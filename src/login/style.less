@@ -1,0 +1,281 @@
+@import '../prelude';
+
+.login {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to bottom left, rgb(137, 178, 227), rgb(106, 111, 43));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+
+    @media (max-width: 420px) {
+        justify-content: stretch;
+        align-items: stretch;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .login-dialog {
+        position: relative;
+        width: 350px;
+        max-width: 100%;
+        background: @card-background;
+        border-radius: 4px;
+        .elevation(24);
+
+        @media (max-width: 420px) {
+            width: 100%;
+            border-radius: 0;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        @media (max-height: 420px) {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .login-header {
+            border-top-left-radius: inherit;
+            border-top-right-radius: inherit;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            background: @primary;
+            color: @text-on-primary;
+
+            .login-logo {
+                position: absolute;
+                left: 50%;
+                top: -10px;
+                transform: translate(-50%, -50%);
+                height: 64px;
+                vertical-align: middle;
+                transition: transform 0.3s @easing 0.1s, opacity 0.3s @easing 0.1s;
+            }
+
+            .login-label {
+                text-align: center;
+                height: 24px;
+                margin-bottom: 8px;
+                position: relative;
+
+                @media (max-width: 420px) {
+                    margin-top: env(safe-area-inset-top);
+                }
+            }
+
+            .login-small-logo {
+                width: 24px;
+                height: 24px;
+                position: absolute;
+                left: 50%;
+                top: 0;
+                transform: translateX(-27px) translateY(-1px) scale(1.1);
+                opacity: 0;
+                transition: transform 0.3s @easing, opacity 0.3s @easing;
+            }
+
+            .login-logo-label {
+                height: 24px;
+                transform: scale((18 / 24));
+                vertical-align: middle;
+                transition: transform 0.5s @easing;
+            }
+
+            @media (max-width: 420px), (max-height: 420px) {
+                .login-logo {
+                    transform: translate(-50%, -50%) translateY(8px) scale(0.9);
+                    opacity: 0;
+                    transition: transform 0.3s @easing, opacity 0.3s @easing;
+                }
+                .login-small-logo {
+                    transform: translateX(-35px);
+                    opacity: 1;
+                    transition: transform 0.3s @easing 0.1s, opacity 0.3s @easing 0.1s;
+                }
+                .login-logo-label {
+                    transform: translateX(13px) scale((20 / 24));
+                }
+            }
+
+            .login-progress {
+                position: relative;
+                height: 1em;
+
+                .login-progress-item {
+                    position: absolute;
+                    left: 50%;
+                    transform-origin: 50% 80%;
+                    will-change: transform, opacity;
+                    white-space: nowrap;
+                    cursor: default;
+                }
+            }
+        }
+
+        .autosizing-page-view {
+            position: relative;
+            overflow: hidden;
+            padding-top: 20px;
+            flex-shrink: 0;
+            flex-grow: 1;
+
+            @media (max-width: 420px) {
+                overflow: visible;
+            }
+
+            .autosizing-page {
+                position: absolute;
+                width: 100%;
+            }
+        }
+
+        p {
+            margin: 0 20px 24px;
+        }
+
+        button .progress-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        button .progress-overlay + span {
+            opacity: 0;
+        }
+
+        .form-validator {
+            display: flex;
+
+            .form-field {
+                margin: 0 20px 24px;
+                flex: 1;
+            }
+        }
+
+        .totp-input {
+            // from https://stackoverflow.com/questions/3790935/#answer-4298216
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+            input {
+                -moz-appearance:textfield;
+            }
+        }
+
+        .form-footer {
+            display: flex;
+            padding: 0 20px 20px;
+            align-items: center;
+
+            .help-links {
+                flex: 1;
+                font-size: 0.8em;
+                line-height: 1.5em;
+
+                .help-link {
+                    font-weight: 500;
+                    text-decoration: none;
+                    color: currentColor;
+                    opacity: 0.7;
+                    transition: opacity 0.3s @easing;
+
+                    &:hover {
+                        text-decoration: underline;
+                        opacity: 1;
+                    }
+                }
+            }
+        }
+
+        .login-meta {
+            left: 20px;
+            text-align: center;
+            right: 20px;
+            color: fade(@text, 60%);
+            display: none;
+            padding: 0;
+
+            @media (max-width: 420px), (max-width: 850px) and (max-height: 420px) {
+                display: block;
+            }
+
+            @media (max-height: 420px) {
+                position: relative;
+                left: auto;
+                right: auto;
+            }
+
+            a:hover {
+                color: @text;
+            }
+        }
+    }
+
+    .login-meta {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        color: fade(@text-on-primary, 60%);
+        font-size: 0.8em;
+        // can’t use bottom: max(..) because it’s broken in Firefox (checked version 67)
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-right: env(safe-area-inset-right);
+
+        a {
+            color: inherit;
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+                color: @text-on-primary;
+            }
+        }
+
+        @media (max-width: 420px), (max-width: 850px) and (max-height: 420px) {
+            display: none;
+        }
+    }
+}
+
+#login-root {
+    &.animate-out {
+        .login {
+            animation: login-out 0.5s cubic-bezier(0.8, 0.1, 0.4, 0.7);
+            opacity: 0;
+            pointer-events: none;
+
+            @keyframes login-out {
+                from {
+                    opacity: 1;
+                }
+            }
+
+            .login-dialog {
+                animation: login-dialog-out 0.5s cubic-bezier(0.8, 0.1, 0.4, 0.7);
+
+                @keyframes login-dialog-out {
+                    to {
+                        transform: scale(0.9);
+                    }
+                }
+
+                @media (max-width: 420px) {
+                    animation: none;
+                }
+            }
+        }
+    }
+}

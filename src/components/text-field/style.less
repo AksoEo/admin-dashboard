@@ -1,0 +1,285 @@
+@import '../../prelude';
+
+.paper-text-field {
+    display: inline-block;
+    position: relative;
+    border-radius: 4px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    width: 200px;
+
+    .p-decoration {
+        border-radius: inherit;
+    }
+
+    .p-outline {
+        position: absolute;
+        display: flex;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        pointer-events: none;
+
+        .outline-left,
+        .outline-right {
+            border: 1px solid @control-idle;
+            box-sizing: border-box;
+        }
+
+        .outline-left {
+            height: 100%;
+            border-right: transparent;
+            border-radius: inherit;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .outline-right {
+            flex: 1;
+            height: 100%;
+            border-left: transparent;
+            border-radius: inherit;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .outline-break {
+            position: relative;
+
+            .break-left,
+            .break-right {
+                position: absolute;
+                top: 0;
+                width: 50%;
+                border-top: 1px solid @control-idle;
+            }
+
+            .break-left {
+                left: 0;
+                transform-origin: 0 0;
+            }
+
+            .break-right {
+                right: 0;
+                transform-origin: 100% 0;
+            }
+
+            .break-bottom {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                border-bottom: 1px solid @control-idle;
+            }
+        }
+
+        .outline-left,
+        .outline-right,
+        .outline-break .break-left,
+        .outline-break .break-right,
+        .outline-break .break-bottom {
+            will-change: border-width, border-color;
+            transition: border-width 0.3s @easing, border-color 0.3s @easing;
+        }
+    }
+
+    &.is-focused .p-outline {
+        .outline-left,
+        .outline-right,
+        .outline-break .break-left,
+        .outline-break .break-right,
+        .outline-break .break-bottom {
+            border-width: 2px;
+            border-color: @control-primary;
+        }
+    }
+
+    &.has-error .p-outline {
+        .outline-left,
+        .outline-right,
+        .outline-break .break-left,
+        .outline-break .break-right,
+        .outline-break .break-bottom {
+            border-color: @error;
+        }
+    }
+
+    &.is-disabled .p-outline {
+        .outline-left,
+        .outline-right,
+        .outline-break .break-left,
+        .outline-break .break-right,
+        .outline-break .break-bottom {
+            border-color: @disabled;
+        }
+    }
+
+    .p-underline {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 1px;
+        background-color: @control-idle;
+
+        .p-underline-inner {
+            margin-top: -1px;
+            border-bottom: 2px solid @control-primary;
+            transform: scaleY(0);
+            transform-origin: 50% 100%;
+        }
+
+        transition: background-color 0.3s @easing;
+    }
+
+    &:not(.is-focused) .p-underline .p-underline-inner {
+        transition: transform 0.3s @easing;
+    }
+
+    &.is-focused .p-underline .p-underline-inner {
+        animation: paper-text-field-underline-in 0.3s @easing;
+        transform: none;
+
+        @keyframes paper-text-field-underline-in {
+            from {
+                transform: scaleX(0);
+            }
+        }
+    }
+
+    &.has-error .p-underline {
+        background-color: @error;
+
+        .p-underline-inner {
+            border-color: @error;
+        }
+    }
+
+    &.is-disabled .p-underline {
+        border-color: @disabled;
+
+        .p-underline-inner {
+            display: none;
+        }
+    }
+
+    .p-label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: 0 0;
+        will-change: transform;
+        pointer-events: none;
+        color: @control-idle;
+        transition: color 0.3s @easing;
+    }
+
+    &.is-focused .p-label {
+        color: @control-primary;
+    }
+
+    &.has-error .p-label {
+        color: @error;
+    }
+
+    &.is-disabled .p-label {
+        color: @disabled;
+    }
+
+    .p-contents {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        .p-input {
+            flex: 1;
+            width: 0;
+            max-width: 100%;
+            margin: 0;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            color: inherit;
+            font: inherit;
+            box-sizing: border-box;
+
+            &:focus {
+                outline: none;
+            }
+
+            &::placeholder {
+                color: @placeholder;
+                transition: opacity 0.3s @easing;
+            }
+        }
+    }
+
+    &:not(.floating):not(.no-label) .p-contents .p-input::placeholder {
+        opacity: 0;
+    }
+
+    &.centered .p-contents .p-input {
+        text-align: center;
+    }
+
+    &.filled-style:not(.no-label) .p-contents .p-input {
+        padding-top: 16px;
+        padding-bottom: 8px;
+    }
+
+    &.has-prefix .p-contents .p-input {
+        padding-left: 8px;
+    }
+
+    .p-helper-label,
+    .p-error-label {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 2px;
+        font-size: 0.75em;
+        max-width: 100%;
+        padding: 0 16px;
+        opacity: 0.5;
+        transition: transform 0.3s @easing, opacity 0.3s @easing;
+        box-sizing: border-box;
+        animation: paper-text-field-helper-label-in 0.3s @easing;
+    }
+
+    .p-error-label {
+        color: @error;
+        opacity: 1;
+    }
+
+    &:not(.has-error) .p-error-label {
+        display: none;
+    }
+
+    &.has-error {
+        .p-inner-input {
+            padding-right: 8px;
+        }
+
+        .p-helper-label {
+            display: none;
+        }
+    }
+
+    @keyframes paper-text-field-helper-label-in {
+        0% {
+            transform: translateY(-8px);
+            opacity: 0;
+        }
+    }
+
+    &.prefix-icon {
+        .p-prefix {
+            padding-left: 8px;
+        }
+    }
+}

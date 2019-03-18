@@ -1,0 +1,106 @@
+@import '../../prelude';
+
+.app-sidebar-contents {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .nested-item {
+        padding-left: 2em;
+    }
+
+    .search-input {
+        margin: 16px;
+        width: calc(100% - 32px);
+    }
+
+    .sidebar-header {
+        padding-top: 4px;
+        padding-left: env(safe-area-inset-left);
+
+        &::before {
+            content: '';
+            display: block;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .sidebar-logo {
+            padding-top: 8px;
+            padding-left: 16px;
+            margin-bottom: 8px;
+
+            .logo, .logo-label {
+                vertical-align: middle;
+            }
+
+            .logo {
+                margin-left: 4px;
+                height: 36px;
+                margin-right: 12px;
+            }
+
+            .logo-label {
+                height: 24px;
+            }
+        }
+
+        .sidebar-user {
+            padding-left: 16px;
+            padding-right: 4px;
+            padding-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid @separator;
+
+            .user-avatar {
+                border: 2px solid currentColor;
+                margin-right: 8px;
+            }
+
+            .user-name {
+                flex: 1;
+                text-overflow: ellipsis;
+                width: 0;
+                overflow: hidden;
+            }
+
+            .user-options {
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .sidebar-nav-container {
+        padding-left: env(safe-area-inset-left);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .sidebar-nav {
+            flex: 1;
+        }
+    }
+
+    .sidebar-meta-info {
+        padding: 16px;
+        font-size: 0.7em;
+
+        .info-logos {
+            opacity: 0.6;
+
+            & > svg {
+                margin-right: 8px;
+            }
+        }
+
+        .info-line {
+            opacity: 0.5;
+
+            a {
+                color: inherit;
+            }
+        }
+    }
+}

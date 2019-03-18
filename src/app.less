@@ -1,0 +1,197 @@
+@import 'prelude';
+
+.gen-roboto-normal-declaration(@path, @weight) {
+    @font-face {
+        font-family: 'Roboto';
+        src: url('@{path}.woff2') format('woff2'), url('@{path}.woff') format('woff');
+        font-weight: @weight;
+        font-style: normal;
+    }
+}
+.gen-roboto-italic-declaration(@path, @weight) {
+    @font-face {
+        font-family: 'Roboto';
+        src: url('@{path}Italic.woff2') format('woff2'), url('@{path}Italic.woff') format('woff');
+        font-weight: @weight;
+        font-style: italic;
+    }
+}
+.gen-roboto-declaration(@path, @weight) {
+    .gen-roboto-normal-declaration(@path, @weight);
+    .gen-roboto-italic-declaration(@path, @weight);
+}
+
+.gen-roboto-declaration('/assets/roboto/Roboto-Black', 900);
+.gen-roboto-declaration('/assets/roboto/Roboto-Bold', 700);
+.gen-roboto-declaration('/assets/roboto/Roboto-Medium', 500);
+.gen-roboto-normal-declaration('/assets/roboto/Roboto-Regular', 400);
+.gen-roboto-italic-declaration('/assets/roboto/Roboto-', 400);
+.gen-roboto-declaration('/assets/roboto/Roboto-Light', 300);
+.gen-roboto-declaration('/assets/roboto/Roboto-Thin', 100);
+
+#app {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: @text;
+    overflow: hidden;
+    font-family: Roboto, sans-serif;
+
+    & > span {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        max-height: 100%;
+    }
+
+    #app-header {
+        background: @primary;
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+
+        &::before {
+            content: '';
+            display: block;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .menu-button {
+            margin-right: 8px;
+        }
+
+        .header-logo {
+            margin-right: 16px;
+
+            .logo, .logo-label {
+                vertical-align: middle;
+            }
+
+            .logo {
+                height: 32px;
+                margin-right: 4px;
+            }
+
+            .logo-label {
+                height: 20px;
+            }
+        }
+
+        .header-progress {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    }
+
+    &.perma-sidebar #app-header {
+        background: #eee;
+        color: inherit;
+
+        &::before {
+            background: #000;
+        }
+    }
+
+    #app-sidebar-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 100%;
+        z-index: 2000;
+
+        #app-sidebar-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            bottom: 0;
+            background: fade(#000, 40%);
+            pointer-events: none;
+            -webkit-tap-highlight-color: transparent;
+            will-change: opacity;
+        }
+
+        #app-sidebar {
+            position: relative;
+            width: 300px;
+            height: 100%;
+            max-width: 80vw;
+            background: @sidebar-background;
+            overflow-x: hidden;
+            overflow-y: auto;
+            z-index: 1;
+            will-change: transform, box-shadow;
+            transition: box-shadow 0.3s @easing;
+            transform-origin: 0 0;
+            scrollbar-width: thin;
+            padding-bottom: env(safe-area-inset-bottom);
+            box-sizing: border-box;
+        }
+
+        &:not(.permanent).open {
+            #app-sidebar-backdrop {
+                pointer-events: all;
+            }
+
+            #app-sidebar {
+                .elevation(10);
+            }
+        }
+
+        &.permanent {
+            position: relative;
+            z-index: 0;
+            width: auto;
+
+            #app-sidebar {
+                border-right: 1px solid @sidebar-border;
+                width: 250px;
+
+                .sidebar-logo {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    .app-contents {
+        display: flex;
+        align-items: stretch;
+        flex: 1;
+        background: @card-background;
+        padding-right: env(safe-area-inset-right);
+        min-height: 0;
+    }
+
+    &:not(.perma-sidebar) .app-contents {
+        padding-left: env(safe-area-inset-left);
+    }
+
+    &.animate-init {
+        #app-header {
+            animation: animate-init-header-in 0.5s @easing;
+
+            @keyframes animate-init-header-in {
+                from {
+                    transform: translateY(-100%);
+                }
+            }
+        }
+
+        .app-contents {
+            animation: animate-init-contents-in 0.7s @easing;
+
+            @keyframes animate-init-contents-in {
+                from {
+                    opacity: 0;
+                }
+            }
+        }
+    }
+}

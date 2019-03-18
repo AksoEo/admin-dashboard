@@ -1,0 +1,95 @@
+@import '../../prelude';
+
+.paper-button {
+    position: relative;
+    font-weight: 500;
+    text-transform: uppercase;
+    padding: 0 16px;
+    border-radius: 4px;
+    border: none;
+    font: inherit;
+    font-size: 0.875em;
+    line-height: 2.5em;
+    letter-spacing: 0.06em;
+    background: none;
+    color: @control-primary;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.3s @easing, box-shadow 0.3s @easing;
+    touch-action: manipulation;
+    user-select: none;
+
+    &:focus {
+        background: @hover-background;
+        outline: none;
+    }
+
+    @media (hover: hover) {
+        &:hover {
+            background: @hover-background;
+        }
+    }
+
+    &:active {
+        color: @control-primary;
+    }
+
+    &[disabled] {
+        color: @disabled;
+    }
+
+    &.raised,
+    &.fab {
+        background: @control-primary;
+        color: @text-on-primary;
+
+        .ink-ripple .ink-single-ripple {
+            background: @ripple-color-on-primary;
+        }
+
+        .ink-ripple .ink-ripple-highlight {
+            background: @ripple-highlight-on-primary;
+        }
+
+        .elevation(3);
+
+        &:focus {
+            .elevation(5);
+        }
+
+        @media (hover: hover) {
+            &:hover {
+                .elevation(5);
+            }
+        }
+
+        &:active {
+            .elevation(7);
+        }
+
+        &[disabled] {
+            box-shadow: none;
+            background: @disabled-background;
+            color: @disabled;
+        }
+
+        &.fab {
+            .elevation(10);
+
+            &:hover, &:focus {
+                .elevation(12);
+            }
+
+            &:active {
+                .elevation(13);
+            }
+        }
+    }
+
+    &.icon-button {
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        line-height: 48px;
+        padding: 0;
+    }
+}

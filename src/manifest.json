@@ -1,0 +1,20 @@
+{
+    "short_name": "AKSO",
+    "name": "AKSO",
+    "icons": [
+        {
+            "src": "assets/icon-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "assets/icon-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "start_url": "/",
+    "theme_color": "#004c3f",
+    "background_color": "#fff",
+    "display": "standalone"
+}

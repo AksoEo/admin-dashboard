@@ -1,0 +1,133 @@
+@primary: #004c3f;
+@control-primary: #31a64f;
+@secondary: #363636;
+@error: #f44336;
+@text: black;
+@text-on-primary: white;
+@ripple-color: fade(#000, 20%);
+@ripple-color-on-primary: fade(@text-on-primary, 70%);
+@ripple-highlight: fade(#000, 8%);
+@ripple-highlight-on-primary: fade(@text-on-primary, 12%);
+@hover-background: fade(#000, 10%);
+@control-idle: fade(#000, 50%);
+@placeholder: fade(#000, 50%);
+@control-idle-on-primary: fade(#fff, 50%);
+@disabled: fade(#000, 40%);
+@disabled-background: fade(#000, 20%);
+@text-field-filled-background: fade(#000, 10%);
+@text-field-filled-disabled-background: fade(#000, 5%);
+@separator: fade(#000, 20%);
+@card-background: #fff;
+@sidebar-background: #f9f9f9;
+@sidebar-border: #ddd;
+@sidebar-text: inherit;
+@monospace: Menlo, Roboto Mono, Consolas, monospace;
+
+@easing: cubic-bezier(0.2, 0.3, 0, 1);
+
+// adapted from https://github.com/material-components/material-components-web/tree/
+//              a865ef5a31724bb97989b463cfe77a1b41044b32/packages/mdc-elevation
+@mdc-elevation-umbra-map:
+    "0px 0px 0px 0px",
+    "0px 2px 1px -1px",
+    "0px 3px 1px -2px",
+    "0px 3px 3px -2px",
+    "0px 2px 4px -1px",
+    "0px 3px 5px -1px",
+    "0px 3px 5px -1px",
+    "0px 4px 5px -2px",
+    "0px 5px 5px -3px",
+    "0px 5px 6px -3px",
+    "0px 6px 6px -3px",
+    "0px 6px 7px -4px",
+    "0px 7px 8px -4px",
+    "0px 7px 8px -4px",
+    "0px 7px 9px -4px",
+    "0px 8px 9px -5px",
+    "0px 8px 10px -5px",
+    "0px 8px 11px -5px",
+    "0px 9px 11px -5px",
+    "0px 9px 12px -6px",
+    "0px 10px 13px -6px",
+    "0px 10px 13px -6px",
+    "0px 10px 14px -6px",
+    "0px 11px 14px -7px",
+    "0px 11px 15px -7px";
+@mdc-elevation-penumbra-map:
+    "0px 0px 0px 0px",
+    "0px 1px 1px 0px",
+    "0px 2px 2px 0px",
+    "0px 3px 4px 0px",
+    "0px 4px 5px 0px",
+    "0px 5px 8px 0px",
+    "0px 6px 10px 0px",
+    "0px 7px 10px 1px",
+    "0px 8px 10px 1px",
+    "0px 9px 12px 1px",
+    "0px 10px 14px 1px",
+    "0px 11px 15px 1px",
+    "0px 12px 17px 2px",
+    "0px 13px 19px 2px",
+    "0px 14px 21px 2px",
+    "0px 15px 22px 2px",
+    "0px 16px 24px 2px",
+    "0px 17px 26px 2px",
+    "0px 18px 28px 2px",
+    "0px 19px 29px 2px",
+    "0px 20px 31px 3px",
+    "0px 21px 33px 3px",
+    "0px 22px 35px 3px",
+    "0px 23px 36px 3px",
+    "0px 24px 38px 3px";
+@mdc-elevation-ambient-map:
+    "0px 0px 0px 0px",
+    "0px 1px 3px 0px",
+    "0px 1px 5px 0px",
+    "0px 1px 8px 0px",
+    "0px 1px 10px 0px",
+    "0px 1px 14px 0px",
+    "0px 1px 18px 0px",
+    "0px 2px 16px 1px",
+    "0px 3px 14px 2px",
+    "0px 3px 16px 2px",
+    "0px 4px 18px 3px",
+    "0px 4px 20px 3px",
+    "0px 5px 22px 4px",
+    "0px 5px 24px 4px",
+    "0px 5px 26px 4px",
+    "0px 6px 28px 5px",
+    "0px 6px 30px 5px",
+    "0px 6px 32px 5px",
+    "0px 7px 34px 6px",
+    "0px 7px 36px 6px",
+    "0px 8px 38px 7px",
+    "0px 8px 40px 7px",
+    "0px 8px 42px 7px",
+    "0px 9px 44px 8px",
+    "0px 9px 46px 8px";
+.elevation(@z-value, @color: black, @opacity-boost: 0) {
+    @umbra-z-value: extract(@mdc-elevation-umbra-map, @z-value);
+    @penumbra-z-value: extract(@mdc-elevation-penumbra-map, @z-value);
+    @ambient-z-value: extract(@mdc-elevation-ambient-map, @z-value);
+
+    @umbra-color: fade(@color, 20% + @opacity-boost);
+    @penumbra-color: fade(@color, 14% + @opacity-boost);
+    @ambient-color: fade(@color, 12% + @opacity-boost);
+
+    box-shadow: ~"@{umbra-z-value} @{umbra-color}",
+        ~"@{penumbra-z-value} @{penumbra-color}",
+        ~"@{ambient-z-value} @{ambient-color}";
+}
+
+.log-gradient-background(@direction: to bottom, @color: black, @least: 0%, @most: 100%) {
+    background-image: linear-gradient(@direction,
+        fade(@color, (@most - @least) * 0.00 + @least) 0%,
+        fade(@color, (@most - @least) * 0.01 + @least) 13%,
+        fade(@color, (@most - @least) * 0.05 + @least) 25%,
+        fade(@color, (@most - @least) * 0.12 + @least) 38%,
+        fade(@color, (@most - @least) * 0.22 + @least) 50%,
+        fade(@color, (@most - @least) * 0.36 + @least) 63%,
+        fade(@color, (@most - @least) * 0.53 + @least) 75%,
+        fade(@color, (@most - @least) * 0.75 + @least) 88%,
+        fade(@color, (@most - @least) * 1.00 + @least) 100%);
+}
