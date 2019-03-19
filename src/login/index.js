@@ -30,6 +30,7 @@ export default class Login extends Component {
     state = {
         username: '',
         password: '',
+        securityCode: '',
         stage: Stage.DETAILS,
         loading: false
     };

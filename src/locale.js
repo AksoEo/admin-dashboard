@@ -39,7 +39,7 @@ export default {
         securityCode: 'Sekurkodo',
         // Text shown above the security code input
         securityCodeDescription: 'Bonvolu enmeti sekurkodon generitan de via duafaktora aplikaĵo.',
-        // The following two are both a link and a title
+        // The following three are both a link and a title
         forgotPassword: 'Mi forgesis mian pasvorton',
         forgotCode: 'Mi forgesis mian UEA-kodon',
         lostSecurityCode: 'Mi ne povas generi sekurkodon',

@@ -16,7 +16,6 @@ import Typography from '@material-ui/core/Typography';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import NotificationsNoneIcon from '@material-ui/icons/NotificationsNone';
 import Sidebar from './features/sidebar';
 
 const theme = createMuiTheme({

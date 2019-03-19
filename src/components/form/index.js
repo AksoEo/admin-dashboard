@@ -33,7 +33,7 @@ export const FormContext = createContext({
  */
 export default class Form extends Component {
     static propTypes = {
-        /// Called when the native `submit` event is intercepted.
+        /** Called when the native `submit` event is intercepted. */
         onSubmit: PropTypes.func.isRequired,
         children: PropTypes.arrayOf(PropTypes.element)
     };
