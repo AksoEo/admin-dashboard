@@ -68,10 +68,21 @@ noscript {
     }
 }
 
-.root-container {
+.root-container,
+.global-error-container {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+.global-error-container {
+    z-index: 100;
+    background: fade(#fff, 80%);
+    overflow: auto;
+    padding: 16px;
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 12px;
 }

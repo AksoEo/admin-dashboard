@@ -19,7 +19,10 @@ export default {
     // Sidebar
     sidebar: {
         // Search input placeholder
-        search: 'Serĉi',
+        search: 'Serĉi'
+    },
+    // Page titles
+    pages: {
         general: 'Ĝeneralaj',
         home: 'Hejmo',
         members: 'Membroj',

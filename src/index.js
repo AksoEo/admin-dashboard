@@ -73,8 +73,13 @@ function initApp (app, shouldPlayLoginAnimation = false) {
             beginSession();
         });
     }).catch(err => {
-        // TODO: handle error
-        alert('TODO: handle ' + err);
+        const errorContainer = document.createElement('pre');
+        errorContainer.classList.add('global-error-container');
+        errorContainer.textContent = `Error rendering application: ${err.message}\n\n${err.stack}`;
+        document.body.appendChild(errorContainer);
+        /* eslint-disable no-console */
+        console.error(err);
+        /* eslint-enable no-console */
     });
 }
 

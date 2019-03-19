@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 /** @jsx React.createElement */
 
-import { routerContext } from './router';
+import { routerContext, ROUTES } from './router';
 import locale from './locale';
 import './app.less';
 
@@ -17,6 +17,8 @@ import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Sidebar from './features/sidebar';
+import LazyPageWrapper from './components/page-wrapper';
+import pages from './pages';
 
 const theme = createMuiTheme({
     palette: {
@@ -31,13 +33,24 @@ const theme = createMuiTheme({
 const PERMA_SIDEBAR_WIDTH = 900;
 const USE_HISTORY_API = 'pushState' in window.history;
 
-/** @returns {string} the current page path. */
+/** @returns {string} the current page ID. */
 function currentPageFromLocation () {
+    let pagePath;
     if (USE_HISTORY_API) {
-        return document.location.pathname;
+        pagePath = document.location.pathname;
     } else {
-        return document.location.hash.substr(1);
+        pagePath = document.location.hash.substr(1);
     }
+
+    for (const category of ROUTES) {
+        for (const item of category.contents) {
+            if (item.url === decodeURIComponent(pagePath)) {
+                return item.id;
+            }
+        }
+    }
+
+    return null;
 }
 
 /** The main app. */
@@ -64,8 +77,12 @@ export default class App extends React.PureComponent {
     onNavigate = target => {
         if (USE_HISTORY_API) {
             window.history.pushState(null, '', target);
-            this.setState({ currentPage: target });
+            this.setState({
+                currentPage: currentPageFromLocation(),
+                sidebarOpen: false
+            });
         } else {
+            // hashchange will change the state
             document.location.hash = `!${target}`;
         }
     };
@@ -81,13 +98,15 @@ export default class App extends React.PureComponent {
 
     onPopState = () => {
         this.setState({
-            currentPage: currentPageFromLocation()
+            currentPage: currentPageFromLocation(),
+            sidebarOpen: false
         });
     };
 
     onHashChange = () => {
         this.setState({
-            currentPage: currentPageFromLocation()
+            currentPage: currentPageFromLocation(),
+            sidebarOpen: false
         });
     };
 
@@ -147,8 +166,8 @@ export default class App extends React.PureComponent {
                     <Typography
                         className="header-title"
                         color="inherit"
-                        variant="title">
-                        page title goes here
+                        variant="h6">
+                        {locale.pages[this.state.currentPage]}
                     </Typography>
                     <div style={{ flexGrow: 1 }} />
                     <IconButton aria-label={locale.header.overflow} color="inherit">
@@ -185,20 +204,11 @@ export default class App extends React.PureComponent {
                 currentPage={this.state.currentPage} />
         );
 
-        // TODO: load page contents
-        pageContents = this.state.currentPage === '/' ? (
-            <div>
-                <button onClick={this.props.onLogout} style={{
-                    fontSize: 24,
-                    color: '#fff',
-                    background: '#ed9b50',
-                    borderRadius: 4,
-                    border: 0
-                }}>
-                    tap here to log out
-                </button>
-            </div>
-        ) : null;
+        const pageComponent = pages[this.state.currentPage];
+        pageContents = (
+            <LazyPageWrapper
+                lazyComponent={pageComponent} />
+        );
 
         return (
             <div id="app" className={className}>

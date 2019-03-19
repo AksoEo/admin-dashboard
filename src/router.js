@@ -1,5 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import HomeIcon from '@material-ui/icons/Home';
+import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import AssessmentIcon from '@material-ui/icons/Assessment';
+import GroupIcon from '@material-ui/icons/Group';
+import PaymentIcon from '@material-ui/icons/Payment';
+import HowToVoteIcon from '@material-ui/icons/HowToVote';
 
 /** @jsx React.createElement */
 
@@ -41,3 +48,70 @@ Link.propTypes = {
     children: PropTypes.any,
     target: PropTypes.string.isRequired
 };
+
+/**
+ * App routes.
+ * IDs are `locale.pages[id]` keys and are also used to identify pages elsewhere.
+ */
+export const ROUTES = [
+    {
+        id: 'general',
+        contents: [
+            {
+                id: 'home',
+                icon: <HomeIcon />,
+                url: '/'
+            },
+            {
+                id: 'members',
+                icon: <AssignmentIndIcon />,
+                url: '/membroj'
+            },
+            {
+                id: 'magazines',
+                icon: <LibraryBooksIcon />,
+                url: '/revuoj'
+            },
+            {
+                id: 'statistics',
+                icon: <AssessmentIcon />,
+                url: '/statistiko'
+            },
+            {
+                id: 'congresses',
+                icon: <GroupIcon />,
+                url: '/kongresoj'
+            },
+            {
+                id: 'payments',
+                icon: <PaymentIcon />,
+                url: '/pagoj'
+            },
+            {
+                id: 'elections',
+                icon: <HowToVoteIcon />,
+                url: '/voĉdonado'
+            }
+        ]
+    },
+    {
+        id: 'uea',
+        contents: [
+            {
+                id: 'uea',
+                icon: <span>?</span>,
+                url: '/todo'
+            }
+        ]
+    },
+    {
+        id: 'tejo',
+        contents: [
+            {
+                id: 'tejo',
+                icon: <span>?</span>,
+                url: '/todo'
+            }
+        ]
+    }
+];

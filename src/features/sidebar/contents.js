@@ -12,40 +12,11 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import HomeIcon from '@material-ui/icons/Home';
-import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import AssessmentIcon from '@material-ui/icons/Assessment';
-import GroupIcon from '@material-ui/icons/Group';
-import PaymentIcon from '@material-ui/icons/Payment';
-import HowToVoteIcon from '@material-ui/icons/HowToVote';
-import { Link } from '../../router';
+import { Link, ROUTES } from '../../router';
 import locale from '../../locale';
 import { TEJOIcon, UEAIcon } from './icons';
 
 /** @jsx React.createElement */
-
-// Sidebar navigation items
-// id: the key in the locale.sidebar object
-// icon: the icon shown beside the name
-// url: page URL
-const sidebarNav = [
-    ['general', [
-        { id: 'home', icon: <HomeIcon />, url: '/' },
-        { id: 'members', icon: <AssignmentIndIcon />, url: '/membroj' },
-        { id: 'magazines', icon: <LibraryBooksIcon />, url: '/revuoj' },
-        { id: 'statistics', icon: <AssessmentIcon />, url: '/statistiko' },
-        { id: 'congresses', icon: <GroupIcon />, url: '/kongresoj' },
-        { id: 'payments', icon: <PaymentIcon />, url: '/pagoj' },
-        { id: 'elections', icon: <HowToVoteIcon />, url: '/voĉdonado' }
-    ]],
-    ['uea', [
-        { id: 'uea', icon: '?', url: '/todo' }
-    ]],
-    ['tejo', [
-        { id: 'tejo', icon: '?', url: '/todo' }
-    ]]
-];
 
 function NavItem (props) {
     const { id, icon, url } = props.item;
@@ -53,9 +24,9 @@ function NavItem (props) {
         <Link target={url}>
             <ListItem
                 button
-                selected={props.currentPage === url}>
+                selected={props.currentPage === id}>
                 <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText>{locale.sidebar[id]}</ListItemText>
+                <ListItemText>{locale.pages[id]}</ListItemText>
             </ListItem>
         </Link>
     );
@@ -67,14 +38,14 @@ NavItem.propTypes = {
 };
 
 function NavGroup (props) {
-    const [name, items] = props.item;
+    const { id, contents } = props.item;
     return (
         <List subheader={
             <ListSubheader>
-                {locale.sidebar[name]}
+                {locale.pages[id]}
             </ListSubheader>
         }>
-            {items.map(item => (
+            {contents.map(item => (
                 <NavItem
                     key={item.id}
                     item={item}
@@ -144,7 +115,7 @@ export default class SidebarContents extends React.PureComponent {
                                 )
                             }} />
                         <nav className="sidebar-nav-list" role="navigation">
-                            {sidebarNav.map(item => (
+                            {ROUTES.map(item => (
                                 <NavGroup
                                     key={item[0]}
                                     item={item}
