@@ -90,7 +90,7 @@ export const ROUTES = [
             {
                 id: 'elections',
                 icon: <HowToVoteIcon />,
-                url: '/voĉdonado'
+                url: '/vochdonado'
             }
         ]
     },
