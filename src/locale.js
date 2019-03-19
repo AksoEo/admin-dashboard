@@ -12,9 +12,9 @@ export default {
     // App header bar
     header: {
         // Hamburger button
-        menu: '[[Menu]]',
+        menu: 'Menuo',
         // Overflow menu item
-        overflow: '[[More]]'
+        overflow: 'Pli'
     },
     // Sidebar
     sidebar: {
@@ -33,16 +33,16 @@ export default {
     },
     // Login screen
     login: {
-        username: 'Retpoŝtadreso aŭ UEA-kodo',
+        username: 'UEA-kodo aŭ retpoŝtadreso',
         password: 'Pasvorto',
         continue: 'Daŭrigi',
-        securityCode: '[[TOTP code]]',
+        securityCode: 'Sekurkodo',
         // Text shown above the security code input
-        securityCodeDescription: '[[explainy text]]',
+        securityCodeDescription: 'Bonvolu enmeti sekurkodon generitan de via duafaktora aplikaĵo.',
         // The following two are both a link and a title
         forgotPassword: 'Mi forgesis mian pasvorton',
         forgotCode: 'Mi forgesis mian UEA-kodon',
-        lostSecurityCode: '[[I lost my TOTP key]]',
+        lostSecurityCode: 'Mi ne povas generi sekurkodon',
         // Login progress indicator titles
         detailsStage: 'Detaloj',
         securityCodeStage: 'Sekurkodo',
@@ -50,7 +50,7 @@ export default {
         login: 'Ensaluti',
 
         // Errors
-        invalidUEACode: '[[Invalid UEA code (or email)]]',
-        invalidSecurityCode: '[[Invalid TOTP code]]'
+        invalidUEACode: 'Nevalida UEA-kodo aŭ retpoŝtadreso',
+        invalidSecurityCode: 'Nevalida sekurkodo'
     }
 };
