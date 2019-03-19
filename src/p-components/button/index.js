@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import Ripple from '../ripple';
 import './style';
 
+function isButtonPressKey (key) {
+    return key === ' ' || key === 'Enter';
+}
+
 /**
  * A material button.
  *
@@ -54,7 +58,7 @@ export default class Button extends Component {
     onKeyDown = e => {
         if (e.target !== this.button) return;
         if (this.props.onKeyDown) this.props.onKeyDown(e);
-        if (!e.defaultPrevented) this.ripple.onAnonymousDown();
+        if (!e.defaultPrevented && isButtonPressKey(e.key)) this.ripple.onAnonymousDown();
     };
 
     onKeyUp = e => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
@@ -14,10 +14,10 @@ import IconButton from '@material-ui/core/IconButton';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Sidebar from './features/sidebar';
-import LazyPageWrapper from './components/page-wrapper';
 import pages from './pages';
 
 const theme = createMuiTheme({
@@ -201,13 +201,22 @@ export default class App extends React.PureComponent {
                 onOpen={() => this.setState({ sidebarOpen: true })}
                 onClose={() => this.setState({ sidebarOpen: false })}
                 animateIn={this.shouldPlayLoginAnimation}
-                currentPage={this.state.currentPage} />
+                currentPage={this.state.currentPage}
+                onLogout={this.props.onLogout} />
         );
 
-        const pageComponent = pages[this.state.currentPage];
+        // TODO: remove Todo fallback
+        const PageComponent = pages[this.state.currentPage] || function Todo () {
+            return 'todo';
+        };
         pageContents = (
-            <LazyPageWrapper
-                lazyComponent={pageComponent} />
+            <Suspense fallback={
+                <div className="app-page loading">
+                    <CircularProgress className="page-loading-indicator" />
+                </div>
+            }>
+                <PageComponent />
+            </Suspense>
         );
 
         return (

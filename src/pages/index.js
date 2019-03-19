@@ -1,4 +1,6 @@
+import { lazy } from 'react';
+
 /// An object with all pages. Asynchronous.
 export default {
-    members: import('./members')
+    members: lazy(() => import('./members'))
 };

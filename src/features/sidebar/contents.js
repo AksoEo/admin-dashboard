@@ -10,6 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link, ROUTES } from '../../router';
@@ -18,6 +20,7 @@ import { TEJOIcon, UEAIcon } from './icons';
 
 /** @jsx React.createElement */
 
+/** Renders a single item in `ROUTES`. */
 function NavItem (props) {
     const { id, icon, url } = props.item;
     return (
@@ -37,7 +40,8 @@ NavItem.propTypes = {
     currentPage: PropTypes.string.isRequired
 };
 
-function NavGroup (props) {
+/** Renders a category in `ROUTES`. */
+function NavCategory (props) {
     const { id, contents } = props.item;
     return (
         <List subheader={
@@ -55,18 +59,20 @@ function NavGroup (props) {
     );
 }
 
-NavGroup.propTypes = {
+NavCategory.propTypes = {
     item: PropTypes.any.isRequired,
     currentPage: PropTypes.string.isRequired
 };
 
 export default class SidebarContents extends React.PureComponent {
     static propTypes = {
-        currentPage: PropTypes.string.isRequired
+        currentPage: PropTypes.string.isRequired,
+        onLogout: PropTypes.func.isRequired
     };
 
     state = {
-        searchQuery: ''
+        searchQuery: '',
+        userMenuOpen: false
     };
 
     render () {
@@ -95,9 +101,26 @@ export default class SidebarContents extends React.PureComponent {
                             color="inherit">
                             fsjdakfhsdajkhfhfdjskfhdsjakl
                         </Typography>
-                        <IconButton color="inherit" class="user-options">
+                        <IconButton
+                            color="inherit"
+                            className="user-options"
+                            aria-owns={this.state.userMenuOpen ? 'sidebar-user-popup-menu' : null}
+                            aria-haspopup="true"
+                            buttonRef={node => this.userMenuButton = node}
+                            onClick={e => this.setState({ userMenuOpen: e.currentTarget })}>
                             <ExpandMoreIcon color="inherit" />
                         </IconButton>
+                        <Menu
+                            id="sidebar-user-popup-menu"
+                            anchorEl={this.userMenuButton}
+                            open={!!this.state.userMenuOpen}
+                            onClose={() => this.setState({ userMenuOpen: false })}>
+                            <MenuItem onClick={() => {
+                                this.setState({ userMenuOpen: false }, this.props.onLogout);
+                            }}>
+                                {locale.sidebar.logout}
+                            </MenuItem>
+                        </Menu>
                     </div>
                 </div>
                 <div className="sidebar-nav-container">
@@ -116,8 +139,8 @@ export default class SidebarContents extends React.PureComponent {
                             }} />
                         <nav className="sidebar-nav-list" role="navigation">
                             {ROUTES.map(item => (
-                                <NavGroup
-                                    key={item[0]}
+                                <NavCategory
+                                    key={item.id}
                                     item={item}
                                     currentPage={this.props.currentPage} />
                             ))}

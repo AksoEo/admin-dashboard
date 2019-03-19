@@ -1,10 +1,10 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import { UEACode } from 'akso-client';
-import Form, { Validator } from '../components/form';
-import Button from '../components/button';
-import TextField from '../components/text-field';
-import { CircularProgressIndicator } from '../components/progress';
+import Form, { Validator } from '../p-components/form';
+import Button from '../p-components/button';
+import TextField from '../p-components/text-field';
+import { CircularProgressIndicator } from '../p-components/progress';
 import locale from '../locale';
 import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';

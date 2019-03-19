@@ -1,5 +1,5 @@
 import { h, render } from 'preact';
-import { CircularProgressIndicator } from './components/progress';
+import { CircularProgressIndicator } from './p-components/progress';
 import Login from './login';
 import './style';
 

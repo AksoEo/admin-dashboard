@@ -19,7 +19,8 @@ export default {
     // Sidebar
     sidebar: {
         // Search input placeholder
-        search: 'Serĉi'
+        search: 'Serĉi',
+        logout: '[[Log out]]'
     },
     // Page titles
     pages: {

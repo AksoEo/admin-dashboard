@@ -41,9 +41,7 @@ module.exports = function (env, argv) {
             alias: {
                 // use source files from akso-client directly to avoid a bunch of issues
                 // (such as source-map-support being loaded)
-                'akso-client': 'akso-client/src',
-                'react': path.resolve(__dirname, 'src/preact-compat.js'),
-                'react-dom': path.resolve(__dirname, 'src/preact-compat.js')
+                'akso-client': 'akso-client/src'
             }
         },
         devtool: prod ? 'source-map' : 'inline-source-map',

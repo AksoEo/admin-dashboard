@@ -1,6 +1,8 @@
-import { h, Component } from 'preact';
+import React from 'react';
 
-export default class MembersPage extends Component {
+/** @jsx React.createElement */
+
+export default class MembersPage extends React.PureComponent {
     render () {
         return (
             <div>

@@ -26,7 +26,9 @@ export default class Sidebar extends React.PureComponent {
         /** If true, will animate the permanent sidebar sliding in. */
         animateIn: PropTypes.bool,
         /** Current page identifier passed to the SidebarContents. */
-        currentPage: PropTypes.string.isRequired
+        currentPage: PropTypes.string.isRequired,
+        /** Called when the log out button is pressed. */
+        onLogout: PropTypes.func.isRequired
     };
 
     /**
@@ -77,6 +79,7 @@ export default class Sidebar extends React.PureComponent {
             const mapped = 1 + Math.pow(position - 1, 0.3) / 20;
             this.node.style.transform = `scaleX(${mapped})`;
         }
+        this.node.style.visibility = position == 0 ? 'hidden' : '';
         this.backdropNode.style.opacity = this.props.permanent ? 0 : Math.min(1, position);
     }
 
@@ -120,8 +123,18 @@ export default class Sidebar extends React.PureComponent {
                         this.spring.locked = false;
                         this.props.onClose();
                     }} />
-                <div id="app-sidebar" ref={node => this.node = node}>
-                    <SidebarContents currentPage={this.props.currentPage} />
+                <div
+                    id="app-sidebar"
+                    ref={node => this.node = node}
+                    onKeyDown={e => {
+                        if (e.key === 'Escape') {
+                            this.spring.locked = false;
+                            this.props.onClose();
+                        }
+                    }}>
+                    <SidebarContents
+                        currentPage={this.props.currentPage}
+                        onLogout={this.props.onLogout} />
                 </div>
             </div>
         );
