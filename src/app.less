@@ -169,15 +169,20 @@
         min-height: 0;
 
         .page-container {
+            display: flex;
             position: relative;
             flex: 1;
             width: 0;
 
-            .app-page.loading .page-loading-indicator {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
+            .app-page {
+                flex: 1;
+                width: 0;
+
+                &.loading {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
             }
         }
     }
