@@ -20,7 +20,7 @@ export default {
     sidebar: {
         // Search input placeholder
         search: 'Serĉi',
-        logout: '[[Log out]]'
+        logout: 'Elsaluti'
     },
     // Page titles
     pages: {
