@@ -1,0 +1,70 @@
+@import '../../prelude';
+
+.members-page {
+    .search-input {
+        display: flex;
+        min-height: 56px;
+        .elevation(2);
+
+        .search-icon-container {
+            width: 48px;
+            padding-left: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-input-inner {
+            position: relative;
+            padding: 16px;
+            padding-left: 0;
+            line-height: 24px;
+            flex: 1;
+            width: 0;
+            cursor: text;
+
+            &::after {
+                display: inline-block;
+                content: attr(data-placeholder);
+                opacity: 0.5;
+            }
+
+            .search-input-append {
+                display: inline-block;
+                font: inherit;
+                border: none;
+                padding: 0 1px;
+                margin: 0;
+
+                &:focus {
+                    outline: none;
+                }
+            }
+
+            span[contenteditable]::before {
+                content: '\200b'; // prevent zero height in Firefox
+            }
+
+            .search-chip {
+                display: inline-block;
+                background: #eee;
+                line-height: 20px;
+                padding: 0 0 0 8px;
+                margin-right: 4px;
+                border-radius: 100px;
+
+                .chip-input {
+                    display: inline-block;
+                    font: inherit;
+                    background: #fff;
+                    border: none;
+                    padding: 0 8px;
+                    margin: 2px;
+                    min-width: 24px;
+                    border-radius: 100px;
+                    box-sizing: border-box;
+                }
+            }
+        }
+    }
+}

@@ -56,5 +56,10 @@ export default {
         // Errors
         invalidUEACode: 'Nevalida UEA-kodo aŭ retpoŝtadreso',
         invalidSecurityCode: 'Nevalida sekurkodo'
+    },
+    // Members page
+    members: {
+        // Search input placeholder
+        search: 'Serĉi'
     }
 };
