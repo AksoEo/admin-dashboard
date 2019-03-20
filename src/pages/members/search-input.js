@@ -4,6 +4,15 @@ import SearchIcon from '@material-ui/icons/Search';
 
 /** @jsx React.createElement */
 
+/** Chip operators */
+const OPERATORS = [
+    { id: 'lt', name: '<', keyEquiv: '<' },
+    { id: 'gt', name: '>', keyEquiv: '>' },
+    { id: 'leq', name: '≤', keyEquiv: '<=' },
+    { id: 'geq', name: '≥', keyEquiv: '>=' },
+    { id: 'eq', name: '=', keyEquiv: '=' }
+];
+
 /**
  * A predicate editor that uses inline “chips” to display predicates.
  *
@@ -24,32 +33,112 @@ export default class SearchInput extends React.PureComponent {
 
     /** DOM refs to all chip input elements */
     chipInputs = [];
+    /** DOM refs to all chip operator <select> elements */
+    chipOperators = [];
     /** The appending input node */
     appendInput = null;
-    /** If set, will focus the input with the given index the next time the component updates. */
+    /**
+     * If set, will focus the input with the given index the next time the component updates.
+     * The first item in the array is the chip index and the second is the input index.
+     * @type {[number, number]|null}
+     */
     focusInput = null;
+
+    /** Flushes the appending input and creates a new chip. */
+    flushAppendInput (id = null, operator = null) {
+        const newValue = this.props.value.slice();
+        id = id || this.state.appendValue;
+        if (operator) {
+            id = id.substr(0, id.length - operator.keyEquiv.length);
+            this.operatorChars = operator.keyEquiv;
+            this.operatorCharsUpdateTime = Date.now();
+        }
+        newValue.push({
+            id: id,
+            operator: operator ? operator.id : OPERATORS[0].id,
+            value: ''
+        });
+        this.props.onChange(newValue);
+        this.setState({ appendValue: '' });
+        this.focusInput = [newValue.length - 1, 0];
+        this.maybeSkipOperatorInput(newValue.length - 1, operator);
+    }
 
     onAppendChange = e => {
         const value = e.target.value;
-        if (value.endsWith(' ')) {
-            const newValue = this.props.value.slice();
-            newValue.push({
-                id: value,
-                value: ''
-            });
-            this.props.onChange(newValue);
-            this.setState({ appendValue: '' });
-            this.focusInput = newValue.length - 1;
-        } else {
-            this.setState({ appendValue: value });
+        for (const operator of OPERATORS) {
+            if (value.endsWith(operator.keyEquiv)) {
+                this.flushAppendInput(value, operator);
+                return;
+            }
         }
+        this.setState({ appendValue: value });
     }
 
     onAppendKeyDown = e => {
-        this.onChipKeyDown(e, this.props.value.length);
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this.flushAppendInput();
+        } else {
+            this.onChipInputKeyDown(e, this.props.value.length, true);
+        }
     }
 
-    onChipKeyDown = (e, index) => {
+    operatorChars = '';
+    operatorCharsUpdateTime = 0;
+
+    /**
+     * Jumps to the chip input If there are no operators with longer key equivalents than the
+     * current one.
+     * @return {boolean} success
+     */
+    maybeSkipOperatorInput (index, operator) {
+        let jump = true;
+        for (const o of OPERATORS) {
+            if (o.keyEquiv.startsWith(operator.keyEquiv) && o !== operator) {
+                jump = false;
+                break;
+            }
+        }
+        if (jump) {
+            this.focusInput = [index, 1];
+            this.forceUpdate();
+            return true;
+        }
+        return false;
+    }
+
+    onChipOpKeyDown = (e, index) => {
+        if (e.key === 'ArrowLeft' && index > 0) {
+            e.preventDefault();
+            this.focusInput = [index - 1, 1];
+            this.forceUpdate();
+        } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+            e.preventDefault();
+            this.focusInput = [index, 1];
+            this.forceUpdate();
+        } else if (e.key.match(/^[^A-Z]/)) {
+            if (Date.now() - this.operatorCharsUpdateTime > 500) {
+                this.operatorChars = '';
+            }
+            this.operatorChars += e.key;
+            this.operatorCharsUpdateTime = Date.now();
+
+            for (const operator of OPERATORS) {
+                if (operator.keyEquiv === this.operatorChars) {
+                    const value = this.props.value.slice();
+                    value[index].operator = operator.id;
+                    this.props.onChange(value);
+                    if (this.maybeSkipOperatorInput(index, operator)) {
+                        e.preventDefault();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    onChipInputKeyDown = (e, index, isActuallyAppendInput) => {
         const isCollapsed = e.target.selectionStart === e.target.selectionEnd;
         const isAtStart = e.target.selectionStart === 0;
         const isAtEnd = e.target.selectionEnd >= e.target.value.length;
@@ -58,14 +147,14 @@ export default class SearchInput extends React.PureComponent {
             const value = this.props.value.slice();
             value.splice(Math.min(value.length - 1, index), 1);
             this.props.onChange(value);
-            this.focusInput = index;
+            this.focusInput = [index, 1];
         } else if (e.key === 'ArrowLeft' && isCollapsed && isAtStart) {
             e.preventDefault();
-            this.focusInput = Math.max(0, index - 1);
+            this.focusInput = isActuallyAppendInput ? [index - 1, 1] : [index, 0];
             this.forceUpdate();
-        } else if (e.key === 'ArrowRight' && isCollapsed && isAtEnd) {
+        } else if ((e.key === 'ArrowRight' && isCollapsed && isAtEnd) || e.key === 'Enter') {
             e.preventDefault();
-            this.focusInput = index + 1;
+            this.focusInput = [index + 1, 0];
             this.forceUpdate();
         }
     }
@@ -80,8 +169,13 @@ export default class SearchInput extends React.PureComponent {
     componentDidUpdate () {
         if (this.focusInput !== null) {
             // focus the input with the given index
-            if (this.focusInput < this.props.value.length) {
-                this.chipInputs[this.focusInput].focus();
+            const [inputIndex, innerIndex] = this.focusInput;
+            if (inputIndex < this.props.value.length) {
+                if (innerIndex === 0) {
+                    this.chipOperators[inputIndex].focus();
+                } else {
+                    this.chipInputs[inputIndex].focus();
+                }
             } else {
                 this.appendInput.focus();
             }
@@ -99,6 +193,22 @@ export default class SearchInput extends React.PureComponent {
             chips.push(
                 <span className="search-chip" key={index}>
                     <span className="chip-name">{chip.id}</span>
+                    <select
+                        className="chip-operator"
+                        value={chip.operator}
+                        ref={node => this.chipOperators[index] = node}
+                        onKeyDown={e => this.onChipOpKeyDown(e, index)}
+                        onChange={e => {
+                            const value = this.props.value.slice();
+                            value[index].operator = e.target.value;
+                            this.props.onChange(value);
+                        }}>
+                        {OPERATORS.map(operator => (
+                            <option key={operator.id} value={operator.id}>
+                                {operator.name}
+                            </option>
+                        ))}
+                    </select>
                     <ContentEditableInput
                         className="chip-input"
                         value={chip.value}
@@ -108,7 +218,7 @@ export default class SearchInput extends React.PureComponent {
                             value[index].value = e.target.value;
                             this.props.onChange(value);
                         }}
-                        onKeyDown={e => this.onChipKeyDown(e, index)} />
+                        onKeyDown={e => this.onChipInputKeyDown(e, index)} />
                 </span>
             );
         }
