@@ -220,6 +220,8 @@ export default class Login extends Component {
                                 label={locale.login.securityCode}
                                 value={this.state.securityCode}
                                 placeholder="000000"
+                                // \d* seems to be the only way to get a numpad input on iOS
+                                pattern="\d*"
                                 type="number"
                                 onChange={e => this.setState({
                                     securityCode: e.target.value.replace(/\D/g, '').substr(0, 6)

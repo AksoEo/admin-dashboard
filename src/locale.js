@@ -60,6 +60,13 @@ export default {
     // Members page
     members: {
         // Search input placeholder
-        search: 'Serĉi'
+        search: {
+            placeholder: 'Serĉi',
+            addPredicate: '[[Add search predicate]]',
+            fields: {
+                name: 'Nomo',
+                age: 'Aĝo'
+            }
+        }
     }
 };

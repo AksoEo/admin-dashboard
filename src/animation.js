@@ -278,3 +278,14 @@ export class Spring extends EventEmitter {
 export function lerp (a, b, t) {
     return t * (b - a) + a;
 }
+
+/**
+ * Clamps a value to the interval between l and h.
+ * @param {number} x
+ * @param {number} l
+ * @param {number} h
+ * @returns {number}
+ */
+export function clamp(x, l, h) {
+    return Math.max(l, Math.min(x, h));
+}

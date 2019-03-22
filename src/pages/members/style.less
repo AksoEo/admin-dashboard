@@ -1,80 +1,58 @@
 @import '../../prelude';
 
 .members-page {
-    .search-input {
-        display: flex;
+    .predicate-editor {
         min-height: 56px;
         .elevation(2);
 
-        .search-icon-container {
-            width: 48px;
-            padding-left: 16px;
+        .add-predicate {
             display: flex;
             align-items: center;
-            justify-content: center;
-        }
 
-        .search-input-inner {
-            position: relative;
-            padding: 16px;
-            padding-left: 0;
-            line-height: 24px;
-            flex: 1;
-            width: 0;
-            cursor: text;
-
-            &::after {
-                display: inline-block;
-                content: attr(data-placeholder);
-                opacity: 0.5;
+            .search-icon-container {
+                width: 48px;
+                padding-left: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: -16px;
             }
 
-            .search-input-append {
-                display: inline-block;
+            .add-predicate-input {
+                padding: 16px;
+                line-height: 24px;
+                flex: 1;
+                width: 0;
                 font: inherit;
                 border: none;
-                padding: 0 1px;
-                margin: 0;
 
                 &:focus {
                     outline: none;
                 }
             }
 
-            span[contenteditable]::before {
-                content: '\200b'; // prevent zero height in Firefox
+            .add-predicate-add {
+                margin-right: 16px;
+            }
+        }
+
+        .predicate {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid @separator;
+            padding: 4px 0;
+
+            .predicate-remove {
+                margin-left: 16px;
             }
 
-            .search-chip {
-                display: inline-block;
-                background: #eee;
-                line-height: 20px;
-                padding: 0 0 0 8px;
-                margin-right: 4px;
-                border-radius: 100px;
+            .numeric-range-editor {
+                height: 48px;
+                width: 0;
+                flex: 1;
 
-                .chip-operator {
-                    font: inherit;
-                    font-weight: bold;
-                    padding: 0 8px;
-                    margin-left: 2px;
-                    border: none;
-                    border-radius: 100px;
-                    background: none;
-                    margin: 0;
-                    -webkit-appearance: none;
-                }
-
-                .chip-input {
-                    display: inline-block;
-                    font: inherit;
-                    background: #fff;
-                    border: none;
-                    padding: 0 8px;
-                    margin: 2px;
-                    min-width: 24px;
-                    border-radius: 100px;
-                    box-sizing: border-box;
+                &:focus {
+                    outline: none;
                 }
             }
         }

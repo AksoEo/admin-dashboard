@@ -1,5 +1,5 @@
 import React from 'react';
-import SearchInput from './search-input';
+import PredicateEditor from './predicate-editor';
 import locale from '../../locale';
 import './style';
 
@@ -7,16 +7,17 @@ import './style';
 
 export default class MembersPage extends React.PureComponent {
     state = {
-        searchQuery: []
+        predicates: []
     };
 
     render () {
         return (
             <div className="app-page members-page">
-                <SearchInput
-                    value={this.state.searchQuery}
-                    onChange={searchQuery => this.setState({ searchQuery })}
-                    placeholder={locale.members.search} />
+                <PredicateEditor
+                    value={this.state.predicates}
+                    onChange={predicates => this.setState({ predicates })}
+                    placeholder={locale.members.search.placeholder}
+                    addPlaceholder={locale.members.search.addPredicate} />
             </div>
         );
     }
