@@ -65,7 +65,9 @@ export default {
             addPredicate: '[[Add search predicate]]',
             fields: {
                 name: 'Nomo',
-                age: 'Aĝo'
+                age: 'Aĝo',
+                oldCode: '[[old code]]',
+                newCode: '[[new code]]'
             }
         }
     }

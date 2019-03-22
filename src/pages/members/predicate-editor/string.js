@@ -19,6 +19,7 @@ export default class StringEditor extends React.PureComponent {
     render () {
         return (
             <TextField
+                className="string-editor"
                 inputRef={node => this.inputRef = node}
                 value={this.props.value}
                 onChange={e => this.props.onChange(e.target.value)} />

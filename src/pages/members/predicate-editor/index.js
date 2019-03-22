@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import IconButton from '@material-ui/core/IconButton';
 import RemoveIcon from '@material-ui/icons/Remove';
 import SearchIcon from '@material-ui/icons/Search';
+import Downshift from 'downshift';
 import locale from '../../../locale';
 import StringEditor from './string';
 import NumericRangeEditor, { NumericRange } from './range';
@@ -16,12 +17,24 @@ const FIELDS = {
             return '';
         }
     },
+    oldCode: {
+        type: 'string',
+        default () {
+            return '';
+        }
+    },
+    newCode: {
+        type: 'string',
+        default () {
+            return '';
+        }
+    },
     age: {
         type: 'range',
-        min: 6,
-        max: 120,
+        min: 0,
+        max: 150,
         default () {
-            return new NumericRange(35, 35, true, true);
+            return new NumericRange(0, 35, true, true);
         }
     }
 };
@@ -34,41 +47,31 @@ export default class PredicateEditor extends React.PureComponent {
         addPlaceholder: PropTypes.string.isRequired
     };
 
-    state = {
-        add: ''
-    };
-
     predicateRefs = [];
 
     /** If set, will focus the predicate with the given index. */
     itemToFocus = null;
 
-    addPredicate = () => {
-        if (!this.state.add) return;
-        // find a field that matches the current input
-        let field = null;
-        for (const f in FIELDS) {
-            // TODO: better comparison method (fuzzy matching?)
-            if (locale.members.search.fields[f].toLowerCase() === this.state.add.toLowerCase()) {
-                field = f;
-                break;
-            }
-        }
+    /** Downshift interface */
+    downshift = null;
 
-        if (field != null) {
+    addPredicate = (fieldName) => {
+        const field = FIELDS[fieldName];
+
+        if (field) {
             const items = this.props.value.slice();
             items.push({
-                field,
-                value: FIELDS[field].default()
+                field: fieldName,
+                value: field.default()
             });
             this.props.onChange(items);
-            this.setState({ add: '' });
+            this.downshift.clearSelection();
             this.itemToFocus = items.length - 1;
         }
     };
 
     componentDidUpdate () {
-        if (this.itemToFocus !== null) {
+        if (this.itemToFocus !== null && this.predicateRefs[this.itemToFocus]) {
             this.predicateRefs[this.itemToFocus].focus();
             this.itemToFocus = null;
         }
@@ -76,8 +79,10 @@ export default class PredicateEditor extends React.PureComponent {
 
     render () {
         const predicates = [];
+        const existingFields = [];
         let i = 0;
         for (const item of this.props.value) {
+            existingFields.push(item.field);
             const index = i++;
             predicates.push(
                 <Predicate
@@ -102,27 +107,78 @@ export default class PredicateEditor extends React.PureComponent {
             this.predicateRefs.pop();
         }
 
+        const hasFieldsLeftToAdd = !!Object.keys(FIELDS)
+            .filter(field => !existingFields.includes(field)).length;
+
+        const addInput = (
+            <Downshift
+                onChange={item => item && this.addPredicate(item.id)}
+                itemToString={item => item ? item.value : ''}>
+                {downshift => {
+                    this.downshift = downshift;
+
+                    const {
+                        getInputProps,
+                        getItemProps,
+                        getMenuProps,
+                        isOpen,
+                        inputValue,
+                        highlightedIndex
+                    } = downshift;
+
+                    return (
+                        <div className="autocomplete-input">
+                            <input
+                                className="add-predicate-input"
+                                placeholder={this.props.value.length
+                                    ? this.props.addPlaceholder
+                                    : this.props.placeholder}
+                                {...getInputProps()} />
+                            <ul className="autocomplete-options" {...getMenuProps()}>
+                                {isOpen && Object.keys(FIELDS)
+                                    .map(field => ({
+                                        id: field,
+                                        value: locale.members.search.fields[field]
+                                    }))
+                                    .filter(field => field.value
+                                        .toLowerCase()
+                                        .includes(inputValue.toLowerCase()))
+                                    .filter(field => !existingFields.includes(field.id))
+                                    .map((item, index) => (
+                                        // Downshift already adds a key prop
+                                        /* eslint-disable react/jsx-key */
+                                        <li
+                                            {...getItemProps({
+                                                key: item.id,
+                                                index,
+                                                item,
+                                                className: highlightedIndex === index
+                                                    ? 'highlighted'
+                                                    : ''
+                                            })}>
+                                            {item.value}
+                                        </li>
+                                        /* eslint-enable react/jsx-key */
+                                    ))
+                                }
+                            </ul>
+                        </div>
+                    );
+                }}
+            </Downshift>
+        );
+
         return (
             <div className="predicate-editor">
                 {predicates}
-                <div className="add-predicate">
-                    <div className="search-icon-container">
-                        <SearchIcon />
+                {hasFieldsLeftToAdd && (
+                    <div className="add-predicate">
+                        <div className="search-icon-container">
+                            <SearchIcon />
+                        </div>
+                        {addInput}
                     </div>
-                    <input
-                        className="add-predicate-input"
-                        value={this.state.add}
-                        onChange={e => this.setState({ add: e.target.value })}
-                        onKeyDown={e => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                this.addPredicate();
-                            }
-                        }}
-                        placeholder={this.props.value.length
-                            ? this.props.addPlaceholder
-                            : this.props.placeholder} />
-                </div>
+                )}
             </div>
         );
     }

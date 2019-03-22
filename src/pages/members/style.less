@@ -18,16 +18,47 @@
                 margin-right: -16px;
             }
 
-            .add-predicate-input {
-                padding: 16px;
-                line-height: 24px;
-                flex: 1;
+            .autocomplete-input {
+                position: relative;
                 width: 0;
-                font: inherit;
-                border: none;
+                flex: 1;
 
-                &:focus {
-                    outline: none;
+                .add-predicate-input {
+                    padding: 16px;
+                    line-height: 24px;
+                    width: 100%;
+                    font: inherit;
+                    border: none;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+
+                .autocomplete-options {
+                    position: absolute;
+                    width: 100%;
+                    background: @card-background;
+                    list-style-type: none;
+                    margin: 0;
+                    padding: 0;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+
+                    li {
+                        padding: 16px 8px;
+                        border-bottom: 1px solid @separator;
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+
+                        &.highlighted {
+                            background: @hover-background;
+                        }
+                    }
+
+                    .elevation(2);
                 }
             }
 
@@ -44,6 +75,12 @@
 
             .predicate-remove {
                 margin-left: 16px;
+            }
+
+            .string-editor {
+                width: 0;
+                flex: 1;
+                padding: 0 16px;
             }
 
             .numeric-range-editor {

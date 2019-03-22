@@ -73,7 +73,8 @@ export default class NumericRangeEditor extends React.PureComponent {
         value: PropTypes.object.isRequired,
         onChange: PropTypes.func.isRequired,
         min: PropTypes.number.isRequired,
-        max: PropTypes.number.isRequired
+        max: PropTypes.number.isRequired,
+        fmtDisplay: PropTypes.func
     };
 
     state = {
@@ -228,7 +229,7 @@ export default class NumericRangeEditor extends React.PureComponent {
         window.removeEventListener('mousemove', this.onMouseMove);
         window.removeEventListener('mouseup', this.onMouseUp);
     };
-    onTouchUp = () => {
+    onTouchEnd = () => {
         this.onPointerUp();
         window.removeEventListener('touchmove', this.onTouchMove);
         window.removeEventListener('touchend', this.onTouchEnd);
@@ -310,10 +311,14 @@ export default class NumericRangeEditor extends React.PureComponent {
         ctx.font = getComputedStyle(this.node).font;
         const fontSize = parseInt(getComputedStyle(this.node).fontSize);
 
+        const collapsedLabel = value.collapsedValue();
+        const startLabel = value.start;
+        const endLabel = value.end;
+
         // draw pin
-        const collapsedLabelWidth = ctx.measureText(value.collapsedValue()).width;
-        const startLabelWidth = ctx.measureText(value.start).width;
-        const endLabelWidth = ctx.measureText(value.end).width;
+        const collapsedLabelWidth = ctx.measureText(collapsedLabel).width;
+        const startLabelWidth = ctx.measureText(startLabel).width;
+        const endLabelWidth = ctx.measureText(endLabel).width;
 
         const pinHeight = lerp(
             Math.max(fontSize, collapsedLabelWidth) + PIN_PADDING,
@@ -431,7 +436,7 @@ export default class NumericRangeEditor extends React.PureComponent {
         ctx.fillStyle = TEXT_COLOR;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(value.collapsedValue(), pinX + pinWidth / 2, pinY + pinHeight / 2);
+        ctx.fillText(collapsedLabel, pinX + pinWidth / 2, pinY + pinHeight / 2);
 
         // pin text (expanded)
         const expandedAlpha = clamp(lerp(1, 0, (1 - expanded) * 2.5), 0, 1);
@@ -439,18 +444,18 @@ export default class NumericRangeEditor extends React.PureComponent {
         ctx.textAlign = 'left';
         ctx.fillStyle = TEXT_COLOR;
         ctx.globalAlpha = clamp(startIncl, 0, 1) * expandedAlpha;
-        ctx.fillText(value.start, pinX + PIN_PADDING, pinY + pinHeight / 2);
+        ctx.fillText(startLabel, pinX + PIN_PADDING, pinY + pinHeight / 2);
         ctx.fillStyle = EXCL_TEXT_COLOR;
         ctx.globalAlpha = (1 - clamp(startIncl, 0, 1)) * expandedAlpha;
-        ctx.fillText(value.start, pinX + PIN_PADDING, pinY + pinHeight / 2);
+        ctx.fillText(startLabel, pinX + PIN_PADDING, pinY + pinHeight / 2);
 
         ctx.textAlign = 'right';
         ctx.fillStyle = TEXT_COLOR;
         ctx.globalAlpha = clamp(endIncl, 0, 1) * expandedAlpha;
-        ctx.fillText(value.end, pinX + pinWidth - PIN_PADDING, pinY + pinHeight / 2);
+        ctx.fillText(endLabel, pinX + pinWidth - PIN_PADDING, pinY + pinHeight / 2);
         ctx.fillStyle = EXCL_TEXT_COLOR;
         ctx.globalAlpha = (1 - clamp(endIncl, 0, 1)) * expandedAlpha;
-        ctx.fillText(value.end, pinX + pinWidth - PIN_PADDING, pinY + pinHeight / 2);
+        ctx.fillText(endLabel, pinX + pinWidth - PIN_PADDING, pinY + pinHeight / 2);
 
         ctx.globalAlpha = 1;
         ctx.restore();
@@ -463,6 +468,7 @@ export default class NumericRangeEditor extends React.PureComponent {
         });
         this.resizeObserver.observe(this.node);
         this.ctx = this.node.getContext('2d');
+        this.updateStateSprings(true);
         this.renderContents();
     }
 
@@ -473,15 +479,25 @@ export default class NumericRangeEditor extends React.PureComponent {
         }
     }
 
+    updateStateSprings (skipAnimation) {
+        this.expandedSpring.target = this.props.value.isCollapsed() ? 0 : 1;
+        this.startInclSpring.target = this.props.value.startInclusive ? 1 : 0;
+        this.endInclSpring.target = this.props.value.endInclusive ? 1 : 0;
+
+        this.expandedSpring.start();
+        this.startInclSpring.start();
+        this.endInclSpring.start();
+
+        if (skipAnimation) {
+            this.expandedSpring.finish();
+            this.startInclSpring.finish();
+            this.endInclSpring.finish();
+        }
+    }
+
     componentDidUpdate (prevProps) {
         if (prevProps.value !== this.props.value) {
-            this.expandedSpring.target = this.props.value.isCollapsed() ? 0 : 1;
-            this.startInclSpring.target = this.props.value.startInclusive ? 1 : 0;
-            this.endInclSpring.target = this.props.value.endInclusive ? 1 : 0;
-
-            this.expandedSpring.start();
-            this.startInclSpring.start();
-            this.endInclSpring.start();
+            this.updateStateSprings();
         }
 
         this.renderContents();

@@ -7,6 +7,7 @@
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^3.0.2",
     "akso-client": "git+https://github.com/AksoEo/client-js.git",
+    "downshift": "^3.2.7",
     "preact": "^8.4.2",
     "preact-compat": "^3.18.4",
     "preact-context": "^1.1.3",
