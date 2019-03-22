@@ -286,6 +286,6 @@ export function lerp (a, b, t) {
  * @param {number} h
  * @returns {number}
  */
-export function clamp(x, l, h) {
+export function clamp (x, l, h) {
     return Math.max(l, Math.min(x, h));
 }

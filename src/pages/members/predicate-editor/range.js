@@ -24,23 +24,56 @@ export class NumericRange {
         if (!this.startInclusive && !this.endInclusive && this.start + 2 >= this.end) return true;
         return false;
     }
+
+    collapsedValue () {
+        return this.startInclusive ? this.start : this.start + 1;
+    }
+
+    normalizeCollapseAtEnd (end) {
+        const collapsedValue = end === 'start'
+            ? (this.startInclusive ? this.start : this.start + 1)
+            : (this.endInclusive ? this.end : this.end - 1);
+        this.startInclusive = true;
+        this.endInclusive = true;
+        this.start = this.end = collapsedValue;
+    }
 }
 
 const TRACK_COLOR = '#979797';
 const PIN_COLOR = '#31a64f';
+const FOCUS_COLOR = 'rgba(0, 0, 0, 0.2)';
+const FOCUS_WIDTH = 2;
 const TEXT_COLOR = '#fff';
 const EXCL_COLOR = '#ddd';
 const EXCL_TEXT_COLOR = '#000';
 const TRACK_WIDTH = 2;
-const PADDING_X = 4;
+const PADDING_X = 24;
 const PIN_PADDING = 8;
 const PIN_ARROW_HEIGHT = 4;
 const EXCL_ARROW_WIDTH = 6;
 
+/**
+ * Numeric range editor: allows the user to select an integer range.
+ *
+ * ```
+ * expanded:
+ *               .--------------.
+ *      ---------| 23        59 |---------
+ *               '--------------'
+ *
+ * collapsed:
+ *                     .--.
+ *                    | 42 |
+ *                     '\/'
+ *      ----------------------------------
+ * ```
+ */
 export default class NumericRangeEditor extends React.PureComponent {
     static propTypes = {
         value: PropTypes.object.isRequired,
-        onChange: PropTypes.func.isRequired
+        onChange: PropTypes.func.isRequired,
+        min: PropTypes.number.isRequired,
+        max: PropTypes.number.isRequired
     };
 
     state = {
@@ -72,6 +105,12 @@ export default class NumericRangeEditor extends React.PureComponent {
     startInclSpring = this.setUpStateSpring('startIncl', 0.7, 0.4);
     endInclSpring = this.setUpStateSpring('endIncl', 0.7, 0.4);
 
+    // layout information for event handling
+    /** Left and right pin bounds. */
+    pinBounds = [0, 0];
+    /** Widths of the left and right pin labels. */
+    pinLabelWidths = [0, 0];
+
     focus () {
         this.node.focus();
     }
@@ -85,8 +124,152 @@ export default class NumericRangeEditor extends React.PureComponent {
         });
     }
 
+    /** Projects a value from value space to screen space. */
     projectValue (x) {
-        return x;
+        const trackWidth = this.state.width - 2 * PADDING_X;
+        const range = this.props.max - this.props.min;
+        return (x - this.props.min) * trackWidth / range + PADDING_X;
+    }
+    /** Projects a value from screen space to value space. */
+    unprojectValue (x) {
+        const trackWidth = this.state.width - 2 * PADDING_X;
+        const range = this.props.max - this.props.min;
+        return Math.round((x - PADDING_X) * range / trackWidth) + this.props.min;
+    }
+
+    /** Will be set to an object with drag information when dragging. */
+    drag = null;
+
+    /**
+     * Handler for any pointer events.
+     * @param {number} clientX - pointer position in client coordinates
+     * @returns {bool} - true if the event should be considered handled
+     */
+    onPointerDown (clientX) {
+        const nodeRect = this.node.getBoundingClientRect();
+        const posX = clientX - nodeRect.left;
+
+        const [left, right] = this.pinBounds;
+        if (posX >= left && posX < right) {
+            const end = posX < (left + right) / 2 ? 'start' : 'end';
+            const value = this.unprojectValue(posX);
+            const offset = this.props.value[end] - value;
+            this.drag = {
+                end,
+                offset,
+                startPos: this.props.value[end],
+                tappedOnLabel: end === 'start'
+                    ? (posX - left) < PIN_PADDING + this.pinLabelWidths[0]
+                    : (right - posX) < PIN_PADDING + this.pinLabelWidths[1],
+                draggedAway: false
+            };
+            return true;
+        }
+    }
+
+    onPointerMove (clientX) {
+        const nodeRect = this.node.getBoundingClientRect();
+        const posX = clientX - nodeRect.left;
+
+        const { end, offset, startPos } = this.drag;
+
+        const value = this.props.value.clone();
+        value[end] = clamp(this.unprojectValue(posX) + offset, this.props.min, this.props.max);
+
+        if (value[end] !== startPos) {
+            this.drag.draggedAway = true;
+        }
+
+        if (value.isCollapsed()) value.normalizeCollapseAtEnd(end);
+
+        this.props.onChange(value);
+    }
+
+    onPointerUp () {
+        if (!this.drag.draggedAway && this.drag.tappedOnLabel) {
+            // toggle inclusive/exclusive
+
+            const value = this.props.value.clone();
+            if (this.drag.end === 'start') {
+                value.startInclusive = !value.startInclusive;
+            } else {
+                value.endInclusive = !value.endInclusive;
+            }
+            this.props.onChange(value);
+        }
+    }
+
+    onMouseDown = e => {
+        if (this.onPointerDown(e.clientX)) {
+            e.preventDefault();
+            window.addEventListener('mousemove', this.onMouseMove);
+            window.addEventListener('mouseup', this.onMouseUp);
+        }
+    };
+    onTouchStart = e => {
+        if (this.onPointerDown(e.touches[0].clientX)) {
+            e.preventDefault();
+            window.addEventListener('touchmove', this.onTouchMove);
+            window.addEventListener('touchend', this.onTouchEnd);
+        }
+    };
+
+    onMouseMove = e => {
+        e.preventDefault();
+        this.onPointerMove(e.clientX);
+    };
+    onTouchMove = e => {
+        e.preventDefault();
+        this.onPointerMove(e.touches[0].clientX);
+    };
+
+    onMouseUp = () => {
+        this.onPointerUp();
+        window.removeEventListener('mousemove', this.onMouseMove);
+        window.removeEventListener('mouseup', this.onMouseUp);
+    };
+    onTouchUp = () => {
+        this.onPointerUp();
+        window.removeEventListener('touchmove', this.onTouchMove);
+        window.removeEventListener('touchend', this.onTouchEnd);
+    };
+
+    /** The end that has keyboard focus. */
+    focusedEnd = 'start';
+
+    onKeyDown = e => {
+        const value = this.props.value.clone();
+
+        if (e.key === 'ArrowLeft') {
+            value[this.focusedEnd] = Math.max(this.props.min, value[this.focusedEnd] - 1);
+            if (value.isCollapsed()) value.normalizeCollapseAtEnd(this.focusedEnd);
+            this.props.onChange(value);
+        } else if (e.key === 'ArrowRight') {
+            value[this.focusedEnd] = Math.min(value[this.focusedEnd] + 1, this.props.max);
+            if (value.isCollapsed()) value.normalizeCollapseAtEnd(this.focusedEnd);
+            this.props.onChange(value);
+        } else if (e.key === ' ') {
+            if (value.isCollapsed()) {
+                value.start--;
+                value.end++;
+                if (value.start < this.props.min) {
+                    value.start++;
+                    value.end++;
+                } else if (value.end > this.props.max) {
+                    value.start--;
+                    value.end--;
+                }
+            }
+            if (this.focusedEnd === 'start') {
+                value.startInclusive = !value.startInclusive;
+            } else {
+                value.endInclusive = !value.endInclusive;
+            }
+            this.props.onChange(value);
+        } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            this.focusedEnd = this.focusedEnd === 'start' ? 'end' : 'start';
+            this.forceUpdate();
+        }
     }
 
     drawRoundedRect (x, y, width, height, radius) {
@@ -128,20 +311,35 @@ export default class NumericRangeEditor extends React.PureComponent {
         const fontSize = parseInt(getComputedStyle(this.node).fontSize);
 
         // draw pin
+        const collapsedLabelWidth = ctx.measureText(value.collapsedValue()).width;
         const startLabelWidth = ctx.measureText(value.start).width;
         const endLabelWidth = ctx.measureText(value.end).width;
 
-        const pinHeight = lerp(startLabelWidth + PIN_PADDING, fontSize + PIN_PADDING, expanded);
+        const pinHeight = lerp(
+            Math.max(fontSize, collapsedLabelWidth) + PIN_PADDING,
+            fontSize + PIN_PADDING,
+            expanded
+        );
 
         const expandedPinWidth = this.projectValue(value.end)
             - this.projectValue(value.start)
             + startLabelWidth
             + endLabelWidth
-            + 4 * PIN_PADDING;
-        const pinWidth = lerp(startLabelWidth + PIN_PADDING, expandedPinWidth, expanded);
-        const pinX = this.projectValue(value.start) + lerp(0, -startLabelWidth, expanded);
+            + 2 * PIN_PADDING;
+        const pinWidth = lerp(
+            Math.max(fontSize, collapsedLabelWidth) + PIN_PADDING,
+            expandedPinWidth,
+            expanded
+        );
+        const pinX = this.projectValue(value.start)
+            + lerp(-pinWidth / 2, -startLabelWidth - PIN_PADDING, expanded);
         const pinY = lerp(trackY - pinHeight - PIN_ARROW_HEIGHT, trackY - pinHeight / 2, expanded);
         const pinRadius = pinHeight / 2;
+
+        this.pinBounds = [pinX, pinX + pinWidth];
+        this.pinLabelWidths = value.isCollapsed()
+            ? [-Infinity, -Infinity]
+            : [startLabelWidth, endLabelWidth];
 
         ctx.fillStyle = PIN_COLOR;
         ctx.save();
@@ -189,12 +387,51 @@ export default class NumericRangeEditor extends React.PureComponent {
             ctx.fill();
         }
 
+        // draw focus
+        if (focused) {
+            ctx.strokeStyle = FOCUS_COLOR;
+            ctx.lineWidth = FOCUS_WIDTH;
+            const w = FOCUS_WIDTH / 2;
+
+            ctx.globalAlpha = clamp(lerp(1, 0, expanded * 2.5), 0, 1);
+            ctx.beginPath();
+            this.drawRoundedRect(
+                pinX + w,
+                pinY + w,
+                pinWidth - 2 * w,
+                pinHeight - 2 * w,
+                pinRadius - w
+            );
+            ctx.stroke();
+
+            ctx.globalAlpha = clamp(lerp(1, 0, (1 - expanded) * 2.5), 0, 1);
+            ctx.beginPath();
+            if (this.focusedEnd === 'start') {
+                this.drawRoundedRect(
+                    pinX + w,
+                    pinY + w,
+                    2 * PIN_PADDING + startLabelWidth - 2 * w,
+                    pinHeight - 2 * w,
+                    pinRadius - w
+                );
+            } else {
+                this.drawRoundedRect(
+                    pinX + pinWidth - 2 * PIN_PADDING - endLabelWidth + w,
+                    pinY + w,
+                    2 * PIN_PADDING + endLabelWidth - 2 * w,
+                    pinHeight - 2 * w,
+                    pinRadius - w
+                );
+            }
+            ctx.stroke();
+        }
+
         // pin text (non-expanded)
         ctx.globalAlpha = clamp(lerp(1, 0, expanded * 2.5), 0, 1);
         ctx.fillStyle = TEXT_COLOR;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(value.start, pinX + pinWidth / 2, pinY + pinHeight / 2);
+        ctx.fillText(value.collapsedValue(), pinX + pinWidth / 2, pinY + pinHeight / 2);
 
         // pin text (expanded)
         const expandedAlpha = clamp(lerp(1, 0, (1 - expanded) * 2.5), 0, 1);
@@ -260,30 +497,9 @@ export default class NumericRangeEditor extends React.PureComponent {
                 height={this.state.height * this.state.scale}
                 onFocus={() => this.setState({ focused: true })}
                 onBlur={() => this.setState({ focused: false })}
-                onKeyDown={e => {
-                    // for debugging
-                    // TODO: remove this
-                    const value = this.props.value.clone();
-                    if (e.key === 'j') {
-                        value.end--;
-                        this.props.onChange(value);
-                    } else if (e.key === 'k') {
-                        value.end++;
-                        this.props.onChange(value);
-                    } else if (e.key === 's') {
-                        value.start--;
-                        this.props.onChange(value);
-                    } else if (e.key === 'd') {
-                        value.start++;
-                        this.props.onChange(value);
-                    } else if (e.key === 'a') {
-                        value.startInclusive = !value.startInclusive;
-                        this.props.onChange(value);
-                    } else if (e.key === 'l') {
-                        value.endInclusive = !value.endInclusive;
-                        this.props.onChange(value);
-                    }
-                }}>
+                onKeyDown={this.onKeyDown}
+                onMouseDown={this.onMouseDown}
+                onTouchStart={this.onTouchStart}>
             </canvas>
         );
     }

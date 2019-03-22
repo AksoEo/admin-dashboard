@@ -18,6 +18,8 @@ const FIELDS = {
     },
     age: {
         type: 'range',
+        min: 6,
+        max: 120,
         default () {
             return new NumericRange(35, 35, true, true);
         }
@@ -152,12 +154,16 @@ class Predicate extends React.PureComponent {
             }
         };
 
-        switch (FIELDS[this.props.value.field].type) {
+        const field = FIELDS[this.props.value.field];
+        switch (field.type) {
         case 'string':
             editor = <StringEditor {...editorProps} />;
             break;
         case 'range':
-            editor = <NumericRangeEditor {...editorProps} />;
+            editor = <NumericRangeEditor
+                min={field.min}
+                max={field.max}
+                {...editorProps} />;
             break;
         }
 
