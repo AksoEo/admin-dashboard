@@ -8,8 +8,6 @@ import locale from '../../../locale';
 import StringEditor from './string';
 import NumericRangeEditor, { NumericRange } from './range';
 
-/** @jsx React.createElement */
-
 /** Field descriptions */
 const FIELDS = {
     name: {

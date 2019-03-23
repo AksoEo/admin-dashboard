@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import { Spring } from '../animation';
 
+/** @jsx h */
+
 /**
  * Login progress indicator.
  * Assumes that the children will never change.

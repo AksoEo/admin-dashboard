@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { Spring } from '../../animation';
 import './style';
 
+/** @jsx h */
+
 /** Context that contains an interface to the Form component. */
 export const FormContext = createContext({
     register: () => {},

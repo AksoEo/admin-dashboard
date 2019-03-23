@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 import { Spring } from '../../animation';
 import './style';
 
+/** @jsx h */
+
 /** Duration of a single ripple effect. */
 const RIPPLE_DURATION = 0.5;
 

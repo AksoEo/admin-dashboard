@@ -3,17 +3,14 @@ import PropTypes from 'prop-types';
 import { Spring, lerp } from '../../animation';
 import './style';
 
+/** @jsx h */
+
 /** Scaling factor that will be applied to the label when it floats. */
 const FLOATING_LABEL_SCALE = 0.75;
 
 let inputIDCounter = 0;
 
-/**
- * A material text field.
- *
- * This component is part of a series of lightweight material components that don’t depend on 40 kB
- * material-ui boilerplate.
- */
+/** A material text field. */
 export default class TextField extends Component {
     static propTypes = {
         /** Floating text field label. */

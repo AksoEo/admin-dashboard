@@ -3,6 +3,8 @@ import { CircularProgressIndicator } from './p-components/progress';
 import Login from './login';
 import './style';
 
+/** @jsx h */
+
 let init;
 
 // load polyfills as needed

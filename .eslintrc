@@ -109,8 +109,7 @@
     },
     "settings": {
         "react": {
-            "version": "16",
-            "pragma": "h"
+            "version": "detect"
         }
     }
 }

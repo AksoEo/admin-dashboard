@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import { Spring, lerp, clamp } from '../../../animation';
 
-/** @jsx React.createElement */
-
 /**
  * A numeric integer range.
  * Also carries information about whether or not the start and end are exclusive or inclusive.

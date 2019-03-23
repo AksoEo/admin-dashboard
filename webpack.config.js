@@ -89,10 +89,7 @@ module.exports = function (env, argv) {
                                         }
                                     ],
                                     [
-                                        '@babel/preset-react',
-                                        {
-                                            pragma: 'h'
-                                        }
+                                        '@babel/preset-react'
                                     ]
                                 ],
                                 plugins: [

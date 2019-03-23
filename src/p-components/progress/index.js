@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import './style';
 
+/** @jsx h */
+
 /** Circle radius for the progress indicator. */
 const CIRCLE_RADIUS = 16;
 

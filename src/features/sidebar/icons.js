@@ -1,8 +1,6 @@
 import React from 'react';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
-/** @jsx React.createElement */
-
 /** The TEJO icon, rendered as inline SVG. */
 export const TEJOIcon = React.memo(function TejoIcon () {
     return (

@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import { Spring, lerp } from '../animation';
 
+/** @jsx h */
+
 /**
  * Container for multiple pages of varying height and fixed width.
  * Assumes fixed child count and mostly fixed child heights.

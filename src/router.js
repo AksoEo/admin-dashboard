@@ -8,8 +8,6 @@ import GroupIcon from '@material-ui/icons/Group';
 import PaymentIcon from '@material-ui/icons/Payment';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
 
-/** @jsx React.createElement */
-
 /**
  * A React context for in-app navigation.
  *

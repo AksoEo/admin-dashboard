@@ -18,8 +18,6 @@ import { Link, ROUTES } from '../../router';
 import locale from '../../locale';
 import { TEJOIcon, UEAIcon } from './icons';
 
-/** @jsx React.createElement */
-
 /** Renders a single item in `ROUTES`. */
 function NavItem (props) {
     const { id, icon, url } = props.item;

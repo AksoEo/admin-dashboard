@@ -2,8 +2,6 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-/** @jsx React.createElement */
-
 import { routerContext, ROUTES } from './router';
 import locale from './locale';
 import './app.less';

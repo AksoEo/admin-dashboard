@@ -10,6 +10,8 @@ import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';
 import './style';
 
+/** @jsx h */
+
 const Stage = {
     LOST_SECURITY_CODE: -3,
     FORGOT_CODE: -2,

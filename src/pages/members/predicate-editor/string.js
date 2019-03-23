@@ -2,8 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 
-/** @jsx React.createElement */
-
 /** A simple string editor input. */
 export default class StringEditor extends React.PureComponent {
     static propTypes = {

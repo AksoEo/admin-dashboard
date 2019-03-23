@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import Ripple from '../ripple';
 import './style';
 
+/** @jsx h */
+
 function isButtonPressKey (key) {
     return key === ' ' || key === 'Enter';
 }

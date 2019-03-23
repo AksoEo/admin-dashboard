@@ -4,8 +4,6 @@ import { Spring } from '../../animation';
 import SidebarContents from './contents';
 import './style';
 
-/** @jsx React.createElement */
-
 /** Width of the region at the left screen edge from which the sidebar may be dragged out. */
 const EDGE_DRAG_WIDTH = 50;
 
