@@ -5,6 +5,7 @@ import './style';
 
 /** @jsx React.createElement */
 
+/** The members’ page. */
 export default class MembersPage extends React.PureComponent {
     state = {
         predicates: []

@@ -48,6 +48,8 @@
         max-height: 100%;
     }
 
+    @perma-sidebar-width: 250px;
+
     #app-header {
         background: @primary;
         padding-left: env(safe-area-inset-left);
@@ -64,7 +66,7 @@
         }
 
         .header-logo {
-            margin-right: 16px;
+            width: @perma-sidebar-width;
 
             .logo, .logo-label {
                 vertical-align: middle;
@@ -151,7 +153,7 @@
 
             #app-sidebar {
                 border-right: 1px solid @sidebar-border;
-                width: 250px;
+                width: @perma-sidebar-width;
 
                 .sidebar-logo {
                     display: none;

@@ -10,6 +10,7 @@ import NumericRangeEditor, { NumericRange } from './range';
 
 /** @jsx React.createElement */
 
+/** Field descriptions */
 const FIELDS = {
     name: {
         type: 'string',
@@ -39,6 +40,9 @@ const FIELDS = {
     }
 };
 
+/**
+ * A predicate editor: manages a list of editable predicates and an input to add more.
+ */
 export default class PredicateEditor extends React.PureComponent {
     static propTypes = {
         value: PropTypes.array.isRequired,
@@ -55,6 +59,10 @@ export default class PredicateEditor extends React.PureComponent {
     /** Downshift interface */
     downshift = null;
 
+    /**
+     * Adds a predicate for the given field.
+     * @param {string} fieldName - the key in `FIELDS`
+     */
     addPredicate = (fieldName) => {
         const field = FIELDS[fieldName];
 
@@ -184,6 +192,7 @@ export default class PredicateEditor extends React.PureComponent {
     }
 }
 
+/** A single predicate. */
 class Predicate extends React.PureComponent {
     static propTypes = {
         value: PropTypes.object.isRequired,

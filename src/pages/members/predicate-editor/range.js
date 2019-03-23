@@ -5,6 +5,10 @@ import { Spring, lerp, clamp } from '../../../animation';
 
 /** @jsx React.createElement */
 
+/**
+ * A numeric integer range.
+ * Also carries information about whether or not the start and end are exclusive or inclusive.
+ */
 export class NumericRange {
     constructor (start, end, startInclusive, endInclusive) {
         this.start = start;
@@ -13,10 +17,15 @@ export class NumericRange {
         this.endInclusive = endInclusive;
     }
 
+    /** Clones the object. */
     clone () {
         return new NumericRange(this.start, this.end, this.startInclusive, this.endInclusive);
     }
 
+    /**
+     * Returns true if the range ends up only containing a single value.
+     * @returns {boolean}
+     */
     isCollapsed () {
         if (this.start >= this.end) return true;
         if (!this.startInclusive && this.start + 1 >= this.end) return true;
@@ -25,10 +34,21 @@ export class NumericRange {
         return false;
     }
 
+    /**
+     * The value to display for when the range is collapsed.
+     * @returns {number}
+     */
     collapsedValue () {
         return this.startInclusive ? this.start : this.start + 1;
     }
 
+    /**
+     * “Normalizes” a collapsed range, so e.g. `2 <= x < 3` turns into `2 <= x <= 2`.
+     * @param {string} - the end to collapse towards. Technically, this shouldn’t matter, but since
+     *                   dragging is implemented to simply set the value without checking if the
+     *                   range is still valid, `start` might end up being greater than `end`. In
+     *                   this case, it should collapse to the end the user is dragging.
+     */
     normalizeCollapseAtEnd (end) {
         const collapsedValue = end === 'start'
             ? (this.startInclusive ? this.start : this.start + 1)
@@ -40,31 +60,48 @@ export class NumericRange {
 }
 
 const TRACK_COLOR = '#979797';
+/** Pin/selection background color. */
 const PIN_COLOR = '#31a64f';
+/** The color of the focus ring. */
 const FOCUS_COLOR = 'rgba(0, 0, 0, 0.2)';
+/** The width of the focus ring. */
 const FOCUS_WIDTH = 2;
 const TEXT_COLOR = '#fff';
+/** Exclusion arrow background color. */
 const EXCL_COLOR = '#ddd';
+/** Text on the exclusion arrow. */
 const EXCL_TEXT_COLOR = '#000';
 const TRACK_WIDTH = 2;
+/** Inset padding on the entire control. */
 const PADDING_X = 24;
+/** Pin/selection inner padding. */
 const PIN_PADDING = 8;
+/** The height of the arrow on the collapsed pin. */
 const PIN_ARROW_HEIGHT = 4;
+/** The width of the tip triangle of the exclusion arrow. */
 const EXCL_ARROW_WIDTH = 6;
 
 /**
  * Numeric range editor: allows the user to select an integer range.
  *
  * ```
- * expanded:
+ * expanded range selection:
  *               .--------------.
  *      ---------| 23        59 |---------
  *               '--------------'
  *
+ *    _.---.--------
+ *   /      \
+ *  |   35   >
+ *   \      /
+ *    ''---'--------
+ *    |    <-> exclusion arrow width
+ *    '- exclusion
+ *
  * collapsed:
  *                     .--.
  *                    | 42 |
- *                     '\/'
+ *                     '\/'  <-- pin arrow
  *      ----------------------------------
  * ```
  */
@@ -87,12 +124,34 @@ export default class NumericRangeEditor extends React.PureComponent {
         endIncl: 0
     }
 
+    /**
+     * Canvas node.
+     * @type {HTMLCanvasElement|null}
+     */
     node = null;
+    /**
+     * Canvas rendering context.
+     * @type {CanvasRenderingContext2D|null}
+     */
     ctx = null;
+    /**
+     * Resize observer on the canvas.
+     * @type {ResizeObserver}
+     */
     resizeObserver = null;
 
+    /**
+     * Contains all springs created by `setUpStateSpring`.
+     * @type {Spring[]}
+     */
     springs = [];
 
+    /**
+     * Sets up a spring that controls a field in the `state` object.
+     * @param {string} key - key in the state object
+     * @param {number} damping - spring parameter
+     * @param {number} period - spring parameter
+     */
     setUpStateSpring = (key, damping, period) => {
         const spring = new Spring(damping, period);
         spring.on('update', value => {
@@ -102,20 +161,37 @@ export default class NumericRangeEditor extends React.PureComponent {
         return spring;
     };
 
+    /**
+     * Spring that animates between the pin and the selection.
+     * @type {Spring}
+     */
     expandedSpring = this.setUpStateSpring('expanded', 0.7, 0.4);
+    /**
+     * Spring that animates the left exclusion arrow.
+     * @type {Spring}
+     */
     startInclSpring = this.setUpStateSpring('startIncl', 0.7, 0.4);
+    /**
+     * Spring that animates the right exclusion arrow.
+     * @type {Spring}
+     */
     endInclSpring = this.setUpStateSpring('endIncl', 0.7, 0.4);
 
     // layout information for event handling
-    /** Left and right pin bounds. */
+    /** Left and right pin frame bounds relative to the canvas node, in pixels. */
     pinBounds = [0, 0];
-    /** Widths of the left and right pin labels. */
+    /** Widths of the left and right pin labels, in pixels. */
     pinLabelWidths = [0, 0];
 
     focus () {
         this.node.focus();
     }
 
+    /**
+     * Resizes the canvas.
+     * @param {number} width
+     * @param {number} height
+     */
     onResize (width, height) {
         const scale = window.devicePixelRatio || 1;
         this.setState({
@@ -125,24 +201,35 @@ export default class NumericRangeEditor extends React.PureComponent {
         });
     }
 
-    /** Projects a value from value space to screen space. */
+    /**
+     * Projects a value from value space to screen space.
+     * @param {number} x - value
+     * @returns {number} - pixel offset
+     */
     projectValue (x) {
         const trackWidth = this.state.width - 2 * PADDING_X;
         const range = this.props.max - this.props.min;
         return (x - this.props.min) * trackWidth / range + PADDING_X;
     }
-    /** Projects a value from screen space to value space. */
+    /**
+     * Projects a value from screen space to value space.
+     * @param {number} x - pixel offset
+     * @returns {number} - value
+     */
     unprojectValue (x) {
         const trackWidth = this.state.width - 2 * PADDING_X;
         const range = this.props.max - this.props.min;
         return Math.round((x - PADDING_X) * range / trackWidth) + this.props.min;
     }
 
-    /** Will be set to an object with drag information when dragging. */
+    /**
+     * Will be set to an object with drag information when dragging.
+     * @type {Object|null}
+     */
     drag = null;
 
     /**
-     * Handler for any pointer events.
+     * Handler for any pointer-down events.
      * @param {number} clientX - pointer position in client coordinates
      * @returns {bool} - true if the event should be considered handled
      */
@@ -168,6 +255,10 @@ export default class NumericRangeEditor extends React.PureComponent {
         }
     }
 
+    /**
+     * Handler for any pointer-move events.
+     * @param {number} clientX - pointer position in client coordinates
+     */
     onPointerMove (clientX) {
         const nodeRect = this.node.getBoundingClientRect();
         const posX = clientX - nodeRect.left;
@@ -186,9 +277,10 @@ export default class NumericRangeEditor extends React.PureComponent {
         this.props.onChange(value);
     }
 
+    /** Handler for any pointer-up events. */
     onPointerUp () {
         if (!this.drag.draggedAway && this.drag.tappedOnLabel) {
-            // toggle inclusive/exclusive
+            // toggle inclusive/exclusive if the user didn’t drag and tapped on one of the ends
 
             const value = this.props.value.clone();
             if (this.drag.end === 'start') {
@@ -241,12 +333,15 @@ export default class NumericRangeEditor extends React.PureComponent {
     onKeyDown = e => {
         const value = this.props.value.clone();
 
+        // end movement amount
+        const amount = e.shiftKey ? 10 : 1;
+
         if (e.key === 'ArrowLeft') {
-            value[this.focusedEnd] = Math.max(this.props.min, value[this.focusedEnd] - 1);
+            value[this.focusedEnd] = Math.max(this.props.min, value[this.focusedEnd] - amount);
             if (value.isCollapsed()) value.normalizeCollapseAtEnd(this.focusedEnd);
             this.props.onChange(value);
         } else if (e.key === 'ArrowRight') {
-            value[this.focusedEnd] = Math.min(value[this.focusedEnd] + 1, this.props.max);
+            value[this.focusedEnd] = Math.min(value[this.focusedEnd] + amount, this.props.max);
             if (value.isCollapsed()) value.normalizeCollapseAtEnd(this.focusedEnd);
             this.props.onChange(value);
         } else if (e.key === ' ') {
@@ -273,6 +368,14 @@ export default class NumericRangeEditor extends React.PureComponent {
         }
     }
 
+    /**
+     * Draws a rounded rectangle in the canvas rendering context.
+     * @param {number} x
+     * @param {number} y
+     * @param {number} width
+     * @param {number} height
+     * @param {number} radius
+     */
     drawRoundedRect (x, y, width, height, radius) {
         const ctx = this.ctx;
         ctx.moveTo(x + radius, y);
@@ -286,6 +389,7 @@ export default class NumericRangeEditor extends React.PureComponent {
         ctx.closePath();
     }
 
+    /** Renders the control contents in the canvas. */
     renderContents () {
         const { width, height, scale, focused, expanded, startIncl, endIncl } = this.state;
         const ctx = this.ctx;
@@ -457,7 +561,6 @@ export default class NumericRangeEditor extends React.PureComponent {
         ctx.globalAlpha = (1 - clamp(endIncl, 0, 1)) * expandedAlpha;
         ctx.fillText(endLabel, pinX + pinWidth - PIN_PADDING, pinY + pinHeight / 2);
 
-        ctx.globalAlpha = 1;
         ctx.restore();
     }
 
@@ -479,6 +582,10 @@ export default class NumericRangeEditor extends React.PureComponent {
         }
     }
 
+    /**
+     * Updates the spring targets from the current component state.
+     * @param {?boolean} skipAnimation - if true, will skip animating to the new state
+     */
     updateStateSprings (skipAnimation) {
         this.expandedSpring.target = this.props.value.isCollapsed() ? 0 : 1;
         this.startInclSpring.target = this.props.value.startInclusive ? 1 : 0;

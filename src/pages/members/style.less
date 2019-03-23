@@ -15,7 +15,6 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin-right: -16px;
             }
 
             .autocomplete-input {
@@ -29,6 +28,7 @@
                     width: 100%;
                     font: inherit;
                     border: none;
+                    box-sizing: border-box;
 
                     &:focus {
                         outline: none;
@@ -73,8 +73,13 @@
             border-bottom: 1px solid @separator;
             padding: 4px 0;
 
+            &:last-child {
+                border-bottom: none;
+            }
+
             .predicate-remove {
                 margin-left: 16px;
+                margin-right: 16px;
             }
 
             .string-editor {
