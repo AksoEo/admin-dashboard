@@ -78,6 +78,8 @@ const PIN_PADDING = 8;
 const PIN_ARROW_HEIGHT = 4;
 /** The width of the tip triangle of the exclusion arrow. */
 const EXCL_ARROW_WIDTH = 6;
+/** Extra outer padding for the canvas rendering context. */
+const CTX_PADDING = 20;
 
 /**
  * Numeric range editor: allows the user to select an integer range.
@@ -123,10 +125,15 @@ export default class NumericRangeEditor extends React.PureComponent {
     }
 
     /**
+     * Container node.
+     * @type {Node|null}
+     */
+    node = null;
+    /**
      * Canvas node.
      * @type {HTMLCanvasElement|null}
      */
-    node = null;
+    canvas = null;
     /**
      * Canvas rendering context.
      * @type {CanvasRenderingContext2D|null}
@@ -396,7 +403,13 @@ export default class NumericRangeEditor extends React.PureComponent {
         // IE 11 doesn’t support setTransform so the context needs to be saved and restored
         ctx.save();
         ctx.transform(scale, 0, 0, scale, 0, 0);
-        ctx.clearRect(0, 0, width, height);
+        ctx.translate(CTX_PADDING, CTX_PADDING);
+        ctx.clearRect(
+            -CTX_PADDING,
+            -CTX_PADDING,
+            width + 2 * CTX_PADDING,
+            height + 2 * CTX_PADDING
+        );
 
         // draw track
         ctx.strokeStyle = TRACK_COLOR;
@@ -568,8 +581,10 @@ export default class NumericRangeEditor extends React.PureComponent {
             this.onResize(entry.contentRect.width, entry.contentRect.height);
         });
         this.resizeObserver.observe(this.node);
-        this.ctx = this.node.getContext('2d');
+        this.ctx = this.canvas.getContext('2d');
         this.updateStateSprings(true);
+        const nodeRect = this.node.getBoundingClientRect();
+        this.onResize(nodeRect.width, nodeRect.height);
         this.renderContents();
     }
 
@@ -610,18 +625,26 @@ export default class NumericRangeEditor extends React.PureComponent {
 
     render () {
         return (
-            <canvas
-                className="numeric-range-editor"
+            <span className="numeric-range-editor"
                 ref={node => this.node = node}
                 tabIndex="0"
-                width={this.state.width * this.state.scale}
-                height={this.state.height * this.state.scale}
                 onFocus={() => this.setState({ focused: true })}
                 onBlur={() => this.setState({ focused: false })}
                 onKeyDown={this.onKeyDown}
                 onMouseDown={this.onMouseDown}
                 onTouchStart={this.onTouchStart}>
-            </canvas>
+                <canvas
+                    style={{
+                        pointerEvents: 'none',
+                        marginTop: -CTX_PADDING,
+                        marginLeft: -CTX_PADDING,
+                        width: this.state.width + 2 * CTX_PADDING,
+                        height: this.state.height + 2 * CTX_PADDING
+                    }}
+                    ref={node => this.canvas = node}
+                    width={(this.state.width + 2 * CTX_PADDING) * this.state.scale}
+                    height={(this.state.height + 2 * CTX_PADDING) * this.state.scale} />
+            </span>
         );
     }
 }

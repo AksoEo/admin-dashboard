@@ -1,101 +1,119 @@
 @import '../../prelude';
 
 .members-page {
-    .predicate-editor {
-        min-height: 56px;
-        .elevation(2);
+    .members-search {
+        min-height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-        .add-predicate {
+        .search-contents {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20%;
+        }
+
+        .search-title {
+            font-size: 1.7em;
+            opacity: 0.8;
+            margin-top: 1em;
+            margin-bottom: 0.7em;
+            text-align: center;
+        }
+
+        .search-box {
+            .elevation(4);
+            border-radius: 4px;
             display: flex;
             align-items: center;
+            transition: box-shadow 0.3s @easing;
 
-            .search-icon-container {
-                width: 48px;
-                padding-left: 16px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .autocomplete-input {
-                position: relative;
+            .search-input {
                 width: 0;
                 flex: 1;
+                font: inherit;
+                background: none;
+                color: inherit;
+                border: none;
+                padding: 16px;
+                margin: 0;
 
-                .add-predicate-input {
-                    padding: 16px;
-                    line-height: 24px;
-                    width: 100%;
+                &:focus {
+                    outline: none;
+                }
+            }
+
+            .search-button {
+                margin: 0 8px;
+            }
+
+            &:focus-within {
+                .elevation(6);
+            }
+        }
+
+        .predicate-editor {
+            border-radius: 0 0 4px 4px;
+
+            .predicate-editor-title {
+                margin: 0 8px;
+                padding-top: 0.75em;
+                padding-bottom: 0.5em;
+                font-weight: 500;
+                font-size: 0.875em;
+                opacity: 0.8;
+            }
+
+            .add-predicate {
+                padding: 0 4px;
+
+                .add-predicate-field {
                     font: inherit;
+                    font-size: 0.875em;
+                    font-weight: 500;
+                    color: inherit;
+                    background: #eee;
+                    border-radius: 100px;
                     border: none;
-                    box-sizing: border-box;
+                    text-transform: uppercase;
+                    margin: 4px;
+
+                    &::before {
+                        content: '+ ';
+                    }
+                }
+            }
+
+            .predicate {
+                display: flex;
+                align-items: center;
+                border-bottom: 1px solid @separator;
+                padding: 4px 0;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .predicate-remove {
+                    margin-left: 16px;
+                    margin-right: 16px;
+                }
+
+                .string-editor {
+                    width: 0;
+                    flex: 1;
+                    padding: 0 16px;
+                }
+
+                .numeric-range-editor {
+                    height: 48px;
+                    width: 0;
+                    flex: 1;
+                    -webkit-tap-highlight-color: transparent;
 
                     &:focus {
                         outline: none;
                     }
-                }
-
-                .autocomplete-options {
-                    position: absolute;
-                    width: 100%;
-                    background: @card-background;
-                    list-style-type: none;
-                    margin: 0;
-                    padding: 0;
-                    border-radius: 4px;
-                    box-sizing: border-box;
-
-                    li {
-                        padding: 16px 8px;
-                        border-bottom: 1px solid @separator;
-
-                        &:last-child {
-                            border-bottom: none;
-                        }
-
-                        &.highlighted {
-                            background: @hover-background;
-                        }
-                    }
-
-                    .elevation(2);
-                }
-            }
-
-            .add-predicate-add {
-                margin-right: 16px;
-            }
-        }
-
-        .predicate {
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid @separator;
-            padding: 4px 0;
-
-            &:last-child {
-                border-bottom: none;
-            }
-
-            .predicate-remove {
-                margin-left: 16px;
-                margin-right: 16px;
-            }
-
-            .string-editor {
-                width: 0;
-                flex: 1;
-                padding: 0 16px;
-            }
-
-            .numeric-range-editor {
-                height: 48px;
-                width: 0;
-                flex: 1;
-                -webkit-tap-highlight-color: transparent;
-
-                &:focus {
-                    outline: none;
                 }
             }
         }

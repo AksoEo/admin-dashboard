@@ -61,8 +61,9 @@ export default {
     members: {
         // Search input placeholder
         search: {
-            placeholder: 'Serĉi',
-            addPredicate: '[[Add search predicate]]',
+            title: 'Serĉi',
+            placeholder: '[[Tipu nomon aŭ kodon]]',
+            predicates: '[[Filters]]',
             fields: {
                 name: 'Nomo',
                 age: 'Aĝo',

@@ -2,32 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '@material-ui/core/IconButton';
 import RemoveIcon from '@material-ui/icons/Remove';
-import SearchIcon from '@material-ui/icons/Search';
-import Downshift from 'downshift';
 import locale from '../../../locale';
 import StringEditor from './string';
 import NumericRangeEditor, { NumericRange } from './range';
 
 /** Field descriptions */
 const FIELDS = {
-    name: {
-        type: 'string',
-        default () {
-            return '';
-        }
-    },
-    oldCode: {
-        type: 'string',
-        default () {
-            return '';
-        }
-    },
-    newCode: {
-        type: 'string',
-        default () {
-            return '';
-        }
-    },
     age: {
         type: 'range',
         min: 0,
@@ -113,78 +93,29 @@ export default class PredicateEditor extends React.PureComponent {
             this.predicateRefs.pop();
         }
 
-        const hasFieldsLeftToAdd = !!Object.keys(FIELDS)
-            .filter(field => !existingFields.includes(field)).length;
+        const fieldsLeftToAdd = Object.keys(FIELDS)
+            .filter(field => !existingFields.includes(field));
 
-        const addInput = (
-            <Downshift
-                onChange={item => item && this.addPredicate(item.id)}
-                itemToString={item => item ? item.value : ''}>
-                {downshift => {
-                    this.downshift = downshift;
-
-                    const {
-                        getInputProps,
-                        getItemProps,
-                        getMenuProps,
-                        isOpen,
-                        inputValue,
-                        highlightedIndex
-                    } = downshift;
-
-                    return (
-                        <div className="autocomplete-input">
-                            <input
-                                className="add-predicate-input"
-                                placeholder={this.props.value.length
-                                    ? this.props.addPlaceholder
-                                    : this.props.placeholder}
-                                {...getInputProps()} />
-                            <ul className="autocomplete-options" {...getMenuProps()}>
-                                {isOpen && Object.keys(FIELDS)
-                                    .map(field => ({
-                                        id: field,
-                                        value: locale.members.search.fields[field]
-                                    }))
-                                    .filter(field => field.value
-                                        .toLowerCase()
-                                        .includes(inputValue.toLowerCase()))
-                                    .filter(field => !existingFields.includes(field.id))
-                                    .map((item, index) => (
-                                        // Downshift already adds a key prop
-                                        /* eslint-disable react/jsx-key */
-                                        <li
-                                            {...getItemProps({
-                                                key: item.id,
-                                                index,
-                                                item,
-                                                className: highlightedIndex === index
-                                                    ? 'highlighted'
-                                                    : ''
-                                            })}>
-                                            {item.value}
-                                        </li>
-                                        /* eslint-enable react/jsx-key */
-                                    ))
-                                }
-                            </ul>
-                        </div>
-                    );
-                }}
-            </Downshift>
-        );
+        const addPredicate = fieldsLeftToAdd.length ? (
+            <div className="add-predicate">
+                {fieldsLeftToAdd
+                    .map(field => (
+                        <button key={field} className="add-predicate-field" onClick={() => {
+                            this.addPredicate(field);
+                        }}>
+                            {locale.members.search.fields[field]}
+                        </button>
+                    ))}
+            </div>
+        ) : null;
 
         return (
             <div className="predicate-editor">
+                <div className="predicate-editor-title">
+                    {locale.members.search.predicates}
+                </div>
                 {predicates}
-                {hasFieldsLeftToAdd && (
-                    <div className="add-predicate">
-                        <div className="search-icon-container">
-                            <SearchIcon />
-                        </div>
-                        {addInput}
-                    </div>
-                )}
+                {addPredicate}
             </div>
         );
     }
