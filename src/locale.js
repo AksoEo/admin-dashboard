@@ -63,12 +63,10 @@ export default {
         search: {
             title: 'Serĉi',
             placeholder: 'Nomo aŭ UEA-kodo',
-            predicates: 'Filtriloj',
+            expand: '[[More options]]',
+            collapse: '[[Fewer options]]',
             fields: {
-                name: 'Nomo',
-                age: 'Aĝo',
-                oldCode: 'Malnova UEA-kodo',
-                newCode: 'Nova UEA-kodo'
+                age: 'Aĝo'
             }
         }
     }

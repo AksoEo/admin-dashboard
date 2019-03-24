@@ -5,12 +5,11 @@
         min-height: 100%;
         display: flex;
         justify-content: center;
-        align-items: center;
 
         .search-contents {
+            margin-top: 10%;
             width: 100%;
             max-width: 600px;
-            margin-bottom: 20%;
         }
 
         .search-title {
@@ -22,29 +21,40 @@
         }
 
         .search-box {
-            .elevation(4);
+            position: relative;
             border-radius: 4px;
-            display: flex;
-            align-items: center;
             transition: box-shadow 0.3s @easing;
+            .elevation(4);
 
-            .search-input {
-                width: 0;
-                flex: 1;
-                font: inherit;
-                background: none;
-                color: inherit;
-                border: none;
-                padding: 16px;
-                margin: 0;
+            .search-primary {
+                display: flex;
+                align-items: center;
+                position: relative;
+                background: @card-background;
+                border-radius: inherit;
+                z-index: 1;
 
-                &:focus {
-                    outline: none;
+                .search-icon-container {
+                    width: 48px;
+                    text-align: center;
+                    margin-left: 8px;
                 }
-            }
 
-            .search-button {
-                margin: 0 8px;
+                .search-input {
+                    width: 0;
+                    flex: 1;
+                    font: inherit;
+                    background: none;
+                    color: inherit;
+                    border: none;
+                    padding: 16px;
+                    padding-left: 8px;
+                    margin: 0;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
             }
 
             &:focus-within {
@@ -53,50 +63,25 @@
         }
 
         .predicate-editor {
-            border-radius: 0 0 4px 4px;
-
-            .predicate-editor-title {
-                margin: 0 8px;
-                padding-top: 0.75em;
-                padding-bottom: 0.5em;
-                font-weight: 500;
-                font-size: 0.875em;
-                opacity: 0.8;
-            }
-
-            .add-predicate {
-                padding: 0 4px;
-
-                .add-predicate-field {
-                    font: inherit;
-                    font-size: 0.875em;
-                    font-weight: 500;
-                    color: inherit;
-                    background: #eee;
-                    border-radius: 100px;
-                    border: none;
-                    text-transform: uppercase;
-                    margin: 4px;
-
-                    &::before {
-                        content: '+ ';
-                    }
-                }
-            }
-
             .predicate {
                 display: flex;
                 align-items: center;
                 border-bottom: 1px solid @separator;
                 padding: 4px 0;
+                background: @card-background;
+                transform-origin: 0 0;
+
+                &.animated {
+                    transition: transform 0.3s @easing, opacity 0.3s @easing;
+                }
 
                 &:last-child {
                     border-bottom: none;
+                    border-radius: 0 0 4px 4px;
                 }
 
-                .predicate-remove {
-                    margin-left: 16px;
-                    margin-right: 16px;
+                .predicate-field {
+                    margin: 0 16px;
                 }
 
                 .string-editor {
@@ -116,6 +101,21 @@
                     }
                 }
             }
+
+            &:not(.open) .predicate {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                pointer-events: none;
+                opacity: 0;
+                .elevation(4);
+            }
+        }
+
+        .search-footer {
+            text-align: right;
+            margin-top: 8px;
         }
     }
 }

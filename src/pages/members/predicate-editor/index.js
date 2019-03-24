@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import IconButton from '@material-ui/core/IconButton';
-import RemoveIcon from '@material-ui/icons/Remove';
 import locale from '../../../locale';
 import StringEditor from './string';
 import NumericRangeEditor, { NumericRange } from './range';
@@ -18,6 +16,14 @@ const FIELDS = {
     }
 };
 
+export function defaultFields () {
+    return Object.keys(FIELDS)
+        .map(field => ({
+            field,
+            value: FIELDS[field].default()
+        }));
+}
+
 /**
  * A predicate editor: manages a list of editable predicates and an input to add more.
  */
@@ -26,7 +32,7 @@ export default class PredicateEditor extends React.PureComponent {
         value: PropTypes.array.isRequired,
         onChange: PropTypes.func.isRequired,
         placeholder: PropTypes.string.isRequired,
-        addPlaceholder: PropTypes.string.isRequired
+        isOpen: PropTypes.bool.isRequired
     };
 
     predicateRefs = [];
@@ -56,19 +62,63 @@ export default class PredicateEditor extends React.PureComponent {
         }
     };
 
-    componentDidUpdate () {
+    predicateRects = [];
+
+    componentWillUpdate (newProps) {
+        if (newProps.isOpen !== this.props.isOpen) {
+            this.predicateRects = [];
+            for (const predicate of this.predicateRefs) {
+                this.predicateRects.push(predicate.node.getBoundingClientRect());
+            }
+        }
+    }
+
+    componentDidUpdate (prevProps) {
         if (this.itemToFocus !== null && this.predicateRefs[this.itemToFocus]) {
             this.predicateRefs[this.itemToFocus].focus();
             this.itemToFocus = null;
+        }
+
+        if (prevProps.isOpen !== this.props.isOpen) {
+            // animate predicates expanding/collapsing using FLIP
+
+            const targetRects = [];
+            for (const predicate of this.predicateRefs) {
+                targetRects.push(predicate.node.getBoundingClientRect());
+                predicate.node.classList.remove('animated');
+            }
+
+            for (let i = 0; i < this.predicateRefs.length; i++) {
+                const node = this.predicateRefs[i].node;
+                const startRect = this.predicateRects[i];
+                const targetRect = targetRects[i];
+                const dx = startRect.left - targetRect.left;
+                const dy = startRect.top - targetRect.top;
+                const dsx = startRect.width / targetRect.width;
+                const dsy = startRect.height / targetRect.height;
+                node.style.transform = `translate(${dx}px, ${dy}px) scale(${dsx}, ${dsy})`;
+                node.style.opacity = 1;
+            }
+
+            window.requestAnimationFrame(() => {
+                for (const predicate of this.predicateRefs) {
+                    predicate.node.classList.add('animated');
+                }
+
+                window.requestAnimationFrame(() => {
+                    for (const predicate of this.predicateRefs) {
+                        predicate.node.style.transform = '';
+                        predicate.node.style.opacity = '';
+                    }
+                });
+            });
         }
     }
 
     render () {
         const predicates = [];
-        const existingFields = [];
         let i = 0;
         for (const item of this.props.value) {
-            existingFields.push(item.field);
             const index = i++;
             predicates.push(
                 <Predicate
@@ -93,29 +143,12 @@ export default class PredicateEditor extends React.PureComponent {
             this.predicateRefs.pop();
         }
 
-        const fieldsLeftToAdd = Object.keys(FIELDS)
-            .filter(field => !existingFields.includes(field));
-
-        const addPredicate = fieldsLeftToAdd.length ? (
-            <div className="add-predicate">
-                {fieldsLeftToAdd
-                    .map(field => (
-                        <button key={field} className="add-predicate-field" onClick={() => {
-                            this.addPredicate(field);
-                        }}>
-                            {locale.members.search.fields[field]}
-                        </button>
-                    ))}
-            </div>
-        ) : null;
+        let className = 'predicate-editor';
+        if (this.props.isOpen) className += ' open';
 
         return (
-            <div className="predicate-editor">
-                <div className="predicate-editor-title">
-                    {locale.members.search.predicates}
-                </div>
+            <div className={className}>
                 {predicates}
-                {addPredicate}
             </div>
         );
     }
@@ -129,6 +162,11 @@ class Predicate extends React.PureComponent {
         onRemove: PropTypes.func.isRequired
     };
 
+    /**
+     * The DOM node.
+     * @type {Node|null}
+     */
+    node = null;
     editorRef = null;
 
     focus () {
@@ -162,10 +200,7 @@ class Predicate extends React.PureComponent {
         }
 
         return (
-            <div className="predicate">
-                <IconButton className="predicate-remove" onClick={this.props.onRemove}>
-                    <RemoveIcon />
-                </IconButton>
+            <div className="predicate" ref={node => this.node = node}>
                 <div className="predicate-field">
                     {locale.members.search.fields[this.props.value.field]}:
                 </div>

@@ -1,7 +1,7 @@
 import React from 'react';
-import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
 import SearchIcon from '@material-ui/icons/Search';
-import PredicateEditor from './predicate-editor';
+import PredicateEditor, { defaultFields } from './predicate-editor';
 import locale from '../../locale';
 import './style';
 
@@ -16,9 +16,15 @@ export default class MembersPage extends React.PureComponent {
     }
 }
 
+/** Members’ page search input. */
 class MembersSearch extends React.PureComponent {
     state = {
-        predicates: []
+        predicates: defaultFields(),
+        expanded: false
+    };
+
+    toggleExpanded = () => {
+        this.setState({ expanded: !this.state.expanded });
     };
 
     render () {
@@ -27,20 +33,28 @@ class MembersSearch extends React.PureComponent {
                 <div className="search-contents">
                     <div className="search-title">{locale.members.search.title}</div>
                     <div className="search-box">
-                        <input
-                            className="search-input"
-                            placeholder={locale.members.search.placeholder} />
-                        <IconButton className="search-button">
-                            <SearchIcon />
-                        </IconButton>
-                    </div>
-                    <div className="search-filters">
+                        <div className="search-primary">
+                            <div className="search-icon-container">
+                                <SearchIcon />
+                            </div>
+                            <input
+                                className="search-input"
+                                placeholder={locale.members.search.placeholder} />
+                        </div>
                         <PredicateEditor
                             value={this.state.predicates}
                             onChange={predicates => this.setState({ predicates })}
                             placeholder={locale.members.search.placeholder}
-                            addPlaceholder={locale.members.search.addPredicate} />
+                            addPlaceholder={locale.members.search.addPredicate}
+                            isOpen={this.state.expanded} />
                     </div>
+                    <footer className="search-footer">
+                        <Button className="search-expand" onClick={this.toggleExpanded}>
+                            {this.state.expanded
+                                ? locale.members.search.collapse
+                                : locale.members.search.expand}
+                        </Button>
+                    </footer>
                 </div>
             </div>
         );
