@@ -62,13 +62,13 @@ export default {
         // Search input placeholder
         search: {
             title: 'Serĉi',
-            placeholder: '[[Tipu nomon aŭ kodon]]',
-            predicates: '[[Filters]]',
+            placeholder: 'Nomo aŭ UEA-kodo',
+            predicates: 'Filtriloj',
             fields: {
                 name: 'Nomo',
                 age: 'Aĝo',
-                oldCode: '[[old code]]',
-                newCode: '[[new code]]'
+                oldCode: 'Malnova UEA-kodo',
+                newCode: 'Nova UEA-kodo'
             }
         }
     }
