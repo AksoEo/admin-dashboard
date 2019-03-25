@@ -66,7 +66,10 @@ export default {
             expand: '[[More options]]',
             collapse: '[[Fewer options]]',
             fields: {
-                age: 'Aĝo'
+                age: 'Aĝo',
+                name: 'Nomo',
+                oldCode: 'Malnova UEA-kodo',
+                newCode: 'Nova UEA-kodo'
             }
         }
     }

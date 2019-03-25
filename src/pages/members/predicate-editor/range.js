@@ -60,6 +60,8 @@ export class NumericRange {
 const TRACK_COLOR = '#979797';
 /** Pin/selection background color. */
 const PIN_COLOR = '#31a64f';
+/** Pin/selection background color when the control is disabled. */
+const DISABLED_PIN_COLOR = '#797979';
 /** The color of the focus ring. */
 const FOCUS_COLOR = 'rgba(0, 0, 0, 0.2)';
 /** The width of the focus ring. */
@@ -111,7 +113,8 @@ export default class NumericRangeEditor extends React.PureComponent {
         onChange: PropTypes.func.isRequired,
         min: PropTypes.number.isRequired,
         max: PropTypes.number.isRequired,
-        fmtDisplay: PropTypes.func
+        fmtDisplay: PropTypes.func,
+        disabled: PropTypes.bool
     };
 
     state = {
@@ -399,6 +402,7 @@ export default class NumericRangeEditor extends React.PureComponent {
         const { width, height, scale, focused, expanded, startIncl, endIncl } = this.state;
         const ctx = this.ctx;
         const value = this.props.value;
+        const disabled = this.props.disabled;
 
         // IE 11 doesn’t support setTransform so the context needs to be saved and restored
         ctx.save();
@@ -461,7 +465,7 @@ export default class NumericRangeEditor extends React.PureComponent {
             ? [-Infinity, -Infinity]
             : [startLabelWidth, endLabelWidth];
 
-        ctx.fillStyle = PIN_COLOR;
+        ctx.fillStyle = disabled ? DISABLED_PIN_COLOR : PIN_COLOR;
         ctx.save();
         ctx.beginPath();
         this.drawRoundedRect(pinX, pinY, pinWidth, pinHeight, pinRadius);

@@ -2,7 +2,6 @@
 
 .members-page {
     .members-search {
-        min-height: 100%;
         display: flex;
         justify-content: center;
 
@@ -24,13 +23,13 @@
             position: relative;
             border-radius: 4px;
             transition: box-shadow 0.3s @easing;
+            will-change: height;
             .elevation(4);
 
             .search-primary {
                 display: flex;
                 align-items: center;
                 position: relative;
-                background: @card-background;
                 border-radius: inherit;
                 z-index: 1;
 
@@ -55,33 +54,37 @@
                         outline: none;
                     }
                 }
+
+                .search-expand {
+                    margin-right: 8px;
+                }
             }
 
             &:focus-within {
                 .elevation(6);
             }
-        }
 
-        .predicate-editor {
+            .paper-list-item {
+                position: absolute;
+                width: 100%;
+                background: @card-background;
+                border-radius: 4px;
+                will-change: transform;
+            }
+
             .predicate {
+                width: 100%;
                 display: flex;
                 align-items: center;
-                border-bottom: 1px solid @separator;
                 padding: 4px 0;
-                background: @card-background;
-                transform-origin: 0 0;
 
-                &.animated {
-                    transition: transform 0.3s @easing, opacity 0.3s @easing;
-                }
-
-                &:last-child {
-                    border-bottom: none;
-                    border-radius: 0 0 4px 4px;
+                .predicate-checkbox {
+                    margin-left: 8px;
                 }
 
                 .predicate-field {
                     margin: 0 16px;
+                    margin-left: 8px;
                 }
 
                 .string-editor {
@@ -101,21 +104,28 @@
                     }
                 }
             }
-
-            &:not(.open) .predicate {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                pointer-events: none;
-                opacity: 0;
-                .elevation(4);
-            }
         }
 
-        .search-footer {
-            text-align: right;
-            margin-top: 8px;
+        &.expanded .search-primary .search-input {
+            opacity: 0.5;
+        }
+
+        &.with-results {
+            display: block;
+
+            .search-contents {
+                margin-top: 0;
+                max-width: none;
+            }
+
+            .search-title {
+                display: none;
+            }
+
+            .search-box {
+                .elevation(2);
+                border-radius: 0;
+            }
         }
     }
 }

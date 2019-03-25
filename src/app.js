@@ -20,7 +20,8 @@ import pages from './pages';
 
 const theme = createMuiTheme({
     palette: {
-        primary: { main: '#31a64f' }
+        primary: { main: '#31a64f' },
+        secondary: { main: '#31a64f' }
     },
     typography: {
         useNextVariants: true
