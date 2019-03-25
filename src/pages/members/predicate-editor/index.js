@@ -53,7 +53,8 @@ export default class PredicateEditor extends React.PureComponent {
         enabled: PropTypes.bool.isRequired,
         value: PropTypes.any.isRequired,
         onChange: PropTypes.func.isRequired,
-        onEnabledChange: PropTypes.func.isRequired
+        onEnabledChange: PropTypes.func.isRequired,
+        submitted: PropTypes.bool.isRequired
     };
 
     /**
@@ -104,12 +105,16 @@ export default class PredicateEditor extends React.PureComponent {
                 <Checkbox
                     className="predicate-checkbox"
                     checked={this.props.enabled}
-                    disabled={!field.needsSwitch}
+                    disabled={!field.needsSwitch || this.props.submitted}
                     onChange={(e, checked) => this.props.onEnabledChange(checked)} />
                 <div className="predicate-field">
                     {locale.members.search.fields[this.props.field]}:
                 </div>
-                {editor}
+                <div className="predicate-editor" onClick={e => {
+                    if (this.props.submitted) e.stopPropagation();
+                }}>
+                    {editor}
+                </div>
             </div>
         );
     }

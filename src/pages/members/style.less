@@ -6,9 +6,16 @@
         justify-content: center;
 
         .search-contents {
+            position: relative;
             margin-top: 10%;
             width: 100%;
             max-width: 600px;
+
+            & > .paper-list-item {
+                position: absolute;
+                transform-origin: 0 0;
+                width: 100%;
+            }
         }
 
         .search-title {
@@ -21,6 +28,7 @@
 
         .search-box {
             position: relative;
+            border-radius: 4px;
             border-radius: 4px;
             transition: box-shadow 0.3s @easing;
             will-change: height;
@@ -68,8 +76,9 @@
                 position: absolute;
                 width: 100%;
                 background: @card-background;
-                border-radius: 4px;
+                border-radius: inherit;
                 will-change: transform;
+                transform-origin: 0 0;
             }
 
             .predicate {
@@ -87,6 +96,12 @@
                     margin-left: 8px;
                 }
 
+                .predicate-editor {
+                    display: flex;
+                    width: 0;
+                    flex: 1;
+                }
+
                 .string-editor {
                     width: 0;
                     flex: 1;
@@ -94,9 +109,9 @@
                 }
 
                 .numeric-range-editor {
-                    height: 48px;
                     width: 0;
                     flex: 1;
+                    height: 48px;
                     -webkit-tap-highlight-color: transparent;
 
                     &:focus {
@@ -110,7 +125,12 @@
             opacity: 0.5;
         }
 
-        &.with-results {
+        .search-footer {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        &.submitted {
             display: block;
 
             .search-contents {

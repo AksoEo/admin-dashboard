@@ -65,6 +65,7 @@ export default {
             placeholder: 'Nomo aŭ UEA-kodo',
             expand: '[[More options]]',
             collapse: '[[Fewer options]]',
+            submit: '[[Serĉi]]',
             fields: {
                 age: 'Aĝo',
                 name: 'Nomo',
