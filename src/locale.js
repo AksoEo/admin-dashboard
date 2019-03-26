@@ -66,11 +66,19 @@ export default {
             expand: '[[More options]]',
             collapse: '[[Fewer options]]',
             submit: '[[Serĉi]]',
+            filters: 'Filtriloj',
             fields: {
                 age: 'Aĝo',
                 name: 'Nomo',
+                email: '[[email]]',
+                notes: '[[notes]]',
                 oldCode: 'Malnova UEA-kodo',
                 newCode: 'Nova UEA-kodo'
+            },
+            fieldPlaceholders: {
+                oldCode: 'xxxx-x',
+                newCode: 'xxxxxx',
+                email: '[[a@b.c]]'
             }
         }
     }

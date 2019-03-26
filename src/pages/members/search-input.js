@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import Button from '@material-ui/core/Button';
+import NativeSelect from '@material-ui/core/NativeSelect';
 import SearchIcon from '@material-ui/icons/Search';
 import PredicateEditor, { defaultFields } from './predicate-editor';
 import locale from '../../locale';
 import { Spring, globalAnimator, lerp, clamp } from '../../animation';
+import { SEARCHABLE_FIELDS } from './fields';
 
 /** Members’ page search input. */
 export default class SearchInput extends React.PureComponent {
@@ -14,7 +16,8 @@ export default class SearchInput extends React.PureComponent {
         predicates: defaultFields(),
         expanded: false,
         submitted: false,
-        primarySearch: ''
+        primarySearch: '',
+        searchField: SEARCHABLE_FIELDS[0]
     };
 
     toggleExpanded = () => {
@@ -41,23 +44,38 @@ export default class SearchInput extends React.PureComponent {
         const listItems = [{
             node: <PrimarySearch
                 key="primary"
-                disabled={this.state.expanded}
                 value={this.state.primary}
                 onChange={primary => this.setState({ primary })}
                 onKeyDown={e => {
-                    // TEMP
                     if (e.key === 'Enter') {
-                        this.setState({ submitted: true });
+                        this.onSubmit();
                     }
                 }}
                 submitted={this.state.submitted}
                 expanded={this.state.expanded}
-                toggleExpanded={this.toggleExpanded} />,
-            hidden: this.state.submitted ? !this.state.primary : false
+                toggleExpanded={this.toggleExpanded}
+                searchableFields={SEARCHABLE_FIELDS}
+                searchField={this.state.searchField}
+                onSearchFieldChange={searchField => this.setState({ searchField })} />,
+            hidden: false
+        }, {
+            node: <div className="filters-title">{locale.members.search.filters}</div>,
+            hidden: !this.state.expanded
+                || this.state.submitted && !this.state.predicates.map(i => i.enabled).includes(true)
         }];
 
+        const offset = listItems.length;
+
         for (const item of this.state.predicates) {
-            const index = listItems.length - 1;
+            const index = listItems.length - offset;
+            let isLast = true;
+            for (let j = index + 1; j < this.state.predicates.length; j++) {
+                if (this.state.predicates[j].enabled) {
+                    isLast = false;
+                    break;
+                }
+            }
+
             listItems.push({
                 node: <PredicateEditor
                     key={item.field}
@@ -71,12 +89,15 @@ export default class SearchInput extends React.PureComponent {
                         predicates[index].enabled = true;
                         this.setState({ predicates });
                     }}
+                    isLast={isLast}
                     onEnabledChange={enabled => {
                         const predicates = this.state.predicates.slice();
                         predicates[index].enabled = enabled;
                         this.setState({ predicates });
                     }} />,
-                hidden: this.state.submitted ? !item.enabled : false
+                hidden: this.state.searchField === item.field
+                    ? true
+                    : this.state.submitted ? !item.enabled : false
             });
         }
 
@@ -128,7 +149,10 @@ class PrimarySearch extends React.PureComponent {
         onChange: PropTypes.func.isRequired,
         toggleExpanded: PropTypes.func.isRequired,
         expanded: PropTypes.bool.isRequired,
-        submitted: PropTypes.bool.isRequired
+        submitted: PropTypes.bool.isRequired,
+        searchField: PropTypes.string.isRequired,
+        searchableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+        onSearchFieldChange: PropTypes.func.isRequired
     };
 
     render () {
@@ -140,6 +164,16 @@ class PrimarySearch extends React.PureComponent {
                 <div className="search-icon-container">
                     <SearchIcon />
                 </div>
+                <NativeSelect
+                    className="search-field"
+                    value={this.props.searchField}
+                    onChange={e => this.props.onSearchFieldChange(e.target.value)}>
+                    {this.props.searchableFields.map(field => (
+                        <option value={field} key={field}>
+                            {locale.members.search.fields[field]}
+                        </option>
+                    ))}
+                </NativeSelect>
                 <input
                     className="search-input"
                     {...inputProps}

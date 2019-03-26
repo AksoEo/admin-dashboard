@@ -1,44 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Checkbox from '@material-ui/core/Checkbox';
+import IconButton from '@material-ui/core/IconButton';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import locale from '../../../locale';
+import { FIELDS, FILTERABLE } from '../fields';
 import StringEditor from './string';
-import NumericRangeEditor, { NumericRange } from './range';
-
-/** Field descriptions */
-const FIELDS = {
-    name: {
-        type: 'string',
-        default () {
-            return '';
-        }
-    },
-    oldCode: {
-        type: 'string',
-        default () {
-            return '';
-        }
-    },
-    newCode: {
-        type: 'string',
-        default () {
-            return '';
-        }
-    },
-    age: {
-        type: 'range',
-        min: 0,
-        max: 150,
-        needsSwitch: true,
-        default () {
-            return new NumericRange(0, 35, true, true);
-        }
-    }
-};
+import NumericRangeEditor from './range';
 
 /** Returns the list of default fields. */
 export function defaultFields () {
     return Object.keys(FIELDS)
+        .filter(field => FIELDS[field].flags & FILTERABLE)
         .map(field => ({
             field,
             enabled: false,
@@ -54,7 +27,8 @@ export default class PredicateEditor extends React.PureComponent {
         value: PropTypes.any.isRequired,
         onChange: PropTypes.func.isRequired,
         onEnabledChange: PropTypes.func.isRequired,
-        submitted: PropTypes.bool.isRequired
+        submitted: PropTypes.bool.isRequired,
+        isLast: PropTypes.bool.isRequired
     };
 
     /**
@@ -87,7 +61,9 @@ export default class PredicateEditor extends React.PureComponent {
 
         switch (field.type) {
         case 'string':
-            editor = <StringEditor {...editorProps} />;
+            editor = <StringEditor
+                placeholder={locale.members.search.fieldPlaceholders[this.props.field]}
+                {...editorProps} />;
             break;
         case 'range':
             editor = <NumericRangeEditor
@@ -100,14 +76,33 @@ export default class PredicateEditor extends React.PureComponent {
         let className = 'predicate';
         if (!this.props.enabled) className += ' disabled';
 
+        const userCanToggleEnabled = field.needsSwitch && !this.props.submitted;
+
         return (
             <div className={className} ref={node => this.node = node}>
-                <Checkbox
-                    className="predicate-checkbox"
-                    checked={this.props.enabled}
-                    disabled={!field.needsSwitch || this.props.submitted}
-                    onChange={(e, checked) => this.props.onEnabledChange(checked)} />
-                <div className="predicate-field">
+                {this.props.submitted ? (
+                    this.props.isLast ? (
+                        // seemingly useless button as a fake target for the container click
+                        // event in the search input
+                        <IconButton
+                            className="predicate-expand"
+                            aria-label={locale.members.search.expand}>
+                            <KeyboardArrowDownIcon />
+                        </IconButton>
+                    ) : <div className="predicate-checkbox-placeholder" />
+                ) : (
+                    <Checkbox
+                        className="predicate-checkbox"
+                        checked={this.props.enabled}
+                        disabled={!userCanToggleEnabled}
+                        onChange={(e, checked) => this.props.onEnabledChange(checked)} />
+                )}
+                <div className="predicate-field" onClick={() => {
+                    // also toggle enabled state when clicking on the label
+                    if (userCanToggleEnabled) {
+                        this.props.onEnabledChange(!this.props.enabled);
+                    }
+                }}>
                     {locale.members.search.fields[this.props.field]}:
                 </div>
                 <div className="predicate-editor" onClick={e => {
