@@ -5,15 +5,6 @@ import './style';
 
 /** @jsx h */
 
-let init;
-
-// load polyfills as needed
-if (!('fetch' in window)) {
-    init = import(/* webpackChunkName: "polyfill" */ 'whatwg-fetch');
-} else {
-    init = Promise.resolve(null);
-}
-
 /** Shows the login screen if not logged in and opens the app. */
 function beginSession () {
     const isLoggedIn = window.localStorage.demoLoggedIn;
@@ -85,7 +76,7 @@ function initApp (app, shouldPlayLoginAnimation = false) {
     });
 }
 
-init.then(beginSession);
+beginSession();
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/**service worker file name (see webpack config)**');

@@ -14,5 +14,14 @@
     </head>
     <body>
         <noscript>AKSO ne funkcias sen Javascript</noscript>
+        <script type="text/javascript">
+var isNotSupported = navigator.userAgent.match(/MSIE |Trident\//);
+if (isNotSupported) {
+    var c = document.createElement('div');
+    c.id = 'unsupported';
+    c.innerHTML = '<h1>Via retumilo ne estas subtenata</h1><p>Bonvolu ĝisdatigi al pli nova retumilo kiel ekz. <a href="https://www.google.com/chrome/">Google Chrome</a> aŭ <a href="https://www.mozilla.org/firefox/">Mozilla Firefox</a>.</p>';
+    document.body.appendChild(c);
+}
+        </script>
     </body>
 </html>

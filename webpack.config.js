@@ -9,7 +9,6 @@ const autoprefixer = require('autoprefixer');
 const express = require('express');
 
 const browserTargets = {
-    ie: '11',
     edge: '17',
     chrome: '49',
     firefox: '63',
