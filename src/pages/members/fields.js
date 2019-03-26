@@ -2,43 +2,20 @@ import { NumericRange } from './predicate-editor/range';
 
 export const SEARCHABLE = 1;
 export const FILTERABLE = 1 << 1;
+export const NEEDS_SWITCH = 1 << 2;
 
 /** Field descriptions */
 export const FIELDS = {
-    name: {
+    nameOrCode: {
         type: 'string',
-        flags: SEARCHABLE | FILTERABLE,
+        flags: SEARCHABLE,
         default () {
             return '';
-        }
-    },
-    oldCode: {
-        type: 'string',
-        flags: FILTERABLE,
-        default () {
-            return '';
-        }
-    },
-    newCode: {
-        type: 'string',
-        flags: FILTERABLE,
-        default () {
-            return '';
-        }
-    },
-    age: {
-        type: 'range',
-        flags: FILTERABLE,
-        min: 0,
-        max: 150,
-        needsSwitch: true,
-        default () {
-            return new NumericRange(0, 35, true, true);
         }
     },
     email: {
         type: 'string',
-        flags: SEARCHABLE | FILTERABLE,
+        flags: SEARCHABLE,
         default () {
             return '';
         }
@@ -48,6 +25,29 @@ export const FIELDS = {
         flags: SEARCHABLE,
         default () {
             return '';
+        }
+    },
+    age: {
+        type: 'range',
+        flags: FILTERABLE | NEEDS_SWITCH,
+        min: 0,
+        max: 150,
+        default () {
+            return new NumericRange(0, 35, true, true);
+        }
+    },
+    hasOldCode: {
+        type: 'existence',
+        flags: FILTERABLE | NEEDS_SWITCH,
+        default () {
+            return false;
+        }
+    },
+    hasEmail: {
+        type: 'existence',
+        flags: FILTERABLE | NEEDS_SWITCH,
+        default () {
+            return false;
         }
     }
 };

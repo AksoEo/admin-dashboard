@@ -106,6 +106,7 @@
                 .predicate-field {
                     margin: 0 16px;
                     margin-left: 8px;
+                    cursor: default;
                 }
 
                 .predicate-editor {
@@ -131,6 +132,12 @@
 
                     &:focus {
                         outline: none;
+                    }
+                }
+
+                .existence-editor {
+                    &.disabled {
+                        opacity: 0.5;
                     }
                 }
             }

@@ -16,7 +16,6 @@ export default class SearchInput extends React.PureComponent {
         predicates: defaultFields(),
         expanded: false,
         submitted: false,
-        primarySearch: '',
         searchField: SEARCHABLE_FIELDS[0]
     };
 
@@ -40,6 +39,8 @@ export default class SearchInput extends React.PureComponent {
         let className = 'members-search';
         if (this.state.expanded) className += ' expanded';
         if (this.state.submitted) className += ' submitted';
+
+        const filtersOnly = this.state.expanded && !this.state.primary;
 
         const listItems = [{
             node: <PrimarySearch
@@ -107,7 +108,11 @@ export default class SearchInput extends React.PureComponent {
                     {[
                         {
                             node: (
-                                <div className="search-title">{locale.members.search.title}</div>
+                                <div className="search-title">
+                                    {filtersOnly
+                                        ? locale.members.search.titleFilter
+                                        : locale.members.search.title}
+                                </div>
                             ),
                             hidden: this.state.submitted
                         },
@@ -130,7 +135,9 @@ export default class SearchInput extends React.PureComponent {
                                         color="primary"
                                         className="submit-button"
                                         onClick={this.onSubmit}>
-                                        {locale.members.search.submit}
+                                        {filtersOnly
+                                            ? locale.members.search.submitFilter
+                                            : locale.members.search.submit}
                                     </Button>
                                 </footer>
                             ),
@@ -178,7 +185,7 @@ class PrimarySearch extends React.PureComponent {
                     className="search-input"
                     {...inputProps}
                     onChange={e => this.props.onChange(e.target.value)}
-                    placeholder={locale.members.search.placeholder} />
+                    placeholder={locale.members.search.fieldPlaceholders[this.props.searchField]} />
                 {!this.props.submitted && (
                     <Button className="search-expand" onClick={this.props.toggleExpanded}>
                         {this.props.expanded

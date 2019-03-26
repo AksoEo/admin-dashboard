@@ -59,25 +59,28 @@ export default {
     },
     // Members page
     members: {
-        // Search input placeholder
         search: {
             title: 'Serĉi',
-            placeholder: 'Nomo aŭ UEA-kodo',
+            titleFilter: '[[filter]]',
             expand: '[[More options]]',
             collapse: '[[Fewer options]]',
             submit: '[[Serĉi]]',
+            submitFilter: '[[filter]]',
             filters: 'Filtriloj',
+            existence: {
+                yes: '[[havas]]',
+                no: '[[ne havas]]'
+            },
             fields: {
                 age: 'Aĝo',
-                name: 'Nomo',
+                nameOrCode: 'Nomo aŭ UEA-kodo',
                 email: '[[email]]',
                 notes: '[[notes]]',
-                oldCode: 'Malnova UEA-kodo',
-                newCode: 'Nova UEA-kodo'
+                hasOldCode: '[[havas malnovan UEA-kodon]]',
+                hasEmail: '[[has email]]'
             },
             fieldPlaceholders: {
-                oldCode: 'xxxx-x',
-                newCode: 'xxxxxx',
+                nameOrCode: '[[placeholder]]',
                 email: '[[a@b.c]]'
             }
         }

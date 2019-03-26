@@ -4,9 +4,10 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import locale from '../../../locale';
-import { FIELDS, FILTERABLE } from '../fields';
+import { FIELDS, FILTERABLE, NEEDS_SWITCH } from '../fields';
 import StringEditor from './string';
 import NumericRangeEditor from './range';
+import ExistenceEditor from './existence';
 
 /** Returns the list of default fields. */
 export function defaultFields () {
@@ -52,11 +53,11 @@ export default class PredicateEditor extends React.PureComponent {
             value: this.props.value,
             onChange: value => {
                 this.props.onChange(value);
-                if (!field.needsSwitch) {
+                if (!field.flags & NEEDS_SWITCH) {
                     this.props.onEnabledChange(!!value);
                 }
             },
-            disabled: field.needsSwitch && !this.props.enabled
+            disabled: (field.flags & NEEDS_SWITCH) && !this.props.enabled
         };
 
         switch (field.type) {
@@ -71,12 +72,15 @@ export default class PredicateEditor extends React.PureComponent {
                 max={field.max}
                 {...editorProps} />;
             break;
+        case 'existence':
+            editor = <ExistenceEditor {...editorProps} />;
+            break;
         }
 
         let className = 'predicate';
         if (!this.props.enabled) className += ' disabled';
 
-        const userCanToggleEnabled = field.needsSwitch && !this.props.submitted;
+        const userCanToggleEnabled = (field.flags & NEEDS_SWITCH) && !this.props.submitted;
 
         return (
             <div className={className} ref={node => this.node = node}>
