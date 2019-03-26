@@ -113,7 +113,6 @@ export default class NumericRangeEditor extends React.PureComponent {
         onChange: PropTypes.func.isRequired,
         min: PropTypes.number.isRequired,
         max: PropTypes.number.isRequired,
-        fmtDisplay: PropTypes.func,
         disabled: PropTypes.bool
     };
 
@@ -310,7 +309,7 @@ export default class NumericRangeEditor extends React.PureComponent {
     onTouchStart = e => {
         if (this.onPointerDown(e.touches[0].clientX)) {
             e.preventDefault();
-            window.addEventListener('touchmove', this.onTouchMove);
+            window.addEventListener('touchmove', this.onTouchMove, { passive: false });
             window.addEventListener('touchend', this.onTouchEnd);
         }
     };
@@ -580,6 +579,7 @@ export default class NumericRangeEditor extends React.PureComponent {
     }
 
     componentDidMount () {
+        this.node.addEventListener('touchstart', this.onTouchStart, { passive: false });
         this.resizeObserver = new ResizeObserver(entries => {
             const entry = entries[0];
             this.onResize(entry.contentRect.width, entry.contentRect.height);
@@ -593,6 +593,7 @@ export default class NumericRangeEditor extends React.PureComponent {
     }
 
     componentWillUnmount () {
+        this.node.removeEventListener('touchstart', this.onTouchStart);
         this.resizeObserver.disconnect();
         for (const spring of this.springs) {
             spring.stop();
@@ -635,8 +636,7 @@ export default class NumericRangeEditor extends React.PureComponent {
                 onFocus={() => this.setState({ focused: true })}
                 onBlur={() => this.setState({ focused: false })}
                 onKeyDown={this.onKeyDown}
-                onMouseDown={this.onMouseDown}
-                onTouchStart={this.onTouchStart}>
+                onMouseDown={this.onMouseDown}>
                 <canvas
                     style={{
                         pointerEvents: 'none',

@@ -23,12 +23,15 @@ export function defaultFields () {
 /** A single predicate editor. */
 export default class PredicateEditor extends React.PureComponent {
     static propTypes = {
+        /** The field ID. */
         field: PropTypes.string.isRequired,
         enabled: PropTypes.bool.isRequired,
         value: PropTypes.any.isRequired,
         onChange: PropTypes.func.isRequired,
         onEnabledChange: PropTypes.func.isRequired,
+        /** Should be set to true if the form was submitted and the checkboxes should be hidden. */
         submitted: PropTypes.bool.isRequired,
+        /** Will show a down arrow if submitted and true. */
         isLast: PropTypes.bool.isRequired
     };
 

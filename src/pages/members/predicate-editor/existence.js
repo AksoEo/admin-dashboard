@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import Switch from '@material-ui/core/Switch';
 import locale from '../../../locale';
 
-/** A simple boolean existence editor input. */
+/**
+ * A simple boolean existence editor input.
+ *
+ * Will display a material switch and text beside it (one of “has it” or “does not have it” to
+ * indicate the current state.
+ */
 export default class ExistenceEditor extends React.PureComponent {
     static propTypes = {
         value: PropTypes.bool.isRequired,

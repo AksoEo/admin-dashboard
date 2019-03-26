@@ -8,11 +8,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link, ROUTES } from '../../router';
 import locale from '../../locale';
@@ -62,14 +59,16 @@ NavCategory.propTypes = {
     currentPage: PropTypes.string.isRequired
 };
 
+/** Renders the sidebar contents. */
 export default class SidebarContents extends React.PureComponent {
     static propTypes = {
+        /** The current page ID. Used to highlight the corresponding sidebar item. */
         currentPage: PropTypes.string.isRequired,
+        /** Logout callback. */
         onLogout: PropTypes.func.isRequired
     };
 
     state = {
-        searchQuery: '',
         userMenuOpen: false
     };
 
@@ -123,18 +122,6 @@ export default class SidebarContents extends React.PureComponent {
                 </div>
                 <div className="sidebar-nav-container">
                     <div className="sidebar-nav">
-                        <TextField
-                            className="search-input"
-                            placeholder={locale.sidebar.search}
-                            value={this.state.searchQuery}
-                            onInput={e => this.setState({ searchQuery: e.target.value })}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                )
-                            }} />
                         <nav className="sidebar-nav-list" role="navigation">
                             {ROUTES.map(item => (
                                 <NavCategory

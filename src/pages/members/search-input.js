@@ -210,8 +210,7 @@ class PaperList extends React.PureComponent {
         layout: PropTypes.oneOf(['flat', 'collapsed']).isRequired
     };
 
-    node = null;
-
+    /** ResizeObserver that observes all children. */
     resizeObserver = new ResizeObserver(() => this.update(0));
 
     childNodes = [];
@@ -277,6 +276,7 @@ class PaperList extends React.PureComponent {
         }
     }
 
+    /** Returns the style object for a child at the given index. */
     getChildStyle (index) {
         if (!this.childStates[index]) return;
         const state = this.childStates[index];
@@ -330,10 +330,12 @@ class PaperList extends React.PureComponent {
             );
         }
 
+        // GC node refs
         while (this.childNodes.length > this.props.children.length) {
             this.childNodes.pop();
         }
 
+        // find current total height
         const style = {};
         let lastStateIndex = this.childStates.length - 1;
         while (lastStateIndex > 0 && this.props.children[lastStateIndex].hidden) {
@@ -345,7 +347,7 @@ class PaperList extends React.PureComponent {
         }
 
         return (
-            <div {...props} style={style} ref={node => this.node = node}>
+            <div {...props} style={style}>
                 {items}
             </div>
         );
