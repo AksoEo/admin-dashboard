@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
+import MemberField, { Position } from './fields';
 
 const Sorting = {
     NONE: 0,
@@ -18,19 +19,23 @@ const PosHint = {
 const FIELDS = {
     name: {
         weight: 3,
-        posHint: PosHint.NAME,
-        yHint: 0
+        colWeight: 2,
+        posHint: PosHint.NAME
     },
     newCode: {
         weight: 2,
-        posHint: PosHint.NAME,
-        yHint: 0
+        colWeight: 1,
+        posHint: PosHint.NAME
     },
     codeholderType: {
         weight: 1,
-        posHint: PosHint.LEFT,
-        yHint: 0,
-        fixedColWidth: 56
+        fixedColWidth: 56,
+        posHint: PosHint.LEFT
+    },
+    feeCountry: {
+        weight: 1,
+        colWeight: 1,
+        posHint: PosHint.RIGHT
     }
 };
 
@@ -39,6 +44,9 @@ const WEIGHT_UNIT = 64;
 
 /** The minimum weight scale--the inverse of the max. allowed squishing of table columns. */
 const MIN_WEIGHT_SCALE = 0.6;
+
+/** The max. allowed stretching of table columns. */
+const MAX_WEIGHT_SCALE = 3;
 
 /** Min width for the members list to be a table. */
 const MIN_TABLE_WIDTH = 600;
@@ -62,6 +70,10 @@ export default class MembersList extends React.PureComponent {
             {
                 id: 'newCode',
                 sorting: Sorting.NONE
+            },
+            {
+                id: 'feeCountry',
+                sorting: Sorting.NONE
             }
         ];
     }
@@ -82,7 +94,7 @@ export default class MembersList extends React.PureComponent {
         if (width > MIN_TABLE_WIDTH) {
             const flexWidth = fields
                 .filter(field => !FIELDS[field].fixedColWidth)
-                .map(field => FIELDS[field].weight * WEIGHT_UNIT)
+                .map(field => FIELDS[field].colWeight * WEIGHT_UNIT)
                 .reduce((a, b) => a + b, 0);
 
             const fixedColWidth = fields
@@ -90,14 +102,14 @@ export default class MembersList extends React.PureComponent {
                 .filter(x => x)
                 .reduce((a, b) => a + b, 0);
 
-            const weightScale = (width - fixedColWidth) / flexWidth;
+            const weightScale = Math.min(MAX_WEIGHT_SCALE, (width - fixedColWidth) / flexWidth);
 
             if (fixedColWidth < width && weightScale > MIN_WEIGHT_SCALE) {
                 const columns = fields.map(field => ({
                     id: field,
                     width: FIELDS[field].fixedColWidth
                         ? FIELDS[field].fixedColWidth
-                        : weightScale * FIELDS[field].weight * WEIGHT_UNIT
+                        : weightScale * FIELDS[field].colWeight * WEIGHT_UNIT
                 }));
 
                 this.setState({
@@ -170,7 +182,8 @@ export default class MembersList extends React.PureComponent {
             const EXAMPLE = {
                 name: 'Example McExampleface',
                 newCode: 'exampl',
-                codeholderType: 'human'
+                codeholderType: 'human',
+                feeCountry: 'NL'
             };
 
             for (let i = 0; i < 10; i++) {
@@ -209,23 +222,44 @@ class MemberLi extends React.PureComponent {
             className += ' table-layout';
             contents = template.columns.map(({ id, width }) => (
                 <div className="members-li-column" key={id} style={{ width }}>
-                    {value[id]}
+                    {<MemberField
+                        field={id}
+                        value={value[id]}
+                        position={Position.COLUMN} />}
                 </div>
             ));
         } else {
             className += ' flex-layout';
             contents = [
                 <div className="item-left" key={0}>
-                    {value[template.left]}
+                    {<MemberField
+                        field={template.left}
+                        value={value[template.left]}
+                        position={Position.LEFT} />}
                 </div>,
                 <div className="item-center" key={1}>
                     <div className="item-name">
-                        {template.name.map(f => value[f]).join(', ')}
+                        {template.name.map(f => (
+                            <MemberField
+                                key={f}
+                                field={f}
+                                value={value[f]}
+                                position={Position.NAME} />
+                        ))}
                     </div>
-                    {template.center.map(f => value[f]).join('<br/>')}
+                    {template.center.map(f => (
+                        <MemberField
+                            key={f}
+                            field={f}
+                            value={value[f]}
+                            position={Position.CENTER} />
+                    ))}
                 </div>,
                 <div className="item-right" key={2}>
-                    {value[template.right]}
+                    {<MemberField
+                        field={template.right}
+                        value={value[template.right]}
+                        position={Position.RIGHT} />}
                 </div>
             ];
         }

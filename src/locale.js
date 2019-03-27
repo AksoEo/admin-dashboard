@@ -83,6 +83,12 @@ export default {
                 nameOrCode: '[[placeholder]]',
                 email: '[[a@b.c]]'
             }
+        },
+        fields: {
+            codeholderType: {
+                human: '[[Human]]',
+                org: '[[Organization]]'
+            }
         }
     }
 };
