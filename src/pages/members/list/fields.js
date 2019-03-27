@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import ResizeObserver from 'resize-observer-polyfill';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import locale from '../../../locale';
@@ -47,8 +48,42 @@ const FIELDS = {
             );
         }
     },
-    name ({ value }) {
-        return value;
+    name: class Name extends React.PureComponent {
+        node = null;
+        firstName = null;
+        lastName = null;
+        resizeObserver = null;
+
+        componentDidMount () {
+            this.resizeObserver = new ResizeObserver(() => {
+                if (!this.node) return;
+                const containerWidth = this.node.offsetWidth;
+                const lastWidth = this.lastName.offsetWidth;
+                this.firstName.style.maxWidth = (containerWidth - lastWidth) + 'px';
+            });
+            this.resizeObserver.observe(this.node);
+            this.resizeObserver.observe(this.lastName);
+        }
+
+        componentWillUnmount () {
+            this.resizeObserver.unobserve(this.node);
+            this.resizeObserver.unobserve(this.lastName);
+        }
+
+        render () {
+            const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.value;
+            const first = firstName || firstNameLegal;
+            const last = lastName || lastNameLegal;
+            return (
+                <span className="name" title={`${first} ${last}`} ref={node => this.node = node}>
+                    <span className="first-name" ref={node => this.firstName = node}>
+                        {first}
+                    </span> <span className="last-name" ref={node => this.lastName = node}>
+                        {last}
+                    </span>
+                </span>
+            );
+        }
     },
     newCode ({ value }) {
         return <span className="uea-code">{value}</span>;
@@ -60,8 +95,17 @@ const FIELDS = {
         if (position === Position.LEFT || position === Position.RIGHT) {
             return flag;
         } else {
-            return <span>{flag} todo: fetch name</span>;
+            return <span>{flag} todo</span>;
         }
+    },
+    age ({ value, position }) {
+        if (position === Position.CENTER) {
+            return <div className="age">{locale.members.fields.age}: {value}</div>;
+        }
+        return <span className="age">{value}</span>;
+    },
+    email ({ value }) {
+        return <span className="email">{value}</span>;
     }
 };
 /* eslint-enable react/prop-types */

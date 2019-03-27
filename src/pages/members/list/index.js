@@ -36,6 +36,16 @@ const FIELDS = {
         weight: 1,
         colWeight: 1,
         posHint: PosHint.RIGHT
+    },
+    age: {
+        weight: 2,
+        colWeight: 1,
+        posHint: PosHint.RIGHT
+    },
+    email: {
+        weight: 2,
+        colWeight: 2,
+        posHint: PosHint.CENTER
     }
 };
 
@@ -73,6 +83,14 @@ export default class MembersList extends React.PureComponent {
             },
             {
                 id: 'feeCountry',
+                sorting: Sorting.NONE
+            },
+            {
+                id: 'age',
+                sorting: Sorting.NONE
+            },
+            {
+                id: 'email',
                 sorting: Sorting.NONE
             }
         ];
@@ -180,10 +198,17 @@ export default class MembersList extends React.PureComponent {
         if (this.state.template) {
             // TODO: fetch members list
             const EXAMPLE = {
-                name: 'Example McExampleface',
+                name: {
+                    firstName: 'Example',
+                    firstNameLegal: 'Example',
+                    lastName: 'McExampleface',
+                    lastNameLegal: 'McExampleface'
+                },
                 newCode: 'exampl',
                 codeholderType: 'human',
-                feeCountry: 'NL'
+                feeCountry: 'NL',
+                age: 35,
+                email: 'exam@ple.example'
             };
 
             for (let i = 0; i < 10; i++) {

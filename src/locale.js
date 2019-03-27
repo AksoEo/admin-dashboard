@@ -88,7 +88,8 @@ export default {
             codeholderType: {
                 human: '[[Human]]',
                 org: '[[Organization]]'
-            }
+            },
+            age: 'Aĝo'
         }
     }
 };
