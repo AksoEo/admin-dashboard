@@ -11,12 +11,24 @@ import { SEARCHABLE_FIELDS } from './fields';
 
 /** Members’ page search input. */
 export default class SearchInput extends React.PureComponent {
+    static propTypes = {
+        value: PropTypes.object.isRequired,
+        onChange: PropTypes.func.isRequired,
+        onUnsubmit: PropTypes.func.isRequired,
+        onSubmit: PropTypes.func.isRequired
+    };
+
+    static defaultValue () {
+        return {
+            searchQuery: '',
+            searchField: SEARCHABLE_FIELDS[0],
+            predicates: defaultFields()
+        };
+    }
+
     state = {
-        primary: '',
-        predicates: defaultFields(),
         expanded: false,
-        submitted: false,
-        searchField: SEARCHABLE_FIELDS[0]
+        submitted: false
     };
 
     toggleExpanded = () => {
@@ -25,13 +37,14 @@ export default class SearchInput extends React.PureComponent {
 
     onSubmit = () => {
         this.setState({ submitted: true });
-        // TODO: propagate state up
+        this.props.onSubmit();
     };
 
     onContainerClick = e => {
         if (this.state.submitted) {
             e.preventDefault();
             this.setState({ submitted: false });
+            this.props.onUnsubmit();
         }
     }
 
@@ -40,13 +53,15 @@ export default class SearchInput extends React.PureComponent {
         if (this.state.expanded) className += ' expanded';
         if (this.state.submitted) className += ' submitted';
 
-        const filtersOnly = this.state.expanded && !this.state.primary;
+        const filtersOnly = this.state.expanded && !this.props.value.searchQuery;
 
         const listItems = [{
             node: <PrimarySearch
                 key="primary"
-                value={this.state.primary}
-                onChange={primary => this.setState({ primary })}
+                value={this.props.value.searchQuery}
+                onChange={searchQuery => {
+                    this.props.onChange({ ...this.props.value, searchQuery });
+                }}
                 onKeyDown={e => {
                     if (e.key === 'Enter') {
                         this.onSubmit();
@@ -56,22 +71,25 @@ export default class SearchInput extends React.PureComponent {
                 expanded={this.state.expanded}
                 toggleExpanded={this.toggleExpanded}
                 searchableFields={SEARCHABLE_FIELDS}
-                searchField={this.state.searchField}
-                onSearchFieldChange={searchField => this.setState({ searchField })} />,
+                searchField={this.props.value.searchField}
+                onSearchFieldChange={searchField => {
+                    this.props.onChange({ ...this.props.value, searchField });
+                }} />,
             hidden: false
         }, {
             node: <div className="filters-title">{locale.members.search.filters}</div>,
             hidden: !this.state.expanded
-                || this.state.submitted && !this.state.predicates.map(i => i.enabled).includes(true)
+                || this.state.submitted
+                && !this.props.value.predicates.map(i => i.enabled).includes(true)
         }];
 
         const offset = listItems.length;
 
-        for (const item of this.state.predicates) {
+        for (const item of this.props.value.predicates) {
             const index = listItems.length - offset;
             let isLast = true;
-            for (let j = index + 1; j < this.state.predicates.length; j++) {
-                if (this.state.predicates[j].enabled) {
+            for (let j = index + 1; j < this.props.value.predicates.length; j++) {
+                if (this.props.value.predicates[j].enabled) {
                     isLast = false;
                     break;
                 }
@@ -85,18 +103,18 @@ export default class SearchInput extends React.PureComponent {
                     submitted={this.state.submitted}
                     value={item.value}
                     onChange={value => {
-                        const predicates = this.state.predicates.slice();
+                        const predicates = this.props.value.predicates.slice();
                         predicates[index].value = value;
                         predicates[index].enabled = true;
-                        this.setState({ predicates });
+                        this.props.onChange({ ...this.props.value, predicates });
                     }}
                     isLast={isLast}
                     onEnabledChange={enabled => {
-                        const predicates = this.state.predicates.slice();
+                        const predicates = this.props.value.predicates.slice();
                         predicates[index].enabled = enabled;
-                        this.setState({ predicates });
+                        this.props.onChange({ ...this.props.value, predicates });
                     }} />,
-                hidden: this.state.searchField === item.field
+                hidden: this.props.value.searchField === item.field
                     ? true
                     : this.state.submitted ? !item.enabled : false
             });

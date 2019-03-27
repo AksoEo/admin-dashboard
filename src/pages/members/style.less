@@ -161,6 +161,7 @@
                     max-width: 100%;
                     margin-right: 20px;
                     -webkit-tap-highlight-color: transparent;
+                    user-select: none;
 
                     &:focus {
                         outline: none;
@@ -209,6 +210,42 @@
             .search-box {
                 .elevation(2);
                 border-radius: 0 0 4px 4px;
+            }
+        }
+    }
+
+    .members-list {
+        margin: 24px;
+        animation: members-list-in 0.3s @easing;
+
+        @keyframes members-list-in {
+            from {
+                opacity: 0;
+            }
+        }
+
+        .members-list-item {
+            &.table-layout {
+                display: flex;
+                border-bottom: 1px solid @separator;
+
+                &:last-of-type {
+                    border-bottom: none;
+                }
+
+                .members-li-column {
+                    box-sizing: border-box;
+                    padding: 16px;
+                    overflow: hidden;
+                }
+            }
+
+            &.flex-layout {
+                display: flex;
+
+                .item-center {
+                    flex: 1;
+                }
             }
         }
     }
