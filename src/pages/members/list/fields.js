@@ -43,7 +43,7 @@ const FIELDS = {
         } else {
             return (
                 <span className="inline-codeholder-type">
-                    {locale.members.fields.codeholderType[value]}
+                    {locale.members.fields.codeholderTypes[value]}
                 </span>
             );
         }

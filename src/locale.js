@@ -85,11 +85,16 @@ export default {
             }
         },
         fields: {
-            codeholderType: {
+            codeholderType: '[[codeholder type]]',
+            name: 'Nomo',
+            newCode: '[[Nova UEA-kodo]]',
+            feeCountry: '[[Lando]]',
+            age: 'Aĝo',
+            email: '[[Email]]',
+            codeholderTypes: {
                 human: '[[Human]]',
                 org: '[[Organization]]'
-            },
-            age: 'Aĝo'
+            }
         }
     }
 };

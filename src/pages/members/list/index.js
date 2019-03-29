@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import MemberField, { Position } from './fields';
+import locale from '../../../locale';
 
 const Sorting = {
     NONE: 0,
@@ -30,7 +31,8 @@ const FIELDS = {
     codeholderType: {
         weight: 1,
         fixedColWidth: 56,
-        posHint: PosHint.LEFT
+        posHint: PosHint.LEFT,
+        omitTHead: true
     },
     feeCountry: {
         weight: 1,
@@ -127,7 +129,8 @@ export default class MembersList extends React.PureComponent {
                     id: field,
                     width: FIELDS[field].fixedColWidth
                         ? FIELDS[field].fixedColWidth
-                        : weightScale * FIELDS[field].colWeight * WEIGHT_UNIT
+                        : weightScale * FIELDS[field].colWeight * WEIGHT_UNIT,
+                    omitHeader: !!FIELDS[field].omitTHead
                 }));
 
                 this.setState({
@@ -193,9 +196,15 @@ export default class MembersList extends React.PureComponent {
     }
 
     render () {
+        let header = null;
         const members = [];
 
         if (this.state.template) {
+            if (this.state.template.table) {
+                // add table header
+                header = <TableHeader template={this.state.template} />;
+            }
+
             // TODO: fetch members list
             const EXAMPLE = {
                 name: {
@@ -223,6 +232,7 @@ export default class MembersList extends React.PureComponent {
 
         return (
             <div className="members-list" ref={node => this.node = node}>
+                {header}
                 {members}
             </div>
         );
@@ -290,5 +300,23 @@ class MemberLi extends React.PureComponent {
         }
 
         return <div className={className}>{contents}</div>;
+    }
+}
+
+class TableHeader extends React.PureComponent {
+    static propTypes = {
+        template: PropTypes.object.isRequired
+    };
+
+    render () {
+        return (
+            <div className="table-header">
+                {this.props.template.columns.map(({ id, width, omitHeader }) => (
+                    <div className="table-header-column" key={id} style={{ width }}>
+                        {omitHeader ? null : locale.members.fields[id]}
+                    </div>
+                ))}
+            </div>
+        );
     }
 }
