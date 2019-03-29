@@ -3,12 +3,8 @@ import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import MemberField, { Position } from './fields';
 import locale from '../../../locale';
-
-const Sorting = {
-    NONE: 0,
-    DESC: 1,
-    ASC: 2
-};
+import { Sorting } from './field-picker';
+export FieldPicker from './field-picker';
 
 const PosHint = {
     LEFT: 0,
@@ -50,6 +46,8 @@ const FIELDS = {
         posHint: PosHint.CENTER
     }
 };
+
+export const AVAILABLE_FIELDS = Object.keys(FIELDS);
 
 /** The width of a single “weight” unit in pixels in the table layout. */
 const WEIGHT_UNIT = 64;
@@ -193,6 +191,12 @@ export default class MembersList extends React.PureComponent {
         });
         this.resizeObserver.observe(this.node);
         this.onResize(this.node.offsetWidth);
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.fields !== this.props.fields) {
+            this.buildTemplate();
+        }
     }
 
     render () {

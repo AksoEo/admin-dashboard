@@ -95,6 +95,9 @@ export default {
                 human: '[[Human]]',
                 org: '[[Organization]]'
             }
+        },
+        fieldPicker: {
+            title: '[[Pick fields]]'
         }
     }
 };

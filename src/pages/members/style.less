@@ -314,3 +314,29 @@
         }
     }
 }
+
+.members-field-picker {
+    .rearrangable-list {
+        position: relative;
+        min-width: 400px;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+
+        & > .list-item {
+            &.animated {
+                transition: transform 0.3s @easing;
+            }
+
+            .field-picker-field {
+                display: flex;
+                align-items: center;
+
+                .field-label {
+                    flex: 1;
+                    margin-left: 16px;
+                }
+            }
+        }
+    }
+}
