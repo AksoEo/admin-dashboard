@@ -22,6 +22,7 @@ export default {
         search: 'Serĉi',
         logout: 'Elsaluti'
     },
+    documentTitleTemplate: pageTitle => `${pageTitle} | AKSO`,
     // Page titles
     pages: {
         home: 'Hejmo',
@@ -34,6 +35,8 @@ export default {
     },
     // Login screen
     login: {
+        // Used in the document title
+        title: 'Ensaluti',
         username: 'UEA-kodo aŭ retpoŝtadreso',
         password: 'Pasvorto',
         continue: 'Daŭrigi',

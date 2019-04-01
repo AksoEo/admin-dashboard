@@ -53,6 +53,10 @@ export default class Login extends Component {
         }
     };
 
+    componentDidMount () {
+        document.title = locale.documentTitleTemplate(locale.login.title);
+    }
+
     render () {
         const meta = (
             <div class="login-meta">
