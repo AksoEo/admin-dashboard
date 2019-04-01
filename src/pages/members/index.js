@@ -1,6 +1,6 @@
 import React from 'react';
 import SearchInput from './search-input';
-import MembersList, { FieldPicker, AVAILABLE_FIELDS } from './list';
+import MembersList, { FieldPicker, AVAILABLE_FIELDS, PERMANENT_FIELDS } from './list';
 import './style';
 
 /** The members’ page. */
@@ -26,6 +26,7 @@ export default class MembersPage extends React.PureComponent {
                 <FieldPicker
                     open={this.state.fieldPickerOpen}
                     available={AVAILABLE_FIELDS}
+                    permanent={PERMANENT_FIELDS}
                     selected={this.state.fields}
                     onChange={fields => this.setState({ fields })}
                     onClose={() => this.setState({ fieldPickerOpen: false })} />

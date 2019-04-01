@@ -19,7 +19,7 @@ const FIELDS = {
         colWeight: 2,
         posHint: PosHint.NAME
     },
-    newCode: {
+    code: {
         weight: 2,
         colWeight: 1,
         posHint: PosHint.NAME
@@ -28,9 +28,10 @@ const FIELDS = {
         weight: 1,
         fixedColWidth: 56,
         posHint: PosHint.LEFT,
-        omitTHead: true
+        omitTHead: true,
+        permanent: true
     },
-    feeCountry: {
+    country: {
         weight: 1,
         colWeight: 1,
         posHint: PosHint.RIGHT
@@ -48,6 +49,7 @@ const FIELDS = {
 };
 
 export const AVAILABLE_FIELDS = Object.keys(FIELDS);
+export const PERMANENT_FIELDS = AVAILABLE_FIELDS.filter(field => FIELDS[field].permanent);
 
 /** The width of a single “weight” unit in pixels in the table layout. */
 const WEIGHT_UNIT = 64;
@@ -78,11 +80,11 @@ export default class MembersList extends React.PureComponent {
                 sorting: Sorting.ASC
             },
             {
-                id: 'newCode',
+                id: 'code',
                 sorting: Sorting.NONE
             },
             {
-                id: 'feeCountry',
+                id: 'country',
                 sorting: Sorting.NONE
             },
             {
@@ -217,11 +219,15 @@ export default class MembersList extends React.PureComponent {
                     lastName: 'McExampleface',
                     lastNameLegal: 'McExampleface'
                 },
+                oldCode: 'exam-l',
                 newCode: 'exampl',
                 codeholderType: 'human',
                 feeCountry: 'NL',
                 age: 35,
-                email: 'exam@ple.example'
+                email: 'exam@ple.example',
+                addressLatin: {
+                    country: 'NL'
+                }
             };
 
             for (let i = 0; i < 10; i++) {
@@ -264,6 +270,7 @@ class MemberLi extends React.PureComponent {
                     {<MemberField
                         field={id}
                         value={value[id]}
+                        member={value}
                         position={Position.COLUMN} />}
                 </div>
             ));
@@ -274,6 +281,7 @@ class MemberLi extends React.PureComponent {
                     {<MemberField
                         field={template.left}
                         value={value[template.left]}
+                        member={value}
                         position={Position.LEFT} />}
                 </div>,
                 <div className="item-center" key={1}>
@@ -283,6 +291,7 @@ class MemberLi extends React.PureComponent {
                                 key={f}
                                 field={f}
                                 value={value[f]}
+                                member={value}
                                 position={Position.NAME} />
                         ))}
                     </div>
@@ -291,6 +300,7 @@ class MemberLi extends React.PureComponent {
                             key={f}
                             field={f}
                             value={value[f]}
+                            member={value}
                             position={Position.CENTER} />
                     ))}
                 </div>,
@@ -298,6 +308,7 @@ class MemberLi extends React.PureComponent {
                     {<MemberField
                         field={template.right}
                         value={value[template.right]}
+                        member={value}
                         position={Position.RIGHT} />}
                 </div>
             ];

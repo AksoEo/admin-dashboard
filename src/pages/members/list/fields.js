@@ -18,7 +18,8 @@ const COL_POSITIONS = [Position.COLUMN, Position.LEFT, Position.RIGHT];
 export default class MemberField extends React.PureComponent {
     static propTypes = {
         field: PropTypes.string.isRequired,
-        value: PropTypes.any.isRequired,
+        value: PropTypes.any,
+        member: PropTypes.object.isRequired,
         position: PropTypes.number.isRequired
     };
 
@@ -85,17 +86,36 @@ const FIELDS = {
             );
         }
     },
-    newCode ({ value }) {
-        return <span className="uea-code">{value}</span>;
-    },
-    feeCountry ({ value, position }) {
-        // TEMP: render a flag using two regional indicator symbols to create the emoji
-        const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
-        const flag = toRI(value[0]) + toRI(value[1]);
-        if (position === Position.LEFT || position === Position.RIGHT) {
-            return flag;
+    code ({ member }) {
+        const { oldCode, newCode } = member;
+        if (oldCode) {
+            return (
+                <span className="uea-codes">
+                    <span className="uea-code">
+                        {newCode}
+                    </span> <span className="old-uea-code">
+                        {oldCode}
+                    </span>
+                </span>
+            );
         } else {
-            return <span>{flag} todo</span>;
+            return <span className="uea-code">{newCode}</span>;
+        }
+    },
+    country ({ member, position }) {
+        const { feeCountry, addressLatin: { country } } = member;
+
+        if (feeCountry == country) {
+            // TEMP: render a flag using two regional indicator symbols to create the emoji
+            const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
+            const flag = toRI(feeCountry[0]) + toRI(feeCountry[1]);
+            if (position === Position.LEFT || position === Position.RIGHT) {
+                return flag;
+            } else {
+                return <span>{flag} (nomo)</span>;
+            }
+        } else {
+            return <span>todo</span>;
         }
     },
     age ({ value, position }) {

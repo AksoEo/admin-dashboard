@@ -87,8 +87,8 @@ export default {
         fields: {
             codeholderType: 'Membrospeco',
             name: 'Nomo',
-            newCode: 'Nova UEA-kodo',
-            feeCountry: 'Paglando',
+            code: 'UEA-kodo',
+            country: 'Lando',
             age: 'Aĝo',
             email: 'Retpoŝtadreso',
             codeholderTypes: {
