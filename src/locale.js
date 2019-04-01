@@ -60,44 +60,44 @@ export default {
     // Members page
     members: {
         search: {
-            title: 'Serĉi',
-            titleFilter: '[[filter]]',
-            expand: '[[More options]]',
-            collapse: '[[Fewer options]]',
-            submit: '[[Serĉi]]',
-            submitFilter: '[[filter]]',
+            title: 'Serĉi membrojn',
+            titleFilter: 'Filtri membrojn',
+            expand: 'Montri filtrilojn',
+            collapse: 'Kaŝi filtrilojn',
+            submit: 'Serĉi',
+            submitFilter: 'Filtri',
             filters: 'Filtriloj',
             existence: {
-                yes: '[[havas]]',
-                no: '[[ne havas]]'
+                yes: 'ekzistas',
+                no: 'ne ekzistas'
             },
             fields: {
                 age: 'Aĝo',
                 nameOrCode: 'Nomo aŭ UEA-kodo',
-                email: '[[email]]',
-                notes: '[[notes]]',
-                hasOldCode: '[[havas malnovan UEA-kodon]]',
-                hasEmail: '[[has email]]'
+                email: 'Retpoŝtadreso',
+                notes: 'Notoj',
+                hasOldCode: 'Malnova UEA-kodo',
+                hasEmail: 'Retpoŝtadreso'
             },
             fieldPlaceholders: {
-                nameOrCode: '[[placeholder]]',
-                email: '[[a@b.c]]'
+                nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
+                email: 'Ekz. zamenhof@co.uea.org'
             }
         },
         fields: {
-            codeholderType: '[[codeholder type]]',
+            codeholderType: 'Membrospeco',
             name: 'Nomo',
-            newCode: '[[Nova UEA-kodo]]',
-            feeCountry: '[[Lando]]',
+            newCode: 'Nova UEA-kodo',
+            feeCountry: 'Paglando',
             age: 'Aĝo',
-            email: '[[Email]]',
+            email: 'Retpoŝtadreso',
             codeholderTypes: {
-                human: '[[Human]]',
-                org: '[[Organization]]'
+                human: 'Homo',
+                org: 'Organizo'
             }
         },
         fieldPicker: {
-            title: '[[Pick fields]]'
+            title: 'Montrotaj kampoj'
         }
     }
 };
