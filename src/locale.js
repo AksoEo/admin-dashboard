@@ -24,16 +24,13 @@ export default {
     },
     // Page titles
     pages: {
-        general: 'Ĝeneralaj',
         home: 'Hejmo',
         members: 'Membroj',
         magazines: 'Revuoj',
         statistics: 'Statistiko',
         congresses: 'Kongresoj',
         payments: 'Pagoj',
-        elections: 'Voĉdonado',
-        uea: 'UEA',
-        tejo: 'TEJO'
+        elections: 'Voĉdonado'
     },
     // Login screen
     login: {

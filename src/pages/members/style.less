@@ -5,10 +5,12 @@
         display: flex;
         justify-content: center;
 
+        @max-search-width: 800px;
+
         .search-contents {
             position: relative;
             width: 100%;
-            max-width: 600px;
+            max-width: @max-search-width;
 
             & > .paper-list-item {
                 position: absolute;
@@ -72,7 +74,7 @@
                     flex-shrink: 0;
                 }
 
-                @media (max-width: 600px) {
+                @media (max-width: @max-search-width) {
                     flex-direction: column;
                     align-items: stretch;
                     border-bottom: 1px solid @separator;
@@ -174,7 +176,7 @@
                     }
                 }
 
-                @media (max-width: 600px) {
+                @media (max-width: @max-search-width) {
                     flex-wrap: wrap;
                     border-bottom: 1px solid @separator;
 

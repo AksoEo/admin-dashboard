@@ -96,7 +96,7 @@ export default class SidebarContents extends React.PureComponent {
                             className="user-name"
                             variant="subtitle1"
                             color="inherit">
-                            fsjdakfhsdajkhfhfdjskfhdsjakl
+                            Ludviko Zamenhof
                         </Typography>
                         <IconButton
                             color="inherit"

@@ -22,6 +22,13 @@ const Stage = {
 
 const MIN_INDEX = -3;
 
+const temporaryBackLinkStyle = {
+    display: 'block',
+    textAlign: 'center',
+    fontSize: '1.2em',
+    color: 'inherit'
+};
+
 /** The login screen. */
 export default class Login extends Component {
     static propTypes = {
@@ -109,36 +116,39 @@ export default class Login extends Component {
                         minIndex={MIN_INDEX}
                         onPageChange={this.onPageChange}>
                         <p>
-                            you lost your totp key<br />
+                            (...)<br />
                             <a
+                                style={temporaryBackLinkStyle}
                                 href="#"
                                 onClick={e => {
                                     e.preventDefault();
                                     this.setState({ stage: Stage.SECURITY_CODE });
                                 }}>
-                                back
+                                Reiri
                             </a>
                         </p>
                         <p>
-                            you lost your uea code<br />
+                           (...)<br />
                             <a
+                                style={temporaryBackLinkStyle}
                                 href="#"
                                 onClick={e => {
                                     e.preventDefault();
                                     this.setState({ stage: Stage.DETAILS });
                                 }}>
-                                back
+                                Reiri
                             </a>
                         </p>
                         <p>
-                            you lost your password<br />
+                            (...)<br />
                             <a
+                                style={temporaryBackLinkStyle}
                                 href="#"
                                 onClick={e => {
                                     e.preventDefault();
                                     this.setState({ stage: Stage.DETAILS });
                                 }}>
-                                back
+                                Reiri
                             </a>
                         </p>
                         <Form key={Stage.DETAILS} onSubmit={() => {

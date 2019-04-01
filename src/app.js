@@ -206,7 +206,17 @@ export default class App extends React.PureComponent {
 
         // TODO: remove Todo fallback
         const PageComponent = pages[this.state.currentPage] || function Todo () {
-            return 'todo';
+            return (
+                <div style={{
+                    fontSize: '1.5em',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%'
+                }}>
+                    ...
+                </div>
+            );
         };
         pageContents = (
             <Suspense fallback={

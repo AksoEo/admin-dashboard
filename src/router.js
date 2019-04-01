@@ -53,7 +53,8 @@ Link.propTypes = {
  */
 export const ROUTES = [
     {
-        id: 'general',
+        // TODO: proper grouping
+        id: 'undefined',
         contents: [
             {
                 id: 'home',
@@ -89,26 +90,6 @@ export const ROUTES = [
                 id: 'elections',
                 icon: <HowToVoteIcon />,
                 url: '/vochdonado'
-            }
-        ]
-    },
-    {
-        id: 'uea',
-        contents: [
-            {
-                id: 'uea',
-                icon: <span>?</span>,
-                url: '/todo'
-            }
-        ]
-    },
-    {
-        id: 'tejo',
-        contents: [
-            {
-                id: 'tejo',
-                icon: <span>?</span>,
-                url: '/todo'
             }
         ]
     }

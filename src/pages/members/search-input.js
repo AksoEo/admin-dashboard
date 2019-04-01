@@ -267,6 +267,11 @@ class PaperList extends React.PureComponent {
             const index = i++;
             const child = this.props.children[index];
 
+            if (!this.childNodes[index]) {
+                // FIXME: for some reason update is called even after the component was unmounted
+                return;
+            }
+
             state.hidden.target = child.hidden ? 1 : 0;
 
             if (this.props.layout === 'collapsed') {
