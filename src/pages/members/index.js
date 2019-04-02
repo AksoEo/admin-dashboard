@@ -20,9 +20,6 @@ export default class MembersPage extends React.PureComponent {
                     onChange={search => this.setState({ search })}
                     onSubmit={() => this.setState({ submitted: true })}
                     onUnsubmit={() => this.setState({ submitted: false })} />
-                <button onClick={() => this.setState({ fieldPickerOpen: true })}>
-                    temporary button to do the thing
-                </button>
                 <FieldPicker
                     open={this.state.fieldPickerOpen}
                     available={AVAILABLE_FIELDS}
@@ -32,7 +29,8 @@ export default class MembersPage extends React.PureComponent {
                     onClose={() => this.setState({ fieldPickerOpen: false })} />
                 {this.state.submitted && (
                     <MembersList
-                        fields={this.state.fields} />
+                        fields={this.state.fields}
+                        onEditFields={() => this.setState({ fieldPickerOpen: true })} />
                 )}
             </div>
         );

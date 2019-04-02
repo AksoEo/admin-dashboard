@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
+import IconButton from '@material-ui/core/IconButton';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 import MemberField, { Position } from './fields';
 import locale from '../../../locale';
 import { Sorting } from './field-picker';
@@ -51,6 +53,9 @@ const FIELDS = {
 export const AVAILABLE_FIELDS = Object.keys(FIELDS);
 export const PERMANENT_FIELDS = AVAILABLE_FIELDS.filter(field => FIELDS[field].permanent);
 
+/** Column whose title will be replaced with the Pick Fields button. */
+const FIELDS_BTN_COLUMN = 'codeholderType';
+
 /** The width of a single “weight” unit in pixels in the table layout. */
 const WEIGHT_UNIT = 64;
 
@@ -65,7 +70,8 @@ const MIN_TABLE_WIDTH = 600;
 
 export default class MembersList extends React.PureComponent {
     static propTypes = {
-        fields: PropTypes.arrayOf(PropTypes.object).isRequired
+        fields: PropTypes.arrayOf(PropTypes.object).isRequired,
+        onEditFields: PropTypes.func.isRequired
     };
 
     static defaultFields () {
@@ -208,7 +214,18 @@ export default class MembersList extends React.PureComponent {
         if (this.state.template) {
             if (this.state.template.table) {
                 // add table header
-                header = <TableHeader template={this.state.template} />;
+                header = <TableHeader
+                    template={this.state.template}
+                    onEditFields={this.props.onEditFields} />;
+            } else {
+                // add Edit Fields button
+                header = (
+                    <div className="flex-layout-header">
+                        <IconButton onClick={this.props.onEditFields}>
+                            <ListAltIcon />
+                        </IconButton>
+                    </div>
+                );
             }
 
             // TODO: fetch members list
@@ -278,7 +295,7 @@ class MemberLi extends React.PureComponent {
             className += ' flex-layout';
             contents = [
                 <div className="item-left" key={0}>
-                    {<MemberField
+                    {template.left && <MemberField
                         field={template.left}
                         value={value[template.left]}
                         member={value}
@@ -296,16 +313,17 @@ class MemberLi extends React.PureComponent {
                         ))}
                     </div>
                     {template.center.map(f => (
-                        <MemberField
-                            key={f}
-                            field={f}
-                            value={value[f]}
-                            member={value}
-                            position={Position.CENTER} />
+                        <div className="center-field-line" key={f}>
+                            <MemberField
+                                field={f}
+                                value={value[f]}
+                                member={value}
+                                position={Position.CENTER} />
+                        </div>
                     ))}
                 </div>,
                 <div className="item-right" key={2}>
-                    {<MemberField
+                    {template.right && <MemberField
                         field={template.right}
                         value={value[template.right]}
                         member={value}
@@ -320,17 +338,25 @@ class MemberLi extends React.PureComponent {
 
 class TableHeader extends React.PureComponent {
     static propTypes = {
-        template: PropTypes.object.isRequired
+        template: PropTypes.object.isRequired,
+        onEditFields: PropTypes.func.isRequired
     };
 
     render () {
         return (
             <div className="table-header">
-                {this.props.template.columns.map(({ id, width, omitHeader }) => (
-                    <div className="table-header-column" key={id} style={{ width }}>
-                        {omitHeader ? null : locale.members.fields[id]}
-                    </div>
-                ))}
+                {this.props.template.columns.map(({ id, width, omitHeader }) =>
+                    FIELDS_BTN_COLUMN === id ? (
+                        <IconButton
+                            className="table-header-fields-btn"
+                            onClick={this.props.onEditFields}>
+                            <ListAltIcon />
+                        </IconButton>
+                    ) : (
+                        <div className="table-header-column" key={id} style={{ width }}>
+                            {omitHeader ? null : locale.members.fields[id]}
+                        </div>
+                    ))}
             </div>
         );
     }
