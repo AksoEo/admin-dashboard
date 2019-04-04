@@ -226,7 +226,10 @@ export default class MembersList extends React.PureComponent {
                 // add Edit Fields button
                 header = (
                     <div className="flex-layout-header">
-                        <IconButton onClick={this.props.onEditFields}>
+                        <IconButton
+                            onClick={this.props.onEditFields}
+                            aria-label={locale.members.fieldPicker.title}
+                            title={locale.members.fieldPicker.title}>
                             <ListAltIcon />
                         </IconButton>
                     </div>
@@ -360,6 +363,8 @@ class TableHeader extends React.PureComponent {
                         <IconButton
                             key={id}
                             className="table-header-fields-btn"
+                            aria-label={locale.members.fieldPicker.title}
+                            title={locale.members.fieldPicker.title}
                             onClick={this.props.onEditFields}>
                             <ListAltIcon />
                         </IconButton>

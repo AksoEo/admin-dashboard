@@ -99,6 +99,11 @@ export default {
         },
         fieldPicker: {
             title: 'Montrotaj kampoj'
+        },
+        sorting: {
+            none: '[[not sorted]]',
+            asc: '[[ascending]]',
+            desc: '[[descending]]'
         }
     }
 };
