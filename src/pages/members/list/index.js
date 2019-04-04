@@ -19,29 +19,34 @@ const FIELDS = {
     name: {
         weight: 3,
         colWeight: 2,
-        posHint: PosHint.NAME
+        posHint: PosHint.NAME,
+        sortable: true
     },
     code: {
         weight: 2,
         colWeight: 2,
-        posHint: PosHint.NAME
+        posHint: PosHint.NAME,
+        sortable: true
     },
     codeholderType: {
         weight: 1,
         fixedColWidth: 56,
         posHint: PosHint.LEFT,
         omitTHead: true,
-        permanent: true
+        permanent: true,
+        sortable: true
     },
     country: {
         weight: 1,
         colWeight: 2,
-        posHint: PosHint.RIGHT
+        posHint: PosHint.RIGHT,
+        sortable: true
     },
     age: {
         weight: 2,
         colWeight: 1,
-        posHint: PosHint.RIGHT
+        posHint: PosHint.RIGHT,
+        sortable: true
     },
     email: {
         weight: 2,
@@ -51,22 +56,26 @@ const FIELDS = {
     addressLatin: {
         weight: 1,
         colWeight: 3,
-        posHint: PosHint.CENTER
+        posHint: PosHint.CENTER,
+        sortable: true
     },
     addressCity: {
         weight: 1,
         colWeight: 2,
-        posHint: PosHint.CENTER
+        posHint: PosHint.CENTER,
+        sortable: true
     },
     addressCountryArea: {
         weight: 1,
         colWeight: 2,
-        posHint: PosHint.CENTER
+        posHint: PosHint.CENTER,
+        sortable: true
     }
 };
 
 export const AVAILABLE_FIELDS = Object.keys(FIELDS);
 export const PERMANENT_FIELDS = AVAILABLE_FIELDS.filter(field => FIELDS[field].permanent);
+export const SORTABLE_FIELDS = AVAILABLE_FIELDS.filter(field => FIELDS[field].sortable);
 
 /** Column whose title will be replaced with the Pick Fields button. */
 const FIELDS_BTN_COLUMN = 'codeholderType';
@@ -392,31 +401,46 @@ class TableHeader extends React.PureComponent {
     render () {
         return (
             <div className="table-header">
-                {this.props.template.columns.map(({ id, width, omitHeader }) =>
-                    FIELDS_BTN_COLUMN === id ? (
-                        <IconButton
-                            key={id}
-                            className="table-header-fields-btn"
-                            aria-label={locale.members.fieldPicker.title}
-                            title={locale.members.fieldPicker.title}
-                            onClick={this.props.onEditFields}>
-                            <ListAltIcon />
-                        </IconButton>
-                    ) : (
-                        <div className="table-header-column" key={id} style={{ width }}>
-                            <span className="column-title">
-                                {omitHeader ? null : locale.members.fields[id]}
-                            </span>
+                {this.props.template.columns.map(({ id, width, omitHeader }) => {
+                    const selectedIndex = this.findSelectedIndex(id);
+
+                    const sortingControl = FIELDS[id].sortable
+                        ? (
                             <SortingControl
                                 hideLabel
-                                value={this.props.selected[this.findSelectedIndex(id)].sorting}
+                                // it can happen that the template hasn’t updated yet after
+                                // selected did, so this needs to check for existence
+                                value={selectedIndex !== -1
+                                    ? this.props.selected[selectedIndex].sorting
+                                    : Sorting.NONE}
                                 onChange={sorting => {
                                     const selected = this.props.selected.slice();
                                     selected[this.findSelectedIndex(id)].sorting = sorting;
                                     this.props.onSelectedChange(selected);
                                 }} />
-                        </div>
-                    ))}
+                        )
+                        : <div className="sorting-control-none" />;
+
+                    return (
+                        FIELDS_BTN_COLUMN === id ? (
+                            <IconButton
+                                key={id}
+                                className="table-header-fields-btn"
+                                aria-label={locale.members.fieldPicker.title}
+                                title={locale.members.fieldPicker.title}
+                                onClick={this.props.onEditFields}>
+                                <ListAltIcon />
+                            </IconButton>
+                        ) : (
+                            <div className="table-header-column" key={id} style={{ width }}>
+                                {sortingControl}
+                                <span className="column-title">
+                                    {omitHeader ? null : locale.members.fields[id]}
+                                </span>
+                            </div>
+                        )
+                    );
+                })}
             </div>
         );
     }

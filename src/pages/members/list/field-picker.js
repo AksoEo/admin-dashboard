@@ -34,6 +34,8 @@ export default class FieldPicker extends React.PureComponent {
     static propTypes = {
         /** The list of available fields. */
         available: PropTypes.arrayOf(PropTypes.string).isRequired,
+        /** The list of sortable fields. */
+        sortables: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** The list of fixed fields that won’t be displayed in the options. */
         permanent: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** The list of currently selected fields with their sorting type. */
@@ -158,15 +160,8 @@ export default class FieldPicker extends React.PureComponent {
                 this.props.onChange(selected);
             };
 
-            fields.push(
-                <div
-                    className="field-picker-field selected"
-                    key={field.id}
-                    ref={node => this.selectedLiNodes[index] = node}>
-                    <Checkbox checked={true} onClick={onCheckboxClick} />
-                    <label className="field-label" onClick={onCheckboxClick}>
-                        {locale.members.fields[field.id]}
-                    </label>
+            const sortingControl = this.props.sortables.includes(field.id)
+                ? (
                     <SortingControl
                         value={field.sorting}
                         onChange={sorting => {
@@ -181,6 +176,19 @@ export default class FieldPicker extends React.PureComponent {
                             selected[index].sorting = sorting;
                             this.props.onChange(selected);
                         }} />
+                )
+                : null;
+
+            fields.push(
+                <div
+                    className="field-picker-field selected"
+                    key={field.id}
+                    ref={node => this.selectedLiNodes[index] = node}>
+                    <Checkbox checked={true} onClick={onCheckboxClick} />
+                    <label className="field-label" onClick={onCheckboxClick}>
+                        {locale.members.fields[field.id]}
+                    </label>
+                    {sortingControl}
                     <DragButton
                         onMouseDown={e => this.onMouseDragStart(e, index)}
                         onTouchStart={e => this.onTouchDragStart(e, index)}>
