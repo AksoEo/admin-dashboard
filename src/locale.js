@@ -91,9 +91,9 @@ export default {
             country: 'Lando',
             age: 'Aĝo',
             email: 'Retpoŝtadreso',
-            addressLatin: '[[address]]',
-            addressCity: '[[address city]]',
-            addressCountryArea: '[[address country area]]',
+            addressLatin: 'Adreso',
+            addressCity: 'Urbo',
+            addressCountryArea: 'Regiono',
             codeholderTypes: {
                 human: 'Homo',
                 org: 'Organizo'
@@ -103,9 +103,9 @@ export default {
             title: 'Montrotaj kampoj'
         },
         sorting: {
-            none: '[[not sorted]]',
-            asc: '[[ascending]]',
-            desc: '[[descending]]'
+            none: 'ne ordigata',
+            asc: 'plialtiĝanta',
+            desc: 'malplialtiĝanta'
         }
     }
 };
