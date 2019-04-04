@@ -86,15 +86,6 @@ export default class App extends React.PureComponent {
         }
     };
 
-    /** `routerContext` handler. */
-    onLoginStateChanged = () => {
-        const loggedIn = window.localStorage.demoLoggedIn;
-        this.setState({ loggedIn });
-        if (!loggedIn) {
-            this.shouldPlayLoginAnimation = true;
-        }
-    }
-
     onPopState = () => {
         this.setState({
             currentPage: currentPageFromLocation(),

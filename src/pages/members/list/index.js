@@ -47,6 +47,11 @@ const FIELDS = {
         weight: 2,
         colWeight: 2,
         posHint: PosHint.CENTER
+    },
+    addressLatin: {
+        weight: 1,
+        colWeight: 3,
+        posHint: PosHint.CENTER
     }
 };
 
@@ -243,7 +248,12 @@ export default class MembersList extends React.PureComponent {
                 age: 35,
                 email: 'exam@ple.example',
                 addressLatin: {
-                    country: 'NL'
+                    country: 'NL',
+                    countryArea: 'Holland',
+                    city: 'Amsterdam',
+                    cityArea: 'Idontknow',
+                    postalCode: '12345',
+                    streetAddress: 'Idontknow 12'
                 }
             };
 
@@ -348,6 +358,7 @@ class TableHeader extends React.PureComponent {
                 {this.props.template.columns.map(({ id, width, omitHeader }) =>
                     FIELDS_BTN_COLUMN === id ? (
                         <IconButton
+                            key={id}
                             className="table-header-fields-btn"
                             onClick={this.props.onEditFields}>
                             <ListAltIcon />

@@ -12,12 +12,9 @@ import HowToVoteIcon from '@material-ui/icons/HowToVote';
  * A React context for in-app navigation.
  *
  * - `navigate: (string) => void`: function that may be called to navigate in-app
- * - `loginStateChanged: () => void`: function that may be called to notify the context creator
- *   that the login state has changed
  */
 export const routerContext = React.createContext({
-    navigate: null,
-    loginStateChanged: null
+    navigate: null
 });
 
 /**

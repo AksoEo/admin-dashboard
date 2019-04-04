@@ -126,6 +126,24 @@ const FIELDS = {
     },
     email ({ value }) {
         return <span className="email">{value}</span>;
+    },
+    addressLatin ({ value }) {
+        const streetAddress = (value.streetAddress || '').split('\n')
+            .map((line, i) => (<div key={i} className="address-line">{line}</div>));
+
+        return (
+            <div className="address">
+                {streetAddress}
+                <div className="address-line">
+                    {value.postalCode} {value.cityArea}
+                    {value.cityArea && value.city ? ', ' : ''}
+                    {value.city}
+                </div>
+                <div className="address-line">
+                    {value.countryArea}
+                </div>
+            </div>
+        );
     }
 };
 /* eslint-enable react/prop-types */
