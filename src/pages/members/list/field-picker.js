@@ -371,7 +371,8 @@ class DragButton extends React.PureComponent {
 export class SortingControl extends React.PureComponent {
     static propTypes = {
         value: PropTypes.number.isRequired,
-        onChange: PropTypes.func.isRequired
+        onChange: PropTypes.func.isRequired,
+        hideLabel: PropTypes.bool
     };
 
     onClick = () => {
@@ -400,13 +401,13 @@ export class SortingControl extends React.PureComponent {
 
         return (
             <div className={className} onClick={this.onClick}>
-                <label className="sorting-label">
+                {!this.props.hideLabel && <label className="sorting-label">
                     {this.props.value === Sorting.NONE
                         ? locale.members.sorting.none
                         : this.props.value === Sorting.ASC
                             ? locale.members.sorting.asc
                             : locale.members.sorting.desc}
-                </label>
+                </label>}
                 <IconButton className="sorting-icon">
                     {this.props.value === Sorting.NONE
                         ? <RemoveIcon className="none-icon" />

@@ -30,6 +30,7 @@ export default class MembersPage extends React.PureComponent {
                 {this.state.submitted && (
                     <MembersList
                         fields={this.state.fields}
+                        onFieldsChange={fields => this.setState({ fields })}
                         onEditFields={() => this.setState({ fieldPickerOpen: true })} />
                 )}
             </div>

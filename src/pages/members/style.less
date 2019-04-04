@@ -242,11 +242,29 @@
             .table-header-column {
                 box-sizing: border-box;
                 padding: 16px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                font-size: 0.875em;
-                font-weight: 500;
-                opacity: 0.7;
+                padding-right: 0;
+                white-space: nowrap;
+                display: flex;
+                align-items: center;
+
+                .column-title {
+                    flex: 1;
+                    opacity: 0.7;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    font-size: 0.875em;
+                    font-weight: 500;
+                }
+
+                .sorting-control {
+                    display: inline-block;
+                    font-size: 0.7em;
+                    height: auto;
+
+                    .sorting-icon {
+                        padding: 8px;
+                    }
+                }
             }
 
             .table-header-fields-btn {
@@ -326,6 +344,14 @@
 
             .old-uea-code {
                 background: none;
+            }
+
+            .address {
+                .address-pseudoline {
+                    &:not(:first-of-type)::before {
+                        content: ', ';
+                    }
+                }
             }
         }
     }

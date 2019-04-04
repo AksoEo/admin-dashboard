@@ -92,6 +92,8 @@ export default {
             age: 'Aĝo',
             email: 'Retpoŝtadreso',
             addressLatin: '[[address]]',
+            addressCity: '[[address city]]',
+            addressCountryArea: '[[address country area]]',
             codeholderTypes: {
                 human: 'Homo',
                 org: 'Organizo'

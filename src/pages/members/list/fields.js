@@ -20,7 +20,8 @@ export default class MemberField extends React.PureComponent {
         field: PropTypes.string.isRequired,
         value: PropTypes.any,
         member: PropTypes.object.isRequired,
-        position: PropTypes.number.isRequired
+        position: PropTypes.number.isRequired,
+        templateFields: PropTypes.arrayOf(PropTypes.string).isRequired
     };
 
     render () {
@@ -40,7 +41,13 @@ const FIELDS = {
             let icon;
             if (value === 'human') icon = <PersonIcon />;
             else icon = <BusinessIcon />;
-            return <div className="codeholder-type">{icon}</div>;
+            return (
+                <div
+                    className="codeholder-type"
+                    title={locale.members.fields.codeholderTypes[value]}>
+                    {icon}
+                </div>
+            );
         } else {
             return (
                 <span className="inline-codeholder-type">
@@ -127,23 +134,34 @@ const FIELDS = {
     email ({ value }) {
         return <span className="email">{value}</span>;
     },
-    addressLatin ({ value }) {
+    addressLatin ({ value, templateFields }) {
         const streetAddress = (value.streetAddress || '').split('\n')
-            .map((line, i) => (<div key={i} className="address-line">{line}</div>));
+            .map((line, i) => (<span key={i} className="address-pseudoline">{line}</span>));
+
+        const showCity = !templateFields.includes('addressCity');
+        const showCountryArea = !templateFields.includes('addressCountryArea');
+        const city = showCity ? value.city : '';
+        const countryArea = showCountryArea ? value.countryArea : '';
 
         return (
             <div className="address">
                 {streetAddress}
-                <div className="address-line">
+                <span className="address-pseudoline">
                     {value.postalCode} {value.cityArea}
-                    {value.cityArea && value.city ? ', ' : ''}
-                    {value.city}
-                </div>
-                <div className="address-line">
-                    {value.countryArea}
-                </div>
+                    {value.cityArea && city ? ', ' : ''}
+                    {city}
+                </span>
+                {showCountryArea && <span className="address-pseudoline">
+                    {countryArea}
+                </span>}
             </div>
         );
+    },
+    addressCity ({ member }) {
+        return <span className="address-city">{member.addressLatin.city}</span>;
+    },
+    addressCountryArea ({ member }) {
+        return <span className="address-country-area">{member.addressLatin.countryArea}</span>;
     }
 };
 /* eslint-enable react/prop-types */

@@ -5,7 +5,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import MemberField, { Position } from './fields';
 import locale from '../../../locale';
-import { Sorting } from './field-picker';
+import { Sorting, SortingControl } from './field-picker';
 export FieldPicker from './field-picker';
 
 const PosHint = {
@@ -23,7 +23,7 @@ const FIELDS = {
     },
     code: {
         weight: 2,
-        colWeight: 1,
+        colWeight: 2,
         posHint: PosHint.NAME
     },
     codeholderType: {
@@ -35,7 +35,7 @@ const FIELDS = {
     },
     country: {
         weight: 1,
-        colWeight: 1,
+        colWeight: 2,
         posHint: PosHint.RIGHT
     },
     age: {
@@ -52,6 +52,16 @@ const FIELDS = {
         weight: 1,
         colWeight: 3,
         posHint: PosHint.CENTER
+    },
+    addressCity: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER
+    },
+    addressCountryArea: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER
     }
 };
 
@@ -65,7 +75,7 @@ const FIELDS_BTN_COLUMN = 'codeholderType';
 const WEIGHT_UNIT = 64;
 
 /** The minimum weight scale--the inverse of the max. allowed squishing of table columns. */
-const MIN_WEIGHT_SCALE = 0.6;
+const MIN_WEIGHT_SCALE = 0.8;
 
 /** The max. allowed stretching of table columns. */
 const MAX_WEIGHT_SCALE = 3;
@@ -76,6 +86,7 @@ const MIN_TABLE_WIDTH = 600;
 export default class MembersList extends React.PureComponent {
     static propTypes = {
         fields: PropTypes.arrayOf(PropTypes.object).isRequired,
+        onFieldsChange: PropTypes.func.isRequired,
         onEditFields: PropTypes.func.isRequired
     };
 
@@ -221,6 +232,8 @@ export default class MembersList extends React.PureComponent {
                 // add table header
                 header = <TableHeader
                     template={this.state.template}
+                    selected={this.props.fields}
+                    onSelectedChange={this.props.onFieldsChange}
                     onEditFields={this.props.onEditFields} />;
             } else {
                 // add Edit Fields button
@@ -290,7 +303,14 @@ class MemberLi extends React.PureComponent {
 
         let className = 'members-list-item';
 
-        // TODO: properly render fields
+        const templateFields = template.table
+            ? template.columns.map(field => field.id)
+            : [
+                template.left,
+                template.right,
+                ...template.name,
+                ...template.center
+            ].filter(x => x);
 
         let contents;
         if (template.table) {
@@ -301,7 +321,8 @@ class MemberLi extends React.PureComponent {
                         field={id}
                         value={value[id]}
                         member={value}
-                        position={Position.COLUMN} />}
+                        position={Position.COLUMN}
+                        templateFields={templateFields} />}
                 </div>
             ));
         } else {
@@ -312,7 +333,8 @@ class MemberLi extends React.PureComponent {
                         field={template.left}
                         value={value[template.left]}
                         member={value}
-                        position={Position.LEFT} />}
+                        position={Position.LEFT}
+                        templateFields={templateFields} />}
                 </div>,
                 <div className="item-center" key={1}>
                     <div className="item-name">
@@ -322,7 +344,8 @@ class MemberLi extends React.PureComponent {
                                 field={f}
                                 value={value[f]}
                                 member={value}
-                                position={Position.NAME} />
+                                position={Position.NAME}
+                                templateFields={templateFields} />
                         ))}
                     </div>
                     {template.center.map(f => (
@@ -331,7 +354,8 @@ class MemberLi extends React.PureComponent {
                                 field={f}
                                 value={value[f]}
                                 member={value}
-                                position={Position.CENTER} />
+                                position={Position.CENTER}
+                                templateFields={templateFields} />
                         </div>
                     ))}
                 </div>,
@@ -340,7 +364,8 @@ class MemberLi extends React.PureComponent {
                         field={template.right}
                         value={value[template.right]}
                         member={value}
-                        position={Position.RIGHT} />}
+                        position={Position.RIGHT}
+                        templateFields={templateFields} />}
                 </div>
             ];
         }
@@ -352,8 +377,17 @@ class MemberLi extends React.PureComponent {
 class TableHeader extends React.PureComponent {
     static propTypes = {
         template: PropTypes.object.isRequired,
+        selected: PropTypes.arrayOf(PropTypes.object).isRequired,
+        onSelectedChange: PropTypes.func.isRequired,
         onEditFields: PropTypes.func.isRequired
     };
+
+    findSelectedIndex (id) {
+        for (let i = 0; i < this.props.selected.length; i++) {
+            if (this.props.selected[i].id === id) return i;
+        }
+        return -1;
+    }
 
     render () {
         return (
@@ -370,7 +404,17 @@ class TableHeader extends React.PureComponent {
                         </IconButton>
                     ) : (
                         <div className="table-header-column" key={id} style={{ width }}>
-                            {omitHeader ? null : locale.members.fields[id]}
+                            <span className="column-title">
+                                {omitHeader ? null : locale.members.fields[id]}
+                            </span>
+                            <SortingControl
+                                hideLabel
+                                value={this.props.selected[this.findSelectedIndex(id)].sorting}
+                                onChange={sorting => {
+                                    const selected = this.props.selected.slice();
+                                    selected[this.findSelectedIndex(id)].sorting = sorting;
+                                    this.props.onSelectedChange(selected);
+                                }} />
                         </div>
                     ))}
             </div>
