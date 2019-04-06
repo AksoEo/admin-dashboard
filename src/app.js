@@ -42,7 +42,7 @@ function currentPageFromLocation () {
     }
 
     const pathParts = pagePath.split('/').filter(x => x);
-    const pageIDPart = '/' + pathParts.shift();
+    const pageIDPart = '/' + (pathParts.shift() || '');
 
     for (const category of ROUTES) {
         for (const item of category.contents) {
