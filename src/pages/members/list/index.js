@@ -96,7 +96,8 @@ export default class MembersList extends React.PureComponent {
     static propTypes = {
         fields: PropTypes.arrayOf(PropTypes.object).isRequired,
         onFieldsChange: PropTypes.func.isRequired,
-        onEditFields: PropTypes.func.isRequired
+        onEditFields: PropTypes.func.isRequired,
+        openMemberWithTransitionTitleNode: PropTypes.func.isRequired
     };
 
     static defaultFields () {
@@ -125,7 +126,8 @@ export default class MembersList extends React.PureComponent {
     }
 
     state = {
-        template: null
+        template: null,
+        opening: false
     };
 
     node = null;
@@ -206,6 +208,12 @@ export default class MembersList extends React.PureComponent {
         });
     }
 
+    openMember (index, node) {
+        const memberID = `abcdef`; // TODO: this
+        this.setState({ opening: true });
+        this.props.openMemberWithTransitionTitleNode(memberID, node);
+    }
+
     onResize (width) {
         if (width === this.currentWidth) return;
         this.currentWidth = width;
@@ -278,17 +286,22 @@ export default class MembersList extends React.PureComponent {
             };
 
             for (let i = 0; i < 10; i++) {
+                const index = i;
                 members.push(
                     <MemberLi
                         key={i}
                         value={EXAMPLE}
-                        template={this.state.template} />
+                        template={this.state.template}
+                        onOpen={node => this.openMember(index, node)} />
                 );
             }
         }
 
+        let className = 'members-list';
+        if (this.state.opening) className += ' opening';
+
         return (
-            <div className="members-list" ref={node => this.node = node}>
+            <div className={className} ref={node => this.node = node}>
                 {header}
                 {members}
             </div>
@@ -299,8 +312,13 @@ export default class MembersList extends React.PureComponent {
 class MemberLi extends React.PureComponent {
     static propTypes = {
         template: PropTypes.object.isRequired,
-        value: PropTypes.object.isRequired
+        value: PropTypes.object.isRequired,
+        onOpen: PropTypes.func.isRequired
     };
+
+    transitionTitleNode = null;
+
+    onClick = () => this.props.onOpen(this.transitionTitleNode);
 
     render () {
         const { template, value } = this.props;
@@ -326,7 +344,8 @@ class MemberLi extends React.PureComponent {
                         value={value[id]}
                         member={value}
                         position={Position.COLUMN}
-                        templateFields={templateFields} />}
+                        templateFields={templateFields}
+                        transitionTitleRef={node => this.transitionTitleNode = node} />}
                 </div>
             ));
         } else {
@@ -338,7 +357,8 @@ class MemberLi extends React.PureComponent {
                         value={value[template.left]}
                         member={value}
                         position={Position.LEFT}
-                        templateFields={templateFields} />}
+                        templateFields={templateFields}
+                        transitionTitleRef={node => this.transitionTitleNode = node} />}
                 </div>,
                 <div className="item-center" key={1}>
                     <div className="item-name">
@@ -349,7 +369,8 @@ class MemberLi extends React.PureComponent {
                                 value={value[f]}
                                 member={value}
                                 position={Position.NAME}
-                                templateFields={templateFields} />
+                                templateFields={templateFields}
+                                transitionTitleRef={node => this.transitionTitleNode = node} />
                         ))}
                     </div>
                     {template.center.map(f => (
@@ -359,7 +380,8 @@ class MemberLi extends React.PureComponent {
                                 value={value[f]}
                                 member={value}
                                 position={Position.CENTER}
-                                templateFields={templateFields} />
+                                templateFields={templateFields}
+                                transitionTitleRef={node => this.transitionTitleNode = node} />
                         </div>
                     ))}
                 </div>,
@@ -369,12 +391,13 @@ class MemberLi extends React.PureComponent {
                         value={value[template.right]}
                         member={value}
                         position={Position.RIGHT}
-                        templateFields={templateFields} />}
+                        templateFields={templateFields}
+                        transitionTitleRef={node => this.transitionTitleNode = node} />}
                 </div>
             ];
         }
 
-        return <div className={className}>{contents}</div>;
+        return <div className={className} onClick={this.onClick}>{contents}</div>;
     }
 }
 

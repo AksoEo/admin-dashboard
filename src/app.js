@@ -32,7 +32,7 @@ const theme = createMuiTheme({
 const PERMA_SIDEBAR_WIDTH = 900;
 const USE_HISTORY_API = 'pushState' in window.history;
 
-/** @returns {string} the current page ID. */
+/** @returns {string[]} the current page ID, and further path elements. */
 function currentPageFromLocation () {
     let pagePath;
     if (USE_HISTORY_API) {
@@ -41,15 +41,18 @@ function currentPageFromLocation () {
         pagePath = document.location.hash.substr(1);
     }
 
+    const pathParts = pagePath.split('/').filter(x => x);
+    const pageIDPart = '/' + pathParts.shift();
+
     for (const category of ROUTES) {
         for (const item of category.contents) {
-            if (item.url === decodeURIComponent(pagePath)) {
-                return item.id;
+            if (item.url === pageIDPart) {
+                return [item.id, ...pathParts];
             }
         }
     }
 
-    return null;
+    return [null];
 }
 
 /** The main app. */
@@ -128,7 +131,7 @@ export default class App extends React.PureComponent {
      * Updates the document title (shown in e.g. the tab bar) to reflect the current page.
      */
     updatePageTitle () {
-        document.title = locale.documentTitleTemplate(locale.pages[this.state.currentPage]);
+        document.title = locale.documentTitleTemplate(locale.pages[this.state.currentPage[0]]);
     }
 
     /**
@@ -169,7 +172,7 @@ export default class App extends React.PureComponent {
                         className="header-title"
                         color="inherit"
                         variant="h6">
-                        {locale.pages[this.state.currentPage]}
+                        {locale.pages[this.state.currentPage[0]]}
                     </Typography>
                     <div style={{ flexGrow: 1 }} />
                     <IconButton aria-label={locale.header.overflow} color="inherit">
@@ -203,12 +206,12 @@ export default class App extends React.PureComponent {
                 onOpen={() => this.setState({ sidebarOpen: true })}
                 onClose={() => this.setState({ sidebarOpen: false })}
                 animateIn={this.shouldPlayLoginAnimation}
-                currentPage={this.state.currentPage}
+                currentPage={this.state.currentPage[0]}
                 onLogout={this.props.onLogout} />
         );
 
         // TODO: remove Todo fallback
-        const PageComponent = pages[this.state.currentPage] || function Todo () {
+        const PageComponent = pages[this.state.currentPage[0]] || function Todo () {
             return (
                 <div style={{
                     fontSize: '1.5em',
@@ -227,7 +230,7 @@ export default class App extends React.PureComponent {
                     <CircularProgress className="page-loading-indicator" />
                 </div>
             }>
-                <PageComponent />
+                <PageComponent path={this.state.currentPage.slice(1)} />
             </Suspense>
         );
 

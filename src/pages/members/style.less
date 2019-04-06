@@ -229,8 +229,18 @@
         margin-top: 8px;
         animation: members-list-in 0.3s @easing;
 
+        &.opening {
+            animation: members-list-out 0.1s @easing forwards;
+        }
+
         @keyframes members-list-in {
             from {
+                opacity: 0;
+            }
+        }
+
+        @keyframes members-list-out {
+            to {
                 opacity: 0;
             }
         }

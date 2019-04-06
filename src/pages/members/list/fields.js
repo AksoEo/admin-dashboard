@@ -21,7 +21,8 @@ export default class MemberField extends React.PureComponent {
         value: PropTypes.any,
         member: PropTypes.object.isRequired,
         position: PropTypes.number.isRequired,
-        templateFields: PropTypes.arrayOf(PropTypes.string).isRequired
+        templateFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+        transitionTitleRef: PropTypes.func.isRequired
     };
 
     render () {
@@ -83,7 +84,13 @@ const FIELDS = {
             const first = firstName || firstNameLegal;
             const last = lastName || lastNameLegal;
             return (
-                <span className="name" title={`${first} ${last}`} ref={node => this.node = node}>
+                <span
+                    className="name"
+                    title={`${first} ${last}`}
+                    ref={node => {
+                        this.node = node;
+                        this.props.transitionTitleRef(node);
+                    }}>
                     <span className="first-name" ref={node => this.firstName = node}>
                         {first}
                     </span> <span className="last-name" ref={node => this.lastName = node}>

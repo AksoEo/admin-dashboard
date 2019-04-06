@@ -14,6 +14,7 @@ export default class SearchInput extends React.PureComponent {
     static propTypes = {
         value: PropTypes.object.isRequired,
         onChange: PropTypes.func.isRequired,
+        submitted: PropTypes.bool.isRequired,
         onUnsubmit: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired
     };
@@ -27,8 +28,7 @@ export default class SearchInput extends React.PureComponent {
     }
 
     state = {
-        expanded: false,
-        submitted: false
+        expanded: false
     };
 
     toggleExpanded = () => {
@@ -41,7 +41,7 @@ export default class SearchInput extends React.PureComponent {
     };
 
     onContainerClick = e => {
-        if (this.state.submitted) {
+        if (this.props.submitted) {
             e.preventDefault();
             this.setState({ submitted: false });
             this.props.onUnsubmit();
@@ -51,7 +51,7 @@ export default class SearchInput extends React.PureComponent {
     render () {
         let className = 'members-search';
         if (this.state.expanded) className += ' expanded';
-        if (this.state.submitted) className += ' submitted';
+        if (this.props.submitted) className += ' submitted';
 
         const filtersOnly = this.state.expanded && !this.props.value.searchQuery;
 
@@ -67,7 +67,7 @@ export default class SearchInput extends React.PureComponent {
                         this.onSubmit();
                     }
                 }}
-                submitted={this.state.submitted}
+                submitted={this.props.submitted}
                 expanded={this.state.expanded}
                 toggleExpanded={this.toggleExpanded}
                 searchableFields={SEARCHABLE_FIELDS}
@@ -79,7 +79,7 @@ export default class SearchInput extends React.PureComponent {
         }, {
             node: <div className="filters-title">{locale.members.search.filters}</div>,
             hidden: !this.state.expanded
-                || this.state.submitted
+                || this.props.submitted
                 && !this.props.value.predicates.map(i => i.enabled).includes(true)
         }];
 
@@ -100,7 +100,7 @@ export default class SearchInput extends React.PureComponent {
                     key={item.field}
                     field={item.field}
                     enabled={item.enabled}
-                    submitted={this.state.submitted}
+                    submitted={this.props.submitted}
                     value={item.value}
                     onChange={value => {
                         const predicates = this.props.value.predicates.slice();
@@ -116,7 +116,7 @@ export default class SearchInput extends React.PureComponent {
                     }} />,
                 hidden: this.props.value.searchField === item.field
                     ? true
-                    : this.state.submitted ? !item.enabled : false
+                    : this.props.submitted ? !item.enabled : false
             });
         }
 
@@ -132,7 +132,7 @@ export default class SearchInput extends React.PureComponent {
                                         : locale.members.search.title}
                                 </div>
                             ),
-                            hidden: this.state.submitted
+                            hidden: this.props.submitted
                         },
                         {
                             node: (
@@ -159,7 +159,7 @@ export default class SearchInput extends React.PureComponent {
                                     </Button>
                                 </footer>
                             ),
-                            hidden: this.state.submitted
+                            hidden: this.props.submitted
                         }
                     ]}
                 </PaperList>
