@@ -100,7 +100,6 @@ export default class MembersList extends React.PureComponent {
     };
 
     static defaultFields () {
-        // TEMP
         return [
             {
                 id: 'codeholderType',
@@ -108,22 +107,18 @@ export default class MembersList extends React.PureComponent {
             },
             {
                 id: 'name',
-                sorting: Sorting.ASC
+                sorting: Sorting.NONE
             },
             {
                 id: 'code',
-                sorting: Sorting.NONE
-            },
-            {
-                id: 'country',
-                sorting: Sorting.NONE
+                sorting: Sorting.DESC
             },
             {
                 id: 'age',
                 sorting: Sorting.NONE
             },
             {
-                id: 'email',
+                id: 'country',
                 sorting: Sorting.NONE
             }
         ];

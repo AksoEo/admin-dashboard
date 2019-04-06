@@ -636,7 +636,8 @@ export default class NumericRangeEditor extends React.PureComponent {
                 onFocus={() => this.setState({ focused: true })}
                 onBlur={() => this.setState({ focused: false })}
                 onKeyDown={this.onKeyDown}
-                onMouseDown={this.onMouseDown}>
+                onMouseDown={this.onMouseDown}
+                role="slider">
                 <canvas
                     style={{
                         pointerEvents: 'none',

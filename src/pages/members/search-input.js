@@ -121,7 +121,7 @@ export default class SearchInput extends React.PureComponent {
         }
 
         return (
-            <div className={className} onClick={this.onContainerClick}>
+            <div className={className} onClick={this.onContainerClick} role="form">
                 <PaperList className="search-contents" layout="flat">
                     {[
                         {
@@ -252,7 +252,9 @@ class PaperList extends React.PureComponent {
             height.on('update', forceUpdate);
             hidden.on('update', forceUpdate);
 
-            this.childStates.push({ y, height, hidden });
+            const effectivelyHidden = false;
+
+            this.childStates.push({ y, height, hidden, effectivelyHidden });
         }
 
         while (this.childStates.length > this.props.children.length) {
@@ -273,10 +275,13 @@ class PaperList extends React.PureComponent {
             }
 
             state.hidden.target = child.hidden ? 1 : 0;
+            state.effectivelyHidden = child.hidden;
 
             if (this.props.layout === 'collapsed') {
                 state.y.target = 0;
                 state.height.target = this.childNodes[0].offsetHeight;
+
+                if (index !== 0) state.effectivelyHidden = true;
             } else if (this.props.layout === 'flat') {
                 state.y.target = yAccum;
                 state.height.target = this.childNodes[index].offsetHeight;
@@ -335,6 +340,7 @@ class PaperList extends React.PureComponent {
         const items = [];
         for (let i = 0; i < this.props.children.length; i++) {
             const { node } = this.props.children[i];
+            const hidden = this.childStates[i] ? this.childStates[i].effectivelyHidden : true;
             const style = this.getChildStyle(i);
             const index = i;
             items.push(
@@ -342,6 +348,7 @@ class PaperList extends React.PureComponent {
                     key={i}
                     className="paper-list-item"
                     style={style}
+                    aria-hidden={hidden}
                     ref={node => {
                         this.childNodes[index] = node;
                         if (node) {

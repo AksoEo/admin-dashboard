@@ -84,6 +84,12 @@ export default {
                 email: 'Ekz. zamenhof@co.uea.org'
             }
         },
+        resultStats: (count, filtered, total, time) => {
+            const plural = n => n === 1 ? '' : 'j';
+            return `[[Montras ${count} rezulto${plural(count)}n ${
+                filtered ? `filtrita${plural(count)}n ` : ''}el entute ${
+                total} trovita${plural(total)} en ${time}]]`;
+        },
         fields: {
             codeholderType: 'Membrospeco',
             name: 'Nomo',
