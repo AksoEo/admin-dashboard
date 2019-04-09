@@ -86,9 +86,9 @@ export default {
         },
         resultStats: (count, filtered, total, time) => {
             const plural = n => n === 1 ? '' : 'j';
-            return `[[Montras ${count} rezulto${plural(count)}n ${
+            return `Montras ${count} rezulto${plural(count)}n ${
                 filtered ? `filtrita${plural(count)}n ` : ''}el entute ${
-                total} trovita${plural(total)} en ${time}]]`;
+                total} trovita${plural(total)} en ${time}`;
         },
         fields: {
             codeholderType: 'Membrospeco',
@@ -114,8 +114,8 @@ export default {
             desc: 'malplialtiĝanta'
         },
         pagination: {
-            displayedRows: ({ from, to, count }) => `[[${from}–${to} of ${count}]]`,
-            rowsPerPage: '[[rows per page:]]'
+            displayedRows: ({ from, to, count }) => `${from}–${to} el ${count}`,
+            rowsPerPage: 'Rezultoj po paĝo'
         }
     }
 };
