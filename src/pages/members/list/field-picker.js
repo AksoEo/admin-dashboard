@@ -47,7 +47,8 @@ export default class FieldPicker extends React.PureComponent {
     };
 
     state = {
-        fullScreen: window.innerWidth <= FULLSCREEN_WIDTH
+        fullScreen: window.innerWidth <= FULLSCREEN_WIDTH,
+        draggingIndex: -1
     };
 
     /**
@@ -64,11 +65,8 @@ export default class FieldPicker extends React.PureComponent {
         this.setState({ fullScreen: window.innerWidth <= FULLSCREEN_WIDTH });
     };
 
-    /** Index of the item that’s currently being dragged. */
-    draggingIndex = -1;
-
     onDragStart (clientY, index) {
-        this.draggingIndex = index;
+        this.setState({ draggingIndex: index });
     }
     onDragMove (clientY) {
         const listTop = this.listNode.getBoundingClientRect().top;
@@ -87,13 +85,16 @@ export default class FieldPicker extends React.PureComponent {
             y += nodeHeight;
         }
 
-        if (newIndex === -1 || newIndex === this.draggingIndex) return;
+        if (newIndex === -1 || newIndex === this.state.draggingIndex) return;
 
         const selected = this.props.selected.slice();
-        const item = selected.splice(this.draggingIndex, 1)[0];
+        const item = selected.splice(this.state.draggingIndex, 1)[0];
         selected.splice(newIndex, 0, item);
-        this.draggingIndex = newIndex;
+        this.setState({ draggingIndex: newIndex });
         this.props.onChange(selected);
+    }
+    onDragEnd () {
+        this.setState({ draggingIndex: -1 });
     }
 
     onMouseDragStart = (e, index) => {
@@ -104,6 +105,7 @@ export default class FieldPicker extends React.PureComponent {
     };
     onMouseDragMove = e => this.onDragMove(e.clientY);
     onMouseDragEnd = () => {
+        this.onDragEnd();
         window.removeEventListener('mousemove', this.onMouseDragMove);
         window.removeEventListener('mouseup', this.onMouseDragEnd);
     };
@@ -115,6 +117,7 @@ export default class FieldPicker extends React.PureComponent {
     };
     onTouchDragMove = e => this.onDragMove(e.touches[0].clientY);
     onTouchDragEnd = () => {
+        this.onDragEnd();
         window.removeEventListener('touchmove', this.onTouchDragMove);
         window.removeEventListener('touchend', this.onTouchDragEnd);
     };
@@ -172,9 +175,12 @@ export default class FieldPicker extends React.PureComponent {
                 )
                 : null;
 
+            let className = 'field-picker-field selected';
+            if (this.state.draggingIndex === index) className += ' dragging';
+
             fields.push(
                 <div
-                    className="field-picker-field selected"
+                    className={className}
                     key={field.id}
                     ref={node => this.selectedLiNodes[index] = node}>
                     <Checkbox checked={true} onClick={onCheckboxClick} />

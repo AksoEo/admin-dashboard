@@ -411,10 +411,19 @@
             .field-picker-field {
                 display: flex;
                 align-items: center;
+                border-radius: 4px;
+                transition: box-shadow 0.3s @easing;
 
                 .field-label {
                     flex: 1;
                     margin-left: 16px;
+                }
+
+                &.dragging {
+                    position: relative;
+                    background: @card-background;
+                    .elevation(5);
+                    z-index: 2;
                 }
             }
         }
