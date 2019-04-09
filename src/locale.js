@@ -112,6 +112,10 @@ export default {
             none: 'ne ordigata',
             asc: 'plialtiĝanta',
             desc: 'malplialtiĝanta'
+        },
+        pagination: {
+            displayedRows: ({ from, to, count }) => `[[${from}–${to} of ${count}]]`,
+            rowsPerPage: '[[rows per page:]]'
         }
     }
 };

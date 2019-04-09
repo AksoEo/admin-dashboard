@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { UEACode } from 'akso-client';
+import TablePagination from '@material-ui/core/TablePagination';
 import SearchInput from './search-input';
 import MembersList, {
     FieldPicker, AVAILABLE_FIELDS, SORTABLE_FIELDS, PERMANENT_FIELDS
@@ -100,6 +101,16 @@ export default class MembersPage extends React.PureComponent {
                         onFieldsChange={fields => this.setState({ fields })}
                         onEditFields={() => this.setState({ fieldPickerOpen: true })}
                         openMemberWithTransitionTitleNode={this.openMember} />
+                    <TablePagination
+                        className="table-pagination"
+                        component="div"
+                        count={10}
+                        labelDisplayedRows={locale.members.pagination.displayedRows}
+                        labelRowsPerPage={locale.members.pagination.rowsPerPage}
+                        page={0}
+                        rowsPerPage={10}
+                        onChangePage={() => {}}
+                        onChangeRowsPerPage={() => {}} />
                 </div>
             );
         }
