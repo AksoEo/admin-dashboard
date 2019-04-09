@@ -14,13 +14,11 @@ import DragHandleIcon from '@material-ui/icons/DragHandle';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
 import locale from '../../../locale';
+import { Sorting } from './fields';
 
-export const Sorting = {
-    NONE: 0,
-    DESC: 1,
-    ASC: 2
-};
-
+/**
+ * Width below which the field picker will be a full-screen modal.
+ */
 const FULLSCREEN_WIDTH = 600;
 
 function SlideUp (props) {
@@ -66,16 +64,11 @@ export default class FieldPicker extends React.PureComponent {
         this.setState({ fullScreen: window.innerWidth <= FULLSCREEN_WIDTH });
     };
 
+    /** Index of the item that’s currently being dragged. */
     draggingIndex = -1;
 
     onDragStart (clientY, index) {
-        const listTop = this.listNode.getBoundingClientRect().top;
-        const offsetY = clientY - listTop;
         this.draggingIndex = index;
-        const node = this.selectedLiNodes[index];
-        const nodeRect = node.getBoundingClientRect();
-        const nodeY = nodeRect.top - listTop;
-        this.dragOffset = offsetY - nodeY;
     }
     onDragMove (clientY) {
         const listTop = this.listNode.getBoundingClientRect().top;
@@ -374,12 +367,15 @@ class DragButton extends React.PureComponent {
 }
 
 /**
- * Lets the user pick the sorting type for a field.
+ * Lets the user click through sorting types for a field.
  */
 export class SortingControl extends React.PureComponent {
     static propTypes = {
+        /** The current Sorting. */
         value: PropTypes.number.isRequired,
+        /** Change handler. */
         onChange: PropTypes.func.isRequired,
+        /** If true, will hide the label explaining the current state. */
         hideLabel: PropTypes.bool
     };
 

@@ -1,174 +1,94 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import ResizeObserver from 'resize-observer-polyfill';
-import PersonIcon from '@material-ui/icons/Person';
-import BusinessIcon from '@material-ui/icons/Business';
-import locale from '../../../locale';
-
-export const Position = {
-    COLUMN: 0,
-    LEFT: 1,
-    NAME: 2,
-    CENTER: 3,
-    RIGHT: 4
+/**
+ * “Enum” of sorting types.
+ */
+export const Sorting = {
+    NONE: 0,
+    DESC: 1,
+    ASC: 2
 };
 
-const COL_POSITIONS = [Position.COLUMN, Position.LEFT, Position.RIGHT];
+/**
+ * “Enum” of position hints for the flex layout.
+ */
+export const PosHint = {
+    LEFT: 0,
+    NAME: 1,
+    CENTER: 2,
+    RIGHT: 3
+};
 
-export default class MemberField extends React.PureComponent {
-    static propTypes = {
-        field: PropTypes.string.isRequired,
-        value: PropTypes.any,
-        member: PropTypes.object.isRequired,
-        position: PropTypes.number.isRequired,
-        templateFields: PropTypes.arrayOf(PropTypes.string).isRequired,
-        transitionTitleRef: PropTypes.func.isRequired
-    };
-
-    render () {
-        const Field = FIELDS[this.props.field];
-        if (Field) {
-            return <Field {...this.props} />;
-        } else {
-            return <span>error</span>;
-        }
-    }
-}
-
-/* eslint-disable react/prop-types */
-const FIELDS = {
-    codeholderType ({ value, position }) {
-        if (COL_POSITIONS.includes(position)) {
-            let icon;
-            if (value === 'human') icon = <PersonIcon />;
-            else icon = <BusinessIcon />;
-            return (
-                <div
-                    className="codeholder-type"
-                    title={locale.members.fields.codeholderTypes[value]}>
-                    {icon}
-                </div>
-            );
-        } else {
-            return (
-                <span className="inline-codeholder-type">
-                    {locale.members.fields.codeholderTypes[value]}
-                </span>
-            );
-        }
+/**
+ * List of all member fields.
+ *
+ * - weight: inherent priority of the field, e.g. when picking which field gets the LEFT slot
+ *   in the flex layout
+ * - colWeight: abstract width of the field in the table layout
+ * - posHint: preferred position in the flex layout
+ * - sortable: whether or not the field should have a sorting control
+ * - omitTHead/permanent: special flags that omit the table header or mark the field as
+ *   permanent, hiding it from the field picker
+ */
+export const FIELDS = {
+    name: {
+        weight: 3,
+        colWeight: 2,
+        posHint: PosHint.NAME,
+        sortable: true
     },
-    name: class Name extends React.PureComponent {
-        node = null;
-        firstName = null;
-        lastName = null;
-        resizeObserver = null;
-
-        componentDidMount () {
-            this.resizeObserver = new ResizeObserver(() => {
-                if (!this.node) return;
-                const containerWidth = this.node.offsetWidth;
-                const lastWidth = this.lastName.offsetWidth;
-                this.firstName.style.maxWidth = (containerWidth - lastWidth) + 'px';
-            });
-            this.resizeObserver.observe(this.node);
-            this.resizeObserver.observe(this.lastName);
-        }
-
-        componentWillUnmount () {
-            this.resizeObserver.unobserve(this.node);
-            this.resizeObserver.unobserve(this.lastName);
-        }
-
-        render () {
-            const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.value;
-            const first = firstName || firstNameLegal;
-            const last = lastName || lastNameLegal;
-            return (
-                <span
-                    className="name"
-                    title={`${first} ${last}`}
-                    ref={node => {
-                        this.node = node;
-                        this.props.transitionTitleRef(node);
-                    }}>
-                    <span className="first-name" ref={node => this.firstName = node}>
-                        {first}
-                    </span> <span className="last-name" ref={node => this.lastName = node}>
-                        {last}
-                    </span>
-                </span>
-            );
-        }
+    code: {
+        weight: 2,
+        colWeight: 2,
+        posHint: PosHint.NAME,
+        sortable: true
     },
-    code ({ member }) {
-        const { oldCode, newCode } = member;
-        if (oldCode) {
-            return (
-                <span className="uea-codes">
-                    <span className="uea-code">
-                        {newCode}
-                    </span> <span className="old-uea-code">
-                        {oldCode}
-                    </span>
-                </span>
-            );
-        } else {
-            return <span className="uea-code">{newCode}</span>;
-        }
+    codeholderType: {
+        weight: 1,
+        fixedColWidth: 56,
+        posHint: PosHint.LEFT,
+        omitTHead: true,
+        permanent: true,
+        sortable: true
     },
-    country ({ member, position }) {
-        const { feeCountry, addressLatin: { country } } = member;
-
-        if (feeCountry == country) {
-            // TEMP: render a flag using two regional indicator symbols to create the emoji
-            const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
-            const flag = toRI(feeCountry[0]) + toRI(feeCountry[1]);
-            if (position === Position.LEFT || position === Position.RIGHT) {
-                return flag;
-            } else {
-                return <span>{flag} (nomo)</span>;
-            }
-        } else {
-            return <span>todo</span>;
-        }
+    country: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.RIGHT,
+        sortable: true
     },
-    age ({ value, position }) {
-        if (position === Position.CENTER) {
-            return <div className="age">{locale.members.fields.age}: {value}</div>;
-        }
-        return <span className="age">{value}</span>;
+    age: {
+        weight: 2,
+        colWeight: 1,
+        posHint: PosHint.RIGHT,
+        sortable: true
     },
-    email ({ value }) {
-        return <span className="email">{value}</span>;
+    email: {
+        weight: 2,
+        colWeight: 2,
+        posHint: PosHint.CENTER
     },
-    addressLatin ({ value, templateFields }) {
-        const streetAddress = (value.streetAddress || '').split('\n')
-            .map((line, i) => (<span key={i} className="address-pseudoline">{line}</span>));
-
-        const showCity = !templateFields.includes('addressCity');
-        const showCountryArea = !templateFields.includes('addressCountryArea');
-        const city = showCity ? value.city : '';
-        const countryArea = showCountryArea ? value.countryArea : '';
-
-        return (
-            <div className="address">
-                {streetAddress}
-                <span className="address-pseudoline">
-                    {value.postalCode} {value.cityArea}
-                    {value.cityArea && city ? ', ' : ''}
-                    {city}
-                </span>
-                {showCountryArea && <span className="address-pseudoline">
-                    {countryArea}
-                </span>}
-            </div>
-        );
+    addressLatin: {
+        weight: 1,
+        colWeight: 3,
+        posHint: PosHint.CENTER,
+        sortable: true
     },
-    addressCity ({ member }) {
-        return <span className="address-city">{member.addressLatin.city}</span>;
+    addressCity: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER,
+        sortable: true
     },
-    addressCountryArea ({ member }) {
-        return <span className="address-country-area">{member.addressLatin.countryArea}</span>;
+    addressCountryArea: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER,
+        sortable: true
     }
 };
-/* eslint-enable react/prop-types */
+
+/** List of all field names. */
+export const AVAILABLE_FIELDS = Object.keys(FIELDS);
+/** List of permanent field names. */
+export const PERMANENT_FIELDS = AVAILABLE_FIELDS.filter(field => FIELDS[field].permanent);
+/** List of sortable field names. */
+export const SORTABLE_FIELDS = AVAILABLE_FIELDS.filter(field => FIELDS[field].sortable);

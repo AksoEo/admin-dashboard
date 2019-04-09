@@ -3,79 +3,12 @@ import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import IconButton from '@material-ui/core/IconButton';
 import ListAltIcon from '@material-ui/icons/ListAlt';
-import MemberField, { Position } from './fields';
+import MemberField, { Position } from './field-views';
 import locale from '../../../locale';
-import { Sorting, SortingControl } from './field-picker';
+import { SortingControl } from './field-picker';
+import { FIELDS, PosHint, Sorting } from './fields';
 export FieldPicker from './field-picker';
-
-const PosHint = {
-    LEFT: 0,
-    NAME: 1,
-    CENTER: 2,
-    RIGHT: 3
-};
-
-const FIELDS = {
-    name: {
-        weight: 3,
-        colWeight: 2,
-        posHint: PosHint.NAME,
-        sortable: true
-    },
-    code: {
-        weight: 2,
-        colWeight: 2,
-        posHint: PosHint.NAME,
-        sortable: true
-    },
-    codeholderType: {
-        weight: 1,
-        fixedColWidth: 56,
-        posHint: PosHint.LEFT,
-        omitTHead: true,
-        permanent: true,
-        sortable: true
-    },
-    country: {
-        weight: 1,
-        colWeight: 2,
-        posHint: PosHint.RIGHT,
-        sortable: true
-    },
-    age: {
-        weight: 2,
-        colWeight: 1,
-        posHint: PosHint.RIGHT,
-        sortable: true
-    },
-    email: {
-        weight: 2,
-        colWeight: 2,
-        posHint: PosHint.CENTER
-    },
-    addressLatin: {
-        weight: 1,
-        colWeight: 3,
-        posHint: PosHint.CENTER,
-        sortable: true
-    },
-    addressCity: {
-        weight: 1,
-        colWeight: 2,
-        posHint: PosHint.CENTER,
-        sortable: true
-    },
-    addressCountryArea: {
-        weight: 1,
-        colWeight: 2,
-        posHint: PosHint.CENTER,
-        sortable: true
-    }
-};
-
-export const AVAILABLE_FIELDS = Object.keys(FIELDS);
-export const PERMANENT_FIELDS = AVAILABLE_FIELDS.filter(field => FIELDS[field].permanent);
-export const SORTABLE_FIELDS = AVAILABLE_FIELDS.filter(field => FIELDS[field].sortable);
+export * from './fields';
 
 /** Column whose title will be replaced with the Pick Fields button. */
 const FIELDS_BTN_COLUMN = 'codeholderType';
@@ -92,14 +25,30 @@ const MAX_WEIGHT_SCALE = 3;
 /** Min width for the members list to be a table. */
 const MIN_TABLE_WIDTH = 600;
 
+/**
+ * Renders the list of members.
+ *
+ * This list has two possible layouts: the table layout and the flex layout (for lack of a
+ * better term).
+ * In the table layout, selected fields will be shown as columns in order, as expected.
+ * In the flex layout, fields will be arranged in three columns to form a more
+ * small-screen-friendly layout.
+ * The table layout is preferred for large screens but will fall back to the flex layout if
+ * there is insufficient space.
+ */
 export default class MembersList extends React.PureComponent {
     static propTypes = {
+        /** List of selected fields. See `defaultFields` for an example. */
         fields: PropTypes.arrayOf(PropTypes.object).isRequired,
+        /** Called when the selected fields change. */
         onFieldsChange: PropTypes.func.isRequired,
+        /** Called when the field picker modal is requested. */
         onEditFields: PropTypes.func.isRequired,
+        /** Called when a member was tapped. */
         openMemberWithTransitionTitleNode: PropTypes.func.isRequired
     };
 
+    /** Returns the default configuration. */
     static defaultFields () {
         return [
             {
@@ -134,6 +83,9 @@ export default class MembersList extends React.PureComponent {
     resizeObserver = null;
     currentWidth = null;
 
+    /**
+     * Builds a layout template for the member items.
+     */
     buildTemplate () {
         const fields = this.props.fields.map(field => field.id);
         const width = this.currentWidth;
@@ -171,7 +123,7 @@ export default class MembersList extends React.PureComponent {
             }
         }
 
-        // otherwise, use non-table layout
+        // otherwise, use flex layout
 
         let left = null;
         const name = [];
@@ -208,6 +160,11 @@ export default class MembersList extends React.PureComponent {
         });
     }
 
+    /**
+     * Opens a member’s page.
+     * @param {number} index - the index of the member in the currently loaded list
+     * @param {?Node} node - the transition title node
+     */
     openMember (index, node) {
         const memberID = `abcdef`; // TODO: this
         this.setState({ opening: true });
@@ -309,6 +266,7 @@ export default class MembersList extends React.PureComponent {
     }
 }
 
+/** Renders a member list item. */
 class MemberLi extends React.PureComponent {
     static propTypes = {
         template: PropTypes.object.isRequired,
@@ -401,6 +359,7 @@ class MemberLi extends React.PureComponent {
     }
 }
 
+/** Renders the table header. */
 class TableHeader extends React.PureComponent {
     static propTypes = {
         template: PropTypes.object.isRequired,
