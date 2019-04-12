@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
-import { Spring } from '../animation';
+import { Spring, lerp } from '../animation';
 
 /** @jsx h */
 
@@ -16,10 +16,9 @@ export default class ProgressIndicator extends Component {
         helpLabel: PropTypes.any.isRequired
     };
 
-    state = { offset: 0 };
+    state = { offset: 0, currentNodeWidth: 0 };
     spring = new Spring(1, 0.5);
     nodes = [];
-    maxNodeWidth = 0;
 
     constructor (props) {
         super(props);
@@ -27,11 +26,27 @@ export default class ProgressIndicator extends Component {
         this.spring.on('update', offset => this.setState({ offset }));
     }
 
-    componentDidMount () {
+    updateNodeWidths () {
         for (const node of this.nodes) {
-            this.maxNodeWidth = Math.max(this.maxNodeWidth, node.offsetWidth);
+            node.width = node.node.offsetWidth;
         }
-        this.forceUpdate();
+    }
+
+    updateCurrentNodeWidth () {
+        const leftIndex = Math.max(0, Math.floor(this.state.offset));
+        const rightIndex = Math.max(0, Math.ceil(this.state.offset));
+        const left = this.nodes[leftIndex].width;
+        const right = this.nodes[rightIndex].width;
+        const p = Math.max(0, this.state.offset) - leftIndex;
+        const currentNodeWidth = lerp(left, right, p);
+        if (currentNodeWidth !== this.state.currentNodeWidth) {
+            this.setState({ currentNodeWidth });
+        }
+    }
+
+    componentDidMount () {
+        this.updateNodeWidths();
+        this.updateCurrentNodeWidth();
     }
 
     componentDidUpdate (prevProps) {
@@ -39,6 +54,8 @@ export default class ProgressIndicator extends Component {
             this.spring.target = this.props.selected;
             this.spring.start();
         }
+
+        this.updateCurrentNodeWidth();
     }
 
     componentWillUnmount () {
@@ -48,7 +65,8 @@ export default class ProgressIndicator extends Component {
     /** Returns styles for an item at the given index. */
     itemStyle (index) {
         const offset = index - this.state.offset;
-        const dx = offset * this.maxNodeWidth;
+        const nodeWidth = this.nodes[index] ? this.nodes[index].width : 0;
+        const dx = offset * ((this.state.currentNodeWidth + nodeWidth) / 2 + 10);
         const scale = 1 - (offset / 2) ** 2;
         const opacity = Math.max(0, Math.min(-Math.abs(offset) + 1.5, 1));
 
@@ -67,7 +85,7 @@ export default class ProgressIndicator extends Component {
                 <div
                     key={i}
                     class="login-progress-item"
-                    ref={node => this.nodes[i] = node}
+                    ref={node => node && (this.nodes[i] = { node, width: node.offsetWidth })}
                     style={this.itemStyle(i)}>
                     {child}
                 </div>

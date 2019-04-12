@@ -83,6 +83,12 @@ export default class AutosizingPageView extends Component {
         }
     }
 
+    /** Updates page heights and triggers a re-render. */
+    pageHeightChanged () {
+        this.updatePageHeights();
+        this.forceUpdate();
+    }
+
     /**
      * Returns the current height, i.e. the height of the current page or an interpolated value
      * when animating.

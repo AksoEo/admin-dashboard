@@ -39,8 +39,10 @@ export default {
         title: 'Ensaluti',
         username: 'UEA-kodo aŭ retpoŝtadreso',
         password: 'Pasvorto',
+        confirmPassword: '[[confirm password]]',
         continue: 'Daŭrigi',
         securityCode: 'Sekurkodo',
+        createPasswordPlaceholder: '[[type a password]]',
         // Text shown above the security code input
         securityCodeDescription: 'Bonvolu enmeti sekurkodon generitan de via duafaktora aplikaĵo.',
         // The following three are both a link and a title
@@ -49,13 +51,16 @@ export default {
         lostSecurityCode: 'Mi ne povas generi sekurkodon',
         // Login progress indicator titles
         detailsStage: 'Detaloj',
+        createPasswordStage: '[[create password]]',
+        resetPasswordStage: '[[reset password]]',
         securityCodeStage: 'Sekurkodo',
         // Login button
         login: 'Ensaluti',
 
         // Errors
         invalidUEACode: 'Nevalida UEA-kodo aŭ retpoŝtadreso',
-        invalidSecurityCode: 'Nevalida sekurkodo'
+        invalidSecurityCode: 'Nevalida sekurkodo',
+        passwordMismatch: '[[passwords do not match]]',
     },
     // Members page
     members: {

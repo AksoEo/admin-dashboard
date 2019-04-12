@@ -20,6 +20,12 @@ const Stage = {
     SECURITY_CODE: 1
 };
 
+const Mode = {
+    NORMAL: 0,
+    CREATING_PASSWORD: 1,
+    RESETTING_PASSWORD: 2
+};
+
 const MIN_INDEX = -3;
 
 const temporaryBackLinkStyle = {
@@ -28,6 +34,7 @@ const temporaryBackLinkStyle = {
     fontSize: '1.2em',
     color: 'inherit'
 };
+
 
 /** The login screen. */
 export default class Login extends Component {
@@ -38,23 +45,40 @@ export default class Login extends Component {
 
     state = {
         username: '',
-        password: '',
-        securityCode: '',
         stage: Stage.DETAILS,
-        loading: false
+        loading: false,
+        mode: Mode.NORMAL
     };
 
-    securityCodeField = null;
+    pageView = null;
+    detailsStage = null;
+    securityCodeStage = null;
 
     /** Called when the current dialog page changes. */
     onPageChange = page => {
-        if (page === Stage.SECURITY_CODE) {
-            this.securityCodeField.focus();
+        if (page === Stage.DETAILS) {
+            this.detailsStage.focus();
+        } else if (page === Stage.SECURITY_CODE) {
+            this.securityCodeStage.focus();
         }
     };
 
     componentDidMount () {
         document.title = locale.documentTitleTemplate(locale.login.title);
+
+        const pathname = document.location.pathname;
+        const match = pathname.match(/^\/krei_pasvorton\/([^/]+)\/([\da-fA-f]+)\/?$/);
+        if (match) {
+            this.setState({
+                mode: Mode.CREATING_PASSWORD,
+                username: match[1]
+            }, () => this.pageView.pageHeightChanged());
+        }
+
+        setTimeout(() => {
+            // fake page change to trigger focus
+            this.onPageChange(this.state.stage);
+        }, 100);
     }
 
     render () {
@@ -79,20 +103,20 @@ export default class Login extends Component {
                 <div class="login-dialog">
                     <header class="login-header">
                         <img
-                            className="login-logo"
+                            class="login-logo"
                             src="/assets/logo-dark.svg"
                             aria-hidden="true"
                             role="presentation"
                             draggable={0} />
-                        <div className="login-label">
+                        <div class="login-label">
                             <img
-                                className="login-small-logo"
+                                class="login-small-logo"
                                 src="/assets/logo-dark.svg"
                                 aria-hidden="true"
                                 role="presentation"
                                 draggable={0} />
                             <img
-                                className="login-logo-label"
+                                class="login-logo-label"
                                 src="/assets/logo-label-dark.svg"
                                 alt="AKSO"
                                 draggable={0} />
@@ -110,12 +134,17 @@ export default class Login extends Component {
                             }>
                             <span onClick={() =>
                                 this.setState({ stage: Stage.DETAILS })}>
-                                {locale.login.detailsStage}
+                                {this.state.mode === Mode.NORMAL
+                                    ? locale.login.detailsStage
+                                    : this.state.mode === Mode.CREATING_PASSWORD
+                                        ? locale.login.createPasswordStage
+                                        : locale.login.resetPasswordStage}
                             </span>
                             <span>{locale.login.securityCodeStage}</span>
                         </ProgressIndicator>
                     </header>
                     <AutosizingPageView
+                        ref={view => this.pageView = view}
                         selected={this.state.stage}
                         minIndex={MIN_INDEX}
                         onPageChange={this.onPageChange}>
@@ -155,126 +184,216 @@ export default class Login extends Component {
                                 Reiri
                             </a>
                         </p>
-                        <Form key={Stage.DETAILS} onSubmit={() => {
-                            setTimeout(() => {
-                                this.setState({
-                                    stage: Stage.SECURITY_CODE,
-                                    loading: false,
-                                    password: ''
-                                });
-                            }, 1000);
-                            this.setState({ loading: true });
-                        }}>
-                            <Validator component={TextField}
-                                class="form-field"
-                                outline
-                                label={locale.login.username}
-                                type={this.state.username.includes('@') ? 'email' : 'text'}
-                                autocapitalize="none"
-                                value={this.state.username}
-                                onChange={e => this.setState({ username: e.target.value })}
-                                validate={value => {
-                                    if (!value.includes('@') && !UEACode.validate(value)) {
-                                        throw { error: locale.login.invalidUEACode };
-                                    }
-                                }} />
-                            <Validator component={TextField}
-                                class="form-field"
-                                outline
-                                label={locale.login.password}
-                                value={this.state.password}
-                                type="password"
-                                onChange={e => this.setState({ password: e.target.value })}
-                                validate={() => true} />
-                            <footer class="form-footer">
-                                <div class="help-links">
-                                    <a
-                                        class="help-link"
-                                        href="#"
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            this.setState({ stage: Stage.FORGOT_PASSWORD });
-                                        }}>
-                                        {locale.login.forgotPassword}
-                                    </a>
-                                    <br />
-                                    <a
-                                        class="help-link"
-                                        href="#"
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            this.setState({ stage: Stage.FORGOT_CODE });
-                                        }}>
-                                        {locale.login.forgotCode}
-                                    </a>
-                                </div>
-                                <Button type="submit" class="raised" disabled={this.state.loading}>
-                                    {this.state.loading ? (
-                                        <CircularProgressIndicator
-                                            class="progress-overlay"
-                                            indeterminate
-                                            small />
-                                    ) : null}
-                                    <span>{locale.login.continue}</span>
-                                </Button>
-                            </footer>
-                        </Form>
-                        <Form key={Stage.SECURITY_CODE} onSubmit={() => {
-                            setTimeout(() => {
-                                this.props.onLogin();
-                            }, 1000);
-                            this.setState({ loading: true });
-                        }}>
-                            <p>
-                                {locale.login.securityCodeDescription}
-                            </p>
-                            <Validator component={TextField}
-                                class="form-field totp-input"
-                                innerRef={node => this.securityCodeField = node}
-                                outline
-                                center
-                                label={locale.login.securityCode}
-                                value={this.state.securityCode}
-                                placeholder="000000"
-                                // \d* seems to be the only way to get a numpad input on iOS
-                                pattern="\d*"
-                                type="number"
-                                onChange={e => this.setState({
-                                    securityCode: e.target.value.replace(/\D/g, '').substr(0, 6)
-                                })}
-                                validate={value => {
-                                    if (!value || !value.match(/^\d{6}$/)) {
-                                        throw { error: locale.login.invalidSecurityCode };
-                                    }
-                                }} />
-                            <footer class="form-footer">
-                                <div class="help-links">
-                                    <a
-                                        class="help-link"
-                                        href="#"
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            this.setState({ stage: Stage.LOST_SECURITY_CODE });
-                                        }}>
-                                        {locale.login.lostSecurityCode}
-                                    </a>
-                                </div>
-                                <Button type="submit" class="raised" disabled={this.state.loading}>
-                                    {this.state.loading ? (
-                                        <CircularProgressIndicator
-                                            class="progress-overlay"
-                                            indeterminate
-                                            small />
-                                    ) : null}
-                                    <span>{locale.login.login}</span>
-                                </Button>
-                            </footer>
-                        </Form>
+                        <DetailsStage
+                            ref={stage => this.detailsStage = stage}
+                            username={this.state.username}
+                            mode={this.state.mode}
+                            onUsernameChange={username => this.setState({ username })}
+                            onSuccess={() => this.setState({ stage: Stage.SECURITY_CODE })}
+                            onForgotPassword={() => this.setState({ stage: Stage.FORGOT_PASSWORD })}
+                            onForgotCode={() => this.setState({ stage: Stage.FORGOT_CODE })} />
+                        <SecurityCodeStage
+                            ref={stage => this.securityCodeStage = stage}
+                            onSuccess={this.props.onLogin}
+                            onLostCode={() => this.setState({ stage: Stage.LOST_SECURITY_CODE })} />
                     </AutosizingPageView>
                     {meta}
                 </div>
                 {meta}
             </div>
+        );
+    }
+}
+
+class DetailsStage extends Component {
+    propTypes = {
+        onSuccess: PropTypes.func.isRequired,
+        onForgotPassword: PropTypes.func.isRequired,
+        onForgotCode: PropTypes.func.isRequired,
+        username: PropTypes.string.isRequired,
+        onUsernameChange: PropTypes.func.isRequired,
+        mode: PropTypes.number.isRequired,
+    };
+
+    state = {
+        password: '',
+        confirmPassword: '',
+        loading: false
+    };
+
+    usernameField = null;
+    passwordField = null;
+
+    focus () {
+        if (this.props.mode === Mode.NORMAL) {
+            this.usernameField.focus();
+        } else {
+            this.passwordField.focus();
+        }
+    }
+
+    render () {
+        return (
+            <Form onSubmit={() => {
+                // TODO: fetch
+                setTimeout(() => {
+                    this.setState({
+                        loading: false,
+                        password: '',
+                        confirmPassword: '',
+                    });
+                    this.props.onSuccess();
+                }, 1000);
+                this.setState({ loading: true });
+            }}>
+                <Validator component={TextField}
+                    class="form-field"
+                    innerRef={node => this.usernameField = node}
+                    outline
+                    label={locale.login.username}
+                    type={this.props.username.includes('@') ? 'email' : 'text'}
+                    autocapitalize="none"
+                    value={this.props.username}
+                    onChange={e => this.props.onUsernameChange(e.target.value)}
+                    validate={value => {
+                        if (!value.includes('@') && !UEACode.validate(value)) {
+                            throw { error: locale.login.invalidUEACode };
+                        }
+                    }} />
+                <Validator component={TextField}
+                    class="form-field"
+                    innerRef={node => this.passwordField = node}
+                    outline
+                    label={locale.login.password}
+                    value={this.state.password}
+                    type="password"
+                    placeholder={this.props.mode === Mode.CREATING_PASSWORD
+                        ? locale.login.createPasswordPlaceholder
+                        : null}
+                    onChange={e => this.setState({ password: e.target.value })}
+                    validate={() => true} />
+                {this.props.mode !== Mode.NORMAL ? (
+                    <Validator component={TextField}
+                        class="form-field"
+                        outline
+                        label={locale.login.confirmPassword}
+                        value={this.state.confirmPassword}
+                        type="password"
+                        onChange={e => this.setState({ confirmPassword: e.target.value })}
+                        validate={value => {
+                            if (value !== this.state.password) {
+                                throw { error: locale.login.passwordMismatch };
+                            }
+                        }} />
+                ) : null}
+                <footer class="form-footer">
+                    {this.props.mode === Mode.NORMAL ? (
+                        <div class="help-links">
+                            <a
+                                class="help-link"
+                                href="#"
+                                onClick={e => {
+                                    e.preventDefault();
+                                    this.props.onForgotPassword();
+                                }}>
+                                {locale.login.forgotPassword}
+                            </a>
+                            <br />
+                            <a
+                                class="help-link"
+                                href="#"
+                                onClick={e => {
+                                    e.preventDefault();
+                                    this.props.onForgotCode();
+                                }}>
+                                {locale.login.forgotCode}
+                            </a>
+                        </div>
+                    ) : <div class="help-links" />}
+                    <Button type="submit" class="raised" disabled={this.state.loading}>
+                        {this.state.loading ? (
+                            <CircularProgressIndicator
+                                class="progress-overlay"
+                                indeterminate
+                                small />
+                        ) : null}
+                        <span>{locale.login.continue}</span>
+                    </Button>
+                </footer>
+            </Form>
+        );
+    }
+}
+
+// TODO: mode for creating a TOTP code or something
+class SecurityCodeStage extends Component {
+    propTypes = {
+        onSuccess: PropTypes.func.isRequired,
+        onLostCode: PropTypes.func.isRequired,
+    };
+
+    state = {
+        securityCode: '',
+        loading: false
+    }
+
+    securityCodeField = null;
+
+    focus () {
+        this.securityCodeField.focus();
+    }
+
+    render () {
+        return (
+            <Form onSubmit={() => {
+                setTimeout(this.props.onSuccess, 1000);
+                this.setState({ loading: true });
+            }}>
+                <p>
+                    {locale.login.securityCodeDescription}
+                </p>
+                <Validator component={TextField}
+                    class="form-field totp-input"
+                    innerRef={node => this.securityCodeField = node}
+                    outline
+                    center
+                    label={locale.login.securityCode}
+                    value={this.state.securityCode}
+                    placeholder="000000"
+                    // \d* seems to be the only way to get a numpad input on iOS
+                    pattern="\d*"
+                    type="number"
+                    onChange={e => this.setState({
+                        securityCode: e.target.value.replace(/\D/g, '').substr(0, 6)
+                    })}
+                    validate={value => {
+                        if (!value || !value.match(/^\d{6}$/)) {
+                            throw { error: locale.login.invalidSecurityCode };
+                        }
+                    }} />
+                <footer class="form-footer">
+                    <div class="help-links">
+                        <a
+                            class="help-link"
+                            href="#"
+                            onClick={e => {
+                                e.preventDefault();
+                                this.props.onLostCode();
+                            }}>
+                            {locale.login.lostSecurityCode}
+                        </a>
+                    </div>
+                    <Button type="submit" class="raised" disabled={this.state.loading}>
+                        {this.state.loading ? (
+                            <CircularProgressIndicator
+                                class="progress-overlay"
+                                indeterminate
+                                small />
+                        ) : null}
+                        <span>{locale.login.login}</span>
+                    </Button>
+                </footer>
+            </Form>
         );
     }
 }
