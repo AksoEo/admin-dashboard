@@ -21,11 +21,11 @@ import pages from './pages';
 const theme = createMuiTheme({
     palette: {
         primary: { main: '#31a64f' },
-        secondary: { main: '#31a64f' }
+        secondary: { main: '#31a64f' },
     },
     typography: {
-        useNextVariants: true
-    }
+        useNextVariants: true,
+    },
 });
 
 /** Minimum width for a perma-sidebar. */
@@ -59,13 +59,13 @@ function currentPageFromLocation () {
 export default class App extends React.PureComponent {
     static propTypes = {
         shouldPlayLoginAnimation: PropTypes.bool.isRequired,
-        onLogout: PropTypes.func.isRequired
+        onLogout: PropTypes.func.isRequired,
     };
 
     state = {
         sidebarOpen: false,
         permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH,
-        currentPage: currentPageFromLocation()
+        currentPage: currentPageFromLocation(),
     };
 
     /** If true, will play the logged-in animation. */
@@ -81,7 +81,7 @@ export default class App extends React.PureComponent {
             window.history.pushState(null, '', target);
             this.setState({
                 currentPage: currentPageFromLocation(),
-                sidebarOpen: false
+                sidebarOpen: false,
             });
         } else {
             // hashchange will change the state
@@ -92,14 +92,14 @@ export default class App extends React.PureComponent {
     onPopState = () => {
         this.setState({
             currentPage: currentPageFromLocation(),
-            sidebarOpen: false
+            sidebarOpen: false,
         });
     };
 
     onHashChange = () => {
         this.setState({
             currentPage: currentPageFromLocation(),
-            sidebarOpen: false
+            sidebarOpen: false,
         });
     };
 
@@ -163,7 +163,7 @@ export default class App extends React.PureComponent {
                             color="inherit"
                             aria-label={locale.header.menu}
                             onClick={() => this.setState({
-                                sidebarOpen: !this.state.sidebarOpen
+                                sidebarOpen: !this.state.sidebarOpen,
                             })}>
                             <MenuIcon />
                         </IconButton>
@@ -218,7 +218,7 @@ export default class App extends React.PureComponent {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: '100%'
+                    width: '100%',
                 }}>
                     ...
                 </div>
@@ -239,7 +239,7 @@ export default class App extends React.PureComponent {
                 <MuiThemeProvider theme={theme}>
                     <routerContext.Provider value={{
                         navigate: this.onNavigate,
-                        loginStateChanged: this.onLoginStateChanged
+                        loginStateChanged: this.onLoginStateChanged,
                     }}>
                         {appHeader}
                         <div className="app-contents">

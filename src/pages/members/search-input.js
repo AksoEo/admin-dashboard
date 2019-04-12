@@ -16,19 +16,19 @@ export default class SearchInput extends React.PureComponent {
         onChange: PropTypes.func.isRequired,
         submitted: PropTypes.bool.isRequired,
         onUnsubmit: PropTypes.func.isRequired,
-        onSubmit: PropTypes.func.isRequired
+        onSubmit: PropTypes.func.isRequired,
     };
 
     static defaultValue () {
         return {
             searchQuery: '',
             searchField: SEARCHABLE_FIELDS[0],
-            predicates: defaultFields()
+            predicates: defaultFields(),
         };
     }
 
     state = {
-        expanded: false
+        expanded: false,
     };
 
     toggleExpanded = () => {
@@ -75,12 +75,12 @@ export default class SearchInput extends React.PureComponent {
                 onSearchFieldChange={searchField => {
                     this.props.onChange({ ...this.props.value, searchField });
                 }} />,
-            hidden: false
+            hidden: false,
         }, {
             node: <div className="filters-title">{locale.members.search.filters}</div>,
             hidden: !this.state.expanded
                 || this.props.submitted
-                && !this.props.value.predicates.map(i => i.enabled).includes(true)
+                && !this.props.value.predicates.map(i => i.enabled).includes(true),
         }];
 
         const offset = listItems.length;
@@ -116,7 +116,7 @@ export default class SearchInput extends React.PureComponent {
                     }} />,
                 hidden: this.props.value.searchField === item.field
                     ? true
-                    : this.props.submitted ? !item.enabled : false
+                    : this.props.submitted ? !item.enabled : false,
             });
         }
 
@@ -132,7 +132,7 @@ export default class SearchInput extends React.PureComponent {
                                         : locale.members.search.title}
                                 </div>
                             ),
-                            hidden: this.props.submitted
+                            hidden: this.props.submitted,
                         },
                         {
                             node: (
@@ -143,7 +143,7 @@ export default class SearchInput extends React.PureComponent {
                                 </PaperList>
                             ),
                             hidden: false,
-                            staticHeight: true
+                            staticHeight: true,
                         },
                         {
                             node: (
@@ -159,8 +159,8 @@ export default class SearchInput extends React.PureComponent {
                                     </Button>
                                 </footer>
                             ),
-                            hidden: this.props.submitted
-                        }
+                            hidden: this.props.submitted,
+                        },
                     ]}
                 </PaperList>
             </div>
@@ -177,7 +177,7 @@ class PrimarySearch extends React.PureComponent {
         submitted: PropTypes.bool.isRequired,
         searchField: PropTypes.string.isRequired,
         searchableFields: PropTypes.arrayOf(PropTypes.string).isRequired,
-        onSearchFieldChange: PropTypes.func.isRequired
+        onSearchFieldChange: PropTypes.func.isRequired,
     };
 
     render () {
@@ -225,7 +225,7 @@ const RESPONSE = 0.3;
 class PaperList extends React.PureComponent {
     static propTypes = {
         children: PropTypes.arrayOf(PropTypes.object).isRequired,
-        layout: PropTypes.oneOf(['flat', 'collapsed']).isRequired
+        layout: PropTypes.oneOf(['flat', 'collapsed']).isRequired,
     };
 
     /** ResizeObserver that observes all children. */
@@ -317,7 +317,7 @@ class PaperList extends React.PureComponent {
             transform: `translateY(${state.y.value}px) scaleY(${scaleY})`,
             zIndex: Math.round(lerp(this.childStates.length - index, -1, state.hidden.value)),
             opacity: clamp(1 - state.hidden.value, 0, 1),
-            pointerEvents: state.hidden.value > 0.5 ? 'none' : ''
+            pointerEvents: state.hidden.value > 0.5 ? 'none' : '',
         };
     }
 

@@ -23,7 +23,7 @@ export const NewspaperIcon = React.memo(function NewspaperIcon () {
  * - `navigate: (string) => void`: function that may be called to navigate in-app
  */
 export const routerContext = React.createContext({
-    navigate: null
+    navigate: null,
 });
 
 /**
@@ -50,7 +50,7 @@ export const Link = React.memo(function Link (props) {
 Link.propTypes = {
     onClick: PropTypes.func,
     children: PropTypes.any,
-    target: PropTypes.string.isRequired
+    target: PropTypes.string.isRequired,
 };
 
 /**
@@ -65,38 +65,38 @@ export const ROUTES = [
             {
                 id: 'home',
                 icon: <HomeIcon />,
-                url: '/'
+                url: '/',
             },
             {
                 id: 'members',
                 icon: <AssignmentIndIcon />,
-                url: '/membroj'
+                url: '/membroj',
             },
             {
                 id: 'magazines',
                 icon: <NewspaperIcon />,
-                url: '/revuoj'
+                url: '/revuoj',
             },
             {
                 id: 'statistics',
                 icon: <AssessmentIcon />,
-                url: '/statistiko'
+                url: '/statistiko',
             },
             {
                 id: 'congresses',
                 icon: <BusinessIcon />,
-                url: '/kongresoj'
+                url: '/kongresoj',
             },
             {
                 id: 'payments',
                 icon: <PaymentIcon />,
-                url: '/pagoj'
+                url: '/pagoj',
             },
             {
                 id: 'elections',
                 icon: <HowToVoteIcon />,
-                url: '/vochdonado'
-            }
-        ]
-    }
+                url: '/vochdonado',
+            },
+        ],
+    },
 ];

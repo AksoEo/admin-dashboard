@@ -29,7 +29,7 @@ export class CircularProgressIndicator extends Component {
         /** The progress value. Ignored if `indeterminate` is true. */
         progress: PropTypes.number,
         /** If true, the progress indicator will be 24×24 instead of 48×48. */
-        small: PropTypes.bool
+        small: PropTypes.bool,
     };
 
     /**
@@ -51,7 +51,7 @@ export class CircularProgressIndicator extends Component {
 
         return [
             `M ${startX} ${startY}`,
-            `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`
+            `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`,
         ].join(' ');
     }
 

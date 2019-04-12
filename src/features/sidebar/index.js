@@ -26,7 +26,7 @@ export default class Sidebar extends React.PureComponent {
         /** Current page identifier passed to the SidebarContents. */
         currentPage: PropTypes.string.isRequired,
         /** Called when the log out button is pressed. */
-        onLogout: PropTypes.func.isRequired
+        onLogout: PropTypes.func.isRequired,
     };
 
     /**

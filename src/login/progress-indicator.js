@@ -13,7 +13,7 @@ export default class ProgressIndicator extends Component {
     static propTypes = {
         selected: PropTypes.number.isRequired,
         children: PropTypes.arrayOf(PropTypes.any).isRequired,
-        helpLabel: PropTypes.any.isRequired
+        helpLabel: PropTypes.any.isRequired,
     };
 
     state = { offset: 0, currentNodeWidth: 0 };
@@ -72,7 +72,7 @@ export default class ProgressIndicator extends Component {
 
         return {
             transform: `translateX(${dx}px) translateX(-50%) scale(${scale})`,
-            opacity
+            opacity,
         };
     }
 

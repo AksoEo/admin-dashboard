@@ -7,20 +7,20 @@ export default {
         copyrightHref: 'https://tejo.org',
         license: 'MIT-Permesilo',
         githubHref: 'https://github.com/AksoEo',
-        github: 'GitHub'
+        github: 'GitHub',
     },
     // App header bar
     header: {
         // Hamburger button
         menu: 'Menuo',
         // Overflow menu item
-        overflow: 'Pli'
+        overflow: 'Pli',
     },
     // Sidebar
     sidebar: {
         // Search input placeholder
         search: 'Serĉi',
-        logout: 'Elsaluti'
+        logout: 'Elsaluti',
     },
     documentTitleTemplate: pageTitle => `${pageTitle} | AKSO`,
     // Page titles
@@ -31,7 +31,7 @@ export default {
         statistics: 'Statistiko',
         congresses: 'Kongresoj',
         payments: 'Pagoj',
-        elections: 'Voĉdonado'
+        elections: 'Voĉdonado',
     },
     // Login screen
     login: {
@@ -74,7 +74,7 @@ export default {
             filters: 'Filtriloj',
             existence: {
                 yes: 'ekzistas',
-                no: 'ne ekzistas'
+                no: 'ne ekzistas',
             },
             fields: {
                 age: 'Aĝo',
@@ -82,12 +82,12 @@ export default {
                 email: 'Retpoŝtadreso',
                 notes: 'Notoj',
                 hasOldCode: 'Malnova UEA-kodo',
-                hasEmail: 'Retpoŝtadreso'
+                hasEmail: 'Retpoŝtadreso',
             },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
-                email: 'Ekz. zamenhof@co.uea.org'
-            }
+                email: 'Ekz. zamenhof@co.uea.org',
+            },
         },
         resultStats: (count, filtered, total, time) => {
             const plural = n => n === 1 ? '' : 'j';
@@ -107,20 +107,20 @@ export default {
             addressCountryArea: 'Regiono',
             codeholderTypes: {
                 human: 'Homo',
-                org: 'Organizo'
-            }
+                org: 'Organizo',
+            },
         },
         fieldPicker: {
-            title: 'Montrotaj kampoj'
+            title: 'Montrotaj kampoj',
         },
         sorting: {
             none: 'ne ordigata',
             asc: 'plialtiĝanta',
-            desc: 'malplialtiĝanta'
+            desc: 'malplialtiĝanta',
         },
         pagination: {
             displayedRows: ({ from, to, count }) => `${from}–${to} el ${count}`,
-            rowsPerPage: 'Rezultoj po paĝo'
-        }
-    }
+            rowsPerPage: 'Rezultoj po paĝo',
+        },
+    },
 };

@@ -9,7 +9,7 @@ import './style';
 /** Context that contains an interface to the Form component. */
 export const FormContext = createContext({
     register: () => {},
-    deregister: () => {}
+    deregister: () => {},
 });
 
 /**
@@ -37,7 +37,7 @@ export default class Form extends Component {
     static propTypes = {
         /** Called when the native `submit` event is intercepted. */
         onSubmit: PropTypes.func.isRequired,
-        children: PropTypes.arrayOf(PropTypes.element)
+        children: PropTypes.arrayOf(PropTypes.element),
     };
 
     /** Form fields registered using [FormContext]. */
@@ -79,7 +79,7 @@ export default class Form extends Component {
         return (
             <FormContext.Provider value={{
                 register: this.onRegister,
-                deregister: this.onDeregister
+                deregister: this.onDeregister,
             }}>
                 <form
                     {...this.props}
@@ -107,7 +107,7 @@ export class Validator extends Component {
         component: PropTypes.any.isRequired,
         children: PropTypes.any,
         /** Like a `ref`, but for the wrapped component. */
-        innerRef: PropTypes.func
+        innerRef: PropTypes.func,
     };
 
     state = {
@@ -121,7 +121,7 @@ export class Validator extends Component {
          *If true, will continuously check validity instead of only when validation is triggered
          * externally (such as by the Form being submitted).
          */
-        continuous: false
+        continuous: false,
     };
 
     translateX = new Spring(0.4, 0.3);
@@ -188,7 +188,7 @@ export class Validator extends Component {
                     this.formContext = context;
                     return (
                         <span class="form-validator" style={{
-                            transform: `translateX(${this.state.translateX}px)`
+                            transform: `translateX(${this.state.translateX}px)`,
                         }}>
                             {h(this.props.component, props, this.props.children)}
                         </span>

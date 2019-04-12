@@ -33,11 +33,11 @@ export default class TextField extends Component {
         /** Error label. Will replace the helper label if not empty. */
         error: PropTypes.any,
         /** A prefix that will be positioned before the input. */
-        prefix: PropTypes.any
+        prefix: PropTypes.any,
     };
 
     state = {
-        isFocused: false
+        isFocused: false,
     };
 
     floatingSpring = new Spring(1, 0.3);
@@ -155,11 +155,11 @@ class TextFieldDecoration extends Component {
         prefixNode: PropTypes.any.isRequired,
         floatingSpring: PropTypes.any.isRequired,
         outline: PropTypes.bool.isRequired,
-        center: PropTypes.bool.isRequired
+        center: PropTypes.bool.isRequired,
     };
 
     state = {
-        float: 0
+        float: 0,
     };
 
     /**
@@ -195,7 +195,7 @@ class TextFieldDecoration extends Component {
 
         return [
             {
-                transform: `translate(${x}px, ${y}px) scale(${scale})`
+                transform: `translate(${x}px, ${y}px) scale(${scale})`,
             },
             {
                 //           scale (of the two border lines, indicated by +++ here)
@@ -210,8 +210,8 @@ class TextFieldDecoration extends Component {
                 //          x
                 x: breakX,
                 width: breakWidth,
-                scale: 1 - this.state.float
-            }
+                scale: 1 - this.state.float,
+            },
         ];
     }
 

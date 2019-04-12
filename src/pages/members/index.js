@@ -4,7 +4,7 @@ import { UEACode } from 'akso-client';
 import TablePagination from '@material-ui/core/TablePagination';
 import SearchInput from './search-input';
 import MembersList, {
-    FieldPicker, AVAILABLE_FIELDS, SORTABLE_FIELDS, PERMANENT_FIELDS
+    FieldPicker, AVAILABLE_FIELDS, SORTABLE_FIELDS, PERMANENT_FIELDS,
 } from './list';
 import MemberDetail from './detail';
 import locale from '../../locale';
@@ -33,7 +33,7 @@ function deepCloneNode (node) {
 /** The members’ page. */
 export default class MembersPage extends React.PureComponent {
     static propTypes = {
-        path: PropTypes.arrayOf(PropTypes.string).isRequired
+        path: PropTypes.arrayOf(PropTypes.string).isRequired,
     };
 
     static contextType = routerContext;
@@ -42,7 +42,7 @@ export default class MembersPage extends React.PureComponent {
         search: SearchInput.defaultValue(),
         fields: MembersList.defaultFields(),
         submitted: false,
-        fieldPickerOpen: false
+        fieldPickerOpen: false,
     };
 
     pendingTransitionNode = null;
@@ -58,7 +58,7 @@ export default class MembersPage extends React.PureComponent {
                 left: 0,
                 width: nodeRect.width + 'px',
                 height: nodeRect.height + 'px',
-                transform: `translate(${nodeRect.left}px, ${nodeRect.top}px)`
+                transform: `translate(${nodeRect.left}px, ${nodeRect.top}px)`,
             });
             this.pendingTransitionNode = transitionNode;
             document.body.appendChild(transitionNode);

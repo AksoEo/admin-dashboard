@@ -71,7 +71,7 @@ function styleForState (less, sweepStart, sweepEnd, radius) {
 
     return [
         new less.tree.Declaration('transform', `rotate(${rotation.toFixed(2)}rad)`),
-        new less.tree.Declaration('stroke-dasharray', `${length.toFixed(2)} 1000`)
+        new less.tree.Declaration('stroke-dasharray', `${length.toFixed(2)} 1000`),
     ];
 }
 
@@ -88,5 +88,5 @@ module.exports = {
             }
             return new less.tree.AtRule('@keyframes', name, keyframes);
         });
-    }
+    },
 };

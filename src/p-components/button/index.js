@@ -26,7 +26,7 @@ export default class Button extends Component {
         onTouchStart: PropTypes.func,
         onKeyDown: PropTypes.func,
         onKeyUp: PropTypes.func,
-        children: PropTypes.any
+        children: PropTypes.any,
     };
 
     /**

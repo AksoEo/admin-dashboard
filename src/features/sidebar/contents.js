@@ -32,7 +32,7 @@ function NavItem (props) {
 
 NavItem.propTypes = {
     item: PropTypes.object.isRequired,
-    currentPage: PropTypes.string.isRequired
+    currentPage: PropTypes.string.isRequired,
 };
 
 /** Renders a category in `ROUTES`. */
@@ -56,7 +56,7 @@ function NavCategory (props) {
 
 NavCategory.propTypes = {
     item: PropTypes.any.isRequired,
-    currentPage: PropTypes.string.isRequired
+    currentPage: PropTypes.string.isRequired,
 };
 
 /** Renders the sidebar contents. */
@@ -65,11 +65,11 @@ export default class SidebarContents extends React.PureComponent {
         /** The current page ID. Used to highlight the corresponding sidebar item. */
         currentPage: PropTypes.string.isRequired,
         /** Logout callback. */
-        onLogout: PropTypes.func.isRequired
+        onLogout: PropTypes.func.isRequired,
     };
 
     state = {
-        userMenuOpen: false
+        userMenuOpen: false,
     };
 
     render () {

@@ -7,7 +7,7 @@ export default class StringEditor extends React.PureComponent {
     static propTypes = {
         value: PropTypes.string.isRequired,
         placeholder: PropTypes.string,
-        onChange: PropTypes.func.isRequired
+        onChange: PropTypes.func.isRequired,
     };
 
     inputRef = null;

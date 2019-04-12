@@ -11,21 +11,21 @@ export const FIELDS = {
         flags: SEARCHABLE,
         default () {
             return '';
-        }
+        },
     },
     email: {
         type: 'string',
         flags: SEARCHABLE,
         default () {
             return '';
-        }
+        },
     },
     notes: {
         type: 'string',
         flags: SEARCHABLE,
         default () {
             return '';
-        }
+        },
     },
     age: {
         type: 'range',
@@ -34,22 +34,22 @@ export const FIELDS = {
         max: 150,
         default () {
             return new NumericRange(0, 35, true, true);
-        }
+        },
     },
     hasOldCode: {
         type: 'existence',
         flags: FILTERABLE | NEEDS_SWITCH,
         default () {
             return false;
-        }
+        },
     },
     hasEmail: {
         type: 'existence',
         flags: FILTERABLE | NEEDS_SWITCH,
         default () {
             return false;
-        }
-    }
+        },
+    },
 };
 
 export const SEARCHABLE_FIELDS = Object.keys(FIELDS)

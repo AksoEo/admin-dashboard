@@ -45,7 +45,7 @@ export default class MembersList extends React.PureComponent {
         /** Called when the field picker modal is requested. */
         onEditFields: PropTypes.func.isRequired,
         /** Called when a member was tapped. */
-        openMemberWithTransitionTitleNode: PropTypes.func.isRequired
+        openMemberWithTransitionTitleNode: PropTypes.func.isRequired,
     };
 
     /** Returns the default configuration. */
@@ -53,30 +53,30 @@ export default class MembersList extends React.PureComponent {
         return [
             {
                 id: 'codeholderType',
-                sorting: Sorting.NONE
+                sorting: Sorting.NONE,
             },
             {
                 id: 'name',
-                sorting: Sorting.NONE
+                sorting: Sorting.NONE,
             },
             {
                 id: 'code',
-                sorting: Sorting.DESC
+                sorting: Sorting.DESC,
             },
             {
                 id: 'age',
-                sorting: Sorting.NONE
+                sorting: Sorting.NONE,
             },
             {
                 id: 'country',
-                sorting: Sorting.NONE
-            }
+                sorting: Sorting.NONE,
+            },
         ];
     }
 
     state = {
         template: null,
-        opening: false
+        opening: false,
     };
 
     node = null;
@@ -110,14 +110,14 @@ export default class MembersList extends React.PureComponent {
                     width: FIELDS[field].fixedColWidth
                         ? FIELDS[field].fixedColWidth
                         : weightScale * FIELDS[field].colWeight * WEIGHT_UNIT,
-                    omitHeader: !!FIELDS[field].omitTHead
+                    omitHeader: !!FIELDS[field].omitTHead,
                 }));
 
                 this.setState({
                     template: {
                         table: true,
-                        columns
-                    }
+                        columns,
+                    },
                 });
                 return;
             }
@@ -141,7 +141,7 @@ export default class MembersList extends React.PureComponent {
             } else {
                 center.push({
                     id: field,
-                    weight: (fields.length - index) * FIELDS[field].weight
+                    weight: (fields.length - index) * FIELDS[field].weight,
                 });
             }
             index++;
@@ -155,8 +155,8 @@ export default class MembersList extends React.PureComponent {
                 left,
                 name,
                 center: center.map(field => field.id),
-                right
-            }
+                right,
+            },
         });
     }
 
@@ -224,7 +224,7 @@ export default class MembersList extends React.PureComponent {
                     firstName: 'Example',
                     firstNameLegal: 'Example',
                     lastName: 'McExampleface',
-                    lastNameLegal: 'McExampleface'
+                    lastNameLegal: 'McExampleface',
                 },
                 oldCode: 'exam-l',
                 newCode: 'exampl',
@@ -238,8 +238,8 @@ export default class MembersList extends React.PureComponent {
                     city: 'Amsterdam',
                     cityArea: 'Idontknow',
                     postalCode: '12345',
-                    streetAddress: 'Idontknow 12'
-                }
+                    streetAddress: 'Idontknow 12',
+                },
             };
 
             for (let i = 0; i < 10; i++) {
@@ -271,7 +271,7 @@ class MemberLi extends React.PureComponent {
     static propTypes = {
         template: PropTypes.object.isRequired,
         value: PropTypes.object.isRequired,
-        onOpen: PropTypes.func.isRequired
+        onOpen: PropTypes.func.isRequired,
     };
 
     transitionTitleNode = null;
@@ -289,7 +289,7 @@ class MemberLi extends React.PureComponent {
                 template.left,
                 template.right,
                 ...template.name,
-                ...template.center
+                ...template.center,
             ].filter(x => x);
 
         let contents;
@@ -351,7 +351,7 @@ class MemberLi extends React.PureComponent {
                         position={Position.RIGHT}
                         templateFields={templateFields}
                         transitionTitleRef={node => this.transitionTitleNode = node} />}
-                </div>
+                </div>,
             ];
         }
 
@@ -365,7 +365,7 @@ class TableHeader extends React.PureComponent {
         template: PropTypes.object.isRequired,
         selected: PropTypes.arrayOf(PropTypes.object).isRequired,
         onSelectedChange: PropTypes.func.isRequired,
-        onEditFields: PropTypes.func.isRequired
+        onEditFields: PropTypes.func.isRequired,
     };
 
     findSelectedIndex (id) {

@@ -13,7 +13,7 @@ export default class ExistenceEditor extends React.PureComponent {
     static propTypes = {
         value: PropTypes.bool.isRequired,
         onChange: PropTypes.func.isRequired,
-        disabled: PropTypes.bool
+        disabled: PropTypes.bool,
     };
 
     inputRef = null;

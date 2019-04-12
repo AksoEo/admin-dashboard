@@ -19,12 +19,12 @@ export default class AutosizingPageView extends Component {
         minIndex: PropTypes.number.isRequired,
         children: PropTypes.arrayOf(PropTypes.any).isRequired,
         /** Called when the current page changes; shortly before the animation finishes. */
-        onPageChange: PropTypes.func
+        onPageChange: PropTypes.func,
     };
 
     state = {
         x: 0,
-        height: 0
+        height: 0,
     };
 
     /** Item refs and heights. */

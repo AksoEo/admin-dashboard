@@ -16,7 +16,7 @@ export function defaultFields () {
         .map(field => ({
             field,
             enabled: false,
-            value: FIELDS[field].default()
+            value: FIELDS[field].default(),
         }));
 }
 
@@ -32,7 +32,7 @@ export default class PredicateEditor extends React.PureComponent {
         /** Should be set to true if the form was submitted and the checkboxes should be hidden. */
         submitted: PropTypes.bool.isRequired,
         /** Will show a down arrow if submitted and true. */
-        isLast: PropTypes.bool.isRequired
+        isLast: PropTypes.bool.isRequired,
     };
 
     /**
@@ -60,7 +60,7 @@ export default class PredicateEditor extends React.PureComponent {
                     this.props.onEnabledChange(!!value);
                 }
             },
-            disabled: (field.flags & NEEDS_SWITCH) && !this.props.enabled
+            disabled: (field.flags & NEEDS_SWITCH) && !this.props.enabled,
         };
 
         switch (field.type) {

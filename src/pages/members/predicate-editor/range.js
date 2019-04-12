@@ -113,7 +113,7 @@ export default class NumericRangeEditor extends React.PureComponent {
         onChange: PropTypes.func.isRequired,
         min: PropTypes.number.isRequired,
         max: PropTypes.number.isRequired,
-        disabled: PropTypes.bool
+        disabled: PropTypes.bool,
     };
 
     state = {
@@ -123,7 +123,7 @@ export default class NumericRangeEditor extends React.PureComponent {
         focused: false,
         expanded: 0,
         startIncl: 0,
-        endIncl: 0
+        endIncl: 0,
     }
 
     /**
@@ -204,7 +204,7 @@ export default class NumericRangeEditor extends React.PureComponent {
         this.setState({
             width: Math.round(width),
             height: Math.round(height),
-            scale: Math.ceil(scale)
+            scale: Math.ceil(scale),
         });
     }
 
@@ -256,7 +256,7 @@ export default class NumericRangeEditor extends React.PureComponent {
                 tappedOnLabel: end === 'start'
                     ? (posX - left) < PIN_PADDING + this.pinLabelWidths[0]
                     : (right - posX) < PIN_PADDING + this.pinLabelWidths[1],
-                draggedAway: false
+                draggedAway: false,
             };
             return true;
         }
@@ -644,7 +644,7 @@ export default class NumericRangeEditor extends React.PureComponent {
                         marginTop: -CTX_PADDING,
                         marginLeft: -CTX_PADDING,
                         width: this.state.width + 2 * CTX_PADDING,
-                        height: this.state.height + 2 * CTX_PADDING
+                        height: this.state.height + 2 * CTX_PADDING,
                     }}
                     ref={node => this.canvas = node}
                     width={(this.state.width + 2 * CTX_PADDING) * this.state.scale}

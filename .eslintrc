@@ -14,14 +14,8 @@
         "no-unused-vars": "warn",
         // semicolons
         "semi": "error",
-        // no dangling commas
-        "comma-dangle": ["warn", {
-            "arrays": "never",
-            "objects": "never",
-            "imports": "never",
-            "exports": "never",
-            "functions": "never"
-        }],
+        // dangling commas
+        "comma-dangle": ["warn", "always-multiline"],
         // consistent newlines around array brackets
         "array-bracket-newline": ["warn", "consistent"],
         // no spaces around array brackets: [a]

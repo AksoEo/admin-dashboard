@@ -25,7 +25,7 @@ export default class Ripple extends Component {
          * The ID of the current ripple. Used to identify which ripple to modify when the
          * pointer is released.
          */
-        currentRippleID: null
+        currentRippleID: null,
     };
 
     /** The DOM node. */
@@ -99,7 +99,7 @@ export default class Ripple extends Component {
             x: offsetX,
             y: offsetY,
             sizeSpring: new Spring(1, RIPPLE_HOLD_DURATION),
-            opacitySpring: new Spring(1, RIPPLE_HOLD_DURATION)
+            opacitySpring: new Spring(1, RIPPLE_HOLD_DURATION),
         };
 
         ripple.sizeSpring.target = 1;
@@ -112,7 +112,7 @@ export default class Ripple extends Component {
         ripples.push(ripple);
         this.setState({
             currentRippleID: ripple.id,
-            ripples
+            ripples,
         });
     }
 
@@ -132,7 +132,7 @@ export default class Ripple extends Component {
 
             this.setState({
                 currentRippleID: null,
-                ripples
+                ripples,
             });
         } else {
             this.setState({ currentRippleID: null });
@@ -189,7 +189,7 @@ export default class Ripple extends Component {
                         width: `${targetScale}px`,
                         height: `${targetScale}px`,
                         marginLeft: `${-targetScale / 2}px`,
-                        marginTop: `${-targetScale / 2}px`
+                        marginTop: `${-targetScale / 2}px`,
                     }}>
                 </div>
             );

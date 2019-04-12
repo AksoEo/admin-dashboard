@@ -4,7 +4,7 @@
 export const Sorting = {
     NONE: 0,
     DESC: 1,
-    ASC: 2
+    ASC: 2,
 };
 
 /**
@@ -14,7 +14,7 @@ export const PosHint = {
     LEFT: 0,
     NAME: 1,
     CENTER: 2,
-    RIGHT: 3
+    RIGHT: 3,
 };
 
 /**
@@ -33,13 +33,13 @@ export const FIELDS = {
         weight: 3,
         colWeight: 2,
         posHint: PosHint.NAME,
-        sortable: true
+        sortable: true,
     },
     code: {
         weight: 2,
         colWeight: 2,
         posHint: PosHint.NAME,
-        sortable: true
+        sortable: true,
     },
     codeholderType: {
         weight: 1,
@@ -47,43 +47,43 @@ export const FIELDS = {
         posHint: PosHint.LEFT,
         omitTHead: true,
         permanent: true,
-        sortable: true
+        sortable: true,
     },
     country: {
         weight: 1,
         colWeight: 2,
         posHint: PosHint.RIGHT,
-        sortable: true
+        sortable: true,
     },
     age: {
         weight: 2,
         colWeight: 1,
         posHint: PosHint.RIGHT,
-        sortable: true
+        sortable: true,
     },
     email: {
         weight: 2,
         colWeight: 2,
-        posHint: PosHint.CENTER
+        posHint: PosHint.CENTER,
     },
     addressLatin: {
         weight: 1,
         colWeight: 3,
         posHint: PosHint.CENTER,
-        sortable: true
+        sortable: true,
     },
     addressCity: {
         weight: 1,
         colWeight: 2,
         posHint: PosHint.CENTER,
-        sortable: true
+        sortable: true,
     },
     addressCountryArea: {
         weight: 1,
         colWeight: 2,
         posHint: PosHint.CENTER,
-        sortable: true
-    }
+        sortable: true,
+    },
 };
 
 /** List of all field names. */

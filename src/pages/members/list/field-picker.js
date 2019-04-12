@@ -43,12 +43,12 @@ export default class FieldPicker extends React.PureComponent {
         /** If true, will show the modal. */
         open: PropTypes.bool.isRequired,
         /** Close handler. */
-        onClose: PropTypes.func.isRequired
+        onClose: PropTypes.func.isRequired,
     };
 
     state = {
         fullScreen: window.innerWidth <= FULLSCREEN_WIDTH,
-        draggingIndex: -1
+        draggingIndex: -1,
     };
 
     /**
@@ -210,7 +210,7 @@ export default class FieldPicker extends React.PureComponent {
                         const selected = this.props.selected.slice();
                         selected.push({
                             id: field,
-                            sorting: Sorting.NONE
+                            sorting: Sorting.NONE,
                         });
                         this.props.onChange(selected);
                     }}>
@@ -270,7 +270,7 @@ export default class FieldPicker extends React.PureComponent {
 class RearrangableList extends React.PureComponent {
     static propTypes = {
         children: PropTypes.array.isRequired,
-        innerRef: PropTypes.func
+        innerRef: PropTypes.func,
     };
 
     itemRefs = {};
@@ -348,7 +348,7 @@ class DragButton extends React.PureComponent {
     static propTypes = {
         children: PropTypes.any,
         onTouchStart: PropTypes.func.isRequired,
-        onMouseDown: PropTypes.func.isRequired
+        onMouseDown: PropTypes.func.isRequired,
     };
 
     onTouchStart = () => this.props.onTouchStart;
@@ -382,7 +382,7 @@ export class SortingControl extends React.PureComponent {
         /** Change handler. */
         onChange: PropTypes.func.isRequired,
         /** If true, will hide the label explaining the current state. */
-        hideLabel: PropTypes.bool
+        hideLabel: PropTypes.bool,
     };
 
     onClick = () => {

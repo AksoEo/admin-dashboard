@@ -11,7 +11,7 @@ export const Position = {
     LEFT: 1,
     NAME: 2,
     CENTER: 3,
-    RIGHT: 4
+    RIGHT: 4,
 };
 
 /** Column-like positions. */
@@ -31,7 +31,7 @@ export default class MemberField extends React.PureComponent {
         /** List of currently selected fields. */
         templateFields: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** Function for setting the transition title. */
-        transitionTitleRef: PropTypes.func.isRequired
+        transitionTitleRef: PropTypes.func.isRequired,
     };
 
     render () {
@@ -179,6 +179,6 @@ const FIELDS = {
     },
     addressCountryArea ({ member }) {
         return <span className="address-country-area">{member.addressLatin.countryArea}</span>;
-    }
+    },
 };
 /* eslint-enable react/prop-types */

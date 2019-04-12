@@ -17,13 +17,13 @@ const Stage = {
     FORGOT_CODE: -2,
     FORGOT_PASSWORD: -1,
     DETAILS: 0,
-    SECURITY_CODE: 1
+    SECURITY_CODE: 1,
 };
 
 const Mode = {
     NORMAL: 0,
     CREATING_PASSWORD: 1,
-    RESETTING_PASSWORD: 2
+    RESETTING_PASSWORD: 2,
 };
 
 const MIN_INDEX = -3;
@@ -32,7 +32,7 @@ const temporaryBackLinkStyle = {
     display: 'block',
     textAlign: 'center',
     fontSize: '1.2em',
-    color: 'inherit'
+    color: 'inherit',
 };
 
 
@@ -40,14 +40,14 @@ const temporaryBackLinkStyle = {
 export default class Login extends Component {
     static propTypes = {
         /** Login callback. */
-        onLogin: PropTypes.func.isRequired
+        onLogin: PropTypes.func.isRequired,
     };
 
     state = {
         username: '',
         stage: Stage.DETAILS,
         loading: false,
-        mode: Mode.NORMAL
+        mode: Mode.NORMAL,
     };
 
     pageView = null;
@@ -71,7 +71,7 @@ export default class Login extends Component {
         if (match) {
             this.setState({
                 mode: Mode.CREATING_PASSWORD,
-                username: match[1]
+                username: match[1],
             }, () => this.pageView.pageHeightChanged());
         }
 
@@ -218,7 +218,7 @@ class DetailsStage extends Component {
     state = {
         password: '',
         confirmPassword: '',
-        loading: false
+        loading: false,
     };
 
     usernameField = null;
@@ -334,7 +334,7 @@ class SecurityCodeStage extends Component {
 
     state = {
         securityCode: '',
-        loading: false
+        loading: false,
     }
 
     securityCodeField = null;
@@ -364,7 +364,7 @@ class SecurityCodeStage extends Component {
                     pattern="\d*"
                     type="number"
                     onChange={e => this.setState({
-                        securityCode: e.target.value.replace(/\D/g, '').substr(0, 6)
+                        securityCode: e.target.value.replace(/\D/g, '').substr(0, 6),
                     })}
                     validate={value => {
                         if (!value || !value.match(/^\d{6}$/)) {
