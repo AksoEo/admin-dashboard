@@ -17,6 +17,11 @@ export const Position = {
 /** Column-like positions. */
 const COL_POSITIONS = [Position.COLUMN, Position.LEFT, Position.RIGHT];
 
+// TODO: remove
+const TMP_COUNTRY_NAMES = {
+    NL: 'Nederlando',
+};
+
 /** Renders a single member field. */
 export default class MemberField extends React.PureComponent {
     static propTypes = {
@@ -136,7 +141,8 @@ const FIELDS = {
             if (position === Position.LEFT || position === Position.RIGHT) {
                 return flag;
             } else {
-                return <span>{flag} (nomo)</span>;
+                const name = TMP_COUNTRY_NAMES[feeCountry];
+                return <span>{flag} {name}</span>;
             }
         } else {
             return <span>todo</span>;

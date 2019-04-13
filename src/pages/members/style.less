@@ -303,6 +303,12 @@
 
         .members-list-item {
             border-bottom: 1px solid @separator;
+            transition: background 0.2s @easing;
+            cursor: pointer;
+
+            &:hover {
+                background: @hover-background;
+            }
 
             &:last-of-type {
                 border-bottom: none;
@@ -371,6 +377,10 @@
             white-space: nowrap;
         }
 
+        .email {
+            word-wrap: break-word;
+        }
+
         .old-uea-code {
             background: none;
         }
@@ -402,7 +412,13 @@
             }
 
             .title-item:not([data-field='name']) {
-                animation: member-detail-item-in 0.6s @easing 0.3s backwards;
+                animation: member-detail-title-in 0.6s @easing 0.3s backwards;
+
+                @keyframes member-detail-title-in {
+                    from {
+                        opacity: 0;
+                    }
+                }
             }
 
             .gen-member-detail-table-transition(@n, @offset) when (@n < 20) {
@@ -430,6 +446,11 @@
                 display: inline-block;
             }
 
+            .title-item {
+                display: inline-block;
+                vertical-align: middle;
+            }
+
             .title-item:not(:last-of-type) {
                 margin-right: 16px;
             }
@@ -438,8 +459,24 @@
         .member-detail-table {
             .field-name {
                 font-weight: 500;
-                padding-right: 16px;
+                padding: 8px 16px;
                 text-align: right;
+                vertical-align: top;
+            }
+
+            .field-value {
+                padding: 8px;
+                padding-left: 0;
+            }
+
+            .address {
+                .address-pseudoline {
+                    display: block;
+
+                    &::before {
+                        content: none;
+                    }
+                }
             }
         }
     }

@@ -169,7 +169,7 @@ export default class App extends React.PureComponent {
                                 aria-label="AKSO"
                                 alt="AKSO" />
                         </div>
-                    ) : (
+                    ) : this.state.showBackButton ? null : (
                         <IconButton
                             className="menu-button"
                             color="inherit"

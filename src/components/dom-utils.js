@@ -6,7 +6,12 @@
 export function deepCloneNode (node) {
     const newNode = node.cloneNode(false);
     if (newNode.nodeType === 1) {
-        Object.assign(newNode.style, getComputedStyle(node));
+        const computedStyle = getComputedStyle(node);
+        for (const key in computedStyle) {
+            if (!key.match(/^\d+|length|parentRule$/)) {
+                newNode.style[key] = computedStyle[key];
+            }
+        }
     }
 
     for (const child of node.childNodes) {
@@ -35,7 +40,7 @@ export function cloneNodeInScreenSpace (node, zIndex = 100) {
         zIndex,
         top: 0,
         left: 0,
-        width: width + 'px',
+        width: Math.ceil(width) + 'px',
         height: height + 'px',
         transform: `translate(${left}px, ${top}px)`,
     });

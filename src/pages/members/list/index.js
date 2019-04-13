@@ -221,24 +221,24 @@ export default class MembersList extends React.PureComponent {
             // TODO: fetch members list
             const EXAMPLE = {
                 name: {
-                    firstName: 'Example',
-                    firstNameLegal: 'Example',
-                    lastName: 'McExampleface',
-                    lastNameLegal: 'McExampleface',
+                    firstName: 'Max',
+                    firstNameLegal: 'Max',
+                    lastName: 'Mustermann',
+                    lastNameLegal: 'Mustermann',
                 },
-                oldCode: 'exam-l',
-                newCode: 'exampl',
+                oldCode: 'mxms-o',
+                newCode: 'maxmus',
                 codeholderType: 'human',
                 feeCountry: 'NL',
                 age: 35,
-                email: 'exam@ple.example',
+                email: 'max.mustermann@ekzemplo.com',
                 addressLatin: {
                     country: 'NL',
-                    countryArea: 'Holland',
-                    city: 'Amsterdam',
-                    cityArea: 'Idontknow',
-                    postalCode: '12345',
-                    streetAddress: 'Idontknow 12',
+                    countryArea: 'Zuid-Holland',
+                    city: 'Rotterdam',
+                    cityArea: null,
+                    postalCode: '3015 BJ',
+                    streetAddress: 'Nieuwe Binnenweg 176',
                 },
             };
 

@@ -19,6 +19,7 @@ export const PosHint = {
 
 /** Position in the detail view. */
 export const DetailPos = {
+    NONE: -1,
     TITLE: 0,
     TABLE: 1,
 };
@@ -58,13 +59,6 @@ export const FIELDS = {
         sortable: true,
         detailPos: DetailPos.TABLE,
     },
-    country: {
-        weight: 1,
-        colWeight: 2,
-        posHint: PosHint.RIGHT,
-        sortable: true,
-        detailPos: DetailPos.TABLE,
-    },
     age: {
         weight: 2,
         colWeight: 1,
@@ -90,12 +84,19 @@ export const FIELDS = {
         colWeight: 2,
         posHint: PosHint.CENTER,
         sortable: true,
-        detailPos: DetailPos.TABLE,
+        detailPos: DetailPos.NONE,
     },
     addressCountryArea: {
         weight: 1,
         colWeight: 2,
         posHint: PosHint.CENTER,
+        sortable: true,
+        detailPos: DetailPos.NONE,
+    },
+    country: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.RIGHT,
         sortable: true,
         detailPos: DetailPos.TABLE,
     },
