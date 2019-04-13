@@ -43,7 +43,7 @@ export default {
         continue: 'Daŭrigi',
         securityCode: 'Sekurkodo',
         createPasswordPlaceholder: 'Skribu pasvorton',
-        confirmPasswordPlaceholder: '[[type your password again]]',
+        confirmPasswordPlaceholder: 'Skribu pasvorton denove',
         // Text shown above the security code input
         securityCodeDescription: 'Bonvolu enmeti sekurkodon generitan de via duafaktora aplikaĵo.',
         // The following three are both a link and a title
