@@ -7,7 +7,7 @@ import locale from '../../../locale';
 import { FIELDS, FILTERABLE, NEEDS_SWITCH } from '../fields';
 import StringEditor from './string';
 import NumericRangeEditor from './range';
-import ExistenceEditor from './existence';
+import BooleanEditor from './boolean';
 
 /** Returns the list of default fields. */
 export function defaultFields () {
@@ -56,8 +56,8 @@ export default class PredicateEditor extends React.PureComponent {
             value: this.props.value,
             onChange: value => {
                 this.props.onChange(value);
-                if (!field.flags & NEEDS_SWITCH) {
-                    this.props.onEnabledChange(!!value);
+                if (!(field.flags & NEEDS_SWITCH)) {
+                    this.props.onEnabledChange(!field.isNone(value));
                 }
             },
             disabled: (field.flags & NEEDS_SWITCH) && !this.props.enabled,
@@ -75,8 +75,48 @@ export default class PredicateEditor extends React.PureComponent {
                 max={field.max}
                 {...editorProps} />;
             break;
+        case 'age-range':
+            editor = (
+                <div className="age-range">
+                    <NumericRangeEditor
+                        min={field.min}
+                        max={field.max}
+                        {...editorProps}
+                        value={this.props.value.range}
+                        onChange={value => {
+                            editorProps.onChange({ ...this.props.value, range: value });
+                        }} />
+                    <BooleanEditor
+                        labelKey="agePrime"
+                        {...editorProps}
+                        value={this.props.value.atStartOfYear}
+                        onChange={value => {
+                            editorProps.onChange({ ...this.props.value, atStartOfYear: value });
+                        }} />
+                </div>
+            );
+            break;
         case 'existence':
-            editor = <ExistenceEditor {...editorProps} />;
+            editor = <BooleanEditor labelKey="existence" {...editorProps} />;
+            break;
+        case 'boolean':
+            editor = <BooleanEditor labelKey="boolean" {...editorProps} />;
+            break;
+        case 'codeholderType':
+            editor = (
+                <div className="codeholder-type">
+                    <BooleanEditor
+                        labelKey="codeholderTypeHuman"
+                        {...editorProps}
+                        value={this.props.value.human}
+                        onChange={human => editorProps.onChange({ ...this.props.value, human })} />
+                    <BooleanEditor
+                        labelKey="codeholderTypeOrg"
+                        {...editorProps}
+                        value={this.props.value.org}
+                        onChange={org => editorProps.onChange({ ...this.props.value, org })} />
+                </div>
+            );
             break;
         }
 

@@ -170,7 +170,17 @@
                     }
                 }
 
-                .existence-editor {
+                .age-range {
+                    flex: 1;
+                    display: flex;
+                    padding-right: 16px;
+                }
+
+                .codeholder-type {
+                    display: flex;
+                }
+
+                .boolean-editor {
                     &.disabled {
                         opacity: 0.5;
                     }
@@ -187,6 +197,14 @@
 
                     .numeric-range-editor {
                         margin-left: 20px;
+                    }
+
+                    .age-range {
+                        flex-wrap: wrap;
+
+                        .boolean-editor {
+                            width: 100%;
+                        }
                     }
                 }
             }
@@ -426,7 +444,7 @@
                     animation: member-detail-item-in 0.5s @easing @offset backwards;
                 }
 
-                .gen-member-detail-table-transition(@n + 1, @offset + 0.03s);
+                .gen-member-detail-table-transition(@n + 1, @offset + 0.01s);
             }
 
             .gen-member-detail-table-transition(0, 0.2s);

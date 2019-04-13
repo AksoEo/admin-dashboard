@@ -7,33 +7,67 @@ export const NEEDS_SWITCH = 1 << 2;
 /** Field descriptions */
 export const FIELDS = {
     nameOrCode: {
-        type: 'string',
         flags: SEARCHABLE,
-        default () {
-            return '';
-        },
     },
     email: {
-        type: 'string',
         flags: SEARCHABLE,
-        default () {
-            return '';
-        },
+    },
+    landlinePhone: {
+        flags: SEARCHABLE,
+    },
+    cellphone: {
+        flags: SEARCHABLE,
+    },
+    officePhone: {
+        flags: SEARCHABLE,
     },
     notes: {
-        type: 'string',
         flags: SEARCHABLE,
+    },
+    codeholderType: {
+        type: 'codeholderType',
+        flags: FILTERABLE,
         default () {
-            return '';
+            return { human: true, org: true };
+        },
+        isNone (value) {
+            return value.human && value.org;
+        },
+    },
+    feeCountry: {
+        type: 'countries',
+        flags: FILTERABLE,
+        default () {
+            return [];
+        },
+        isNone (value) {
+            return !value.length;
+        },
+    },
+    enabled: {
+        type: 'boolean',
+        flags: FILTERABLE | NEEDS_SWITCH,
+        default () {
+            return false;
         },
     },
     age: {
-        type: 'range',
+        type: 'age-range',
         flags: FILTERABLE | NEEDS_SWITCH,
         min: 0,
         max: 150,
         default () {
-            return new NumericRange(0, 35, true, true);
+            return {
+                range: new NumericRange(0, 35, true, true),
+                atStartOfYear: false,
+            };
+        },
+    },
+    birthdate: {
+        type: 'date-range',
+        flags: FILTERABLE | NEEDS_SWITCH,
+        default () {
+            return 'todo';
         },
     },
     hasOldCode: {
@@ -45,6 +79,13 @@ export const FIELDS = {
     },
     hasEmail: {
         type: 'existence',
+        flags: FILTERABLE | NEEDS_SWITCH,
+        default () {
+            return false;
+        },
+    },
+    isDead: {
+        type: 'boolean',
         flags: FILTERABLE | NEEDS_SWITCH,
         default () {
             return false;

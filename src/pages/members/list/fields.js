@@ -24,6 +24,8 @@ export const DetailPos = {
     TABLE: 1,
 };
 
+// TODO: order fields in some sensible order
+
 /**
  * List of all member fields.
  *
@@ -45,6 +47,12 @@ export const FIELDS = {
         sortable: true,
         detailPos: DetailPos.TITLE,
     },
+    honorific: {
+        weight: 1,
+        colWeight: 1,
+        posHint: PosHint.NAME,
+        detailPos: DetailPos.TABLE,
+    },
     name: {
         weight: 3,
         colWeight: 2,
@@ -59,10 +67,23 @@ export const FIELDS = {
         sortable: true,
         detailPos: DetailPos.TABLE,
     },
+    enabled: {
+        weight: 1,
+        colWeight: 1,
+        posHint: PosHint.CENTER,
+        detailPos: DetailPos.TABLE,
+    },
     age: {
         weight: 2,
         colWeight: 1,
         posHint: PosHint.RIGHT,
+        sortable: true,
+        detailPos: DetailPos.TABLE,
+    },
+    birthdate: {
+        weight: 2,
+        colWeight: 2,
+        posHint: PosHint.CENTER,
         sortable: true,
         detailPos: DetailPos.TABLE,
     },
@@ -98,6 +119,42 @@ export const FIELDS = {
         colWeight: 2,
         posHint: PosHint.RIGHT,
         sortable: true,
+        detailPos: DetailPos.TABLE,
+    },
+    officePhone: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER,
+        detailPos: DetailPos.TABLE,
+    },
+    cellphone: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER,
+        detailPos: DetailPos.TABLE,
+    },
+    landlinePhone: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER,
+        detailPos: DetailPos.TABLE,
+    },
+    isDead: {
+        weight: 1,
+        colWeight: 1,
+        posHint: PosHint.CENTER,
+        detailPos: DetailPos.TABLE,
+    },
+    profession: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER,
+        detailPos: DetailPos.TABLE,
+    },
+    notes: {
+        weight: 1,
+        colWeight: 2,
+        posHint: PosHint.CENTER,
         detailPos: DetailPos.TABLE,
     },
 };
