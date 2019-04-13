@@ -1,6 +1,6 @@
 import { h, render } from 'preact';
 import { CircularProgressIndicator } from './p-components/progress';
-import Login from './login';
+import Login, { isSpecialPage } from './login';
 import './style';
 
 /** @jsx h */
@@ -10,7 +10,7 @@ function beginSession () {
     const isLoggedIn = window.localStorage.demoLoggedIn;
     const app = import(/* webpackChunkName: "app", webpackPrefetch: true */ './app');
 
-    if (!isLoggedIn) {
+    if (!isLoggedIn || isSpecialPage()) {
         const loginRoot = document.createElement('div');
         loginRoot.id = 'login-root';
         loginRoot.className = 'root-container';

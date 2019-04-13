@@ -21,7 +21,7 @@ const Stage = {
 };
 
 const Mode = {
-    NORMAL: 0,
+    NORMAL: 0, // must be falsy for isSpecialPage
     CREATING_PASSWORD: 1,
     RESETTING_PASSWORD: 2,
 };
@@ -35,6 +35,21 @@ const temporaryBackLinkStyle = {
     color: 'inherit',
 };
 
+/** Returns the mode and possibly additional data for the current page. */
+function getPageMode () {
+    const pathname = document.location.pathname;
+    const match = pathname.match(/^\/krei_pasvorton\/([^/]+)\/([\da-fA-f]+)\/?$/);
+    if (match) return { mode: Mode.CREATING_PASSWORD, username: match[1] };
+    return { mode: Mode.NORMAL };
+}
+
+/**
+ * Returns true if the current page is a special page (such as the “create password” page) and
+ * should always show the login screen.
+ */
+export function isSpecialPage () {
+    return getPageMode().mode !== Mode.NORMAL;
+}
 
 /** The login screen. */
 export default class Login extends Component {
@@ -66,14 +81,7 @@ export default class Login extends Component {
     componentDidMount () {
         document.title = locale.documentTitleTemplate(locale.login.title);
 
-        const pathname = document.location.pathname;
-        const match = pathname.match(/^\/krei_pasvorton\/([^/]+)\/([\da-fA-f]+)\/?$/);
-        if (match) {
-            this.setState({
-                mode: Mode.CREATING_PASSWORD,
-                username: match[1],
-            }, () => this.pageView.pageHeightChanged());
-        }
+        this.setState(getPageMode(), () => this.pageView.pageHeightChanged());
 
         setTimeout(() => {
             // fake page change to trigger focus
@@ -279,6 +287,7 @@ class DetailsStage extends Component {
                         label={locale.login.confirmPassword}
                         value={this.state.confirmPassword}
                         type="password"
+                        placeholder={locale.login.confirmPasswordPlaceholder}
                         onChange={e => this.setState({ confirmPassword: e.target.value })}
                         validate={value => {
                             if (value !== this.state.password) {
