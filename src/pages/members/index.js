@@ -25,6 +25,7 @@ export default class MembersPage extends React.PureComponent {
         search: SearchInput.defaultValue(),
         fields: MembersList.defaultFields(),
         submitted: false,
+        results: null, // TODO: use this
         fieldPickerOpen: false,
     };
 
@@ -74,7 +75,7 @@ export default class MembersPage extends React.PureComponent {
                         }
                     }} />
             );
-        } else if (this.state.submitted) {
+        } else if (this.state.results) {
             // TODO: use actual data
             const count = 123;
             const total = 456;
@@ -110,8 +111,14 @@ export default class MembersPage extends React.PureComponent {
                     value={this.state.search}
                     onChange={search => this.setState({ search })}
                     submitted={searchInputSubmitted}
-                    onSubmit={() => this.setState({ submitted: true })}
-                    onUnsubmit={() => this.setState({ submitted: false })} />
+                    onSubmit={() => {
+                        this.setState({ submitted: true });
+                        // TODO: fetch here?
+                        setTimeout(() => {
+                            this.setState({ results: [] });
+                        }, 200);
+                    }}
+                    onUnsubmit={() => this.setState({ submitted: false, results: null })} />
                 <FieldPicker
                     open={fieldPickerOpen}
                     available={AVAILABLE_FIELDS}

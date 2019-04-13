@@ -35,11 +35,6 @@ export default class SearchInput extends React.PureComponent {
         this.setState({ expanded: !this.state.expanded });
     };
 
-    onSubmit = () => {
-        this.setState({ submitted: true });
-        this.props.onSubmit();
-    };
-
     onContainerClick = e => {
         if (this.props.submitted) {
             e.preventDefault();
@@ -64,7 +59,7 @@ export default class SearchInput extends React.PureComponent {
                 }}
                 onKeyDown={e => {
                     if (e.key === 'Enter') {
-                        this.onSubmit();
+                        this.props.onSubmit();
                     }
                 }}
                 submitted={this.props.submitted}
@@ -152,7 +147,7 @@ export default class SearchInput extends React.PureComponent {
                                         variant="contained"
                                         color="primary"
                                         className="submit-button"
-                                        onClick={this.onSubmit}>
+                                        onClick={this.props.onSubmit}>
                                         {filtersOnly
                                             ? locale.members.search.submitFilter
                                             : locale.members.search.submit}

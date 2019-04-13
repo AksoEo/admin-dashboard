@@ -101,10 +101,16 @@ export default {
                 isDead: '[[is dead]]',
                 feeCountry: 'Paĝlando',
                 birthdate: '[[birth date]]',
+                address: 'Adreso',
             },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
                 email: 'Ekz. zamenhof@co.uea.org',
+                landlinePhone: '[[placeholder]]',
+                cellphone: '[[placeholder]]',
+                officePhone: '[[placeholder]]',
+                address: '[[placeholder]]',
+                notes: '[[placeholder]]',
             },
         },
         resultStats: (count, filtered, total, time) => {

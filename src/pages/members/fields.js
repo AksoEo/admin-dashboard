@@ -21,6 +21,9 @@ export const FIELDS = {
     officePhone: {
         flags: SEARCHABLE,
     },
+    address: {
+        flags: SEARCHABLE,
+    },
     notes: {
         flags: SEARCHABLE,
     },
