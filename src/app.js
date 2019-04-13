@@ -15,6 +15,7 @@ import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Sidebar from './features/sidebar';
 import pages from './pages';
 
@@ -66,7 +67,11 @@ export default class App extends React.PureComponent {
         sidebarOpen: false,
         permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH,
         currentPage: currentPageFromLocation(),
+        showBackButton: false,
     };
+
+    /** The current page component. */
+    currentPage = null;
 
     /** If true, will play the logged-in animation. */
     shouldPlayLoginAnimation = this.props.shouldPlayLoginAnimation;
@@ -90,17 +95,24 @@ export default class App extends React.PureComponent {
     };
 
     onPopState = () => {
+        const currentPage = currentPageFromLocation();
         this.setState({
-            currentPage: currentPageFromLocation(),
+            currentPage,
             sidebarOpen: false,
+            showBackButton: currentPage[0] !== this.state.currentPage
+                ? false // reset back button visibility if page changes
+                : this.state.showBackButton,
         });
     };
 
-    onHashChange = () => {
-        this.setState({
-            currentPage: currentPageFromLocation(),
-            sidebarOpen: false,
-        });
+    onHashChange = this.onPopState;
+
+    setBackButtonVisible = visible => {
+        this.setState({ showBackButton: visible });
+    };
+
+    goBack = () => {
+        window.history.back();
     };
 
     componentDidMount () {
@@ -168,6 +180,15 @@ export default class App extends React.PureComponent {
                             <MenuIcon />
                         </IconButton>
                     )}
+                    {this.state.showBackButton ? (
+                        <IconButton
+                            className="back-button"
+                            color="inherit"
+                            aria-label={locale.header.back}
+                            onClick={this.goBack}>
+                            <ArrowBackIcon />
+                        </IconButton>
+                    ) : null}
                     <Typography
                         className="header-title"
                         color="inherit"
@@ -230,7 +251,10 @@ export default class App extends React.PureComponent {
                     <CircularProgress className="page-loading-indicator" />
                 </div>
             }>
-                <PageComponent path={this.state.currentPage.slice(1)} />
+                <PageComponent
+                    path={this.state.currentPage.slice(1)}
+                    setBackButtonVisible={this.setBackButtonVisible}
+                    ref={page => this.currentPage = page} />
             </Suspense>
         );
 

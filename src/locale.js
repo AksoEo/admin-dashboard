@@ -15,6 +15,8 @@ export default {
         menu: 'Menuo',
         // Overflow menu item
         overflow: 'Pli',
+        // Back button
+        back: '[[back]]',
     },
     // Sidebar
     sidebar: {

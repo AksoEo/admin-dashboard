@@ -31,7 +31,7 @@ export default class MemberField extends React.PureComponent {
         /** List of currently selected fields. */
         templateFields: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** Function for setting the transition title. */
-        transitionTitleRef: PropTypes.func.isRequired,
+        transitionTitleRef: PropTypes.func,
     };
 
     render () {
@@ -99,7 +99,7 @@ const FIELDS = {
                     title={`${first} ${last}`}
                     ref={node => {
                         this.node = node;
-                        this.props.transitionTitleRef(node);
+                        this.props.transitionTitleRef && this.props.transitionTitleRef(node);
                     }}>
                     <span className="first-name" ref={node => this.firstName = node}>
                         {first}

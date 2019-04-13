@@ -6,34 +6,17 @@ import SearchInput from './search-input';
 import MembersList, {
     FieldPicker, AVAILABLE_FIELDS, SORTABLE_FIELDS, PERMANENT_FIELDS,
 } from './list';
-import MemberDetail from './detail';
+import MemberDetail from './list/detail';
 import locale from '../../locale';
 import { routerContext } from '../../router';
+import { cloneNodeInScreenSpace } from '../../components/dom-utils';
 import './style';
-
-// TODO: move this somewhere else
-/**
- * Clones a node and its children, including styles.
- * @param {Node} node - a DOM node
- * @returns {Node} - the node’s clone
- */
-function deepCloneNode (node) {
-    const newNode = node.cloneNode(false);
-    if (newNode.nodeType === 1) {
-        Object.assign(newNode.style, getComputedStyle(node));
-    }
-
-    for (const child of node.childNodes) {
-        newNode.appendChild(deepCloneNode(child));
-    }
-
-    return newNode;
-}
 
 /** The members’ page. */
 export default class MembersPage extends React.PureComponent {
     static propTypes = {
         path: PropTypes.arrayOf(PropTypes.string).isRequired,
+        setBackButtonVisible: PropTypes.func.isRequired,
     };
 
     static contextType = routerContext;
@@ -45,31 +28,37 @@ export default class MembersPage extends React.PureComponent {
         fieldPickerOpen: false,
     };
 
-    pendingTransitionNode = null;
+    pendingTransition = null;
 
     openMember = (id, titleNode) => {
         if (titleNode) {
-            const nodeRect = titleNode.getBoundingClientRect();
-            const transitionNode = deepCloneNode(titleNode);
-            Object.assign(transitionNode.style, {
-                position: 'fixed',
-                zIndex: 100,
-                top: 0,
-                left: 0,
-                width: nodeRect.width + 'px',
-                height: nodeRect.height + 'px',
-                transform: `translate(${nodeRect.left}px, ${nodeRect.top}px)`,
-            });
-            this.pendingTransitionNode = transitionNode;
-            document.body.appendChild(transitionNode);
+            const transition = cloneNodeInScreenSpace(titleNode);
+            this.pendingTransition = transition;
+            document.body.appendChild(transition.node);
         }
         setTimeout(() => {
             this.context.navigate(`/membroj/${id}`);
         }, 100);
     };
 
+    isDetailPage (props = this.props) {
+        return UEACode.validate(props.path[0]);
+    }
+
+    updateBackButtonVisibility (props) {
+        this.props.setBackButtonVisible(this.isDetailPage(props));
+    }
+
+    componentDidMount () {
+        this.updateBackButtonVisibility();
+    }
+
+    componentWillUpdate (newProps) {
+        this.updateBackButtonVisibility(newProps);
+    }
+
     render () {
-        const isDetailPage = UEACode.validate(this.props.path[0]);
+        const isDetailPage = this.isDetailPage();
         const searchInputSubmitted = isDetailPage || this.state.submitted;
         const fieldPickerOpen = !isDetailPage && this.state.fieldPickerOpen;
 
@@ -79,9 +68,9 @@ export default class MembersPage extends React.PureComponent {
             contents = (
                 <MemberDetail
                     ref={node => {
-                        if (this.pendingTransitionNode) {
-                            node.transitionWith(this.pendingTransitionNode);
-                            this.pendingTransitionNode = null;
+                        if (this.pendingTransition) {
+                            node.transitionWith(this.pendingTransition);
+                            this.pendingTransition = null;
                         }
                     }} />
             );

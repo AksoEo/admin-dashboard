@@ -17,6 +17,12 @@ export const PosHint = {
     RIGHT: 3,
 };
 
+/** Position in the detail view. */
+export const DetailPos = {
+    TITLE: 0,
+    TABLE: 1,
+};
+
 /**
  * List of all member fields.
  *
@@ -29,18 +35,6 @@ export const PosHint = {
  *   permanent, hiding it from the field picker
  */
 export const FIELDS = {
-    name: {
-        weight: 3,
-        colWeight: 2,
-        posHint: PosHint.NAME,
-        sortable: true,
-    },
-    code: {
-        weight: 2,
-        colWeight: 2,
-        posHint: PosHint.NAME,
-        sortable: true,
-    },
     codeholderType: {
         weight: 1,
         fixedColWidth: 56,
@@ -48,41 +42,62 @@ export const FIELDS = {
         omitTHead: true,
         permanent: true,
         sortable: true,
+        detailPos: DetailPos.TITLE,
+    },
+    name: {
+        weight: 3,
+        colWeight: 2,
+        posHint: PosHint.NAME,
+        sortable: true,
+        detailPos: DetailPos.TITLE,
+    },
+    code: {
+        weight: 2,
+        colWeight: 2,
+        posHint: PosHint.NAME,
+        sortable: true,
+        detailPos: DetailPos.TABLE,
     },
     country: {
         weight: 1,
         colWeight: 2,
         posHint: PosHint.RIGHT,
         sortable: true,
+        detailPos: DetailPos.TABLE,
     },
     age: {
         weight: 2,
         colWeight: 1,
         posHint: PosHint.RIGHT,
         sortable: true,
+        detailPos: DetailPos.TABLE,
     },
     email: {
         weight: 2,
         colWeight: 2,
         posHint: PosHint.CENTER,
+        detailPos: DetailPos.TABLE,
     },
     addressLatin: {
         weight: 1,
         colWeight: 3,
         posHint: PosHint.CENTER,
         sortable: true,
+        detailPos: DetailPos.TABLE,
     },
     addressCity: {
         weight: 1,
         colWeight: 2,
         posHint: PosHint.CENTER,
         sortable: true,
+        detailPos: DetailPos.TABLE,
     },
     addressCountryArea: {
         weight: 1,
         colWeight: 2,
         posHint: PosHint.CENTER,
         sortable: true,
+        detailPos: DetailPos.TABLE,
     },
 };
 
