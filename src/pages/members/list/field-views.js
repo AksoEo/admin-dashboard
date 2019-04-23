@@ -44,7 +44,7 @@ export default class MemberField extends React.PureComponent {
         if (Field) {
             return <Field {...this.props} />;
         } else {
-            return <span>error</span>;
+            return <span>?</span>;
         }
     }
 }
@@ -115,6 +115,9 @@ const FIELDS = {
             );
         }
     },
+    honorific ({ value }) {
+        return <span className="honorific">{value}</span>;
+    },
     code ({ member }) {
         const { oldCode, newCode } = member;
         if (oldCode) {
@@ -130,6 +133,12 @@ const FIELDS = {
         } else {
             return <span className="uea-code">{newCode}</span>;
         }
+    },
+    enabled ({ value }) {
+        const label = value
+            ? locale.members.fields.enabledStates.yes
+            : locale.members.fields.enabledStates.no;
+        return <span className="enabled-state">{label}</span>;
     },
     country ({ member, position }) {
         const { feeCountry, addressLatin: { country } } = member;
@@ -148,11 +157,15 @@ const FIELDS = {
             return <span>todo</span>;
         }
     },
-    age ({ value, position }) {
+    age ({ value, member, position }) {
+        const atStartOfYear = member.agePrimo;
+        const label = locale.members.fields.ageFormat(value, atStartOfYear);
         if (position === Position.CENTER) {
-            return <div className="age">{locale.members.fields.age}: {value}</div>;
+            return <div className="age">{locale.members.fields.age}: {label}</div>;
+        } else if (position === Position.LEFT || position === Position.RIGHT) {
+            return <span className="age">{value}</span>;
         }
-        return <span className="age">{value}</span>;
+        return <span className="age">{label}</span>;
     },
     email ({ value }) {
         return <span className="email">{value}</span>;
@@ -185,6 +198,9 @@ const FIELDS = {
     },
     addressCountryArea ({ member }) {
         return <span className="address-country-area">{member.addressLatin.countryArea}</span>;
+    },
+    birthdate ({ value }) {
+        return <span className="birthdate">{value}</span>;
     },
 };
 /* eslint-enable react/prop-types */

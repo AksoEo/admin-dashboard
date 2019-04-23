@@ -47,7 +47,7 @@ export default class PredicateEditor extends React.PureComponent {
     }
 
     render () {
-        let editor = 'error';
+        let editor = '?';
 
         const field = FIELDS[this.props.field];
 
@@ -60,7 +60,7 @@ export default class PredicateEditor extends React.PureComponent {
                     this.props.onEnabledChange(!field.isNone(value));
                 }
             },
-            disabled: (field.flags & NEEDS_SWITCH) && !this.props.enabled,
+            disabled: !!(field.flags & NEEDS_SWITCH) && !this.props.enabled,
         };
 
         switch (field.type) {

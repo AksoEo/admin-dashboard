@@ -125,6 +125,7 @@ export default {
             code: 'UEA-kodo',
             country: 'Lando',
             age: 'Aĝo',
+            ageFormat: (age, agep) => `${age} (${agep} jarkomence)`,
             email: 'Retpoŝtadreso',
             addressLatin: 'Adreso',
             addressCity: 'Urbo',
@@ -138,6 +139,10 @@ export default {
             cellphone: 'Poŝtelefono',
             officePhone: 'Oficeja telefono',
             enabled: 'Konto ŝaltita',
+            enabledStates: {
+                yes: '[[enabled]]',
+                no: '[[disabled]]',
+            },
             isDead: 'Mortinta',
             feeCountry: 'Paglando',
             birthdate: 'Naskiĝtago',

@@ -51,7 +51,7 @@ export const FIELDS = {
         weight: 1,
         colWeight: 1,
         posHint: PosHint.NAME,
-        detailPos: DetailPos.TABLE,
+        detailPos: DetailPos.NAME,
     },
     name: {
         weight: 3,
@@ -75,7 +75,7 @@ export const FIELDS = {
     },
     age: {
         weight: 2,
-        colWeight: 1,
+        colWeight: 2,
         posHint: PosHint.RIGHT,
         sortable: true,
         detailPos: DetailPos.TABLE,

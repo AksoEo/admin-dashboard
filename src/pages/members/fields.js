@@ -62,7 +62,7 @@ export const FIELDS = {
         default () {
             return {
                 range: new NumericRange(0, 35, true, true),
-                atStartOfYear: false,
+                atStartOfYear: true,
             };
         },
     },

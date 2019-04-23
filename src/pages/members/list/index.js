@@ -231,7 +231,11 @@ export default class MembersList extends React.PureComponent {
                 codeholderType: 'human',
                 feeCountry: 'NL',
                 age: 35,
+                agePrimo: 34,
                 email: 'max.mustermann@ekzemplo.com',
+                enabled: true,
+                isDead: false,
+                birthdate: '1983-01-23',
                 addressLatin: {
                     country: 'NL',
                     countryArea: 'Zuid-Holland',
