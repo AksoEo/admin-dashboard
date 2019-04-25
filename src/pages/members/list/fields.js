@@ -117,7 +117,7 @@ export const FIELDS = {
     country: {
         weight: 1,
         colWeight: 2,
-        posHint: PosHint.RIGHT,
+        posHint: PosHint.CENTER,
         sortable: true,
         detailPos: DetailPos.TABLE,
     },

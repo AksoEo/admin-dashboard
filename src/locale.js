@@ -124,6 +124,7 @@ export default {
             name: 'Nomo',
             code: 'UEA-kodo',
             country: 'Lando',
+            disjunctCountry: (fee, country) => `Paĝas laŭ ${fee}, loĝas en ${country}`,
             age: 'Aĝo',
             ageFormat: (age, agep) => `${age} (${agep} jarkomence)`,
             email: 'Retpoŝtadreso',

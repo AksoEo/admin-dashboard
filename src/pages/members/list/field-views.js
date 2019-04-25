@@ -154,7 +154,10 @@ const FIELDS = {
                 return <span>{flag} {name}</span>;
             }
         } else {
-            return <span>todo</span>;
+            // TODO: flags maybe?
+            const feeCountryName = TMP_COUNTRY_NAMES[feeCountry];
+            const countryName = TMP_COUNTRY_NAMES[country];
+            return <span>{locale.members.fields.disjunctCountry(feeCountryName, countryName)}</span>;
         }
     },
     age ({ value, member, position }) {
