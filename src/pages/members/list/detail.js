@@ -1,11 +1,8 @@
 import React from 'react';
-import { Spring, lerp, clamp } from '../../../animation';
 import MemberField, { Position } from './field-views';
 import { FIELDS, DetailPos } from './fields';
+import { transitionTitles } from '../../../components/dom-utils';
 import locale from '../../../locale';
-
-/** Largest allowed vertical movement in the title transition. */
-const MAX_DELTA_Y = 200;
 
 /**
  * Renders the detail page for a member.
@@ -17,53 +14,11 @@ export default class MemberDetail extends React.PureComponent {
     transitionWith (transition) {
         if (!this.titleNode) return;
 
-        const titleNode = this.titleNode;
-
-        const startRect = transition;
-        const endRect = titleNode.getBoundingClientRect();
-
-        transition.node.style.transformOrigin = '0 0';
-        titleNode.style.transformOrigin = '0 0';
-        titleNode.style.opacity = 0;
-
         this.node.classList.add('transition-in');
 
-        const reduceMotion = Math.abs(endRect.top - startRect.top) > MAX_DELTA_Y;
-        const yDir = Math.sign(endRect.top - startRect.top);
-
-        const spring = new Spring(1.3, 0.4);
-        spring.on('update', p => {
-            const xp = Math.pow(p, 0.8);
-            const yp = Math.pow(p, 2);
-
-            const tEndY = reduceMotion ? startRect.top + yDir * MAX_DELTA_Y / 2 : endRect.top;
-            const tsp = reduceMotion ? p / 2 : p;
-
-            const tx = lerp(startRect.left, endRect.left, xp);
-            const ty = lerp(startRect.top, tEndY, reduceMotion ? p * 1.5 : yp);
-            const tsx = lerp(1, endRect.width / startRect.width, tsp);
-            const tsy = lerp(1, endRect.height / startRect.height, tsp);
-
-            transition.node.style.transform = `translate(${tx}px, ${ty}px) scale(${tsx}, ${tsy})`;
-            transition.node.style.opacity = reduceMotion ? clamp(1 - p * 2, 0, 1) : 1 - p;
-
-            const uStartY = reduceMotion ? -yDir * MAX_DELTA_Y / 2 : startRect.top - endRect.top;
-            const usp = reduceMotion ? 0.5 + p / 2 : p;
-
-            const ux = lerp(startRect.left - endRect.left, 0, reduceMotion ? usp : xp);
-            const uy = lerp(uStartY, 0, reduceMotion ? p * 1.5 - 0.5 : yp);
-            const usx = lerp(startRect.width / endRect.width, 1, usp);
-            const usy = lerp(startRect.height / endRect.height, 1, usp);
-
-            titleNode.style.transform = `translate(${ux}px, ${uy}px) scale(${usx}, ${usy})`;
-            titleNode.style.opacity = reduceMotion ? clamp(p * 2 - 1, 0, 1) : p;
-
-            if (p === 1 && transition.node.parentNode) {
-                document.body.removeChild(transition.node);
-            }
+        transitionTitles(transition.node, this.titleNode, transition).then(() => {
+            if (transition.node.parentNode) document.body.removeChild(transition.node);
         });
-        spring.target = 1;
-        spring.start();
     }
 
     render () {

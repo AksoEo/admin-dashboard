@@ -36,12 +36,14 @@ export const Link = React.memo(function Link (props) {
     return (
         <routerContext.Consumer>
             {context => (
-                <span {...props} onClick={() => {
+                <a {...props} href={props.target} onClick={e => {
+                    if (e.ctrlKey || e.metaKey) return;
+                    e.preventDefault();
                     if (props.onClick) props.onClick();
                     context.navigate(props.target);
                 }}>
                     {props.children}
-                </span>
+                </a>
             )}
         </routerContext.Consumer>
     );

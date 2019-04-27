@@ -19,7 +19,7 @@ import { TEJOIcon, UEAIcon } from './icons';
 function NavItem (props) {
     const { id, icon, url } = props.item;
     return (
-        <Link target={url}>
+        <Link target={url} className="sidebar-link">
             <ListItem
                 button
                 selected={props.currentPage === id}>

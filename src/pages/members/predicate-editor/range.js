@@ -61,7 +61,9 @@ const TRACK_COLOR = '#979797';
 /** Pin/selection background color. */
 const PIN_COLOR = '#31a64f';
 /** Pin/selection background color when the control is disabled. */
-const DISABLED_PIN_COLOR = '#797979';
+const DISABLED_PIN_COLOR = '#a9a9a9';
+/** Pin/selection stroke color when the control is disabled. */
+const DISABLED_PIN_OUTER_COLOR = '#797979';
 /** The color of the focus ring. */
 const FOCUS_COLOR = 'rgba(0, 0, 0, 0.2)';
 /** The width of the focus ring. */
@@ -471,6 +473,14 @@ export default class NumericRangeEditor extends React.PureComponent {
         ctx.clip();
 
         ctx.fillRect(pinX, pinY, pinWidth, pinHeight);
+        ctx.globalAlpha = 1;
+
+        if (disabled) {
+            ctx.strokeStyle = DISABLED_PIN_OUTER_COLOR;
+            ctx.beginPath();
+            this.drawRoundedRect(pinX, pinY, pinWidth, pinHeight, pinRadius);
+            ctx.stroke();
+        }
 
         // draw exclusion arrows
         ctx.fillStyle = EXCL_COLOR;
