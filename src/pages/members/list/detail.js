@@ -1,5 +1,5 @@
 import React from 'react';
-import MemberField, { Position } from './field-views';
+import MemberField from './field-views';
 import { FIELDS, DetailPos } from './fields';
 import { transitionTitles } from '../../../components/dom-utils';
 import locale from '../../../locale';
@@ -61,8 +61,7 @@ export default class MemberDetail extends React.PureComponent {
                         field={field}
                         value={member[field]}
                         member={member}
-                        position={Position.COLUMN}
-                        templateFields={fieldKeys}
+                        selectedFields={fieldKeys}
                         transitionTitleRef={node => this.titleNode = node} />
                 </span>
             ));
@@ -77,8 +76,7 @@ export default class MemberDetail extends React.PureComponent {
                             field={field}
                             value={member[field]}
                             member={member}
-                            position={Position.COLUMN}
-                            templateFields={fieldKeys} />
+                            selectedFields={fieldKeys} />
                     </td>
                 </tr>
             ));

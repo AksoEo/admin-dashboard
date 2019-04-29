@@ -3,20 +3,19 @@ import PropTypes from 'prop-types';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import locale from '../../../locale';
-import { FIELDS, FILTERABLE, NEEDS_SWITCH } from '../fields';
+import locale from '../../../../locale';
+import { FILTERABLE_FIELDS } from './fields';
 import StringEditor from './string';
 import NumericRangeEditor from './range';
 import BooleanEditor from './boolean';
 
-/** Returns the list of default fields. */
-export function defaultFields () {
-    return Object.keys(FIELDS)
-        .filter(field => FIELDS[field].flags & FILTERABLE)
+/** Creates a list of filterable fields with their default values. */
+export function filterableFields () {
+    return Object.keys(FILTERABLE_FIELDS)
         .map(field => ({
             field,
             enabled: false,
-            value: FIELDS[field].default(),
+            value: FILTERABLE_FIELDS[field].default(),
         }));
 }
 
@@ -49,18 +48,18 @@ export default class PredicateEditor extends React.PureComponent {
     render () {
         let editor = '?';
 
-        const field = FIELDS[this.props.field];
+        const field = FILTERABLE_FIELDS[this.props.field];
 
         const editorProps = {
             ref: node => this.editorRef = node,
             value: this.props.value,
             onChange: value => {
                 this.props.onChange(value);
-                if (!(field.flags & NEEDS_SWITCH)) {
+                if (!(field.needsSwitch)) {
                     this.props.onEnabledChange(!field.isNone(value));
                 }
             },
-            disabled: !!(field.flags & NEEDS_SWITCH) && !this.props.enabled,
+            disabled: !!(field.needsSwitch) && !this.props.enabled,
         };
 
         switch (field.type) {
@@ -123,7 +122,7 @@ export default class PredicateEditor extends React.PureComponent {
         let className = 'predicate';
         if (!this.props.enabled) className += ' disabled';
 
-        const userCanToggleEnabled = (field.flags & NEEDS_SWITCH) && !this.props.submitted;
+        const userCanToggleEnabled = (field.needsSwitch) && !this.props.submitted;
 
         return (
             <div className={className} ref={node => this.node = node}>

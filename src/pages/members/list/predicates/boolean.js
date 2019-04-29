@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Switch from '@material-ui/core/Switch';
-import locale from '../../../locale';
+import locale from '../../../../locale';
 
 /**
  * A simple boolean existence editor input.

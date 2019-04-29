@@ -4,87 +4,76 @@ import ResizeObserver from 'resize-observer-polyfill';
 import Button from '@material-ui/core/Button';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import SearchIcon from '@material-ui/icons/Search';
-import PredicateEditor, { defaultFields } from './predicate-editor';
-import locale from '../../locale';
-import { Spring, globalAnimator, lerp, clamp } from '../../animation';
-import { SEARCHABLE_FIELDS } from './fields';
+import PredicateEditor from './predicates';
+import locale from '../../../locale';
+import { Spring, globalAnimator, lerp, clamp } from '../../../animation';
+import { SEARCHABLE_FIELDS } from './predicates/fields';
 
 /** Members’ page search input. */
 export default class SearchInput extends React.PureComponent {
     static propTypes = {
-        value: PropTypes.object.isRequired,
-        onChange: PropTypes.func.isRequired,
+        field: PropTypes.string.isRequired,
+        query: PropTypes.any.isRequired,
+        expanded: PropTypes.bool.isRequired,
+        predicates: PropTypes.arrayOf(PropTypes.object).isRequired,
+        onQueryChange: PropTypes.func.isRequired,
+        onFieldChange: PropTypes.func.isRequired,
+        onExpandedChange: PropTypes.func.isRequired,
+        onPredicatesChange: PropTypes.func.isRequired,
         submitted: PropTypes.bool.isRequired,
         onUnsubmit: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
     };
 
-    static defaultValue () {
-        return {
-            searchQuery: '',
-            searchField: SEARCHABLE_FIELDS[0],
-            predicates: defaultFields(),
-        };
-    }
-
-    state = {
-        expanded: false,
-    };
-
     toggleExpanded = () => {
-        this.setState({ expanded: !this.state.expanded });
+        this.props.onExpandedChange(!this.props.expanded);
     };
 
     onContainerClick = e => {
         if (this.props.submitted) {
             e.preventDefault();
-            this.setState({ submitted: false });
             this.props.onUnsubmit();
         }
     }
 
     render () {
         let className = 'members-search';
-        if (this.state.expanded) className += ' expanded';
+        if (this.props.expanded) className += ' expanded';
         if (this.props.submitted) className += ' submitted';
 
-        const filtersOnly = this.state.expanded && !this.props.value.searchQuery;
+        const filtersOnly = this.props.expanded && !this.props.query;
 
         const listItems = [{
             node: <PrimarySearch
                 key="primary"
-                value={this.props.value.searchQuery}
-                onChange={searchQuery => {
-                    this.props.onChange({ ...this.props.value, searchQuery });
-                }}
+                value={this.props.query}
+                onChange={this.props.onQueryChange}
                 onKeyDown={e => {
                     if (e.key === 'Enter') {
                         this.props.onSubmit();
                     }
                 }}
                 submitted={this.props.submitted}
-                expanded={this.state.expanded}
+                expanded={this.props.expanded}
                 toggleExpanded={this.toggleExpanded}
                 searchableFields={SEARCHABLE_FIELDS}
-                searchField={this.props.value.searchField}
-                onSearchFieldChange={searchField => {
-                    this.props.onChange({ ...this.props.value, searchField });
-                }} />,
+                searchField={this.props.field}
+                onSearchFieldChange={this.props.onFieldChange} />,
             hidden: false,
         }, {
             node: <div className="filters-title">{locale.members.search.filters}</div>,
-            hidden: !this.state.expanded
+            hidden: !this.props.expanded
                 || this.props.submitted
-                && !this.props.value.predicates.map(i => i.enabled).includes(true),
+                && !this.props.predicates.map(i => i.enabled).includes(true),
         }];
 
         const offset = listItems.length;
 
-        for (const item of this.props.value.predicates) {
+        for (const item of this.props.predicates) {
             const index = listItems.length - offset;
             let isLast = true;
-            for (let j = index + 1; j < this.props.value.predicates.length; j++) {
-                if (this.props.value.predicates[j].enabled) {
+            for (let j = index + 1; j < this.props.predicates.length; j++) {
+                if (this.props.predicates[j].enabled) {
                     isLast = false;
                     break;
                 }
@@ -98,18 +87,18 @@ export default class SearchInput extends React.PureComponent {
                     submitted={this.props.submitted}
                     value={item.value}
                     onChange={value => {
-                        const predicates = this.props.value.predicates.slice();
+                        const predicates = this.props.predicates.slice();
                         predicates[index].value = value;
                         predicates[index].enabled = true;
-                        this.props.onChange({ ...this.props.value, predicates });
+                        this.props.onPredicatesChange(predicates);
                     }}
                     isLast={isLast}
                     onEnabledChange={enabled => {
-                        const predicates = this.props.value.predicates.slice();
+                        const predicates = this.props.predicates.slice();
                         predicates[index].enabled = enabled;
-                        this.props.onChange({ ...this.props.value, predicates });
+                        this.props.onPredicatesChange(predicates);
                     }} />,
-                hidden: this.props.value.searchField === item.field
+                hidden: this.props.field === item.field
                     ? true
                     : this.props.submitted ? !item.enabled : false,
             });
@@ -133,7 +122,7 @@ export default class SearchInput extends React.PureComponent {
                             node: (
                                 <PaperList
                                     className="search-box"
-                                    layout={this.state.expanded ? 'flat' : 'collapsed'}>
+                                    layout={this.props.expanded ? 'flat' : 'collapsed'}>
                                     {listItems}
                                 </PaperList>
                             ),
