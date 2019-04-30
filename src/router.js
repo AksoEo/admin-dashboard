@@ -21,9 +21,11 @@ export const NewspaperIcon = React.memo(function NewspaperIcon () {
  * A React context for in-app navigation.
  *
  * - `navigate: (string) => void`: function that may be called to navigate in-app
+ * - `replace: (string) => void`: function that may be called to replaceState in-app
  */
 export const routerContext = React.createContext({
     navigate: null,
+    replace: null,
 });
 
 /**
@@ -36,10 +38,10 @@ export const Link = React.memo(function Link (props) {
     return (
         <routerContext.Consumer>
             {context => (
-                <a {...props} href={props.target} onClick={e => {
+                <a {...props} href={props.target} target={null} onClick={e => {
                     if (e.ctrlKey || e.metaKey) return;
                     e.preventDefault();
-                    if (props.onClick) props.onClick();
+                    if (props.onClick) if (props.onClick(e) === false) return;
                     context.navigate(props.target);
                 }}>
                     {props.children}

@@ -25,8 +25,12 @@ export default class MembersPage extends React.PureComponent {
             document.body.appendChild(transition.node);
         }
         setTimeout(() => {
-            this.context.navigate(`/membroj/${id}`);
+            this.context.navigate(this.getMemberPath(id));
         }, 100);
+    };
+
+    getMemberPath = id => {
+        return `/membroj/${id}`;
     };
 
     isDetailPage (props = this.props) {
@@ -61,7 +65,11 @@ export default class MembersPage extends React.PureComponent {
                     }} />
             );
         } else {
-            contents = <MembersList openMember={this.openMember} />;
+            contents = (
+                <MembersList
+                    openMember={this.openMember}
+                    getMemberPath={this.getMemberPath} />
+            );
         }
 
         return (

@@ -6,12 +6,16 @@ import { filterableFields } from './predicates';
 import { FIELDS } from './fields';
 import MembersList from './list';
 import FieldPicker from './field-picker';
+import { routerContext } from '../../../router';
 import locale from '../../../locale';
 
 export default class MembersSearch extends React.PureComponent {
     static propTypes = {
         openMember: PropTypes.func.isRequired,
+        getMemberPath: PropTypes.func.isRequired,
     };
+
+    static contextType = routerContext;
 
     state = {
         searchField: 'nameOrCode',
@@ -77,7 +81,8 @@ export default class MembersSearch extends React.PureComponent {
                     selectedFields={this.state.selectedFields}
                     onFieldsChange={selectedFields => this.setState({ selectedFields })}
                     onEditFields={() => this.setState({ fieldPickerOpen: true })}
-                    openMemberWithTransitionTitleNode={this.props.openMember} />}
+                    openMemberWithTransitionTitleNode={this.props.openMember}
+                    getMemberPath={this.props.getMemberPath} />}
                 {hasResults && <TablePagination
                     className="table-pagination"
                     component="div"

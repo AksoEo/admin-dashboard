@@ -243,7 +243,6 @@
     }
 
     .members-list {
-        margin: 24px;
         margin-bottom: 8px;
         margin-top: 8px;
         animation: members-list-in 0.3s @easing;
@@ -277,41 +276,8 @@
             background: @card-background;
             align-items: center;
 
-            .table-header-column {
-                box-sizing: border-box;
-                padding-right: 8px;
-                white-space: nowrap;
-                display: flex;
-                align-items: center;
-
-                .column-title {
-                    flex: 1;
-                    opacity: 0.7;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    font-size: 0.875em;
-                    font-weight: 500;
-                    margin-left: 4px;
-                }
-
-                .sorting-control {
-                    display: inline-block;
-                    font-size: 0.7em;
-                    height: auto;
-
-                    .sorting-icon {
-                        padding: 8px;
-                    }
-                }
-
-                .sorting-control-none {
-                    padding-left: 12px;
-                }
-            }
-
-            .table-header-fields-btn {
-                margin-left: 4px;
-                margin-right: 4px;
+            .table-header-fields-btn-container {
+                padding-left: 12px;
             }
         }
 
@@ -332,39 +298,11 @@
                 border-bottom: none;
             }
 
-            &.table-layout {
-                display: flex;
-
-                .members-li-column {
-                    box-sizing: border-box;
-                    padding: 16px;
-                    overflow: hidden;
-                }
-            }
-
-            &.flex-layout {
-                display: flex;
-
-                .item-left, .item-right {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    padding: 16px;
-                }
-
-                .item-center {
-                    width: 0;
-                    flex: 1;
-                    overflow: hidden;
-                    padding: 16px 0;
-
-                    .item-name {
-                        margin-bottom: 8px;
-
-                        & > *:not(:first-child) {
-                            margin-left: 8px;
-                        }
-                    }
+            .members-li-column {
+                .members-li-link {
+                    display: block;
+                    text-decoration: none;
+                    color: inherit;
                 }
             }
         }

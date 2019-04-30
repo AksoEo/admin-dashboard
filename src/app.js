@@ -94,6 +94,18 @@ export default class App extends React.PureComponent {
         }
     };
 
+    /** `routerContext` handler. */
+    onReplace = target => {
+        if (USE_HISTORY_API) {
+            window.history.replaceState(null, '', target);
+            this.setState({
+                currentPage: currentPageFromLocation(),
+            });
+        } else {
+            document.location.hash = `!${target}`;
+        }
+    }
+
     onPopState = () => {
         const currentPage = currentPageFromLocation();
         this.setState({
@@ -263,7 +275,7 @@ export default class App extends React.PureComponent {
                 <MuiThemeProvider theme={theme}>
                     <routerContext.Provider value={{
                         navigate: this.onNavigate,
-                        loginStateChanged: this.onLoginStateChanged,
+                        replace: this.onReplace,
                     }}>
                         {appHeader}
                         <div className="app-contents">

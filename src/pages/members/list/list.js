@@ -10,6 +10,7 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import MemberField from './field-views';
 import locale from '../../../locale';
+import { Link } from '../../../router';
 import { Sorting } from './fields';
 
 /** Column whose title will be replaced with the Pick Fields button. */
@@ -36,6 +37,8 @@ export default class MembersList extends React.PureComponent {
         onEditFields: PropTypes.func.isRequired,
         /** Called when a member was tapped. */
         openMemberWithTransitionTitleNode: PropTypes.func.isRequired,
+        /** Should return the path for a member ID. */
+        getMemberPath: PropTypes.func.isRequired,
     };
 
     /** Returns the default configuration. */
@@ -102,7 +105,7 @@ export default class MembersList extends React.PureComponent {
                     {this.props.selectedFields.map(({ id, sorting }) => {
                         if (id === FIELDS_BTN_COLUMN) {
                             return (
-                                <TableCell key={id}>
+                                <TableCell key={id} className="table-header-fields-btn-container">
                                     <IconButton
                                         key={id}
                                         className="table-header-fields-btn"
@@ -173,7 +176,8 @@ export default class MembersList extends React.PureComponent {
                     key={i}
                     value={EXAMPLE}
                     selectedFields={this.props.selectedFields}
-                    onOpen={node => this.openMember(index, node)} />
+                    onOpen={node => this.openMember(index, node)}
+                    getMemberPath={this.props.getMemberPath} />
             );
         }
 
@@ -197,23 +201,32 @@ class MemberTableRow extends React.PureComponent {
         selectedFields: PropTypes.array.isRequired,
         value: PropTypes.object.isRequired,
         onOpen: PropTypes.func.isRequired,
+        getMemberPath: PropTypes.func.isRequired,
     };
 
     transitionTitleNode = null;
 
-    onClick = () => this.props.onOpen(this.transitionTitleNode);
+    onClick = e => {
+        if (e.shiftKey || e.metaKey || e.ctrlKey) return;
+        this.props.onOpen(this.transitionTitleNode);
+        return false;
+    };
 
     render () {
         const { selectedFields, value } = this.props;
 
+        const memberPath = this.props.getMemberPath(value.newCode);
+
         const contents = selectedFields.map(({ id }) => (
             <TableCell className="members-li-column" key={id}>
-                {<MemberField
-                    field={id}
-                    value={value[id]}
-                    member={value}
-                    selectedFields={selectedFields.map(field => field.id)}
-                    transitionTitleRef={node => this.transitionTitleNode = node} />}
+                <Link target={memberPath} className="members-li-link">
+                    <MemberField
+                        field={id}
+                        value={value[id]}
+                        member={value}
+                        selectedFields={selectedFields.map(field => field.id)}
+                        transitionTitleRef={node => this.transitionTitleNode = node} />
+                </Link>
             </TableCell>
         ));
 
