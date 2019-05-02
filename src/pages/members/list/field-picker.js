@@ -10,9 +10,9 @@ import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
 import Checkbox from '@material-ui/core/Checkbox';
 import CloseIcon from '@material-ui/icons/Close';
-import DragHandleIcon from '@material-ui/icons/DragHandle';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
+import RearrangingList from './rearranging-list';
 import locale from '../../../locale';
 import { Sorting } from './fields';
 
@@ -50,78 +50,10 @@ export default class FieldPicker extends React.PureComponent {
 
     state = {
         fullScreen: window.innerWidth <= FULLSCREEN_WIDTH,
-        draggingIndex: -1,
     };
-
-    /**
-     * The <ol> list node.
-     */
-    listNode = null;
-
-    /**
-     * List item nodes.
-     */
-    selectedLiNodes = [];
 
     onResize = () => {
         this.setState({ fullScreen: window.innerWidth <= FULLSCREEN_WIDTH });
-    };
-
-    onDragStart (clientY, index) {
-        this.setState({ draggingIndex: index });
-    }
-    onDragMove (clientY) {
-        const listTop = this.listNode.getBoundingClientRect().top;
-        const offsetY = clientY - listTop;
-
-        let newIndex = -1;
-        let y = 0;
-        for (let i = 0; i < this.props.selected.length; i++) {
-            const node = this.selectedLiNodes[i];
-            if (!node) continue;
-            const nodeHeight = node.offsetHeight;
-            if (offsetY >= y && offsetY < y + nodeHeight) {
-                newIndex = i;
-                break;
-            }
-            y += nodeHeight;
-        }
-
-        if (newIndex === -1 || newIndex === this.state.draggingIndex) return;
-
-        const selected = this.props.selected.slice();
-        const item = selected.splice(this.state.draggingIndex, 1)[0];
-        selected.splice(newIndex, 0, item);
-        this.setState({ draggingIndex: newIndex });
-        this.props.onChange(selected);
-    }
-    onDragEnd () {
-        this.setState({ draggingIndex: -1 });
-    }
-
-    onMouseDragStart = (e, index) => {
-        e.preventDefault();
-        this.onDragStart(e.clientY, index);
-        window.addEventListener('mousemove', this.onMouseDragMove);
-        window.addEventListener('mouseup', this.onMouseDragEnd);
-    };
-    onMouseDragMove = e => this.onDragMove(e.clientY);
-    onMouseDragEnd = () => {
-        this.onDragEnd();
-        window.removeEventListener('mousemove', this.onMouseDragMove);
-        window.removeEventListener('mouseup', this.onMouseDragEnd);
-    };
-    onTouchDragStart = (e, index) => {
-        e.preventDefault();
-        this.onDragStart(e.touches[0].clientY, index);
-        window.addEventListener('touchmove', this.onTouchDragMove);
-        window.addEventListener('touchend', this.onTouchDragEnd);
-    };
-    onTouchDragMove = e => this.onDragMove(e.touches[0].clientY);
-    onTouchDragEnd = () => {
-        this.onDragEnd();
-        window.removeEventListener('touchmove', this.onTouchDragMove);
-        window.removeEventListener('touchend', this.onTouchDragEnd);
     };
 
     componentDidMount () {
@@ -134,6 +66,7 @@ export default class FieldPicker extends React.PureComponent {
 
     render () {
         const fields = [];
+        const nodeIndexToSelectedIndex = {};
         const selectedFieldNames = [];
 
         let i = 0;
@@ -177,30 +110,17 @@ export default class FieldPicker extends React.PureComponent {
                 )
                 : null;
 
-            let className = 'field-picker-field selected';
-            if (this.state.draggingIndex === index) className += ' dragging';
+            nodeIndexToSelectedIndex[fields.length] = index;
 
             fields.push(
-                <div
-                    className={className}
-                    key={field.id}
-                    ref={node => this.selectedLiNodes[index] = node}>
+                <div className="field-picker-field selected" key={field.id}>
                     <Checkbox checked={true} onClick={onCheckboxClick} />
                     <label className="field-label" onClick={onCheckboxClick}>
                         {locale.members.fields[field.id]}
                     </label>
                     {sortingControl}
-                    <DragButton
-                        onMouseDown={e => this.onMouseDragStart(e, index)}
-                        onTouchStart={e => this.onTouchDragStart(e, index)}>
-                        <DragHandleIcon />
-                    </DragButton>
                 </div>
             );
-        }
-
-        while (this.selectedLiNodes.length > this.props.selected.length) {
-            this.selectedLiNodes.pop();
         }
 
         for (const field of this.props.available) {
@@ -257,119 +177,22 @@ export default class FieldPicker extends React.PureComponent {
                     </DialogTitle>
                 )}
                 <DialogContent>
-                    <RearrangableList innerRef={node => this.listNode = node}>
+                    <RearrangingList
+                        // TODO: these
+                        onMove={(fromIndex, toIndex) => {
+                            const selected = this.props.selected.slice();
+                            fromIndex = nodeIndexToSelectedIndex[fromIndex];
+                            toIndex = nodeIndexToSelectedIndex[toIndex];
+                            const [item] = selected.splice(fromIndex, 1);
+                            selected.splice(toIndex, 0, item);
+                            this.props.onChange(selected);
+                        }}
+                        canMove={index => index in nodeIndexToSelectedIndex}
+                        isItemDraggable={index => index in nodeIndexToSelectedIndex}>
                         {fields}
-                    </RearrangableList>
+                    </RearrangingList>
                 </DialogContent>
             </Dialog>
-        );
-    }
-}
-
-/**
- * Renders a list of items with simple FLIP-animation when rearranging.
- */
-class RearrangableList extends React.PureComponent {
-    static propTypes = {
-        children: PropTypes.array.isRequired,
-        innerRef: PropTypes.func,
-    };
-
-    itemRefs = {};
-    itemPositions = null;
-
-    componentWillUpdate (nextProps) {
-        if (nextProps.children === this.props.children) return;
-        this.itemPositions = {};
-        for (const key in this.itemRefs) {
-            this.itemPositions[key] = this.itemRefs[key].getBoundingClientRect().top;
-        }
-    }
-
-    componentDidUpdate () {
-        if (this.itemPositions) {
-            // animate all items to their new position with FLIP
-
-            const prevPositions = this.itemPositions;
-            this.itemPositions = null;
-
-            for (const key in prevPositions) {
-                const ref = this.itemRefs[key];
-                if (!ref) continue;
-
-                const newPosition = ref.getBoundingClientRect().top;
-                ref.style.transform = `translateY(${prevPositions[key] - newPosition}px)`;
-                ref.classList.remove('animated');
-            }
-
-            requestAnimationFrame(() => {
-                for (const key in prevPositions) {
-                    this.itemRefs[key].classList.add('animated');
-                }
-
-                requestAnimationFrame(() => {
-                    for (const key in prevPositions) {
-                        this.itemRefs[key].style.transform = '';
-                    }
-                });
-            });
-        }
-    }
-
-    render () {
-        const items = [];
-        const itemKeys = [];
-        for (const child of this.props.children) {
-            itemKeys.push(child.key);
-            items.push(
-                <li
-                    className="list-item"
-                    ref={node => this.itemRefs[child.key] = node}
-                    key={child.key}>
-                    {child}
-                </li>
-            );
-        }
-
-        for (const k in Object.keys(this.itemRefs)) {
-            if (!itemKeys.includes(k)) delete this.itemRefs[k];
-        }
-
-        return (
-            <ol className="rearrangable-list" ref={this.props.innerRef}>
-                {items}
-            </ol>
-        );
-    }
-}
-
-/**
- * Wrapper around IconButton to handle touch events properly.
- */
-class DragButton extends React.PureComponent {
-    static propTypes = {
-        children: PropTypes.any,
-        onTouchStart: PropTypes.func.isRequired,
-        onMouseDown: PropTypes.func.isRequired,
-    };
-
-    onTouchStart = () => this.props.onTouchStart;
-
-    componentDidMount () {
-        this.node.addEventListener('touchstart', this.onTouchStart, { passive: false });
-    }
-
-    componentWillUnmount () {
-        this.node.removeEventListener('touchstart', this.onTouchStart);
-    }
-
-    render () {
-        return (
-            <IconButton
-                onMouseDown={this.props.onMouseDown}
-                buttonRef={node => this.node = node}>
-                {this.props.children}
-            </IconButton>
         );
     }
 }
