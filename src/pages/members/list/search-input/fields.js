@@ -1,4 +1,4 @@
-import { NumericRange } from './range';
+import { NumericRange } from '../../editors/numeric-range';
 
 export const SEARCHABLE_FIELDS = [
     'nameOrCode',

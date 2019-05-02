@@ -5,9 +5,9 @@ import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import locale from '../../../../locale';
 import { FILTERABLE_FIELDS } from './fields';
-import StringEditor from './string';
-import NumericRangeEditor from './range';
-import BooleanEditor from './boolean';
+import StringEditor from '../../editors/string';
+import NumericRangeEditor from '../../editors/numeric-range';
+import BooleanEditor from '../../editors/boolean';
 
 /** Creates a list of filterable fields with their default values. */
 export function filterableFields () {

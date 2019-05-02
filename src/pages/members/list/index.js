@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import TablePagination from '@material-ui/core/TablePagination';
 import SearchInput from './search-input';
-import { filterableFields } from './predicates';
+import { filterableFields } from './search-input/predicates';
 import { FIELDS } from './fields';
 import MembersList from './list';
 import FieldPicker from './field-picker';

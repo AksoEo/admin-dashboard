@@ -1,8 +1,10 @@
 import React from 'react';
-import MemberField from './field-views';
-import { FIELDS, DetailPos } from './fields';
-import { transitionTitles } from '../../../components/dom-utils';
-import locale from '../../../locale';
+import MemberField from './list/field-views';
+import { FIELDS, DetailPos } from './list/fields';
+import { transitionTitles } from '../../components/dom-utils';
+import locale from '../../locale';
+
+// TODO: use FIELDS -> editorType & ./editors for editors
 
 /**
  * Renders the detail page for a member.

@@ -16,42 +16,46 @@ export const DetailPos = {
 
 // TODO: order fields in some sensible order
 
-/**
- * List of all member fields.
-
- * - sortable: whether or not the field should have a sorting control
- */
+/** List of all member fields. */
 export const FIELDS = {
     codeholderType: {
         fixedColWidth: 56,
         sortable: true,
         detailPos: DetailPos.TITLE,
+        editorType: 'codeholderType',
     },
     name: {
         sortable: true,
         detailPos: DetailPos.TITLE,
+        editorType: 'name',
     },
     code: {
         sortable: true,
         detailPos: DetailPos.TABLE,
+        editorType: 'code',
     },
     enabled: {
         detailPos: DetailPos.TABLE,
+        editorType: 'boolean',
     },
     age: {
         sortable: true,
         detailPos: DetailPos.TABLE,
+        editorType: 'number',
     },
     birthdate: {
         sortable: true,
         detailPos: DetailPos.TABLE,
+        editorType: 'date',
     },
     email: {
         detailPos: DetailPos.TABLE,
+        editorType: 'string',
     },
     addressLatin: {
         sortable: true,
         detailPos: DetailPos.TABLE,
+        editorType: 'address',
     },
     addressCity: {
         sortable: true,
@@ -64,23 +68,30 @@ export const FIELDS = {
     country: {
         sortable: true,
         detailPos: DetailPos.TABLE,
+        editorType: 'country',
     },
     officePhone: {
         detailPos: DetailPos.TABLE,
+        editorType: 'phone',
     },
     cellphone: {
         detailPos: DetailPos.TABLE,
+        editorType: 'phone',
     },
     landlinePhone: {
         detailPos: DetailPos.TABLE,
+        editorType: 'phone',
     },
     isDead: {
         detailPos: DetailPos.TABLE,
+        editorType: 'boolean',
     },
     profession: {
         detailPos: DetailPos.TABLE,
+        editorType: 'string',
     },
     notes: {
         detailPos: DetailPos.TABLE,
+        editorType: 'string',
     },
 };

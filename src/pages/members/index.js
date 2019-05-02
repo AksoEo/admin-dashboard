@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { UEACode } from 'akso-client';
 import MembersList from './list';
-import MemberDetail from './list/detail';
+import MemberDetail from './detail';
 import { routerContext } from '../../router';
 import { cloneNodeInScreenSpace } from '../../components/dom-utils';
 import './style';

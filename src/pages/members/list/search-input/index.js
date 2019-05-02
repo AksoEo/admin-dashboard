@@ -5,9 +5,9 @@ import Button from '@material-ui/core/Button';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import SearchIcon from '@material-ui/icons/Search';
 import PredicateEditor from './predicates';
-import locale from '../../../locale';
-import { Spring, globalAnimator, lerp, clamp } from '../../../animation';
-import { SEARCHABLE_FIELDS } from './predicates/fields';
+import locale from '../../../../locale';
+import { Spring, globalAnimator, lerp, clamp } from '../../../../animation';
+import { SEARCHABLE_FIELDS } from './fields';
 
 /** Members’ page search input. */
 export default class SearchInput extends React.PureComponent {
