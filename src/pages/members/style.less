@@ -242,67 +242,74 @@
         opacity: 0.7;
     }
 
-    .members-list {
+    .members-list-container {
+        overflow-x: auto;
         margin-bottom: 8px;
         margin-top: 8px;
-        animation: members-list-in 0.3s @easing;
+        position: relative; // omitting this causes graphical glitches in Safari for some reason (?)
 
-        &.opening {
-            animation: members-list-out 0.1s @easing forwards;
-        }
+        .members-list {
+            animation: members-list-in 0.3s @easing;
 
-        @keyframes members-list-in {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-        }
-
-        @keyframes members-list-out {
-            to {
-                opacity: 0;
-            }
-        }
-
-        @media (max-width: 600px) {
-            margin-left: 0;
-            margin-right: 0;
-        }
-
-        .table-header {
-            position: sticky;
-            top: 0;
-            border-bottom: 1px solid @separator;
-            background: @card-background;
-            align-items: center;
-
-            .table-header-fields-btn-container {
-                padding-left: 12px;
-            }
-        }
-
-        .flex-layout-header {
-            padding-left: 4px;
-        }
-
-        .members-list-item {
-            border-bottom: 1px solid @separator;
-            transition: background 0.2s @easing;
-            cursor: pointer;
-
-            &:hover {
-                background: @hover-background;
+            &.opening {
+                animation: members-list-out 0.1s @easing forwards;
             }
 
-            &:last-of-type {
-                border-bottom: none;
+            @keyframes members-list-in {
+                from {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
             }
 
-            .members-li-column {
-                .members-li-link {
-                    display: block;
-                    text-decoration: none;
-                    color: inherit;
+            @keyframes members-list-out {
+                to {
+                    opacity: 0;
+                }
+            }
+
+            @media (max-width: 600px) {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .table-header {
+                position: sticky;
+                top: 0;
+                border-bottom: 1px solid @separator;
+                background: @card-background;
+                align-items: center;
+
+                .table-header-fields-btn-container {
+                    padding-left: 12px;
+                }
+            }
+
+            .flex-layout-header {
+                padding-left: 4px;
+            }
+
+            .members-list-item {
+                border-bottom: 1px solid @separator;
+                transition: background 0.2s @easing;
+                cursor: pointer;
+
+                &:hover {
+                    background: @hover-background;
+                }
+
+                &:last-of-type {
+                    border-bottom: none;
+                }
+
+                .members-li-column {
+                    font-size: 1em;
+
+                    .members-li-link {
+                        display: block;
+                        text-decoration: none;
+                        color: inherit;
+                    }
                 }
             }
         }

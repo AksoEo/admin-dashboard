@@ -77,12 +77,14 @@ export default class MembersSearch extends React.PureComponent {
                     onSubmit={this.onSubmit}
                     onUnsubmit={this.onUnsubmit} />
                 {hasResults && <div className="stats-line">{statsText}</div>}
-                {hasResults && <MembersList
-                    selectedFields={this.state.selectedFields}
-                    onFieldsChange={selectedFields => this.setState({ selectedFields })}
-                    onEditFields={() => this.setState({ fieldPickerOpen: true })}
-                    openMemberWithTransitionTitleNode={this.props.openMember}
-                    getMemberPath={this.props.getMemberPath} />}
+                {hasResults && <div className="members-list-container">
+                    <MembersList
+                        selectedFields={this.state.selectedFields}
+                        onFieldsChange={selectedFields => this.setState({ selectedFields })}
+                        onEditFields={() => this.setState({ fieldPickerOpen: true })}
+                        openMemberWithTransitionTitleNode={this.props.openMember}
+                        getMemberPath={this.props.getMemberPath} />
+                </div>}
                 {hasResults && <TablePagination
                     className="table-pagination"
                     component="div"
