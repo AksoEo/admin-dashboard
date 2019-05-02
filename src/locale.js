@@ -141,8 +141,8 @@ export default {
             officePhone: 'Oficeja telefono',
             enabled: 'Konto ŝaltita',
             enabledStates: {
-                yes: '[[enabled]]',
-                no: '[[disabled]]',
+                yes: 'Jes',
+                no: 'Ne',
             },
             isDead: 'Mortinta',
             feeCountry: 'Paglando',
