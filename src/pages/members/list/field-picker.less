@@ -1,0 +1,111 @@
+@import '../../../prelude';
+
+.members-field-picker {
+    .close-button {
+        margin-right: 16px;
+    }
+
+    .rearranging-list {
+        position: relative;
+        min-width: 400px;
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+
+        @media (max-width: 600px) {
+            min-width: auto;
+        }
+
+        .rearranging-list-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 56px;
+            will-change: transform;
+            display: flex;
+            border-radius: 4px;
+            transition: box-shadow 0.3s @easing;
+            z-index: 0;
+
+            &.dragging {
+                background: @card-background;
+                .elevation(5);
+                z-index: 2;
+            }
+
+            .rearranging-list-item-content {
+                flex: 1;
+            }
+
+            .field-picker-field {
+                display: flex;
+                align-items: center;
+                margin: 4px;
+
+                .field-label {
+                    flex: 1;
+                    margin-left: 16px;
+                }
+            }
+
+            .rearranging-list-item-drag-handle {
+                width: 56px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: move;
+
+                .rearranging-list-item-drag-icon {
+                    opacity: 0.6;
+                }
+            }
+        }
+    }
+
+    .sorting-control {
+        white-space: nowrap;
+        font-size: 0.875em;
+        height: 48px;
+        user-select: none;
+        transition: opacity 0.2s @easing;
+
+        &.not-sorted {
+            opacity: 0.5;
+        }
+
+        .sorting-label {
+            margin-right: 4px;
+        }
+
+        .arrow-icon {
+            transition: transform 0.2s @easing;
+        }
+
+        &.animated {
+            .none-icon {
+                animation: sorting-control-none-icon-in 0.2s @easing;
+
+                @keyframes sorting-control-none-icon-in {
+                    from {
+                        transform: rotate(-90deg);
+                    }
+                }
+            }
+
+            &:not(.desc) .arrow-icon {
+                animation: sorting-control-arrow-icon-in 0.2s @easing;
+
+                @keyframes sorting-control-arrow-icon-in {
+                    from {
+                        transform: rotate(-90deg);
+                    }
+                }
+            }
+        }
+
+        &.desc .arrow-icon {
+            transform: rotate(180deg);
+        }
+    }
+}

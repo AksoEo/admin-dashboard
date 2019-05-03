@@ -1,0 +1,131 @@
+@import '../../../prelude';
+
+.members-list-page {
+    .stats-line {
+        margin-top: 8px;
+        margin-left: 24px;
+        font-size: 12px;
+        font-style: italic;
+        opacity: 0.7;
+    }
+
+    .members-list-container {
+        overflow-x: auto;
+        margin-bottom: 8px;
+        margin-top: 8px;
+        position: relative; // omitting this causes graphical glitches in Safari for some reason (?)
+
+        .members-list {
+            animation: members-list-in 0.3s @easing;
+
+            &.opening {
+                animation: members-list-out 0.1s @easing forwards;
+            }
+
+            @keyframes members-list-in {
+                from {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
+            }
+
+            @keyframes members-list-out {
+                to {
+                    opacity: 0;
+                }
+            }
+
+            @media (max-width: 600px) {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .table-header {
+                position: sticky;
+                top: 0;
+                border-bottom: 1px solid @separator;
+                background: @card-background;
+                align-items: center;
+
+                .table-header-fields-btn-container {
+                    padding-left: 12px;
+                }
+            }
+
+            .flex-layout-header {
+                padding-left: 4px;
+            }
+
+            .members-list-item {
+                border-bottom: 1px solid @separator;
+                transition: background 0.2s @easing;
+                cursor: pointer;
+
+                &:hover {
+                    background: @hover-background;
+                }
+
+                &:last-of-type {
+                    border-bottom: none;
+                }
+
+                .members-li-column {
+                    font-size: 1em;
+
+                    .members-li-link {
+                        display: block;
+                        text-decoration: none;
+                        color: inherit;
+                    }
+                }
+            }
+        }
+    }
+
+    .members-list .members-list-item,
+    .member-detail-page {
+        .name {
+            display: inline-block;
+            white-space: nowrap;
+            justify-content: flex-start;
+            max-width: 100%;
+
+            .first-name, .last-name {
+                display: inline-block;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+        }
+
+        .old-uea-code, .uea-code {
+            font-family: @monospace;
+            font-size: 0.75em;
+            border: 1px solid @separator;
+            background: @hover-background;
+            padding: 2px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .email {
+            word-wrap: break-word;
+        }
+
+        .old-uea-code {
+            background: none;
+        }
+
+        .address {
+            .address-pseudoline {
+                &:not(:first-of-type)::before {
+                    content: ', ';
+                }
+            }
+        }
+    }
+
+    .table-pagination {
+        font-size: 13px;
+        margin-right: 24px;
+    }
+}

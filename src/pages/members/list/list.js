@@ -12,6 +12,7 @@ import MemberField from './field-views';
 import locale from '../../../locale';
 import { Link } from '../../../router';
 import { Sorting } from './fields';
+import './style';
 
 /** Column whose title will be replaced with the Pick Fields button. */
 const FIELDS_BTN_COLUMN = 'codeholderType';

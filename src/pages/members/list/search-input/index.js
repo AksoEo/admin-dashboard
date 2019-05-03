@@ -8,6 +8,7 @@ import PredicateEditor from './predicates';
 import locale from '../../../../locale';
 import { Spring, globalAnimator, lerp, clamp } from '../../../../animation';
 import { SEARCHABLE_FIELDS } from './fields';
+import './style';
 
 /** Members’ page search input. */
 export default class SearchInput extends React.PureComponent {
