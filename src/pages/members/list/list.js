@@ -207,9 +207,12 @@ class MemberTableRow extends React.PureComponent {
 
     transitionTitleNode = null;
 
-    onClick = e => {
-        if (e.shiftKey || e.metaKey || e.ctrlKey) return;
+    onClick = () => {
         this.props.onOpen(this.transitionTitleNode);
+    };
+
+    onLinkClick = e => {
+        if (e.shiftKey || e.metaKey || e.ctrlKey) return;
         return false;
     };
 
@@ -220,7 +223,7 @@ class MemberTableRow extends React.PureComponent {
 
         const contents = selectedFields.map(({ id }) => (
             <TableCell className="members-li-column" key={id}>
-                <Link target={memberPath} className="members-li-link">
+                <Link target={memberPath} className="members-li-link" onClick={this.onLinkClick}>
                     <MemberField
                         field={id}
                         value={value[id]}

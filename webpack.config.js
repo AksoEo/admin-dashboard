@@ -13,9 +13,10 @@ const browserTargets = {
     chrome: '49',
     firefox: '63',
     safari: '10',
-    and_chr: '70',
-    and_uc: '11.8',
-    ios_saf: '11'
+    // FIXME: did browserslist remove these? babel fails when they’re added
+    // and_chr: '70',
+    // and_uc: '11.8',
+    // ios_saf: '11'
 };
 
 module.exports = function (env, argv) {
@@ -84,7 +85,8 @@ module.exports = function (env, argv) {
                                         '@babel/preset-env',
                                         {
                                             targets: browserTargets,
-                                            useBuiltIns: 'usage'
+                                            useBuiltIns: 'usage',
+                                            corejs: '3.0.1',
                                         }
                                     ],
                                     [
@@ -140,6 +142,9 @@ module.exports = function (env, argv) {
             before (app, server) {
                 app.use('/assets', express.static('assets'));
             }
+        },
+        node: {
+            net: 'empty', // fix Can't resolve 'net' error
         }
     };
 };

@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
-import { UEACode } from 'akso-client';
+import UEACode from 'akso-client/uea-code';
 import Form, { Validator } from '../p-components/form';
 import Button from '../p-components/button';
 import TextField from '../p-components/text-field';

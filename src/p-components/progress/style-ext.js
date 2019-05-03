@@ -70,8 +70,9 @@ function styleForState (less, sweepStart, sweepEnd, radius) {
     const length = (sweepEnd - sweepStart) * radius;
 
     return [
-        new less.tree.Declaration('transform', `rotate(${rotation.toFixed(2)}rad)`),
-        new less.tree.Declaration('stroke-dasharray', `${length.toFixed(2)} 1000`),
+        // FIXME: adding .toFixed(2) makes the build fail for some reason
+        new less.tree.Declaration('transform', `rotate(${rotation}rad)`),
+        new less.tree.Declaration('stroke-dasharray', `${length} 1000`),
     ];
 }
 

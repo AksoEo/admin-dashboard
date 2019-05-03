@@ -9,13 +9,13 @@ import PaymentIcon from '@material-ui/icons/Payment';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
 
 /** A newspaper icon. */
-export const NewspaperIcon = React.memo(function NewspaperIcon () {
+export const NewspaperIcon = function NewspaperIcon () {
     return (
         <SvgIcon>
             <path fillRule="evenodd" fill="currentColor" d="M4 19a2 2 0 0 0 2-2V5h16v12a2 2 0 0 1-2 2H4zm4-7v4h5v-4H8zm7 0v4h5v-4h-5zM8 7v3h12V7H8z M4 19a2 2 0 0 1-2-2V7h3v10c0 1.1-.4 2-1 2z"/>
         </SvgIcon>
     );
-});
+};
 
 /**
  * A React context for in-app navigation.
@@ -34,7 +34,7 @@ export const routerContext = React.createContext({
  * - `target: string`: required property that contains the `routerContext`→`navigate` argument.
  * @type {React.PureComponent}
  */
-export const Link = React.memo(function Link (props) {
+export const Link = function Link (props) {
     return (
         <routerContext.Consumer>
             {context => (
@@ -49,7 +49,7 @@ export const Link = React.memo(function Link (props) {
             )}
         </routerContext.Consumer>
     );
-});
+};
 
 Link.propTypes = {
     onClick: PropTypes.func,
