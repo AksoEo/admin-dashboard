@@ -155,8 +155,8 @@ export default {
         },
         sorting: {
             none: 'ne ordigata',
-            asc: 'plialtiĝanta',
-            desc: 'malplialtiĝanta',
+            asc: 'kreskanta',
+            desc: 'malkreskanta',
         },
         pagination: {
             displayedRows: ({ from, to, count }) => `${from}–${to} el ${count}`,
