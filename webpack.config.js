@@ -7,6 +7,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const TerserPlugin = require('terser-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const express = require('express');
+const webpack = require('webpack');
 
 const browserTargets = {
     edge: '17',
@@ -68,7 +69,11 @@ module.exports = function (env, argv) {
                 inject: 'body'
             }),
             analyze && new BundleAnalyzerPlugin(),
-            new SWCacheGenPlugin()
+            new SWCacheGenPlugin(),
+            new webpack.IgnorePlugin({
+                // required by akso-client but not used
+                resourceRegExp: /fetch-cookie/,
+            }),
         ].filter(x => x),
         module: {
             rules: [

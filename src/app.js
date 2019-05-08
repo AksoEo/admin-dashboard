@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import { routerContext, ROUTES } from './router';
 import locale from './locale';
+import { activeRequests, activeRequestsEmitter } from './client';
 import './app.less';
 
 import AppBar from '@material-ui/core/AppBar';
@@ -68,6 +69,7 @@ export default class App extends React.PureComponent {
         permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH,
         currentPage: currentPageFromLocation(),
         showBackButton: false,
+        hasActiveRequest: false,
     };
 
     /** The current page component. */
@@ -127,6 +129,12 @@ export default class App extends React.PureComponent {
         window.history.back();
     };
 
+    onActiveRequestsUpdate = () => {
+        this.setState({
+            hasActiveRequest: !!Object.keys(activeRequests).length,
+        });
+    };
+
     componentDidMount () {
         this.onResize();
         window.addEventListener('resize', this.onResize);
@@ -136,6 +144,7 @@ export default class App extends React.PureComponent {
             window.addEventListener('hashchange', this.onHashChange);
         }
         this.updatePageTitle();
+        activeRequestsEmitter.on('update', this.onActiveRequestsUpdate);
     }
 
     componentWillUnmount () {
@@ -145,6 +154,7 @@ export default class App extends React.PureComponent {
         } else {
             window.removeEventListener('hashchange', this.onHashChange);
         }
+        activeRequestsEmitter.removeListener('update', this.onActiveRequestsUpdate);
     }
 
     componentDidUpdate () {
@@ -228,7 +238,7 @@ export default class App extends React.PureComponent {
         let appDrawer = null;
         let pageContents = null;
 
-        const isLoading = false; // TODO: set to true when something is happening
+        const isLoading = this.state.hasActiveRequest;
 
         appHeader = this.renderAppHeader(isLoading);
 

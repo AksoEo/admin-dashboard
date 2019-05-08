@@ -64,6 +64,10 @@ export default {
         invalidUEACode: 'Nevalida UEA-kodo aŭ retpoŝtadreso',
         invalidSecurityCode: 'Nevalida sekurkodo',
         passwordMismatch: 'Bonvolu skribi la saman pasvorton dufoje',
+        invalidLogin: '[[username or password is wrong]]',
+        noPassword: '[[you don’t have a password set up]]',
+        genericError: '[[failed to login for some reason]]',
+        notAdmin: '[[you are not an administrator]]',
     },
     // Members page
     members: {

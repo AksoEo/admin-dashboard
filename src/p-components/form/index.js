@@ -140,6 +140,11 @@ export class Validator extends Component {
         this.translateX.start();
     }
 
+    /** Manually sets an error. */
+    setError (error) {
+        this.setState({ error, continuous: true });
+    }
+
     /**
      * Validates the value using the `validate` prop.
      * @param {boolean} submitting - if true, will shake the component on error. Should be falsy
@@ -151,7 +156,7 @@ export class Validator extends Component {
             this.setState({ error: null, continuous: false });
             return true;
         } catch (error) {
-            this.setState({ error, continuous: true });
+            this.setError(error);
             if (submitting) this.shake();
             return false;
         }

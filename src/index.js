@@ -1,35 +1,46 @@
 import { h, render } from 'preact';
 import { CircularProgressIndicator } from './p-components/progress';
 import Login, { isSpecialPage } from './login';
+import client from './client';
 import './style';
 
 /** @jsx h */
 
 /** Shows the login screen if not logged in and opens the app. */
 function beginSession () {
-    const isLoggedIn = window.localStorage.demoLoggedIn;
-    const app = import(/* webpackChunkName: "app", webpackPrefetch: true */ './app');
+    client.restoreSession().catch(err => {
+        // TODO: handle error properly
+        /* eslint-disable no-console */
+        console.error('failed to restore session', err);
+        /* eslint-enable no-console */
+        return false;
+    }).then(response => {
+        if (response && !response.isAdmin) return client.logOut();
+        else return response;
+    }).then(response => {
+        const app = import(/* webpackChunkName: "app", webpackPrefetch: true */ './app');
 
-    if (!isLoggedIn || isSpecialPage()) {
-        const loginRoot = document.createElement('div');
-        loginRoot.id = 'login-root';
-        loginRoot.className = 'root-container';
-        document.body.appendChild(loginRoot);
+        if (isSpecialPage() || !response || !response.totpUsed) {
+            const loginRoot = document.createElement('div');
+            loginRoot.id = 'login-root';
+            loginRoot.className = 'root-container';
+            document.body.appendChild(loginRoot);
 
-        const onLogin = function () {
-            window.localStorage.demoLoggedIn = true;
-            loginRoot.classList.add('animate-out');
-            setTimeout(() => {
-                document.body.removeChild(loginRoot);
-            }, 1000);
+            const onLogin = function () {
+                window.localStorage.demoLoggedIn = true;
+                loginRoot.classList.add('animate-out');
+                setTimeout(() => {
+                    document.body.removeChild(loginRoot);
+                }, 1000);
 
-            setTimeout(() => initApp(app, true), 300);
-        };
+                setTimeout(() => initApp(app, true), 300);
+            };
 
-        render(<Login onLogin={onLogin} />, loginRoot);
-    } else {
-        initApp(app);
-    }
+            render(<Login onLogin={onLogin} />, loginRoot);
+        } else {
+            initApp(app);
+        }
+    });
 }
 
 /**
@@ -61,9 +72,10 @@ function initApp (app, shouldPlayLoginAnimation = false) {
 
         const appRoot = app.init(shouldPlayLoginAnimation, () => {
             // logged out
-            delete window.localStorage.demoLoggedIn;
-            document.body.removeChild(appRoot);
-            beginSession();
+            client.logOut().then(() => {
+                document.body.removeChild(appRoot);
+                beginSession();
+            });
         });
     }).catch(err => {
         const errorContainer = document.createElement('pre');

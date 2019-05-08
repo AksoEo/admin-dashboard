@@ -8,6 +8,7 @@ import { CircularProgressIndicator } from '../p-components/progress';
 import locale from '../locale';
 import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';
+import client from '../client';
 import './style';
 
 /** @jsx h */
@@ -81,6 +82,13 @@ export default class Login extends Component {
     componentDidMount () {
         document.title = locale.documentTitleTemplate(locale.login.title);
 
+        if (client.loggedIn && client.totpRequired) {
+            // setTimeout to fix weird glitchiness
+            setTimeout(() => {
+                this.setState({ stage: Stage.SECURITY_CODE });
+            }, 100);
+        }
+
         this.setState(getPageMode(), () => this.pageView.pageHeightChanged());
 
         setTimeout(() => {
@@ -140,8 +148,13 @@ export default class Login extends Component {
                                             ? locale.login.lostSecurityCode
                                             : ''
                             }>
-                            <span onClick={() =>
-                                this.setState({ stage: Stage.DETAILS })}>
+                            <span onClick={() => {
+                                if (client.loggedIn) {
+                                    client.logOut().then(() => {
+                                        this.setState({ stage: Stage.DETAILS });
+                                    });
+                                }
+                            }}>
                                 {this.state.mode === Mode.NORMAL
                                     ? locale.login.detailsStage
                                     : this.state.mode === Mode.CREATING_PASSWORD
@@ -197,12 +210,20 @@ export default class Login extends Component {
                             username={this.state.username}
                             mode={this.state.mode}
                             onUsernameChange={username => this.setState({ username })}
-                            onSuccess={() => this.setState({ stage: Stage.SECURITY_CODE })}
+                            onSuccess={(totpSetUp, totpUsed) => {
+                                if (!totpSetUp) {
+                                    // TODO: this
+                                    throw new Error('unimplemented');
+                                } else if (!totpUsed) {
+                                    this.setState({ stage: Stage.SECURITY_CODE });
+                                } else this.props.onLogin();
+                            }}
                             onForgotPassword={() => this.setState({ stage: Stage.FORGOT_PASSWORD })}
                             onForgotCode={() => this.setState({ stage: Stage.FORGOT_CODE })} />
                         <SecurityCodeStage
                             ref={stage => this.securityCodeStage = stage}
                             onSuccess={this.props.onLogin}
+                            onShouldLoginFirst={() => this.setState({ stage: Stage.DETAILS })}
                             onLostCode={() => this.setState({ stage: Stage.LOST_SECURITY_CODE })} />
                     </AutosizingPageView>
                     {meta}
@@ -231,6 +252,7 @@ class DetailsStage extends Component {
 
     usernameField = null;
     passwordField = null;
+    passwordValidator = null;
 
     focus () {
         if (this.props.mode === Mode.NORMAL) {
@@ -243,16 +265,42 @@ class DetailsStage extends Component {
     render () {
         return (
             <Form onSubmit={() => {
-                // TODO: fetch
-                setTimeout(() => {
-                    this.setState({
-                        loading: false,
-                        password: '',
-                        confirmPassword: '',
-                    });
-                    this.props.onSuccess();
-                }, 1000);
+                if (this.state.loading) return;
                 this.setState({ loading: true });
+
+                if (this.props.mode === Mode.NORMAL) {
+                    client.logIn(this.props.username, this.state.password).then(response => {
+                        if (response.isAdmin) {
+                            this.setState({
+                                loading: false,
+                                password: '',
+                                confirmPassword: '',
+                            });
+                            this.props.onSuccess(response.totpSetUp, response.totpUsed);
+                        } else throw { statusCode: 'not-admin' };
+                    }).catch(err => {
+                        let error = locale.login.genericError;
+                        if (err.statusCode === 401) error = locale.login.invalidLogin;
+                        else if (err.statusCode === 409) error = locale.login.noPassword;
+
+                        if (err.statusCode === 'not-admin') {
+                            error = locale.login.notAdmin;
+
+                            client.logOut().then(() => {
+                                this.passwordValidator.shake();
+                                this.passwordValidator.setError({ error });
+                                this.setState({ loading: false });
+                            });
+                        } else {
+                            this.passwordValidator.shake();
+                            this.passwordValidator.setError({ error });
+                            this.setState({ loading: false });
+                        }
+                    });
+                } else {
+                    // TODO: this
+                    throw new Error('unimplemented');
+                }
             }}>
                 <Validator component={TextField}
                     class="form-field"
@@ -270,6 +318,7 @@ class DetailsStage extends Component {
                     }} />
                 <Validator component={TextField}
                     class="form-field"
+                    ref={node => this.passwordValidator = node}
                     innerRef={node => this.passwordField = node}
                     outline
                     label={locale.login.password}
@@ -338,6 +387,7 @@ class DetailsStage extends Component {
 class SecurityCodeStage extends Component {
     propTypes = {
         onSuccess: PropTypes.func.isRequired,
+        onShouldLoginFirst: PropTypes.func.isRequired,
         onLostCode: PropTypes.func.isRequired,
     };
 
@@ -347,6 +397,7 @@ class SecurityCodeStage extends Component {
     }
 
     securityCodeField = null;
+    securityCodeValidator = null;
 
     focus () {
         this.securityCodeField.focus();
@@ -355,14 +406,31 @@ class SecurityCodeStage extends Component {
     render () {
         return (
             <Form onSubmit={() => {
-                setTimeout(this.props.onSuccess, 1000);
                 this.setState({ loading: true });
+                client.totpLogIn(this.state.securityCode).then(() => {
+                    this.setState({ loading: false });
+                    this.props.onSuccess();
+                }).catch(err => {
+                    this.securityCodeValidator.shake();
+                    let error = locale.login.genericTotpError;
+                    if (err.statusCode === 401) error = locale.login.invalidTotp;
+                    else if (err.statusCode === 403) {
+                        // already logged in
+                        this.props.onSuccess();
+                    } else if (err.statusCode === 404) {
+                        // no session found
+                        this.props.onShouldLoginFirst();
+                    }
+                    this.securityCodeValidator.setError({ error });
+                    this.setState({ loading: false });
+                });
             }}>
                 <p>
                     {locale.login.securityCodeDescription}
                 </p>
                 <Validator component={TextField}
                     class="form-field totp-input"
+                    ref={node => this.securityCodeValidator = node}
                     innerRef={node => this.securityCodeField = node}
                     outline
                     center
