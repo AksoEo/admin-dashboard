@@ -64,10 +64,12 @@ export default {
         invalidUEACode: 'Nevalida UEA-kodo aŭ retpoŝtadreso',
         invalidSecurityCode: 'Nevalida sekurkodo',
         passwordMismatch: 'Bonvolu skribi la saman pasvorton dufoje',
-        invalidLogin: '[[username or password is wrong]]',
-        noPassword: '[[you don’t have a password set up]]',
-        genericError: '[[failed to login for some reason]]',
-        notAdmin: '[[you are not an administrator]]',
+        invalidLogin: {
+            ueaCode: 'Nevalida UEA-kodo aŭ pasvorto',
+            email: 'Nevalida retpoŝtadreso aŭ pasvorto',
+        },
+        genericError: 'Ne sukcesis ensaluti, bv. reprovi poste',
+        notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon',
     },
     // Members page
     members: {
