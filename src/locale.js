@@ -62,7 +62,7 @@ export default {
 
         // Errors
         invalidUEACode: 'Nevalida UEA-kodo aŭ retpoŝtadreso',
-        invalidSecurityCode: 'Nevalida sekurkodo',
+        invalidSecurityCode: 'Bonvolu enmeti vian sesciferan sekurkodon',
         passwordMismatch: 'Bonvolu skribi la saman pasvorton dufoje',
         invalidLogin: {
             ueaCode: 'Nevalida UEA-kodo aŭ pasvorto',
@@ -70,8 +70,8 @@ export default {
         },
         genericError: 'Ne sukcesis ensaluti, bv. reprovi poste',
         notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon',
-        genericTotpError: '[[totp code thing failed, try again later?]]',
-        invalidTotp: '[[wrong totp code (make sure not to use same text as invalidSecurityCode)]]',
+        genericTotpError: 'Ne sukcesis ensaluti, bv. reprovi poste',
+        invalidTotp: 'Nevalida sekurkodo',
     },
     // Members page
     members: {
