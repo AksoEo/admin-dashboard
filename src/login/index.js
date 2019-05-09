@@ -280,8 +280,13 @@ class DetailsStage extends Component {
                         } else throw { statusCode: 'not-admin' };
                     }).catch(err => {
                         let error = locale.login.genericError;
-                        if (err.statusCode === 401) error = locale.login.invalidLogin;
-                        else if (err.statusCode === 409) error = locale.login.noPassword;
+                        if (err.statusCode === 401) {
+                            if (this.props.username.includes('@')) {
+                                error = locale.login.invalidLogin.email;
+                            } else {
+                                error = locale.login.invalidLogin.ueaCode;
+                            }
+                        } else if (err.statusCode === 409) error = locale.login.noPassword;
 
                         if (err.statusCode === 'not-admin') {
                             error = locale.login.notAdmin;
