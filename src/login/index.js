@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import UEACode from 'akso-client/uea-code';
 import Form, { Validator } from '../p-components/form';
 import Button from '../p-components/button';
+import Checkbox from '../p-components/checkbox';
 import TextField from '../p-components/text-field';
 import { CircularProgressIndicator } from '../p-components/progress';
 import locale from '../locale';
@@ -398,6 +399,7 @@ class SecurityCodeStage extends Component {
 
     state = {
         securityCode: '',
+        bypassTotp: false,
         loading: false,
     }
 
@@ -412,7 +414,7 @@ class SecurityCodeStage extends Component {
         return (
             <Form onSubmit={() => {
                 this.setState({ loading: true });
-                client.totpLogIn(this.state.securityCode).then(() => {
+                client.totpLogIn(this.state.securityCode, this.state.bypassTotp).then(() => {
                     this.setState({ loading: false });
                     this.props.onSuccess();
                 }).catch(err => {
@@ -453,6 +455,18 @@ class SecurityCodeStage extends Component {
                             throw { error: locale.login.invalidSecurityCode };
                         }
                     }} />
+                <p className="totp-bypass-container">
+                    <Checkbox
+                        className="totp-bypass-switch"
+                        id="totp-bypass-switch"
+                        checked={this.state.bypassTotp}
+                        onChange={bypassTotp => this.setState({ bypassTotp })} />
+                    <label
+                        className="totp-bypass-label"
+                        for="totp-bypass-switch">
+                        {locale.login.bypassTotp}
+                    </label>
+                </p>
                 <footer class="form-footer">
                     <div class="help-links">
                         <a

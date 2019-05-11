@@ -171,8 +171,28 @@
                 margin: 0;
             }
             input {
-                -moz-appearance:textfield;
+                -moz-appearance: textfield;
             }
+        }
+
+        .totp-bypass-container {
+            text-align: center;
+        }
+
+        .totp-bypass-switch {
+            vertical-align: middle;
+            margin-right: 12px;
+        }
+
+        .totp-bypass-label {
+            font-size: small;
+            font-weight: 600;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .totp-bypass-switch.is-checked + .totp-bypass-label {
+            opacity: 1;
         }
 
         .form-footer {
