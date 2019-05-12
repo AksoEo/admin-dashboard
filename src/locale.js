@@ -46,7 +46,7 @@ export default {
         securityCode: 'Sekurkodo',
         createPasswordPlaceholder: 'Skribu pasvorton',
         confirmPasswordPlaceholder: 'Skribu pasvorton denove',
-        bypassTotp: '[[remember this device]]',
+        bypassTotp: 'Memori tiun ĉi aparaton dum 60 tagoj',
         // Text shown above the security code input
         securityCodeDescription: 'Bonvolu enmeti sekurkodon generitan de via duafaktora aplikaĵo.',
         // The following three are both a link and a title
