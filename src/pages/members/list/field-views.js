@@ -7,7 +7,7 @@ import locale from '../../../locale';
 
 // TODO: remove
 const TMP_COUNTRY_NAMES = {
-    NL: 'Nederlando',
+    nl: 'Nederlando',
 };
 
 /** Renders a single member field. */
@@ -58,47 +58,55 @@ const FIELDS = {
         resizeObserver = null;
 
         componentDidMount () {
-            this.resizeObserver = new ResizeObserver(() => {
-                if (!this.node) return;
-                const containerWidth = this.node.offsetWidth;
-                const honorificWidth = this.honorific.offsetWidth;
-                const lastWidth = this.lastName.offsetWidth;
-                this.firstName.style.maxWidth = (containerWidth - lastWidth
-                    - honorificWidth) + 'px';
-            });
-            this.resizeObserver.observe(this.node);
-            this.resizeObserver.observe(this.lastName);
-            this.resizeObserver.observe(this.honorific);
+            if (this.props.member.codeholderType === 'human') {
+                this.resizeObserver = new ResizeObserver(() => {
+                    if (!this.node) return;
+                    const containerWidth = this.node.offsetWidth;
+                    const honorificWidth = this.honorific.offsetWidth;
+                    const lastWidth = this.lastName.offsetWidth;
+                    this.firstName.style.maxWidth = (containerWidth - lastWidth
+                        - honorificWidth) + 'px';
+                });
+                this.resizeObserver.observe(this.node);
+                this.resizeObserver.observe(this.lastName);
+                this.resizeObserver.observe(this.honorific);
+            }
         }
 
         componentWillUnmount () {
-            this.resizeObserver.unobserve(this.node);
-            this.resizeObserver.unobserve(this.lastName);
+            if (this.props.member.codeholderType === 'human') {
+                this.resizeObserver.unobserve(this.node);
+                this.resizeObserver.unobserve(this.lastName);
+            }
         }
 
         render () {
-            const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.value;
-            const honorific = this.props.member.honorific;
-            const first = firstName || firstNameLegal;
-            const last = lastName || lastNameLegal;
-            return (
-                <span
-                    className="name"
-                    title={`${first} ${last}`}
-                    ref={node => {
-                        this.node = node;
-                        this.props.transitionTitleRef && this.props.transitionTitleRef(node);
-                    }}>
-                    <span className="honorific" ref={node => this.honorific = node}>
-                        {honorific}
+            if (this.props.member.codeholderType === 'human') {
+                const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.member;
+                const honorific = this.props.member.honorific;
+                const first = firstName || firstNameLegal;
+                const last = lastName || lastNameLegal;
+                return (
+                    <span
+                        className="name"
+                        title={`${first} ${last}`}
+                        ref={node => {
+                            this.node = node;
+                            this.props.transitionTitleRef && this.props.transitionTitleRef(node);
+                        }}>
+                        <span className="honorific" ref={node => this.honorific = node}>
+                            {honorific}
+                        </span>
+                        <span className="first-name" ref={node => this.firstName = node}>
+                            {first}
+                        </span> <span className="last-name" ref={node => this.lastName = node}>
+                            {last}
+                        </span>
                     </span>
-                    <span className="first-name" ref={node => this.firstName = node}>
-                        {first}
-                    </span> <span className="last-name" ref={node => this.lastName = node}>
-                        {last}
-                    </span>
-                </span>
-            );
+                );
+            } else {
+                return 'todo: org name';
+            }
         }
     },
     code ({ member }) {
@@ -124,13 +132,14 @@ const FIELDS = {
         return <span className="enabled-state">{label}</span>;
     },
     country ({ member }) {
+        if (!member.addressLatin) return '';
         const { feeCountry, addressLatin: { country } } = member;
 
-        if (feeCountry == country) {
+        if (!feeCountry || feeCountry == country) {
             // TEMP: render a flag using two regional indicator symbols to create the emoji
             const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
-            const flag = toRI(feeCountry[0]) + toRI(feeCountry[1]);
-            const name = TMP_COUNTRY_NAMES[feeCountry];
+            const flag = toRI(country[0]) + toRI(country[1]);
+            const name = TMP_COUNTRY_NAMES[country];
             return <span>{flag} {name}</span>;
         } else {
             // TODO: flags maybe?
@@ -140,6 +149,9 @@ const FIELDS = {
         }
     },
     age ({ value, member }) {
+        if (!value) {
+            return '';
+        }
         const atStartOfYear = member.agePrimo;
         const label = locale.members.fields.ageFormat(value, atStartOfYear);
         return <span className="age">{label}</span>;

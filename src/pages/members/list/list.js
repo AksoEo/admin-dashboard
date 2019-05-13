@@ -40,6 +40,8 @@ export default class MembersList extends React.PureComponent {
         openMemberWithTransitionTitleNode: PropTypes.func.isRequired,
         /** Should return the path for a member ID. */
         getMemberPath: PropTypes.func.isRequired,
+        /** The list of members. */
+        list: PropTypes.arrayOf(PropTypes.object).isRequired,
     };
 
     /** Returns the default configuration. */
@@ -142,40 +144,13 @@ export default class MembersList extends React.PureComponent {
 
         const members = [];
 
-        // TODO: fetch members list
-        const EXAMPLE = {
-            name: {
-                firstName: 'Max',
-                firstNameLegal: 'Max',
-                lastName: 'Mustermann',
-                lastNameLegal: 'Mustermann',
-            },
-            oldCode: 'mxms-o',
-            newCode: 'maxmus',
-            codeholderType: 'human',
-            feeCountry: 'NL',
-            age: 35,
-            agePrimo: 34,
-            email: 'max.mustermann@ekzemplo.com',
-            enabled: true,
-            isDead: false,
-            birthdate: '1983-01-23',
-            addressLatin: {
-                country: 'NL',
-                countryArea: 'Zuid-Holland',
-                city: 'Rotterdam',
-                cityArea: null,
-                postalCode: '3015 BJ',
-                streetAddress: 'Nieuwe Binnenweg 176',
-            },
-        };
-
-        for (let i = 0; i < 10; i++) {
-            const index = i;
+        let i = 0;
+        for (const item of this.props.list) {
+            const index = i++;
             members.push(
                 <MemberTableRow
-                    key={i}
-                    value={EXAMPLE}
+                    key={item.id}
+                    value={item}
                     selectedFields={this.props.selectedFields}
                     onOpen={node => this.openMember(index, node)}
                     getMemberPath={this.props.getMemberPath} />
