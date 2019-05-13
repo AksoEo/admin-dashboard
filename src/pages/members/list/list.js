@@ -57,7 +57,7 @@ export default class MembersList extends React.PureComponent {
             },
             {
                 id: 'code',
-                sorting: Sorting.DESC,
+                sorting: Sorting.ASC,
             },
             {
                 id: 'age',
@@ -79,13 +79,12 @@ export default class MembersList extends React.PureComponent {
 
     /**
      * Opens a member’s page.
-     * @param {number} index - the index of the member in the currently loaded list
+     * @param {string} id - the id of the member
      * @param {?Node} node - the transition title node
      */
-    openMember (index, node) {
-        const memberID = `abcdef`; // TODO: this
+    openMember (id, node) {
         this.setState({ opening: true });
-        this.props.openMemberWithTransitionTitleNode(memberID, node);
+        this.props.openMemberWithTransitionTitleNode(id, node);
     }
 
     changeSorting (id) {
@@ -144,15 +143,13 @@ export default class MembersList extends React.PureComponent {
 
         const members = [];
 
-        let i = 0;
         for (const item of this.props.list) {
-            const index = i++;
             members.push(
                 <MemberTableRow
                     key={item.id}
                     value={item}
                     selectedFields={this.props.selectedFields}
-                    onOpen={node => this.openMember(index, node)}
+                    onOpen={node => this.openMember(item.id, node)}
                     getMemberPath={this.props.getMemberPath} />
             );
         }
@@ -194,7 +191,7 @@ class MemberTableRow extends React.PureComponent {
     render () {
         const { selectedFields, value } = this.props;
 
-        const memberPath = this.props.getMemberPath(value.newCode);
+        const memberPath = this.props.getMemberPath(value.id);
 
         const contents = selectedFields.map(({ id }) => (
             <TableCell className="members-li-column" key={id}>

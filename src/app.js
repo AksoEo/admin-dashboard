@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import { routerContext, ROUTES } from './router';
+import { routerContext } from './router';
 import locale from './locale';
 import { activeRequests, activeRequestsEmitter } from './client';
 import './app.less';
@@ -18,7 +18,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Sidebar from './features/sidebar';
-import pages from './pages';
+import routes from './pages';
 
 const theme = createMuiTheme({
     palette: {
@@ -32,29 +32,36 @@ const theme = createMuiTheme({
 
 /** Minimum width for a perma-sidebar. */
 const PERMA_SIDEBAR_WIDTH = 900;
-const USE_HISTORY_API = 'pushState' in window.history;
 
-/** @returns {string[]} the current page ID, and further path elements. */
+/** @returns {Object} the current page descriptor. */
 function currentPageFromLocation () {
-    let pagePath;
-    if (USE_HISTORY_API) {
-        pagePath = document.location.pathname;
-    } else {
-        pagePath = document.location.hash.substr(1);
-    }
+    const pagePath = document.location.pathname;
+    const queryString = document.location.search;
 
     const pathParts = pagePath.split('/').filter(x => x);
-    const pageIDPart = '/' + (pathParts.shift() || '');
 
-    for (const category of ROUTES) {
-        for (const item of category.contents) {
-            if (item.url === pageIDPart) {
-                return [item.id, ...pathParts];
+    if (!pathParts.length) pathParts.push('');
+
+    let items = routes.flatMap(category => category.contents);
+    const page = { id: null, component: null, query: queryString, match: null };
+
+    for (const part of pathParts) {
+        for (const item of items) {
+            let urlMatch = false;
+            if (item.url instanceof RegExp) urlMatch = part.match(item.url);
+            else urlMatch = item.url === part;
+
+            if (urlMatch) {
+                items = item.routes || [];
+                if (item.id) page.id = item.id; // inherit IDs
+                page.component = item.component;
+                page.match = urlMatch;
+                break;
             }
         }
     }
 
-    return [null];
+    return page;
 }
 
 /** The main app. */
@@ -84,28 +91,19 @@ export default class App extends React.PureComponent {
 
     /** `routerContext` handler. */
     onNavigate = target => {
-        if (USE_HISTORY_API) {
-            window.history.pushState(null, '', target);
-            this.setState({
-                currentPage: currentPageFromLocation(),
-                sidebarOpen: false,
-            });
-        } else {
-            // hashchange will change the state
-            document.location.hash = `!${target}`;
-        }
+        window.history.pushState(null, '', target);
+        this.setState({
+            currentPage: currentPageFromLocation(),
+            sidebarOpen: false,
+        });
     };
 
     /** `routerContext` handler. */
     onReplace = target => {
-        if (USE_HISTORY_API) {
-            window.history.replaceState(null, '', target);
-            this.setState({
-                currentPage: currentPageFromLocation(),
-            });
-        } else {
-            document.location.hash = `!${target}`;
-        }
+        window.history.replaceState(null, '', target);
+        this.setState({
+            currentPage: currentPageFromLocation(),
+        });
     }
 
     onPopState = () => {
@@ -113,13 +111,11 @@ export default class App extends React.PureComponent {
         this.setState({
             currentPage,
             sidebarOpen: false,
-            showBackButton: currentPage[0] !== this.state.currentPage
+            showBackButton: currentPage.component !== this.state.currentPage.component
                 ? false // reset back button visibility if page changes
                 : this.state.showBackButton,
         });
     };
-
-    onHashChange = this.onPopState;
 
     setBackButtonVisible = visible => {
         this.setState({ showBackButton: visible });
@@ -138,22 +134,14 @@ export default class App extends React.PureComponent {
     componentDidMount () {
         this.onResize();
         window.addEventListener('resize', this.onResize);
-        if (USE_HISTORY_API) {
-            window.addEventListener('popstate', this.onPopState);
-        } else {
-            window.addEventListener('hashchange', this.onHashChange);
-        }
+        window.addEventListener('popstate', this.onPopState);
         this.updatePageTitle();
         activeRequestsEmitter.on('update', this.onActiveRequestsUpdate);
     }
 
     componentWillUnmount () {
         window.removeEventListener('resize', this.onResize);
-        if (USE_HISTORY_API) {
-            window.removeEventListener('popstate', this.onPopState);
-        } else {
-            window.removeEventListener('hashchange', this.onHashChange);
-        }
+        window.removeEventListener('popstate', this.onPopState);
         activeRequestsEmitter.removeListener('update', this.onActiveRequestsUpdate);
     }
 
@@ -166,6 +154,28 @@ export default class App extends React.PureComponent {
      */
     updatePageTitle () {
         document.title = locale.documentTitleTemplate(locale.pages[this.state.currentPage[0]]);
+    }
+
+    getPageComponent () {
+        if (this.state.currentPage.component) {
+            return this.state.currentPage.component;
+        }
+
+        return class NullPage extends React.PureComponent {
+            render () {
+                return (
+                    <div style={{
+                        fontSize: '1.5em',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '100%',
+                    }}>
+                        ...
+                    </div>
+                );
+            }
+        };
     }
 
     /**
@@ -249,24 +259,12 @@ export default class App extends React.PureComponent {
                 onOpen={() => this.setState({ sidebarOpen: true })}
                 onClose={() => this.setState({ sidebarOpen: false })}
                 animateIn={this.shouldPlayLoginAnimation}
-                currentPage={this.state.currentPage[0]}
+                currentPage={this.state.currentPage.id}
                 onLogout={this.props.onLogout} />
         );
 
         // TODO: remove Todo fallback
-        const PageComponent = pages[this.state.currentPage[0]] || function Todo () {
-            return (
-                <div style={{
-                    fontSize: '1.5em',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '100%',
-                }}>
-                    ...
-                </div>
-            );
-        };
+        const PageComponent = this.getPageComponent();
         pageContents = (
             <Suspense fallback={
                 <div className="app-page loading">
@@ -274,7 +272,8 @@ export default class App extends React.PureComponent {
                 </div>
             }>
                 <PageComponent
-                    path={this.state.currentPage.slice(1)}
+                    match={this.state.currentPage.match}
+                    query={this.state.currentPage.query}
                     setBackButtonVisible={this.setBackButtonVisible}
                     ref={page => this.currentPage = page} />
             </Suspense>

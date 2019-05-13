@@ -39,11 +39,11 @@ const FIELDS = {
         if (value === 'human') icon = <PersonIcon />;
         else icon = <BusinessIcon />;
         return (
-            <div
+            <span
                 className="codeholder-type"
                 title={locale.members.fields.codeholderTypes[value]}>
                 {icon}
-            </div>
+            </span>
         );
     },
     name: class Name extends React.PureComponent {
@@ -69,13 +69,6 @@ const FIELDS = {
             }
         }
 
-        componentWillUnmount () {
-            if (this.props.member.codeholderType === 'human') {
-                this.resizeObserver.unobserve(this.node);
-                this.resizeObserver.unobserve(this.lastName);
-            }
-        }
-
         render () {
             if (this.props.member.codeholderType === 'human') {
                 const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.member;
@@ -91,7 +84,7 @@ const FIELDS = {
                             this.props.transitionTitleRef && this.props.transitionTitleRef(node);
                         }}>
                         <span className="honorific" ref={node => this.honorific = node}>
-                            {honorific}
+                            {honorific ? honorific + '\u00a0' : ''}
                         </span>
                         <span className="first-name" ref={node => this.firstName = node}>
                             {first}
@@ -101,7 +94,12 @@ const FIELDS = {
                     </span>
                 );
             } else {
-                return 'todo: org name';
+                return <span
+                    className="name"
+                    ref={node => {
+                        this.node = node;
+                        this.props.transitionTitleRef && this.props.transitionTitleRef(node);
+                    }}>todo: org name</span>;
             }
         }
     },
@@ -175,6 +173,7 @@ const FIELDS = {
         return <span className="email">{value}</span>;
     },
     addressLatin ({ value, selectedFields }) {
+        if (!value) value = {};
         const streetAddress = (value.streetAddress || '').split('\n')
             .map((line, i) => (<span key={i} className="address-pseudoline">{line}</span>));
 

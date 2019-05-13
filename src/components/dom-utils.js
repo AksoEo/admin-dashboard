@@ -66,6 +66,9 @@ export function transitionTitles (a, b, startRect, endRect) {
         startRect = startRect || a.getBoundingClientRect();
         endRect = endRect || b.getBoundingClientRect();
 
+        b = cloneNodeInScreenSpace(b).node;
+        document.body.appendChild(b);
+
         a.style.transformOrigin = b.style.transformOrigin = '0 0';
         b.style.opacity = 0;
 
@@ -91,8 +94,8 @@ export function transitionTitles (a, b, startRect, endRect) {
             const uStartY = reduceMotion ? -yDir * MAX_DELTA_Y / 2 : startRect.top - endRect.top;
             const usp = reduceMotion ? 0.5 + p / 2 : p;
 
-            const ux = lerp(startRect.left - endRect.left, 0, reduceMotion ? usp : xp);
-            const uy = lerp(uStartY, 0, reduceMotion ? p * 1.5 - 0.5 : yp);
+            const ux = lerp(startRect.left, endRect.left, reduceMotion ? usp : xp);
+            const uy = lerp(uStartY, 0, reduceMotion ? p * 1.5 - 0.5 : yp) + endRect.top;
             const usx = lerp(startRect.width / endRect.width, 1, usp);
             const usy = lerp(startRect.height / endRect.height, 1, usp);
 
@@ -100,7 +103,8 @@ export function transitionTitles (a, b, startRect, endRect) {
             b.style.opacity = reduceMotion ? clamp(p * 2 - 1, 0, 1) : p;
 
             if (p === 1) {
-                a.style.transformOrigin = b.style.transformOrigin = '';
+                a.style.transformOrigin = '';
+                if (b.parentNode) document.body.removeChild(b);
                 resolve();
             }
         });

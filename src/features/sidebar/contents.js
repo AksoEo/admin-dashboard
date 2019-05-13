@@ -11,7 +11,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Link, ROUTES } from '../../router';
+import { Link  } from '../../router';
+import pages from '../../pages';
 import locale from '../../locale';
 import { TEJOIcon, UEAIcon } from './icons';
 
@@ -19,7 +20,7 @@ import { TEJOIcon, UEAIcon } from './icons';
 function NavItem (props) {
     const { id, icon, url } = props.item;
     return (
-        <Link target={url} className="sidebar-link">
+        <Link target={`/${url}`} className="sidebar-link">
             <ListItem
                 button
                 selected={props.currentPage === id}>
@@ -35,7 +36,7 @@ NavItem.propTypes = {
     currentPage: PropTypes.string.isRequired,
 };
 
-/** Renders a category in `ROUTES`. */
+/** Renders a category in `pages`. */
 function NavCategory (props) {
     const { id, contents } = props.item;
     return (
@@ -123,7 +124,7 @@ export default class SidebarContents extends React.PureComponent {
                 <div className="sidebar-nav-container">
                     <div className="sidebar-nav">
                         <nav className="sidebar-nav-list" role="navigation">
-                            {ROUTES.map(item => (
+                            {pages.map(item => (
                                 <NavCategory
                                     key={item.id}
                                     item={item}

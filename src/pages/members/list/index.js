@@ -14,6 +14,7 @@ export default class MembersSearch extends React.PureComponent {
     static propTypes = {
         openMember: PropTypes.func.isRequired,
         getMemberPath: PropTypes.func.isRequired,
+        query: PropTypes.string.isRequired,
     };
 
     static contextType = routerContext;
@@ -32,10 +33,23 @@ export default class MembersSearch extends React.PureComponent {
 
     componentDidMount () {
         data.on('result', this.onResult);
+
+        if (this.props.query) {
+            this.decodeQuery(this.props.query);
+        }
     }
 
     componentWillUnmount () {
         data.removeListener('result', this.onResult);
+    }
+
+    decodeQuery (query) {
+        // TODO: this
+    }
+
+    encodeQuery () {
+        // TODO: this
+        return 'todo';
     }
 
     onResult = result => {
@@ -60,6 +74,9 @@ export default class MembersSearch extends React.PureComponent {
     onSubmit = () => {
         clearTimeout(this.debounceTimeout);
         this.setState({ submitted: true });
+
+        // TODO: char limit check
+        this.context.replace(`/membroj/?${this.encodeQuery()}`);
 
         // TODO: these
         const offset = 0;
@@ -94,6 +111,8 @@ export default class MembersSearch extends React.PureComponent {
         const statsText = locale.members.resultStats(count, filtered, total, time);
 
         const hasResults = !!this.state.list;
+
+        // TODO: proper error display
 
         return (
             <div className="members-list-page">
