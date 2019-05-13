@@ -4,11 +4,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import locale from '../../../locale';
-
-// TODO: remove
-const TMP_COUNTRY_NAMES = {
-    nl: 'Nederlando',
-};
+import data from './data';
 
 /** Renders a single member field. */
 export default class MemberField extends React.PureComponent {
@@ -131,21 +127,40 @@ const FIELDS = {
             : locale.members.fields.enabledStates.no;
         return <span className="enabled-state">{label}</span>;
     },
-    country ({ member }) {
-        if (!member.addressLatin) return '';
-        const { feeCountry, addressLatin: { country } } = member;
+    country: class Country extends React.PureComponent {
+        state = {};
 
-        if (!feeCountry || feeCountry == country) {
-            // TEMP: render a flag using two regional indicator symbols to create the emoji
-            const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
-            const flag = toRI(country[0]) + toRI(country[1]);
-            const name = TMP_COUNTRY_NAMES[country];
-            return <span>{flag} {name}</span>;
-        } else {
-            // TODO: flags maybe?
-            const feeCountryName = TMP_COUNTRY_NAMES[feeCountry];
-            const countryName = TMP_COUNTRY_NAMES[country];
-            return <span>{locale.members.fields.disjunctCountry(feeCountryName, countryName)}</span>;
+        componentDidMount () {
+            data.getCountries().then(countries => this.setState({ countries }));
+        }
+
+        getCountryName (name) {
+            if (this.state.countries) return this.state.countries[name];
+            else return '';
+        }
+
+        render () {
+            const { feeCountry, addressLatin } = this.props.member;
+            const addressCountry = addressLatin ? addressLatin.country : null;
+
+            if (!feeCountry || !addressCountry || feeCountry == addressCountry) {
+                const country = addressCountry || feeCountry;
+                if (!country) return '';
+
+                // TEMP: render a flag using two regional indicator symbols to create the emoji
+                const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
+                const flag = toRI(country[0]) + toRI(country[1]);
+                const name = this.getCountryName(country);
+                return <span>{flag} {name}</span>;
+            } else {
+                const feeCountryName = this.getCountryName(feeCountry);
+                const countryName = this.getCountryName(addressCountry);
+                return (
+                    <span>
+                        {locale.members.fields.disjunctCountry(feeCountryName, countryName)}
+                    </span>
+                );
+            }
         }
     },
     age ({ value, member }) {

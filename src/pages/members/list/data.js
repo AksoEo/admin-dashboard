@@ -1,9 +1,11 @@
 /** Handles interfacing with the API. */
 
 import EventEmitter from 'events';
-import { UEACode } from 'akso-client';
+import { UEACode, util as aksoUtil } from 'akso-client';
 import client from '../../../client';
 import { Sorting } from './fields';
+
+const { transformSearch } = aksoUtil;
 
 const dataSingleton = new EventEmitter();
 
@@ -74,11 +76,11 @@ function search (field, query, filters, fields, offset, limit) {
     };
 
     if (query) {
-        options.search = { str: query, cols: searchFields };
+        options.search = { str: transformSearch(query), cols: searchFields };
     }
 
     const searchQuery = JSON.stringify(options);
-    if (searchQuery === currentSearchQuery) {
+    if (searchQuery === currentSearchQuery && currentResult.ok) {
         dataSingleton.emit('result', currentResult);
         return;
     } else {
@@ -135,6 +137,24 @@ function numericRangeToFilter (value) {
     return v;
 }
 
+let loadedCountries;
+async function getCountries () {
+    if (!loadedCountries) {
+        const result = await client.get('/countries', {
+            limit: 300,
+            fields: ['code', 'name_eo'],
+        });
+
+        loadedCountries = [];
+
+        for (const item of result.body) {
+            loadedCountries[item.code] = item.name_eo;
+        }
+    }
+    return loadedCountries;
+}
+
 dataSingleton.search = search;
+dataSingleton.getCountries = getCountries;
 
 export default dataSingleton;
