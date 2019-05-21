@@ -30,9 +30,7 @@
         position: relative;
         border-radius: 4px;
         border-radius: 4px;
-        transition: box-shadow 0.3s @easing;
         will-change: height;
-        .elevation(4);
 
         .search-primary {
             display: flex;
@@ -40,6 +38,12 @@
             position: relative;
             border-radius: inherit;
             z-index: 1;
+            transition: box-shadow 0.3s @easing;
+            .elevation(4);
+
+            &:focus-within {
+                .elevation(6);
+            }
 
             .search-icon-container {
                 width: 48px;
@@ -100,10 +104,6 @@
             }
         }
 
-        &:focus-within {
-            .elevation(6);
-        }
-
         .paper-list-item {
             position: absolute;
             width: 100%;
@@ -118,41 +118,44 @@
             font-weight: 500;
             opacity: 0.5;
             padding: 8px 8px 0 64px;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .predicate {
             width: 100%;
-            display: flex;
-            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
             padding: 4px 0;
 
-            .predicate-checkbox,
-            .predicate-checkbox-placeholder,
-            .predicate-expand {
-                margin-left: 8px;
-            }
+            .predicate-field-header {
+                height: 48px;
 
-            .predicate-checkbox-placeholder {
-                width: 48px;
-            }
+                .predicate-checkbox,
+                .predicate-checkbox-placeholder,
+                .predicate-expand {
+                    margin-left: 8px;
+                    display: inline-block;
+                }
 
-            .predicate-field {
-                margin: 0 16px;
-                margin-left: 8px;
-                cursor: default;
+                .predicate-checkbox-placeholder {
+                    width: 48px;
+                }
+
+                .predicate-field {
+                    display: inline-block;
+                    margin: 0 16px;
+                    line-height: 48px;
+                    margin-left: 8px;
+                    cursor: default;
+                    text-transform: uppercase;
+                    font-size: small;
+                    font-weight: bold;
+                }
             }
 
             .predicate-editor {
-                display: flex;
-                width: 0;
-                flex: 1;
-                max-width: 100%;
-            }
-
-            .string-editor {
-                width: 0;
-                flex: 1;
-                padding: 0 16px;
+                display: inline-block;
             }
 
             .numeric-range-editor {
@@ -169,40 +172,49 @@
                 }
             }
 
-            .age-range {
-                flex: 1;
-                display: flex;
-                padding-right: 16px;
-            }
-
-            .codeholder-type {
-                display: flex;
-            }
-
-            .boolean-editor {
-                &.disabled {
-                    opacity: 0.5;
+            .age-editor {
+                .age-editor-top {
+                    display: flex;
+                    justify-content: space-between;
+                    padding-right: 16px;
                 }
-            }
 
-            @media (max-width: @max-search-width) {
-                flex-wrap: wrap;
-                border-bottom: 1px solid @separator;
-
-                .predicate-editor {
-                    flex-basis: 100%;
-                    flex-shrink: 0;
+                &.disabled .age-prime-switch {
+                    opacity: 0.5;
                 }
 
                 .numeric-range-editor {
-                    margin-left: 20px;
+                    display: block;
+                    width: calc(100% - 40px);
+                    margin: 0 20px;
+                }
+            }
+
+            .left-right-editor {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-right: 16px;
+            }
+
+            @media (max-width: 600px) {
+                border-bottom: 1px solid @separator;
+
+                .age-editor .age-editor-top {
+                    padding-right: 8px;
                 }
 
-                .age-range {
-                    flex-wrap: wrap;
+                .left-right-editor {
+                    flex-direction: column;
+                    align-items: auto;
+                    padding-right: 8px;
 
-                    .boolean-editor {
-                        width: 100%;
+                    :first-child {
+                        align-self: start;
+                    }
+
+                    :last-child {
+                        align-self: flex-end;
                     }
                 }
             }
@@ -227,7 +239,6 @@
         }
 
         .search-box {
-            .elevation(2);
             border-radius: 0 0 4px 4px;
         }
     }

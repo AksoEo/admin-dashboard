@@ -12,7 +12,6 @@ export const SEARCHABLE_FIELDS = [
 
 export const FILTERABLE_FIELDS = {
     codeholderType: {
-        type: 'codeholderType',
         default () {
             return { human: true, org: true };
         },
@@ -21,7 +20,6 @@ export const FILTERABLE_FIELDS = {
         },
     },
     feeCountry: {
-        type: 'countries',
         default () {
             return [];
         },
@@ -30,14 +28,13 @@ export const FILTERABLE_FIELDS = {
         },
     },
     enabled: {
-        type: 'boolean',
         needsSwitch: true,
+        invisibleSwitch: true,
         default () {
             return false;
         },
     },
     age: {
-        type: 'age-range',
         needsSwitch: true,
         min: 0,
         max: 150,
@@ -49,29 +46,35 @@ export const FILTERABLE_FIELDS = {
         },
     },
     birthdate: {
-        type: 'date-range',
         needsSwitch: true,
         default () {
             return 'todo';
         },
     },
     hasOldCode: {
-        type: 'existence',
         needsSwitch: true,
+        invisibleSwitch: true,
         default () {
             return false;
         },
     },
     hasEmail: {
-        type: 'existence',
         needsSwitch: true,
+        invisibleSwitch: true,
+        default () {
+            return false;
+        },
+    },
+    hasPassword: {
+        needsSwitch: true,
+        invisibleSwitch: true,
         default () {
             return false;
         },
     },
     isDead: {
-        type: 'boolean',
         needsSwitch: true,
+        invisibleSwitch: true,
         default () {
             return false;
         },

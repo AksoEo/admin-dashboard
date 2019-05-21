@@ -22,7 +22,7 @@ export default class MembersSearch extends React.PureComponent {
     state = {
         searchField: 'nameOrCode',
         searchQuery: '',
-        searchFilters: false,
+        searchFilters: true,
         predicates: filterableFields(),
         selectedFields: MembersList.defaultSelectedFields(),
         submitted: false,

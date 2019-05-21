@@ -85,13 +85,23 @@ export default {
             submitFilter: 'Filtri',
             filters: 'Filtriloj',
             agePrime: 'jarkomence',
-            codeholderTypeHuman: 'Homo',
-            codeholderTypeOrg: 'Organizo',
+            codeholderTypes: {
+                all: '[[all]]',
+                human: 'Homo',
+                org: 'Organizo',
+            },
+            enabledStates: {
+                all: '[[either]]',
+                enabled: '[[enabled]]',
+                disabled: '[[disabled]]',
+            },
             boolean: {
+                all: '[[either]]',
                 yes: 'jes',
                 no: 'ne',
             },
             existence: {
+                all: '[[either]]',
                 yes: 'ekzistas',
                 no: 'ne ekzistas',
             },
@@ -111,6 +121,7 @@ export default {
                 feeCountry: 'Paglando',
                 birthdate: 'Naskiĝtago',
                 address: 'Adreso',
+                hasPassword: '[[has created account]]',
             },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',

@@ -138,18 +138,18 @@ function numericRangeToFilter (value) {
 }
 
 let loadedCountries;
-async function getCountries () {
+function getCountries () {
     if (!loadedCountries) {
-        const result = await client.get('/countries', {
+        loadedCountries = client.get('/countries', {
             limit: 300,
             fields: ['code', 'name_eo'],
+        }).then(result => {
+            const map = {};
+            for (const item of result.body) {
+                map[item.code] = item.name_eo;
+            }
+            return map;
         });
-
-        loadedCountries = [];
-
-        for (const item of result.body) {
-            loadedCountries[item.code] = item.name_eo;
-        }
     }
     return loadedCountries;
 }

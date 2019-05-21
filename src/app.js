@@ -153,7 +153,7 @@ export default class App extends React.PureComponent {
      * Updates the document title (shown in e.g. the tab bar) to reflect the current page.
      */
     updatePageTitle () {
-        document.title = locale.documentTitleTemplate(locale.pages[this.state.currentPage[0]]);
+        document.title = locale.documentTitleTemplate(locale.pages[this.state.currentPage.id]);
     }
 
     getPageComponent () {

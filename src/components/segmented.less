@@ -1,0 +1,26 @@
+@import '../prelude';
+
+.segmented-control {
+    display: inline-flex;
+    align-items: stretch;
+    border-radius: 4px;
+
+    .segmented-control-option {
+        padding: 8px 16px;
+        color: inherit;
+        font: inherit;
+        background: none;
+        border: none;
+        margin: 0;
+        display: inline-block;
+        border-radius: inherit;
+        transition: background 0.3s @easing, box-shadow 0.3s @easing, color 0.3s @easing;
+        .elevation(0);
+
+        &.selected {
+            background: @control-primary;
+            color: @text-on-primary;
+            .elevation(4);
+        }
+    }
+}
