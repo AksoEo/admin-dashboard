@@ -225,7 +225,7 @@ export default class App extends React.PureComponent {
                         className="header-title"
                         color="inherit"
                         variant="h6">
-                        {locale.pages[this.state.currentPage[0]]}
+                        {locale.pages[this.state.currentPage.id]}
                     </Typography>
                     <div style={{ flexGrow: 1 }} />
                     <IconButton aria-label={locale.header.overflow} color="inherit">

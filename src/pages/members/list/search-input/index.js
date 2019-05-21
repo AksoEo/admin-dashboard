@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import Button from '@material-ui/core/Button';
 import NativeSelect from '@material-ui/core/NativeSelect';
+import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import PredicateEditor from './predicates';
 import locale from '../../../../locale';
 import { Spring, globalAnimator, lerp, clamp } from '../../../../animation';
@@ -185,9 +187,11 @@ class PrimarySearch extends React.PureComponent {
                     ))}
                 </NativeSelect>
                 <input
+                    autoFocus={true}
                     className="search-input"
                     {...inputProps}
                     onChange={e => this.props.onChange(e.target.value)}
+                    onClick={e => this.props.submitted && e.stopPropagation()}
                     placeholder={locale.members.search.fieldPlaceholders[this.props.searchField]} />
                 {!this.props.submitted && (
                     <Button className="search-expand" onClick={this.props.toggleExpanded}>
@@ -195,6 +199,15 @@ class PrimarySearch extends React.PureComponent {
                             ? locale.members.search.collapse
                             : locale.members.search.expand}
                     </Button>
+                )}
+                {this.props.submitted && (
+                    // seemingly useless button as a fake target for the container click
+                    // event in the search input
+                    <IconButton
+                        className="search-expand"
+                        aria-label={locale.members.search.expand}>
+                        <KeyboardArrowDownIcon />
+                    </IconButton>
                 )}
             </div>
         );

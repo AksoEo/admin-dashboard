@@ -54,7 +54,7 @@ function search (field, query, filters, fields, offset, limit) {
             // TODO: prepend extra search with only the code
         }
         searchFields = ['name'];
-    }
+    } else if (field === 'address') searchFields = ['searchAddress'];
 
     const filter = {};
     for (const predicate of filters) {

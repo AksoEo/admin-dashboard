@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import locale from '../../../../locale';
 import { FILTERABLE_FIELDS } from './fields';
 import editors from './editors';
@@ -47,17 +45,7 @@ export default class PredicateEditor extends React.PureComponent {
 
         const fieldHeader = (
             <div className="predicate-field-header">
-                {this.props.submitted ? (
-                    this.props.isLast ? (
-                        // seemingly useless button as a fake target for the container click
-                        // event in the search input
-                        <IconButton
-                            className="predicate-expand"
-                            aria-label={locale.members.search.expand}>
-                            <KeyboardArrowDownIcon />
-                        </IconButton>
-                    ) : <div className="predicate-checkbox-placeholder" />
-                ) : (field.needsSwitch && !field.invisibleSwitch) ? (
+                {(field.needsSwitch && !field.invisibleSwitch && !this.props.submitted) ? (
                     <Checkbox
                         className="predicate-checkbox"
                         checked={this.props.enabled}

@@ -128,7 +128,7 @@ export default class MemberDetail extends React.PureComponent {
                     <tbody>
                         {rows}
                     </tbody>
-                </table>
+                </table>,
             ];
         }
 

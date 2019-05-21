@@ -10,6 +10,18 @@ import { routerContext } from '../../../router';
 import locale from '../../../locale';
 import data from './data';
 
+const initialState = () => ({
+    searchField: 'nameOrCode',
+    searchQuery: '',
+    searchFilters: false,
+    predicates: filterableFields(),
+    selectedFields: MembersList.defaultSelectedFields(),
+    submitted: false,
+    fieldPickerOpen: false,
+    list: null,
+    responseStats: null,
+});
+
 export default class MembersSearch extends React.PureComponent {
     static propTypes = {
         openMember: PropTypes.func.isRequired,
@@ -19,17 +31,7 @@ export default class MembersSearch extends React.PureComponent {
 
     static contextType = routerContext;
 
-    state = {
-        searchField: 'nameOrCode',
-        searchQuery: '',
-        searchFilters: true,
-        predicates: filterableFields(),
-        selectedFields: MembersList.defaultSelectedFields(),
-        submitted: false,
-        fieldPickerOpen: false,
-        list: null,
-        responseStats: null,
-    };
+    state = initialState();
 
     componentDidMount () {
         data.on('result', this.onResult);
@@ -41,6 +43,15 @@ export default class MembersSearch extends React.PureComponent {
 
     componentWillUnmount () {
         data.removeListener('result', this.onResult);
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.query !== this.props.query) {
+            if (this.props.query === '') {
+                // reset
+                this.setState(initialState());
+            }
+        }
     }
 
     decodeQuery (query) {
