@@ -1,8 +1,11 @@
 import React from 'react';
 import Switch from '@material-ui/core/Switch';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import NumericRangeEditor from '../../editors/numeric-range';
 import Segmented from '../../../../components/segmented';
 import locale from '../../../../locale';
+import data from '../data';
 
 /* eslint-disable react/prop-types */
 
@@ -61,15 +64,57 @@ export default {
             onChange(newValue);
         },
     ),
-    feeCountry (props) {
-        const { fieldHeader } = props;
+    feeCountry: class FeeCountryEditor extends React.PureComponent {
+        state = { countries: null, countryGroups: null };
 
-        return (
-            <div className="fee-country-editor left-right-editor">
-                {fieldHeader}
-                <span>todo: select</span>
-            </div>
-        );
+        componentDidMount () {
+            Promise.all([
+                data.getCountries(),
+                data.getCountryGroups(),
+            ])
+                .then(([countries, countryGroups]) => this.setState({ countries, countryGroups }));
+        }
+
+        render () {
+            const { fieldHeader, value, onChange } = this.props;
+
+            const countryGroups = [];
+            const countries = [];
+
+            if (this.state.countryGroups && this.state.countries) {
+                for (const id in this.state.countryGroups) {
+                    const group = this.state.countryGroups[id];
+                    countryGroups.push(
+                        <MenuItem key={id} value={id}>{group.name}</MenuItem>
+                    );
+                }
+
+                for (const id in this.state.countries) {
+                    countries.push(
+                        <MenuItem key={id} value={id}>{this.state.countries[id]}</MenuItem>
+                    );
+                }
+            }
+
+            return (
+                <div className="fee-country-editor left-right-editor">
+                    {fieldHeader}
+                    <Select
+                        multiple
+                        value={value}
+                        onChange={e => onChange(e.target.value)}>
+                        <MenuItem disabled value="">
+                            {locale.members.search.countries.countryGroups}
+                        </MenuItem>
+                        {countryGroups}
+                        <MenuItem disabled value="">
+                            {locale.members.search.countries.countries}
+                        </MenuItem>
+                        {countries}
+                    </Select>
+                </div>
+            );
+        }
     },
     enabled: tripleSwitch(
         'all',

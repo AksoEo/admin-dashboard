@@ -123,6 +123,11 @@ export default {
                 address: 'Adreso',
                 hasPassword: '[[has created account]]',
             },
+            countries: {
+                // section labels in <select>
+                countryGroups: '[[country groups]]',
+                countries: '[[countries]]',
+            },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
                 email: 'Ekz. zamenhof@co.uea.org',

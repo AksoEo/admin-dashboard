@@ -37,7 +37,7 @@ let currentResult;
  * @param {Array} filters - an array of search filters
  * @param {Array} fields - an array of selected fields
  */
-function search (field, query, filters, fields, offset, limit) {
+dataSingleton.search = function search (field, query, filters, fields, offset, limit) {
     const order = fields.map(({ id, sorting }) => {
         if (sorting === Sorting.NONE) return null;
         else if (sorting === Sorting.ASC) return [mapFieldId(id)[0], 'asc'];
@@ -109,7 +109,7 @@ function search (field, query, filters, fields, offset, limit) {
             dataSingleton.emit('result', currentResult);
         }
     });
-}
+};
 
 function toFilterValue (field, value) {
     if (field === 'age') {
@@ -138,7 +138,7 @@ function numericRangeToFilter (value) {
 }
 
 let loadedCountries;
-function getCountries () {
+dataSingleton.getCountries = function getCountries () {
     if (!loadedCountries) {
         loadedCountries = client.get('/countries', {
             limit: 300,
@@ -152,9 +152,23 @@ function getCountries () {
         });
     }
     return loadedCountries;
-}
+};
 
-dataSingleton.search = search;
-dataSingleton.getCountries = getCountries;
+let loadedCountryGroups;
+dataSingleton.getCountryGroups = function getCountryGroups () {
+    if (!loadedCountryGroups) {
+        loadedCountryGroups = client.get('/country_groups', {
+            limit: 100,
+            fields: ['code', 'name', 'countries'],
+        }).then(result => {
+            const map = {};
+            for (const item of result.body) {
+                map[item.code] = item;
+            }
+            return map;
+        });
+    }
+    return loadedCountryGroups;
+};
 
 export default dataSingleton;
