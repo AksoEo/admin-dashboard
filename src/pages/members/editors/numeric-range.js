@@ -77,13 +77,15 @@ const TRACK_WIDTH = 2;
 /** Inset padding on the entire control. */
 const PADDING_X = 24;
 /** Pin/selection inner padding. */
-const PIN_PADDING = 8;
+const PIN_PADDING = 16;
 /** The height of the arrow on the collapsed pin. */
-const PIN_ARROW_HEIGHT = 4;
+const PIN_ARROW_HEIGHT = 8;
 /** The width of the tip triangle of the exclusion arrow. */
-const EXCL_ARROW_WIDTH = 6;
+const EXCL_ARROW_WIDTH = 8;
 /** Extra outer padding for the canvas rendering context. */
 const CTX_PADDING = 20;
+/** Time in milliseconds before a value will be considered not composed. */
+const COMPOSITION_TIMEOUT = 1500;
 
 /**
  * Numeric range editor: allows the user to select an integer range.
@@ -339,6 +341,9 @@ export default class NumericRangeEditor extends React.PureComponent {
     /** The end that has keyboard focus. */
     focusedEnd = 'start';
 
+    /** The last time a key was pressed for value composition. */
+    compositionState = { time: 0, end: 'start' };
+
     onKeyDown = e => {
         const value = this.props.value.clone();
 
@@ -374,6 +379,19 @@ export default class NumericRangeEditor extends React.PureComponent {
         } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
             this.focusedEnd = this.focusedEnd === 'start' ? 'end' : 'start';
             this.forceUpdate();
+        } else if (e.key.match(/^\d$/)) {
+            if ((this.compositionState.end !== this.focusedEnd)
+                || (this.compositionState.time < Date.now() - COMPOSITION_TIMEOUT)) {
+                // timed out---reset
+                this.compositionState.end = this.focusedEnd;
+                value[this.focusedEnd] = 0;
+            }
+            value[this.focusedEnd] = (value[this.focusedEnd] * 10) + (+e.key);
+            value[this.focusedEnd] = Math.max(this.props.min,
+                Math.min(value[this.focusedEnd], this.props.max));
+            if (value.isCollapsed()) value.normalizeCollapseAtEnd(this.focusedEnd);
+            this.props.onChange(value);
+            this.compositionState.time = Date.now();
         }
     }
 

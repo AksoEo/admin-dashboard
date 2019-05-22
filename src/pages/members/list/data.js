@@ -196,6 +196,7 @@ function toFilterValue (field, value) {
 }
 
 function numericRangeToFilter (value) {
+    if (value.isCollapsed()) return { $eq: value.collapsedValue() };
     const v = {};
     if (value.startInclusive) v.$gte = value.start;
     else v.$gt = value.start;
