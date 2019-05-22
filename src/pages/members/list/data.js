@@ -53,28 +53,23 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
 
     selectedFields.push('id');
 
-    let prependedSearch = Promise.resolve([]);
-    let prependedItemCount = 0;
+    let singlePrependedItem = Promise.resolve(null);
 
     let searchFields = [field];
     if (field === 'nameOrCode') {
         try {
             // query is a valid UEA code; prepend search
             const code = new UEACode(query);
-            prependedItemCount++;
-            if (offset === 0) {
-                const filter = {};
-                if (code.type === 'new') filter.newCode = query;
-                else filter.oldCode = query;
-                limit--; // result already takes up one space
-                prependedSearch = client.get('/codeholders', {
-                    filter,
-                    fields: selectedFields,
-                    limit: 1,
-                }).then(result => {
-                    return result.body;
-                });
-            } else offset--; // compensate for space taken up by prepended result on first page
+            const filter = {};
+            if (code.type === 'new') filter.newCode = query;
+            else filter.oldCode = query;
+            singlePrependedItem = client.get('/codeholders', {
+                filter,
+                fields: selectedFields,
+                limit: 1,
+            }).then(result => {
+                return result.body[0];
+            });
         } catch (invalidUeaCode) { /* only search for name otherwise */ }
         searchFields = ['name'];
     } else if (field === 'address') searchFields = ['searchAddress'];
@@ -130,32 +125,44 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
         currentSearchQuery = searchQuery;
     }
 
-    const promise = currentSearch = Promise.all([
-        prependedSearch,
-        client.get('/codeholders', options),
-    ]);
-    promise.then(([prepended, result]) => {
+    const promise = currentSearch = singlePrependedItem.then(prependedItem => {
+        if (prependedItem) {
+            if (options.offset === 0) {
+                // first page; show prepended item and show one less result
+                options.limit--;
+            } else {
+                // not the first page; need to offset by one
+                options.offset--;
+            }
+        }
+
+        return client.get('/codeholders', options).then(result => [prependedItem, result]);
+    }).then(([prependedItem, result]) => {
         if (currentSearch === promise) {
             if (result.bodyOk) {
                 const list = result.body;
 
-                // prepend items in `prepended` as long as they’re not duplicates
-                for (const item of prepended.reverse()) {
-                    let duplicate = false;
+                // prepend `prependedItem` as long it’s not a duplicate
+                // and as long as this is page 1
+                let prependedIsDuplicate = false;
+                if (prependedItem) {
                     for (const j of list) {
-                        if (j.id === item.id) {
-                            duplicate = true;
+                        if (j.id === prependedItem.id) {
+                            prependedIsDuplicate = true;
                             break;
                         }
                     }
-                    if (!duplicate) list.unshift(item);
+                    if (!prependedIsDuplicate) list.unshift(prependedItem);
                 }
+
+                let totalItems = +result.res.headers.map['x-total-items'];
+                if (prependedItem && !prependedIsDuplicate) totalItems++;
 
                 currentResult = {
                     ok: true,
                     list,
                     resTime: result.resTime,
-                    totalItems: +result.res.headers.map['x-total-items'] + prependedItemCount,
+                    totalItems,
                 };
                 dataSingleton.emit('result', currentResult);
             } else {
