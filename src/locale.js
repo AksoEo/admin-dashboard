@@ -86,22 +86,22 @@ export default {
             filters: 'Filtriloj',
             agePrime: 'jarkomence',
             codeholderTypes: {
-                all: '[[all]]',
+                all: 'Ne gravas',
                 human: 'Homo',
                 org: 'Organizo',
             },
             enabledStates: {
-                all: '[[either]]',
-                enabled: '[[enabled]]',
-                disabled: '[[disabled]]',
+                all: 'ne gravas',
+                enabled: 'ŝaltita',
+                disabled: 'malŝaltita',
             },
             boolean: {
-                all: '[[either]]',
+                all: 'ne gravas',
                 yes: 'jes',
                 no: 'ne',
             },
             existence: {
-                all: '[[either]]',
+                all: 'ne gravas',
                 yes: 'ekzistas',
                 no: 'ne ekzistas',
             },
@@ -121,12 +121,12 @@ export default {
                 feeCountry: 'Paglando',
                 birthdate: 'Naskiĝtago',
                 address: 'Adreso',
-                hasPassword: '[[has created account]]',
+                hasPassword: 'Kreis konton',
             },
             countries: {
                 // section labels in <select>
-                countryGroups: '[[country groups]]',
-                countries: '[[countries]]',
+                countryGroups: 'Landaroj',
+                countries: 'Landoj',
             },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
