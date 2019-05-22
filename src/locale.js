@@ -86,9 +86,9 @@ export default {
             filters: 'Filtriloj',
             agePrime: 'jarkomence',
             codeholderTypes: {
-                all: 'Ne gravas',
-                human: 'Homo',
-                org: 'Organizo',
+                all: 'ne gravas',
+                human: 'homo',
+                org: 'organizo',
             },
             enabledStates: {
                 all: 'ne gravas',
