@@ -59,7 +59,7 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
     } else if (field === 'address') searchFields = ['searchAddress'];
     else if (phoneNumberFields.includes(field)) {
         // filter out non-alphanumeric chars because they might be interpreted as search operators
-        query = query.replace(/[^a-z0-9]/i, '');
+        query = query.replace(/[^a-z0-9]/ig, '');
     }
 
     const filter = {};
@@ -82,7 +82,9 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
     };
 
     if (query) {
-        if (!isValidSearch(query)) {
+        const transformedQuery = transformSearch(query);
+
+        if (!isValidSearch(transformedQuery)) {
             dataSingleton.emit('result', {
                 ok: false,
                 error: {
@@ -96,7 +98,7 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
             return;
         }
 
-        options.search = { str: transformSearch(query), cols: searchFields };
+        options.search = { str: transformedQuery, cols: searchFields };
     }
 
     const searchQuery = JSON.stringify(options);
@@ -163,6 +165,7 @@ dataSingleton.getCountries = function getCountries () {
         loadedCountries = client.get('/countries', {
             limit: 300,
             fields: ['code', 'name_eo'],
+            order: [['name_eo', 'asc']],
         }).then(result => {
             const map = {};
             for (const item of result.body) {
@@ -180,6 +183,7 @@ dataSingleton.getCountryGroups = function getCountryGroups () {
         loadedCountryGroups = client.get('/country_groups', {
             limit: 100,
             fields: ['code', 'name', 'countries'],
+            order: [['name', 'asc']],
         }).then(result => {
             const map = {};
             for (const item of result.body) {

@@ -105,6 +105,7 @@ export default class FieldPicker extends React.PureComponent {
                                     break;
                                 }
                             }
+                            selected[index] = { ...selected[index] };
                             selected[index].sorting = sorting;
                             this.props.onChange(selected);
                         }} />
@@ -179,7 +180,6 @@ export default class FieldPicker extends React.PureComponent {
                 )}
                 <DialogContent>
                     <RearrangingList
-                        // TODO: these
                         onMove={(fromIndex, toIndex) => {
                             const selected = this.props.selected.slice();
                             fromIndex = nodeIndexToSelectedIndex[fromIndex];

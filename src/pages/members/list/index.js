@@ -113,6 +113,30 @@ export default class MembersSearch extends React.PureComponent {
         this.debounceTimeout = setTimeout(this.onSubmit, 500);
     }
 
+    onSelectedFieldsChange = (selectedFields) => {
+        let shouldReload = false;
+        if (selectedFields.length > this.state.selectedFields.length) {
+            // more fields selected than available; needs reload
+            shouldReload = true;
+        }
+
+        const currentSorting = {};
+        for (const field of this.state.selectedFields) {
+            currentSorting[field.id] = field.sorting;
+        }
+        for (const field of selectedFields) {
+            if (currentSorting[field.id] !== field.sorting) {
+                // sorting changed; reload
+                shouldReload = true;
+                break;
+            }
+        }
+
+        if (shouldReload) this.submitDebounced();
+
+        this.setState({ selectedFields });
+    };
+
     render () {
         // TODO: use actual data
         const count = this.state.list && this.state.list.length;
@@ -133,13 +157,7 @@ export default class MembersSearch extends React.PureComponent {
                     sortables={Object.keys(FIELDS).filter(f => FIELDS[f].sortable)}
                     permanent={['codeholderType']}
                     selected={this.state.selectedFields}
-                    onChange={selectedFields => {
-                        if (selectedFields.length > this.state.selectedFields.length) {
-                            // more fields selected than available; needs reload
-                            this.submitDebounced();
-                        }
-                        this.setState({ selectedFields });
-                    }}
+                    onChange={this.onSelectedFieldsChange}
                     onClose={() => this.setState({ fieldPickerOpen: false })} />
                 <SearchInput
                     field={this.state.searchField}
@@ -174,7 +192,7 @@ export default class MembersSearch extends React.PureComponent {
                 ) : <div className="members-list-container">
                     <MembersList
                         selectedFields={this.state.selectedFields}
-                        onFieldsChange={selectedFields => this.setState({ selectedFields })}
+                        onFieldsChange={this.onSelectedFieldsChange}
                         onEditFields={() => this.setState({ fieldPickerOpen: true })}
                         openMemberWithTransitionTitleNode={this.props.openMember}
                         getMemberPath={this.props.getMemberPath}

@@ -30,6 +30,7 @@ export const FIELDS = {
         editorType: 'name',
     },
     code: {
+        sortable: true,
         detailPos: DetailPos.TABLE,
         editorType: 'code',
     },

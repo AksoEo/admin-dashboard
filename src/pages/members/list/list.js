@@ -91,6 +91,7 @@ export default class MembersList extends React.PureComponent {
         for (let i = 0; i < this.props.selectedFields.length; i++) {
             if (this.props.selectedFields[i].id === id) {
                 const selected = this.props.selectedFields.slice();
+                selected[i] = { ...selected[i] };
                 const current = selected[i].sorting;
                 if (current === Sorting.NONE) selected[i].sorting = Sorting.ASC;
                 else if (current === Sorting.ASC) selected[i].sorting = Sorting.DESC;
