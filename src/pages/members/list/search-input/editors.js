@@ -22,9 +22,9 @@ function tripleSwitch (all, a, b, labels, decode, onSelect) {
                     onSelect(selected, { value, onChange, enabled, onEnabledChange });
                 }}>
                     {[
-                        { id: all, label: labels[all] },
                         { id: a, label: labels[a] },
                         { id: b, label: labels[b] },
+                        { id: all, label: labels[all] },
                     ]}
                 </Segmented>
             </div>
