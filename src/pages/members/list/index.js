@@ -20,6 +20,8 @@ const initialState = () => ({
     fieldPickerOpen: false,
     list: null,
     responseStats: null,
+    page: 0,
+    rowsPerPage: 10,
 });
 
 export default class MembersSearch extends React.PureComponent {
@@ -90,8 +92,8 @@ export default class MembersSearch extends React.PureComponent {
         this.context.replace(`/membroj/?${this.encodeQuery()}`);
 
         // TODO: these
-        const offset = 0;
-        const limit = 10;
+        const offset = this.state.rowsPerPage * this.state.page;
+        const limit = this.state.rowsPerPage;
 
         data.search(
             this.state.searchField,
@@ -204,10 +206,23 @@ export default class MembersSearch extends React.PureComponent {
                     count={total | 0}
                     labelDisplayedRows={locale.members.pagination.displayedRows}
                     labelRowsPerPage={locale.members.pagination.rowsPerPage}
-                    page={0}
-                    rowsPerPage={10}
-                    onChangePage={() => {}}
-                    onChangeRowsPerPage={() => {}} />}
+                    page={this.state.page}
+                    rowsPerPage={this.state.rowsPerPage}
+                    onChangePage={(e, page) => {
+                        if (page !== this.state.page) {
+                            this.setState({ page }, this.onSubmit);
+                        }
+                    }}
+                    onChangeRowsPerPage={e => {
+                        if (e.target.value !== this.state.rowsPerPage) {
+                            this.setState({
+                                page: Math.floor(
+                                    (this.state.page * this.state.rowsPerPage) / e.target.value
+                                ),
+                                rowsPerPage: e.target.value
+                            }, this.onSubmit);
+                        }
+                    }} />}
             </div>
         );
     }
