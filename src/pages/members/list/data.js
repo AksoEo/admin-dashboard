@@ -5,7 +5,7 @@ import { UEACode, util as aksoUtil } from 'akso-client';
 import client from '../../../client';
 import { Sorting } from './fields';
 
-const { transformSearch } = aksoUtil;
+const { transformSearch, isValidSearch } = aksoUtil;
 
 const dataSingleton = new EventEmitter();
 
@@ -23,6 +23,8 @@ const fieldIdMapping = {
     country: ['addressLatin.country', 'feeCountry'],
     age: ['age', 'agePrimo'],
 };
+
+const phoneNumberFields = ['landlinePhone', 'officePhone', 'cellphone'];
 
 const mapFieldId = id => fieldIdMapping[id] || [id];
 
@@ -55,6 +57,10 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
         }
         searchFields = ['name'];
     } else if (field === 'address') searchFields = ['searchAddress'];
+    else if (phoneNumberFields.includes(field)) {
+        // filter out non-alphanumeric chars because they might be interpreted as search operators
+        query = query.replace(/[^a-z0-9]/i, '');
+    }
 
     const filter = {};
     for (const predicate of filters) {
@@ -76,6 +82,20 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
     };
 
     if (query) {
+        if (!isValidSearch(query)) {
+            dataSingleton.emit('result', {
+                ok: false,
+                error: {
+                    code: 'invalid-search-query',
+                    toString () {
+                        // TEMP
+                        return '((temporary error message) invalid search query)';
+                    },
+                },
+            });
+            return;
+        }
+
         options.search = { str: transformSearch(query), cols: searchFields };
     }
 

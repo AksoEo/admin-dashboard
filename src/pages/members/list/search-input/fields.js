@@ -45,12 +45,6 @@ export const FILTERABLE_FIELDS = {
             };
         },
     },
-    birthdate: {
-        needsSwitch: true,
-        default () {
-            return 'todo';
-        },
-    },
     hasOldCode: {
         needsSwitch: true,
         invisibleSwitch: true,
