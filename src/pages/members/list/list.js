@@ -52,12 +52,12 @@ export default class MembersList extends React.PureComponent {
                 sorting: Sorting.NONE,
             },
             {
-                id: 'name',
-                sorting: Sorting.NONE,
-            },
-            {
                 id: 'code',
                 sorting: Sorting.ASC,
+            },
+            {
+                id: 'name',
+                sorting: Sorting.NONE,
             },
             {
                 id: 'age',

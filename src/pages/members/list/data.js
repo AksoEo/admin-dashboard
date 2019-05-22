@@ -20,8 +20,11 @@ const fieldIdMapping = {
         'fullNameLocal',
         'nameAbbrev',
     ],
-    country: ['addressLatin.country', 'feeCountry'],
+    country: ['feeCountry', 'addressLatin.country'],
     age: ['age', 'agePrimo'],
+    officePhone: ['officePhone', 'officePhoneFormatted'],
+    landlinePhone: ['landlinePhone', 'landlinePhoneFormatted'],
+    cellphone: ['cellphone', 'cellphoneFormatted'],
 };
 
 const phoneNumberFields = ['landlinePhone', 'officePhone', 'cellphone'];
@@ -50,11 +53,29 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
 
     selectedFields.push('id');
 
+    let prependedSearch = Promise.resolve([]);
+    let prependedItemCount = 0;
+
     let searchFields = [field];
     if (field === 'nameOrCode') {
-        if (UEACode.validate(query)) {
-            // TODO: prepend extra search with only the code
-        }
+        try {
+            // query is a valid UEA code; prepend search
+            const code = new UEACode(query);
+            prependedItemCount++;
+            if (offset === 0) {
+                const filter = {};
+                if (code.type === 'new') filter.newCode = query;
+                else filter.oldCode = query;
+                limit--; // result already takes up one space
+                prependedSearch = client.get('/codeholders', {
+                    filter,
+                    fields: selectedFields,
+                    limit: 1,
+                }).then(result => {
+                    return result.body;
+                });
+            } else offset--; // compensate for space taken up by prepended result on first page
+        } catch (invalidUeaCode) { /* only search for name otherwise */ }
         searchFields = ['name'];
     } else if (field === 'address') searchFields = ['searchAddress'];
     else if (phoneNumberFields.includes(field)) {
@@ -109,15 +130,32 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
         currentSearchQuery = searchQuery;
     }
 
-    const promise = currentSearch = client.get('/codeholders', options);
-    promise.then(result => {
+    const promise = currentSearch = Promise.all([
+        prependedSearch,
+        client.get('/codeholders', options),
+    ]);
+    promise.then(([prepended, result]) => {
         if (currentSearch === promise) {
             if (result.bodyOk) {
+                const list = result.body;
+
+                // prepend items in `prepended` as long as they’re not duplicates
+                for (const item of prepended.reverse()) {
+                    let duplicate = false;
+                    for (const j of list) {
+                        if (j.id === item.id) {
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                    if (!duplicate) list.unshift(item);
+                }
+
                 currentResult = {
                     ok: true,
-                    list: result.body,
+                    list,
                     resTime: result.resTime,
-                    totalItems: +result.res.headers.map['x-total-items'],
+                    totalItems: +result.res.headers.map['x-total-items'] + prependedItemCount,
                 };
                 dataSingleton.emit('result', currentResult);
             } else {

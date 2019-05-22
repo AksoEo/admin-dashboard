@@ -17,8 +17,6 @@ import locale from '../../../locale';
 import { Sorting } from './fields';
 import './field-picker.less';
 
-// TODO: refactor this to use proper drag and drop
-
 /**
  * Width below which the field picker will be a full-screen modal.
  */

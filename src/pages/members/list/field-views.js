@@ -203,7 +203,17 @@ const FIELDS = {
         return <span className="address-country-area">{member.addressLatin.countryArea}</span>;
     },
     birthdate ({ value }) {
+        // TODO: format
         return <span className="birthdate">{value}</span>;
+    },
+    officePhone ({ member }) {
+        return <span className="office-phone">{member.officePhoneFormatted}</span>;
+    },
+    landlinePhone ({ member }) {
+        return <span className="landline-phone">{member.landlinePhoneFormatted}</span>;
+    },
+    cellphone ({ member }) {
+        return <span className="cellphone">{member.cellphoneFormatted}</span>;
     },
 };
 /* eslint-enable react/prop-types */

@@ -127,8 +127,9 @@ export default class MembersSearch extends React.PureComponent {
             currentSorting[field.id] = field.sorting;
         }
         for (const field of selectedFields) {
-            if (currentSorting[field.id] !== field.sorting) {
+            if (field.id in currentSorting && currentSorting[field.id] !== field.sorting) {
                 // sorting changed; reload
+                this.setState({ page: 0 });
                 shouldReload = true;
                 break;
             }
@@ -151,11 +152,15 @@ export default class MembersSearch extends React.PureComponent {
 
         // TODO: proper error display
 
+        // TODO: filter available fields to ones permitted by user permissions
+        const availableFields = Object.keys(FIELDS)
+            .filter(field => !FIELDS[field].hideColumn);
+
         return (
             <div className="members-list-page">
                 <FieldPicker
                     open={this.state.fieldPickerOpen}
-                    available={Object.keys(FIELDS)}
+                    available={availableFields}
                     sortables={Object.keys(FIELDS).filter(f => FIELDS[f].sortable)}
                     permanent={['codeholderType']}
                     selected={this.state.selectedFields}
@@ -219,7 +224,7 @@ export default class MembersSearch extends React.PureComponent {
                                 page: Math.floor(
                                     (this.state.page * this.state.rowsPerPage) / e.target.value
                                 ),
-                                rowsPerPage: e.target.value
+                                rowsPerPage: e.target.value,
                             }, this.onSubmit);
                         }
                     }} />}

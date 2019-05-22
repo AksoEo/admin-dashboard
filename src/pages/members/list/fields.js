@@ -19,7 +19,6 @@ export const DetailPos = {
 /** List of all member fields. */
 export const FIELDS = {
     codeholderType: {
-        fixedColWidth: 56,
         sortable: true,
         detailPos: DetailPos.TITLE,
         editorType: 'codeholderType',
@@ -91,6 +90,7 @@ export const FIELDS = {
         editorType: 'string',
     },
     notes: {
+        hideColumn: true,
         detailPos: DetailPos.TABLE,
         editorType: 'string',
     },
