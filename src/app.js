@@ -89,8 +89,25 @@ export default class App extends React.PureComponent {
         this.setState({ permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH });
     }
 
+    currentPageNode () {
+        return this.pageContainer ? this.pageContainer.children[0] : {};
+    }
+
+    saveCurrentScrollPosition () {
+        // FIXME: this is hacky
+        // TODO: maybe also save periodically after a scroll interaction?
+        // when popstate fires there’s no opportunity to save state first before navigating away
+        const current = document.location.pathname
+            + document.location.search
+            + document.location.hash;
+        window.history.replaceState({
+            scrollPosition: this.currentPageNode().scrollTop,
+        }, '', current);
+    }
+
     /** `routerContext` handler. */
     onNavigate = target => {
+        this.saveCurrentScrollPosition();
         window.history.pushState(null, '', target);
         this.setState({
             currentPage: currentPageFromLocation(),
@@ -106,7 +123,7 @@ export default class App extends React.PureComponent {
         });
     }
 
-    onPopState = () => {
+    onPopState = (e) => {
         const currentPage = currentPageFromLocation();
         this.setState({
             currentPage,
@@ -114,6 +131,11 @@ export default class App extends React.PureComponent {
             showBackButton: currentPage.component !== this.state.currentPage.component
                 ? false // reset back button visibility if page changes
                 : this.state.showBackButton,
+        }, () => {
+            // restore scroll position if it was saved
+            if (e.state && e.state.scrollPosition) {
+                this.currentPageNode().scrollTop = e.state.scrollPosition;
+            }
         });
     };
 
@@ -289,7 +311,7 @@ export default class App extends React.PureComponent {
                         {appHeader}
                         <div className="app-contents">
                             {appDrawer}
-                            <div className="page-container">
+                            <div className="page-container" ref={node => this.pageContainer = node}>
                                 {pageContents}
                             </div>
                         </div>
