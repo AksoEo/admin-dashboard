@@ -15,6 +15,7 @@ import { Link  } from '../../router';
 import pages from '../../pages';
 import locale from '../../locale';
 import { TEJOIcon, UEAIcon } from './icons';
+import client from '../../client';
 
 /** Renders a single item in `ROUTES`. */
 function NavItem (props) {
@@ -71,9 +72,36 @@ export default class SidebarContents extends React.PureComponent {
 
     state = {
         userMenuOpen: false,
+        userName: null,
     };
 
+    componentDidMount () {
+        client.get('/codeholders/self', {
+            fields: [
+                'codeholderType',
+                'firstName',
+                'firstNameLegal',
+                'lastName',
+                'lastNameLegal',
+                'fullName',
+                'nameAbbrev',
+            ],
+        }).then(result => {
+            const data = result.body;
+            const name = data.codeholderType === 'human'
+                ? (data.firstName || data.firstNameLegal) + ' '
+                    + (data.lastName || data.lastNameLegal)
+                : (data.fullName.length > 20 && data.nameAbbrev) || data.fullName;
+            this.setState({ userName: name });
+        });
+    }
+
     render () {
+        let avatarURLBase = new URL(client.client.host);
+        avatarURLBase.pathname = '/codeholders/self/profile_picture/';
+        avatarURLBase = avatarURLBase.toString();
+        const avatarSrcSet = [32, 64, 128, 256].map(w => `${avatarURLBase}${w}px ${w}w`).join(', ');
+
         return (
             <div className="app-sidebar-contents">
                 <div className="sidebar-header">
@@ -92,12 +120,14 @@ export default class SidebarContents extends React.PureComponent {
                             alt="AKSO" />
                     </div>
                     <div className="sidebar-user">
-                        <Avatar className="user-avatar" />
+                        <Avatar
+                            className="user-avatar"
+                            srcSet={avatarSrcSet} />
                         <Typography
                             className="user-name"
                             variant="subtitle1"
                             color="inherit">
-                            Ludviko Zamenhof
+                            {this.state.userName}
                         </Typography>
                         <IconButton
                             color="inherit"
