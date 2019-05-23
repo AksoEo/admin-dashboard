@@ -1,8 +1,14 @@
+import config from './config.val';
+
+const startYear = 2019;
+const thisYear = new Date(config.buildTime).getUTCFullYear();
+const copyrightYear = thisYear === startYear ? thisYear : `${startYear}–${thisYear}`;
+
 /** The default locale (Esperanto). */
 export default {
     // Information shown in the sidebar
     meta: {
-        copyright: '© 2019',
+        copyright: `© ${copyrightYear}`,
         copyrightHolder: 'TEJO',
         copyrightHref: 'https://tejo.org',
         license: 'MIT-Permesilo',

@@ -31,8 +31,13 @@ const phoneNumberFields = ['landlinePhone', 'officePhone', 'cellphone'];
 
 const mapFieldId = id => fieldIdMapping[id] || [id];
 
+/** The current search query as the user would describe it, i.e. only the search and filters. */
+let currentUserSearchQuery;
+/** The current search query as the API sees it, i.e. everything in the query string. */
 let currentSearchQuery;
+/** The current search promise. */
 let currentSearch;
+/** The current search result. */
 let currentResult;
 
 /**
@@ -117,6 +122,18 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
         options.search = { str: transformedQuery, cols: searchFields };
     }
 
+    const userSearchQuery = JSON.stringify({
+        filter: options.filter,
+        search: options.search,
+    });
+
+    let goBackToFirstPage = false;
+    if (userSearchQuery !== currentUserSearchQuery) {
+        currentUserSearchQuery = userSearchQuery;
+        goBackToFirstPage = true;
+        options.offset = 0;
+    }
+
     const searchQuery = JSON.stringify(options);
     if (searchQuery === currentSearchQuery && currentResult.ok) {
         dataSingleton.emit('result', currentResult);
@@ -165,6 +182,7 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
                     totalItems,
                 };
                 dataSingleton.emit('result', currentResult);
+                if (goBackToFirstPage) dataSingleton.emit('reset-page');
             } else {
                 // TODO: handle error
                 throw new Error('unimplemented: handle !bodyOk');

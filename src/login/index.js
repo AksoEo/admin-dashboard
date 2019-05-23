@@ -270,7 +270,13 @@ class DetailsStage extends Component {
                 this.setState({ loading: true });
 
                 if (this.props.mode === Mode.NORMAL) {
-                    client.logIn(this.props.username, this.state.password).then(response => {
+                    let username = this.props.username;
+                    try {
+                        // remove check letters in old UEA codes
+                        username = new UEACode(username).code;
+                    } catch (_) { /* not a UEA code */ }
+
+                    client.logIn(username, this.state.password).then(response => {
                         if (response.isAdmin) {
                             this.setState({
                                 loading: false,

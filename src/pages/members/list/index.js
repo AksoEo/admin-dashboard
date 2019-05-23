@@ -37,6 +37,7 @@ export default class MembersSearch extends React.PureComponent {
 
     componentDidMount () {
         data.on('result', this.onResult);
+        data.on('reset-page', this.onResetPage);
 
         data.getPerms().then(perms => {
             if (Object.keys(perms.memberFilter).length) {
@@ -52,6 +53,7 @@ export default class MembersSearch extends React.PureComponent {
 
     componentWillUnmount () {
         data.removeListener('result', this.onResult);
+        data.removeListener('reset-page', this.onResetPage);
     }
 
     componentDidUpdate (prevProps) {
@@ -89,6 +91,10 @@ export default class MembersSearch extends React.PureComponent {
             /* eslint-enable no-console */
             this.setState({ list: [], error: result.error });
         }
+    };
+
+    onResetPage = () => {
+        this.setState({ page: 0 });
     };
 
     onSubmit = () => {

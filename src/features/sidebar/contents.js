@@ -73,11 +73,13 @@ export default class SidebarContents extends React.PureComponent {
     state = {
         userMenuOpen: false,
         userName: null,
+        hasProfilePicture: false,
     };
 
     componentDidMount () {
         client.get('/codeholders/self', {
             fields: [
+                'hasProfilePicture',
                 'codeholderType',
                 'firstName',
                 'firstNameLegal',
@@ -92,7 +94,10 @@ export default class SidebarContents extends React.PureComponent {
                 ? (data.firstName || data.firstNameLegal) + ' '
                     + (data.lastName || data.lastNameLegal)
                 : (data.fullName.length > 20 && data.nameAbbrev) || data.fullName;
-            this.setState({ userName: name });
+            this.setState({
+                userName: name,
+                hasProfilePicture: data.hasProfilePicture,
+            });
         });
     }
 
@@ -122,7 +127,11 @@ export default class SidebarContents extends React.PureComponent {
                     <div className="sidebar-user">
                         <Avatar
                             className="user-avatar"
-                            srcSet={avatarSrcSet} />
+                            srcSet={this.state.hasProfilePicture ? avatarSrcSet : null}>
+                            {!this.state.hasProfilePicture && this.state.userName
+                                ? this.state.userName[0]
+                                : null}
+                        </Avatar>
                         <Typography
                             className="user-name"
                             variant="subtitle1"

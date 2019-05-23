@@ -78,6 +78,11 @@ module.exports = function (env, argv) {
         module: {
             rules: [
                 {
+                    test: /\.val\.js$/,
+                    exclude: /node_modules/,
+                    use: 'val-loader',
+                },
+                {
                     test: /\.m?js$/,
                     // exclude all node_modules (except akso-client; see above)
                     exclude: /node_modules\/(?!akso-client)/,
