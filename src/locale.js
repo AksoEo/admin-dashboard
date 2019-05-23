@@ -187,5 +187,6 @@ export default {
             displayedRows: ({ from, to, count }) => `${from}–${to} el ${count}`,
             rowsPerPage: 'Rezultoj po paĝo',
         },
+        globalFilterNotice: '[[all your search queries are restricted to a filter etc etc]]',
     },
 };

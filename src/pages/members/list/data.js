@@ -205,40 +205,40 @@ function numericRangeToFilter (value) {
     return v;
 }
 
-let loadedCountries;
-dataSingleton.getCountries = function getCountries () {
-    if (!loadedCountries) {
-        loadedCountries = client.get('/countries', {
-            limit: 300,
-            fields: ['code', 'name_eo'],
-            order: [['name_eo', 'asc']],
-        }).then(result => {
-            const map = {};
-            for (const item of result.body) {
-                map[item.code] = item.name_eo;
-            }
-            return map;
-        });
-    }
-    return loadedCountries;
-};
+function cachedRequest (endpoint, options = {}, handle = (result => result.body)) {
+    let cached;
+    return function getCached () {
+        if (!cached) {
+            cached = client.get(endpoint, options).then(handle);
+        }
+        return cached;
+    };
+}
 
-let loadedCountryGroups;
-dataSingleton.getCountryGroups = function getCountryGroups () {
-    if (!loadedCountryGroups) {
-        loadedCountryGroups = client.get('/country_groups', {
-            limit: 100,
-            fields: ['code', 'name', 'countries'],
-            order: [['name', 'asc']],
-        }).then(result => {
-            const map = {};
-            for (const item of result.body) {
-                map[item.code] = item;
-            }
-            return map;
-        });
+dataSingleton.getCountries = cachedRequest('/countries', {
+    limit: 300,
+    fields: ['code', 'name_eo'],
+    order: [['name_eo', 'asc']],
+}, result => {
+    const map = {};
+    for (const item of result.body) {
+        map[item.code] = item.name_eo;
     }
-    return loadedCountryGroups;
-};
+    return map;
+});
+
+dataSingleton.getCountryGroups = cachedRequest('/country_groups', {
+    limit: 100,
+    fields: ['code', 'name', 'countries'],
+    order: [['name', 'asc']],
+}, result => {
+    const map = {};
+    for (const item of result.body) {
+        map[item.code] = item;
+    }
+    return map;
+});
+
+dataSingleton.getPerms = cachedRequest('/perms');
 
 export default dataSingleton;

@@ -38,6 +38,13 @@ export default class MembersSearch extends React.PureComponent {
     componentDidMount () {
         data.on('result', this.onResult);
 
+        data.getPerms().then(perms => {
+            if (Object.keys(perms.memberFilter).length) {
+                // there’s a member filter so we need to display a notice about it
+                this.setState({ isRestrictedByGlobalFilter: true });
+            }
+        });
+
         if (this.props.query) {
             this.decodeQuery(this.props.query);
         }
@@ -192,6 +199,11 @@ export default class MembersSearch extends React.PureComponent {
                     onSubmit={this.onSubmit}
                     onUnsubmit={this.onUnsubmit} />
                 {hasResults && !this.state.error && <div className="stats-line">{statsText}</div>}
+                {hasResults && this.state.isRestrictedByGlobalFilter && (
+                    <div className="global-filter-notice">
+                        {locale.members.globalFilterNotice}
+                    </div>
+                )}
                 {hasResults && (this.state.error ? (
                     <div className="members-list-error">
                         {this.state.error.toString()}
