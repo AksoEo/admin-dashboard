@@ -18,6 +18,14 @@ export const FILTERABLE_FIELDS = {
         isNone (value) {
             return value.human && value.org;
         },
+        serialize (value) {
+            return value.human && value.org ? '*' : value.human ? 'h' : 'o';
+        },
+        deserialize (value) {
+            if (value === 'o') return { human: false, org: true };
+            else if (value === 'h') return { human: true, org: false };
+            else return { human: true, org: true };
+        },
     },
     feeCountry: {
         default () {
@@ -42,6 +50,21 @@ export const FILTERABLE_FIELDS = {
             return {
                 range: new NumericRange(0, 35, true, true),
                 atStartOfYear: true,
+            };
+        },
+        serialize (value) {
+            return {
+                rs: value.range.start,
+                re: value.range.end,
+                rsi: value.range.startInclusive,
+                rei: value.range.endInclusive,
+                asoy: value.atStartOfYear,
+            };
+        },
+        deserialize (value) {
+            return {
+                range: new NumericRange(value.rs, value.re, value.rsi, value.rei),
+                atStartOfYear: value.asoy,
             };
         },
     },

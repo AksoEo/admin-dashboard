@@ -60,18 +60,62 @@ export default class MembersSearch extends React.PureComponent {
         if (prevProps.query !== this.props.query) {
             if (this.props.query === '') {
                 // reset
-                this.setState(initialState());
+                if (this.dontResetState) this.dontResetState = false;
+                else this.setState(initialState());
+            } else {
+                this.decodeQuery(this.props.query);
             }
         }
     }
 
     decodeQuery (query) {
-        // TODO: this
+        query = query.replace(/^\?/, '');
+        try {
+            const {
+                field: searchField,
+                query: searchQuery,
+                filters: partialFilters,
+                fields: selectedFields,
+                page,
+                rowsPerPage,
+            } = data.decodeQuery(query);
+
+            // technically this should be a deep clone, but… (it still works fine)
+            const predicates = this.state.predicates.slice();
+
+            for (const item of partialFilters) {
+                for (const p of predicates) {
+                    if (p.field === item.field) {
+                        p.enabled = true;
+                        p.value = item.value;
+                    }
+                }
+            }
+
+            this.setState({
+                searchField: searchField || this.state.searchField,
+                searchQuery: searchQuery || this.state.searchQuery,
+                searchFilters: !!partialFilters.length,
+                predicates,
+                selectedFields,
+                page,
+                rowsPerPage,
+            }, this.onSubmit);
+        } catch (err) {
+            // TODO: handle
+            console.error('failed to decode query', err);
+        }
     }
 
     encodeQuery () {
-        // TODO: this
-        return 'todo';
+        return data.encodeQuery(
+            this.state.searchField,
+            this.state.searchQuery,
+            this.state.searchFilters ? this.state.predicates : [],
+            this.state.selectedFields,
+            this.state.page,
+            this.state.rowsPerPage,
+        );
     }
 
     onResult = result => {
@@ -104,7 +148,6 @@ export default class MembersSearch extends React.PureComponent {
         // TODO: char limit check
         this.context.replace(`/membroj/?${this.encodeQuery()}`);
 
-        // TODO: these
         const offset = this.state.rowsPerPage * this.state.page;
         const limit = this.state.rowsPerPage;
 
@@ -120,6 +163,8 @@ export default class MembersSearch extends React.PureComponent {
 
     onUnsubmit = () => {
         this.setState({ submitted: false, list: null });
+        this.dontResetState = true;
+        this.context.replace('/membroj/');
     };
 
     submitDebounced () {

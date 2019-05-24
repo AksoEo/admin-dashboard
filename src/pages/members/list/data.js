@@ -4,6 +4,8 @@ import EventEmitter from 'events';
 import { UEACode, util as aksoUtil } from 'akso-client';
 import client from '../../../client';
 import { Sorting } from './fields';
+import { FILTERABLE_FIELDS } from './search-input/fields';
+import msgpack from 'msgpack-lite';
 
 const { transformSearch, isValidSearch } = aksoUtil;
 
@@ -222,6 +224,51 @@ function numericRangeToFilter (value) {
     else v.$lt = value.end;
     return v;
 }
+
+dataSingleton.encodeQuery = function encodeQuery (
+    field,
+    query,
+    filters,
+    fields,
+    page,
+    rowsPerPage,
+) {
+    const serialized = {};
+    if (query) {
+        serialized.f = field;
+        serialized.q = query;
+    }
+    if (filters.length) {
+        const serializedFilters = filters
+            .filter(x => x.enabled)
+            .map(x => {
+                if (FILTERABLE_FIELDS[x.field].serialize) {
+                    return { i: x.field, v: FILTERABLE_FIELDS[x.field].serialize(x.value) };
+                } else return { i: x.field, v: x.value };
+            });
+        serialized.p = serializedFilters;
+    }
+    serialized.c = fields.map(f => ({ i: f.id, s: f.sorting }));
+    serialized.pos = [page, rowsPerPage];
+    return msgpack.encode(serialized).toString('base64');
+};
+
+/** @throws */
+dataSingleton.decodeQuery = function decodeQuery (query) {
+    const serialized = msgpack.decode(Buffer.from(query, 'base64'));
+    return {
+        field: serialized.f,
+        query: serialized.q,
+        filters: (serialized.p || []).map(x => {
+            if (FILTERABLE_FIELDS[x.i].deserialize) {
+                return { field: x.i, value: FILTERABLE_FIELDS[x.i].deserialize(x.v) };
+            } else return { field: x.i, value: x.v };
+        }),
+        fields: serialized.c.map(f => ({ id: f.i, sorting: f.s })),
+        page: serialized.pos[0],
+        rowsPerPage: serialized.pos[1],
+    };
+};
 
 function cachedRequest (endpoint, options = {}, handle = (result => result.body)) {
     let cached;
