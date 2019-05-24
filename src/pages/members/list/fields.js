@@ -47,6 +47,11 @@ export const FIELDS = {
         detailPos: DetailPos.TABLE,
         editorType: 'date',
     },
+    deathdate: {
+        sortable: true,
+        detailPos: DetailPos.TABLE,
+        editorType: 'date',
+    },
     email: {
         detailPos: DetailPos.TABLE,
         editorType: 'string',

@@ -7,6 +7,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import MemberField from './field-views';
 import locale from '../../../locale';
@@ -105,6 +106,12 @@ export default class MembersList extends React.PureComponent {
         const header = (
             <TableHead className="table-header">
                 <TableRow>
+                    <TableCell className="members-select-column">
+                        <Checkbox
+                            // TODO: this
+                            checked={false}
+                            onChange={() => {}} />
+                    </TableCell>
                     {this.props.selectedFields.map(({ id, sorting }) => {
                         if (id === FIELDS_BTN_COLUMN) {
                             return (
@@ -176,6 +183,8 @@ class MemberTableRow extends React.PureComponent {
         value: PropTypes.object.isRequired,
         onOpen: PropTypes.func.isRequired,
         getMemberPath: PropTypes.func.isRequired,
+        isSelected: PropTypes.bool.isRequired,
+        onSelectChange: PropTypes.func.isRequired,
     };
 
     transitionTitleNode = null;
@@ -209,6 +218,14 @@ class MemberTableRow extends React.PureComponent {
 
         return (
             <TableRow className="members-list-item" onClick={this.onClick}>
+                <TableCell className="members-li-column members-select-column" onClick={e => {
+                    e.stopPropagation();
+                }}>
+                    <Checkbox
+                        // TODO: this
+                        checked={false}
+                        onChange={() => {}} />
+                </TableCell>
                 {contents}
             </TableRow>
         );

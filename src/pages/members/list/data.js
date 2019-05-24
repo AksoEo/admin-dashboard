@@ -137,7 +137,7 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
     }
 
     const searchQuery = JSON.stringify(options);
-    if (searchQuery === currentSearchQuery && currentResult.ok) {
+    if (searchQuery === currentSearchQuery && currentResult && currentResult.ok) {
         dataSingleton.emit('result', currentResult);
         return;
     } else {

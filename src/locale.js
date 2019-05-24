@@ -178,6 +178,7 @@ export default {
             isDead: 'Mortinta',
             feeCountry: 'Paglando',
             birthdate: 'Naskiĝtago',
+            deathdate: '[[death date]]',
             honorific: 'Titolo',
             profession: 'Profesio',
         },
@@ -194,5 +195,6 @@ export default {
             rowsPerPage: 'Rezultoj po paĝo',
         },
         globalFilterNotice: '[[all your search queries are restricted to a filter etc etc]]',
+        noResults: '[[no results :(]]',
     },
 };

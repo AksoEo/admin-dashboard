@@ -207,6 +207,7 @@ export default class MembersSearch extends React.PureComponent {
         const statsText = locale.members.resultStats(count, filtered, total, time);
 
         const hasResults = !!this.state.list;
+        const resultsNotEmpty = hasResults && !!this.state.list.length;
 
         // TODO: proper error display
 
@@ -259,16 +260,22 @@ export default class MembersSearch extends React.PureComponent {
                     <div className="members-list-error">
                         {this.state.error.toString()}
                     </div>
-                ) : <div className="members-list-container">
-                    <MembersList
-                        selectedFields={this.state.selectedFields}
-                        onFieldsChange={this.onSelectedFieldsChange}
-                        onEditFields={() => this.setState({ fieldPickerOpen: true })}
-                        openMemberWithTransitionTitleNode={this.props.openMember}
-                        getMemberPath={this.props.getMemberPath}
-                        list={this.state.list} />
-                </div>)}
-                {hasResults && !this.state.error && <TablePagination
+                ) : resultsNotEmpty ? (
+                    <div className="members-list-container">
+                        <MembersList
+                            selectedFields={this.state.selectedFields}
+                            onFieldsChange={this.onSelectedFieldsChange}
+                            onEditFields={() => this.setState({ fieldPickerOpen: true })}
+                            openMemberWithTransitionTitleNode={this.props.openMember}
+                            getMemberPath={this.props.getMemberPath}
+                            list={this.state.list} />
+                    </div>
+                ) : (
+                    <div className="members-list-no-results">
+                        {locale.members.noResults}
+                    </div>
+                ))}
+                {resultsNotEmpty && !this.state.error && <TablePagination
                     className="table-pagination"
                     component="div"
                     count={total | 0}

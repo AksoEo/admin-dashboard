@@ -206,6 +206,9 @@ const FIELDS = {
         // TODO: format
         return <span className="birthdate">{value}</span>;
     },
+    get deathdate () {
+        return this.birthdate;
+    },
     officePhone ({ member }) {
         return <span className="office-phone">{member.officePhoneFormatted}</span>;
     },
