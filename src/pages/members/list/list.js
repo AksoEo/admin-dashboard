@@ -158,7 +158,10 @@ export default class MembersList extends React.PureComponent {
                     value={item}
                     selectedFields={this.props.selectedFields}
                     onOpen={node => this.openMember(item.id, node)}
-                    getMemberPath={this.props.getMemberPath} />
+                    getMemberPath={this.props.getMemberPath}
+                    // TODO: this
+                    isSelected={false}
+                    onSelectChange={() => {}} />
             );
         }
 
@@ -222,9 +225,8 @@ class MemberTableRow extends React.PureComponent {
                     e.stopPropagation();
                 }}>
                     <Checkbox
-                        // TODO: this
-                        checked={false}
-                        onChange={() => {}} />
+                        checked={this.props.isSelected}
+                        onChange={this.props.onSelectChange} />
                 </TableCell>
                 {contents}
             </TableRow>

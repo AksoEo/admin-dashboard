@@ -12,6 +12,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import CloseIcon from '@material-ui/icons/Close';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
+import fuzzaldrin from 'fuzzaldrin';
 import RearrangingList from './rearranging-list';
 import locale from '../../../locale';
 import { Sorting } from './fields';
@@ -49,6 +50,7 @@ export default class FieldPicker extends React.PureComponent {
 
     state = {
         fullScreen: window.innerWidth <= FULLSCREEN_WIDTH,
+        search: '',
     };
 
     onResize = () => {
@@ -68,6 +70,15 @@ export default class FieldPicker extends React.PureComponent {
         const nodeIndexToSelectedIndex = {};
         const selectedFieldNames = [];
 
+        let searchResults = this.props.available.map(field => ({
+            id: field,
+            name: locale.members.fields[field],
+        }));
+        if (this.state.search) {
+            searchResults = fuzzaldrin.filter(searchResults, this.state.search, { key: 'name' });
+        }
+        searchResults = searchResults.map(x => x.id);
+
         let i = 0;
         for (const field of this.props.selected) {
             selectedFieldNames.push(field.id);
@@ -76,6 +87,8 @@ export default class FieldPicker extends React.PureComponent {
             if (this.props.permanent.includes(field.id)) {
                 continue;
             }
+
+            if (!searchResults.includes(field.id)) continue;
 
             const onCheckboxClick = () => {
                 const selected = this.props.selected.slice();
@@ -125,6 +138,8 @@ export default class FieldPicker extends React.PureComponent {
 
         for (const field of this.props.available) {
             if (selectedFieldNames.includes(field)) continue;
+            if (!searchResults.includes(field)) continue;
+
             fields.push(
                 <div
                     className="field-picker-field" key={field}
@@ -177,6 +192,12 @@ export default class FieldPicker extends React.PureComponent {
                     </DialogTitle>
                 )}
                 <DialogContent>
+                    <div className="field-search">
+                        <input
+                            value={this.state.search}
+                            onChange={e => this.setState({ search: e.target.value })}
+                            placeholder={locale.members.fieldPicker.searchPlaceholder} />
+                    </div>
                     <RearrangingList
                         onMove={(fromIndex, toIndex) => {
                             const selected = this.props.selected.slice();

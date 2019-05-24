@@ -5,6 +5,27 @@
         margin-right: 16px;
     }
 
+    .field-search {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+
+        input {
+            font: inherit;
+            padding: 16px;
+            margin: 0;
+            border: none;
+            background: @card-background;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 0 0 4px 4px;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
     .rearranging-list {
         position: relative;
         min-width: 400px;

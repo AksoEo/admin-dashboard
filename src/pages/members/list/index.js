@@ -141,12 +141,16 @@ export default class MembersSearch extends React.PureComponent {
         this.setState({ page: 0 });
     };
 
+    setRequestURL () {
+        // TODO: char limit check
+        this.context.replace(`/membroj/?${this.encodeQuery()}`);
+    }
+
     onSubmit = () => {
         clearTimeout(this.debounceTimeout);
         this.setState({ submitted: true });
 
-        // TODO: char limit check
-        this.context.replace(`/membroj/?${this.encodeQuery()}`);
+        this.setRequestURL();
 
         const offset = this.state.rowsPerPage * this.state.page;
         const limit = this.state.rowsPerPage;
@@ -175,10 +179,11 @@ export default class MembersSearch extends React.PureComponent {
 
     onSelectedFieldsChange = (selectedFields) => {
         let shouldReload = false;
+        let shouldSetURL = false;
         if (selectedFields.length > this.state.selectedFields.length) {
             // more fields selected than available; needs reload
             shouldReload = true;
-        }
+        } else shouldSetURL = true; // still need to set the URL though
 
         const currentSorting = {};
         for (const field of this.state.selectedFields) {
@@ -195,7 +200,9 @@ export default class MembersSearch extends React.PureComponent {
 
         if (shouldReload) this.submitDebounced();
 
-        this.setState({ selectedFields });
+        this.setState({ selectedFields }, () => {
+            if (shouldSetURL && !shouldReload) this.setRequestURL();
+        });
     };
 
     render () {

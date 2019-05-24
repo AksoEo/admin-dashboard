@@ -184,6 +184,7 @@ export default {
         },
         fieldPicker: {
             title: 'Montrotaj kampoj',
+            searchPlaceholder: '[[search for fields]]',
         },
         sorting: {
             none: 'ne ordigata',
