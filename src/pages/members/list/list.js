@@ -9,6 +9,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import ListAltIcon from '@material-ui/icons/ListAlt';
+import SearchIcon from '@material-ui/icons/Search';
 import MemberField from './field-views';
 import locale from '../../../locale';
 import { Link } from '../../../router';
@@ -33,6 +34,8 @@ export default class MembersList extends React.PureComponent {
     static propTypes = {
         /** List of selected fields. See `defaultFields` for an example. */
         selectedFields: PropTypes.arrayOf(PropTypes.object).isRequired,
+        /** List of temporary selected fields which are only there because of the search query. */
+        tmpSelectedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** Called when the selected fields change. */
         onFieldsChange: PropTypes.func.isRequired,
         /** Called when the field picker modal is requested. */
@@ -98,11 +101,29 @@ export default class MembersList extends React.PureComponent {
                 else if (current === Sorting.ASC) selected[i].sorting = Sorting.DESC;
                 else selected[i].sorting = Sorting.NONE;
                 this.props.onFieldsChange(selected);
+                break;
             }
         }
     }
 
+    selectTmpField (id) {
+        const selected = this.props.selectedFields.slice();
+        selected.splice(1, 0, { id, sorting: Sorting.NONE });
+        this.props.onFieldsChange(selected);
+    }
+
     render () {
+        const selectedFields = this.props.selectedFields.slice();
+        const selectedFieldIds = selectedFields.map(x => x.id);
+        for (const tmpId of this.props.tmpSelectedFields) {
+            if (!selectedFieldIds.includes(tmpId)) {
+                selectedFieldIds.push(tmpId);
+                // hacky: insert after codeholderType
+                // (unchecked invariant: codeholderType is in selected fields)
+                selectedFields.splice(1, 0, { id: tmpId, sorting: Sorting.NONE, isTmp: true });
+            }
+        }
+
         const header = (
             <TableHead className="table-header">
                 <TableRow>
@@ -112,7 +133,7 @@ export default class MembersList extends React.PureComponent {
                             checked={false}
                             onChange={() => {}} />
                     </TableCell>
-                    {this.props.selectedFields.map(({ id, sorting }) => {
+                    {selectedFields.map(({ id, sorting, isTmp }) => {
                         if (id === FIELDS_BTN_COLUMN) {
                             return (
                                 <TableCell key={id} className="table-header-fields-btn-container">
@@ -133,12 +154,17 @@ export default class MembersList extends React.PureComponent {
 
                             return (
                                 <TableCell
+                                    className={isTmp ? 'tmp-field' : ''}
                                     key={id}
                                     sortDirection={sortDirection}>
+                                    {isTmp && <SearchIcon className="tmp-field-icon" />}
                                     <TableSortLabel
                                         active={!!sortDirection}
                                         direction={sortDirection || 'asc'}
-                                        onClick={() => this.changeSorting(id)}>
+                                        onClick={() => {
+                                            if (isTmp) this.selectTmpField(id);
+                                            else this.changeSorting(id);
+                                        }}>
                                         {locale.members.fields[id]}
                                     </TableSortLabel>
                                 </TableCell>
@@ -156,7 +182,7 @@ export default class MembersList extends React.PureComponent {
                 <MemberTableRow
                     key={item.id}
                     value={item}
-                    selectedFields={this.props.selectedFields}
+                    selectedFields={selectedFields}
                     onOpen={node => this.openMember(item.id, node)}
                     getMemberPath={this.props.getMemberPath}
                     // TODO: this

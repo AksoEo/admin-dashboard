@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import TablePagination from '@material-ui/core/TablePagination';
 import SearchInput from './search-input';
 import { filterableFields } from './search-input/predicates';
-import { FIELDS } from './fields';
+import { FIELDS, Sorting } from './fields';
 import MembersList from './list';
 import FieldPicker from './field-picker';
 import { routerContext } from '../../../router';
@@ -16,6 +16,7 @@ const initialState = () => ({
     searchFilters: false,
     predicates: filterableFields(),
     selectedFields: MembersList.defaultSelectedFields(),
+    tmpSelectedFields: [],
     submitted: false,
     fieldPickerOpen: false,
     list: null,
@@ -23,6 +24,10 @@ const initialState = () => ({
     page: 0,
     rowsPerPage: 10,
 });
+
+const TMP_SELECTED_FIELDS = {
+    'nameOrCode': ['name', 'code'],
+};
 
 export default class MembersSearch extends React.PureComponent {
     static propTypes = {
@@ -148,7 +153,11 @@ export default class MembersSearch extends React.PureComponent {
 
     onSubmit = () => {
         clearTimeout(this.debounceTimeout);
-        this.setState({ submitted: true });
+
+        const tmpSelectedFields = (TMP_SELECTED_FIELDS[this.state.searchField]
+            || [this.state.searchField]);
+
+        this.setState({ submitted: true, tmpSelectedFields });
 
         this.setRequestURL();
 
@@ -159,7 +168,9 @@ export default class MembersSearch extends React.PureComponent {
             this.state.searchField,
             this.state.searchQuery,
             this.state.searchFilters ? this.state.predicates : [],
-            this.state.selectedFields,
+            this.state.selectedFields.concat(
+                tmpSelectedFields.map(id => ({ id, sorting: Sorting.NONE }))
+            ),
             offset,
             limit,
         );
@@ -235,6 +246,7 @@ export default class MembersSearch extends React.PureComponent {
                     field={this.state.searchField}
                     onFieldChange={searchField => {
                         if (searchField !== this.state.searchField) {
+                            this.submitDebounced();
                             this.setState({ searchField, searchQuery: '' });
                         }
                     }}
@@ -270,6 +282,7 @@ export default class MembersSearch extends React.PureComponent {
                     <div className="members-list-container">
                         <MembersList
                             selectedFields={this.state.selectedFields}
+                            tmpSelectedFields={this.state.tmpSelectedFields}
                             onFieldsChange={this.onSelectedFieldsChange}
                             onEditFields={() => this.setState({ fieldPickerOpen: true })}
                             openMemberWithTransitionTitleNode={this.props.openMember}
