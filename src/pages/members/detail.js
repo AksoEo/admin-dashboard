@@ -70,6 +70,7 @@ export default class MemberDetail extends React.PureComponent {
             'deathdate', 'hasProfilePicture', 'firstName', 'firstNameLegal', 'lastName',
             'lastNameLegal', 'honorific', 'birthdate', 'age', 'agePrimo', 'profession',
             'landlinePhone', 'landlinePhoneFormatted', 'cellphone', 'cellphoneFormatted',
+            'fullName', 'nameAbbrev',
         ];
 
         client.get(`/codeholders/${id}`, { fields }).then(response => {

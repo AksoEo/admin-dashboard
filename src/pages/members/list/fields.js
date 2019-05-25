@@ -82,10 +82,6 @@ export const FIELDS = {
         detailPos: DetailPos.TABLE,
         editorType: 'phone',
     },
-    isDead: {
-        detailPos: DetailPos.TABLE,
-        editorType: 'boolean',
-    },
     profession: {
         detailPos: DetailPos.TABLE,
         editorType: 'string',

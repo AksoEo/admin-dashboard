@@ -45,36 +45,32 @@ const FIELDS = {
         else if (enabled) icon = <BusinessIcon />;
         else if (value === 'human') icon = <CodeholderDisabledIcon />;
         else icon = <DomainDisabledIcon />;
+
+        let title = locale.members.fields.codeholderTypes[value];
+        if (!enabled) title += ` (${locale.members.fields.codeholderDisabledTitle})`;
+
         return (
             <span
                 className={'codeholder-type' + (!enabled ? ' disabled' : '')}
-                title={locale.members.fields.codeholderTypes[value]}>
+                title={title}>
                 {icon}
             </span>
         );
     },
     name: class Name extends React.PureComponent {
         node = null;
-        honorific = null;
-        firstName = null;
-        lastName = null;
-        resizeObserver = null;
+        prefixName = null;
+        truncatingName = null;
+        fixedName = null;
 
-        componentDidMount () {
-            if (this.props.member.codeholderType === 'human') {
-                this.resizeObserver = new ResizeObserver(() => {
-                    if (!this.node) return;
-                    const containerWidth = this.node.offsetWidth;
-                    const honorificWidth = this.honorific.offsetWidth;
-                    const lastWidth = this.lastName.offsetWidth;
-                    this.firstName.style.maxWidth = (containerWidth - lastWidth
-                        - honorificWidth) + 'px';
-                });
-                this.resizeObserver.observe(this.node);
-                this.resizeObserver.observe(this.lastName);
-                this.resizeObserver.observe(this.honorific);
-            }
-        }
+        resizeObserver = new ResizeObserver(() => {
+            if (!this.node) return;
+            const containerWidth = this.node.offsetWidth;
+            const prefixWidth = this.prefixName ? this.prefixName.offsetWidth : 0;
+            const fixedWidth = this.fixedName.offsetWidth;
+            this.truncatingName.style.maxWidth = (containerWidth - fixedWidth
+                - prefixWidth) + 'px';
+        });
 
         render () {
             const { codeholderType, isDead } = this.props.member;
@@ -87,28 +83,52 @@ const FIELDS = {
                 return (
                     <span
                         className={'name' + (isDead ? ' is-dead' : '')}
-                        title={`${first} ${last}`}
+                        title={`${honorific ? honorific + ' ' : ''}${first} ${last}`}
                         ref={node => {
                             this.node = node;
                             this.props.transitionTitleRef && this.props.transitionTitleRef(node);
+                            if (node) this.resizeObserver.observe(node);
                         }}>
-                        <span className="honorific" ref={node => this.honorific = node}>
+                        <span className="honorific" ref={node => {
+                            this.prefixName = node;
+                            if (node) this.resizeObserver.observe(node);
+                        }}>
                             {honorific ? honorific + '\u00a0' : ''}
                         </span>
-                        <span className="first-name" ref={node => this.firstName = node}>
+                        <span className="first-name" ref={node => this.truncatingName = node}>
                             {first}
-                        </span> <span className="last-name" ref={node => this.lastName = node}>
+                        </span> <span className="last-name" ref={node => {
+                            this.fixedName = node;
+                            if (node) this.resizeObserver.observe(node);
+                        }}>
                             {last}
                         </span>
                     </span>
                 );
+            } else if (codeholderType === 'org') {
+                const { fullName, nameAbbrev } = this.props.member;
+
+                return (
+                    <span
+                        className={'name' + (isDead ? ' is-dead' : '')}
+                        title={`${fullName} ${nameAbbrev}`}
+                        ref={node => {
+                            this.node = node;
+                            this.props.transitionTitleRef && this.props.transitionTitleRef(node);
+                            if (node) this.resizeObserver.observe(node);
+                        }}>
+                        <span className="org-full-name" ref={node => this.truncatingName = node}>
+                            {fullName}
+                        </span> <span className="org-abbrev" ref={node => {
+                            this.fixedName = node;
+                            if (node) this.resizeObserver.observe(node);
+                        }}>
+                            {nameAbbrev ? `(${nameAbbrev})` : ''}
+                        </span>
+                    </span>
+                );
             } else {
-                return <span
-                    className={'name' + (isDead ? ' is-dead' : '')}
-                    ref={node => {
-                        this.node = node;
-                        this.props.transitionTitleRef && this.props.transitionTitleRef(node);
-                    }}>todo: org name</span>;
+                return <span className="name"></span>;
             }
         }
     },

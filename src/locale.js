@@ -166,6 +166,7 @@ export default {
                 human: 'Homo',
                 org: 'Organizo',
             },
+            codeholderDisabledTitle: '[[disabled]]',
             notes: 'Notoj',
             landlinePhone: 'Hejma telefono',
             cellphone: 'Poŝtelefono',
