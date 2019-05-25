@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
+import { CodeholderDisabledIcon } from './icons';
+import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
+import { UEACode } from 'akso-client';
 import locale from '../../../locale';
 import data from './data';
 
@@ -34,13 +37,17 @@ export default class MemberField extends React.PureComponent {
 /* eslint-disable react/prop-types */ // props are kinda checked above anyway
 /** Field renderers. */
 const FIELDS = {
-    codeholderType ({ value }) {
+    codeholderType ({ value, member }) {
         let icon;
-        if (value === 'human') icon = <PersonIcon />;
-        else icon = <BusinessIcon />;
+        if (!value) return <span className="codeholder-type-placeholder" />;
+        const { enabled } = member;
+        if (value === 'human' && enabled) icon = <PersonIcon />;
+        else if (enabled) icon = <BusinessIcon />;
+        else if (value === 'human') icon = <CodeholderDisabledIcon />;
+        else icon = <DomainDisabledIcon />;
         return (
             <span
-                className="codeholder-type"
+                className={'codeholder-type' + (!enabled ? ' disabled' : '')}
                 title={locale.members.fields.codeholderTypes[value]}>
                 {icon}
             </span>
@@ -70,14 +77,16 @@ const FIELDS = {
         }
 
         render () {
-            if (this.props.member.codeholderType === 'human') {
+            const { codeholderType, isDead } = this.props.member;
+
+            if (codeholderType === 'human') {
                 const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.member;
                 const honorific = this.props.member.honorific;
                 const first = firstName || firstNameLegal;
                 const last = lastName || lastNameLegal;
                 return (
                     <span
-                        className="name"
+                        className={'name' + (isDead ? ' is-dead' : '')}
                         title={`${first} ${last}`}
                         ref={node => {
                             this.node = node;
@@ -95,7 +104,7 @@ const FIELDS = {
                 );
             } else {
                 return <span
-                    className="name"
+                    className={'name' + (isDead ? ' is-dead' : '')}
                     ref={node => {
                         this.node = node;
                         this.props.transitionTitleRef && this.props.transitionTitleRef(node);
@@ -106,12 +115,13 @@ const FIELDS = {
     code ({ member }) {
         const { oldCode, newCode } = member;
         if (oldCode) {
+            const oldCodeCheckLetter = new UEACode(oldCode).getCheckLetter();
             return (
                 <span className="uea-codes">
                     <span className="uea-code">
                         {newCode}
                     </span> <span className="old-uea-code">
-                        {oldCode}
+                        {oldCode}-{oldCodeCheckLetter}
                     </span>
                 </span>
             );
@@ -172,29 +182,41 @@ const FIELDS = {
     email ({ value }) {
         return <span className="email">{value}</span>;
     },
-    addressLatin ({ value, selectedFields }) {
-        if (!value) value = {};
-        const streetAddress = (value.streetAddress || '').split('\n')
-            .map((line, i) => (<span key={i} className="address-pseudoline">{line}</span>));
+    addressLatin: class AddressLatin extends React.PureComponent {
+        state = {};
+        componentDidMount () {
+            data.getCountries().then(countries => this.setState({ countries }));
+        }
+        render () {
+            let { value } = this.props;
+            const { selectedFields } = this.props;
+            if (!value) value = {};
 
-        const showCity = !selectedFields.includes('addressCity');
-        const showCountryArea = !selectedFields.includes('addressCountryArea');
-        const city = showCity ? value.city : '';
-        const countryArea = showCountryArea ? value.countryArea : '';
+            const streetAddress = (value.streetAddress || '').split('\n');
+            const showCity = !selectedFields.includes('addressCity');
+            const showCountryArea = !selectedFields.includes('addressCountryArea');
+            const city = showCity ? value.city : '';
+            const countryArea = showCountryArea ? value.countryArea : '';
+            const showCountry = !selectedFields.includes('country');
+            const country = showCountry
+                ? this.state.countries ? this.state.countries[value.country] : '' : '';
 
-        return (
-            <div className="address">
-                {streetAddress}
-                <span className="address-pseudoline">
-                    {value.postalCode} {value.cityArea}
-                    {value.cityArea && city ? ', ' : ''}
-                    {city}
-                </span>
-                {showCountryArea && <span className="address-pseudoline">
-                    {countryArea}
-                </span>}
-            </div>
-        );
+            const addressPseudolines = [
+                ...streetAddress,
+                [
+                    [value.postalCode, value.cityArea].filter(x => x).join(' '),
+                    city,
+                ].filter(x => x).join(', '),
+                countryArea,
+                country,
+            ].filter(x => x).map((x, i) => (<span className="address-pseudoline" key={i}>{x}</span>));
+
+            return (
+                <div className="address">
+                    {addressPseudolines}
+                </div>
+            );
+        }
     },
     addressCity ({ member }) {
         return <span className="address-city">{member.addressLatin.city}</span>;

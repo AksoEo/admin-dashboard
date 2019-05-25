@@ -107,6 +107,10 @@
 
 .members-list .members-list-item,
 .member-detail-page {
+    .codeholder-type.disabled {
+        color: @error;
+    }
+
     .name {
         display: inline-block;
         white-space: nowrap;
@@ -117,6 +121,12 @@
             display: inline-block;
             text-overflow: ellipsis;
             overflow: hidden;
+        }
+
+        &.is-dead,
+        &.is-dead * {
+            text-decoration-line: line-through;
+            text-decoration-color: @error;
         }
     }
 

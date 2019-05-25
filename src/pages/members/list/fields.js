@@ -33,10 +33,6 @@ export const FIELDS = {
         detailPos: DetailPos.TABLE,
         editorType: 'code',
     },
-    enabled: {
-        detailPos: DetailPos.TABLE,
-        editorType: 'boolean',
-    },
     age: {
         sortable: true,
         detailPos: DetailPos.TABLE,

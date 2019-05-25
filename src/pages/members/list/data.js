@@ -12,6 +12,7 @@ const { transformSearch, isValidSearch } = aksoUtil;
 const dataSingleton = new EventEmitter();
 
 const fieldIdMapping = {
+    codeholderType: ['codeholderType', 'enabled'],
     code: ['newCode', 'oldCode'],
     name: [
         'firstName',
@@ -21,6 +22,7 @@ const fieldIdMapping = {
         'fullName',
         'fullNameLocal',
         'nameAbbrev',
+        'isDead',
     ],
     country: ['feeCountry', 'addressLatin.country'],
     age: ['age', 'agePrimo'],
@@ -130,6 +132,11 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
         }
 
         options.search = { str: transformedQuery, cols: searchFields };
+
+        // order by relevance if no order is selected
+        if (!options.order.length) {
+            options.order = [['_relevance', 'desc']];
+        }
     }
 
     const userSearchQuery = JSON.stringify({
@@ -139,9 +146,12 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
 
     let goBackToFirstPage = false;
     if (userSearchQuery !== currentUserSearchQuery) {
+        if (currentUserSearchQuery) {
+            // go back to first page unless this is the first request
+            goBackToFirstPage = true;
+            options.offset = 0;
+        }
         currentUserSearchQuery = userSearchQuery;
-        goBackToFirstPage = true;
-        options.offset = 0;
     }
 
     const searchQuery = JSON.stringify(options);
