@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Spring, lerp } from '../animation';
 import './segmented.less';
 
 /**
@@ -30,10 +31,84 @@ export default class Segmented extends React.PureComponent {
         onSelect: PropTypes.func.isRequired,
     };
 
+    state = {
+        backgroundPos: 0,
+    }
+
+    backgroundPos = new Spring(0.85, 0.4);
+    childRefs = [];
+
+    constructor (props) {
+        super(props);
+
+        this.backgroundPos.on('update', backgroundPos => this.setState({ backgroundPos }));
+    }
+
+    componentWillUpdate (newProps) {
+        if (newProps.selected !== this.props.selected
+            || newProps.children !== this.props.children) {
+            let targetPos = -1;
+            for (let i = 0; i < newProps.children.length; i++) {
+                if (newProps.children[i].id === newProps.selected) {
+                    targetPos = i;
+                    break;
+                }
+            }
+            this.backgroundPos.target = targetPos;
+            if (this.backgroundPos.wantsUpdate()) {
+                this.backgroundPos.start();
+            }
+        }
+    }
+
+    componentWillUnmount () {
+        this.backgroundPos.stop();
+    }
+
     render () {
-        const options = this.props.children.map(option => {
+        const idleBackgroundPos = !(this.backgroundPos.wantsUpdate() && this.node);
+
+        let animatedBackground = null;
+        if (!idleBackgroundPos) {
+            const nodeRect = this.node.getBoundingClientRect();
+            let left = Math.floor(this.state.backgroundPos);
+            let right = Math.ceil(this.state.backgroundPos);
+
+            while (left < 0) {
+                left++;
+                right++;
+            }
+            while (right >= this.props.children.length) {
+                left--;
+                right--;
+            }
+
+            const p = this.state.backgroundPos - left;
+
+            const leftRect = this.childRefs[left] && this.childRefs[left].getBoundingClientRect();
+            const rightRect = this.childRefs[right] && this.childRefs[right].getBoundingClientRect();
+
+            if (leftRect && rightRect) {
+                const dx = lerp(leftRect.left, rightRect.left, p) - nodeRect.left;
+                const dy = lerp(leftRect.top, rightRect.top, p) - nodeRect.top;
+                const width = lerp(leftRect.width, rightRect.width, p);
+                const height = lerp(leftRect.height, rightRect.height, p);
+                const styleWidth = Math.round(width);
+                const styleHeight = Math.round(height);
+                const sx = styleWidth / width;
+                const sy = styleHeight / height;
+                const transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+                const style = { transform, width: styleWidth, height: styleHeight };
+                animatedBackground = <div className="segmented-control-background" style={style} />;
+            }
+        }
+
+        const options = this.props.children.map((option, index) => {
             let className = 'segmented-control-option';
-            if (option.id === this.props.selected) className += ' selected';
+            if (option.id === this.props.selected) {
+                className += ' selected';
+                if (!idleBackgroundPos) className += ' hidden-background';
+            }
             return (
                 <button
                     key={option.id}
@@ -41,14 +116,18 @@ export default class Segmented extends React.PureComponent {
                     role="radio"
                     aria-checked={option.id === this.props.selected}
                     disabled={option.disabled}
-                    onClick={() => this.props.onSelect(option.id)}>
+                    onClick={() => this.props.onSelect(option.id)}
+                    ref={node => this.childRefs[index] = node}>
                     {option.label}
                 </button>
             );
         });
 
+        this.childRefs.splice(this.props.children.length);
+
         return (
-            <div className="segmented-control">
+            <div className="segmented-control" ref={node => this.node = node}>
+                {animatedBackground}
                 {options}
             </div>
         );

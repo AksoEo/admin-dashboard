@@ -206,7 +206,6 @@ export default class MembersSearch extends React.PureComponent {
     };
 
     render () {
-        // TODO: use actual data
         const count = this.state.list && this.state.list.length;
         const total = this.state.responseStats && this.state.responseStats.total;
         const time = this.state.responseStats && this.state.responseStats.time;

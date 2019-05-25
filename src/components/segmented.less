@@ -5,6 +5,15 @@
     align-items: stretch;
     border-radius: 4px;
 
+    .segmented-control-background {
+        position: absolute;
+        border-radius: inherit;
+        background: @control-primary;
+        color: @text-on-primary;
+        .elevation(4);
+        will-change: transform, width;
+    }
+
     .segmented-control-option {
         padding: 8px 16px;
         color: inherit;
@@ -14,12 +23,15 @@
         margin: 0;
         display: inline-block;
         border-radius: inherit;
-        transition: background 0.3s @easing, box-shadow 0.3s @easing, color 0.3s @easing;
-        .elevation(0);
+        transition: color 0.3s @easing;
+        z-index: 1;
 
         &.selected {
-            background: @control-primary;
             color: @text-on-primary;
+        }
+
+        &.selected:not(.hidden-background) {
+            background: @control-primary;
             .elevation(4);
         }
 
