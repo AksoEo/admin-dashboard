@@ -67,6 +67,7 @@ export const FILTERABLE_FIELDS = {
                 atStartOfYear: value.asoy,
             };
         },
+        codeholderType: 'human',
     },
     hasOldCode: {
         needsSwitch: true,

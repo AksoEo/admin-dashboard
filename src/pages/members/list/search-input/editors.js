@@ -9,11 +9,12 @@ import data from '../data';
 
 /* eslint-disable react/prop-types */
 
-function tripleSwitch (all, a, b, labels, decode, onSelect) {
+function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
     return function TripleSwitch (props) {
         const { fieldHeader, value, onChange, enabled, onEnabledChange } = props;
 
         const selected = decode(value, enabled);
+        isOptionDisabled = isOptionDisabled || (() => false);
 
         return (
             <div className="left-right-editor">
@@ -22,9 +23,9 @@ function tripleSwitch (all, a, b, labels, decode, onSelect) {
                     onSelect(selected, { value, onChange, enabled, onEnabledChange });
                 }}>
                     {[
-                        { id: a, label: labels[a] },
-                        { id: b, label: labels[b] },
-                        { id: all, label: labels[all] },
+                        { id: a, label: labels[a], disabled: isOptionDisabled(a, value) },
+                        { id: b, label: labels[b], disabled: isOptionDisabled(b, value) },
+                        { id: all, label: labels[all], disabled: isOptionDisabled(all, value) },
                     ]}
                 </Segmented>
             </div>
@@ -62,6 +63,14 @@ export default {
             if (selected === 'all' || selected === 'human') newValue.human = true;
             if (selected === 'all' || selected === 'org') newValue.org = true;
             onChange(newValue);
+        },
+        (id, value) => {
+            if (value._restricted) {
+                if (id === 'all') return true;
+                if (id === 'org' && value.human) return true;
+                if (id === 'human' && value.org) return true;
+            }
+            return false;
         },
     ),
     country: class CountryEditor extends React.PureComponent {

@@ -9,7 +9,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import PredicateEditor from './predicates';
 import locale from '../../../../locale';
 import { Spring, globalAnimator, lerp, clamp } from '../../../../animation';
-import { SEARCHABLE_FIELDS } from './fields';
+import { SEARCHABLE_FIELDS, FILTERABLE_FIELDS } from './fields';
 import './style';
 
 /** Members’ page search input. */
@@ -37,6 +37,40 @@ export default class SearchInput extends React.PureComponent {
             e.preventDefault();
             this.props.onUnsubmit();
         }
+    }
+
+    emitPredicatesChange (predicates) {
+        // some fields are restricted to a codeholder type; this needs to be handled
+        let codeholderRestriction = null;
+        let invalid = false;
+        for (const predicate of predicates) {
+            if (!predicate.enabled) continue;
+            const fieldRestriction = FILTERABLE_FIELDS[predicate.field].codeholderType;
+            if (fieldRestriction) {
+                if (codeholderRestriction) {
+                    // can’t restrict to disjunct types
+                    invalid = true;
+                    break;
+                } else {
+                    codeholderRestriction = fieldRestriction;
+                }
+            }
+        }
+
+        for (const predicate of predicates) {
+            if (predicate.field === 'codeholderType') {
+                if (!invalid && codeholderRestriction) {
+                    predicate.value = codeholderRestriction === 'human'
+                        ? { human: true, org: false, _restricted: true }
+                        : { human: false, org: true, _restricted: true };
+                } else {
+                    delete predicate.value._restricted;
+                }
+                break;
+            }
+        }
+
+        this.props.onPredicatesChange(predicates);
     }
 
     render () {
@@ -93,13 +127,13 @@ export default class SearchInput extends React.PureComponent {
                         const predicates = this.props.predicates.slice();
                         predicates[index].value = value;
                         predicates[index].enabled = true;
-                        this.props.onPredicatesChange(predicates);
+                        this.emitPredicatesChange(predicates);
                     }}
                     isLast={isLast}
                     onEnabledChange={enabled => {
                         const predicates = this.props.predicates.slice();
                         predicates[index].enabled = enabled;
-                        this.props.onPredicatesChange(predicates);
+                        this.emitPredicatesChange(predicates);
                     }} />,
                 hidden: this.props.field === item.field
                     ? true

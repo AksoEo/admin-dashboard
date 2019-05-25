@@ -40,6 +40,7 @@ export default class Segmented extends React.PureComponent {
                     className={className}
                     role="radio"
                     aria-checked={option.id === this.props.selected}
+                    disabled={option.disabled}
                     onClick={() => this.props.onSelect(option.id)}>
                     {option.label}
                 </button>
