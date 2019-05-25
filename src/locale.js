@@ -124,7 +124,7 @@ export default {
                 officePhone: 'Oficeja telefono',
                 enabled: 'Konto ŝaltita',
                 isDead: 'Mortinta',
-                feeCountry: 'Paglando',
+                country: 'Lando',
                 birthdate: 'Naskiĝtago',
                 address: 'Adreso',
                 hasPassword: 'Kreis konton',

@@ -27,12 +27,12 @@ export const FILTERABLE_FIELDS = {
             else return { human: true, org: true };
         },
     },
-    feeCountry: {
+    country: {
         default () {
-            return [];
+            return { countries: [], type: null };
         },
         isNone (value) {
-            return !value.length;
+            return !value.countries.length;
         },
     },
     enabled: {

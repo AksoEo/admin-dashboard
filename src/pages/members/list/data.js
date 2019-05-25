@@ -27,6 +27,11 @@ const fieldIdMapping = {
     officePhone: ['officePhone', 'officePhoneFormatted'],
     landlinePhone: ['landlinePhone', 'landlinePhoneFormatted'],
     cellphone: ['cellphone', 'cellphoneFormatted'],
+    addressLatin: [
+        'country', 'countryArea', 'city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode',
+    ].map(x => 'addressLatin.' + x),
+    addressCity: ['addressLatin.city', 'addressLatin.cityArea'],
+    addressCountryArea: ['addressLatin.countryArea'],
 };
 
 const phoneNumberFields = ['landlinePhone', 'officePhone', 'cellphone'];
@@ -90,8 +95,11 @@ dataSingleton.search = function search (field, query, filters, fields, offset, l
         if (predicate.enabled) {
             const result = toFilterValue(predicate.field, predicate.value);
             if (result) {
-                const [field, value] = result;
-                filter[field] = value;
+                // result looks like [field, value, field, value, field, value...]
+                for (let i = 0; i < result.length; i += 2) {
+                    const [field, value] = [result[i], result[i + 1]];
+                    filter[field] = value;
+                }
             }
         }
     }
@@ -210,6 +218,18 @@ function toFilterValue (field, value) {
         return ['oldCode', value ? { $neq: null } : null];
     } else if (field === 'hasEmail') {
         return ['email', value ? { $neq: null } : null];
+    } else if (field === 'country') {
+        const countries = { $in: value.countries.slice() };
+        if (value.type === null) {
+            return ['$or', [
+                { feeCountry: countries },
+                { 'addressLatin.country': countries },
+            ]];
+        } else if (value.type === 'feeCountry') {
+            return ['feeCountry', countries];
+        } else if (value.type === 'addressCountry') {
+            return ['addressLatin.country', countries];
+        }
     } else {
         return [field, value];
     }

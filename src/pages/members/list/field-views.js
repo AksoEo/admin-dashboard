@@ -218,5 +218,8 @@ const FIELDS = {
     cellphone ({ member }) {
         return <span className="cellphone">{member.cellphoneFormatted}</span>;
     },
+    profession ({ value }) {
+        return <span className="profession">{value}</span>;
+    },
 };
 /* eslint-enable react/prop-types */

@@ -64,7 +64,7 @@ export default {
             onChange(newValue);
         },
     ),
-    feeCountry: class FeeCountryEditor extends React.PureComponent {
+    country: class CountryEditor extends React.PureComponent {
         state = { countries: null, countryGroups: null };
 
         componentDidMount () {
@@ -97,12 +97,12 @@ export default {
             }
 
             return (
-                <div className="fee-country-editor left-right-editor">
+                <div className="country-editor left-right-editor">
                     {fieldHeader}
                     <Select
                         multiple
-                        value={value}
-                        onChange={e => onChange(e.target.value)}>
+                        value={value.countries}
+                        onChange={e => onChange({ ...value, countries: e.target.value })}>
                         <MenuItem disabled value="">
                             {locale.members.search.countries.countryGroups}
                         </MenuItem>
