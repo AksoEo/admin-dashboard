@@ -46,7 +46,7 @@ export default class Segmented extends React.PureComponent {
 
     componentWillUpdate (newProps) {
         if (newProps.selected !== this.props.selected
-            || newProps.children !== this.props.children) {
+            || newProps.children.length !== this.props.children.length) {
             let targetPos = -1;
             for (let i = 0; i < newProps.children.length; i++) {
                 if (newProps.children[i].id === newProps.selected) {

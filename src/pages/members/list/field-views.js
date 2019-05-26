@@ -6,6 +6,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import { CodeholderDisabledIcon } from './icons';
 import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
 import { UEACode } from 'akso-client';
+import moment from 'moment';
 import locale from '../../../locale';
 import data from './data';
 
@@ -245,8 +246,10 @@ const FIELDS = {
         return <span className="address-country-area">{member.addressLatin.countryArea}</span>;
     },
     birthdate ({ value }) {
-        // TODO: format
-        return <span className="birthdate">{value}</span>;
+        // FIXME: displays as “15-a de December 1859”
+        const formatted = value ? moment(value).format('D[-a de] MMMM Y') : '';
+
+        return <span className="birthdate-deathdate" title={value}>{formatted}</span>;
     },
     get deathdate () {
         return this.birthdate;

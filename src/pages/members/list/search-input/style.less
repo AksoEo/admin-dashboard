@@ -175,7 +175,13 @@
                 .age-editor-top {
                     display: flex;
                     justify-content: space-between;
+                    align-items: center;
                     padding-right: 16px;
+                }
+
+                .age-birth-year {
+                    // margin-right: 16px;
+                    opacity: 0.8;
                 }
 
                 &.disabled .age-prime-switch {
@@ -201,6 +207,11 @@
 
                 .age-editor .age-editor-top {
                     padding-right: 8px;
+
+                    .age-birth-year {
+                        // FIXME: is this a good idea?
+                        display: none;
+                    }
                 }
 
                 .left-right-editor {

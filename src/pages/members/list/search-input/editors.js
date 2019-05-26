@@ -2,6 +2,7 @@ import React from 'react';
 import Switch from '@material-ui/core/Switch';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import moment from 'moment';
 import NumericRangeEditor from '../../editors/numeric-range';
 import Segmented from '../../../../components/segmented';
 import locale from '../../../../locale';
@@ -143,10 +144,28 @@ export default {
         const { field, value, onChange, fieldHeader, disabled } = props;
         const topValue = value;
 
+        const ageToYear = age => value.atStartOfYear
+            ? moment().startOf('year').subtract(age, 'years').year()
+            : moment().subtract(age, 'years').year();
+
+        let birthYearRange;
+        if (value.range.isCollapsed()) {
+            birthYearRange = ageToYear(value.range.collapsedValue());
+        } else {
+            const start = value.range.startInclusive ? value.range.start : value.range.start + 1;
+            const end = value.range.endInclusive ? value.range.end : value.range.end - 1;
+            // age is the inverse of birth date; so end comes first
+            birthYearRange = `${ageToYear(end)}–${ageToYear(start)}`;
+        }
+
         return (
             <div className={'age-editor' + (disabled ? ' disabled' : '')}>
                 <div className="age-editor-top">
                     {fieldHeader}
+                    <span className="age-birth-year">
+                        {/* FIXME: why does this break when I put it in .age-prime-switch? */}
+                        {locale.members.search.ageBirthYear(birthYearRange)}
+                    </span>
                     <div className="age-prime-switch">
                         <label>{locale.members.search.agePrime}</label>
                         <Switch

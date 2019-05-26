@@ -91,6 +91,7 @@ export default {
             submitFilter: 'Filtri',
             filters: 'Filtriloj',
             agePrime: 'jarkomence',
+            ageBirthYear: range => `[[would be born in ${range}]]`,
             codeholderTypes: {
                 all: 'ne gravas',
                 human: 'homo',
