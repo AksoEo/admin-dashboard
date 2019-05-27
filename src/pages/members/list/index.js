@@ -30,6 +30,7 @@ const TMP_SELECTED_FIELDS = {
     'address': ['addressLatin'],
 };
 
+/** Members search page. Needs a refactor */
 export default class MembersSearch extends React.PureComponent {
     static propTypes = {
         openMember: PropTypes.func.isRequired,

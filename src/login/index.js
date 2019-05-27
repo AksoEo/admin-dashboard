@@ -409,6 +409,7 @@ class SecurityCodeStage extends Component {
         loading: false,
     }
 
+    form = null;
     securityCodeField = null;
     securityCodeValidator = null;
 
@@ -418,7 +419,7 @@ class SecurityCodeStage extends Component {
 
     render () {
         return (
-            <Form onSubmit={() => {
+            <Form ref={node => this.form = node} onSubmit={() => {
                 this.setState({ loading: true });
                 client.totpLogIn(this.state.securityCode, this.state.bypassTotp).then(() => {
                     this.setState({ loading: false });
@@ -453,6 +454,16 @@ class SecurityCodeStage extends Component {
                     // \d* seems to be the only way to get a numpad input on iOS
                     pattern="\d*"
                     type="number"
+                    onKeyDown={e => {
+                        if (!e.key.match(/\d/) && !e.key.match(/^[A-Z]/)) {
+                            e.preventDefault();
+                        }
+                    }}
+                    onKeyUp={() => requestAnimationFrame(() => {
+                        if (this.state.securityCode.length === 6) {
+                            this.form.submit();
+                        }
+                    })}
                     onChange={e => this.setState({
                         securityCode: e.target.value.replace(/\D/g, '').substr(0, 6),
                     })}

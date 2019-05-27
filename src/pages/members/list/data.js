@@ -1,4 +1,5 @@
 /** Handles interfacing with the API. */
+// TODO: refactor this
 
 import EventEmitter from 'events';
 import { UEACode, util as aksoUtil } from 'akso-client';

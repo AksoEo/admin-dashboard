@@ -17,9 +17,12 @@ import LanguageIcon from '@material-ui/icons/Language';
 import locale from '../../../../locale';
 import data from '../data';
 
+/** Converts a letter to a regional indicator */
 const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
+/** Converts a two-letter country code to its corresponding emoji */
 const countryCodeToEmoji = code => toRI(code[0]) + toRI(code[1]);
 
+/** Renders a country picker. */
 export default class CountryPicker extends React.PureComponent {
     static propTypes = {
         onChange: PropTypes.func.isRequired,

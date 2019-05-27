@@ -22,6 +22,13 @@ import './segmented.less';
  */
 export default class Segmented extends React.PureComponent {
     static propTypes = {
+        /**
+         * A list of objects with the following properties:
+         *
+         * - `id`: a unique identifier that will be used for the `selected` prop
+         * - `label`: a label string or component
+         * - `disabled`: if true, will render it disabled
+         */
         children: PropTypes.arrayOf(PropTypes.object).isRequired,
 
         /** The selected option’s id. */
@@ -35,7 +42,10 @@ export default class Segmented extends React.PureComponent {
         backgroundPos: 0,
     }
 
+    /** Animates the background rectangle while it’s moving. */
     backgroundPos = new Spring(0.85, 0.4);
+    node = null;
+    /** Child refs used to get rectangle sizes for the background animation. */
     childRefs = [];
 
     constructor (props) {
@@ -45,6 +55,7 @@ export default class Segmented extends React.PureComponent {
     }
 
     componentDidMount () {
+        // set background value so it doesn’t glitch when pressed
         let targetPos = -1;
         for (let i = 0; i < this.props.children.length; i++) {
             if (this.props.children[i].id === this.props.selected) {
@@ -53,11 +64,14 @@ export default class Segmented extends React.PureComponent {
             }
         }
         this.backgroundPos.value = this.backgroundPos.target = targetPos;
+        this.setState({ backgroundPos: targetPos });
     }
 
     componentWillUpdate (newProps) {
         if (newProps.selected !== this.props.selected
             || newProps.children.length !== this.props.children.length) {
+            // set new background target because either the selected item or the number of children
+            // changed
             let targetPos = -1;
             for (let i = 0; i < newProps.children.length; i++) {
                 if (newProps.children[i].id === newProps.selected) {
@@ -127,13 +141,14 @@ export default class Segmented extends React.PureComponent {
                     role="radio"
                     aria-checked={option.id === this.props.selected}
                     disabled={option.disabled}
-                    onClick={() => this.props.onSelect(option.id)}
+                    onClick={() => !option.disabled && this.props.onSelect(option.id)}
                     ref={node => this.childRefs[index] = node}>
                     {option.label}
                 </button>
             );
         });
 
+        // drop excess child refs
         this.childRefs.splice(this.props.children.length);
 
         return (

@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
-import Button from '@material-ui/core/Button';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import PredicateEditor from './predicates';
 import locale from '../../../../locale';
@@ -57,16 +58,19 @@ export default class SearchInput extends React.PureComponent {
             }
         }
 
-        for (const predicate of predicates) {
-            if (predicate.field === 'codeholderType') {
-                if (!invalid && codeholderRestriction) {
-                    predicate.value = codeholderRestriction === 'human'
-                        ? { human: true, org: false, _restricted: true }
-                        : { human: false, org: true, _restricted: true };
-                } else {
-                    delete predicate.value._restricted;
+        if (!invalid) {
+            for (const predicate of predicates) {
+                if (predicate.field === 'codeholderType') {
+                    if (!invalid && codeholderRestriction) {
+                        predicate.value = codeholderRestriction === 'human'
+                            ? { human: true, org: false, _restricted: true }
+                            : { human: false, org: true, _restricted: true };
+                        predicate.enabled = true;
+                    } else {
+                        delete predicate.value._restricted;
+                    }
+                    break;
                 }
-                break;
             }
         }
 
@@ -92,16 +96,22 @@ export default class SearchInput extends React.PureComponent {
                 }}
                 submitted={this.props.submitted}
                 expanded={this.props.expanded}
-                toggleExpanded={this.toggleExpanded}
+                filtersOnly={filtersOnly}
+                onSubmit={this.props.onSubmit}
                 searchableFields={SEARCHABLE_FIELDS}
                 searchField={this.props.field}
                 onSearchFieldChange={this.props.onFieldChange} />,
             hidden: false,
         }, {
-            node: <div className="filters-title">{locale.members.search.filters}</div>,
-            hidden: !this.props.expanded
-                || this.props.submitted
-                && !this.props.predicates.map(i => i.enabled).includes(true),
+            node: <button
+                className="filters-button"
+                onClick={!this.props.submitted && this.toggleExpanded}>
+                {locale.members.search.filters}
+                {this.props.expanded
+                    ? <ExpandLessIcon className="expand-icon" />
+                    : <ExpandMoreIcon className="expand-icon" />}
+            </button>,
+            hidden: this.props.submitted && !this.props.predicates.filter(i => i.enabled).length,
         }];
 
         const offset = listItems.length;
@@ -135,9 +145,7 @@ export default class SearchInput extends React.PureComponent {
                         predicates[index].enabled = enabled;
                         this.emitPredicatesChange(predicates);
                     }} />,
-                hidden: this.props.field === item.field
-                    ? true
-                    : this.props.submitted ? !item.enabled : false,
+                hidden: this.props.submitted ? !item.enabled : !this.props.expanded,
             });
         }
 
@@ -155,33 +163,7 @@ export default class SearchInput extends React.PureComponent {
                             ),
                             hidden: this.props.submitted,
                         },
-                        {
-                            node: (
-                                <PaperList
-                                    className="search-box"
-                                    layout={this.props.expanded ? 'flat' : 'collapsed'}>
-                                    {listItems}
-                                </PaperList>
-                            ),
-                            hidden: false,
-                            staticHeight: true,
-                        },
-                        {
-                            node: (
-                                <footer className="search-footer">
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        className="submit-button"
-                                        onClick={this.props.onSubmit}>
-                                        {filtersOnly
-                                            ? locale.members.search.submitFilter
-                                            : locale.members.search.submit}
-                                    </Button>
-                                </footer>
-                            ),
-                            hidden: this.props.submitted,
-                        },
+                        ...listItems,
                     ]}
                 </PaperList>
             </div>
@@ -193,7 +175,8 @@ export default class SearchInput extends React.PureComponent {
 class PrimarySearch extends React.PureComponent {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
-        toggleExpanded: PropTypes.func.isRequired,
+        onSubmit: PropTypes.func.isRequired,
+        filtersOnly: PropTypes.bool.isRequired,
         expanded: PropTypes.bool.isRequired,
         submitted: PropTypes.bool.isRequired,
         searchField: PropTypes.string.isRequired,
@@ -207,9 +190,6 @@ class PrimarySearch extends React.PureComponent {
 
         return (
             <div className="search-primary">
-                <div className="search-icon-container">
-                    <SearchIcon />
-                </div>
                 <NativeSelect
                     className="search-field"
                     value={this.props.searchField}
@@ -229,11 +209,15 @@ class PrimarySearch extends React.PureComponent {
                     onClick={e => this.props.submitted && e.stopPropagation()}
                     placeholder={locale.members.search.fieldPlaceholders[this.props.searchField]} />
                 {!this.props.submitted && (
-                    <Button className="search-expand" onClick={this.props.toggleExpanded}>
-                        {this.props.expanded
-                            ? locale.members.search.collapse
-                            : locale.members.search.expand}
-                    </Button>
+                    <IconButton
+                        className="search-submit"
+                        color="primary"
+                        aria-label={this.props.filtersOnly
+                            ? locale.members.search.submitFilter
+                            : locale.members.search.submit}
+                        onClick={this.props.onSubmit}>
+                        <SearchIcon />
+                    </IconButton>
                 )}
                 {this.props.submitted && (
                     // seemingly useless button as a fake target for the container click
@@ -249,8 +233,8 @@ class PrimarySearch extends React.PureComponent {
     }
 }
 
-const DAMPING = 0.9;
-const RESPONSE = 0.3;
+const DAMPING = 1;
+const RESPONSE = 0.4;
 
 /**
  * Renders a vertical array of animatable material paper.
@@ -258,7 +242,6 @@ const RESPONSE = 0.3;
 class PaperList extends React.PureComponent {
     static propTypes = {
         children: PropTypes.arrayOf(PropTypes.object).isRequired,
-        layout: PropTypes.oneOf(['flat', 'collapsed']).isRequired,
     };
 
     /** ResizeObserver that observes all children. */
@@ -267,7 +250,7 @@ class PaperList extends React.PureComponent {
     childNodes = [];
     childStates = [];
 
-    update (deltaTime) {
+    update (deltaTime, setInitialState) {
         // sync childStates count with child count
         while (this.childStates.length < this.props.children.length) {
             const lastState = this.childStates[this.childStates.length - 1];
@@ -285,9 +268,7 @@ class PaperList extends React.PureComponent {
             height.on('update', forceUpdate);
             hidden.on('update', forceUpdate);
 
-            const effectivelyHidden = false;
-
-            this.childStates.push({ y, height, hidden, effectivelyHidden });
+            this.childStates.push({ y, height, hidden });
         }
 
         while (this.childStates.length > this.props.children.length) {
@@ -308,19 +289,18 @@ class PaperList extends React.PureComponent {
             }
 
             state.hidden.target = child.hidden ? 1 : 0;
-            state.effectivelyHidden = child.hidden;
 
-            if (this.props.layout === 'collapsed') {
-                state.y.target = 0;
-                state.height.target = this.childNodes[0].offsetHeight;
+            const offsetHeight = this.childNodes[index].offsetHeight;
 
-                if (index !== 0) state.effectivelyHidden = true;
-            } else if (this.props.layout === 'flat') {
-                state.y.target = yAccum;
-                state.height.target = this.childNodes[index].offsetHeight;
+            state.y.target = lerp(yAccum, yAccum - offsetHeight / 2, state.hidden.value);
+            state.height.target = offsetHeight;
 
-                yAccum += this.childNodes[index].offsetHeight * (1 - state.hidden.value);
+            if (setInitialState) {
+                state.y.value = state.y.target;
+                state.height.value = state.height.target;
             }
+
+            yAccum += offsetHeight * (1 - state.hidden.value);
 
             state.y.update(deltaTime);
             state.height.update(deltaTime);
@@ -355,7 +335,7 @@ class PaperList extends React.PureComponent {
     }
 
     componentDidMount () {
-        this.update(0);
+        this.update(0, true);
     }
 
     componentDidUpdate () {
@@ -373,7 +353,7 @@ class PaperList extends React.PureComponent {
         const items = [];
         for (let i = 0; i < this.props.children.length; i++) {
             const { node } = this.props.children[i];
-            const hidden = this.childStates[i] ? this.childStates[i].effectivelyHidden : true;
+            const hidden = this.childStates[i] ? this.childStates[i].hidden : true;
             const style = this.getChildStyle(i);
             const index = i;
             items.push(

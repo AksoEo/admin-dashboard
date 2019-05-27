@@ -70,10 +70,14 @@ export default class Form extends Component {
     /** Native `submit` event handler */
     onSubmit = e => {
         e.preventDefault();
+        this.submit();
+    };
+
+    submit () {
         if (this.validate()) {
             this.props.onSubmit();
         }
-    };
+    }
 
     render () {
         return (

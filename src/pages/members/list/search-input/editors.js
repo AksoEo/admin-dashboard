@@ -10,6 +10,14 @@ import data from '../data';
 
 /* eslint-disable react/prop-types */
 
+/**
+ * Renders a segmented control with three options, [a] [b] [all].
+ * @param {Object} labels - mapping of identifiers to labels
+ * @param {Function} decode - function to decode a `value` into an identifier (a, b, or all)
+ * @param {Function} onSelect - select handler; is passed the identifier and a bunch of props
+ * @param {Function} isOptionDisabled - if true, the option will be disabled
+ * @return {Function} a functional switch component
+ */
 function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
     return function TripleSwitch (props) {
         const { fieldHeader, value, onChange, enabled, onEnabledChange } = props;
@@ -34,6 +42,7 @@ function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
     };
 }
 
+/** Like tripleSwitch but for simple boolean filters */
 function tripleSwitchYesNo (labels) {
     return tripleSwitch(
         'all',

@@ -85,8 +85,6 @@ export default {
         search: {
             title: 'Serĉi membrojn',
             titleFilter: 'Filtri membrojn',
-            expand: 'Montri filtrilojn',
-            collapse: 'Kaŝi filtrilojn',
             submit: 'Serĉi',
             submitFilter: 'Filtri',
             filters: 'Filtriloj',

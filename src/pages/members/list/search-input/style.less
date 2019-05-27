@@ -26,238 +26,229 @@
         text-align: center;
     }
 
-    .search-box {
+    .search-primary {
+        display: flex;
+        align-items: center;
         position: relative;
         border-radius: 4px;
-        border-radius: 4px;
-        will-change: height;
+        z-index: 1;
+        transition: box-shadow 0.3s @easing;
+        .elevation(4);
 
-        .search-primary {
-            display: flex;
-            align-items: center;
-            position: relative;
-            border-radius: inherit;
-            z-index: 1;
-            transition: box-shadow 0.3s @easing;
-            .elevation(4);
+        &:focus-within {
+            .elevation(6);
+        }
 
-            &:focus-within {
-                .elevation(6);
+        .search-field {
+            flex-shrink: 0;
+            margin-left: 16px;
+        }
+
+        .search-input {
+            width: 0;
+            flex: 1;
+            font: inherit;
+            background: none;
+            color: inherit;
+            border: none;
+            padding: 16px;
+            padding-left: 8px;
+            margin: 0;
+
+            &:focus {
+                outline: none;
             }
+        }
 
-            .search-icon-container {
-                width: 48px;
-                text-align: center;
-                margin-left: 8px;
-                flex-shrink: 0;
-            }
+        .search-expand, .search-submit {
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: @max-search-width) {
+            flex-direction: column;
+            align-items: stretch;
+            border-bottom: 1px solid @separator;
 
             .search-field {
-                flex-shrink: 0;
+                margin: 16px;
+                margin-bottom: 8px;
             }
 
             .search-input {
-                width: 0;
-                flex: 1;
-                font: inherit;
-                background: none;
-                color: inherit;
-                border: none;
-                padding: 16px;
-                padding-left: 8px;
-                margin: 0;
-
-                &:focus {
-                    outline: none;
-                }
+                width: 100%;
+                padding-left: 16px;
+                box-sizing: border-box;
             }
 
-            .search-expand {
-                margin-right: 8px;
-                flex-shrink: 0;
-            }
-
-            @media (max-width: @max-search-width) {
-                flex-direction: column;
-                align-items: stretch;
-                border-bottom: 1px solid @separator;
-
-                .search-icon-container {
-                    display: none;
-                }
-
-                .search-field {
-                    margin: 16px;
-                    margin-bottom: 8px;
-                }
-
-                .search-input {
-                    width: 100%;
-                    padding-left: 16px;
-                    box-sizing: border-box;
-                }
-
-                .search-expand {
-                    margin: 16px;
-                    margin-top: 8px;
-                }
+            .search-expand, .search-submit {
+                margin: 16px;
+                margin-top: 8px;
             }
         }
+    }
 
-        .paper-list-item {
-            position: absolute;
-            width: 100%;
-            background: @card-background;
-            border-radius: inherit;
-            will-change: transform;
-            transform-origin: 0 0;
+    .paper-list-item {
+        position: absolute;
+        width: 100%;
+        background: @card-background;
+        border-radius: inherit;
+        will-change: transform;
+        transform-origin: 0 0;
+    }
+
+    .filters-button {
+        font: inherit;
+        font-size: 0.875em;
+        font-weight: 500;
+        opacity: 0.5;
+        padding: 16px 8px 0 64px;
+        max-width: 600px;
+        margin: 0 auto;
+        color: inherit;
+        background: none;
+        border: none;
+
+        .expand-icon {
+            vertical-align: middle;
         }
+    }
 
-        .filters-title {
-            font-size: 0.875em;
-            font-weight: 500;
-            opacity: 0.5;
-            padding: 16px 8px 0 64px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
+    .predicate {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 4px 0;
 
-        .predicate {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 4px 0;
+        .predicate-field-header {
+            height: 48px;
 
-            .predicate-field-header {
-                height: 48px;
-
-                .predicate-checkbox,
-                .predicate-checkbox-placeholder {
-                    margin-left: 8px;
-                    display: inline-block;
-                }
-
-                .predicate-checkbox-placeholder {
-                    width: 48px;
-                }
-
-                .predicate-field {
-                    display: inline-block;
-                    margin: 0 16px;
-                    line-height: 48px;
-                    margin-left: 8px;
-                    cursor: default;
-                    text-transform: uppercase;
-                    font-size: small;
-                    font-weight: bold;
-                }
-            }
-
-            .predicate-editor {
+            .predicate-checkbox,
+            .predicate-checkbox-placeholder {
+                margin-left: 8px;
                 display: inline-block;
             }
 
-            .numeric-range-editor {
-                width: 0;
-                flex: 1;
-                height: 48px;
-                max-width: 100%;
-                margin-right: 20px;
-                -webkit-tap-highlight-color: transparent;
-                user-select: none;
-
-                &:focus {
-                    outline: none;
-                }
+            .predicate-checkbox-placeholder {
+                width: 48px;
             }
 
-            .country-picker {
-                display: flex;
-                align-items: center;
-                margin: 8px;
-                margin-right: 16px;
-                margin-left: 56px;
-                padding: 8px;
+            .predicate-field {
+                display: inline-block;
+                margin: 0 16px;
+                line-height: 48px;
+                margin-left: 8px;
                 cursor: default;
-                border-bottom: 2px solid @control-idle;
-                border-radius: 4px 4px 0 0;
+                text-transform: uppercase;
+                font-size: small;
+                font-weight: bold;
+            }
+        }
 
-                &:hover {
-                    border-bottom-color: @control-primary;
-                }
+        .predicate-editor {
+            display: inline-block;
+        }
 
-                .picked-countries {
-                    flex: 1;
-                    width: 0;
-                    height: 1.5em;
-                    font-size: small;
+        .numeric-range-editor {
+            width: 0;
+            flex: 1;
+            height: 48px;
+            max-width: 100%;
+            margin-right: 20px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
 
-                    .countries-placeholder {
-                        opacity: 0.6;
-                    }
-                }
+            &:focus {
+                outline: none;
+            }
+        }
 
-                .expand-icon {
-                    flex-shrink: 0;
+        .country-picker {
+            display: flex;
+            align-items: center;
+            margin: 8px;
+            margin-right: 16px;
+            margin-left: 56px;
+            padding: 8px;
+            cursor: default;
+            border-bottom: 2px solid @control-idle;
+            border-radius: 4px 4px 0 0;
+
+            &:hover {
+                border-bottom-color: @control-primary;
+            }
+
+            .picked-countries {
+                flex: 1;
+                width: 0;
+                height: 1.5em;
+                font-size: small;
+
+                .countries-placeholder {
+                    opacity: 0.6;
                 }
             }
 
-            .age-editor .age-editor-top,
-            .country-editor .country-editor-top {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding-right: 16px;
+            .expand-icon {
+                flex-shrink: 0;
+            }
+        }
+
+        .age-editor .age-editor-top,
+        .country-editor .country-editor-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 16px;
+        }
+
+        .age-editor {
+            .age-birth-year {
+                // margin-right: 16px;
+                opacity: 0.8;
             }
 
-            .age-editor {
+            &.disabled .age-prime-switch {
+                opacity: 0.5;
+            }
+
+            .numeric-range-editor {
+                display: block;
+                width: calc(100% - 40px);
+                margin: 0 20px;
+            }
+        }
+
+        .left-right-editor {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-right: 16px;
+        }
+
+        @media (max-width: 600px) {
+            border-bottom: 1px solid @separator;
+
+            .age-editor .age-editor-top {
+                padding-right: 8px;
+
                 .age-birth-year {
-                    // margin-right: 16px;
-                    opacity: 0.8;
-                }
-
-                &.disabled .age-prime-switch {
-                    opacity: 0.5;
-                }
-
-                .numeric-range-editor {
-                    display: block;
-                    width: calc(100% - 40px);
-                    margin: 0 20px;
+                    // FIXME: is this a good idea?
+                    display: none;
                 }
             }
 
             .left-right-editor {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding-right: 16px;
-            }
+                flex-direction: column;
+                align-items: auto;
+                padding-right: 8px;
 
-            @media (max-width: 600px) {
-                border-bottom: 1px solid @separator;
-
-                .age-editor .age-editor-top {
-                    padding-right: 8px;
-
-                    .age-birth-year {
-                        // FIXME: is this a good idea?
-                        display: none;
-                    }
+                :first-child {
+                    align-self: start;
                 }
 
-                .left-right-editor {
-                    flex-direction: column;
-                    align-items: auto;
-                    padding-right: 8px;
-
-                    :first-child {
-                        align-self: start;
-                    }
-
-                    :last-child {
-                        align-self: flex-end;
-                    }
+                :last-child {
+                    align-self: flex-end;
                 }
             }
         }
