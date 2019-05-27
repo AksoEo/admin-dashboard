@@ -171,14 +171,46 @@
                 }
             }
 
-            .age-editor {
-                .age-editor-top {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding-right: 16px;
+            .country-picker {
+                display: flex;
+                align-items: center;
+                margin: 8px;
+                margin-right: 16px;
+                margin-left: 56px;
+                padding: 8px;
+                cursor: default;
+                border-bottom: 2px solid @control-idle;
+                border-radius: 4px 4px 0 0;
+
+                &:hover {
+                    border-bottom-color: @control-primary;
                 }
 
+                .picked-countries {
+                    flex: 1;
+                    width: 0;
+                    height: 1.5em;
+                    font-size: small;
+
+                    .countries-placeholder {
+                        opacity: 0.6;
+                    }
+                }
+
+                .expand-icon {
+                    flex-shrink: 0;
+                }
+            }
+
+            .age-editor .age-editor-top,
+            .country-editor .country-editor-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-right: 16px;
+            }
+
+            .age-editor {
                 .age-birth-year {
                     // margin-right: 16px;
                     opacity: 0.8;

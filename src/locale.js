@@ -134,6 +134,12 @@ export default {
                 // section labels in <select>
                 countryGroups: 'Landaroj',
                 countries: 'Landoj',
+                // types
+                all: 'ne gravas',
+                fee: '[[fee]]',
+                address: '[[address]]',
+                dialogTitle: '[[pick countries]]',
+                placeholder: '[[pick countries]]',
             },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
@@ -168,6 +174,7 @@ export default {
                 org: 'Organizo',
             },
             codeholderDisabledTitle: '[[disabled]]',
+            codeholderDeadTitle: '[[dead]]',
             notes: 'Notoj',
             landlinePhone: 'Hejma telefono',
             cellphone: 'Poŝtelefono',

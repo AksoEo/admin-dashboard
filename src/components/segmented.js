@@ -44,6 +44,17 @@ export default class Segmented extends React.PureComponent {
         this.backgroundPos.on('update', backgroundPos => this.setState({ backgroundPos }));
     }
 
+    componentDidMount () {
+        let targetPos = -1;
+        for (let i = 0; i < this.props.children.length; i++) {
+            if (this.props.children[i].id === this.props.selected) {
+                targetPos = i;
+                break;
+            }
+        }
+        this.backgroundPos.value = this.backgroundPos.target = targetPos;
+    }
+
     componentWillUpdate (newProps) {
         if (newProps.selected !== this.props.selected
             || newProps.children.length !== this.props.children.length) {

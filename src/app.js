@@ -20,6 +20,9 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Sidebar from './features/sidebar';
 import routes from './pages';
 
+import moment from 'moment';
+moment.locale('eo');
+
 const theme = createMuiTheme({
     palette: {
         primary: { main: '#31a64f' },

@@ -1,11 +1,11 @@
 import React from 'react';
 import Switch from '@material-ui/core/Switch';
-import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import moment from 'moment';
 import NumericRangeEditor from '../../editors/numeric-range';
 import Segmented from '../../../../components/segmented';
 import locale from '../../../../locale';
+import CountryPicker from './country-picker';
 import data from '../data';
 
 /* eslint-disable react/prop-types */
@@ -106,22 +106,26 @@ export default {
                 }
             }
 
+            const selectedType = value.type === null ? 'all' : value.type;
+
             return (
-                <div className="country-editor left-right-editor">
-                    {fieldHeader}
-                    <Select
-                        multiple
-                        value={value.countries}
-                        onChange={e => onChange({ ...value, countries: e.target.value })}>
-                        <MenuItem disabled value="">
-                            {locale.members.search.countries.countryGroups}
-                        </MenuItem>
-                        {countryGroups}
-                        <MenuItem disabled value="">
-                            {locale.members.search.countries.countries}
-                        </MenuItem>
-                        {countries}
-                    </Select>
+                <div className="country-editor">
+                    <div className="country-editor-top">
+                        {fieldHeader}
+                        <Segmented selected={selectedType} onSelect={selected => {
+                            if (selected === 'all') selected = null;
+                            onChange({ ...value, type: selected });
+                        }}>
+                            {[
+                                { id: 'fee', label: locale.members.search.countries.fee },
+                                { id: 'address', label: locale.members.search.countries.address },
+                                { id: 'all', label: locale.members.search.countries.all },
+                            ]}
+                        </Segmented>
+                    </div>
+                    <CountryPicker
+                        onChange={countries => onChange({ ...value, countries })}
+                        value={value.countries} />
                 </div>
             );
         }

@@ -41,14 +41,15 @@ const FIELDS = {
     codeholderType ({ value, member }) {
         let icon;
         if (!value) return <span className="codeholder-type-placeholder" />;
-        const { enabled } = member;
+        const { enabled, isDead } = member;
         if (value === 'human' && enabled) icon = <PersonIcon />;
         else if (enabled) icon = <BusinessIcon />;
         else if (value === 'human') icon = <CodeholderDisabledIcon />;
         else icon = <DomainDisabledIcon />;
 
         let title = locale.members.fields.codeholderTypes[value];
-        if (!enabled) title += ` (${locale.members.fields.codeholderDisabledTitle})`;
+        if (!enabled && !isDead) title += ` (${locale.members.fields.codeholderDisabledTitle})`;
+        else if (!enabled) title += ` (${locale.members.fields.codeholderDeadTitle})`;
 
         return (
             <span

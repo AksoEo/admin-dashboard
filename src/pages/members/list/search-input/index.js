@@ -213,6 +213,7 @@ class PrimarySearch extends React.PureComponent {
                 <NativeSelect
                     className="search-field"
                     value={this.props.searchField}
+                    onClick={e => this.props.submitted && e.stopPropagation()}
                     onChange={e => this.props.onSearchFieldChange(e.target.value)}>
                     {this.props.searchableFields.map(field => (
                         <option value={field} key={field}>

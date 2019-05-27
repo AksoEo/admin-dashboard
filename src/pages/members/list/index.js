@@ -27,6 +27,7 @@ const initialState = () => ({
 
 const TMP_SELECTED_FIELDS = {
     'nameOrCode': ['name', 'code'],
+    'address': ['addressLatin'],
 };
 
 export default class MembersSearch extends React.PureComponent {
@@ -61,13 +62,15 @@ export default class MembersSearch extends React.PureComponent {
         data.removeListener('reset-page', this.onResetPage);
     }
 
+    mostRecentlyEncodedQuery = null;
+
     componentDidUpdate (prevProps) {
         if (prevProps.query !== this.props.query) {
             if (this.props.query === '') {
                 // reset
                 if (this.dontResetState) this.dontResetState = false;
                 else this.setState(initialState());
-            } else {
+            } else if (this.props.query !== this.mostRecentlyEncodedQuery) {
                 this.decodeQuery(this.props.query);
             }
         }
@@ -148,7 +151,9 @@ export default class MembersSearch extends React.PureComponent {
 
     setRequestURL () {
         // TODO: char limit check
-        this.context.replace(`/membroj/?${this.encodeQuery()}`);
+        const query = '?' + this.encodeQuery();
+        this.context.replace(`/membroj/${query}`);
+        this.mostRecentlyEncodedQuery = query;
     }
 
     onSubmit = () => {
@@ -157,9 +162,9 @@ export default class MembersSearch extends React.PureComponent {
         const tmpSelectedFields = (TMP_SELECTED_FIELDS[this.state.searchField]
             || [this.state.searchField]);
 
-        this.setState({ submitted: true, tmpSelectedFields });
-
-        this.setRequestURL();
+        this.setState({ submitted: true, tmpSelectedFields }, () => {
+            this.setRequestURL();
+        });
 
         const offset = this.state.rowsPerPage * this.state.page;
         const limit = this.state.rowsPerPage;
