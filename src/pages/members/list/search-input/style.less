@@ -112,6 +112,11 @@
         background: none;
         border: none;
 
+        &:focus {
+            outline: none;
+            opacity: 0.7;
+        }
+
         .expand-icon {
             vertical-align: middle;
         }
@@ -230,6 +235,8 @@
         }
 
         .membership-editor {
+            padding-right: 16px;
+
             .membership-item {
                 &:not([data-is-first="true"])::before {
                     content: attr(data-conjunction-label);
@@ -249,10 +256,20 @@
                     text-align: right;
                     margin-bottom: 8px;
 
-                    .numeric-range-editor {
-                        display: block;
-                        width: calc(100% - 50px);
-                        margin: 10px 30px 0 20px;
+                    &.membership-range-line {
+                        display: flex;
+                        margin-top: 8px;
+
+                        .membership-range-checkbox {
+                            margin: 16px;
+                            margin-left: 8px;
+                        }
+
+                        .numeric-range-editor {
+                            display: inline-block;
+                            width: calc(100% - 50px - 56px);
+                            margin: 16px 30px 0 20px;
+                        }
                     }
                 }
             }

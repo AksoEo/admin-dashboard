@@ -2,6 +2,8 @@ import React from 'react';
 import Switch from '@material-ui/core/Switch';
 import IconButton from '@material-ui/core/IconButton';
 import MenuItem from '@material-ui/core/MenuItem';
+import Checkbox from '@material-ui/core/Checkbox';
+import Select from '@material-ui/core/Select';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import moment from 'moment';
@@ -207,7 +209,9 @@ export default {
     membership (props) {
         const { value, onChange, fieldHeader } = props;
 
-        const items = value.map(({ invert, lifetime, givesMembership, range }, index) => (
+        const items = value.map(({
+            invert, lifetime, givesMembership, useRange, range, categories
+        }, index) => (
             <div
                 className="membership-item"
                 key={index}
@@ -296,13 +300,34 @@ export default {
                     </Segmented>
                 </div>
                 <div className="membership-item-line">
+                    <Select
+                        multiple
+                        value={categories}
+                        onChange={() => {}}>
+                        {categories.map(category => (
+                            <MenuItem key={category} value={category}>
+                                {category}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </div>
+                <div className="membership-item-line membership-range-line">
+                    <Checkbox
+                        className="membership-range-checkbox"
+                        checked={useRange}
+                        onChange={e => {
+                            const newValue = [...value];
+                            newValue[index] = { ...newValue[index], useRange: e.target.checked };
+                            onChange(newValue);
+                        }} />
                     <NumericRangeEditor
                         min={1887}
                         max={new Date().getFullYear()}
                         value={range}
+                        disabled={!useRange}
                         onChange={range => {
                             const newValue = [...value];
-                            newValue[index] = { ...newValue[index], range };
+                            newValue[index] = { ...newValue[index], range, useRange: true };
                             onChange(newValue);
                         }} />
                 </div>
@@ -310,13 +335,17 @@ export default {
         ));
 
         items.push(
-            <div className="membership-add-container">
-                <IconButton key={-1} className="membership-add-button" onClick={() => {
+            <div className="membership-add-container" key={-1}>
+                <IconButton className="membership-add-button" onClick={() => {
+                    const thisYear = new Date().getFullYear();
+
                     onChange(value.concat([{
                         invert: false,
                         lifetime: null,
                         givesMembership: null,
-                        range: new NumericRange(1887, new Date().getFullYear(), true, true),
+                        useRange: true,
+                        range: new NumericRange(thisYear, thisYear, true, true),
+                        categories: [],
                     }]));
                 }}>
                     <AddIcon />
