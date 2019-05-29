@@ -70,6 +70,10 @@ function userFields (state = [], action) {
         state = state.slice();
         state[action.index] = { ...state[action.index], sorting: action.sorting };
         return state;
+    case actions.MOVE_FIELD:
+        state = state.slice();
+        state.splice(action.target, 0, state.splice(action.index, 1)[0]);
+        return state;
     default:
         return state;
     }
