@@ -5,6 +5,7 @@ import { FIELDS, DetailPos } from './list/fields';
 import { transitionTitles } from '../../components/dom-utils';
 import locale from '../../locale';
 import client from '../../client';
+import './detail.less';
 
 // TODO: use FIELDS -> editorType & ./editors for editors
 

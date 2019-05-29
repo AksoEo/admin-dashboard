@@ -21,8 +21,6 @@ export default class MemberField extends React.PureComponent {
         member: PropTypes.object.isRequired,
         /** List of currently selected fields. */
         selectedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
-        /** Function for setting the transition title. */
-        transitionTitleRef: PropTypes.func,
     };
 
     render () {
@@ -88,7 +86,6 @@ const FIELDS = {
                         title={`${honorific ? honorific + ' ' : ''}${first} ${last}`}
                         ref={node => {
                             this.node = node;
-                            this.props.transitionTitleRef && this.props.transitionTitleRef(node);
                             if (node) this.resizeObserver.observe(node);
                         }}>
                         <span className="honorific" ref={node => {
@@ -116,7 +113,6 @@ const FIELDS = {
                         title={`${fullName} ${nameAbbrev}`}
                         ref={node => {
                             this.node = node;
-                            this.props.transitionTitleRef && this.props.transitionTitleRef(node);
                             if (node) this.resizeObserver.observe(node);
                         }}>
                         <span className="org-full-name" ref={node => this.truncatingName = node}>

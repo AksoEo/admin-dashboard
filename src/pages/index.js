@@ -37,7 +37,7 @@ export default [
                 id: 'members',
                 component: lazy(() => import(
                     /* webpackChunkName: "members", webpackPrefetch: true */
-                    './members'
+                    './members/list'
                 )),
                 icon: <AssignmentIndIcon />,
                 url: 'membroj',

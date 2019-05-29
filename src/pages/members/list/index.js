@@ -132,8 +132,7 @@ function Results (props) {
                         onAddField={props.onAddField}
                         onSetFieldSorting={props.onSetFieldSorting}
                         onEditFields={props.onOpenFieldPicker}
-                        openMemberWithTransitionTitleNode={() => {}}
-                        getMemberPath={() => ''}
+                        getMemberPath={id => `/membroj/${id}`}
                         list={props.list} />
                 </div>
             ) : (

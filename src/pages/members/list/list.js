@@ -12,7 +12,7 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import SearchIcon from '@material-ui/icons/Search';
 import MemberField from './field-views';
 import locale from '../../../locale';
-import { Link } from '../../../router';
+import { Link, routerContext } from '../../../router';
 import { Sorting } from './fields';
 import './style';
 
@@ -43,8 +43,6 @@ export default class MembersList extends React.PureComponent {
         onSetFieldSorting: PropTypes.func.isRequired,
         /** Called when the field picker modal is requested. */
         onEditFields: PropTypes.func.isRequired,
-        /** Called when a member was tapped. */
-        openMemberWithTransitionTitleNode: PropTypes.func.isRequired,
         /** Should return the path for a member ID. */
         getMemberPath: PropTypes.func.isRequired,
         /** The list of members. */
@@ -56,16 +54,6 @@ export default class MembersList extends React.PureComponent {
     };
 
     node = null;
-
-    /**
-     * Opens a member’s page.
-     * @param {string} id - the id of the member
-     * @param {?Node} node - the transition title node
-     */
-    openMember (id, node) {
-        this.setState({ opening: true });
-        this.props.openMemberWithTransitionTitleNode(id, node);
-    }
 
     render () {
         const selectedFields = this.props.userSelectedFields
@@ -153,7 +141,6 @@ export default class MembersList extends React.PureComponent {
                     key={item.id}
                     value={item}
                     selectedFields={selectedFields}
-                    onOpen={node => this.openMember(item.id, node)}
                     getMemberPath={this.props.getMemberPath}
                     // TODO: this
                     isSelected={false}
@@ -180,16 +167,15 @@ class MemberTableRow extends React.PureComponent {
     static propTypes = {
         selectedFields: PropTypes.array.isRequired,
         value: PropTypes.object.isRequired,
-        onOpen: PropTypes.func.isRequired,
         getMemberPath: PropTypes.func.isRequired,
         isSelected: PropTypes.bool.isRequired,
         onSelectChange: PropTypes.func.isRequired,
     };
 
-    transitionTitleNode = null;
+    static contextType = routerContext;
 
     onClick = () => {
-        this.props.onOpen(this.transitionTitleNode);
+        this.context.navigate(this.props.getMemberPath(this.props.value.id));
     };
 
     onLinkClick = e => {
@@ -209,8 +195,7 @@ class MemberTableRow extends React.PureComponent {
                         field={id}
                         value={value[id]}
                         member={value}
-                        selectedFields={selectedFields.map(field => field.id)}
-                        transitionTitleRef={node => this.transitionTitleNode = node} />
+                        selectedFields={selectedFields.map(field => field.id)} />
                 </Link>
             </TableCell>
         ));
