@@ -98,8 +98,8 @@ export const FILTERABLE_FIELDS = {
             }
             return {
                 [field]: {
-                    [value.range.startInclusive ? '$gte' : '$gt']: value.start,
-                    [value.range.endInclusive ? '$lte' : '$lt']: value.end,
+                    [value.range.startInclusive ? '$gte' : '$gt']: value.range.start,
+                    [value.range.endInclusive ? '$lte' : '$lt']: value.range.end,
                 },
             };
         },

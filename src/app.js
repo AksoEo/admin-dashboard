@@ -126,8 +126,9 @@ export default class App extends React.PureComponent {
         });
     }
 
-    onPopState = (e) => {
+    onPopState = e => {
         const currentPage = currentPageFromLocation();
+
         this.setState({
             currentPage,
             sidebarOpen: false,

@@ -60,7 +60,12 @@ export function setRowsPerPage (rowsPerPage) {
 
 export const UNSUBMIT = 'unsubmit';
 export function unsubmit () {
-    return { type: UNSUBMIT };
+    return (dispatch, getState, data) => {
+        dispatch({ type: UNSUBMIT });
+        data.currentRequest = -1;
+        clearTimeout(data.submitTimeout);
+        data.updateURLQuery();
+    };
 }
 
 export const SUBMIT = 'submit';
@@ -75,6 +80,8 @@ export function submit () {
             requestMembers(getState()).then(result => {
                 if (data.currentRequest !== currentRequest) return;
                 dispatch(receiveMembers(result.list, result.temporaryFields, result.stats));
+                data.updateURLQuery();
+                // TODO: return to page 0 if appropriate
             }).catch(err => {
                 // TODO: handle
                 console.error(err);

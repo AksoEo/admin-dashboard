@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { createStore, applyMiddleware } from 'redux';
 import { connect, Provider } from 'react-redux';
 import thunk from 'redux-thunk';
+import msgpack from 'msgpack-lite';
 import * as actions from './actions';
 import { searchPage } from './reducers';
 import TablePagination from '@material-ui/core/TablePagination';
@@ -176,61 +177,163 @@ Results.propTypes = {
     onOpenFieldPicker: PropTypes.func.isRequired,
 };
 
-const store = createStore(searchPage, {
-    search: {
-        field: 'nameOrCode',
-        query: '',
-    },
-    filters: Object.fromEntries(Object.keys(FILTERABLE_FIELDS).map(field => [field, {
-        enabled: false,
-        value: FILTERABLE_FIELDS[field].default(),
-    }])),
-    fields: {
-        fixed: [
-            {
-                id: 'codeholderType',
-                sorting: Sorting.NONE,
-            },
-        ],
-        user: [
-            {
-                id: 'code',
-                sorting: Sorting.ASC,
-            },
-            {
-                id: 'name',
-                sorting: Sorting.NONE,
-            },
-            {
-                id: 'age',
-                sorting: Sorting.NONE,
-            },
-            {
-                id: 'country',
-                sorting: Sorting.NONE,
-            },
-        ],
-    },
-    page: {
-        submitted: false,
-        filtersEnabled: false,
-        page: 0,
-        rowsPerPage: 10,
-    },
-    results: {
-        hasResults: false,
-        list: [],
-        temporaryFields: [],
-        stats: {
-            time: 0,
-            total: 0,
-            filtered: false,
-        },
-    },
-}, applyMiddleware(thunk.withExtraArgument({})));
+export default class MembersSearchContainer extends React.PureComponent {
+    static propTypes = {
+        query: PropTypes.string,
+    };
 
-export default function MembersSearchContainer () {
-    return <Provider store={store}><MembersSearch /></Provider>;
+    static contextType = routerContext;
+
+    constructor (props) {
+        super(props);
+
+        // TODO: decode props.query into this
+        this.store = createStore(searchPage, {
+            search: {
+                field: 'nameOrCode',
+                query: '',
+            },
+            filters: Object.fromEntries(Object.keys(FILTERABLE_FIELDS).map(field => [field, {
+                enabled: false,
+                value: FILTERABLE_FIELDS[field].default(),
+            }])),
+            fields: {
+                fixed: [
+                    {
+                        id: 'codeholderType',
+                        sorting: Sorting.NONE,
+                    },
+                ],
+                user: [
+                    {
+                        id: 'code',
+                        sorting: Sorting.ASC,
+                    },
+                    {
+                        id: 'name',
+                        sorting: Sorting.NONE,
+                    },
+                    {
+                        id: 'age',
+                        sorting: Sorting.NONE,
+                    },
+                    {
+                        id: 'country',
+                        sorting: Sorting.NONE,
+                    },
+                ],
+            },
+            page: {
+                submitted: false,
+                filtersEnabled: false,
+                page: 0,
+                rowsPerPage: 10,
+            },
+            results: {
+                hasResults: false,
+                list: [],
+                temporaryFields: [],
+                stats: {
+                    time: 0,
+                    total: 0,
+                    filtered: false,
+                },
+            },
+        }, applyMiddleware(thunk.withExtraArgument({
+            updateURLQuery: this.updateURLQuery,
+        })));
+
+        if (props.query) this.decodeQuery(props.query);
+    }
+
+    decodeQuery (query) {
+        query = query.replace(/^\?/, '');
+        const state = this.store.getState();
+
+        if (!query) {
+            this.store.dispatch(actions.unsubmit());
+            return;
+        }
+
+        try {
+            const serialized = msgpack.decode(Buffer.from(query, 'base64'));
+
+            this.store.dispatch(actions.setSearchField(serialized.f || 'nameOrCode'));
+            this.store.dispatch(actions.setSearchQuery(serialized.q || ''));
+
+            for (const id in state.filters) {
+                if (id in serialized.p) {
+                    let value = serialized.p[id];
+                    if (FILTERABLE_FIELDS[id].deserialize) {
+                        value = FILTERABLE_FIELDS[id].deserialize(value);
+                    }
+                    this.store.dispatch(actions.setFilterValue(id, value));
+                } else if (state.filters[id].enabled) {
+                    this.store.dispatch(actions.setFilterEnabled(id, false));
+                }
+            }
+
+            for (const field of state.fields.user) {
+                this.store.dispatch(actions.removeField(field.id));
+            }
+            let index = 0;
+            for (const field of serialized.c) {
+                const { i: id, s: sorting } = field;
+                this.store.dispatch(actions.addField(id));
+                this.store.dispatch(actions.setFieldSorting(index++, sorting));
+            }
+
+            this.store.dispatch(actions.setPage(serialized.pos[0]));
+            this.store.dispatch(actions.setRowsPerPage(serialized.pos[1]));
+            this.store.dispatch(actions.submit());
+        } catch (err) {
+            // TODO: handle error
+        }
+    }
+
+    encodeQuery () {
+        const state = this.store.getState();
+
+        if (state.page.submitted) {
+            const serialized = {};
+            if (state.search.query) {
+                serialized.f = state.search.field;
+                serialized.q = state.search.query;
+            }
+            serialized.p = {};
+            for (const id in state.filters) {
+                const filter = state.filters[id];
+                if (!filter.enabled) continue;
+                let value = filter.value;
+                if (FILTERABLE_FIELDS[id].serialize) value = FILTERABLE_FIELDS[id].serialize(value);
+                serialized.p[id] = value;
+            }
+            serialized.c = state.fields.user.map(f => ({ i: f.id, s: f.sorting }));
+            serialized.pos = [state.page.page, state.page.rowsPerPage];
+            return msgpack.encode(serialized).toString('base64');
+        } else return null;
+    }
+
+    updateURLQuery = () => {
+        let query = this.encodeQuery();
+        if (query) query = '?' + query;
+        else query = '';
+        if (query !== this.props.query) {
+            this.context.navigate(`/membroj/${query}`);
+        }
+    };
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.query !== this.props.query) this.decodeQuery(this.props.query);
+    }
+
+    render () {
+        return (
+            <div className="app-page members-page">
+                <Provider store={this.store}><MembersSearch /></Provider>
+            </div>
+        );
+    }
 }
 
 /** Members search page. Needs a refactor */
@@ -278,56 +381,6 @@ export class TmpMembersSearch extends React.PureComponent {
                 this.decodeQuery(this.props.query);
             }
         }
-    }
-
-    decodeQuery (query) {
-        query = query.replace(/^\?/, '');
-        try {
-            const {
-                field: searchField,
-                query: searchQuery,
-                filters: partialFilters,
-                fields: selectedFields,
-                page,
-                rowsPerPage,
-            } = data.decodeQuery(query);
-
-            // technically this should be a deep clone, but… (it still works fine)
-            const predicates = this.state.predicates.slice();
-
-            for (const item of partialFilters) {
-                for (const p of predicates) {
-                    if (p.field === item.field) {
-                        p.enabled = true;
-                        p.value = item.value;
-                    }
-                }
-            }
-
-            this.setState({
-                searchField: searchField || this.state.searchField,
-                searchQuery: searchQuery || this.state.searchQuery,
-                searchFilters: !!partialFilters.length,
-                predicates,
-                selectedFields,
-                page,
-                rowsPerPage,
-            }, this.onSubmit);
-        } catch (err) {
-            // TODO: handle
-            console.error('failed to decode query', err);
-        }
-    }
-
-    encodeQuery () {
-        return data.encodeQuery(
-            this.state.searchField,
-            this.state.searchQuery,
-            this.state.searchFilters ? this.state.predicates : [],
-            this.state.selectedFields,
-            this.state.page,
-            this.state.rowsPerPage,
-        );
     }
 
     onResult = result => {
