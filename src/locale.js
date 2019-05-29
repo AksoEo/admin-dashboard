@@ -156,6 +156,7 @@ export default {
                     all: 'ne gravas',
                 },
                 conjunction: 'kaj',
+                placeholder: '[[select categories]]',
             },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',

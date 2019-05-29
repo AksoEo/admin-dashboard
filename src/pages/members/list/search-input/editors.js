@@ -11,7 +11,7 @@ import NumericRangeEditor, { NumericRange } from '../../editors/numeric-range';
 import Segmented from '../../../../components/segmented';
 import locale from '../../../../locale';
 import CountryPicker from './country-picker';
-import data from '../data';
+import cache from '../cache';
 
 /* eslint-disable react/prop-types */
 
@@ -93,8 +93,8 @@ export default {
 
         componentDidMount () {
             Promise.all([
-                data.getCountries(),
-                data.getCountryGroups(),
+                cache.getCountries(),
+                cache.getCountryGroups(),
             ])
                 .then(([countries, countryGroups]) => this.setState({ countries, countryGroups }));
         }
@@ -206,158 +206,181 @@ export default {
     hasEmail: tripleSwitchYesNo(locale.members.search.existence),
     hasPassword: tripleSwitchYesNo(locale.members.search.boolean),
     isDead: tripleSwitchYesNo(locale.members.search.boolean),
-    membership (props) {
-        const { value, onChange, fieldHeader } = props;
+    membership: class Membership extends React.PureComponent {
+        state = {
+            categories: [],
+        }
 
-        const items = value.map(({
-            invert, lifetime, givesMembership, useRange, range, categories
-        }, index) => (
-            <div
-                className="membership-item"
-                key={index}
-                data-is-first={index === 0}
-                data-conjunction-label={locale.members.search.membership.conjunction}>
-                <IconButton className="membership-remove" onClick={() => {
-                    const newValue = [...value];
-                    newValue.splice(index, 1);
-                    onChange(newValue);
-                }}>
-                    <RemoveIcon />
-                </IconButton>
-                <div className="membership-item-line">
-                    <Segmented selected={invert ? 'yes' : 'no'} onSelect={selected => {
+        componentDidMount () {
+            cache.getMembershipCategories().then(categories => this.setState({ categories }));
+        }
+
+        render () {
+            const { value, onChange, fieldHeader } = this.props;
+            const { categories: availableCategories } = this.state;
+
+            const items = value.map(({
+                invert, lifetime, givesMembership, useRange, range, categories,
+            }, index) => (
+                <div
+                    className="membership-item"
+                    key={index}
+                    data-is-first={index === 0}
+                    data-conjunction-label={locale.members.search.membership.conjunction}>
+                    <IconButton className="membership-remove" onClick={() => {
                         const newValue = [...value];
-                        newValue[index] = { ...newValue[index], invert: selected === 'yes' };
+                        newValue.splice(index, 1);
                         onChange(newValue);
                     }}>
-                        {[
-                            {
-                                id: 'yes',
-                                label: locale.members.search.membership.invert.yes,
-                            },
-                            {
-                                id: 'no',
-                                label: locale.members.search.membership.invert.no,
-                            },
-                        ]}
-                    </Segmented>
-                </div>
-                <div className="membership-item-line">
-                    <Segmented
-                        selected={lifetime ? 'yes' : lifetime === false ? 'no' : 'all'}
-                        onSelect={selected => {
+                        <RemoveIcon />
+                    </IconButton>
+                    <div className="membership-item-line">
+                        <Segmented selected={invert ? 'yes' : 'no'} onSelect={selected => {
                             const newValue = [...value];
-                            newValue[index] = {
-                                ...newValue[index],
-                                lifetime: selected === 'yes'
-                                    ? true : selected === 'no' ? false : null,
-                            };
+                            newValue[index] = { ...newValue[index], invert: selected === 'yes' };
                             onChange(newValue);
                         }}>
-                        {[
-                            {
-                                id: 'yes',
-                                label: locale.members.search.membership.lifetime.yes,
-                            },
-                            {
-                                id: 'no',
-                                label: locale.members.search.membership.lifetime.no,
-                            },
-                            {
-                                id: 'all',
-                                label: locale.members.search.membership.lifetime.all,
-                            },
-                        ]}
-                    </Segmented>
+                            {[
+                                {
+                                    id: 'yes',
+                                    label: locale.members.search.membership.invert.yes,
+                                },
+                                {
+                                    id: 'no',
+                                    label: locale.members.search.membership.invert.no,
+                                },
+                            ]}
+                        </Segmented>
+                    </div>
+                    <div className="membership-item-line">
+                        <Segmented
+                            selected={lifetime ? 'yes' : lifetime === false ? 'no' : 'all'}
+                            onSelect={selected => {
+                                const newValue = [...value];
+                                newValue[index] = {
+                                    ...newValue[index],
+                                    lifetime: selected === 'yes'
+                                        ? true : selected === 'no' ? false : null,
+                                };
+                                onChange(newValue);
+                            }}>
+                            {[
+                                {
+                                    id: 'yes',
+                                    label: locale.members.search.membership.lifetime.yes,
+                                },
+                                {
+                                    id: 'no',
+                                    label: locale.members.search.membership.lifetime.no,
+                                },
+                                {
+                                    id: 'all',
+                                    label: locale.members.search.membership.lifetime.all,
+                                },
+                            ]}
+                        </Segmented>
+                    </div>
+                    <div className="membership-item-line">
+                        <Segmented
+                            selected={givesMembership
+                                ? 'yes' : givesMembership === false ? 'no' : 'all'}
+                            onSelect={selected => {
+                                const newValue = [...value];
+                                newValue[index] = {
+                                    ...newValue[index],
+                                    givesMembership: selected === 'yes'
+                                        ? true : selected === 'no' ? false : null,
+                                };
+                                onChange(newValue);
+                            }}>
+                            {[
+                                {
+                                    id: 'yes',
+                                    label: locale.members.search.membership.givesMembership.yes,
+                                },
+                                {
+                                    id: 'no',
+                                    label: locale.members.search.membership.givesMembership.no,
+                                },
+                                {
+                                    id: 'all',
+                                    label: locale.members.search.membership.givesMembership.all,
+                                },
+                            ]}
+                        </Segmented>
+                    </div>
+                    <div className="membership-item-line">
+                        <Select
+                            className="membership-categories"
+                            multiple
+                            value={categories}
+                            onChange={e => {
+                                const newValue = [...value];
+                                newValue[index] = {
+                                    ...newValue[index],
+                                    categories: e.target.value,
+                                };
+                                onChange(newValue);
+                            }}
+                            renderValue={value => value
+                                .map(id => availableCategories[id].nameAbbrev)
+                                .join(', ') || locale.members.search.membership.placeholder}
+                            displayEmpty={true}>
+                            {Object.keys(availableCategories).map(id => (
+                                <MenuItem key={id} value={id}>
+                                    {availableCategories[id].name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </div>
+                    <div className="membership-item-line membership-range-line">
+                        <Checkbox
+                            className="membership-range-checkbox"
+                            checked={useRange}
+                            onChange={e => {
+                                const newValue = [...value];
+                                newValue[index] = { ...newValue[index], useRange: e.target.checked };
+                                onChange(newValue);
+                            }} />
+                        <NumericRangeEditor
+                            min={1887}
+                            max={new Date().getFullYear()}
+                            value={range}
+                            disabled={!useRange}
+                            onChange={range => {
+                                const newValue = [...value];
+                                newValue[index] = { ...newValue[index], range, useRange: true };
+                                onChange(newValue);
+                            }} />
+                    </div>
                 </div>
-                <div className="membership-item-line">
-                    <Segmented
-                        selected={givesMembership
-                            ? 'yes' : givesMembership === false ? 'no' : 'all'}
-                        onSelect={selected => {
-                            const newValue = [...value];
-                            newValue[index] = {
-                                ...newValue[index],
-                                givesMembership: selected === 'yes'
-                                    ? true : selected === 'no' ? false : null,
-                            };
-                            onChange(newValue);
-                        }}>
-                        {[
-                            {
-                                id: 'yes',
-                                label: locale.members.search.membership.givesMembership.yes,
-                            },
-                            {
-                                id: 'no',
-                                label: locale.members.search.membership.givesMembership.no,
-                            },
-                            {
-                                id: 'all',
-                                label: locale.members.search.membership.givesMembership.all,
-                            },
-                        ]}
-                    </Segmented>
-                </div>
-                <div className="membership-item-line">
-                    <Select
-                        multiple
-                        value={categories}
-                        onChange={() => {}}>
-                        {categories.map(category => (
-                            <MenuItem key={category} value={category}>
-                                {category}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </div>
-                <div className="membership-item-line membership-range-line">
-                    <Checkbox
-                        className="membership-range-checkbox"
-                        checked={useRange}
-                        onChange={e => {
-                            const newValue = [...value];
-                            newValue[index] = { ...newValue[index], useRange: e.target.checked };
-                            onChange(newValue);
-                        }} />
-                    <NumericRangeEditor
-                        min={1887}
-                        max={new Date().getFullYear()}
-                        value={range}
-                        disabled={!useRange}
-                        onChange={range => {
-                            const newValue = [...value];
-                            newValue[index] = { ...newValue[index], range, useRange: true };
-                            onChange(newValue);
-                        }} />
-                </div>
-            </div>
-        ));
+            ));
 
-        items.push(
-            <div className="membership-add-container" key={-1}>
-                <IconButton className="membership-add-button" onClick={() => {
-                    const thisYear = new Date().getFullYear();
+            items.push(
+                <div className="membership-add-container" key={-1}>
+                    <IconButton className="membership-add-button" onClick={() => {
+                        const thisYear = new Date().getFullYear();
 
-                    onChange(value.concat([{
-                        invert: false,
-                        lifetime: null,
-                        givesMembership: null,
-                        useRange: true,
-                        range: new NumericRange(thisYear, thisYear, true, true),
-                        categories: [],
-                    }]));
-                }}>
-                    <AddIcon />
-                </IconButton>
-            </div>
-        );
+                        onChange(value.concat([{
+                            invert: false,
+                            lifetime: null,
+                            givesMembership: null,
+                            useRange: true,
+                            range: new NumericRange(thisYear, thisYear, true, true),
+                            categories: [],
+                        }]));
+                    }}>
+                        <AddIcon />
+                    </IconButton>
+                </div>
+            );
 
-        return (
-            <div className={'membership-editor' + (!value.length ? ' is-empty' : '')}>
-                {fieldHeader}
-                {items}
-            </div>
-        );
+            return (
+                <div className={'membership-editor' + (!value.length ? ' is-empty' : '')}>
+                    {fieldHeader}
+                    {items}
+                </div>
+            );
+        }
     },
 };

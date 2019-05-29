@@ -15,7 +15,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
 import locale from '../../../../locale';
-import data from '../data';
+import cache from '../cache';
 
 /** Converts a letter to a regional indicator */
 const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
@@ -36,8 +36,8 @@ export default class CountryPicker extends React.PureComponent {
     };
 
     componentDidMount () {
-        data.getCountries().then(countries => this.setState({ countries }));
-        data.getCountryGroups().then(countryGroups => this.setState({ countryGroups }));
+        cache.getCountries().then(countries => this.setState({ countries }));
+        cache.getCountryGroups().then(countryGroups => this.setState({ countryGroups }));
     }
 
     render () {

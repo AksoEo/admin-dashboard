@@ -8,7 +8,7 @@ import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
 import { UEACode } from 'akso-client';
 import moment from 'moment';
 import locale from '../../../locale';
-import data from './data';
+import cache from './cache';
 
 /** Renders a single member field. */
 export default class MemberField extends React.PureComponent {
@@ -161,7 +161,7 @@ const FIELDS = {
         state = {};
 
         componentDidMount () {
-            data.getCountries().then(countries => this.setState({ countries }));
+            cache.getCountries().then(countries => this.setState({ countries }));
         }
 
         getCountryName (name) {
@@ -207,7 +207,7 @@ const FIELDS = {
     addressLatin: class AddressLatin extends React.PureComponent {
         state = {};
         componentDidMount () {
-            data.getCountries().then(countries => this.setState({ countries }));
+            cache.getCountries().then(countries => this.setState({ countries }));
         }
         render () {
             let { value } = this.props;
