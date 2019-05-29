@@ -18,6 +18,11 @@ export const FILTERABLE_FIELDS = {
         isNone (value) {
             return value.human && value.org;
         },
+        toRequest (value) {
+            return {
+                codeholderType: value.human && value.org ? null : value.human ? 'human' : 'org',
+            };
+        },
         serialize (value) {
             return value.human && value.org ? '*' : value.human ? 'h' : 'o';
         },
@@ -33,6 +38,24 @@ export const FILTERABLE_FIELDS = {
         },
         isNone (value) {
             return !value.countries.length;
+        },
+        toRequest (value) {
+            const countryGroups = [];
+            const countries = [];
+            for (const item of value) {
+                if (item.startsWith('x')) countryGroups.push(item);
+                else countries.push(item);
+            }
+            const filterItems = [];
+            if (value.type === null || value.type === 'fee') {
+                filterItems.push({ feeCountry: { $in: countries } });
+                filterItems.push({ feeCountryGroups: { $hasAny: countryGroups } });
+            }
+            if (value.type === null || value.type === 'address') {
+                filterItems.push({ 'addressLatin.country': { $in: countries } });
+                filterItems.push({ 'addressCountryGroups': { $hasAny: countryGroups } });
+            }
+            return { $or: filterItems };
         },
     },
     enabled: {
@@ -68,6 +91,18 @@ export const FILTERABLE_FIELDS = {
             };
         },
         codeholderType: 'human',
+        toRequest (value) {
+            const field = value.atStartOfYear ? 'agePrimo' : 'age';
+            if (value.range.isCollapsed()) {
+                return { [field]: { $eq: value.range.collapsedValue() } };
+            }
+            return {
+                [field]: {
+                    [value.range.startInclusive ? '$gte' : '$gt']: value.start,
+                    [value.range.endInclusive ? '$lte' : '$lt']: value.end,
+                },
+            };
+        },
     },
     hasOldCode: {
         needsSwitch: true,
@@ -75,12 +110,18 @@ export const FILTERABLE_FIELDS = {
         default () {
             return false;
         },
+        toRequest (value) {
+            return { oldCode: value ? { $neq: null } : null };
+        },
     },
     hasEmail: {
         needsSwitch: true,
         invisibleSwitch: true,
         default () {
             return false;
+        },
+        toRequest (value) {
+            return { email: value ? { $neq: null } : null };
         },
     },
     hasPassword: {

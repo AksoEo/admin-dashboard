@@ -1,8 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { createStore, applyMiddleware } from 'redux';
+import { connect, Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+import * as actions from './actions';
+import { searchPage } from './reducers';
 import TablePagination from '@material-ui/core/TablePagination';
 import SearchInput from './search-input';
-import { filterableFields } from './search-input/predicates';
+import { FILTERABLE_FIELDS } from './search-input/fields';
 import { FIELDS, Sorting } from './fields';
 import MembersList from './list';
 import FieldPicker from './field-picker';
@@ -10,28 +15,226 @@ import { routerContext } from '../../../router';
 import locale from '../../../locale';
 import data from './data';
 
-const initialState = () => ({
-    searchField: 'nameOrCode',
-    searchQuery: '',
-    searchFilters: false,
-    predicates: filterableFields(),
-    selectedFields: MembersList.defaultSelectedFields(),
-    tmpSelectedFields: [],
-    submitted: false,
-    fieldPickerOpen: false,
-    list: null,
-    responseStats: null,
-    page: 0,
-    rowsPerPage: 10,
-});
-
 const TMP_SELECTED_FIELDS = {
     'nameOrCode': ['name', 'code'],
     'address': ['addressLatin'],
 };
 
+const MembersSearch = connect(
+    state => state,
+    dispatch => ({ dispatch }),
+)(class MembersSearch extends React.PureComponent {
+    static propTypes = {
+        search: PropTypes.object.isRequired,
+        filters: PropTypes.object.isRequired,
+        fields: PropTypes.object.isRequired,
+        page: PropTypes.object.isRequired,
+        results: PropTypes.object.isRequired,
+        dispatch: PropTypes.func.isRequired,
+    };
+
+    state = {
+        fieldPickerOpen: false,
+    };
+
+    render () {
+        const { search, filters, fields, page, results, dispatch } = this.props;
+
+        const onSearchFieldChange = field => dispatch(actions.setSearchField(field));
+        const onSearchQueryChange = query => dispatch(actions.setSearchQuery(query));
+        const onFiltersEnabledChange = enabled => dispatch(actions.setFiltersEnabled(enabled));
+        const onSetFilterValue = (id, value) => dispatch(actions.setFilterValue(id, value));
+        const onSetFilterEnabled = (id, enabled) => dispatch(actions.setFilterEnabled(id, enabled));
+        const onSetPage = (page) => dispatch(actions.setPage(page));
+        const onSetRowsPerPage = (rowsPerPage) => dispatch(actions.setRowsPerPage(rowsPerPage));
+        const onAddField = (id, prepend) => dispatch(actions.addField(id, prepend));
+        const onRemoveField = (i) => dispatch(actions.removeField(i));
+        const onSetFieldSorting = (i, sorting) => dispatch(actions.setFieldSorting(i, sorting));
+        const onMoveField = (i, j) => dispatch(actions.moveField(i, j));
+        const onSubmit = () => dispatch(actions.submit());
+        const onUnsubmit = () => dispatch(actions.unsubmit());
+
+        // FIXME: hacky solution
+        const maybeResubmit = f => (...args) => {
+            f(...args);
+            if (page.submitted) onSubmit();
+        };
+
+        const fixedFieldIds = fields.fixed.map(x => x.id);
+
+        // TODO: filter available fields to ones permitted by user permissions
+        const availableFields = Object.keys(FIELDS)
+            .filter(field => !FIELDS[field].hideColumn)
+            .filter(field => !fixedFieldIds.includes(field));
+
+        return (
+            <div className="members-list-page">
+                <FieldPicker
+                    open={this.state.fieldPickerOpen}
+                    available={availableFields}
+                    sortables={Object.keys(FIELDS).filter(f => FIELDS[f].sortable)}
+                    selected={fields.user}
+                    onAddField={maybeResubmit(onAddField)}
+                    onRemoveField={onRemoveField}
+                    onSetFieldSorting={maybeResubmit(onSetFieldSorting)}
+                    onMoveField={onMoveField}
+                    onClose={() => this.setState({ fieldPickerOpen: false })} />
+                <SearchInput
+                    field={search.field}
+                    onFieldChange={maybeResubmit(onSearchFieldChange)}
+                    query={search.query}
+                    onQueryChange={maybeResubmit(onSearchQueryChange)}
+                    filtersEnabled={page.filtersEnabled}
+                    onFiltersEnabledChange={maybeResubmit(onFiltersEnabledChange)}
+                    filters={filters}
+                    onSetFilterEnabled={maybeResubmit(onSetFilterEnabled)}
+                    onSetFilterValue={maybeResubmit(onSetFilterValue)}
+                    submitted={page.submitted}
+                    onSubmit={onSubmit}
+                    onUnsubmit={onUnsubmit} />
+                {results.hasResults && page.submitted ? (
+                    <Results
+                        isRestrictedByGlobalFilter={false} // TODO: this
+                        list={results.list}
+                        stats={results.stats}
+                        fixedFields={fields.fixed}
+                        userSelectedFields={fields.user}
+                        temporaryFields={results.temporaryFields}
+                        page={page.page}
+                        rowsPerPage={page.rowsPerPage}
+                        onSetPage={maybeResubmit(onSetPage)}
+                        onSetRowsPerPage={maybeResubmit(onSetRowsPerPage)}
+                        onAddField={maybeResubmit(onAddField)}
+                        onSetFieldSorting={maybeResubmit(onSetFieldSorting)}
+                        onOpenFieldPicker={() => this.setState({ fieldPickerOpen: true })} />
+                ) : null}
+            </div>
+        );
+    }
+});
+
+function Results (props) {
+    const count = props.list.length;
+    const total = props.stats.total;
+    const time = props.stats.time;
+    const filtered = props.stats.filtered;
+    const statsText = locale.members.resultStats(count, filtered, total, time);
+
+    return (
+        <div className="members-results">
+            <div className="stats-line">{statsText}</div>
+            {props.isRestrictedByGlobalFilter && (
+                <div className="global-filter-notice">
+                    {locale.members.globalFilterNotice}
+                </div>
+            )}
+            {props.list.length ? (
+                <div className="members-list-container">
+                    <MembersList
+                        fixedFields={props.fixedFields}
+                        userSelectedFields={props.userSelectedFields}
+                        temporaryFields={props.temporaryFields}
+                        onAddField={props.onAddField}
+                        onSetFieldSorting={props.onSetFieldSorting}
+                        onEditFields={props.onOpenFieldPicker}
+                        openMemberWithTransitionTitleNode={() => {}}
+                        getMemberPath={() => ''}
+                        list={props.list} />
+                </div>
+            ) : (
+                <div className="members-list-no-results">
+                    {locale.members.noResults}
+                </div>
+            )}
+            {!!props.list.length && <TablePagination
+                className="table-pagination"
+                component="div"
+                count={total | 0}
+                labelDisplayedRows={locale.members.pagination.displayedRows}
+                labelRowsPerPage={locale.members.pagination.rowsPerPage}
+                page={props.page}
+                rowsPerPage={props.rowsPerPage}
+                onChangePage={(e, page) => props.onSetPage(page)}
+                onChangeRowsPerPage={e => props.onSetRowsPerPage(e.target.value)} />}
+        </div>
+    );
+}
+
+Results.propTypes = {
+    isRestrictedByGlobalFilter: PropTypes.bool.isRequired,
+    list: PropTypes.array.isRequired,
+    stats: PropTypes.object.isRequired,
+    fixedFields: PropTypes.array.isRequired,
+    userSelectedFields: PropTypes.array.isRequired,
+    temporaryFields: PropTypes.array.isRequired,
+    page: PropTypes.number.isRequired,
+    rowsPerPage: PropTypes.number.isRequired,
+    onSetPage: PropTypes.func.isRequired,
+    onSetRowsPerPage: PropTypes.func.isRequired,
+    onAddField: PropTypes.func.isRequired,
+    onSetFieldSorting: PropTypes.func.isRequired,
+    onOpenFieldPicker: PropTypes.func.isRequired,
+};
+
+const store = createStore(searchPage, {
+    search: {
+        field: 'nameOrCode',
+        query: '',
+    },
+    filters: Object.fromEntries(Object.keys(FILTERABLE_FIELDS).map(field => [field, {
+        enabled: false,
+        value: FILTERABLE_FIELDS[field].default(),
+    }])),
+    fields: {
+        fixed: [
+            {
+                id: 'codeholderType',
+                sorting: Sorting.NONE,
+            },
+        ],
+        user: [
+            {
+                id: 'code',
+                sorting: Sorting.ASC,
+            },
+            {
+                id: 'name',
+                sorting: Sorting.NONE,
+            },
+            {
+                id: 'age',
+                sorting: Sorting.NONE,
+            },
+            {
+                id: 'country',
+                sorting: Sorting.NONE,
+            },
+        ],
+    },
+    page: {
+        submitted: false,
+        filtersEnabled: false,
+        page: 0,
+        rowsPerPage: 10,
+    },
+    results: {
+        hasResults: false,
+        list: [],
+        temporaryFields: [],
+        stats: {
+            time: 0,
+            total: 0,
+            filtered: false,
+        },
+    },
+}, applyMiddleware(thunk.withExtraArgument({})));
+
+export default function MembersSearchContainer () {
+    return <Provider store={store}><MembersSearch /></Provider>;
+}
+
 /** Members search page. Needs a refactor */
-export default class MembersSearch extends React.PureComponent {
+export class TmpMembersSearch extends React.PureComponent {
     static propTypes = {
         openMember: PropTypes.func.isRequired,
         getMemberPath: PropTypes.func.isRequired,
@@ -40,7 +243,7 @@ export default class MembersSearch extends React.PureComponent {
 
     static contextType = routerContext;
 
-    state = initialState();
+    state = {};
 
     componentDidMount () {
         data.on('result', this.onResult);
@@ -70,7 +273,7 @@ export default class MembersSearch extends React.PureComponent {
             if (this.props.query === '') {
                 // reset
                 if (this.dontResetState) this.dontResetState = false;
-                else this.setState(initialState());
+                else this.setState({});
             } else if (this.props.query !== this.mostRecentlyEncodedQuery) {
                 this.decodeQuery(this.props.query);
             }

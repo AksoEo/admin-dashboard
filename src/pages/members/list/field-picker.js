@@ -36,12 +36,12 @@ export default class FieldPicker extends React.PureComponent {
         available: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** The list of sortable fields. */
         sortables: PropTypes.arrayOf(PropTypes.string).isRequired,
-        /** The list of fixed fields that won’t be displayed in the options. */
-        permanent: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** The list of currently selected fields with their sorting type. */
         selected: PropTypes.arrayOf(PropTypes.object).isRequired,
-        /** `selected` change handler. */
-        onChange: PropTypes.func.isRequired,
+        onAddField: PropTypes.func.isRequired,
+        onRemoveField: PropTypes.func.isRequired,
+        onSetFieldSorting: PropTypes.func.isRequired,
+        onMoveField: PropTypes.func.isRequired,
         /** If true, will show the modal. */
         open: PropTypes.bool.isRequired,
         /** Close handler. */
@@ -67,7 +67,6 @@ export default class FieldPicker extends React.PureComponent {
 
     render () {
         const fields = [];
-        const nodeIndexToSelectedIndex = {};
         const selectedFieldNames = [];
 
         let searchResults = this.props.available.map(field => ({
@@ -84,46 +83,17 @@ export default class FieldPicker extends React.PureComponent {
             selectedFieldNames.push(field.id);
             const index = i++;
 
-            if (this.props.permanent.includes(field.id)) {
-                continue;
-            }
-
             if (!searchResults.includes(field.id)) continue;
 
-            const onCheckboxClick = () => {
-                const selected = this.props.selected.slice();
-                let index;
-                for (let i = 0; i < selected.length; i++) {
-                    if (selected[i].id === field.id) {
-                        index = i;
-                        break;
-                    }
-                }
-                selected.splice(index, 1);
-                this.props.onChange(selected);
-            };
+            const onCheckboxClick = () => this.props.onRemoveField(index);
 
             const sortingControl = this.props.sortables.includes(field.id)
                 ? (
                     <SortingControl
                         value={field.sorting}
-                        onChange={sorting => {
-                            const selected = this.props.selected.slice();
-                            let index;
-                            for (let i = 0; i < selected.length; i++) {
-                                if (selected[i].id === field.id) {
-                                    index = i;
-                                    break;
-                                }
-                            }
-                            selected[index] = { ...selected[index] };
-                            selected[index].sorting = sorting;
-                            this.props.onChange(selected);
-                        }} />
+                        onChange={sorting => this.props.onSetFieldSorting(index, sorting)} />
                 )
                 : null;
-
-            nodeIndexToSelectedIndex[fields.length] = index;
 
             fields.push(
                 <div className="field-picker-field selected" key={field.id}>
@@ -143,14 +113,7 @@ export default class FieldPicker extends React.PureComponent {
             fields.push(
                 <div
                     className="field-picker-field" key={field}
-                    onClick={() => {
-                        const selected = this.props.selected.slice();
-                        selected.push({
-                            id: field,
-                            sorting: Sorting.NONE,
-                        });
-                        this.props.onChange(selected);
-                    }}>
+                    onClick={() => this.props.onAddField(field)}>
                     <Checkbox checked={false} />
                     <div className="field-label">
                         {locale.members.fields[field]}
@@ -199,16 +162,9 @@ export default class FieldPicker extends React.PureComponent {
                             placeholder={locale.members.fieldPicker.searchPlaceholder} />
                     </div>
                     <RearrangingList
-                        onMove={(fromIndex, toIndex) => {
-                            const selected = this.props.selected.slice();
-                            fromIndex = nodeIndexToSelectedIndex[fromIndex];
-                            toIndex = nodeIndexToSelectedIndex[toIndex];
-                            const [item] = selected.splice(fromIndex, 1);
-                            selected.splice(toIndex, 0, item);
-                            this.props.onChange(selected);
-                        }}
-                        canMove={index => index in nodeIndexToSelectedIndex}
-                        isItemDraggable={index => index in nodeIndexToSelectedIndex}>
+                        onMove={(fromIndex, toIndex) => this.props.onMoveField(fromIndex, toIndex)}
+                        canMove={index => index < this.props.selected.length}
+                        isItemDraggable={index => index < this.props.selected.length}>
                         {fields}
                     </RearrangingList>
                 </DialogContent>

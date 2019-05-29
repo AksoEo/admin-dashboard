@@ -32,12 +32,15 @@ const FIELDS_BTN_COLUMN = 'codeholderType';
  */
 export default class MembersList extends React.PureComponent {
     static propTypes = {
-        /** List of selected fields. See `defaultFields` for an example. */
-        selectedFields: PropTypes.arrayOf(PropTypes.object).isRequired,
-        /** List of temporary selected fields which are only there because of the search query. */
-        tmpSelectedFields: PropTypes.arrayOf(PropTypes.string).isRequired,
+        /** List of permanent fields. */
+        fixedFields: PropTypes.arrayOf(PropTypes.object).isRequired,
+        /** List of user-selected fields. */
+        userSelectedFields: PropTypes.arrayOf(PropTypes.object).isRequired,
+        /** List of temporary selected fields. */
+        temporaryFields: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** Called when the selected fields change. */
-        onFieldsChange: PropTypes.func.isRequired,
+        onAddField: PropTypes.func.isRequired,
+        onSetFieldSorting: PropTypes.func.isRequired,
         /** Called when the field picker modal is requested. */
         onEditFields: PropTypes.func.isRequired,
         /** Called when a member was tapped. */
@@ -48,34 +51,7 @@ export default class MembersList extends React.PureComponent {
         list: PropTypes.arrayOf(PropTypes.object).isRequired,
     };
 
-    /** Returns the default configuration. */
-    static defaultSelectedFields () {
-        return [
-            {
-                id: 'codeholderType',
-                sorting: Sorting.NONE,
-            },
-            {
-                id: 'code',
-                sorting: Sorting.ASC,
-            },
-            {
-                id: 'name',
-                sorting: Sorting.NONE,
-            },
-            {
-                id: 'age',
-                sorting: Sorting.NONE,
-            },
-            {
-                id: 'country',
-                sorting: Sorting.NONE,
-            },
-        ];
-    }
-
     state = {
-        template: null,
         opening: false,
     };
 
@@ -91,37 +67,23 @@ export default class MembersList extends React.PureComponent {
         this.props.openMemberWithTransitionTitleNode(id, node);
     }
 
-    changeSorting (id) {
-        for (let i = 0; i < this.props.selectedFields.length; i++) {
-            if (this.props.selectedFields[i].id === id) {
-                const selected = this.props.selectedFields.slice();
-                selected[i] = { ...selected[i] };
-                const current = selected[i].sorting;
-                if (current === Sorting.NONE) selected[i].sorting = Sorting.ASC;
-                else if (current === Sorting.ASC) selected[i].sorting = Sorting.DESC;
-                else selected[i].sorting = Sorting.NONE;
-                this.props.onFieldsChange(selected);
-                break;
-            }
-        }
-    }
-
-    selectTmpField (id) {
-        const selected = this.props.selectedFields.slice();
-        selected.splice(1, 0, { id, sorting: Sorting.NONE });
-        this.props.onFieldsChange(selected);
-    }
-
     render () {
-        const selectedFields = this.props.selectedFields.slice();
+        const selectedFields = this.props.userSelectedFields
+            .map((field, i) => ({ ...field, index: i }));
         const selectedFieldIds = selectedFields.map(x => x.id);
-        for (const tmpId of this.props.tmpSelectedFields) {
+
+        // prepend temporary fields that aren’t already selected
+        for (let i = this.props.temporaryFields.length - 1; i >= 0; i--) {
+            const tmpId = this.props.temporaryFields[i];
             if (!selectedFieldIds.includes(tmpId)) {
                 selectedFieldIds.push(tmpId);
-                // hacky: insert after codeholderType
-                // (unchecked invariant: codeholderType is in selected fields)
-                selectedFields.splice(1, 0, { id: tmpId, sorting: Sorting.NONE, isTmp: true });
+                selectedFields.unshift({ id: tmpId, sorting: Sorting.NONE, isTmp: true });
             }
+        }
+
+        // also prepend fixed fields
+        for (let i = this.props.fixedFields.length - 1; i >= 0; i--) {
+            selectedFields.unshift(this.props.fixedFields[i]);
         }
 
         const header = (
@@ -133,7 +95,7 @@ export default class MembersList extends React.PureComponent {
                             checked={false}
                             onChange={() => {}} />
                     </TableCell>
-                    {selectedFields.map(({ id, sorting, isTmp }) => {
+                    {selectedFields.map(({ id, sorting, isTmp, index }) => {
                         if (id === FIELDS_BTN_COLUMN) {
                             return (
                                 <TableCell key={id} className="table-header-fields-btn-container">
@@ -162,8 +124,16 @@ export default class MembersList extends React.PureComponent {
                                         active={!!sortDirection}
                                         direction={sortDirection || 'asc'}
                                         onClick={() => {
-                                            if (isTmp) this.selectTmpField(id);
-                                            else this.changeSorting(id);
+                                            if (isTmp) {
+                                                this.props.onAddField(id, true);
+                                            } else {
+                                                const newSorting = sorting === Sorting.NONE
+                                                    ? Sorting.ASC
+                                                    : sorting === Sorting.ASC
+                                                        ? Sorting.DESC
+                                                        : Sorting.NONE;
+                                                this.props.onSetFieldSorting(index, newSorting);
+                                            }
                                         }}>
                                         {locale.members.fields[id]}
                                     </TableSortLabel>

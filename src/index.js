@@ -27,7 +27,6 @@ function beginSession () {
             document.body.appendChild(loginRoot);
 
             const onLogin = function () {
-                window.localStorage.demoLoggedIn = true;
                 loginRoot.classList.add('animate-out');
                 setTimeout(() => {
                     document.body.removeChild(loginRoot);

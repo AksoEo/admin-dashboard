@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import NativeSelect from '@material-ui/core/NativeSelect';
+import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import PredicateEditor from './predicates';
+import editors from './editors';
 import locale from '../../../../locale';
 import { Spring, globalAnimator, lerp, clamp } from '../../../../animation';
 import { SEARCHABLE_FIELDS, FILTERABLE_FIELDS } from './fields';
@@ -18,19 +19,20 @@ export default class SearchInput extends React.PureComponent {
     static propTypes = {
         field: PropTypes.string.isRequired,
         query: PropTypes.any.isRequired,
-        expanded: PropTypes.bool.isRequired,
-        predicates: PropTypes.arrayOf(PropTypes.object).isRequired,
+        filters: PropTypes.object.isRequired,
+        filtersEnabled: PropTypes.bool.isRequired,
         onQueryChange: PropTypes.func.isRequired,
         onFieldChange: PropTypes.func.isRequired,
-        onExpandedChange: PropTypes.func.isRequired,
-        onPredicatesChange: PropTypes.func.isRequired,
+        onFiltersEnabledChange: PropTypes.func.isRequired,
+        onSetFilterEnabled: PropTypes.func.isRequired,
+        onSetFilterValue: PropTypes.func.isRequired,
         submitted: PropTypes.bool.isRequired,
         onUnsubmit: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
     };
 
-    toggleExpanded = () => {
-        this.props.onExpandedChange(!this.props.expanded);
+    toggleFiltersEnabled = () => {
+        this.props.onFiltersEnabledChange(!this.props.filtersEnabled);
     };
 
     onContainerClick = e => {
@@ -40,49 +42,20 @@ export default class SearchInput extends React.PureComponent {
         }
     }
 
-    emitPredicatesChange (predicates) {
-        // some fields are restricted to a codeholder type; this needs to be handled
-        let codeholderRestriction = null;
-        let invalid = false;
-        for (const predicate of predicates) {
-            if (!predicate.enabled) continue;
-            const fieldRestriction = FILTERABLE_FIELDS[predicate.field].codeholderType;
-            if (fieldRestriction) {
-                if (codeholderRestriction) {
-                    // can’t restrict to disjunct types
-                    invalid = true;
-                    break;
-                } else {
-                    codeholderRestriction = fieldRestriction;
-                }
-            }
-        }
-
-        if (!invalid) {
-            for (const predicate of predicates) {
-                if (predicate.field === 'codeholderType') {
-                    if (!invalid && codeholderRestriction) {
-                        predicate.value = codeholderRestriction === 'human'
-                            ? { human: true, org: false, _restricted: true }
-                            : { human: false, org: true, _restricted: true };
-                        predicate.enabled = true;
-                    } else {
-                        delete predicate.value._restricted;
-                    }
-                    break;
-                }
-            }
-        }
-
-        this.props.onPredicatesChange(predicates);
-    }
-
     render () {
         let className = 'members-search';
-        if (this.props.expanded) className += ' expanded';
+        if (this.props.filtersEnabled) className += ' expanded';
         if (this.props.submitted) className += ' submitted';
 
-        const filtersOnly = this.props.expanded && !this.props.query;
+        const filtersOnly = this.props.filtersEnabled && !this.props.query;
+
+        let hasEnabledFilters = false;
+        for (const id in this.props.filters) {
+            if (this.props.filters[id].enabled) {
+                hasEnabledFilters = true;
+                break;
+            }
+        }
 
         const listItems = [{
             node: <PrimarySearch
@@ -95,7 +68,7 @@ export default class SearchInput extends React.PureComponent {
                     }
                 }}
                 submitted={this.props.submitted}
-                expanded={this.props.expanded}
+                expanded={this.props.filtersEnabled}
                 filtersOnly={filtersOnly}
                 onSubmit={this.props.onSubmit}
                 searchableFields={SEARCHABLE_FIELDS}
@@ -105,47 +78,28 @@ export default class SearchInput extends React.PureComponent {
         }, {
             node: <button
                 className="filters-button"
-                onClick={!this.props.submitted && this.toggleExpanded}>
+                onClick={this.props.submitted ? undefined : this.toggleFiltersEnabled}>
                 {locale.members.search.filters}
-                {this.props.expanded
+                {this.props.filtersEnabled
                     ? <ExpandLessIcon className="expand-icon" />
                     : <ExpandMoreIcon className="expand-icon" />}
             </button>,
-            hidden: this.props.submitted && !this.props.predicates.filter(i => i.enabled).length,
+            hidden: this.props.submitted && !(hasEnabledFilters && this.props.filtersEnabled),
         }];
 
-        const offset = listItems.length;
-
-        for (const item of this.props.predicates) {
-            const index = listItems.length - offset;
-            let isLast = true;
-            for (let j = index + 1; j < this.props.predicates.length; j++) {
-                if (this.props.predicates[j].enabled) {
-                    isLast = false;
-                    break;
-                }
-            }
+        for (const id in this.props.filters) {
+            const item = this.props.filters[id];
 
             listItems.push({
-                node: <PredicateEditor
-                    key={item.field}
-                    field={item.field}
+                node: <Filter
+                    key={id}
+                    field={id}
                     enabled={item.enabled}
                     submitted={this.props.submitted}
                     value={item.value}
-                    onChange={value => {
-                        const predicates = this.props.predicates.slice();
-                        predicates[index].value = value;
-                        predicates[index].enabled = true;
-                        this.emitPredicatesChange(predicates);
-                    }}
-                    isLast={isLast}
-                    onEnabledChange={enabled => {
-                        const predicates = this.props.predicates.slice();
-                        predicates[index].enabled = enabled;
-                        this.emitPredicatesChange(predicates);
-                    }} />,
-                hidden: this.props.submitted ? !item.enabled : !this.props.expanded,
+                    onChange={value => this.props.onSetFilterValue(id, value)}
+                    onEnabledChange={enabled => this.props.onSetFilterEnabled(id, enabled)} />,
+                hidden: this.props.submitted && !item.enabled || !this.props.filtersEnabled,
             });
         }
 
@@ -228,6 +182,85 @@ class PrimarySearch extends React.PureComponent {
                         <KeyboardArrowDownIcon />
                     </IconButton>
                 )}
+            </div>
+        );
+    }
+}
+
+/** A single filter. */
+class Filter extends React.PureComponent {
+    static propTypes = {
+        /** The field ID. */
+        field: PropTypes.string.isRequired,
+        enabled: PropTypes.bool.isRequired,
+        value: PropTypes.any.isRequired,
+        onChange: PropTypes.func.isRequired,
+        onEnabledChange: PropTypes.func.isRequired,
+        /** Should be set to true if the form was submitted and the checkboxes should be hidden. */
+        submitted: PropTypes.bool.isRequired,
+    };
+
+    /**
+     * The DOM node.
+     * @type {Node|null}
+     */
+    node = null;
+
+    render () {
+        let editor = '?';
+
+        const field = FILTERABLE_FIELDS[this.props.field];
+        const userCanToggleEnabled = (field.needsSwitch && !field.invisibleSwitch)
+            && !this.props.submitted;
+
+        const fieldHeader = (
+            <div className="predicate-field-header">
+                {(field.needsSwitch && !field.invisibleSwitch && !this.props.submitted) ? (
+                    <Checkbox
+                        className="predicate-checkbox"
+                        checked={this.props.enabled}
+                        disabled={!userCanToggleEnabled}
+                        onChange={(e, checked) => this.props.onEnabledChange(checked)} />
+                ) : <div className="predicate-checkbox-placeholder" />}
+                <div className="predicate-field" onClick={() => {
+                    // also toggle enabled state when clicking on the label
+                    if (userCanToggleEnabled) {
+                        this.props.onEnabledChange(!this.props.enabled);
+                    }
+                }}>
+                    {locale.members.search.fields[this.props.field]}
+                </div>
+            </div>
+        );
+
+        const editorProps = {
+            field: field,
+            fieldHeader,
+            value: this.props.value,
+            onChange: value => {
+                this.props.onChange(value);
+                if (!(field.needsSwitch)) {
+                    this.props.onEnabledChange(!field.isNone(value));
+                }
+            },
+            enabled: this.props.enabled,
+            onEnabledChange: this.props.onEnabledChange,
+            disabled: !!(field.needsSwitch) && !this.props.enabled,
+        };
+
+        const Editor = editors[this.props.field];
+        if (Editor) {
+            editor = <Editor {...editorProps} />;
+        } else editor = fieldHeader;
+
+        let className = 'predicate';
+        if (!this.props.enabled) className += ' disabled';
+
+        return (
+            <div className={className} ref={node => this.node = node} onClick={e => {
+                if (this.props.submitted) e.stopPropagation();
+            }}>
+                {editor}
             </div>
         );
     }
@@ -353,7 +386,7 @@ class PaperList extends React.PureComponent {
         const items = [];
         for (let i = 0; i < this.props.children.length; i++) {
             const { node } = this.props.children[i];
-            const hidden = this.childStates[i] ? this.childStates[i].hidden : true;
+            const hidden = this.childStates[i] ? !!this.childStates[i].hidden.target : true;
             const style = this.getChildStyle(i);
             const index = i;
             items.push(
