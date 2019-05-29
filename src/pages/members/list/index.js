@@ -318,13 +318,16 @@ export default class MembersSearchContainer extends React.PureComponent {
         let query = this.encodeQuery();
         if (query) query = '?' + query;
         else query = '';
+        this.query = query;
         if (query !== this.props.query) {
             this.context.navigate(`/membroj/${query}`);
         }
     };
 
     componentDidUpdate (prevProps) {
-        if (prevProps.query !== this.props.query) this.decodeQuery(this.props.query);
+        if (prevProps.query !== this.props.query && this.props.query !== this.query) {
+            this.decodeQuery(this.props.query);
+        }
     }
 
     render () {

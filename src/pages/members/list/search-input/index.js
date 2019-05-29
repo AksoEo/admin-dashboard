@@ -100,6 +100,7 @@ export default class SearchInput extends React.PureComponent {
                     onChange={value => this.props.onSetFilterValue(id, value)}
                     onEnabledChange={enabled => this.props.onSetFilterEnabled(id, enabled)} />,
                 hidden: this.props.submitted && !item.enabled || !this.props.filtersEnabled,
+                staticHeight: true,
             });
         }
 

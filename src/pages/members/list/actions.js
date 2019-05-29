@@ -75,13 +75,20 @@ export function submit () {
 
         const currentRequest = data.currentRequest = Math.random();
 
+        // return to page 0 if the “request ID” changes
+        const state = getState();
+        const requestID = JSON.stringify([state.search, state.filters]);
+        if ('requestID' in data && requestID !== data.requestID && state.page !== 0) {
+            dispatch(setPage(0));
+        }
+        data.requestID = requestID;
+
         clearTimeout(data.submitTimeout);
         data.submitTimeout = setTimeout(() => {
             requestMembers(getState()).then(result => {
                 if (data.currentRequest !== currentRequest) return;
                 dispatch(receiveMembers(result.list, result.temporaryFields, result.stats));
                 data.updateURLQuery();
-                // TODO: return to page 0 if appropriate
             }).catch(err => {
                 // TODO: handle
                 console.error(err);

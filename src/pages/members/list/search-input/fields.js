@@ -138,4 +138,16 @@ export const FILTERABLE_FIELDS = {
             return false;
         },
     },
+    membership: {
+        default () {
+            return [];
+        },
+        isNone (value) {
+            return !value.length;
+        },
+        toRequest (value) {
+            // TODO
+            return {};
+        },
+    },
 };

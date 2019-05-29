@@ -127,6 +127,7 @@ export default {
                 birthdate: 'Naskiĝtago',
                 address: 'Adreso',
                 hasPassword: 'Kreis konton',
+                membership: '[[membership]]',
             },
             countries: {
                 // section labels in <select>
@@ -138,6 +139,23 @@ export default {
                 address: '[[address]]',
                 dialogTitle: '[[pick countries]]',
                 placeholder: '[[pick countries]]',
+            },
+            membership: {
+                invert: {
+                    yes: '[[invert]]',
+                    no: '[[don’t]]',
+                },
+                lifetime: {
+                    yes: '[[lifetime]]',
+                    no: '[[not lifetime]]',
+                    all: '[[either]]',
+                },
+                givesMembership: {
+                    yes: '[[gives m’ship]]',
+                    no: '[[doesn’t]]',
+                    all: '[[either]]',
+                },
+                conjunction: '[[and]]',
             },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',

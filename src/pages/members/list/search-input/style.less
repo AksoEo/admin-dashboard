@@ -229,6 +229,45 @@
             padding-right: 16px;
         }
 
+        .membership-editor {
+            .membership-item {
+                &:not([data-is-first="true"])::before {
+                    content: attr(data-conjunction-label);
+                    display: block;
+                    margin: 8px 0;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                    font-size: 0.875em;
+                }
+
+                .membership-remove {
+                    float: left;
+                }
+
+                .membership-item-line {
+                    text-align: right;
+                    margin-bottom: 8px;
+
+                    .numeric-range-editor {
+                        display: block;
+                        width: calc(100% - 50px);
+                        margin: 10px 30px 0 20px;
+                    }
+                }
+            }
+
+            .membership-add-container {
+                text-align: center;
+            }
+
+            &.is-empty {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
         @media (max-width: 600px) {
             border-bottom: 1px solid @separator;
 

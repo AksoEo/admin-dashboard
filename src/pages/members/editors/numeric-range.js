@@ -83,7 +83,7 @@ const PIN_ARROW_HEIGHT = 8;
 /** The width of the tip triangle of the exclusion arrow. */
 const EXCL_ARROW_WIDTH = 8;
 /** Extra outer padding for the canvas rendering context. */
-const CTX_PADDING = 20;
+const CTX_PADDING = 30;
 /** Time in milliseconds before a value will be considered not composed. */
 const COMPOSITION_TIMEOUT = 1500;
 
