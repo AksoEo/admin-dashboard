@@ -254,16 +254,24 @@ export default class MembersSearchContainer extends React.PureComponent {
             this.store.dispatch(actions.setSearchField(serialized.f || 'nameOrCode'));
             this.store.dispatch(actions.setSearchQuery(serialized.q || ''));
 
+            let enableFilters = false;
             for (const id in state.filters) {
+                enableFilters = true;
+
                 if (id in serialized.p) {
                     let value = serialized.p[id];
                     if (FILTERABLE_FIELDS[id].deserialize) {
                         value = FILTERABLE_FIELDS[id].deserialize(value);
                     }
                     this.store.dispatch(actions.setFilterValue(id, value));
+                    this.store.dispatch(actions.setFilterEnabled(id, true));
                 } else if (state.filters[id].enabled) {
                     this.store.dispatch(actions.setFilterEnabled(id, false));
                 }
+            }
+
+            if (enableFilters) {
+                this.store.dispatch(actions.setFiltersEnabled(true));
             }
 
             for (const field of state.fields.user) {

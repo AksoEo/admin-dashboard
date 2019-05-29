@@ -146,8 +146,70 @@ export const FILTERABLE_FIELDS = {
             return !value.length;
         },
         toRequest (value) {
-            // TODO
-            return {};
+            const items = value.map(({
+                invert, lifetime, givesMembership, useRange, range, categories,
+            }) => {
+                const filter = {};
+                if (givesMembership !== null) {
+                    filter.givesMembership = invert ? !givesMembership : givesMembership;
+                }
+                if (lifetime !== null) {
+                    filter.lifetime = invert ? !lifetime : lifetime;
+                }
+                if (useRange) {
+                    if (range.isCollapsed()) {
+                        const value = range.collapsedValue();
+                        filter.year = invert ? { $neq: value } : value;
+                    } else {
+                        const rangeMin = range.startInclusive ? range.start : range.start + 1;
+                        const rangeMax = range.endInclusive ? range.end : range.end - 1;
+                        if (invert) {
+                            filter.$or = [
+                                { year: { $gt: rangeMax } },
+                                { year: { $lt: rangeMin } },
+                            ];
+                        } else {
+                            filter.year = { $gte: rangeMin, $lte: rangeMax };
+                        }
+                    }
+                }
+                if (categories.length) {
+                    filter.categoryId = invert ? { $nin: categories } : { $in: categories };
+                }
+                return filter;
+            });
+
+            return { $membership: { $and: items } };
+        },
+        serialize (value) {
+            return value.map(({
+                invert, lifetime, givesMembership, useRange, range, categories,
+            }) => ({
+                i: invert,
+                l: lifetime,
+                g: givesMembership,
+                r: useRange ? {
+                    si: range.startInclusive,
+                    s: range.start,
+                    ei: range.endInclusive,
+                    e: range.end,
+                } : null,
+                c: categories,
+            }));
+        },
+        deserialize (value) {
+            const thisYear = new Date().getFullYear();
+
+            return value.map(({ i, l, g, r, c }) => ({
+                invert: i,
+                lifetime: l,
+                givesMembership: g,
+                useRange: r !== null,
+                range: r
+                    ? new NumericRange(r.s, r.e, r.si, r.ei)
+                    : new NumericRange(thisYear, thisYear, true, true),
+                categories: c,
+            }));
         },
     },
 };
