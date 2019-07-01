@@ -104,7 +104,7 @@ export default class MembersList extends React.PureComponent {
 
                             return (
                                 <TableCell
-                                    className={isTmp ? 'tmp-field' : ''}
+                                    className={'table-header-field' + (isTmp ? ' tmp-field' : '')}
                                     key={id}
                                     sortDirection={sortDirection}>
                                     {isTmp && <SearchIcon className="tmp-field-icon" />}

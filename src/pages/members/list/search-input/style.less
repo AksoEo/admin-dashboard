@@ -84,6 +84,7 @@
             .search-expand, .search-submit {
                 margin: 16px;
                 margin-top: 8px;
+                align-self: flex-end;
             }
         }
     }
@@ -237,19 +238,62 @@
         .membership-editor {
             padding-right: 16px;
 
+            .membership-conjunction-separator {
+                position: relative;
+                display: block;
+                margin: 8px 0;
+                text-align: center;
+                text-transform: uppercase;
+                font-weight: bold;
+                font-size: 0.875em;
+                animation: members-search-membership-separator-in 0.4s @easing;
+
+                &::before, &::after {
+                    content: '';
+                    position: absolute;
+                    background: currentColor;
+                    opacity: 0.2;
+                    top: 50%;
+                    height: 1px;
+                    width: 40%;
+                }
+                &::before {
+                    left: 16px;
+                }
+                &::after {
+                    right: 16px;
+                }
+
+                @keyframes members-search-membership-separator-in {
+                    from {
+                        transform: translateY(-50%);
+                        opacity: 0;
+                    }
+                }
+            }
+
             .membership-item {
-                &:not([data-is-first="true"])::before {
-                    content: attr(data-conjunction-label);
-                    display: block;
-                    margin: 8px 0;
-                    text-align: center;
-                    text-transform: uppercase;
-                    font-weight: bold;
-                    font-size: 0.875em;
+                padding: 16px;
+                border: 1px solid fade(@text, 20%);
+                border-radius: 4px;
+                animation: members-search-membership-item-in 0.4s @easing;
+
+                @keyframes members-search-membership-item-in {
+                    from {
+                        transform: translateY(-50%);
+                        clip-path: inset(49% 0 49% 0);
+                    }
+                    to {
+                        clip-path: inset(0 0 0 0);
+                    }
                 }
 
                 .membership-remove {
                     float: left;
+
+                    &:hover {
+                        color: @danger;
+                    }
                 }
 
                 .membership-item-line {
@@ -273,6 +317,8 @@
                         .numeric-range-editor {
                             display: inline-block;
                             width: calc(100% - 50px - 56px);
+                            // firefox has weird flexbox behavior with this element
+                            max-width: calc(100% - 50px - 56px);
                             margin: 16px 30px 0 20px;
                         }
                     }
@@ -280,6 +326,7 @@
             }
 
             .membership-add-container {
+                margin-top: 8px;
                 text-align: center;
             }
 

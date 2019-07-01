@@ -224,9 +224,7 @@ export default {
             }, index) => (
                 <div
                     className="membership-item"
-                    key={index}
-                    data-is-first={index === 0}
-                    data-conjunction-label={locale.members.search.membership.conjunction}>
+                    key={index}>
                     <IconButton className="membership-remove" onClick={() => {
                         const newValue = [...value];
                         newValue.splice(index, 1);
@@ -355,6 +353,15 @@ export default {
                     </div>
                 </div>
             ));
+
+            // intersperse items with conjunctions
+            for (let i = items.length - 1; i > 0; i--) {
+                items.splice(i, 0, (
+                    <div class="membership-conjunction-separator" key={`conj-${i}`}>
+                        {locale.members.search.membership.conjunction}
+                    </div>
+                ));
+            }
 
             items.push(
                 <div className="membership-add-container" key={-1}>
