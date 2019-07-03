@@ -167,6 +167,10 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
 
+            canvas {
+                position: absolute;
+            }
+
             &:focus {
                 outline: none;
             }
@@ -233,6 +237,31 @@
             align-items: center;
             justify-content: space-between;
             padding-right: 16px;
+        }
+
+        .active-member-editor {
+            display: flex;
+            padding: 8px 0; // numeric range editor gets clipped otherwise
+
+            .predicate-field-header {
+                flex-shrink: 0;
+            }
+
+            .numeric-range-editor {
+                width: 0;
+                flex: 1;
+                margin-left: 16px;
+            }
+
+            @media (max-width: 600px) {
+                display: block;
+
+                .numeric-range-editor {
+                    display: block;
+                    margin: 0 20px;
+                    width: calc(100% - 40px);
+                }
+            }
         }
 
         .membership-editor {

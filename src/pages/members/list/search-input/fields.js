@@ -212,4 +212,45 @@ export const FILTERABLE_FIELDS = {
             }));
         },
     },
+    isActiveMember: {
+        needsSwitch: true,
+        min: 1887,
+        max: new Date().getFullYear(),
+        default () {
+            return new NumericRange(1887, new Date().getFullYear(), true, true);
+        },
+        serialize (value) {
+            return [value.start, value.end, value.startInclusive, value.endInclusive];
+        },
+        deserialize (value) {
+            return new NumericRange(...value);
+        },
+        toRequest (value) {
+            const range = {};
+            if (value.isCollapsed()) {
+                range.$eq = value.collapsedValue();
+            } else {
+                if (value.startInclusive) range.$gte = value.start;
+                else range.$gt = value.start;
+                if (value.endInclusive) range.$lte = value.end;
+                else range.$lt = value.end;
+            }
+
+            return {
+                $membership: {
+                    givesMembership: true,
+                    $or: [
+                        {
+                            lifetime: false,
+                            year: range,
+                        },
+                        {
+                            lifetime: true,
+                            year: { $leq: range.start },
+                        },
+                    ],
+                },
+            };
+        },
+    },
 };

@@ -128,6 +128,7 @@ export default {
                 address: 'Adreso',
                 hasPassword: 'Kreis konton',
                 membership: 'Membreckategorioj',
+                isActiveMember: '[[isactivemember]]',
             },
             countries: {
                 // section labels in <select>

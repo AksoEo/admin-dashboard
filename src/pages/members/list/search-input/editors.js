@@ -396,4 +396,19 @@ export default {
             );
         }
     },
+    isActiveMember (props) {
+        const { field, value, onChange, fieldHeader, disabled } = props;
+
+        return (
+            <div className="active-member-editor">
+                {fieldHeader}
+                <NumericRangeEditor
+                    min={field.min}
+                    max={field.max}
+                    value={value}
+                    disabled={disabled}
+                    onChange={onChange} />
+            </div>
+        );
+    },
 };
