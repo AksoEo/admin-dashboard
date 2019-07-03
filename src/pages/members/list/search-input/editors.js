@@ -325,7 +325,13 @@ export default {
                                 .join(', ') || locale.members.search.membership.placeholder}
                             displayEmpty={true}>
                             {Object.keys(availableCategories).map(id => (
-                                <MenuItem key={id} value={id}>
+                                <MenuItem
+                                    key={id}
+                                    value={id}
+                                    className="members-list-membership-category">
+                                    <div className="membership-category-id">
+                                        {availableCategories[id].nameAbbrev}
+                                    </div>
                                     {availableCategories[id].name}
                                 </MenuItem>
                             ))}
