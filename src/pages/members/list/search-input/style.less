@@ -425,18 +425,67 @@
 }
 
 .country-picker-dialog {
-    .country-picker-split-view {
+    .multicol-list {
+        position: relative;
         display: flex;
         width: 100%;
         height: 100%;
         overflow: hidden;
         justify-content: stretch;
 
-        .split-list {
+        .column {
+            position: relative;
             flex: 1;
             min-width: 25vw;
             overflow-x: hidden;
             overflow-y: auto;
+        }
+
+        .list-item {
+            position: absolute;
+            height: 48px;
+            transition: background 0.2s;
+            border-radius: 4px;
+
+            &:hover {
+                background: @hover-background;
+            }
+
+            &.floating {
+                background: @card-background;
+            }
+
+            .country-item {
+                display: flex;
+                height: 100%;
+                align-items: stretch;
+                cursor: default;
+                line-height: 48px;
+
+                .country-icon, .country-check {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 48px;
+                }
+
+                .country-name {
+                    flex: 1;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+
+            &.floating .country-check {
+                animation: country-picker-country-check-in 0.3s @easing 0.2s backwards;
+
+                @keyframes country-picker-country-check-in {
+                    0% {
+                        transform: scale(0);
+                    }
+                }
+            }
         }
     }
 }

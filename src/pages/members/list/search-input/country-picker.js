@@ -4,15 +4,11 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
+import { Spring, globalAnimator, lerp } from '../../../../animation';
 import locale from '../../../../locale';
 import cache from '../cache';
 
@@ -56,38 +52,44 @@ export default class CountryPicker extends React.PureComponent {
             this.props.onChange(value);
         };
 
-        const selectedItems = this.props.value.map(id => (
-            <ListItem button key={id} onClick={onItemClick(id)}>
-                <ListItemIcon>
+        const selectedItems = this.props.value.map(id => ({
+            key: id,
+            column: 0,
+            node: <div class="country-item" onClick={onItemClick(id)}>
+                <div class="country-icon">
                     {id in this.state.countries
                         ? <span>{countryCodeToEmoji(id)}</span>
                         : <LanguageIcon />}
-                </ListItemIcon>
-                <ListItemText>
+                </div>
+                <div class="country-name">
                     {this.state.countries[id]
                         || this.state.countryGroups[id] && this.state.countryGroups[id].name}
-                </ListItemText>
-                <ListItemSecondaryAction>
+                </div>
+                <div class="country-check">
                     <CheckIcon />
-                </ListItemSecondaryAction>
-            </ListItem>
-        ));
+                </div>
+            </div>,
+        }));
 
         const availableItems = Object.keys(this.state.countryGroups)
             .filter(group => !this.props.value.includes(group))
-            .map(group => (
-                <ListItem button key={group} onClick={onItemClick(group)}>
-                    <ListItemIcon><LanguageIcon /></ListItemIcon>
-                    <ListItemText>{this.state.countryGroups[group].name}</ListItemText>
-                </ListItem>
-            )).concat(Object.keys(this.state.countries)
+            .map(group => ({
+                key: group,
+                column: 1,
+                node: <div class="country-item" onClick={onItemClick(group)}>
+                    <div class="country-icon"><LanguageIcon /></div>
+                    <div class="country-name">{this.state.countryGroups[group].name}</div>
+                </div>,
+            })).concat(Object.keys(this.state.countries)
                 .filter(country => !this.props.value.includes(country))
-                .map(country => (
-                    <ListItem button key={country} onClick={onItemClick(country)}>
-                        <ListItemIcon><span>{countryCodeToEmoji(country)}</span></ListItemIcon>
-                        <ListItemText>{this.state.countries[country]}</ListItemText>
-                    </ListItem>
-                )));
+                .map(country => ({
+                    key: country,
+                    column: 1,
+                    node: <div class="country-item" onClick={onItemClick(country)}>
+                        <div class="country-icon"><span>{countryCodeToEmoji(country)}</span></div>
+                        <div class="country-name">{this.state.countries[country]}</div>
+                    </div>,
+                })));
 
         return (
             <div className="country-picker" onClick={() => this.setState({ dialogOpen: true })}>
@@ -115,16 +117,144 @@ export default class CountryPicker extends React.PureComponent {
                         {locale.members.search.countries.dialogTitle}
                     </DialogTitle>
                     <DialogContent>
-                        <div className="country-picker-split-view">
-                            <List className="split-list">
-                                {selectedItems}
-                            </List>
-                            <List className="split-list">
-                                {availableItems}
-                            </List>
-                        </div>
+                        <MulticolList columns={2}>
+                            {selectedItems.concat(availableItems)}
+                        </MulticolList>
                     </DialogContent>
                 </Dialog>
+            </div>
+        );
+    }
+}
+
+const LI_HEIGHT = 48;
+
+/**
+ * Renders multiple columns with fixed order, with items able to be dragged in between.
+ */
+class MulticolList extends React.PureComponent {
+    static propTypes = {
+        children: PropTypes.arrayOf(PropTypes.object).isRequired,
+        columns: PropTypes.number.isRequired,
+    };
+
+    itemData = new Map();
+    columnRefs = [];
+
+    createItemData (item, index) {
+        const data = {
+            x: new Spring(1, 0.5),
+            y: new Spring(1, 0.5),
+            key: item.key,
+            column: item.column,
+            index,
+            vnode: item.node,
+        };
+        data.x.value = data.x.target = item.column;
+        data.y.value = data.y.target = index;
+        this.itemData[item.key] = data;
+    }
+
+    update (dt) {
+        let wantsUpdate = false;
+        for (const key in this.itemData) {
+            const item = this.itemData[key];
+            item.x.target = item.column;
+            item.y.target = item.index;
+            item.x.update(dt);
+            item.y.update(dt);
+
+            if (!wantsUpdate && (item.x.wantsUpdate() || item.y.wantsUpdate())) wantsUpdate = true;
+        }
+
+        if (!wantsUpdate) globalAnimator.deregister(this);
+        this.forceUpdate();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.children !== this.props.children) globalAnimator.register(this);
+    }
+
+    render () {
+        let columns = [];
+        const columnHeights = [];
+        for (let i = 0; i < this.props.columns; i++) {
+            columns.push([]);
+            columnHeights.push(0);
+        }
+
+        const itemKeys = new Set();
+        for (const item of this.props.children) {
+            if (!item.key) throw new Error('MulticolList: child has no key');
+            itemKeys.add(item.key);
+            if (!this.itemData[item.key]) {
+                this.createItemData(item, columns[item.column].length);
+            } else {
+                const data = this.itemData[item.key];
+                data.index = columnHeights[item.column];
+                columnHeights[item.column]++;
+                data.vnode = item.node;
+                data.column = item.column;
+            }
+            const data = this.itemData[item.key];
+            columns[Math.round(data.x.value)].push(data);
+        }
+
+        const isItemFixed = item => item.x.value === Math.round(item.x.value);
+        const columnScrollOffsets = this.columnRefs.map(column => column.scrollTop);
+        console.log(columnScrollOffsets);
+
+        const floatingItems = columns.flatMap(column => (
+            column.filter(item => !isItemFixed(item)).map(item => {
+                const leftCol = Math.floor(item.x.value);
+                const rightCol = Math.ceil(item.x.value);
+                const leftScroll = columnScrollOffsets[leftCol] | 0;
+                const rightScroll = columnScrollOffsets[rightCol] | 0;
+                const scrollOffset = lerp(leftScroll, rightScroll, item.x.value - leftCol);
+                const y = item.y.value * LI_HEIGHT - scrollOffset;
+
+                return (
+                    <div
+                        className="list-item floating"
+                        key={item.key}
+                        style={{
+                            width: `${100 / columns.length}%`,
+                            transform: `translate(${item.x.value * 100}%, ${y}px)`,
+                        }}>
+                        {item.vnode}
+                    </div>
+                );
+            })
+        ));
+
+        columns = columns.map((column, i) => (
+            <div
+                className="column"
+                ref={node => node && (this.columnRefs[i] = node)}
+                key={i}>
+                {column.filter(isItemFixed).map(item => (
+                    <div
+                        className="list-item"
+                        key={item.key}
+                        style={{
+                            width: '100%',
+                            transform: `translate(${
+                                (item.x.value - i) * 100}%, ${
+                                item.y.value * LI_HEIGHT}px)`,
+                        }}>
+                        {item.vnode}
+                    </div>
+                ))}
+                <div className="column-scroll-height" style={{
+                    height: column.length * LI_HEIGHT,
+                }} />
+            </div>
+        ));
+
+        return (
+            <div className="multicol-list">
+                {columns}
+                {floatingItems}
             </div>
         );
     }
