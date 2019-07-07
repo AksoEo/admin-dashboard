@@ -140,6 +140,7 @@ export default {
                 address: 'Loĝlando',
                 dialogTitle: 'Elekti land(ar)ojn',
                 placeholder: 'Elekti land(ar)ojn',
+                search: '[[search countries]]',
             },
             membership: {
                 invert: {

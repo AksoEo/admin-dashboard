@@ -6,8 +6,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
+import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
+import fuzzaldrin from 'fuzzaldrin';
 import { Spring, globalAnimator, lerp } from '../../../../animation';
 import locale from '../../../../locale';
 import cache from '../cache';
@@ -28,6 +30,7 @@ export default class CountryPicker extends React.PureComponent {
         countries: {},
         countryGroups: {},
         dialogOpen: false,
+        search: '',
     };
 
     componentDidMount () {
@@ -71,8 +74,21 @@ export default class CountryPicker extends React.PureComponent {
             </div>,
         }));
 
+        // list of all items that are to be visible
+        let searchResults = Object.keys(this.state.countryGroups)
+            .map(id => ({ id, name: this.state.countryGroups[id].name }))
+            .concat(Object.keys(this.state.countries)
+                .map(id => ({ id, name: this.state.countries[id] })))
+            .filter(x => !this.props.value.includes(x));
+
+        if (this.state.search) {
+            searchResults = fuzzaldrin.filter(searchResults, this.state.search, { key: 'name' });
+        }
+        searchResults = searchResults.map(x => x.id);
+
         const availableItems = Object.keys(this.state.countryGroups)
             .filter(group => !this.props.value.includes(group))
+            .filter(group => searchResults.includes(group))
             .map(group => ({
                 key: group,
                 column: 1,
@@ -82,6 +98,7 @@ export default class CountryPicker extends React.PureComponent {
                 </div>,
             })).concat(Object.keys(this.state.countries)
                 .filter(country => !this.props.value.includes(country))
+                .filter(country => searchResults.includes(country))
                 .map(country => ({
                     key: country,
                     column: 1,
@@ -110,11 +127,21 @@ export default class CountryPicker extends React.PureComponent {
                     onClose={() => this.setState({ dialogOpen: false })}
                     className="country-picker-dialog"
                     open={this.state.dialogOpen}>
-                    <DialogTitle>
+                    <DialogTitle className="dialog-title">
                         <IconButton onClick={() => this.setState({ dialogOpen: false })}>
                             <CloseIcon />
                         </IconButton>
                         {locale.members.search.countries.dialogTitle}
+                        <div class="search-box-container">
+                            <div class="search-icon-container">
+                                <SearchIcon />
+                            </div>
+                            <input
+                                class="search-box"
+                                value={this.state.search}
+                                onChange={e => this.setState({ search: e.target.value })}
+                                placeholder={locale.members.search.countries.search} />
+                        </div>
                     </DialogTitle>
                     <DialogContent>
                         <MulticolList columns={2}>
@@ -202,7 +229,6 @@ class MulticolList extends React.PureComponent {
 
         const isItemFixed = item => item.x.value === Math.round(item.x.value);
         const columnScrollOffsets = this.columnRefs.map(column => column.scrollTop);
-        console.log(columnScrollOffsets);
 
         const floatingItems = columns.flatMap(column => (
             column.filter(item => !isItemFixed(item)).map(item => {
