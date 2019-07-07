@@ -9,7 +9,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Divider from '@material-ui/core/Divider';
 import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -107,6 +106,7 @@ export default class CountryPicker extends React.PureComponent {
                 <Dialog
                     onClick={e => e.stopPropagation()}
                     onClose={() => this.setState({ dialogOpen: false })}
+                    className="country-picker-dialog"
                     open={this.state.dialogOpen}>
                     <DialogTitle>
                         <IconButton onClick={() => this.setState({ dialogOpen: false })}>
@@ -115,11 +115,14 @@ export default class CountryPicker extends React.PureComponent {
                         {locale.members.search.countries.dialogTitle}
                     </DialogTitle>
                     <DialogContent>
-                        <List>
-                            {selectedItems}
-                            <Divider />
-                            {availableItems}
-                        </List>
+                        <div className="country-picker-split-view">
+                            <List className="split-list">
+                                {selectedItems}
+                            </List>
+                            <List className="split-list">
+                                {availableItems}
+                            </List>
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>

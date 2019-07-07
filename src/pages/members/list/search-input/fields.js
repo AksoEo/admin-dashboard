@@ -42,7 +42,7 @@ export const FILTERABLE_FIELDS = {
         toRequest (value) {
             const countryGroups = [];
             const countries = [];
-            for (const item of value) {
+            for (const item of value.countries) {
                 if (item.startsWith('x')) countryGroups.push(item);
                 else countries.push(item);
             }
