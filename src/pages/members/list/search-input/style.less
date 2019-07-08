@@ -196,6 +196,9 @@
                 width: 0;
                 height: 1.5em;
                 font-size: small;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
 
                 .countries-placeholder {
                     opacity: 0.6;
@@ -466,6 +469,11 @@
         }
     }
 
+    .dialog-content {
+        display: flex;
+        flex-direction: column;
+    }
+
     .multicol-list {
         position: relative;
         display: flex;
@@ -527,6 +535,16 @@
                     }
                 }
             }
+        }
+    }
+
+    .selection-controls {
+        display: flex;
+        justify-content: space-between;
+        flex-shrink: 0;
+
+        .selection-button {
+            font-size: small;
         }
     }
 }

@@ -141,6 +141,8 @@ export default {
                 dialogTitle: 'Elekti land(ar)ojn',
                 placeholder: 'Elekti land(ar)ojn',
                 search: '[[search countries]]',
+                selectAll: '[[select all]]',
+                deselectAll: '[[deselect all]]',
             },
             membership: {
                 invert: {
