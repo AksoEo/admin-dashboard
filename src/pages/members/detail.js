@@ -75,8 +75,6 @@ export default class MemberDetail extends React.PureComponent {
         ];
 
         client.get(`/codeholders/${id}`, { fields }).then(response => {
-            console.log(response);
-
             this.setState({ member: response.body, error: null });
         }).catch(error => this.setState({ error }));
     }

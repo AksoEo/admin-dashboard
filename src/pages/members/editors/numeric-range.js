@@ -669,8 +669,8 @@ export default class NumericRangeEditor extends React.PureComponent {
                 <canvas
                     style={{
                         pointerEvents: 'none',
-                        marginTop: -CTX_PADDING,
-                        marginLeft: -CTX_PADDING,
+                        top: -CTX_PADDING,
+                        left: -CTX_PADDING,
                         width: this.state.width + 2 * CTX_PADDING,
                         height: this.state.height + 2 * CTX_PADDING,
                     }}

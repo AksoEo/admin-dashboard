@@ -57,7 +57,7 @@
         // consistent newlines around object constructors
         "object-curly-newline": "warn",
         // operators on the next line
-        "operator-linebreak": ["warn", "before"],
+        "operator-linebreak": ["warn", "before", { "overrides": { "=": "after" } }],
         // no line padding inside { ... }
         "padded-blocks": ["warn", "never"],
         // prefer single quotes

@@ -144,6 +144,7 @@ export default class CountryPicker extends React.PureComponent {
                     onClick={e => e.stopPropagation()}
                     onClose={() => this.setState({ dialogOpen: false })}
                     className="country-picker-dialog"
+                    PaperProps={{ className: 'country-picker-dialog-paper' }}
                     open={this.state.dialogOpen}>
                     <DialogTitle className="dialog-title">
                         <IconButton onClick={() => this.setState({ dialogOpen: false })}>
@@ -158,6 +159,7 @@ export default class CountryPicker extends React.PureComponent {
                                 className="search-box"
                                 value={this.state.search}
                                 onChange={e => this.setState({ search: e.target.value })}
+                                ref={node => this.searchBox = node}
                                 placeholder={locale.members.search.countries.search} />
                         </div>
                     </DialogTitle>
@@ -226,6 +228,10 @@ class MulticolList extends React.PureComponent {
 
     componentDidUpdate (prevProps) {
         if (prevProps.children !== this.props.children) globalAnimator.register(this);
+    }
+
+    componentWillUnmount () {
+        globalAnimator.deregister(this);
     }
 
     render () {

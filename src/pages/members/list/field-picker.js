@@ -128,6 +128,7 @@ export default class FieldPicker extends React.PureComponent {
                 fullScreen={this.state.fullScreen}
                 open={this.props.open}
                 onClose={this.props.onClose}
+                PaperProps={{ className: 'members-field-picker-paper' }}
                 TransitionComponent={this.state.fullScreen ? SlideUp : undefined}>
                 {this.state.fullScreen ? (
                     <AppBar position="sticky">

@@ -159,6 +159,7 @@
         }
 
         .numeric-range-editor {
+            position: relative;
             width: 0;
             flex: 1;
             height: 48px;
@@ -421,13 +422,23 @@
 }
 
 .members-list-membership-category {
+    display: flex;
+    align-items: center;
+
     .membership-category-id {
         font-size: small;
         margin-right: 8px;
     }
+    .membership-category-name {
+        flex: 1;
+    }
 }
 
 .country-picker-dialog {
+    .country-picker-dialog-paper {
+        height: 100%;
+    }
+
     .dialog-title {
         position: relative;
     }
@@ -485,7 +496,7 @@
         .column {
             position: relative;
             flex: 1;
-            min-width: 25vw;
+            width: 300px;
             overflow-x: hidden;
             overflow-y: auto;
         }

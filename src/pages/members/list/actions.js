@@ -91,7 +91,9 @@ export function submit () {
                 data.updateURLQuery();
             }).catch(err => {
                 // TODO: handle
+                /* eslint-disable no-console */
                 console.error(err);
+                /* eslint-enable no-console */
             });
         }, 500);
     };

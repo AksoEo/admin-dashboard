@@ -6,6 +6,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Select from '@material-ui/core/Select';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
+import CheckIcon from '@material-ui/icons/Check';
 import moment from 'moment';
 import NumericRangeEditor, { NumericRange } from '../../editors/numeric-range';
 import Segmented from '../../../../components/segmented';
@@ -332,7 +333,14 @@ export default {
                                     <div className="membership-category-id">
                                         {availableCategories[id].nameAbbrev}
                                     </div>
-                                    {availableCategories[id].name}
+                                    <div className="membership-category-name">
+                                        {availableCategories[id].name}
+                                    </div>
+                                    <div className="membership-category-check">
+                                        {categories.includes(id)
+                                            ? <CheckIcon />
+                                            : null}
+                                    </div>
                                 </MenuItem>
                             ))}
                         </Select>
