@@ -3,6 +3,17 @@ import * as actions from './actions';
 import { FILTERABLE_FIELDS } from './search-input/fields';
 import { Sorting } from './fields';
 
+function json (state = {}, action) {
+    switch (action.type) {
+    case actions.SET_JSON_ENABLED:
+        return { ...state, enabled: action.enabled };
+    case actions.SET_JSON_QUERY:
+        return { ...state, query: action.query };
+    default:
+        return state;
+    }
+}
+
 function search (state = {}, action) {
     switch (action.type) {
     case actions.SET_SEARCH_FIELD:
@@ -118,6 +129,7 @@ function results (state = {}, action) {
 }
 
 export const searchPage = combineReducers({
+    json,
     search,
     fields,
     filters,

@@ -20,6 +20,7 @@ const MembersSearch = connect(
     dispatch => ({ dispatch }),
 )(class MembersSearch extends React.PureComponent {
     static propTypes = {
+        json: PropTypes.object.isRequired,
         search: PropTypes.object.isRequired,
         filters: PropTypes.object.isRequired,
         fields: PropTypes.object.isRequired,
@@ -33,7 +34,7 @@ const MembersSearch = connect(
     };
 
     render () {
-        const { search, filters, fields, page, results, dispatch } = this.props;
+        const { json, search, filters, fields, page, results, dispatch } = this.props;
 
         const onSearchFieldChange = field => dispatch(actions.setSearchField(field));
         const onSearchQueryChange = query => dispatch(actions.setSearchQuery(query));
@@ -86,7 +87,8 @@ const MembersSearch = connect(
                     onSetFilterValue={maybeResubmit(onSetFilterValue)}
                     submitted={page.submitted}
                     onSubmit={onSubmit}
-                    onUnsubmit={onUnsubmit} />
+                    onUnsubmit={onUnsubmit}
+                    useJSON={json.enabled} />
                 {results.hasResults && page.submitted ? (
                     <Results
                         isRestrictedByGlobalFilter={false} // TODO: this
@@ -180,8 +182,11 @@ export default class MembersSearchContainer extends React.PureComponent {
     constructor (props) {
         super(props);
 
-        // TODO: decode props.query into this
         this.store = createStore(searchPage, {
+            json: {
+                enabled: false,
+                query: '{}',
+            },
             search: {
                 field: 'nameOrCode',
                 query: '',
@@ -237,6 +242,23 @@ export default class MembersSearchContainer extends React.PureComponent {
         })));
 
         if (props.query) this.decodeQuery(props.query);
+    }
+
+    getOverflowMenu () {
+        const state = this.store.getState();
+        return [
+            {
+                action: () => {
+                    if (state.page.submitted) {
+                        this.store.dispatch(actions.unsubmit());
+                    }
+                    this.store.dispatch(actions.setJSONEnabled(!state.json.enabled));
+                },
+                label: state.json.enabled
+                    ? locale.members.search.json.menuLabel.disable
+                    : locale.members.search.json.menuLabel.enable,
+            },
+        ];
     }
 
     decodeQuery (query) {

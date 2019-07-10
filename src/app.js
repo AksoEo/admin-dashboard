@@ -14,6 +14,8 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -80,6 +82,7 @@ export default class App extends React.PureComponent {
         currentPage: currentPageFromLocation(),
         showBackButton: false,
         hasActiveRequest: false,
+        overflowMenu: null,
     };
 
     /** The current page component. */
@@ -155,6 +158,38 @@ export default class App extends React.PureComponent {
         this.setState({
             hasActiveRequest: !!Object.keys(activeRequests).length,
         });
+    };
+
+    onOverflowClick = e => {
+        // ask the current page for an overflow menu
+        if (this.currentPage && this.currentPage.getOverflowMenu) {
+            const menuSpec = this.currentPage.getOverflowMenu();
+            if (!menuSpec.length) return;
+
+            const items = [];
+            for (const item of menuSpec) {
+                items.push(
+                    <MenuItem
+                        key={item}
+                        onClick={() => {
+                            item.action();
+                            this.setState({
+                                overflowMenu: { ...this.state.overflowMenu, open: false },
+                            });
+                        }}>
+                        {item.label}
+                    </MenuItem>
+                );
+            }
+
+            this.setState({
+                overflowMenu: {
+                    items,
+                    anchor: e.currentTarget,
+                    open: true,
+                },
+            });
+        }
     };
 
     componentDidMount () {
@@ -254,9 +289,22 @@ export default class App extends React.PureComponent {
                         {locale.pages[this.state.currentPage.id]}
                     </Typography>
                     <div style={{ flexGrow: 1 }} />
-                    <IconButton aria-label={locale.header.overflow} color="inherit">
+                    <IconButton
+                        aria-label={locale.header.overflow}
+                        color="inherit"
+                        onClick={this.onOverflowClick}>
                         <MoreVertIcon />
                     </IconButton>
+                    {this.state.overflowMenu && (
+                        <Menu
+                            open={this.state.overflowMenu.open}
+                            anchorEl={this.state.overflowMenu.anchor}
+                            onClose={() => this.setState({
+                                overflowMenu: { ...this.state.overflowMenu, open: false },
+                            })}>
+                            {this.state.overflowMenu.items}
+                        </Menu>
+                    )}
                 </Toolbar>
                 {isLoading ? (
                     <LinearProgress className="header-progress" />

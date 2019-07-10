@@ -3,6 +3,16 @@ import { Sorting } from './fields';
 import { UEACode, util } from 'akso-client';
 import client from '../../../client';
 
+export const SET_JSON_ENABLED = 'set-json-enabled';
+export function setJSONEnabled (enabled) {
+    return { type: SET_JSON_ENABLED, enabled };
+}
+
+export const SET_JSON_QUERY = 'set-json-query';
+export function setJSONQuery (query) {
+    return { type: SET_JSON_QUERY, query };
+}
+
 export const SET_SEARCH_FIELD = 'set-search-field';
 export function setSearchField (field) {
     return { type: SET_SEARCH_FIELD, field };
@@ -77,7 +87,9 @@ export function submit () {
 
         // return to page 0 if the “request ID” changes
         const state = getState();
-        const requestID = JSON.stringify([state.search, state.filters]);
+        const requestID = state.json.enabled
+            ? '0' + state.json.query
+            : '1' + JSON.stringify([state.search, state.filters]);
         if ('requestID' in data && requestID !== data.requestID && state.page !== 0) {
             dispatch(setPage(0));
         }
@@ -177,12 +189,16 @@ const searchFieldToSelectedFields = {
 };
 
 async function requestMembers (state) {
+    const useJSON = state.json.enabled;
+
     const options = {};
     const temporaryFields = [];
 
     let prependedUeaCodeSearch = null;
 
-    if (state.search.query) {
+    if (useJSON) {
+        options.search = JSON.parse(state.json.query);
+    } else if (state.search.query) {
         let query = state.search.query;
         let searchField = state.search.field;
 
@@ -230,7 +246,7 @@ async function requestMembers (state) {
         .map(({ id, sorting }) => sorting === Sorting.ASC ? [id, 'asc'] : [id, 'desc']);
 
     // order by relevance if no order is selected
-    if (options.search && !options.order.length) {
+    if (!useJSON && options.search && !options.order.length) {
         options.order = [['_relevance', 'desc']];
     }
 
@@ -241,7 +257,7 @@ async function requestMembers (state) {
     options.limit = state.page.rowsPerPage;
 
     const filters = [];
-    if (state.page.filtersEnabled) {
+    if (!useJSON && state.page.filtersEnabled) {
         for (const id in state.filters) {
             const filter = state.filters[id];
             if (filter.enabled) {
@@ -250,9 +266,9 @@ async function requestMembers (state) {
                     : { [id]: filter.value });
             }
         }
-    }
 
-    if (filters.length) options.filter = { $and: filters };
+        if (filters.length) options.filter = { $and: filters };
+    }
 
     let itemToPrepend = null;
     if (prependedUeaCodeSearch) {

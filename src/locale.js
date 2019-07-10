@@ -171,6 +171,12 @@ export default {
                 address: 'Ekz. Nieuwe Binnenweg',
                 notes: 'Serĉi en notoj',
             },
+            json: {
+                menuLabel: {
+                    enable: '[[use json search]]',
+                    disable: '[[use normal search]]',
+                },
+            },
         },
         resultStats: (count, filtered, total, time) => {
             const plural = n => n === 1 ? '' : 'j';

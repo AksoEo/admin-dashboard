@@ -29,6 +29,7 @@ export default class SearchInput extends React.PureComponent {
         submitted: PropTypes.bool.isRequired,
         onUnsubmit: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
+        useJSON: PropTypes.bool,
     };
 
     toggleFiltersEnabled = () => {
@@ -47,66 +48,83 @@ export default class SearchInput extends React.PureComponent {
         if (this.props.filtersEnabled) className += ' expanded';
         if (this.props.submitted) className += ' submitted';
 
-        const filtersOnly = this.props.filtersEnabled && !this.props.query;
+        let filtersOnly = false;
 
-        let hasEnabledFilters = false;
-        for (const id in this.props.filters) {
-            if (this.props.filters[id].enabled) {
-                hasEnabledFilters = true;
-                break;
+        const listItems = [];
+
+        if (this.props.useJSON) {
+            // TODO
+            listItems.push({
+                node: <center>json editor goes here</center>,
+            });
+        } else {
+            filtersOnly = this.props.filtersEnabled && !this.props.query;
+
+            let hasEnabledFilters = false;
+            for (const id in this.props.filters) {
+                if (this.props.filters[id].enabled) {
+                    hasEnabledFilters = true;
+                    break;
+                }
             }
-        }
-
-        const listItems = [{
-            node: <PrimarySearch
-                key="primary"
-                value={this.props.query}
-                onChange={this.props.onQueryChange}
-                onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                        this.props.onSubmit();
-                    }
-                }}
-                submitted={this.props.submitted}
-                expanded={this.props.filtersEnabled}
-                filtersOnly={filtersOnly}
-                onSubmit={this.props.onSubmit}
-                searchableFields={SEARCHABLE_FIELDS}
-                searchField={this.props.field}
-                onSearchFieldChange={this.props.onFieldChange} />,
-            hidden: false,
-        }, {
-            node: <button
-                className="filters-button"
-                onClick={this.props.submitted ? undefined : this.toggleFiltersEnabled}>
-                {locale.members.search.filters}
-                {this.props.filtersEnabled
-                    ? <ExpandLessIcon className="expand-icon" />
-                    : <ExpandMoreIcon className="expand-icon" />}
-            </button>,
-            hidden: this.props.submitted && !(hasEnabledFilters && this.props.filtersEnabled),
-        }];
-
-        for (const id in this.props.filters) {
-            const item = this.props.filters[id];
 
             listItems.push({
-                node: <Filter
-                    key={id}
-                    field={id}
-                    enabled={item.enabled}
+                node: <PrimarySearch
+                    key="primary"
+                    value={this.props.query}
+                    onChange={this.props.onQueryChange}
+                    onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                            this.props.onSubmit();
+                        }
+                    }}
                     submitted={this.props.submitted}
-                    value={item.value}
-                    onChange={value => this.props.onSetFilterValue(id, value)}
-                    onEnabledChange={enabled => this.props.onSetFilterEnabled(id, enabled)} />,
-                hidden: this.props.submitted && !item.enabled || !this.props.filtersEnabled,
-                staticHeight: true,
+                    expanded={this.props.filtersEnabled}
+                    filtersOnly={filtersOnly}
+                    onSubmit={this.props.onSubmit}
+                    searchableFields={SEARCHABLE_FIELDS}
+                    searchField={this.props.field}
+                    onSearchFieldChange={this.props.onFieldChange} />,
+                hidden: false,
+            }, {
+                node: <button
+                    className="filters-button"
+                    onClick={this.props.submitted ? undefined : this.toggleFiltersEnabled}>
+                    {locale.members.search.filters}
+                    {this.props.filtersEnabled
+                        ? <ExpandLessIcon className="expand-icon" />
+                        : <ExpandMoreIcon className="expand-icon" />}
+                </button>,
+                hidden: this.props.submitted && !(hasEnabledFilters && this.props.filtersEnabled),
             });
+
+            for (const id in this.props.filters) {
+                const item = this.props.filters[id];
+
+                listItems.push({
+                    node: <Filter
+                        key={id}
+                        field={id}
+                        enabled={item.enabled}
+                        submitted={this.props.submitted}
+                        value={item.value}
+                        onChange={value => this.props.onSetFilterValue(id, value)}
+                        onEnabledChange={enabled => this.props.onSetFilterEnabled(id, enabled)} />,
+                    hidden: this.props.submitted && !item.enabled || !this.props.filtersEnabled,
+                    staticHeight: true,
+                });
+            }
         }
 
         return (
             <div className={className} onClick={this.onContainerClick} role="form">
-                <PaperList className="search-contents" layout="flat">
+                <PaperList
+                    className="search-contents"
+                    layout="flat"
+                    // keying this node by useJSON is a hacky way of reinstantiating the element
+                    // whenever useJSON changes, because PaperList currently doesn’t support
+                    // adding or removing children
+                    key={this.props.useJSON}>
                     {[
                         {
                             node: (
