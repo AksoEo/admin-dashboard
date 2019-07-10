@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import ResizeObserver from 'resize-observer-polyfill';
 import NativeSelect from '@material-ui/core/NativeSelect';
@@ -13,6 +13,8 @@ import locale from '../../../../locale';
 import { Spring, globalAnimator, lerp, clamp } from '../../../../animation';
 import { SEARCHABLE_FIELDS, FILTERABLE_FIELDS } from './fields';
 import './style';
+
+const JSONEditor = lazy(() => import('./json-editor'));
 
 /** Members’ page search input. */
 export default class SearchInput extends React.PureComponent {
@@ -29,7 +31,9 @@ export default class SearchInput extends React.PureComponent {
         submitted: PropTypes.bool.isRequired,
         onUnsubmit: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
-        useJSON: PropTypes.bool,
+        useJSON: PropTypes.bool.isRequired,
+        jsonQuery: PropTypes.string.isRequired,
+        onJSONChange: PropTypes.func.isRequired,
     };
 
     toggleFiltersEnabled = () => {
@@ -55,7 +59,19 @@ export default class SearchInput extends React.PureComponent {
         if (this.props.useJSON) {
             // TODO
             listItems.push({
-                node: <center>json editor goes here</center>,
+                node: (
+                    <Suspense fallback={(
+                        <div className="json-editor-loading">
+                            {locale.members.search.json.loading}
+                        </div>
+                    )}>
+                        <JSONEditor
+                            value={this.props.jsonQuery}
+                            onChange={this.props.onJSONChange}
+                            submitted={this.props.submitted}
+                            onSubmit={this.props.onSubmit} />
+                    </Suspense>
+                ),
             });
         } else {
             filtersOnly = this.props.filtersEnabled && !this.props.query;

@@ -120,7 +120,6 @@ module.exports = function (env, argv) {
                 },
                 {
                     test: /\.(c|le)ss$/,
-                    exclude: /node_modules/,
                     use: [
                         MiniCssExtractPlugin.loader,
                         {

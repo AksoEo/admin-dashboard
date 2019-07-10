@@ -49,6 +49,7 @@ const MembersSearch = connect(
         const onMoveField = (i, j) => dispatch(actions.moveField(i, j));
         const onSubmit = () => dispatch(actions.submit());
         const onUnsubmit = () => dispatch(actions.unsubmit());
+        const onJSONChange = query => dispatch(actions.setJSONQuery(query));
 
         // FIXME: hacky solution
         const maybeResubmit = f => (...args) => {
@@ -88,7 +89,9 @@ const MembersSearch = connect(
                     submitted={page.submitted}
                     onSubmit={onSubmit}
                     onUnsubmit={onUnsubmit}
-                    useJSON={json.enabled} />
+                    useJSON={json.enabled}
+                    jsonQuery={json.query}
+                    onJSONChange={maybeResubmit(onJSONChange)} />
                 {results.hasResults && page.submitted ? (
                     <Results
                         isRestrictedByGlobalFilter={false} // TODO: this

@@ -1,0 +1,76 @@
+@import '../../../../prelude';
+
+.members-search .json-editor {
+    --editor-background: #333;
+    --editor-selection: fade(#fff, 35%);
+    --editor-line-number: #aaa;
+    --editor-text: #ddd;
+    --editor-syntax-string: @control-primary;
+    --editor-syntax-atom: #e95;
+    --editor-syntax-number: #e95;
+    --editor-syntax-property: #f48;
+    --editor-error: @error;
+    --editor-error-background: fade(@error, 20%);
+    --editor-match: #4ce;
+
+    max-width: 600px;
+    margin: 0 auto;
+
+    .CodeMirror.cm-s-akso {
+        font-family: @monospace;
+        font-size: 12px;
+        background: var(--editor-background);
+        color: var(--editor-text);
+        border-radius: 6px;
+        .elevation(4);
+
+        .CodeMirror-cursor {
+            border-left-color: var(--editor-text);
+        }
+        .CodeMirror-selected {
+            background: var(--editor-selection);
+        }
+        .CodeMirror-gutters {
+            background: var(--editor-background);
+            border-right-color: transparent;
+        }
+        .CodeMirror-linenumber {
+            color: var(--editor-line-number);
+            font-size: 0.8em;
+            margin-top: 0.25em;
+        }
+        .CodeMirror-nonmatchingbracket {
+            color: var(--editor-error);
+        }
+        .CodeMirror-matchingbracket {
+            color: var(--editor-match);
+        }
+
+        .cm-property { color: var(--editor-syntax-property); }
+        .cm-string { color: var(--editor-syntax-string); }
+        .cm-atom { color: var(--editor-syntax-atom); }
+        .cm-number { color: var(--editor-syntax-number); }
+
+        .json-error-line {
+            background: var(--editor-error-background);
+        }
+        .json-error-message {
+            font-family: Roboto, sans-serif; // FIXME: hardcoded font
+        }
+    }
+
+    .submit-button-container {
+        margin: 16px 0;
+        text-align: center;
+    }
+
+    &.submitted {
+        .CodeMirror {
+            height: 64px;
+        }
+
+        .submit-button-container {
+            display: none;
+        }
+    }
+}

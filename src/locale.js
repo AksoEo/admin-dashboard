@@ -172,10 +172,12 @@ export default {
                 notes: 'Serĉi en notoj',
             },
             json: {
+                loading: '[[loading]]',
                 menuLabel: {
                     enable: '[[use json search]]',
                     disable: '[[use normal search]]',
                 },
+                submit: '[[submit]]',
             },
         },
         resultStats: (count, filtered, total, time) => {
