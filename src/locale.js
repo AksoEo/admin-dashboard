@@ -174,10 +174,9 @@ export default {
             json: {
                 loading: '[[loading]]',
                 menuLabel: {
-                    enable: '[[use json search]]',
-                    disable: '[[use normal search]]',
+                    enable: '[[use json filters]]',
+                    disable: '[[use normal filters]]',
                 },
-                submit: '[[submit]]',
             },
         },
         resultStats: (count, filtered, total, time) => {

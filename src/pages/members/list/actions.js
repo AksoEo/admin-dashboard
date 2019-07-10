@@ -8,9 +8,9 @@ export function setJSONEnabled (enabled) {
     return { type: SET_JSON_ENABLED, enabled };
 }
 
-export const SET_JSON_QUERY = 'set-json-query';
-export function setJSONQuery (query) {
-    return { type: SET_JSON_QUERY, query };
+export const SET_JSON_FILTER = 'set-json-filtera';
+export function setJSONFilter (filter) {
+    return { type: SET_JSON_FILTER, filter };
 }
 
 export const SET_SEARCH_FIELD = 'set-search-field';
@@ -189,16 +189,14 @@ const searchFieldToSelectedFields = {
 };
 
 async function requestMembers (state) {
-    const useJSON = state.json.enabled;
+    const useJSONFilters = state.json.enabled;
 
     const options = {};
     const temporaryFields = [];
 
     let prependedUeaCodeSearch = null;
 
-    if (useJSON) {
-        options.search = JSON.parse(state.json.query);
-    } else if (state.search.query) {
+    if (state.search.query) {
         let query = state.search.query;
         let searchField = state.search.field;
 
@@ -246,7 +244,7 @@ async function requestMembers (state) {
         .map(({ id, sorting }) => sorting === Sorting.ASC ? [id, 'asc'] : [id, 'desc']);
 
     // order by relevance if no order is selected
-    if (!useJSON && options.search && !options.order.length) {
+    if (options.search && !options.order.length) {
         options.order = [['_relevance', 'desc']];
     }
 
@@ -256,8 +254,12 @@ async function requestMembers (state) {
     options.offset = state.page.page * state.page.rowsPerPage;
     options.limit = state.page.rowsPerPage;
 
-    const filters = [];
-    if (!useJSON && state.page.filtersEnabled) {
+    let usedFilters = false;
+    if (useJSONFilters) {
+        usedFilters = true;
+        options.filter = JSON.parse(state.json.filter);
+    } else if (state.page.filtersEnabled) {
+        const filters = [];
         for (const id in state.filters) {
             const filter = state.filters[id];
             if (filter.enabled) {
@@ -267,7 +269,10 @@ async function requestMembers (state) {
             }
         }
 
-        if (filters.length) options.filter = { $and: filters };
+        if (filters.length) {
+            options.filter = { $and: filters };
+            usedFilters = true;
+        }
     }
 
     let itemToPrepend = null;
@@ -313,7 +318,7 @@ async function requestMembers (state) {
         stats: {
             time: result.resTime,
             total: totalItems,
-            filtered: !!filters.length,
+            filtered: usedFilters,
         },
     };
 }

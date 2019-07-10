@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@material-ui/core/Button';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
-import locale from '../../../../locale';
 import './json-editor.less';
 
 export default class JSONEditor extends React.PureComponent {
@@ -14,7 +12,6 @@ export default class JSONEditor extends React.PureComponent {
         value: PropTypes.string.isRequired,
         onChange: PropTypes.func.isRequired,
         submitted: PropTypes.bool.isRequired,
-        onSubmit: PropTypes.func.isRequired,
     };
 
     onEditorMount = editor => {
@@ -82,14 +79,6 @@ export default class JSONEditor extends React.PureComponent {
                     }}
                     editorDidMount={this.onEditorMount}
                     onBeforeChange={(editor, data, value) => this.props.onChange(value)} />
-                <div className="submit-button-container">
-                    <Button
-                        className="submit-button"
-                        onClick={this.props.onSubmit}
-                        color="primary">
-                        {locale.members.search.json.submit}
-                    </Button>
-                </div>
             </div>
         );
     }

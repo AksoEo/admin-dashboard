@@ -32,7 +32,7 @@ export default class SearchInput extends React.PureComponent {
         onUnsubmit: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
         useJSON: PropTypes.bool.isRequired,
-        jsonQuery: PropTypes.string.isRequired,
+        jsonFilter: PropTypes.string.isRequired,
         onJSONChange: PropTypes.func.isRequired,
     };
 
@@ -56,8 +56,27 @@ export default class SearchInput extends React.PureComponent {
 
         const listItems = [];
 
+        listItems.push({
+            node: <PrimarySearch
+                key="primary"
+                value={this.props.query}
+                onChange={this.props.onQueryChange}
+                onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                        this.props.onSubmit();
+                    }
+                }}
+                submitted={this.props.submitted}
+                expanded={this.props.filtersEnabled}
+                filtersOnly={filtersOnly}
+                onSubmit={this.props.onSubmit}
+                searchableFields={SEARCHABLE_FIELDS}
+                searchField={this.props.field}
+                onSearchFieldChange={this.props.onFieldChange} />,
+            hidden: false,
+        });
+
         if (this.props.useJSON) {
-            // TODO
             listItems.push({
                 node: (
                     <Suspense fallback={(
@@ -66,43 +85,16 @@ export default class SearchInput extends React.PureComponent {
                         </div>
                     )}>
                         <JSONEditor
-                            value={this.props.jsonQuery}
+                            value={this.props.jsonFilter}
                             onChange={this.props.onJSONChange}
-                            submitted={this.props.submitted}
-                            onSubmit={this.props.onSubmit} />
+                            submitted={this.props.submitted} />
                     </Suspense>
                 ),
             });
         } else {
             filtersOnly = this.props.filtersEnabled && !this.props.query;
 
-            let hasEnabledFilters = false;
-            for (const id in this.props.filters) {
-                if (this.props.filters[id].enabled) {
-                    hasEnabledFilters = true;
-                    break;
-                }
-            }
-
             listItems.push({
-                node: <PrimarySearch
-                    key="primary"
-                    value={this.props.query}
-                    onChange={this.props.onQueryChange}
-                    onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                            this.props.onSubmit();
-                        }
-                    }}
-                    submitted={this.props.submitted}
-                    expanded={this.props.filtersEnabled}
-                    filtersOnly={filtersOnly}
-                    onSubmit={this.props.onSubmit}
-                    searchableFields={SEARCHABLE_FIELDS}
-                    searchField={this.props.field}
-                    onSearchFieldChange={this.props.onFieldChange} />,
-                hidden: false,
-            }, {
                 node: <button
                     className="filters-button"
                     onClick={this.props.submitted ? undefined : this.toggleFiltersEnabled}>
@@ -113,6 +105,14 @@ export default class SearchInput extends React.PureComponent {
                 </button>,
                 hidden: this.props.submitted && !(hasEnabledFilters && this.props.filtersEnabled),
             });
+
+            let hasEnabledFilters = false;
+            for (const id in this.props.filters) {
+                if (this.props.filters[id].enabled) {
+                    hasEnabledFilters = true;
+                    break;
+                }
+            }
 
             for (const id in this.props.filters) {
                 const item = this.props.filters[id];

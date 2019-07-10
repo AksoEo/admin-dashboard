@@ -7,8 +7,8 @@ function json (state = {}, action) {
     switch (action.type) {
     case actions.SET_JSON_ENABLED:
         return { ...state, enabled: action.enabled };
-    case actions.SET_JSON_QUERY:
-        return { ...state, query: action.query };
+    case actions.SET_JSON_FILTER:
+        return { ...state, filter: action.filter };
     default:
         return state;
     }

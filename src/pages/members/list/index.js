@@ -49,7 +49,7 @@ const MembersSearch = connect(
         const onMoveField = (i, j) => dispatch(actions.moveField(i, j));
         const onSubmit = () => dispatch(actions.submit());
         const onUnsubmit = () => dispatch(actions.unsubmit());
-        const onJSONChange = query => dispatch(actions.setJSONQuery(query));
+        const onJSONChange = filter => dispatch(actions.setJSONFilter(filter));
 
         // FIXME: hacky solution
         const maybeResubmit = f => (...args) => {
@@ -90,7 +90,7 @@ const MembersSearch = connect(
                     onSubmit={onSubmit}
                     onUnsubmit={onUnsubmit}
                     useJSON={json.enabled}
-                    jsonQuery={json.query}
+                    jsonFilter={json.filter}
                     onJSONChange={maybeResubmit(onJSONChange)} />
                 {results.hasResults && page.submitted ? (
                     <Results
@@ -188,7 +188,7 @@ export default class MembersSearchContainer extends React.PureComponent {
         this.store = createStore(searchPage, {
             json: {
                 enabled: false,
-                query: '{}',
+                filter: '{}',
             },
             search: {
                 field: 'nameOrCode',
@@ -280,18 +280,23 @@ export default class MembersSearchContainer extends React.PureComponent {
             this.store.dispatch(actions.setSearchQuery(serialized.q || ''));
 
             let enableFilters = false;
-            for (const id in state.filters) {
-                enableFilters = true;
+            if (serialized.j) {
+                this.store.dispatch(actions.setJSONEnabled(true));
+                this.store.dispatch(actions.setJSONFilter(serialized.j));
+            } else {
+                for (const id in state.filters) {
+                    enableFilters = true;
 
-                if (id in serialized.p) {
-                    let value = serialized.p[id];
-                    if (FILTERABLE_FIELDS[id].deserialize) {
-                        value = FILTERABLE_FIELDS[id].deserialize(value);
+                    if (id in serialized.p) {
+                        let value = serialized.p[id];
+                        if (FILTERABLE_FIELDS[id].deserialize) {
+                            value = FILTERABLE_FIELDS[id].deserialize(value);
+                        }
+                        this.store.dispatch(actions.setFilterValue(id, value));
+                        this.store.dispatch(actions.setFilterEnabled(id, true));
+                    } else if (state.filters[id].enabled) {
+                        this.store.dispatch(actions.setFilterEnabled(id, false));
                     }
-                    this.store.dispatch(actions.setFilterValue(id, value));
-                    this.store.dispatch(actions.setFilterEnabled(id, true));
-                } else if (state.filters[id].enabled) {
-                    this.store.dispatch(actions.setFilterEnabled(id, false));
                 }
             }
 
@@ -326,13 +331,19 @@ export default class MembersSearchContainer extends React.PureComponent {
                 serialized.f = state.search.field;
                 serialized.q = state.search.query;
             }
-            serialized.p = {};
-            for (const id in state.filters) {
-                const filter = state.filters[id];
-                if (!filter.enabled) continue;
-                let value = filter.value;
-                if (FILTERABLE_FIELDS[id].serialize) value = FILTERABLE_FIELDS[id].serialize(value);
-                serialized.p[id] = value;
+            if (state.json.enabled) {
+                serialized.j = state.json.filter;
+            } else {
+                serialized.p = {};
+                for (const id in state.filters) {
+                    const filter = state.filters[id];
+                    if (!filter.enabled) continue;
+                    let value = filter.value;
+                    if (FILTERABLE_FIELDS[id].serialize) {
+                        value = FILTERABLE_FIELDS[id].serialize(value);
+                    }
+                    serialized.p[id] = value;
+                }
             }
             serialized.c = state.fields.user.map(f => ({ i: f.id, s: f.sorting }));
             serialized.pos = [state.page.page, state.page.rowsPerPage];
