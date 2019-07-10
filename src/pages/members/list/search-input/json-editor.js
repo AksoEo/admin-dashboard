@@ -52,20 +52,23 @@ export default class JSONEditor extends React.PureComponent {
                 lastErrorLine = error.position.line;
                 if (lastErrorLine >= 0) {
                     editor.doc.addLineClass(lastErrorLine, 'background', 'json-error-line');
-
-                    const node = document.createElement('div');
-                    node.classList.add('json-error-message');
-                    node.textContent = error.message;
-
-                    lastWidget = editor.doc.addLineWidget(lastErrorLine, node);
                 }
+
+                const node = document.createElement('div');
+                node.classList.add('json-error-message');
+                node.textContent = error.message;
+
+                const widgetLine = lastErrorLine === -1 ? editor.doc.lastLine() : lastErrorLine;
+                lastWidget = editor.doc.addLineWidget(widgetLine, node);
             }
         });
     };
 
     render () {
         return (
-            <div className={'json-editor' + (this.props.submitted ? ' submitted' : '')}>
+            <div
+                className={'json-editor' + (this.props.submitted ? ' submitted' : '')}
+                onClick={e => e.stopPropagation()}>
                 <CodeMirror
                     value={this.props.value}
                     options={{
