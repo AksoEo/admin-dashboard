@@ -20,15 +20,7 @@ import './style';
 const FIELDS_BTN_COLUMN = 'codeholderType';
 
 /**
- * Renders the list of members.
- *
- * This list has two possible layouts: the table layout and the flex layout (for lack of a
- * better term).
- * In the table layout, selected fields will be shown as columns in order, as expected.
- * In the flex layout, fields will be arranged in three columns to form a more
- * small-screen-friendly layout.
- * The table layout is preferred for large screens but will fall back to the flex layout if
- * there is insufficient space.
+ * Renders a list of members in a table.
  */
 export default class MembersList extends React.PureComponent {
     static propTypes = {
@@ -40,6 +32,7 @@ export default class MembersList extends React.PureComponent {
         temporaryFields: PropTypes.arrayOf(PropTypes.string).isRequired,
         /** Called when the selected fields change. */
         onAddField: PropTypes.func.isRequired,
+        /** Called when the user changes the sorting for a field. */
         onSetFieldSorting: PropTypes.func.isRequired,
         /** Called when the field picker modal is requested. */
         onEditFields: PropTypes.func.isRequired,

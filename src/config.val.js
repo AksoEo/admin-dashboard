@@ -1,5 +1,6 @@
 const data = {
     buildTime: new Date().toISOString(),
+    host: global.aksoConfig.host,
 };
 
 module.exports = () => {

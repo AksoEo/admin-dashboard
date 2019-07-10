@@ -55,6 +55,7 @@ export default class CountryPicker extends React.PureComponent {
                 ? countryCodeToEmoji(id)
                 : this.state.countryGroups[id] && this.state.countryGroups[id].name).join(', ');
 
+        // Event handler for when a country item is clicked; moves it to the other column
         const onItemClick = id => () => {
             const value = this.props.value.slice();
             if (this.props.value.includes(id)) {
@@ -185,7 +186,7 @@ export default class CountryPicker extends React.PureComponent {
 const LI_HEIGHT = 48;
 
 /**
- * Renders multiple columns with fixed order, with items able to be dragged in between.
+ * Renders multiple columns with fixed order, with items able to be animated in between.
  */
 class MulticolList extends React.PureComponent {
     static propTypes = {

@@ -1,11 +1,10 @@
 // shared global akso instance
 
 import { UserClient } from 'akso-client';
+import config from './config.val';
 import EventEmitter from 'events';
 
-const HOST = 'https://apitest.akso.org';
-
-const instance = new UserClient({ host: HOST });
+const instance = new UserClient({ host: config.host });
 export default instance;
 export const activeRequests = {};
 export const activeRequestsEmitter = new EventEmitter();

@@ -20,6 +20,10 @@ const browserTargets = {
     // ios_saf: '11'
 };
 
+global.aksoConfig = {
+    host: process.env['AKSO_HOST'] || 'https://apitest.akso.org',
+};
+
 module.exports = function (env, argv) {
     const analyze = env === 'analyze';
     const prod = env === 'prod' || analyze;
