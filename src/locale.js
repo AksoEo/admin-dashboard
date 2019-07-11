@@ -128,7 +128,7 @@ export default {
                 address: 'Adreso',
                 hasPassword: 'Kreis konton',
                 membership: 'Membreckategorioj',
-                isActiveMember: '[[isactivemember]]',
+                isActiveMember: 'Aktiva membro en',
             },
             countries: {
                 // section labels in <select>
@@ -140,9 +140,9 @@ export default {
                 address: 'Loĝlando',
                 dialogTitle: 'Elekti land(ar)ojn',
                 placeholder: 'Elekti land(ar)ojn',
-                search: '[[search countries]]',
-                selectAll: '[[select all]]',
-                deselectAll: '[[deselect all]]',
+                search: 'Serĉi land(ar)ojn',
+                selectAll: 'Elekti ĉiujn',
+                deselectAll: 'Malelekti ĉiujn',
             },
             membership: {
                 invert: {
@@ -160,7 +160,7 @@ export default {
                     all: 'ne gravas',
                 },
                 conjunction: 'kaj',
-                placeholder: '[[select categories]]',
+                placeholder: 'Elekti kategoriojn',
             },
             fieldPlaceholders: {
                 nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
@@ -172,10 +172,10 @@ export default {
                 notes: 'Serĉi en notoj',
             },
             json: {
-                loading: '[[loading]]',
+                loading: 'Ŝarĝas...',
                 menuLabel: {
-                    enable: '[[use json filters]]',
-                    disable: '[[use normal filters]]',
+                    enable: 'Uzi JSON-filtrilojn',
+                    disable: 'Uzi facilajn filtrilojn',
                 },
             },
         },
