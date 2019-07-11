@@ -234,5 +234,6 @@ export default {
         },
         globalFilterNotice: 'Ĉiuj viaj serĉoj estas limigitaj laŭ membrofiltrilo. Okaze de demandoj, kontaktu vian administranton.',
         noResults: 'Trovis neniujn rezultojn',
+        error: '[[error]]',
     },
 };

@@ -92,7 +92,7 @@ const MembersSearch = connect(
                     useJSON={json.enabled}
                     jsonFilter={json.filter}
                     onJSONChange={maybeResubmit(onJSONChange)} />
-                {results.hasResults && page.submitted ? (
+                {page.submitted && results.hasResults ? (
                     <Results
                         isRestrictedByGlobalFilter={false} // TODO: this
                         list={results.list}
@@ -107,6 +107,8 @@ const MembersSearch = connect(
                         onAddField={maybeResubmit(onAddField)}
                         onSetFieldSorting={maybeResubmit(onSetFieldSorting)}
                         onOpenFieldPicker={() => this.setState({ fieldPickerOpen: true })} />
+                ) : page.submitted && results.error ? (
+                    <Error error={results.error} />
                 ) : null}
             </div>
         );
@@ -239,6 +241,7 @@ export default class MembersSearchContainer extends React.PureComponent {
                     total: 0,
                     filtered: false,
                 },
+                error: null,
             },
         }, applyMiddleware(thunk.withExtraArgument({
             updateURLQuery: this.updateURLQuery,
@@ -375,3 +378,20 @@ export default class MembersSearchContainer extends React.PureComponent {
         );
     }
 }
+
+function Error ({ error }) {
+    return (
+        <div className="list-error">
+            <div className="error-title">
+                {locale.members.error}
+            </div>
+            <pre className="error-details">
+                {error.toString()}
+            </pre>
+        </div>
+    );
+}
+
+Error.propTypes = {
+    error: PropTypes.any.isRequired,
+};

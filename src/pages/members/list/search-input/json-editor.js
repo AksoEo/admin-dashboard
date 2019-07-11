@@ -15,50 +15,57 @@ export default class JSONEditor extends React.PureComponent {
         submitted: PropTypes.bool.isRequired,
     };
 
+    lastErrorLine = -1;
+    lastWidget = null;
+    editor = null;
+
+    validateJSON = () => {
+        let error = null;
+        try {
+            JSON5.parse(this.props.value);
+        } catch (err) {
+            const message = err.toString()
+                .replace();
+
+            error = {
+                message,
+                position: {
+                    line: err.lineNumber - 1,
+                    column: err.columnNumber - 1,
+                },
+            };
+        }
+
+        if (this.lastErrorLine >= 0) {
+            this.editor.doc.removeLineClass(this.lastErrorLine, 'background', 'json-error-line');
+            this.lastErrorLine = -1;
+        }
+        if (this.lastWidget) {
+            this.lastWidget.clear();
+            this.lastWidget = null;
+        }
+
+        if (error) {
+            this.lastErrorLine = error.position.line;
+            if (this.lastErrorLine >= 0) {
+                this.editor.doc.addLineClass(this.lastErrorLine, 'background', 'json-error-line');
+            }
+
+            const node = document.createElement('div');
+            node.classList.add('json-error-message');
+            node.textContent = error.message;
+
+            const widgetLine = this.lastErrorLine === -1
+                ? this.editor.doc.lastLine()
+                : this.lastErrorLine;
+            this.lastWidget = this.editor.doc.addLineWidget(widgetLine, node);
+        }
+    };
+
     onEditorMount = editor => {
-        let lastErrorLine = -1;
-        let lastWidget;
-
-        editor.on('change', () => {
-            let error = null;
-            try {
-                JSON5.parse(this.props.value);
-            } catch (err) {
-                const message = err.toString()
-                    .replace();
-
-                error = {
-                    message,
-                    position: {
-                        line: err.lineNumber - 1,
-                        column: err.columnNumber - 1,
-                    },
-                };
-            }
-
-            if (lastErrorLine >= 0) {
-                editor.doc.removeLineClass(lastErrorLine, 'background', 'json-error-line');
-                lastErrorLine = -1;
-            }
-            if (lastWidget) {
-                lastWidget.clear();
-                lastWidget = null;
-            }
-
-            if (error) {
-                lastErrorLine = error.position.line;
-                if (lastErrorLine >= 0) {
-                    editor.doc.addLineClass(lastErrorLine, 'background', 'json-error-line');
-                }
-
-                const node = document.createElement('div');
-                node.classList.add('json-error-message');
-                node.textContent = error.message;
-
-                const widgetLine = lastErrorLine === -1 ? editor.doc.lastLine() : lastErrorLine;
-                lastWidget = editor.doc.addLineWidget(widgetLine, node);
-            }
-        });
+        this.editor = editor;
+        this.validateJSON();
+        editor.on('change', this.validateJSON);
     };
 
     render () {
