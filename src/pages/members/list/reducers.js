@@ -31,7 +31,8 @@ function maybeRestrictCodeholderType (filters) {
         if (!filters[id].enabled) continue;
         if (!restriction) {
             restriction = FILTERABLE_FIELDS[id].codeholderType;
-        } else if (FILTERABLE_FIELDS[id].codeholderType !== restriction) {
+        } else if (FILTERABLE_FIELDS[id].codeholderType
+            && FILTERABLE_FIELDS[id].codeholderType !== restriction) {
             filters[id] = { ...filters[id], enabled: false };
         }
     }
