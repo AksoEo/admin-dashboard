@@ -122,6 +122,13 @@ function results (state = {}, action) {
             list: action.list,
             temporaryFields: action.temporaryFields,
             stats: action.stats,
+            error: null,
+        };
+    case actions.RECEIVE_ERROR:
+        return {
+            ...state,
+            hasResults: false,
+            error: action.error,
         };
     default:
         return state;

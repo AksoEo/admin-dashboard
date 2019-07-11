@@ -103,7 +103,8 @@ export function submit () {
                 dispatch(receiveMembers(result.list, result.temporaryFields, result.stats));
                 data.updateURLQuery();
             }).catch(err => {
-                // TODO: handle
+                dispatch(receiveError(err));
+                data.updateURLQuery();
                 /* eslint-disable no-console */
                 console.error(err);
                 /* eslint-enable no-console */
@@ -120,6 +121,11 @@ function receiveMembers (list, temporaryFields, stats) {
         temporaryFields,
         stats,
     };
+}
+
+export const RECEIVE_ERROR = 'receive-error';
+function receiveError (error) {
+    return { type: RECEIVE_ERROR, error };
 }
 
 const fieldMapping = {
