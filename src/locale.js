@@ -218,6 +218,7 @@ export default {
             deathdate: 'Mortdato',
             honorific: 'Titolo',
             profession: 'Profesio',
+            membership: 'Membreco',
         },
         fieldPicker: {
             title: 'Montrotaj kampoj',

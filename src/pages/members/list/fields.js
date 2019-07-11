@@ -91,4 +91,8 @@ export const FIELDS = {
         detailPos: DetailPos.TABLE,
         editorType: 'string',
     },
+    membership: {
+        detailPos: DetailPos.TABLE,
+        editorType: 'membership',
+    },
 };

@@ -263,5 +263,23 @@ const FIELDS = {
     profession ({ value }) {
         return <span className="profession">{value}</span>;
     },
+    membership ({ value }) {
+        if (!value) return null;
+        return (
+            <span className="memberships">
+                {value.flatMap((item, i) => (i == 0 ? [] : [', ']).concat([(
+                    <span
+                        className="membership-item"
+                        key={`${item.categoryId}-${item.year}`}
+                        data-category-id={item.categoryId}>
+                        <abbr className="membership-item-id" title={item.name}>
+                            {item.nameAbbrev}
+                        </abbr>
+                        <span className="membership-year">{item.year}</span>
+                    </span>
+                )]))}
+            </span>
+        );
+    },
 };
 /* eslint-enable react/prop-types */
