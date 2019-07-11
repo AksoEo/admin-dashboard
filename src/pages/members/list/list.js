@@ -13,7 +13,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import MemberField from './field-views';
 import locale from '../../../locale';
 import { Link, routerContext } from '../../../router';
-import { Sorting } from './fields';
+import { FIELDS, Sorting } from './fields';
 import './style';
 
 /** Column whose title will be replaced with the Pick Fields button. */
@@ -105,6 +105,7 @@ export default class MembersList extends React.PureComponent {
                                         active={!!sortDirection}
                                         direction={sortDirection || 'asc'}
                                         onClick={() => {
+                                            if (!FIELDS[id].sortable) return;
                                             if (isTmp) {
                                                 this.props.onAddField(id, true);
                                             } else {
