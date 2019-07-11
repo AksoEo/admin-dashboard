@@ -1,6 +1,7 @@
 import { FILTERABLE_FIELDS } from './search-input/fields';
 import { Sorting } from './fields';
 import { UEACode, util } from 'akso-client';
+import JSON5 from 'json5';
 import client from '../../../client';
 
 export const SET_JSON_ENABLED = 'set-json-enabled';
@@ -257,7 +258,7 @@ async function requestMembers (state) {
     let usedFilters = false;
     if (useJSONFilters) {
         usedFilters = true;
-        options.filter = JSON.parse(state.json.filter);
+        options.filter = JSON5.parse(state.json.filter);
     } else if (state.page.filtersEnabled) {
         const filters = [];
         for (const id in state.filters) {

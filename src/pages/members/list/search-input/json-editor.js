@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Controlled as CodeMirror } from 'react-codemirror2';
+import JSON5 from 'json5';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/edit/matchbrackets';
@@ -21,21 +22,17 @@ export default class JSONEditor extends React.PureComponent {
         editor.on('change', () => {
             let error = null;
             try {
-                JSON.parse(this.props.value);
+                JSON5.parse(this.props.value);
             } catch (err) {
                 const message = err.toString()
-                    .replace(/^SyntaxError:\s*/, '')
-                    .replace(/^JSON\.parse:\s*/, '');
-
-                const position = { line: -1, column: -1 };
-                let match = message.match(/line\s+(\d+)/, '');
-                if (match) position.line = +match[1] - 1;
-                match = message.match(/column\s+(\d+)/, '');
-                if (match) position.column = +match[1] - 1;
+                    .replace();
 
                 error = {
                     message,
-                    position,
+                    position: {
+                        line: err.lineNumber - 1,
+                        column: err.columnNumber - 1,
+                    },
                 };
             }
 

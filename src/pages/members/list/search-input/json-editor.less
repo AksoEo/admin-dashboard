@@ -8,7 +8,8 @@
     --editor-syntax-string: @control-primary;
     --editor-syntax-atom: #e95;
     --editor-syntax-number: #e95;
-    --editor-syntax-property: #f48;
+    --editor-syntax-property: #f5a;
+    --editor-syntax-comment: #999;
     --editor-error: @error;
     --editor-error-background: fade(@error, 20%);
     --editor-match: #4ce;
@@ -50,6 +51,7 @@
         .cm-string { color: var(--editor-syntax-string); }
         .cm-atom { color: var(--editor-syntax-atom); }
         .cm-number { color: var(--editor-syntax-number); }
+        .cm-comment { color: var(--editor-syntax-comment); }
 
         .json-error-line {
             background: var(--editor-error-background);
