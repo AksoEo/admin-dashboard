@@ -236,5 +236,9 @@ export default {
         globalFilterNotice: 'Ĉiuj viaj serĉoj estas limigitaj laŭ membrofiltrilo. Okaze de demandoj, kontaktu vian administranton.',
         noResults: 'Trovis neniujn rezultojn',
         error: 'Eraro',
+        errors: {
+            invalidSearchQuery: '[[utils.isValidSearch says your search query isn’t valid; iirc Mia said something about adding an explainy text here so i guess they can do that when they localize this]]',
+            invalidJSON: '[[the json filter has a syntax error; refer to the codemirror view for details]]',
+        },
     },
 };

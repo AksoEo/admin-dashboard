@@ -221,6 +221,10 @@ export default class MembersSearchContainer extends React.PureComponent {
                         sorting: Sorting.NONE,
                     },
                     {
+                        id: 'membership',
+                        sorting: Sorting.NONE,
+                    },
+                    {
                         id: 'country',
                         sorting: Sorting.NONE,
                     },
@@ -380,14 +384,34 @@ export default class MembersSearchContainer extends React.PureComponent {
 }
 
 function Error ({ error }) {
+    let errorIsLocalized = false;
+    let errorDetails = error.toString();
+
+    switch (error.id) {
+    case 'invalid-search-query':
+        errorIsLocalized = true;
+        errorDetails = locale.members.errors.invalidSearchQuery;
+        break;
+    case 'invalid-json':
+        errorIsLocalized = true;
+        errorDetails = locale.members.errors.invalidJSON;
+        break;
+    }
+
     return (
         <div className="list-error">
             <div className="error-title">
                 {locale.members.error}
             </div>
-            <pre className="error-details">
-                {error.toString()}
-            </pre>
+            {errorIsLocalized ? (
+                <div className="error-details">
+                    {errorDetails}
+                </div>
+            ) : (
+                <pre className="error-details">
+                    {errorDetails}
+                </pre>
+            )}
         </div>
     );
 }

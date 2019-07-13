@@ -230,8 +230,9 @@ async function requestMembers (state) {
         const transformedQuery = util.transformSearch(query);
 
         if (!util.isValidSearch(transformedQuery)) {
-            // TODO: emit error?
-            return;
+            const error = Error('invalid search query');
+            error.id = 'invalid-search-query';
+            throw error;
         }
 
         options.search = { str: transformedQuery, cols: [searchField] };
@@ -264,7 +265,12 @@ async function requestMembers (state) {
     let usedFilters = false;
     if (useJSONFilters) {
         usedFilters = true;
-        options.filter = JSON5.parse(state.json.filter);
+        try {
+            options.filter = JSON5.parse(state.json.filter);
+        } catch (err) {
+            err.id = 'invalid-json';
+            throw err;
+        }
     } else if (state.page.filtersEnabled) {
         const filters = [];
         for (const id in state.filters) {
