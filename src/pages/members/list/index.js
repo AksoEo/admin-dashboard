@@ -15,6 +15,7 @@ import FieldPicker from './field-picker';
 import { routerContext } from '../../../router';
 import { Spring } from '../../../animation';
 import locale from '../../../locale';
+import cache from './cache';
 
 const MembersSearch = connect(
     state => state,
@@ -33,7 +34,27 @@ const MembersSearch = connect(
 
     state = {
         fieldPickerOpen: false,
+        perms: {
+            // dummy defaults
+            memberFields: null,
+            memberFilter: {},
+        },
     };
+
+    tryGetPerms () {
+        cache.getPerms().then(perms => {
+            this.setState({ perms });
+        }).catch(err => {
+            /* eslint-disable no-console */
+            console.error('Failed to get permissions, trying again', err);
+            /* eslint-enable no-console */
+            this.tryGetPerms();
+        });
+    }
+
+    componentDidMount () {
+        this.tryGetPerms();
+    }
 
     render () {
         const { json, search, filters, fields, page, results, dispatch } = this.props;
@@ -58,7 +79,6 @@ const MembersSearch = connect(
         const onUnsubmit = () => dispatch(actions.unsubmit());
         const onJSONChange = filter => dispatch(actions.setJSONFilter(filter));
 
-        // FIXME: hacky solution
         const maybeResubmit = f => (...args) => {
             f(...args);
             if (page.submitted) onSubmit();
@@ -66,10 +86,16 @@ const MembersSearch = connect(
 
         const fixedFieldIds = fields.fixed.map(x => x.id);
 
-        // TODO: filter available fields to ones permitted by user permissions
         const availableFields = Object.keys(FIELDS)
             .filter(field => !FIELDS[field].hideColumn)
-            .filter(field => !fixedFieldIds.includes(field));
+            .filter(field => !fixedFieldIds.includes(field))
+            .filter(field => {
+                if (this.state.perms.memberFields) {
+                    return (this.state.perms.memberFields[field] || '').includes('r');
+                } else return true;
+            });
+
+        const hasGlobalFilter = !!Object.keys(this.state.perms.memberFilter).length;
 
         return (
             <div className="members-list-page">
@@ -101,7 +127,7 @@ const MembersSearch = connect(
                     onJSONChange={maybeResubmit(onJSONChange)} />
                 {page.submitted && results.hasResults ? (
                     <Results
-                        isRestrictedByGlobalFilter={false} // TODO: this
+                        isRestrictedByGlobalFilter={hasGlobalFilter}
                         list={results.list}
                         stats={results.stats}
                         fixedFields={fields.fixed}
