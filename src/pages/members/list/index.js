@@ -7,6 +7,12 @@ import msgpack from 'msgpack-lite';
 import * as actions from './actions';
 import { searchPage } from './reducers';
 import TablePagination from '@material-ui/core/TablePagination';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import IconButton from '@material-ui/core/IconButton';
+import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import SearchInput from './search-input';
 import { FILTERABLE_FIELDS } from './search-input/fields';
 import { FIELDS, Sorting } from './fields';
@@ -78,6 +84,7 @@ const MembersSearch = connect(
         const onSubmit = () => dispatch(actions.submit());
         const onUnsubmit = () => dispatch(actions.unsubmit());
         const onJSONChange = filter => dispatch(actions.setJSONFilter(filter));
+        const onCloseCSVExport = () => dispatch(actions.closeCSVExport());
 
         const maybeResubmit = f => (...args) => {
             f(...args);
@@ -143,6 +150,7 @@ const MembersSearch = connect(
                 ) : page.submitted && results.error ? (
                     <Error error={results.error} />
                 ) : null}
+                <CSVExportDialog page={page} onClose={onCloseCSVExport} />
             </div>
         );
     }
@@ -268,6 +276,7 @@ export default class MembersSearchContainer extends React.PureComponent {
                 filtersEnabled: false,
                 page: 0,
                 rowsPerPage: 10,
+                csvExport: null,
             },
             results: {
                 hasResults: false,
@@ -289,7 +298,7 @@ export default class MembersSearchContainer extends React.PureComponent {
 
     getOverflowMenu () {
         const state = this.store.getState();
-        return [
+        const items = [
             {
                 action: () => {
                     if (state.page.submitted) {
@@ -302,6 +311,15 @@ export default class MembersSearchContainer extends React.PureComponent {
                     : locale.members.search.json.menuLabel.enable,
             },
         ];
+        if (state.page.submitted) {
+            items.push({
+                label: locale.members.csvExport.menuItem,
+                action: () => {
+                    this.store.dispatch(actions.beginCSVExport());
+                },
+            });
+        }
+        return items;
     }
 
     decodeQuery (query) {
@@ -467,4 +485,43 @@ function Error ({ error }) {
 
 Error.propTypes = {
     error: PropTypes.any.isRequired,
+};
+
+function CSVExportDialog ({ page, onClose }) {
+    const href = 'data:text/csv;base64,' + btoa(page.csvExport && page.csvExport.data);
+
+    return (
+        <Dialog
+            open={!!page.csvExport}
+            onClose={onClose}>
+            <DialogTitle>
+                {locale.members.csvExport.title}
+            </DialogTitle>
+            <DialogContent className="members-csv-export-dialog">
+                {(page.csvExport && page.csvExport.data) ? (
+                    <div className="csv-data">
+                        <div className="csv-data-file">
+                            {locale.members.csvExport.filename}
+                        </div>
+                        <IconButton
+                            component="a"
+                            className="csv-download-button"
+                            download={locale.members.csvExport.filename}
+                            href={href}>
+                            <SaveAltIcon />
+                        </IconButton>
+                    </div>
+                ) : (page.csvExport && page.csvExport.error) ? (
+                    <div className="csv-error">
+                        {page.csvExport.error.toString()}
+                    </div>
+                ) : <CircularProgress />}
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+CSVExportDialog.propTypes = {
+    page: PropTypes.any.isRequried,
+    onClose: PropTypes.func.isRequired,
 };

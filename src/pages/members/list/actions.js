@@ -128,6 +128,29 @@ function receiveError (error) {
     return { type: RECEIVE_ERROR, error };
 }
 
+export const BEGIN_CSV_EXPORT = 'begin-csv-export';
+export function beginCSVExport () {
+    return (dispatch, getState) => {
+        dispatch({ type: BEGIN_CSV_EXPORT });
+
+        requestMembersCSV(getState()).then(csv => {
+            dispatch(endCSVExport(csv, null));
+        }).catch(err => {
+            dispatch(endCSVExport(null, err));
+        });
+    };
+}
+
+export const END_CSV_EXPORT = 'end-csv-export';
+function endCSVExport (data, error) {
+    return { type: END_CSV_EXPORT, data, error };
+}
+
+export const CLOSE_CSV_EXPORT = 'close-csv-export';
+export function closeCSVExport () {
+    return { type: CLOSE_CSV_EXPORT };
+}
+
 const fieldMapping = {
     codeholderType: {
         fields: ['codeholderType', 'enabled'],
@@ -195,7 +218,7 @@ const searchFieldToSelectedFields = {
     address: ['addressLatin'],
 };
 
-async function requestMembers (state) {
+async function requestMembers (state, queryOnly = false) {
     const useJSONFilters = state.json.enabled;
 
     const options = {};
@@ -288,6 +311,8 @@ async function requestMembers (state) {
         }
     }
 
+    if (queryOnly) return options;
+
     let itemToPrepend = null;
     if (prependedUeaCodeSearch) {
         itemToPrepend = (await client.get('/codeholders', {
@@ -334,4 +359,11 @@ async function requestMembers (state) {
             filtered: usedFilters,
         },
     };
+}
+
+async function requestMembersCSV (state, stringifyOptions) {
+    const query = await requestMembers(state, true);
+    delete query.offset;
+
+    return await client.getCsv('/codeholders', query, stringifyOptions);
 }

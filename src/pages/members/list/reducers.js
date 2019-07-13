@@ -107,6 +107,24 @@ function page (state = {}, action) {
         return { ...state, page: action.page };
     case actions.SET_ROWS_PER_PAGE:
         return { ...state, rowsPerPage: action.rowsPerPage };
+    case actions.BEGIN_CSV_EXPORT:
+        return {
+            ...state,
+            csvExport: {
+                data: null,
+                error: null,
+            },
+        };
+    case actions.END_CSV_EXPORT:
+        return {
+            ...state,
+            csvExport: {
+                data: action.data,
+                error: action.error,
+            },
+        };
+    case actions.CLOSE_CSV_EXPORT:
+        return { ...state, csvExport: null };
     default:
         return state;
     }
