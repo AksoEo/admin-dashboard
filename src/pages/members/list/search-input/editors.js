@@ -163,19 +163,32 @@ export default {
         const { field, value, onChange, fieldHeader, disabled } = props;
         const topValue = value;
 
-        const ageToYear = age => value.atStartOfYear
-            ? moment().startOf('year').subtract(age, 'years').year()
-            : moment().subtract(age, 'years').year();
+        const ageToBirthYearRange = age => {
+            // date at which age is zero
+            const zeroDate = (value.atStartOfYear
+                // subtract one second to only include people who were age years old *before*
+                // midnight Jan 1. While this is technically mathematically incorrect it’s kind
+                // of confusing to show e.g. 2018–2019 instead of 2019 on a collapsed range because
+                // of one measly second
+                ? moment().startOf('year').subtract(1, 'seconds')
+                : moment())
+                .subtract(age, 'years');
 
-        let birthYearRange;
-        if (value.range.isCollapsed()) {
-            birthYearRange = ageToYear(value.range.collapsedValue());
-        } else {
-            const start = value.range.startInclusive ? value.range.start : value.range.start + 1;
-            const end = value.range.endInclusive ? value.range.end : value.range.end - 1;
-            // age is the inverse of birth date; so end comes first
-            birthYearRange = `${ageToYear(end)}–${ageToYear(start)}`;
-        }
+            // zeroDate could be one day before [1 year after their birthday]
+            const lowerBound = zeroDate.clone().subtract(1, 'years').add(1, 'days').year();
+            // or it could be their birthday
+            const upperBound = zeroDate.year();
+            return { lowerBound, upperBound };
+        };
+
+        const start = value.range.startInclusive ? value.range.start : value.range.start + 1;
+        const end = value.range.endInclusive ? value.range.end : value.range.end - 1;
+        // age is the inverse of birth date; so end comes first
+        const lowerBound = ageToBirthYearRange(end).lowerBound;
+        const upperBound = ageToBirthYearRange(start).upperBound;
+        const birthYearRange = lowerBound === upperBound
+            ? lowerBound
+            : lowerBound + '–' + upperBound;
 
         return (
             <div className={'age-editor' + (disabled ? ' disabled' : '')}>
