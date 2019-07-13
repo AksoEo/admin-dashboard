@@ -13,6 +13,7 @@ import { FIELDS, Sorting } from './fields';
 import MembersList from './list';
 import FieldPicker from './field-picker';
 import { routerContext } from '../../../router';
+import { Spring } from '../../../animation';
 import locale from '../../../locale';
 
 const MembersSearch = connect(
@@ -27,6 +28,7 @@ const MembersSearch = connect(
         page: PropTypes.object.isRequired,
         results: PropTypes.object.isRequired,
         dispatch: PropTypes.func.isRequired,
+        onScrollToTop: PropTypes.func.isRequired,
     };
 
     state = {
@@ -41,7 +43,12 @@ const MembersSearch = connect(
         const onFiltersEnabledChange = enabled => dispatch(actions.setFiltersEnabled(enabled));
         const onSetFilterValue = (id, value) => dispatch(actions.setFilterValue(id, value));
         const onSetFilterEnabled = (id, enabled) => dispatch(actions.setFilterEnabled(id, enabled));
-        const onSetPage = (page) => dispatch(actions.setPage(page));
+        const onSetPage = (newPage) => {
+            if (newPage !== page.page) {
+                this.props.onScrollToTop();
+                dispatch(actions.setPage(newPage));
+            }
+        };
         const onSetRowsPerPage = (rowsPerPage) => dispatch(actions.setRowsPerPage(rowsPerPage));
         const onAddField = (id, prepend) => dispatch(actions.addField(id, prepend));
         const onRemoveField = (i) => dispatch(actions.removeField(i));
@@ -374,10 +381,26 @@ export default class MembersSearchContainer extends React.PureComponent {
         }
     }
 
+    onScrollToTop = () => {
+        if (!this.node) return;
+        if (this.node.scrollTop !== 0) {
+            const spring = new Spring(1, 0.6);
+            spring.value = this.node.scrollTop;
+            spring.target = 0;
+            spring.on('update', value => {
+                this.node.scrollTop = value;
+            });
+            spring.start();
+        }
+    };
+
     render () {
         return (
-            <div className="app-page members-page">
-                <Provider store={this.store}><MembersSearch /></Provider>
+            <div className="app-page members-page" ref={node => this.node = node}>
+                <Provider store={this.store}>
+                    <MembersSearch
+                        onScrollToTop={this.onScrollToTop} />
+                </Provider>
             </div>
         );
     }
