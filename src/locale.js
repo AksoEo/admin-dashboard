@@ -254,5 +254,8 @@ export default {
             title: '[[csv export]]',
             filename: 'data.csv',
         },
+        addMember: {
+            menuItem: '[[add member]]',
+        },
     },
 };

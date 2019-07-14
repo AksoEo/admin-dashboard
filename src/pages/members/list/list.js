@@ -38,8 +38,10 @@ export default class MembersList extends React.PureComponent {
         onEditFields: PropTypes.func.isRequired,
         /** Should return the path for a member ID. */
         getMemberPath: PropTypes.func.isRequired,
-        /** The list of members. */
-        list: PropTypes.arrayOf(PropTypes.object).isRequired,
+        /** The list of member IDs currently visible. */
+        list: PropTypes.array.isRequired,
+        /** The list of members by ID. */
+        members: PropTypes.object.isRequired,
     };
 
     state = {
@@ -129,7 +131,8 @@ export default class MembersList extends React.PureComponent {
 
         const members = [];
 
-        for (const item of this.props.list) {
+        for (const id of this.props.list) {
+            const item = this.props.members[id];
             members.push(
                 <MemberTableRow
                     key={item.id}

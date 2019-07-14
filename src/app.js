@@ -170,7 +170,7 @@ export default class App extends React.PureComponent {
             for (const item of menuSpec) {
                 items.push(
                     <MenuItem
-                        key={item}
+                        key={item.label}
                         onClick={() => {
                             item.action();
                             this.setState({

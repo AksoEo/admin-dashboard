@@ -130,6 +130,25 @@ function page (state = {}, action) {
     }
 }
 
+function members (state = {}, action) {
+    switch (action.type) {
+    case actions.RECEIVE_MEMBERS: {
+        const items = { ...state };
+        for (const item of action.list) {
+            if (items[item.id]) {
+                items[item.id] = { ...items[item.id], ...item };
+            } else {
+                items[item.id] = item;
+            }
+        }
+        // TODO: garbage-collect stale items in case memory consumption becomes a problem
+        return items;
+    }
+    default:
+        return state;
+    }
+}
+
 function results (state = {}, action) {
     switch (action.type) {
     case actions.UNSUBMIT:
@@ -138,7 +157,7 @@ function results (state = {}, action) {
         return {
             ...state,
             hasResults: true,
-            list: action.list,
+            list: action.list.map(item => item.id),
             temporaryFields: action.temporaryFields,
             stats: action.stats,
             error: null,
@@ -160,5 +179,6 @@ export const searchPage = combineReducers({
     fields,
     filters,
     page,
+    members,
     results,
 });

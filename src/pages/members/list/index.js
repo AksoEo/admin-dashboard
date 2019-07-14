@@ -33,6 +33,7 @@ const MembersSearch = connect(
         filters: PropTypes.object.isRequired,
         fields: PropTypes.object.isRequired,
         page: PropTypes.object.isRequired,
+        members: PropTypes.object.isRequired,
         results: PropTypes.object.isRequired,
         dispatch: PropTypes.func.isRequired,
         onScrollToTop: PropTypes.func.isRequired,
@@ -63,7 +64,7 @@ const MembersSearch = connect(
     }
 
     render () {
-        const { json, search, filters, fields, page, results, dispatch } = this.props;
+        const { json, search, filters, fields, page, members, results, dispatch } = this.props;
 
         const onSearchFieldChange = field => dispatch(actions.setSearchField(field));
         const onSearchQueryChange = query => dispatch(actions.setSearchQuery(query));
@@ -136,6 +137,7 @@ const MembersSearch = connect(
                     <Results
                         isRestrictedByGlobalFilter={hasGlobalFilter}
                         list={results.list}
+                        members={members}
                         stats={results.stats}
                         fixedFields={fields.fixed}
                         userSelectedFields={fields.user}
@@ -181,7 +183,8 @@ function Results (props) {
                         onSetFieldSorting={props.onSetFieldSorting}
                         onEditFields={props.onOpenFieldPicker}
                         getMemberPath={id => `/membroj/${id}`}
-                        list={props.list} />
+                        list={props.list}
+                        members={props.members} />
                 </div>
             ) : (
                 <div className="members-list-no-results">
@@ -205,6 +208,7 @@ function Results (props) {
 Results.propTypes = {
     isRestrictedByGlobalFilter: PropTypes.bool.isRequired,
     list: PropTypes.array.isRequired,
+    members: PropTypes.object.isRequired,
     stats: PropTypes.object.isRequired,
     fixedFields: PropTypes.array.isRequired,
     userSelectedFields: PropTypes.array.isRequired,
@@ -278,6 +282,7 @@ export default class MembersSearchContainer extends React.PureComponent {
                 rowsPerPage: 10,
                 csvExport: null,
             },
+            members: {},
             results: {
                 hasResults: false,
                 list: [],
@@ -319,6 +324,12 @@ export default class MembersSearchContainer extends React.PureComponent {
                 },
             });
         }
+        items.push({
+            label: locale.members.addMember.menuItem,
+            action: () => {
+                // TODO
+            },
+        });
         return items;
     }
 
