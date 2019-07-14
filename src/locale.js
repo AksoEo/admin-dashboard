@@ -177,6 +177,15 @@ export default {
                     enable: 'Uzi JSON-filtrilojn',
                     disable: 'Uzi facilajn filtrilojn',
                 },
+                help: {
+                    title: '[[json help]]',
+                    content: `[[json help content goes here. if you would like this to be raw html\
+                    that can be arranged (it’s not like we’re going to html inject ourselves though\
+                    this locale object isn’t immutable so technically that is a possibility but who\
+                    would even do that)\
+                    if this is going to be interactive (api doc browser?) that too can be\
+                    arranged]]`,
+                },
             },
         },
         resultStats: (count, filtered, total, time) => {

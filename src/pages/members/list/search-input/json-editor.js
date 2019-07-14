@@ -2,10 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import JSON5 from 'json5';
+import IconButton from '@material-ui/core/IconButton';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import HelpIcon from '@material-ui/icons/Help';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
+import locale from '../../../../locale';
 import './json-editor.less';
 
 // see ../index.js for the default value
@@ -18,6 +24,10 @@ export default class JSONEditor extends React.PureComponent {
         onChange: PropTypes.func.isRequired,
         submitted: PropTypes.bool.isRequired,
         onSubmit: PropTypes.func.isRequired,
+    };
+
+    state = {
+        helpOpen: false,
     };
 
     lastErrorLine = -1;
@@ -88,6 +98,11 @@ export default class JSONEditor extends React.PureComponent {
             <div
                 className={'json-editor' + (this.props.submitted ? ' submitted' : '')}
                 onClick={e => e.stopPropagation()}>
+                <IconButton
+                    className="json-editor-help-button"
+                    onClick={() => this.setState({ helpOpen: true })}>
+                    <HelpIcon />
+                </IconButton>
                 <CodeMirror
                     value={this.props.value}
                     options={{
@@ -101,6 +116,16 @@ export default class JSONEditor extends React.PureComponent {
                     }}
                     editorDidMount={this.onEditorMount}
                     onBeforeChange={(editor, data, value) => this.props.onChange(value)} />
+                <Dialog
+                    open={this.state.helpOpen}
+                    onClose={() => this.setState({ helpOpen: false })}>
+                    <DialogTitle>
+                        {locale.members.search.json.help.title}
+                    </DialogTitle>
+                    <DialogContent>
+                        {locale.members.search.json.help.content}
+                    </DialogContent>
+                </Dialog>
             </div>
         );
     }

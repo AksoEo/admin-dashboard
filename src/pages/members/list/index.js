@@ -522,6 +522,6 @@ function CSVExportDialog ({ page, onClose }) {
 }
 
 CSVExportDialog.propTypes = {
-    page: PropTypes.any.isRequried,
+    page: PropTypes.any.isRequired,
     onClose: PropTypes.func.isRequired,
 };
