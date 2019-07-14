@@ -146,8 +146,8 @@ export default {
             },
             membership: {
                 invert: {
-                    yes: 'Ne havas',
-                    no: 'Havas',
+                    yes: 'ne havas',
+                    no: 'havas',
                 },
                 lifetime: {
                     yes: 'dumviva',

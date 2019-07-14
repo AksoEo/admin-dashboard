@@ -8,11 +8,16 @@ import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import './json-editor.less';
 
+// see ../index.js for the default value
+// after the tab on the second line
+const DEFAULT_CURSOR_POS = [1, 1];
+
 export default class JSONEditor extends React.PureComponent {
     static propTypes = {
         value: PropTypes.string.isRequired,
         onChange: PropTypes.func.isRequired,
         submitted: PropTypes.bool.isRequired,
+        onSubmit: PropTypes.func.isRequired,
     };
 
     lastErrorLine = -1;
@@ -62,10 +67,20 @@ export default class JSONEditor extends React.PureComponent {
         }
     };
 
+    onKeyDown = (instance, e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+            // submit on ⌃⏎ or ⌘⏎
+            e.preventDefault();
+            this.props.onSubmit();
+        }
+    };
+
     onEditorMount = editor => {
         this.editor = editor;
         this.validateJSON();
         editor.on('change', this.validateJSON);
+        editor.doc.setCursor(...DEFAULT_CURSOR_POS);
+        editor.on('keydown', this.onKeyDown);
     };
 
     render () {

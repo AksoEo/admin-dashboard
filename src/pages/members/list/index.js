@@ -231,7 +231,7 @@ export default class MembersSearchContainer extends React.PureComponent {
         this.store = createStore(searchPage, {
             json: {
                 enabled: false,
-                filter: '{}',
+                filter: '{\n\t\n}',
             },
             search: {
                 field: 'nameOrCode',

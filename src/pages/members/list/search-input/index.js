@@ -87,6 +87,7 @@ export default class SearchInput extends React.PureComponent {
                         <JSONEditor
                             value={this.props.jsonFilter}
                             onChange={this.props.onJSONChange}
+                            onSubmit={this.props.onSubmit}
                             submitted={this.props.submitted} />
                     </Suspense>
                 ),
