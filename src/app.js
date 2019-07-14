@@ -20,6 +20,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Sidebar from './features/sidebar';
+import HeaderLogo from './components/header-logo';
 import routes from './pages';
 
 import moment from 'moment';
@@ -248,20 +249,7 @@ export default class App extends React.PureComponent {
             <AppBar position="sticky" id="app-header">
                 <Toolbar>
                     {this.state.permaSidebar ? (
-                        <div className="header-logo">
-                            <img
-                                className="logo"
-                                src="/assets/logo.svg"
-                                draggable={0}
-                                aria-hidden="true"
-                                role="presentation" />
-                            <img
-                                className="logo-label"
-                                src="/assets/logo-label.svg"
-                                draggable={0}
-                                aria-label="AKSO"
-                                alt="AKSO" />
-                        </div>
+                        <HeaderLogo onClick={() => this.onNavigate('/')} />
                     ) : this.state.showBackButton ? null : (
                         <IconButton
                             className="menu-button"
