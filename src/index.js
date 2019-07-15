@@ -1,5 +1,5 @@
 import { h, render } from 'preact';
-import { CircularProgressIndicator } from './p-components/progress';
+import { CircularProgress } from 'yamdl';
 import Login, { isSpecialPage } from './login';
 import client from './client';
 import './style';
@@ -50,7 +50,7 @@ function beginSession () {
 function initApp (app, shouldPlayLoginAnimation = false) {
     const loadingRoot = document.createElement('div');
     loadingRoot.id = 'app-loading';
-    render(<CircularProgressIndicator indeterminate />, loadingRoot);
+    render(<CircularProgress indeterminate />, loadingRoot);
 
     let appLoaded = false;
     let addedLoadingIndicator = false;
