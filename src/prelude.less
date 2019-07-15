@@ -24,6 +24,12 @@
 @sidebar-text: inherit;
 @monospace: Menlo, Roboto Mono, Consolas, monospace;
 
+// yamdl style setup
+@import '../node_modules/yamdl/src/prelude';
+:root {
+    .md-light-theme(@primary, @control-primary, @error);
+}
+
 @easing: cubic-bezier(0.2, 0.3, 0, 1);
 
 // adapted from https://github.com/material-components/material-components-web/tree/

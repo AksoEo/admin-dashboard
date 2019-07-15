@@ -1,11 +1,8 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import UEACode from 'akso-client/uea-code';
-import Form, { Validator } from '../p-components/form';
-import Button from '../p-components/button';
-import Checkbox from '../p-components/checkbox';
-import TextField from '../p-components/text-field';
-import { CircularProgressIndicator } from '../p-components/progress';
+import Form, { Validator } from './form';
+import { Button, Checkbox, TextField, CircularProgress } from 'yamdl';
 import locale from '../locale';
 import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';
@@ -382,7 +379,7 @@ class DetailsStage extends Component {
                     ) : <div class="help-links" />}
                     <Button type="submit" class="raised" disabled={this.state.loading}>
                         {this.state.loading ? (
-                            <CircularProgressIndicator
+                            <CircularProgress
                                 class="progress-overlay"
                                 indeterminate
                                 small />
@@ -472,14 +469,14 @@ class SecurityCodeStage extends Component {
                             throw { error: locale.login.invalidSecurityCode };
                         }
                     }} />
-                <p className="totp-bypass-container">
+                <p class="totp-bypass-container">
                     <Checkbox
-                        className="totp-bypass-switch"
+                        class="totp-bypass-switch"
                         id="totp-bypass-switch"
                         checked={this.state.bypassTotp}
                         onChange={bypassTotp => this.setState({ bypassTotp })} />
                     <label
-                        className="totp-bypass-label"
+                        class="totp-bypass-label"
                         for="totp-bypass-switch">
                         {locale.login.bypassTotp}
                     </label>
@@ -498,7 +495,7 @@ class SecurityCodeStage extends Component {
                     </div>
                     <Button type="submit" class="raised" disabled={this.state.loading}>
                         {this.state.loading ? (
-                            <CircularProgressIndicator
+                            <CircularProgress
                                 class="progress-overlay"
                                 indeterminate
                                 small />

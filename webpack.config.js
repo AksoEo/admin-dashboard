@@ -119,6 +119,38 @@ module.exports = function (env, argv) {
                     ]
                 },
                 {
+                    // temporary solution to yamdl preact pragma h
+                    test: /node_modules\/yamdl\/.+\.js$/,
+                    use: [
+                        {
+                            loader: 'babel-loader',
+                            options: {
+                                presets: [
+                                    [
+                                        '@babel/preset-env',
+                                        {
+                                            targets: browserTargets,
+                                            useBuiltIns: 'usage',
+                                            corejs: '3.0.1',
+                                        }
+                                    ],
+                                    [
+                                        '@babel/preset-react',
+                                        { pragma: 'h' },
+                                    ]
+                                ],
+                                plugins: [
+                                    '@babel/plugin-proposal-class-properties',
+                                    '@babel/plugin-proposal-export-default-from',
+                                    '@babel/plugin-syntax-dynamic-import'
+                                ]
+                            }
+                        }, {
+                            loader: 'eslint-loader'
+                        }
+                    ]
+                },
+                {
                     test: /\.(c|le)ss$/,
                     use: [
                         MiniCssExtractPlugin.loader,

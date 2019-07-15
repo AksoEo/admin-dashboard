@@ -91,6 +91,11 @@ class Mass {
             this.value = this.ground;
             this.velocity *= -this.bounce;
         }
+
+        if (!this.wantsUpdate) {
+            this.value = this.ground;
+            this.velocity = 0;
+        }
     }
 
     get wantsUpdate () {
