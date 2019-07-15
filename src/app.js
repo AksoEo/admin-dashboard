@@ -24,6 +24,7 @@ import HeaderLogo from './components/header-logo';
 import routes from './pages';
 
 import moment from 'moment';
+import 'moment/locale/eo';
 moment.locale('eo');
 
 const theme = createMuiTheme({

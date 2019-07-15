@@ -78,6 +78,8 @@ module.exports = function (env, argv) {
                 // required by akso-client but not used
                 resourceRegExp: /fetch-cookie/,
             }),
+            // stop moment from loading all the locales
+            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         ].filter(x => x),
         module: {
             rules: [
