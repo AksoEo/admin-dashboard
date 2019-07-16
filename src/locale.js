@@ -182,7 +182,7 @@ export default {
                     disable: 'Uzi facilajn filtrilojn',
                 },
                 help: {
-                    title: '[[json help]]',
+                    title: 'JSON-helpo',
                     content: `[[json help content goes here. if you would like this to be raw html\
                     that can be arranged (it’s not like we’re going to html inject ourselves though\
                     this locale object isn’t immutable so technically that is a possibility but who\
@@ -250,17 +250,17 @@ export default {
         noResults: 'Trovis neniujn rezultojn',
         error: 'Eraro',
         errors: {
-            invalidSearchQuery: '[[utils.isValidSearch says your search query isn’t valid; iirc Mia said something about adding an explainy text here so i guess they can do that when they localize this]]',
-            invalidJSON: '[[the json filter has a syntax error; refer to the codemirror view for details]]',
+            invalidSearchQuery: 'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj. Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon: `*` post vorto por permesi ajnajn sekvantajn signojn post la vorto, `+` antaŭ vorto por postuli ĝian ekziston, `-` antaŭ vorto por postuli ĝian malekziston kaj `""`-citilojn ĉirkaŭ frazo aŭ vorto por postuli la ekzaktan kombinon de la vortoj. Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.',
+            invalidJSON: 'Estas tajperaro en la JSON-filtriloj. Detalaj informoj troviĝas en la JSON-filtrilkampo.',
         },
         csvExport: {
-            menuItem: '[[export csv]]',
-            title: '[[csv export]]',
+            menuItem: 'Elporti kiel CSV',
+            title: 'Elporti kiel CSV',
             filename: 'data.csv',
         },
         addMember: {
-            menuItem: '[[add member]]',
-            title: '[[add member]]',
+            menuItem: 'Aldoni membron',
+            title: 'Aldoni membron',
         },
     },
 };
