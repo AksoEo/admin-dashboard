@@ -18,7 +18,6 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Sidebar from './features/sidebar';
 import HeaderLogo from './components/header-logo';
 import routes from './pages';

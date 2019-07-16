@@ -74,7 +74,8 @@ module.exports = function (env, argv) {
             new OptimizeCssAssetsPlugin(),
             new HtmlWebpackPlugin({
                 template: 'src/index.html',
-                inject: 'body'
+                inject: 'body',
+                chunks: ['entry'],
             }),
             analyze && new BundleAnalyzerPlugin(),
             new SWCacheGenPlugin(),
@@ -106,7 +107,7 @@ module.exports = function (env, argv) {
                                         {
                                             targets: browserTargets,
                                             useBuiltIns: 'usage',
-                                            corejs: '3.0.1',
+                                            corejs: '3.1.4',
                                         }
                                     ],
                                     [
@@ -137,7 +138,7 @@ module.exports = function (env, argv) {
                                         {
                                             targets: browserTargets,
                                             useBuiltIns: 'usage',
-                                            corejs: '3.0.1',
+                                            corejs: '3.1.4',
                                         }
                                     ],
                                     [
@@ -154,7 +155,19 @@ module.exports = function (env, argv) {
                         }, {
                             loader: 'eslint-loader'
                         }
-                    ]
+                    ],
+                },
+                {
+                    // some dependencies seem to have syntax not supported by MS Edge
+                    test: /node_modules\/csv-stringify\/.+\.js$/,
+                    use: [{
+                        loader: 'babel-loader',
+                        options: {
+                            plugins: [
+                                '@babel/plugin-proposal-object-rest-spread',
+                            ],
+                        },
+                    }],
                 },
                 {
                     test: /\.(c|le)ss$/,
