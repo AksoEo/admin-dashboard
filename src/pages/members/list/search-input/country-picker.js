@@ -13,7 +13,7 @@ import LanguageIcon from '@material-ui/icons/Language';
 import fuzzaldrin from 'fuzzaldrin';
 import { Spring, globalAnimator, lerp } from '../../../../animation';
 import locale from '../../../../locale';
-import cache from '../cache';
+import cache from '../../../../cache';
 
 /** Converts a letter to a regional indicator */
 const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);

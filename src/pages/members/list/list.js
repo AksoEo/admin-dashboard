@@ -12,7 +12,7 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import SearchIcon from '@material-ui/icons/Search';
 import MemberField from './field-views';
 import locale from '../../../locale';
-import { Link, routerContext } from '../../../router';
+import { Link, appContext } from '../../../router';
 import { FIELDS, Sorting } from './fields';
 import './style';
 
@@ -169,7 +169,7 @@ class MemberTableRow extends React.PureComponent {
         onSelectChange: PropTypes.func.isRequired,
     };
 
-    static contextType = routerContext;
+    static contextType = appContext;
 
     onClick = () => {
         this.context.navigate(this.props.getMemberPath(this.props.value.id));

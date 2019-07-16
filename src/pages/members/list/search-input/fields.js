@@ -217,7 +217,8 @@ export const FILTERABLE_FIELDS = {
         min: 1887,
         max: new Date().getFullYear(),
         default () {
-            return new NumericRange(1887, new Date().getFullYear(), true, true);
+            const thisYear = new Date().getFullYear();
+            return new NumericRange(thisYear, thisYear, true, true);
         },
         serialize (value) {
             return [value.start, value.end, value.startInclusive, value.endInclusive];

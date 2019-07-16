@@ -18,10 +18,9 @@ import { FILTERABLE_FIELDS } from './search-input/fields';
 import { FIELDS, Sorting } from './fields';
 import MembersList from './list';
 import FieldPicker from './field-picker';
-import { routerContext } from '../../../router';
+import { appContext } from '../../../router';
 import { Spring } from '../../../animation';
 import locale from '../../../locale';
-import cache from './cache';
 
 const MembersSearch = connect(
     state => state,
@@ -41,27 +40,9 @@ const MembersSearch = connect(
 
     state = {
         fieldPickerOpen: false,
-        perms: {
-            // dummy defaults
-            memberFields: null,
-            memberFilter: {},
-        },
     };
 
-    tryGetPerms () {
-        cache.getPerms().then(perms => {
-            this.setState({ perms });
-        }).catch(err => {
-            /* eslint-disable no-console */
-            console.error('Failed to get permissions, trying again', err);
-            /* eslint-enable no-console */
-            this.tryGetPerms();
-        });
-    }
-
-    componentDidMount () {
-        this.tryGetPerms();
-    }
+    static contextType = appContext;
 
     render () {
         const { json, search, filters, fields, page, members, results, dispatch } = this.props;
@@ -98,12 +79,12 @@ const MembersSearch = connect(
             .filter(field => !FIELDS[field].hideColumn)
             .filter(field => !fixedFieldIds.includes(field))
             .filter(field => {
-                if (this.state.perms.memberFields) {
-                    return (this.state.perms.memberFields[field] || '').includes('r');
+                if (this.context.permissions.memberFields) {
+                    return (this.context.permissions.memberFields[field] || '').includes('r');
                 } else return true;
             });
 
-        const hasGlobalFilter = !!Object.keys(this.state.perms.memberFilter).length;
+        const hasGlobalFilter = !!Object.keys(this.context.permissions.memberFilter).length;
 
         return (
             <div className="members-list-page">
@@ -227,7 +208,7 @@ export default class MembersSearchContainer extends React.PureComponent {
         query: PropTypes.string,
     };
 
-    static contextType = routerContext;
+    static contextType = appContext;
 
     constructor (props) {
         super(props);

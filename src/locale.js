@@ -35,11 +35,15 @@ export default {
     pages: {
         home: 'Hejmo',
         members: 'Membroj',
+        membership: 'Membreco',
+        email: 'Retpoŝto',
         magazines: 'Revuoj',
         statistics: 'Statistiko',
         congresses: 'Kongresoj',
         payments: 'Pagoj',
         elections: 'Voĉdonado',
+        newsletters: 'Bultenoj',
+        administration: 'Administrado',
     },
     // Login screen
     login: {
@@ -256,6 +260,7 @@ export default {
         },
         addMember: {
             menuItem: '[[add member]]',
+            title: '[[add member]]',
         },
     },
 };

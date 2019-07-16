@@ -6,6 +6,10 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import BusinessIcon from '@material-ui/icons/Business';
 import PaymentIcon from '@material-ui/icons/Payment';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
+import CardMembershipIcon from '@material-ui/icons/CardMembership';
+import EmailIcon from '@material-ui/icons/Email';
+import MarkunreadMailboxIcon from '@material-ui/icons/MarkunreadMailbox';
+import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 
 /** A newspaper icon. */
 export const NewspaperIcon = function NewspaperIcon () {
@@ -52,6 +56,16 @@ export default [
                 ]
             },
             {
+                id: 'membership',
+                icon: <CardMembershipIcon />,
+                url: 'membreco',
+            },
+            {
+                id: 'email',
+                icon: <EmailIcon />,
+                url: 'retposhto',
+            },
+            {
                 id: 'magazines',
                 icon: <NewspaperIcon />,
                 url: 'revuoj',
@@ -75,6 +89,16 @@ export default [
                 id: 'elections',
                 icon: <HowToVoteIcon />,
                 url: 'vochdonado',
+            },
+            {
+                id: 'newsletters',
+                icon: <MarkunreadMailboxIcon />,
+                url: 'bultenoj',
+            },
+            {
+                id: 'administration',
+                icon: <SupervisorAccountIcon />,
+                url: 'administrado',
             },
         ],
     },

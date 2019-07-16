@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import { routerContext } from './router';
+import { appContext } from './router';
 import locale from './locale';
 import { activeRequests, activeRequestsEmitter } from './client';
 import './app.less';
@@ -22,6 +22,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import Sidebar from './features/sidebar';
 import HeaderLogo from './components/header-logo';
 import routes from './pages';
+import cache from './cache';
 
 import moment from 'moment';
 import 'moment/locale/eo';
@@ -85,9 +86,13 @@ export default class App extends React.PureComponent {
         sidebarOpen: false,
         permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH,
         currentPage: currentPageFromLocation(),
-        showBackButton: false,
         hasActiveRequest: false,
         overflowMenu: null,
+        permissions: {
+            // dummy defaults
+            memberFields: null,
+            memberFilter: {},
+        },
     };
 
     /** The current page component. */
@@ -140,19 +145,12 @@ export default class App extends React.PureComponent {
         this.setState({
             currentPage,
             sidebarOpen: false,
-            showBackButton: currentPage.component !== this.state.currentPage.component
-                ? false // reset back button visibility if page changes
-                : this.state.showBackButton,
         }, () => {
             // restore scroll position if it was saved
             if (e.state && e.state.scrollPosition) {
                 this.currentPageNode().scrollTop = e.state.scrollPosition;
             }
         });
-    };
-
-    setBackButtonVisible = visible => {
-        this.setState({ showBackButton: visible });
     };
 
     goBack = () => {
@@ -197,12 +195,24 @@ export default class App extends React.PureComponent {
         }
     };
 
+    tryGetPerms () {
+        cache.getPerms().then(permissions => {
+            this.setState({ permissions });
+        }).catch(err => {
+            /* eslint-disable no-console */
+            console.error('Failed to get permissions, trying again', err);
+            /* eslint-enable no-console */
+            this.tryGetPerms();
+        });
+    }
+
     componentDidMount () {
         this.onResize();
         window.addEventListener('resize', this.onResize);
         window.addEventListener('popstate', this.onPopState);
         this.updatePageTitle();
         activeRequestsEmitter.on('update', this.onActiveRequestsUpdate);
+        this.tryGetPerms();
     }
 
     componentWillUnmount () {
@@ -254,7 +264,7 @@ export default class App extends React.PureComponent {
                 <Toolbar>
                     {this.state.permaSidebar ? (
                         <HeaderLogo onClick={() => this.onNavigate('/')} />
-                    ) : this.state.showBackButton ? null : (
+                    ) : (
                         <IconButton
                             className="menu-button"
                             color="inherit"
@@ -265,15 +275,6 @@ export default class App extends React.PureComponent {
                             <MenuIcon />
                         </IconButton>
                     )}
-                    {this.state.showBackButton ? (
-                        <IconButton
-                            className="back-button"
-                            color="inherit"
-                            aria-label={locale.header.back}
-                            onClick={this.goBack}>
-                            <ArrowBackIcon />
-                        </IconButton>
-                    ) : null}
                     <Typography
                         className="header-title"
                         color="inherit"
@@ -340,7 +341,6 @@ export default class App extends React.PureComponent {
                 <PageComponent
                     match={this.state.currentPage.match}
                     query={this.state.currentPage.query}
-                    setBackButtonVisible={this.setBackButtonVisible}
                     ref={page => this.currentPage = page} />
             </Suspense>
         );
@@ -348,9 +348,10 @@ export default class App extends React.PureComponent {
         return (
             <div id="app" className={className}>
                 <MuiThemeProvider theme={theme}>
-                    <routerContext.Provider value={{
+                    <appContext.Provider value={{
                         navigate: this.onNavigate,
                         replace: this.onReplace,
+                        permissions: this.state.permissions,
                     }}>
                         {appHeader}
                         <div className="app-contents">
@@ -359,7 +360,7 @@ export default class App extends React.PureComponent {
                                 {pageContents}
                             </div>
                         </div>
-                    </routerContext.Provider>
+                    </appContext.Provider>
                 </MuiThemeProvider>
             </div>
         );

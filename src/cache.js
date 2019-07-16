@@ -1,4 +1,4 @@
-import client from '../../../client';
+import client from './client';
 
 function cachedRequest (endpoint, options = {}, handle = (result => result.body)) {
     let cached;

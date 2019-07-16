@@ -8,7 +8,7 @@ import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
 import { UEACode } from 'akso-client';
 import moment from 'moment';
 import locale from '../../../locale';
-import cache from './cache';
+import cache from '../../../cache';
 
 /** Renders a single member field. */
 export default class MemberField extends React.PureComponent {

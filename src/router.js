@@ -6,21 +6,23 @@ import PropTypes from 'prop-types';
  *
  * - `navigate: (string) => void`: function that may be called to navigate in-app
  * - `replace: (string) => void`: function that may be called to replaceState in-app
+ * - `permissions: Object`: permissions object, as defined in the AKSO API
  */
-export const routerContext = React.createContext({
+export const appContext = React.createContext({
     navigate: null,
     replace: null,
+    permissions: null,
 });
 
 /**
  * An in-app link.
  *
- * - `target: string`: required property that contains the `routerContext`→`navigate` argument.
+ * - `target: string`: required property that contains the `appContext`→`navigate` argument.
  * @type {React.PureComponent}
  */
 export const Link = function Link (props) {
     return (
-        <routerContext.Consumer>
+        <appContext.Consumer>
             {context => (
                 <a {...props} href={props.target} target={null} onClick={e => {
                     if (e.ctrlKey || e.metaKey) return;
@@ -31,7 +33,7 @@ export const Link = function Link (props) {
                     {props.children}
                 </a>
             )}
-        </routerContext.Consumer>
+        </appContext.Consumer>
     );
 };
 

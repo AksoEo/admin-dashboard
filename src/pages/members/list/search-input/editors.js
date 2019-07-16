@@ -12,7 +12,7 @@ import NumericRangeEditor, { NumericRange } from '../../editors/numeric-range';
 import Segmented from '../../../../components/segmented';
 import locale from '../../../../locale';
 import CountryPicker from './country-picker';
-import cache from '../cache';
+import cache from '../../../../cache';
 
 /* eslint-disable react/prop-types */
 
