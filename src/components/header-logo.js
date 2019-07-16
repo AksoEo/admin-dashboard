@@ -83,13 +83,18 @@ class Mass {
         this.bounce = bounce;
     }
 
-    update (dt) {
-        this.velocity += this.gravity * this.mass * dt;
-        this.value += this.velocity * dt;
+    update (elapsed) {
+        let timeLeft = elapsed;
+        while (timeLeft > 0) {
+            const dt = Math.min(1 / 60, timeLeft);
+            timeLeft -= dt;
+            this.velocity += this.gravity * this.mass * dt;
+            this.value += this.velocity * dt;
 
-        if (this.value < this.ground) {
-            this.value = this.ground;
-            this.velocity *= -this.bounce;
+            if (this.value < this.ground) {
+                this.value = this.ground;
+                this.velocity *= -this.bounce;
+            }
         }
 
         if (!this.wantsUpdate) {

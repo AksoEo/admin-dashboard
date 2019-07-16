@@ -49,7 +49,10 @@ function currentPageFromLocation () {
 
     if (!pathParts.length) pathParts.push('');
 
+    // match routes against path, iteratively going deeper
     let items = routes.flatMap(category => category.contents);
+
+    // default null page
     const page = { id: null, component: null, query: queryString, match: null };
 
     for (const part of pathParts) {

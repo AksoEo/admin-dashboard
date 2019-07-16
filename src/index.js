@@ -26,7 +26,12 @@ function beginSession () {
             loginRoot.className = 'root-container';
             document.body.appendChild(loginRoot);
 
+            let didLogin = false;
             const onLogin = function () {
+                // FIXME: sometimes it creates two react roots? i suspect it calls onLogin twice
+                // so here’s a quick fix
+                if (didLogin) return;
+                didLogin = true;
                 loginRoot.classList.add('animate-out');
                 setTimeout(() => {
                     document.body.removeChild(loginRoot);
