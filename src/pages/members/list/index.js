@@ -14,13 +14,30 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import IconButton from '@material-ui/core/IconButton';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import SearchInput from './search-input';
-import { FILTERABLE_FIELDS } from './search-input/fields';
+import { SEARCHABLE_FIELDS, FILTERABLE_FIELDS } from './search-input/fields';
 import { FIELDS, Sorting } from './fields';
 import MembersList from './list';
 import FieldPicker from './field-picker';
 import { appContext } from '../../../router';
 import { Spring } from '../../../animation';
 import locale from '../../../locale';
+import ListView from '../../../components/list';
+
+export default class MembersSearch2 extends React.PureComponent {
+    render () {
+        return <ListView
+            defaults={{
+                searchField: 'nameOrCode',
+            }}
+            searchFields={SEARCHABLE_FIELDS}
+            filters={{
+                age: {
+                    id: 'age',
+                    needsSwitch: true,
+                },
+            }} />;
+    }
+}
 
 const MembersSearch = connect(
     state => state,
@@ -203,7 +220,7 @@ Results.propTypes = {
     onOpenFieldPicker: PropTypes.func.isRequired,
 };
 
-export default class MembersSearchContainer extends React.PureComponent {
+export class MembersSearchContainer extends React.PureComponent {
     static propTypes = {
         query: PropTypes.string,
     };

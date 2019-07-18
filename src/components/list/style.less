@@ -1,0 +1,40 @@
+@import '../../prelude';
+
+.list-view {
+    .search-input {
+        display: flex;
+        align-items: center;
+        border-radius: 4px;
+        transition: box-shadow 0.3s @easing;
+        .elevation(4);
+
+        &:focus-within {
+            .elevation(6);
+        }
+
+        .search-field {
+            flex-shrink: 0;
+            margin-left: 16px;
+        }
+
+        .search-query {
+            flex: 1;
+            font: inherit;
+            background: none;
+            color: inherit;
+            border: none;
+            align-self: stretch;
+            padding: 16px;
+            margin: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+
+        .search-action {
+            flex-shrink: 0;
+            margin-right: 8px;
+        }
+    }
+}

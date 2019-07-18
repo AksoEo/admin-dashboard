@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import * as actions from './actions';
+import Sorting from './sorting';
 
 function search (state = { field: null, query: '' }, action) {
     switch (action.type) {
@@ -44,6 +45,19 @@ function filters (state = { enabled: false, filters: {} }, action) {
             };
         }
         return state;
+    case actions.ADD_FILTER:
+        return {
+            ...state,
+            filters: {
+                ...state.filters,
+                [action.id]: action.data,
+            },
+        };
+    case actions.REMOVE_FILTER: {
+        const filters = { ...state.filters };
+        delete filters[action.id];
+        return { ...state, filters };
+    }
     default:
         return state;
     }

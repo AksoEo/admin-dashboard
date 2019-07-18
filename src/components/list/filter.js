@@ -1,5 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Checkbox from '@material-ui/core/Checkbox';
+import locale from '../../locale';
+
+// TODO: fix locale
 
 /** A single filter. */
 export default class Filter extends React.PureComponent {
@@ -11,10 +15,13 @@ export default class Filter extends React.PureComponent {
          * - `id: string`
          * - `needsSwitch: bool?`
          * - `autoSwitch: bool?`
+         * - `isNone: ((any) => bool)?` required if !needsSwitch
+         * - `default: (() => T)?`
+         * - `editor: Component?`
          */
         filter: PropTypes.object.isRequired,
         enabled: PropTypes.bool.isRequired,
-        value: PropTypes.any.isRequired,
+        value: PropTypes.any,
         onChange: PropTypes.func.isRequired,
         onEnabledChange: PropTypes.func.isRequired,
         /** Should be set to true if the form was submitted and the checkboxes should be hidden. */
@@ -54,7 +61,7 @@ export default class Filter extends React.PureComponent {
             value: this.props.value,
             onChange: value => {
                 this.props.onChange(value);
-                if (!(field.needsSwitch)) {
+                if (!(filter.needsSwitch)) {
                     this.props.onEnabledChange(!filter.isNone(value));
                 }
             },
@@ -63,10 +70,10 @@ export default class Filter extends React.PureComponent {
             disabled: !!filter.needsSwitch && !this.props.enabled,
         };
 
-        const Editor = editors[filter.id];
+        const Editor = filter.editor;
         if (Editor) {
             editor = <Editor {...editorProps} />;
-        } else editor = fieldHeader;
+        } else editor = filterHeader;
 
         let className = 'search-filter';
         if (!this.props.enabled) className += ' disabled';
