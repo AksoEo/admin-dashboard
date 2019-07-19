@@ -12,13 +12,13 @@ export default class Filter extends React.PureComponent {
          * The filter spec.
          *
          * # Properties
-         * - `id: string`
          * - `needsSwitch: bool?`
          * - `autoSwitch: bool?`
          * - `isNone: ((any) => bool)?` required if !needsSwitch
          * - `default: (() => T)?`
          * - `editor: Component?`
          */
+        id: PropTypes.string.isRequired,
         filter: PropTypes.object.isRequired,
         enabled: PropTypes.bool.isRequired,
         value: PropTypes.any,
@@ -31,6 +31,7 @@ export default class Filter extends React.PureComponent {
     render () {
         let editor = '?';
 
+        const id = this.props.id;
         const filter = this.props.filter;
         const userCanToggleEnabled = (filter.needsSwitch && !filter.autoSwitch)
             && !this.props.submitted;
@@ -50,7 +51,7 @@ export default class Filter extends React.PureComponent {
                         this.props.onEnabledChange(!this.props.enabled);
                     }
                 }}>
-                    {locale.members.search.fields[filter.id]}
+                    {locale.members.search.fields[id]}
                 </div>
             </div>
         );

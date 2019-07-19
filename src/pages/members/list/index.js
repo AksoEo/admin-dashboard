@@ -66,12 +66,7 @@ export default class MembersSearch2 extends React.PureComponent {
                         ],
                     }}
                     searchFields={SEARCHABLE_FIELDS}
-                    filters={{
-                        age: {
-                            id: 'age',
-                            needsSwitch: true,
-                        },
-                    }}
+                    filters={FILTERABLE_FIELDS}
                     fields={fields}
                     fieldConfigColumn={'codeholderType'}
                     onRequest={handleRequest}

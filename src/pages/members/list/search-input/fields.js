@@ -1,4 +1,5 @@
 import { NumericRange } from '../../editors/numeric-range';
+import editors from './editors';
 
 export const SEARCHABLE_FIELDS = [
     'nameOrCode',
@@ -31,6 +32,7 @@ export const FILTERABLE_FIELDS = {
             else if (value === 'h') return { human: true, org: false };
             else return { human: true, org: true };
         },
+        editor: editors.codeholderType,
     },
     country: {
         default () {
@@ -57,13 +59,15 @@ export const FILTERABLE_FIELDS = {
             }
             return { $or: filterItems };
         },
+        editor: editors.country,
     },
     enabled: {
         needsSwitch: true,
-        invisibleSwitch: true,
+        autoSwitch: true,
         default () {
             return false;
         },
+        editor: editors.enabled,
     },
     age: {
         needsSwitch: true,
@@ -103,40 +107,45 @@ export const FILTERABLE_FIELDS = {
                 },
             };
         },
+        editor: editors.age,
     },
     hasOldCode: {
         needsSwitch: true,
-        invisibleSwitch: true,
+        autoSwitch: true,
         default () {
             return false;
         },
         toRequest (value) {
             return { oldCode: value ? { $neq: null } : null };
         },
+        editor: editors.hasOldCode,
     },
     hasEmail: {
         needsSwitch: true,
-        invisibleSwitch: true,
+        autoSwitch: true,
         default () {
             return false;
         },
         toRequest (value) {
             return { email: value ? { $neq: null } : null };
         },
+        editor: editors.hasEmail,
     },
     hasPassword: {
         needsSwitch: true,
-        invisibleSwitch: true,
+        autoSwitch: true,
         default () {
             return false;
         },
+        editor: editors.hasPassword,
     },
     isDead: {
         needsSwitch: true,
-        invisibleSwitch: true,
+        autoSwitch: true,
         default () {
             return false;
         },
+        editor: editors.isDead,
     },
     membership: {
         default () {
@@ -211,6 +220,7 @@ export const FILTERABLE_FIELDS = {
                 categories: c,
             }));
         },
+        editor: editors.membership,
     },
     isActiveMember: {
         needsSwitch: true,
@@ -253,5 +263,6 @@ export const FILTERABLE_FIELDS = {
                 },
             };
         },
+        editor: editors.isActiveMember,
     },
 };

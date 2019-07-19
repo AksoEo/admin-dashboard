@@ -26,14 +26,14 @@ import cache from '../../../../cache';
  */
 function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
     return function TripleSwitch (props) {
-        const { fieldHeader, value, onChange, enabled, onEnabledChange } = props;
+        const { filterHeader, value, onChange, enabled, onEnabledChange } = props;
 
         const selected = decode(value, enabled);
         isOptionDisabled = isOptionDisabled || (() => false);
 
         return (
             <div className="left-right-editor">
-                {fieldHeader}
+                {filterHeader}
                 <Segmented selected={selected} onSelect={selected => {
                     onSelect(selected, { value, onChange, enabled, onEnabledChange });
                 }}>
@@ -101,7 +101,7 @@ export default {
         }
 
         render () {
-            const { fieldHeader, value, onChange } = this.props;
+            const { filterHeader, value, onChange } = this.props;
 
             const countryGroups = [];
             const countries = [];
@@ -126,7 +126,7 @@ export default {
             return (
                 <div className="country-editor">
                     <div className="country-editor-top">
-                        {fieldHeader}
+                        {filterHeader}
                         <Segmented selected={selectedType} onSelect={selected => {
                             if (selected === 'all') selected = null;
                             onChange({ ...value, type: selected });
@@ -160,7 +160,7 @@ export default {
         },
     ),
     age (props) {
-        const { field, value, onChange, fieldHeader, disabled } = props;
+        const { filter, value, onChange, filterHeader, disabled } = props;
         const topValue = value;
 
         const ageToBirthYearRange = age => {
@@ -193,7 +193,7 @@ export default {
         return (
             <div className={'age-editor' + (disabled ? ' disabled' : '')}>
                 <div className="age-editor-top">
-                    {fieldHeader}
+                    {filterHeader}
                     <span className="age-birth-year">
                         {/* FIXME: why does this break when I put it in .age-prime-switch? */}
                         {locale.members.search.ageBirthYear(birthYearRange)}
@@ -208,8 +208,8 @@ export default {
                     </div>
                 </div>
                 <NumericRangeEditor
-                    min={field.min}
-                    max={field.max}
+                    min={filter.min}
+                    max={filter.max}
                     value={value.range}
                     disabled={disabled}
                     onChange={value => onChange({ ...topValue, range: value })} />
@@ -230,7 +230,7 @@ export default {
         }
 
         render () {
-            const { value, onChange, fieldHeader } = this.props;
+            const { value, onChange, filterHeader } = this.props;
             const { categories: availableCategories } = this.state;
 
             const items = value.map(({
@@ -411,21 +411,21 @@ export default {
 
             return (
                 <div className={'membership-editor' + (!value.length ? ' is-empty' : '')}>
-                    {fieldHeader}
+                    {filterHeader}
                     {items}
                 </div>
             );
         }
     },
     isActiveMember (props) {
-        const { field, value, onChange, fieldHeader, disabled } = props;
+        const { filter, value, onChange, fieldHeader, disabled } = props;
 
         return (
             <div className="active-member-editor">
                 {fieldHeader}
                 <NumericRangeEditor
-                    min={field.min}
-                    max={field.max}
+                    min={filter.min}
+                    max={filter.max}
                     value={value}
                     disabled={disabled}
                     onChange={onChange} />

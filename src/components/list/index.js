@@ -52,7 +52,7 @@ export default class ListView extends React.PureComponent {
         searchFields: PropTypes.arrayOf(PropTypes.string),
 
         /// List of available filters.
-        /// Should be keyed by filter ID. See search/filter.js for how to write filter specs.
+        /// Should be keyed by filter ID. See ./filter.js for how to write filter specs.
         filters: PropTypes.object,
 
         /// List of available fields.
@@ -239,6 +239,7 @@ const Filters = connect(state => ({
                 .map(([id, filter]) => (
                     <Filter
                         key={id}
+                        id={id}
                         filter={filter}
                         enabled={props.filterStates[id].enabled}
                         value={props.filterStates[id].value}
