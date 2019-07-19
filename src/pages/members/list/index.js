@@ -68,7 +68,8 @@ export default class MembersSearch2 extends React.PureComponent {
             }}
             fields={FIELDS}
             fieldConfigColumn={'codeholderType'}
-            onRequest={handleRequest} />;
+            onRequest={handleRequest}
+            isRestrictedByGlobalFilter={/* TODO */ false} />;
     }
 }
 

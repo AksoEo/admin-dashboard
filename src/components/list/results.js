@@ -13,6 +13,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import locale from '../../locale';
 import Sorting from './sorting';
+import { Link } from '../../router';
 
 // TODO: fix locale
 
@@ -54,6 +55,8 @@ export default function Results ({
             {count ? (
                 <div className="results-list">
                     <ResultsTable
+                        list={list}
+                        items={items}
                         fields={fields}
                         transientFields={transientFields}
                         fieldSpec={fieldSpec}
@@ -141,6 +144,8 @@ ErrorResult.propTypes = {
 };
 
 function ResultsTable ({
+    list,
+    items,
     fields,
     transientFields,
     fieldSpec,
@@ -166,6 +171,8 @@ function ResultsTable ({
         selectedFields.unshift(fields.fixed[i]);
     }
 
+    const fieldIDs = selectedFields.map(field => field.id);
+
     return (
         <Table className="results-table">
             <TableHeader
@@ -175,11 +182,27 @@ function ResultsTable ({
                 onEditFields={onEditFields}
                 onAddField={onAddField}
                 onSetFieldSorting={onSetFieldSorting} />
+            <TableBody>
+                {list.map(id => (
+                    <TableItem
+                        key={id}
+                        fields={fieldIDs}
+                        value={items[id]}
+                        onClick={/* TODO */ () => {}}
+                        isSelected={/* TODO */ false}
+                        onSelectChange={() => {
+                            // TODO
+                        }}
+                        linkTarget={/* TODO */ '/'} />
+                ))}
+            </TableBody>
         </Table>
     );
 }
 
 ResultsTable.propTypes = {
+    list: PropTypes.array.isRequired,
+    items: PropTypes.object.isRequired,
     fields: PropTypes.object.isRequired,
     transientFields: PropTypes.array.isRequired,
     fieldSpec: PropTypes.object.isRequired,
@@ -237,7 +260,7 @@ function TableHeader ({
                                     onClick={() => {
                                         if (transient) {
                                             onAddField(id, true);
-                                        } else if (fieldSpec[id] && !fieldSpec[id].sortable) {
+                                        } else if (fieldSpec[id] && fieldSpec[id].sortable) {
                                             const newSorting = sorting === Sorting.NONE
                                                 ? Sorting.ASC
                                                 : sorting === Sorting.ASC
@@ -265,3 +288,48 @@ TableHeader.propTypes = {
     onAddField: PropTypes.func.isRequired,
     onSetFieldSorting: PropTypes.func.isRequired,
 };
+
+function TableItem ({ fields, value, isSelected, onClick, onSelectChange, linkTarget }) {
+    return (
+        <TableRow className="list-item" onClick={onClick}>
+            <TableCell className="li-column select-column" onClick={e => {
+                e.stopPropagation();
+            }}>
+                <Checkbox
+                    checked={isSelected}
+                    onChange={() => onSelectChange(!isSelected)} />
+            </TableCell>
+            {fields.map(id => (
+                <TableCell className="li-column" key={id}>
+                    <Link
+                        target={linkTarget}
+                        className="li-link"
+                        onClick={e => {
+                            if (e.shiftKey || e.metaKey || e.ctrlKey) return;
+                            e.preventDefault();
+                        }}>
+                        <Field
+                            field={id}
+                            value={value[id]}
+                            member={value}
+                            fields={fields} />
+                    </Link>
+                </TableCell>
+            ))}
+        </TableRow>
+    );
+}
+
+TableItem.propTypes = {
+    fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    value: PropTypes.any,
+    isSelected: PropTypes.bool,
+    onClick: PropTypes.func.isRequired,
+    onSelectChange: PropTypes.func.isRequired,
+    linkTarget: PropTypes.string,
+};
+
+function Field () {
+    // TODO
+    return 'field';
+}

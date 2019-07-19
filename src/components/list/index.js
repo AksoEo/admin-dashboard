@@ -41,6 +41,9 @@ export default class ListView extends React.PureComponent {
 
         /// List request handler.
         onRequest: PropTypes.func,
+
+        /// If true, will show a notice about being restricted by a global filter.
+        isRestrictedByGlobalFilter: PropTypes.bool,
     };
 
     /// State store.
@@ -137,7 +140,7 @@ export default class ListView extends React.PureComponent {
                             filters={this.props.filters || {}} />
                     </div>
                     <ConnectedResults
-                        isRestrictedByGlobalFilter={/* TODO */ false}
+                        isRestrictedByGlobalFilter={this.props.isRestrictedByGlobalFilter}
                         fieldSpec={this.props.fields || {}}
                         configColumn={this.props.fieldConfigColumn}
                         onEditFields={() => this.setState({ fieldPickerOpen: true })}
