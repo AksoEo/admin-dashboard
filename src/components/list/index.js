@@ -14,6 +14,12 @@ import FieldPicker from './field-picker';
 import './style';
 
 // TODO: fix locale
+// TODO: use JSON editor
+// TODO: JSON editor switch
+// TODO: use PaperList
+// TODO: handle filter constraints (e.g. codeholderType <= age)
+// TODO: handle hideColumn
+// TODO: CSV export
 
 const reloadingActions = [
     actions.SET_SEARCH_QUERY,

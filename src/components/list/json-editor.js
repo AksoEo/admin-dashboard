@@ -14,6 +14,8 @@ import 'codemirror/addon/edit/closebrackets';
 import locale from '../../../../locale';
 import './json-editor.less';
 
+// TODO: fix locale
+
 // see ../index.js for the default value
 // after the tab on the second line
 const DEFAULT_CURSOR_POS = [1, 1];

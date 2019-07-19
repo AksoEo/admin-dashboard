@@ -49,7 +49,7 @@ export default [
                     {
                         component: lazy(() => import(
                             /* webpackChunkName: "members", webpackPrefetch: true */
-                            './members/detail'
+                            './members/list' // TODO; dummy placeholder
                         )),
                         url: /^(\d+)$/,
                     }
