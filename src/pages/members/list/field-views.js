@@ -35,11 +35,11 @@ export default class MemberField extends React.PureComponent {
 
 /* eslint-disable react/prop-types */ // props are kinda checked above anyway
 /** Field renderers. */
-const FIELDS = {
-    codeholderType ({ value, member }) {
+export const FIELDS = {
+    codeholderType ({ value, item }) {
         let icon;
         if (!value) return <span className="codeholder-type-placeholder" />;
-        const { enabled, isDead } = member;
+        const { enabled, isDead } = item;
         if (value === 'human' && enabled) icon = <PersonIcon />;
         else if (enabled) icon = <BusinessIcon />;
         else if (value === 'human') icon = <CodeholderDisabledIcon />;
@@ -73,11 +73,11 @@ const FIELDS = {
         });
 
         render () {
-            const { codeholderType, isDead } = this.props.member;
+            const { codeholderType, isDead } = this.props.item;
 
             if (codeholderType === 'human') {
-                const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.member;
-                const honorific = this.props.member.honorific;
+                const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.item;
+                const honorific = this.props.item.honorific;
                 const first = firstName || firstNameLegal;
                 const last = lastName || lastNameLegal;
                 return (
@@ -105,7 +105,7 @@ const FIELDS = {
                     </span>
                 );
             } else if (codeholderType === 'org') {
-                const { fullName, nameAbbrev } = this.props.member;
+                const { fullName, nameAbbrev } = this.props.item;
 
                 return (
                     <span
@@ -130,8 +130,8 @@ const FIELDS = {
             }
         }
     },
-    code ({ member }) {
-        const { oldCode, newCode } = member;
+    code ({ item }) {
+        const { oldCode, newCode } = item;
         if (oldCode) {
             const oldCodeCheckLetter = new UEACode(oldCode).getCheckLetter();
             return (
@@ -166,7 +166,7 @@ const FIELDS = {
         }
 
         render () {
-            const { feeCountry, addressLatin } = this.props.member;
+            const { feeCountry, addressLatin } = this.props.item;
             const addressCountry = addressLatin ? addressLatin.country : null;
 
             if (!feeCountry || !addressCountry || feeCountry == addressCountry) {
@@ -189,11 +189,11 @@ const FIELDS = {
             }
         }
     },
-    age ({ value, member }) {
+    age ({ value, item }) {
         if (!value) {
             return '';
         }
-        const atStartOfYear = member.agePrimo;
+        const atStartOfYear = item.agePrimo;
         const label = locale.members.fields.ageFormat(value, atStartOfYear);
         return <span className="age">{label}</span>;
     },
@@ -236,11 +236,11 @@ const FIELDS = {
             );
         }
     },
-    addressCity ({ member }) {
-        return <span className="address-city">{member.addressLatin.city}</span>;
+    addressCity ({ item }) {
+        return <span className="address-city">{item.addressLatin.city}</span>;
     },
-    addressCountryArea ({ member }) {
-        return <span className="address-country-area">{member.addressLatin.countryArea}</span>;
+    addressCountryArea ({ item }) {
+        return <span className="address-country-area">{item.addressLatin.countryArea}</span>;
     },
     birthdate ({ value }) {
         // FIXME: displays as “15-a de December 1859”
@@ -251,14 +251,14 @@ const FIELDS = {
     get deathdate () {
         return this.birthdate;
     },
-    officePhone ({ member }) {
-        return <span className="office-phone">{member.officePhoneFormatted}</span>;
+    officePhone ({ item }) {
+        return <span className="office-phone">{item.officePhoneFormatted}</span>;
     },
-    landlinePhone ({ member }) {
-        return <span className="landline-phone">{member.landlinePhoneFormatted}</span>;
+    landlinePhone ({ item }) {
+        return <span className="landline-phone">{item.landlinePhoneFormatted}</span>;
     },
-    cellphone ({ member }) {
-        return <span className="cellphone">{member.cellphoneFormatted}</span>;
+    cellphone ({ item }) {
+        return <span className="cellphone">{item.cellphoneFormatted}</span>;
     },
     profession ({ value }) {
         return <span className="profession">{value}</span>;

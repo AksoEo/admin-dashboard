@@ -187,6 +187,7 @@ function ResultsTable ({
                     <TableItem
                         key={id}
                         fields={fieldIDs}
+                        fieldSpec={fieldSpec}
                         value={items[id]}
                         onClick={/* TODO */ () => {}}
                         isSelected={/* TODO */ false}
@@ -289,7 +290,7 @@ TableHeader.propTypes = {
     onSetFieldSorting: PropTypes.func.isRequired,
 };
 
-function TableItem ({ fields, value, isSelected, onClick, onSelectChange, linkTarget }) {
+function TableItem ({ fields, fieldSpec, value, isSelected, onClick, onSelectChange, linkTarget }) {
     return (
         <TableRow className="list-item" onClick={onClick}>
             <TableCell className="li-column select-column" onClick={e => {
@@ -299,29 +300,33 @@ function TableItem ({ fields, value, isSelected, onClick, onSelectChange, linkTa
                     checked={isSelected}
                     onChange={() => onSelectChange(!isSelected)} />
             </TableCell>
-            {fields.map(id => (
-                <TableCell className="li-column" key={id}>
-                    <Link
-                        target={linkTarget}
-                        className="li-link"
-                        onClick={e => {
-                            if (e.shiftKey || e.metaKey || e.ctrlKey) return;
-                            e.preventDefault();
-                        }}>
-                        <Field
-                            field={id}
-                            value={value[id]}
-                            member={value}
-                            fields={fields} />
-                    </Link>
-                </TableCell>
-            ))}
+            {fields.map(id => {
+                const Field = (fieldSpec[id] && fieldSpec[id].component) || NullField;
+                return (
+                    <TableCell className="li-column" key={id}>
+                        <Link
+                            target={linkTarget}
+                            className="li-link"
+                            onClick={e => {
+                                if (e.shiftKey || e.metaKey || e.ctrlKey) return;
+                                e.preventDefault();
+                            }}>
+                            <Field
+                                field={id}
+                                value={value[id]}
+                                item={value}
+                                fields={fields} />
+                        </Link>
+                    </TableCell>
+                );
+            })}
         </TableRow>
     );
 }
 
 TableItem.propTypes = {
     fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    fieldSpec: PropTypes.object.isRequired,
     value: PropTypes.any,
     isSelected: PropTypes.bool,
     onClick: PropTypes.func.isRequired,
@@ -329,7 +334,7 @@ TableItem.propTypes = {
     linkTarget: PropTypes.string,
 };
 
-function Field () {
-    // TODO
-    return 'field';
+function NullField ({ field }) {
+    return <code>missing field component for {field}</code>;
 }
+NullField.propTypes = { field: PropTypes.any };

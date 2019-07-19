@@ -15,6 +15,29 @@ import './style';
 
 // TODO: fix locale
 
+const reloadingActions = [
+    actions.SET_SEARCH_QUERY,
+    actions.SET_FILTERS_ENABLED,
+    actions.SET_FILTER_ENABLED,
+    actions.SET_FILTER_VALUE,
+    actions.SET_JSON_FILTER_ENABLED,
+    actions.SET_JSON_FILTER,
+    actions.ADD_FIELD,
+    actions.SET_FIELDS,
+    actions.ADD_FILTER,
+    actions.REMOVE_FILTER,
+    actions.SET_PAGE,
+    actions.SET_ITEMS_PER_PAGE,
+];
+
+const reloadMiddleware = listView => () => next => action => {
+    if (reloadingActions.includes(action.type)) {
+        listView.scheduleReload();
+    }
+    next(action);
+};
+const RELOAD_DEBOUNCE_TIME = 500; // ms
+
 /// Renders a searchable and filterable list of items, each with a detail view.
 export default class ListView extends React.PureComponent {
     static propTypes = {
@@ -47,7 +70,10 @@ export default class ListView extends React.PureComponent {
     };
 
     /// State store.
-    store = createStore(listViewReducer, applyMiddleware(thunk.withExtraArgument(this)));
+    store = createStore(listViewReducer, applyMiddleware(
+        thunk.withExtraArgument(this),
+        reloadMiddleware(this),
+    ));
 
     state = {
         fieldPickerOpen: false,
@@ -105,6 +131,17 @@ export default class ListView extends React.PureComponent {
             return await this.props.onRequest(state);
         } else {
             throw new Error('no request handler');
+        }
+    }
+
+    scheduleReload () {
+        clearTimeout(this.scheduledReload);
+        this.scheduledReload = setTimeout(() => this.reload(), RELOAD_DEBOUNCE_TIME);
+    }
+
+    reload () {
+        if (this.store.getState().list.submitted) {
+            this.store.dispatch(actions.submit());
         }
     }
 

@@ -1,8 +1,6 @@
 @import '../../prelude';
 
 .list-view {
-    flex: 1;
-
     .search-input {
         display: flex;
         align-items: center;
@@ -146,6 +144,13 @@
             padding: 16px;
         }
 
+        .results-list {
+            overflow-x: auto;
+            margin-bottom: 8px;
+            margin-top: 8px;
+            position: relative;
+        }
+
         .results-table {
             .table-header {
                 position: sticky;
@@ -178,6 +183,27 @@
 
             .select-column {
                 padding: 0;
+            }
+
+            .list-item {
+                transition: background 0.2s @easing;
+
+                &:active {
+                    background: @hover-background;
+                }
+
+                .li-column {
+                    font-size: 1em;
+                    padding: 0;
+                    max-width: 15em;
+
+                    .li-link {
+                        display: block;
+                        text-decoration: none;
+                        color: inherit;
+                        padding: 4px 16px;
+                    }
+                }
             }
         }
     }

@@ -26,50 +26,58 @@ import Sorting from '../../../components/list/sorting';
 import { UEACode, util } from 'akso-client';
 import JSON5 from 'json5';
 import client from '../../../client';
+import { FIELDS as FIELD_VIEWS } from './field-views';
 
 export default class MembersSearch2 extends React.PureComponent {
     render () {
-        return <ListView
-            defaults={{
-                searchField: 'nameOrCode',
-                fixedFields: [{
-                    id: 'codeholderType',
-                    sorting: Sorting.NONE,
-                }],
-                fields: [
-                    {
-                        id: 'code',
-                        sorting: Sorting.ASC,
-                    },
-                    {
-                        id: 'name',
-                        sorting: Sorting.NONE,
-                    },
-                    {
-                        id: 'age',
-                        sorting: Sorting.NONE,
-                    },
-                    {
-                        id: 'membership',
-                        sorting: Sorting.NONE,
-                    },
-                    {
-                        id: 'country',
-                        sorting: Sorting.NONE,
-                    },
-                ],
-            }}
-            searchFields={SEARCHABLE_FIELDS}
-            filters={{
-                age: {
-                    id: 'age',
-                    needsSwitch: true,
-                },
-            }}
-            fields={FIELDS}
-            fieldConfigColumn={'codeholderType'}
-            onRequest={handleRequest}
-            isRestrictedByGlobalFilter={/* TODO */ false} />;
+        const fields = Object.fromEntries(Object.entries(FIELDS)
+            .map(([k, v]) => [k, { ...v, component: FIELD_VIEWS[k] }]));
+
+        return (
+            <div className="app-page members-page">
+                <ListView
+                    defaults={{
+                        searchField: 'nameOrCode',
+                        fixedFields: [{
+                            id: 'codeholderType',
+                            sorting: Sorting.NONE,
+                        }],
+                        fields: [
+                            {
+                                id: 'code',
+                                sorting: Sorting.ASC,
+                            },
+                            {
+                                id: 'name',
+                                sorting: Sorting.NONE,
+                            },
+                            {
+                                id: 'age',
+                                sorting: Sorting.NONE,
+                            },
+                            {
+                                id: 'membership',
+                                sorting: Sorting.NONE,
+                            },
+                            {
+                                id: 'country',
+                                sorting: Sorting.NONE,
+                            },
+                        ],
+                    }}
+                    searchFields={SEARCHABLE_FIELDS}
+                    filters={{
+                        age: {
+                            id: 'age',
+                            needsSwitch: true,
+                        },
+                    }}
+                    fields={fields}
+                    fieldConfigColumn={'codeholderType'}
+                    onRequest={handleRequest}
+                    isRestrictedByGlobalFilter={/* TODO */ false} />
+            </div>
+        );
     }
 }
 
