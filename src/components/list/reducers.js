@@ -99,7 +99,12 @@ function userFields (state = [], action) {
 }
 
 function fields (state = { fixed: [], user: [] }, action) {
-    return { ...state, user: userFields(state.user, action) };
+    switch (action.type) {
+    case actions.SET_FIELDS:
+        return { ...state, fixed: action.fixed, user: action.user };
+    default:
+        return { ...state, user: userFields(state.user, action) };
+    }
 }
 
 function items (state = {}, action) {

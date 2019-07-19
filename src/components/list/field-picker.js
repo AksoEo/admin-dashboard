@@ -14,9 +14,11 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
 import RearrangingList from './rearranging-list';
-import locale from '../../../locale';
-import { Sorting } from './fields';
+import locale from '../../locale';
+import Sorting from './sorting';
 import './field-picker.less';
+
+// TODO: fix locale
 
 /**
  * Width below which the field picker will be a full-screen modal.
@@ -180,7 +182,7 @@ export default class FieldPicker extends React.PureComponent {
 export class SortingControl extends React.PureComponent {
     static propTypes = {
         /** The current Sorting. */
-        value: PropTypes.number.isRequired,
+        value: PropTypes.string.isRequired,
         /** Change handler. */
         onChange: PropTypes.func.isRequired,
         /** If true, will hide the label explaining the current state. */

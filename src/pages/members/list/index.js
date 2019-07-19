@@ -15,14 +15,14 @@ import IconButton from '@material-ui/core/IconButton';
 import SaveAltIcon from '@material-ui/icons/SaveAlt';
 import SearchInput from './search-input';
 import { SEARCHABLE_FIELDS, FILTERABLE_FIELDS } from './search-input/fields';
-import { FIELDS, Sorting } from './fields';
+import { FIELDS } from './fields';
 import MembersList from './list';
-import FieldPicker from './field-picker';
 import { appContext } from '../../../router';
 import { Spring } from '../../../animation';
 import locale from '../../../locale';
 import ListView from '../../../components/list';
 
+import Sorting from '../../../components/list/sorting';
 import { UEACode, util } from 'akso-client';
 import JSON5 from 'json5';
 import client from '../../../client';
@@ -32,6 +32,32 @@ export default class MembersSearch2 extends React.PureComponent {
         return <ListView
             defaults={{
                 searchField: 'nameOrCode',
+                fixedFields: [{
+                    id: 'codeholderType',
+                    sorting: Sorting.NONE,
+                }],
+                fields: [
+                    {
+                        id: 'code',
+                        sorting: Sorting.ASC,
+                    },
+                    {
+                        id: 'name',
+                        sorting: Sorting.NONE,
+                    },
+                    {
+                        id: 'age',
+                        sorting: Sorting.NONE,
+                    },
+                    {
+                        id: 'membership',
+                        sorting: Sorting.NONE,
+                    },
+                    {
+                        id: 'country',
+                        sorting: Sorting.NONE,
+                    },
+                ],
             }}
             searchFields={SEARCHABLE_FIELDS}
             filters={{
@@ -40,6 +66,8 @@ export default class MembersSearch2 extends React.PureComponent {
                     needsSwitch: true,
                 },
             }}
+            fields={FIELDS}
+            fieldConfigColumn={'codeholderType'}
             onRequest={handleRequest} />;
     }
 }
@@ -252,6 +280,9 @@ async function handleRequest (state) {
     };
 }
 
+function FieldPicker () {
+    return null;
+}
 
 const MembersSearch = connect(
     state => state,

@@ -101,4 +101,78 @@
             }
         }
     }
+
+    .list-view-error {
+        text-align: center;
+        padding: 16px;
+
+        .error-title {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+
+        .error-details {
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.7;
+        }
+
+        pre.error-details {
+            font-family: @monospace;
+            font-size: 12px;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+    }
+
+    .list-view-results {
+        .result-stats {
+            margin-top: 8px;
+            margin-left: 24px;
+            font-size: 12px;
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .global-filter-notice {
+            margin-top: 4px;
+            margin-left: 24px;
+            font-size: small;
+            opacity: 0.8;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 16px;
+        }
+
+        .table-header {
+            position: sticky;
+            top: 0;
+            border-bottom: 1px solid @separator;
+            background: @card-background;
+            align-items: center;
+            white-space: nowrap;
+
+            .table-header-field {
+                padding: 4px 16px;
+            }
+
+            .table-header-fields-btn-container {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .table-header-field.transient {
+                border-bottom: 3px dotted @primary;
+
+                .transient-field-icon {
+                    width: 16px;
+                    height: 16px;
+                    margin-right: 8px;
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
 }

@@ -10,6 +10,7 @@ import { listView as listViewReducer } from './reducers';
 import SearchInput from './search-input';
 import Filter from './filter';
 import Results, { ErrorResult } from './results';
+import FieldPicker from './field-picker';
 import './style';
 
 // TODO: fix locale
@@ -20,6 +21,7 @@ export default class ListView extends React.PureComponent {
         /// Defaults for various things.
         ///
         /// - `searchField`: the default search field
+        /// - `fixedFields`: list of fixed fields: `{ id: string, sorting: Sorting }[]`
         /// - `fields`: list of default fields: `{ id: string, sorting: Sorting }[]`
         defaults: PropTypes.object,
 
@@ -30,12 +32,23 @@ export default class ListView extends React.PureComponent {
         /// Should be keyed by filter ID. See search/filter.js for how to write filter specs.
         filters: PropTypes.object,
 
+        /// List of available fields.
+        /// Should be keyed by field ID.
+        fields: PropTypes.object,
+
+        /// Column for which the header will be replaced with the field configuration button.
+        fieldConfigColumn: PropTypes.string,
+
         /// List request handler.
         onRequest: PropTypes.func,
     };
 
     /// State store.
     store = createStore(listViewReducer, applyMiddleware(thunk.withExtraArgument(this)));
+
+    state = {
+        fieldPickerOpen: false,
+    };
 
     constructor (props) {
         super(props);
@@ -54,10 +67,9 @@ export default class ListView extends React.PureComponent {
             actions.setSearchField(defaults.searchField || null),
             actions.setSearchQuery(''),
             actions.setFiltersEnabled(false),
-            // TODO: filters?
             actions.setJSONFilterEnabled(false),
             actions.setJSONFilter('{\n\t\n}'),
-            // TODO: set fields
+            actions.setFields(defaults.fixedFields || [], defaults.fields || []),
             actions.unsubmit(),
             actions.setPage(0),
             actions.setItemsPerPage(10),
@@ -108,9 +120,16 @@ export default class ListView extends React.PureComponent {
     }
 
     render () {
+        const fields = Object.keys(this.props.fields || {});
+
         return (
             <Provider store={this.store}>
                 <div className="list-view">
+                    <ConnectedFieldPicker
+                        open={this.state.fieldPickerOpen}
+                        onClose={() => this.setState({ fieldPickerOpen: false })}
+                        available={fields}
+                        sortables={fields.filter(id => this.props.fields[id].sortable)} />
                     <div className="list-view-search-list-container-goes-here">
                         <ConnectedSearchInput
                             fields={this.props.searchFields || []} />
@@ -118,12 +137,33 @@ export default class ListView extends React.PureComponent {
                             filters={this.props.filters || {}} />
                     </div>
                     <ConnectedResults
-                        isRestrictedByGlobalFilter={/* TODO */ false} />
+                        isRestrictedByGlobalFilter={/* TODO */ false}
+                        fieldSpec={this.props.fields || {}}
+                        configColumn={this.props.fieldConfigColumn}
+                        onEditFields={() => this.setState({ fieldPickerOpen: true })}
+                        onAddField={(...args) => this.store.dispatch(actions.addField(...args))}
+                        onSetFieldSorting={(...args) => {
+                            this.store.dispatch(actions.setFieldSorting(...args));
+                        }} />
                 </div>
             </Provider>
         );
     }
 }
+
+const ConnectedFieldPicker = connect(state => ({
+    selected: state.fields.user,
+    fixedFields: state.fields.fixed.map(field => field.id),
+}), dispatch => ({
+    onAddField: (...args) => dispatch(actions.addField(...args)),
+    onRemoveField: (...args) => dispatch(actions.removeField(...args)),
+    onSetFieldSorting: (...args) => dispatch(actions.setFieldSorting(...args)),
+    onMoveField: (...args) => dispatch(actions.moveField(...args)),
+}))(function FieldPickerContainer (props) {
+    return <FieldPicker
+        {...props}
+        available={props.available.filter(id => !props.fixedFields.includes(id))} />;
+});
 
 const ConnectedSearchInput = connect(state => ({
     field: state.search.field,
@@ -196,6 +236,8 @@ const ConnectedResults = connect(state => ({
     time: state.results.stats.time,
     isFiltered: state.results.stats.filtered,
     totalItems: state.results.stats.total,
+    fields: state.fields,
+    transientFields: state.results.transientFields,
 }), dispatch => ({
     onSetPage: page => dispatch(actions.setPage(page)),
     onSetItemsPerPage: itemsPerPage => dispatch(actions.setItemsPerPage(itemsPerPage)),

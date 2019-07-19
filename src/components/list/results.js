@@ -1,7 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableBody from '@material-ui/core/TableBody';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import TablePagination from '@material-ui/core/TablePagination';
+import IconButton from '@material-ui/core/IconButton';
+import SearchIcon from '@material-ui/icons/Search';
+import ListAltIcon from '@material-ui/icons/ListAlt';
 import locale from '../../locale';
+import Sorting from './sorting';
 
 // TODO: fix locale
 
@@ -17,6 +28,13 @@ export default function Results ({
     totalItems,
     onSetPage,
     onSetItemsPerPage,
+    fields,
+    transientFields,
+    fieldSpec,
+    configColumn,
+    onEditFields,
+    onAddField,
+    onSetFieldSorting,
 }) {
     const count = list ? list.length : 0;
     const statsText = locale.members.resultStats(count, isFiltered, totalItems || 0, time || '?');
@@ -35,7 +53,14 @@ export default function Results ({
             ) : null}
             {count ? (
                 <div className="results-list">
-                    TODO
+                    <ResultsTable
+                        fields={fields}
+                        transientFields={transientFields}
+                        fieldSpec={fieldSpec}
+                        configColumn={configColumn}
+                        onEditFields={onEditFields}
+                        onAddField={onAddField}
+                        onSetFieldSorting={onSetFieldSorting} />
                 </div>
             ) : time ? (
                 <div className="no-results">
@@ -69,6 +94,13 @@ Results.propTypes = {
     totalItems: PropTypes.number,
     onSetPage: PropTypes.func,
     onSetItemsPerPage: PropTypes.func,
+    fields: PropTypes.object.isRequired,
+    transientFields: PropTypes.array.isRequired,
+    fieldSpec: PropTypes.object.isRequired,
+    configColumn: PropTypes.string,
+    onEditFields: PropTypes.func.isRequired,
+    onAddField: PropTypes.func.isRequired,
+    onSetFieldSorting: PropTypes.func.isRequired,
 };
 
 export function ErrorResult ({ error }) {
@@ -87,7 +119,7 @@ export function ErrorResult ({ error }) {
     }
 
     return (
-        <div className="list-error">
+        <div className="list-view-error">
             <div className="error-title">
                 {locale.members.error}
             </div>
@@ -106,4 +138,130 @@ export function ErrorResult ({ error }) {
 
 ErrorResult.propTypes = {
     error: PropTypes.any.isRequired,
+};
+
+function ResultsTable ({
+    fields,
+    transientFields,
+    fieldSpec,
+    configColumn,
+    onEditFields,
+    onAddField,
+    onSetFieldSorting,
+}) {
+    const selectedFields = fields.user.map((field, i) => ({ ...field, index: i }));
+    const selectedFieldIds = selectedFields.map(x => x.id);
+
+    // prepend temporary fields that aren’t already selected
+    for (let i = transientFields.length - 1; i >= 0; i--) {
+        const tmpId = transientFields[i];
+        if (!selectedFieldIds.includes(tmpId)) {
+            selectedFieldIds.push(tmpId);
+            selectedFields.unshift({ id: tmpId, sorting: Sorting.NONE, transient: true });
+        }
+    }
+
+    // also prepend fixed fields
+    for (let i = fields.fixed.length - 1; i >= 0; i--) {
+        selectedFields.unshift(fields.fixed[i]);
+    }
+
+    return (
+        <Table className="results-table">
+            <TableHeader
+                fields={selectedFields}
+                fieldSpec={fieldSpec}
+                configColumn={configColumn}
+                onEditFields={onEditFields}
+                onAddField={onAddField}
+                onSetFieldSorting={onSetFieldSorting} />
+        </Table>
+    );
+}
+
+ResultsTable.propTypes = {
+    fields: PropTypes.object.isRequired,
+    transientFields: PropTypes.array.isRequired,
+    fieldSpec: PropTypes.object.isRequired,
+    configColumn: PropTypes.string,
+    onEditFields: PropTypes.func.isRequired,
+    onAddField: PropTypes.func.isRequired,
+    onSetFieldSorting: PropTypes.func.isRequired,
+};
+
+function TableHeader ({
+    fields,
+    fieldSpec,
+    configColumn,
+    onEditFields,
+    onAddField,
+    onSetFieldSorting,
+}) {
+    return (
+        <TableHead className="table-header">
+            <TableRow>
+                <TableCell className="select-column">
+                    <Checkbox
+                        // TODO: this
+                        checked={false}
+                        onChange={() => {}} />
+                </TableCell>
+                {fields.map(({ id, sorting, transient, index }) => {
+                    if (id === configColumn) {
+                        return (
+                            <TableCell key={id} className="table-header-fields-btn-container">
+                                <IconButton
+                                    key={id}
+                                    className="table-header-fields-btn"
+                                    aria-label={locale.members.fieldPicker.title}
+                                    title={locale.members.fieldPicker.title}
+                                    onClick={onEditFields}>
+                                    <ListAltIcon />
+                                </IconButton>
+                            </TableCell>
+                        );
+                    } else {
+                        const sortDirection = sorting === Sorting.NONE
+                            ? false
+                            : sorting === Sorting.ASC ? 'asc' : 'desc';
+
+                        return (
+                            <TableCell
+                                className={'table-header-field' + (transient ? ' transient' : '')}
+                                key={id}
+                                sortDirection={sortDirection}>
+                                {transient && <SearchIcon className="transient-field-icon" />}
+                                <TableSortLabel
+                                    active={!!sortDirection}
+                                    direction={sortDirection || 'asc'}
+                                    onClick={() => {
+                                        if (transient) {
+                                            onAddField(id, true);
+                                        } else if (fieldSpec[id] && !fieldSpec[id].sortable) {
+                                            const newSorting = sorting === Sorting.NONE
+                                                ? Sorting.ASC
+                                                : sorting === Sorting.ASC
+                                                    ? Sorting.DESC
+                                                    : Sorting.NONE;
+                                            onSetFieldSorting(index, newSorting);
+                                        }
+                                    }}>
+                                    {locale.members.fields[id]}
+                                </TableSortLabel>
+                            </TableCell>
+                        );
+                    }
+                })}
+            </TableRow>
+        </TableHead>
+    );
+}
+
+TableHeader.propTypes = {
+    fields: PropTypes.arrayOf(PropTypes.object).isRequired,
+    fieldSpec: PropTypes.object.isRequired,
+    configColumn: PropTypes.string,
+    onEditFields: PropTypes.func.isRequired,
+    onAddField: PropTypes.func.isRequired,
+    onSetFieldSorting: PropTypes.func.isRequired,
 };
