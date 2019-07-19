@@ -2,6 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Spring, globalAnimator } from '../animation';
 
+// lazy-loaded particles
+let particlesPromise, triggerParticles;
+function loadParticles () {
+    if (!particlesPromise) {
+        particlesPromise = import('../features/logo-particles');
+        particlesPromise.then(e => {
+            triggerParticles = e.default;
+        }).catch(() => {
+            // fail silently and allow for retries
+            particlesPromise = false;
+        });
+    }
+}
+
 const PATH = 'M33 5h8.053c6.24 0 8.503.65 10.785 1.87a12.721 12.721 0 0 1 5.292 5.292C58.35 14.444'
     + ' 59 16.707 59 22.947V31H33V5z';
 
@@ -35,6 +49,17 @@ export default class HeaderLogo extends React.PureComponent {
         if (this.rotation.wantsUpdate()) wantsUpdate = true;
         if (!wantsUpdate) globalAnimator.deregister(this);
         this.forceUpdate();
+
+        if (this.states[0].bounce.value > 96) {
+            if (triggerParticles) {
+                triggerParticles(this.node);
+                for (const state of this.states) {
+                    state.bounce.value = 0;
+                    state.bounce.velocity = 0;
+                }
+                this.rotation.finish();
+            } else loadParticles();
+        }
     }
 
     componentWillUnmount () {
@@ -43,7 +68,7 @@ export default class HeaderLogo extends React.PureComponent {
 
     render () {
         return (
-            <div className="header-logo" onClick={this.onClick}>
+            <div className="header-logo" onClick={this.onClick} ref={node => this.node = node}>
                 <svg
                     className="logo"
                     aria-hidden="true"
@@ -51,6 +76,7 @@ export default class HeaderLogo extends React.PureComponent {
                     viewBox="0 0 64 64">
                     {this.states.map((state, i) => (
                         <path
+                            className="corner"
                             key={i}
                             fill={i % 2 === 0 ? '#31a64f' : '#363636'}
                             d={PATH}
