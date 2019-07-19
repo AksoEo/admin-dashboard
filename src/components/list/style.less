@@ -1,6 +1,8 @@
 @import '../../prelude';
 
 .list-view {
+    flex: 1;
+
     .search-input {
         display: flex;
         align-items: center;
@@ -35,6 +37,68 @@
         .search-action {
             flex-shrink: 0;
             margin-right: 8px;
+        }
+    }
+
+    .filter-disclosure {
+        display: block;
+        text-align: left;
+        font: inherit;
+        font-size: 0.875em;
+        font-weight: 500;
+        opacity: 0.5;
+        padding: 16px 8px 0 64px;
+        max-width: 600px;
+        width: 100%;
+        padding: 0;
+        margin: 0 auto;
+        color: inherit;
+        background: none;
+        border: none;
+
+        &:focus {
+            outline: none;
+            opacity: 0.7;
+        }
+
+        .filter-disclosure-icon {
+            vertical-align: middle;
+        }
+
+        &.expanded .filter-disclosure-icon {
+            transform: rotate(180deg);
+        }
+    }
+
+    .search-filter {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 4px 0;
+
+        .filter-header {
+            height: 48px;
+
+            .filter-checkbox, .filter-checkbox-placeholder {
+                margin-left: 8px;
+                display: inline-block;
+            }
+
+            .filter-checkbox-placeholder {
+                width: 48px;
+            }
+
+            .filter-label {
+                display: inline-block;
+                margin: 0 16px;
+                line-height: 48px;
+                margin-left: 8px;
+                cursor: default;
+                text-transform: uppercase;
+                font-size: small;
+                font-weight: bold;
+                user-select: none;
+            }
         }
     }
 }

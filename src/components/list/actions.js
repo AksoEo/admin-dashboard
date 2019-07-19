@@ -16,10 +16,10 @@ export const SET_FILTER_VALUE = 'set-filter-value';
 export const setFilterValue = (id, value) => ({ type: SET_FILTER_VALUE, id, value });
 
 export const SET_JSON_FILTER_ENABLED = 'set-json-filter-enabled';
-export const setJSONFilterEnabled = (enabled) => ({ type: SET_FILTER_ENABLED, enabled });
+export const setJSONFilterEnabled = (enabled) => ({ type: SET_JSON_FILTER_ENABLED, enabled });
 
 export const SET_JSON_FILTER = 'set-json-filter';
-export const setJSONFilter = (filter) => ({ type: SET_FILTER_VALUE, filter });
+export const setJSONFilter = (filter) => ({ type: SET_JSON_FILTER, filter });
 
 export const ADD_FIELD = 'add-field';
 export const addField = (id, prepend = false) => ({ type: ADD_FIELD, id, prepend });

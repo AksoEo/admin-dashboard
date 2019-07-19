@@ -3,11 +3,16 @@ import PropTypes from 'prop-types';
 import { createStore, applyMiddleware } from 'redux';
 import { connect, Provider } from 'react-redux';
 import thunk from 'redux-thunk';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import locale from '../../locale';
 import * as actions from './actions';
 import { listView as listViewReducer } from './reducers';
 import SearchInput from './search-input';
 import Filter from './filter';
+import Results, { ErrorResult } from './results';
 import './style';
+
+// TODO: fix locale
 
 /// Renders a searchable and filterable list of items, each with a detail view.
 export default class ListView extends React.PureComponent {
@@ -80,9 +85,12 @@ export default class ListView extends React.PureComponent {
     }
 
     /// Performs a data request for the given state and returns a promise.
-    performRequest (state) {
-        // TODO
-        return new Promise((_, j) => j());
+    async performRequest (state) {
+        if (this.props.onRequest) {
+            return await this.props.onRequest(state);
+        } else {
+            throw new Error('no request handler');
+        }
     }
 
     /// Internal function to handle a new filter.
@@ -109,9 +117,8 @@ export default class ListView extends React.PureComponent {
                         <Filters
                             filters={this.props.filters || {}} />
                     </div>
-                    {
-                        // TODO: list
-                    }
+                    <ConnectedResults
+                        isRestrictedByGlobalFilter={/* TODO */ false} />
                 </div>
             </Provider>
         );
@@ -136,11 +143,18 @@ const Filters = connect(state => ({
 }), dispatch => ({
     onChange: (id, value) => dispatch(actions.setFilterValue(id, value)),
     onEnabledChange: (id, enabled) => dispatch(actions.setFilterEnabled(id, enabled)),
+    onFiltersEnabledChange: (enabled) => dispatch(actions.setFiltersEnabled(enabled)),
 }))(function Filters (props) {
-    // TODO: handle expanded state
+    const filters = Object.entries(props.filters);
+
     return (
         <React.Fragment>
-            {Object.entries(props.filters)
+            {filters.length ? (
+                <FilterDisclosureButton
+                    expanded={props.expanded}
+                    onChange={props.onFiltersEnabledChange}/>
+            ) : null}
+            {filters
                 .filter(([id]) => (id in props.filterStates))
                 .map(([id, filter]) => (
                     <Filter
@@ -154,4 +168,41 @@ const Filters = connect(state => ({
                 ))}
         </React.Fragment>
     );
+});
+
+function FilterDisclosureButton (props) {
+    return (
+        <button
+            className={'filter-disclosure' + (props.expanded ? ' expanded' : '')}
+            onClick={() => props.onChange(!props.expanded)}>
+            {locale.members.search.filters}
+            <KeyboardArrowDownIcon className="filter-disclosure-icon" />
+        </button>
+    );
+}
+
+FilterDisclosureButton.propTypes = {
+    expanded: PropTypes.bool.isRequired,
+    onChange: PropTypes.func.isRequired,
+};
+
+const ConnectedResults = connect(state => ({
+    submitted: state.list.submitted,
+    error: state.results.error,
+    list: state.results.items,
+    items: state.items,
+    page: state.list.page,
+    itemsPerPage: state.list.itemsPerPage,
+    time: state.results.stats.time,
+    isFiltered: state.results.stats.filtered,
+    totalItems: state.results.stats.total,
+}), dispatch => ({
+    onSetPage: page => dispatch(actions.setPage(page)),
+    onSetItemsPerPage: itemsPerPage => dispatch(actions.setItemsPerPage(itemsPerPage)),
+}))(function ResultsContainer (props) {
+    if (props.submitted) {
+        if (props.error) return ErrorResult({ error: props.error });
+        return Results(props);
+    }
+    return null;
 });

@@ -99,7 +99,7 @@ function userFields (state = [], action) {
 }
 
 function fields (state = { fixed: [], user: [] }, action) {
-    return { ...state, user: userFields(state, action) };
+    return { ...state, user: userFields(state.user, action) };
 }
 
 function items (state = {}, action) {
