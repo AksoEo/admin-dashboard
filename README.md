@@ -19,3 +19,6 @@ Pass an environment variable named `AKSO_HOST` to override the API host (default
 - All unrecognized URLs should fall back to `dist/index.html`
 
 Also see `test-server.js` for reference (or for testing).
+
+## License
+This project is licensed under the GPL 3 or later.
