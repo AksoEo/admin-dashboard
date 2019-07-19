@@ -376,11 +376,17 @@ export function init (shouldPlayLoginAnimation, onLogout) {
     root.id = 'react-root';
     root.className = 'root-container';
     document.body.appendChild(root);
+
     ReactDOM.render(
         <App
             shouldPlayLoginAnimation={shouldPlayLoginAnimation}
-            onLogout={onLogout} />,
+            onLogout={() => {
+                // unmount to clean up
+                ReactDOM.unmountComponentAtNode(root);
+                onLogout();
+            }} />,
         root
     );
+
     return root;
 }

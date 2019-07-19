@@ -130,6 +130,7 @@ class Mass {
     }
 
     get wantsUpdate () {
-        return Math.abs(this.value - this.ground) + Math.abs(this.velocity) > 1e-3;
+        return Math.abs(this.value - this.ground)
+            + Math.abs(this.velocity) / (this.gravity ** 2) > 1e-3;
     }
 }

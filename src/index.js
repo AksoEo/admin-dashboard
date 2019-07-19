@@ -26,6 +26,7 @@ function beginSession () {
             loginRoot.className = 'root-container';
             document.body.appendChild(loginRoot);
 
+            let virtualLoginRoot; // eslint-disable-line prefer-const
             let didLogin = false;
             const onLogin = function () {
                 // FIXME: sometimes it creates two react roots? i suspect it calls onLogin twice
@@ -34,13 +35,15 @@ function beginSession () {
                 didLogin = true;
                 loginRoot.classList.add('animate-out');
                 setTimeout(() => {
+                    // unmount to clean up
+                    render(() => null, loginRoot, virtualLoginRoot);
                     document.body.removeChild(loginRoot);
                 }, 1000);
 
                 setTimeout(() => initApp(app, true), 300);
             };
 
-            render(<Login onLogin={onLogin} />, loginRoot);
+            virtualLoginRoot = render(<Login onLogin={onLogin} />, loginRoot);
         } else {
             initApp(app);
         }
@@ -55,12 +58,13 @@ function beginSession () {
 function initApp (app, shouldPlayLoginAnimation = false) {
     const loadingRoot = document.createElement('div');
     loadingRoot.id = 'app-loading';
-    render(<CircularProgress indeterminate />, loadingRoot);
+    let virtualLoadingRoot;
 
     let appLoaded = false;
     let addedLoadingIndicator = false;
     setTimeout(() => {
         if (appLoaded) return;
+        render(<CircularProgress indeterminate />, loadingRoot);
         document.body.appendChild(loadingRoot);
         addedLoadingIndicator = true;
     }, 500);
@@ -70,6 +74,8 @@ function initApp (app, shouldPlayLoginAnimation = false) {
         if (addedLoadingIndicator) {
             loadingRoot.classList.add('animate-out');
             setTimeout(() => {
+                // unmount to clean up
+                render(() => null, loadingRoot, virtualLoadingRoot);
                 document.body.removeChild(loadingRoot);
             }, 1000);
         }
@@ -77,6 +83,7 @@ function initApp (app, shouldPlayLoginAnimation = false) {
         const appRoot = app.init(shouldPlayLoginAnimation, () => {
             // logged out
             client.logOut().then(() => {
+                // TODO: unmountComponentAtNode here
                 document.body.removeChild(appRoot);
                 beginSession();
             });
