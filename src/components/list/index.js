@@ -64,6 +64,9 @@ export default class ListView extends React.PureComponent {
         /// - `fields`: list of default fields: `{ id: string, sorting: Sorting }[]`
         defaults: PropTypes.object,
 
+        /// Title component; will be put above the search field when not submitted.
+        title: PropTypes.element,
+
         /// List of searchable fields.
         searchFields: PropTypes.arrayOf(PropTypes.string),
 
@@ -215,6 +218,7 @@ export default class ListView extends React.PureComponent {
                         available={fields}
                         sortables={fields.filter(id => this.props.fields[id].sortable)} />
                     <SearchFilters
+                        title={this.props.title}
                         searchInput={(
                             <ConnectedSearchInput
                                 fields={this.props.searchFields || []} />
@@ -273,7 +277,12 @@ const SearchFilters = connect(state => ({
     onJSONChange: (filter) => dispatch(actions.setJSONFilter(filter)),
     onSubmit: () => dispatch(actions.submit()),
 }))(function SearchFilters (props) {
-    const items = [{ node: props.searchInput }];
+    const items = [];
+    if (props.title) items.push({
+        node: props.title,
+        hidden: props.submitted,
+    });
+    items.push({ node: props.searchInput });
 
     if (props.jsonFilterEnabled) {
         items.push({

@@ -1,8 +1,10 @@
 import React from 'react';
-import ListView from '../../../components/list';
-import Sorting from '../../../components/list/sorting';
+import { connect } from 'react-redux';
 import { UEACode, util } from 'akso-client';
 import JSON5 from 'json5';
+import ListView from '../../../components/list';
+import Sorting from '../../../components/list/sorting';
+import locale from '../../../locale';
 import client from '../../../client';
 import FILTERS from './filters';
 import FIELDS from './fields';
@@ -52,6 +54,7 @@ export default class MembersList extends React.PureComponent {
                             },
                         ],
                     }}
+                    title={<Title />}
                     searchFields={SEARCHABLE_FIELDS}
                     filters={FILTERS}
                     fields={FIELDS}
@@ -62,6 +65,17 @@ export default class MembersList extends React.PureComponent {
         );
     }
 }
+
+const Title = connect(state => ({
+    query: state.search.query,
+    filters: state.filters.enabled,
+}))(function SearchTitle (props) {
+    let title = locale.members.search.titleFilter;
+    if (!props.filters || props.query) {
+        title = locale.members.search.title;
+    }
+    return <div className="members-search-title">{title}</div>;
+});
 
 const fieldMapping = {
     codeholderType: {
