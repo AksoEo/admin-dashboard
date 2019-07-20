@@ -40,6 +40,7 @@ function filters (state = { enabled: false, filters: {} }, action) {
                     [action.id]: {
                         ...state.filters[action.id],
                         value: action.value,
+                        enabled: true, // auto-enable when changed
                     },
                 },
             };

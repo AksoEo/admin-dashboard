@@ -10,10 +10,14 @@ export const SET_FILTERS_ENABLED = 'set-filters-enabled';
 export const setFiltersEnabled = (enabled) => ({ type: SET_FILTERS_ENABLED, enabled });
 
 export const SET_FILTER_ENABLED = 'set-filter-enabled';
-export const setFilterEnabled = (id, enabled) => ({ type: SET_FILTER_ENABLED, id, enabled });
+export const setFilterEnabled = (id, enabled, skipConstraints = false) => ({
+    type: SET_FILTER_ENABLED, id, enabled, skipConstraints,
+});
 
 export const SET_FILTER_VALUE = 'set-filter-value';
-export const setFilterValue = (id, value) => ({ type: SET_FILTER_VALUE, id, value });
+export const setFilterValue = (id, value, skipConstraints = false) => ({
+    type: SET_FILTER_VALUE, id, value, skipConstraints,
+});
 
 export const SET_JSON_FILTER_ENABLED = 'set-json-filter-enabled';
 export const setJSONFilterEnabled = (enabled) => ({ type: SET_JSON_FILTER_ENABLED, enabled });

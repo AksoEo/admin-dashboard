@@ -181,7 +181,7 @@ export default {
             }
             render () {
                 let { value } = this.props;
-                const { selectedFields } = this.props;
+                const { fields: selectedFields } = this.props;
                 if (!value) value = {};
 
                 const streetAddress = (value.streetAddress || '').split('\n');

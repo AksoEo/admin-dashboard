@@ -18,9 +18,8 @@ const JSONEditor = lazy(() => import('./json-editor'));
 
 // TODO: fix locale
 // TODO: JSON editor switch
-// TODO: handle filter constraints (e.g. codeholderType <= age)
-// TODO: handle hideColumn
 // TODO: CSV export
+// TODO: URL queries
 
 const reloadingActions = [
     actions.SET_SEARCH_QUERY,
@@ -45,6 +44,15 @@ const reloadMiddleware = listView => () => next => action => {
     next(action);
 };
 const RELOAD_DEBOUNCE_TIME = 500; // ms
+
+const filterConstraintMiddleware = listView => () => next => action => {
+    if ([actions.SET_FILTER_VALUE, actions.SET_FILTER_ENABLED].includes(action.type)) {
+        // actions issued by constraints must skip constraints (see below) because bad
+        // applyConstraints implementations might cause an infinite loop otherwise
+        if (!action.skipConstraints) listView.scheduleFilterConstraintsUpdate();
+    }
+    next(action);
+};
 
 /// Renders a searchable and filterable list of items, each with a detail view.
 export default class ListView extends React.PureComponent {
@@ -81,6 +89,7 @@ export default class ListView extends React.PureComponent {
     store = createStore(listViewReducer, applyMiddleware(
         thunk.withExtraArgument(this),
         reloadMiddleware(this),
+        filterConstraintMiddleware(this),
     ));
 
     state = {
@@ -153,6 +162,32 @@ export default class ListView extends React.PureComponent {
         }
     }
 
+    scheduleFilterConstraintsUpdate () {
+        clearTimeout(this.scheduledConstraintUpdate);
+        this.scheduledConstraintUpdate = setTimeout(() => this.applyFilterConstraints(), 50);
+    }
+
+    applyFilterConstraints () {
+        const state = this.store.getState();
+        if (!state.filters.enabled) return;
+        for (const id in state.filters.filters) {
+            if (this.props.filters[id].applyConstraints) {
+                const result = this.props.filters[id].applyConstraints(
+                    state.filters.filters[id].value,
+                    state.filters.filters,
+                );
+                if (result) {
+                    if ('enabled' in result) {
+                        this.store.dispatch(actions.setFilterEnabled(id, result.value, true));
+                    }
+                    if ('value' in result) {
+                        this.store.dispatch(actions.setFilterValue(id, result.value, true));
+                    }
+                }
+            }
+        }
+    }
+
     /// Internal function to handle a new filter.
     /// The filter must not exist in the store yet.
     addFilter (id, spec) {
@@ -168,7 +203,8 @@ export default class ListView extends React.PureComponent {
     }
 
     render () {
-        const fields = Object.keys(this.props.fields || {});
+        const fields = Object.keys(this.props.fields || {})
+            .filter(id => !this.props.fields[id].hideColumn);
 
         return (
             <Provider store={this.store}>

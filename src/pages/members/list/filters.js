@@ -108,6 +108,16 @@ export default {
                 return false;
             },
         ),
+        applyConstraints (value, filters) {
+            let humanOnly = false;
+            if (filters.age && filters.age.enabled) humanOnly = true;
+
+            if (humanOnly && !value._restricted) {
+                return { value: { human: true, org: false, _restricted: true } };
+            } else if (!humanOnly && value._restricted) {
+                return { value: { human: value.human, org: value.org } };
+            }
+        },
     },
     country: {
         default () {
@@ -237,7 +247,6 @@ export default {
                 atStartOfYear: value.asoy,
             };
         },
-        codeholderType: 'human',
         toRequest (value) {
             const field = value.atStartOfYear ? 'agePrimo' : 'age';
             if (value.range.isCollapsed()) {
@@ -665,11 +674,11 @@ export default {
             };
         },
         editor (props) {
-            const { filter, value, onChange, fieldHeader, disabled } = props;
+            const { filter, value, onChange, filterHeader, disabled } = props;
 
             return (
                 <div className="active-member-editor">
-                    {fieldHeader}
+                    {filterHeader}
                     <NumericRangeEditor
                         min={filter.min}
                         max={filter.max}
