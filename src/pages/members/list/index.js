@@ -33,7 +33,8 @@ export default class MembersList extends React.PureComponent {
     onURLQueryChange = query => {
         if (this.currentQuery === query) return;
         this.currentQuery = query;
-        this.context.navigate(this.props.path + '?q=' + query);
+        if (query) this.context.navigate(this.props.path + '?q=' + query);
+        else this.context.navigate(this.props.path);
     };
 
     componentDidMount () {
@@ -47,6 +48,11 @@ export default class MembersList extends React.PureComponent {
     }
 
     tryDecodeURLQuery () {
+        if (!this.props.query && this.currentQuery) {
+            this.currentQuery = '';
+            this.listView.decodeURLQuery('');
+            return;
+        }
         if (!this.props.query.startsWith('?q=')) return;
         const query = this.props.query.substr(3);
         if (query === this.currentQuery) return;

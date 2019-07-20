@@ -165,6 +165,7 @@ export function decodeURLQuery (data, filters) {
             cmds.push(actions.setJSONFilterEnabled(true));
             cmds.push(actions.setJSONFilter(filter));
         } else if (section[1] === 'filter') {
+            cmds.push(actions.setFiltersEnabled(true));
             while (data.length) {
                 const [id, idLen] = maybeDecodeParens(data, ':),');
                 data = data.substr(idLen + 1); // :

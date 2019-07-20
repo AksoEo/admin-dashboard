@@ -41,6 +41,7 @@ const urlQueryActions = reloadingActions.concat([
     actions.MOVE_FIELD,
     actions.REMOVE_FIELD,
     actions.SUBMIT,
+    actions.UNSUBMIT,
 ]);
 
 const reloadMiddleware = listView => () => next => action => {
@@ -224,12 +225,19 @@ export default class ListView extends React.PureComponent {
         if (state.list.submitted) {
             const query = encodeURLQuery(state, this.props.filters || {});
             this.props.onURLQueryChange(query);
+        } else {
+            this.props.onURLQueryChange('');
         }
     }
 
     /// Call this whenever the URL query changes.
     decodeURLQuery (query) {
-        const decoded = decodeURLQuery(query);
+        if (!query) {
+            this.store.dispatch(actions.unsubmit());
+            return;
+        }
+
+        const decoded = decodeURLQuery(query, this.props.filters || {});
         this.resetStore(this.props.defaults || {});
         decoded.forEach(action => this.store.dispatch(action));
         this.store.dispatch(actions.submit());
