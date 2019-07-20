@@ -11,11 +11,13 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
-import locale from '../../../../locale';
+import locale from '../../locale';
 import './json-editor.less';
 
-// see ../index.js for the default value
+// TODO: fix locale
+
 // after the tab on the second line
+// (see ./index.js for the default value)
 const DEFAULT_CURSOR_POS = [1, 1];
 
 export default class JSONEditor extends React.PureComponent {
@@ -96,7 +98,7 @@ export default class JSONEditor extends React.PureComponent {
     render () {
         return (
             <div
-                className={'json-editor' + (this.props.submitted ? ' submitted' : '')}
+                className={'json-filter-editor' + (this.props.submitted ? ' submitted' : '')}
                 onClick={e => e.stopPropagation()}>
                 <IconButton
                     className="json-editor-help-button"

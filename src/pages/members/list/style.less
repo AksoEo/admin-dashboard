@@ -1,153 +1,15 @@
 @import '../../../prelude';
 
-.members-list-page {
-    .stats-line {
-        margin-top: 8px;
-        margin-left: 24px;
-        font-size: 12px;
-        font-style: italic;
-        opacity: 0.7;
-    }
-
-    .global-filter-notice {
-        margin-top: 4px;
-        margin-left: 24px;
-        font-size: small;
+.members-page {
+    .members-search-title {
+        font-size: 1.7em;
         opacity: 0.8;
-    }
-
-    .members-list-no-results {
+        margin-top: 14vh;
+        padding-bottom: 0.7em;
         text-align: center;
-        padding: 16px;
     }
 
-    .list-error {
-        text-align: center;
-        padding: 16px;
-
-        .error-title {
-            font-size: 1.2em;
-            margin-bottom: 8px;
-        }
-
-        .error-details {
-            max-width: 600px;
-            margin: 0 auto;
-            opacity: 0.7;
-        }
-
-        pre.error-details {
-            font-family: @monospace;
-            font-size: 12px;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
-    }
-
-    .members-select-column {
-        padding: 0px;
-    }
-
-    .members-list-container {
-        overflow-x: auto;
-        margin-bottom: 8px;
-        margin-top: 8px;
-        position: relative; // omitting this causes graphical glitches in Safari for some reason (?)
-
-        .members-list {
-            animation: members-list-in 0.3s @easing;
-
-            &.opening {
-                animation: members-list-out 0.1s @easing forwards;
-            }
-
-            @keyframes members-list-in {
-                from {
-                    transform: translateY(30px);
-                    opacity: 0;
-                }
-            }
-
-            @keyframes members-list-out {
-                to {
-                    opacity: 0;
-                }
-            }
-
-            @media (max-width: 600px) {
-                margin-left: 0;
-                margin-right: 0;
-            }
-
-            .table-header {
-                position: sticky;
-                top: 0;
-                border-bottom: 1px solid @separator;
-                background: @card-background;
-                align-items: center;
-                white-space: nowrap;
-
-                .table-header-field {
-                    padding: 4px 16px;
-                }
-
-                .table-header-fields-btn-container {
-                    padding-left: 12px;
-                    padding-right: 12px;
-                }
-
-                .tmp-field {
-                    border-bottom: 3px dotted @primary;
-
-                    .tmp-field-icon {
-                        width: 16px;
-                        height: 16px;
-                        margin-right: 8px;
-                        vertical-align: middle;
-                    }
-                }
-            }
-
-            .flex-layout-header {
-                padding-left: 4px;
-            }
-
-            .members-list-item {
-                transition: background 0.2s @easing;
-                cursor: pointer;
-
-                &:hover {
-                    background: @hover-background;
-                }
-
-                &:last-of-type {
-                    border-bottom: none;
-                }
-
-                .members-li-column {
-                    font-size: 1em;
-                    padding: 0;
-                    max-width: 15em;
-
-                    .members-li-link {
-                        display: block;
-                        text-decoration: none;
-                        color: inherit;
-                        padding: 4px 16px;
-                    }
-                }
-            }
-        }
-    }
-
-    .table-pagination {
-        font-size: 13px;
-        margin-right: 24px;
-    }
-}
-
-.members-list .members-list-item,
-.member-detail-page {
+    // fields
     .codeholder-type.disabled {
         color: @error;
     }
@@ -210,24 +72,345 @@
             }
         }
     }
-}
 
-.members-csv-export-dialog {
-    text-align: center;
-    width: 200px;
+    // filters
 
-    .csv-data {
-        display: flex;
-        text-align: left;
-        align-items: center;
+    .numeric-range-editor {
+        position: relative;
+        width: 0;
+        flex: 1;
+        height: 48px;
+        max-width: 100%;
+        margin-right: 20px;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
 
-        .csv-data-file {
-            flex: 1;
+        canvas {
+            position: absolute;
+        }
+
+        &:focus {
+            outline: none;
         }
     }
 
-    .csv-error {
-        font-family: @monospace;
-        font-size: 12px;
+    .country-picker {
+        display: flex;
+        align-items: center;
+        margin: 8px;
+        margin-right: 16px;
+        margin-left: 56px;
+        padding: 8px;
+        cursor: default;
+        border-bottom: 2px solid @control-idle;
+        border-radius: 4px 4px 0 0;
+
+        &:hover {
+            border-bottom-color: @control-primary;
+        }
+
+        .picked-countries {
+            flex: 1;
+            width: 0;
+            height: 1.5em;
+            font-size: small;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+
+            .countries-placeholder {
+                opacity: 0.6;
+            }
+        }
+
+        .expand-icon {
+            flex-shrink: 0;
+        }
+    }
+
+    .age-editor .age-editor-top,
+    .country-editor .country-editor-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-right: 16px;
+    }
+
+    .age-editor {
+        .age-birth-year {
+            // margin-right: 16px;
+            opacity: 0.8;
+        }
+
+        &.disabled .age-prime-switch {
+            opacity: 0.5;
+        }
+
+        .numeric-range-editor {
+            display: block;
+            width: calc(100% - 40px);
+            margin: 0 20px;
+        }
+    }
+
+    .left-right-editor {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-right: 16px;
+    }
+
+    .active-member-editor {
+        display: flex;
+        padding: 8px 0; // numeric range editor gets clipped otherwise
+
+        .filter-header {
+            flex-shrink: 0;
+        }
+
+        .numeric-range-editor {
+            width: 0;
+            flex: 1;
+            margin-left: 16px;
+        }
+
+        @media (max-width: 600px) {
+            display: block;
+
+            .numeric-range-editor {
+                display: block;
+                margin: 0 20px;
+                width: calc(100% - 40px);
+            }
+        }
+    }
+
+    .membership-editor {
+        padding-right: 16px;
+
+        .membership-conjunction-separator {
+            position: relative;
+            display: block;
+            margin: 8px 0;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.875em;
+            animation: members-search-membership-separator-in 0.4s @easing;
+
+            &::before, &::after {
+                content: '';
+                position: absolute;
+                background: currentColor;
+                opacity: 0.2;
+                top: 50%;
+                height: 1px;
+                width: 40%;
+            }
+            &::before {
+                left: 16px;
+            }
+            &::after {
+                right: 16px;
+            }
+
+            @keyframes members-search-membership-separator-in {
+                from {
+                    transform: translateY(-50%);
+                    opacity: 0;
+                }
+            }
+        }
+
+        .membership-item {
+            padding: 16px;
+            border: 1px solid fade(@text, 20%);
+            border-radius: 4px;
+            animation: members-search-membership-item-in 0.4s @easing;
+
+            @keyframes members-search-membership-item-in {
+                from {
+                    transform: translateY(-50%);
+                    clip-path: inset(49% 0 49% 0);
+                }
+                to {
+                    clip-path: inset(0 0 0 0);
+                }
+            }
+
+            .membership-remove {
+                float: left;
+
+                &:hover {
+                    color: @danger;
+                }
+            }
+
+            .membership-item-line {
+                text-align: right;
+                margin-bottom: 8px;
+
+                .membership-categories {
+                    width: calc(100% - 16px);
+                    text-align: left;
+                }
+
+                &.membership-range-line {
+                    display: flex;
+                    margin-top: 16px;
+
+                    .membership-range-checkbox {
+                        margin: 16px;
+                        margin-left: 8px;
+                    }
+
+                    .numeric-range-editor {
+                        display: inline-block;
+                        width: calc(100% - 50px - 56px);
+                        // firefox has weird flexbox behavior with this element
+                        max-width: calc(100% - 50px - 56px);
+                        margin: 16px 30px 0 20px;
+                    }
+                }
+            }
+        }
+
+        .membership-add-container {
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        &.is-empty {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+}
+
+.country-picker-dialog {
+    .country-picker-dialog-paper {
+        width: 100%; // breaks on MS Edge without
+        height: 100%;
+    }
+
+    .dialog-title {
+        position: relative;
+    }
+
+    .search-box-container {
+        // hacky: just hope it aligns with the multicol list
+        position: absolute;
+        display: flex;
+        top: 50%;
+        right: 0;
+        width: 50%;
+        height: 48px;
+        transform: translateY(-50%);
+
+        .search-icon-container {
+            display: flex;
+            width: 48px;
+            height: 48px;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.7;
+        }
+
+        .search-box {
+            flex: 1;
+            height: 100%;
+            font: inherit;
+            font-size: 16px;
+            font-weight: normal;
+            color: inherit;
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .dialog-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .multicol-list {
+        position: relative;
+        display: flex;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        justify-content: stretch;
+
+        .column {
+            position: relative;
+            flex: 1;
+            width: 300px;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .list-item {
+            position: absolute;
+            height: 48px;
+            transition: background 0.2s;
+            border-radius: 4px;
+
+            &:hover {
+                background: @hover-background;
+            }
+
+            &.floating {
+                background: @card-background;
+            }
+
+            .country-item {
+                display: flex;
+                height: 100%;
+                align-items: stretch;
+                cursor: default;
+                line-height: 48px;
+
+                .country-icon, .country-check {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 48px;
+                }
+
+                .country-name {
+                    flex: 1;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+
+            &.floating .country-check {
+                animation: country-picker-country-check-in 0.3s @easing 0.2s backwards;
+
+                @keyframes country-picker-country-check-in {
+                    0% {
+                        transform: scale(0);
+                    }
+                }
+            }
+        }
+    }
+
+    .selection-controls {
+        display: flex;
+        justify-content: space-between;
+        flex-shrink: 0;
+
+        .selection-button {
+            font-size: small;
+        }
     }
 }

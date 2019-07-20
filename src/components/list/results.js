@@ -1,0 +1,340 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableBody from '@material-ui/core/TableBody';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TableSortLabel from '@material-ui/core/TableSortLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import TablePagination from '@material-ui/core/TablePagination';
+import IconButton from '@material-ui/core/IconButton';
+import SearchIcon from '@material-ui/icons/Search';
+import ListAltIcon from '@material-ui/icons/ListAlt';
+import locale from '../../locale';
+import Sorting from './sorting';
+import { Link } from '../../router';
+
+// TODO: fix locale
+
+/// Renders the list view results.
+export default function Results ({
+    list,
+    items,
+    page,
+    itemsPerPage,
+    isRestrictedByGlobalFilter,
+    time,
+    isFiltered,
+    totalItems,
+    onSetPage,
+    onSetItemsPerPage,
+    fields,
+    transientFields,
+    fieldSpec,
+    configColumn,
+    onEditFields,
+    onAddField,
+    onSetFieldSorting,
+}) {
+    const count = list ? list.length : 0;
+    const statsText = locale.members.resultStats(count, isFiltered, totalItems || 0, time || '?');
+
+    return (
+        <div className="list-view-results">
+            {time ? (
+                <div className="result-stats">
+                    {statsText}
+                </div>
+            ) : null}
+            {isRestrictedByGlobalFilter ? (
+                <div className="global-filter-notice">
+                    {locale.members.globalFilterNotice}
+                </div>
+            ) : null}
+            {count ? (
+                <div className="results-list">
+                    <ResultsTable
+                        list={list}
+                        items={items}
+                        fields={fields}
+                        transientFields={transientFields}
+                        fieldSpec={fieldSpec}
+                        configColumn={configColumn}
+                        onEditFields={onEditFields}
+                        onAddField={onAddField}
+                        onSetFieldSorting={onSetFieldSorting} />
+                </div>
+            ) : time ? (
+                <div className="no-results">
+                    {locale.members.noResults}
+                </div>
+            ) : null}
+            {totalItems ? (
+                <TablePagination
+                    className="table-pagination"
+                    component="div"
+                    count={totalItems}
+                    labelDisplayedRows={locale.members.pagination.displayedRows}
+                    labelRowsPerPage={locale.members.pagination.rowsPerPage}
+                    page={page}
+                    rowsPerPage={itemsPerPage}
+                    onChangePage={(e, page) => onSetPage(page)}
+                    onChangeRowsPerPage={e => onSetItemsPerPage(e.target.value)} />
+            ) : null}
+        </div>
+    );
+}
+
+Results.propTypes = {
+    list: PropTypes.array,
+    items: PropTypes.object,
+    page: PropTypes.number,
+    itemsPerPage: PropTypes.number,
+    isRestrictedByGlobalFilter: PropTypes.bool,
+    time: PropTypes.number,
+    isFiltered: PropTypes.bool,
+    totalItems: PropTypes.number,
+    onSetPage: PropTypes.func,
+    onSetItemsPerPage: PropTypes.func,
+    fields: PropTypes.object.isRequired,
+    transientFields: PropTypes.array.isRequired,
+    fieldSpec: PropTypes.object.isRequired,
+    configColumn: PropTypes.string,
+    onEditFields: PropTypes.func.isRequired,
+    onAddField: PropTypes.func.isRequired,
+    onSetFieldSorting: PropTypes.func.isRequired,
+};
+
+export function ErrorResult ({ error }) {
+    let errorIsLocalized = false;
+    let errorDetails = error.toString();
+
+    switch (error.id) {
+    case 'invalid-search-query':
+        errorIsLocalized = true;
+        errorDetails = locale.members.errors.invalidSearchQuery;
+        break;
+    case 'invalid-json':
+        errorIsLocalized = true;
+        errorDetails = locale.members.errors.invalidJSON;
+        break;
+    }
+
+    return (
+        <div className="list-view-error">
+            <div className="error-title">
+                {locale.members.error}
+            </div>
+            {errorIsLocalized ? (
+                <div className="error-details">
+                    {errorDetails}
+                </div>
+            ) : (
+                <pre className="error-details">
+                    {errorDetails}
+                </pre>
+            )}
+        </div>
+    );
+}
+
+ErrorResult.propTypes = {
+    error: PropTypes.any.isRequired,
+};
+
+function ResultsTable ({
+    list,
+    items,
+    fields,
+    transientFields,
+    fieldSpec,
+    configColumn,
+    onEditFields,
+    onAddField,
+    onSetFieldSorting,
+}) {
+    const selectedFields = fields.user.map((field, i) => ({ ...field, index: i }));
+    const selectedFieldIds = selectedFields.map(x => x.id);
+
+    // prepend temporary fields that aren’t already selected
+    for (let i = transientFields.length - 1; i >= 0; i--) {
+        const tmpId = transientFields[i];
+        if (!selectedFieldIds.includes(tmpId)) {
+            selectedFieldIds.push(tmpId);
+            selectedFields.unshift({ id: tmpId, sorting: Sorting.NONE, transient: true });
+        }
+    }
+
+    // also prepend fixed fields
+    for (let i = fields.fixed.length - 1; i >= 0; i--) {
+        selectedFields.unshift(fields.fixed[i]);
+    }
+
+    const fieldIDs = selectedFields.map(field => field.id);
+
+    return (
+        <Table className="results-table">
+            <TableHeader
+                fields={selectedFields}
+                fieldSpec={fieldSpec}
+                configColumn={configColumn}
+                onEditFields={onEditFields}
+                onAddField={onAddField}
+                onSetFieldSorting={onSetFieldSorting} />
+            <TableBody>
+                {list.map(id => (
+                    <TableItem
+                        key={id}
+                        fields={fieldIDs}
+                        fieldSpec={fieldSpec}
+                        value={items[id]}
+                        onClick={/* TODO */ () => {}}
+                        isSelected={/* TODO */ false}
+                        onSelectChange={() => {
+                            // TODO
+                        }}
+                        linkTarget={/* TODO */ '/'} />
+                ))}
+            </TableBody>
+        </Table>
+    );
+}
+
+ResultsTable.propTypes = {
+    list: PropTypes.array.isRequired,
+    items: PropTypes.object.isRequired,
+    fields: PropTypes.object.isRequired,
+    transientFields: PropTypes.array.isRequired,
+    fieldSpec: PropTypes.object.isRequired,
+    configColumn: PropTypes.string,
+    onEditFields: PropTypes.func.isRequired,
+    onAddField: PropTypes.func.isRequired,
+    onSetFieldSorting: PropTypes.func.isRequired,
+};
+
+function TableHeader ({
+    fields,
+    fieldSpec,
+    configColumn,
+    onEditFields,
+    onAddField,
+    onSetFieldSorting,
+}) {
+    return (
+        <TableHead className="table-header">
+            <TableRow>
+                <TableCell className="select-column">
+                    <Checkbox
+                        // TODO: this
+                        checked={false}
+                        onChange={() => {}} />
+                </TableCell>
+                {fields.map(({ id, sorting, transient, index }) => {
+                    if (id === configColumn) {
+                        return (
+                            <TableCell key={id} className="table-header-fields-btn-container">
+                                <IconButton
+                                    key={id}
+                                    className="table-header-fields-btn"
+                                    aria-label={locale.members.fieldPicker.title}
+                                    title={locale.members.fieldPicker.title}
+                                    onClick={onEditFields}>
+                                    <ListAltIcon />
+                                </IconButton>
+                            </TableCell>
+                        );
+                    } else {
+                        const sortDirection = sorting === Sorting.NONE
+                            ? false
+                            : sorting === Sorting.ASC ? 'asc' : 'desc';
+
+                        return (
+                            <TableCell
+                                className={'table-header-field' + (transient ? ' transient' : '')}
+                                key={id}
+                                sortDirection={sortDirection}>
+                                {transient && <SearchIcon className="transient-field-icon" />}
+                                <TableSortLabel
+                                    active={!!sortDirection}
+                                    direction={sortDirection || 'asc'}
+                                    onClick={() => {
+                                        if (transient) {
+                                            onAddField(id, true);
+                                        } else if (fieldSpec[id] && fieldSpec[id].sortable) {
+                                            const newSorting = sorting === Sorting.NONE
+                                                ? Sorting.ASC
+                                                : sorting === Sorting.ASC
+                                                    ? Sorting.DESC
+                                                    : Sorting.NONE;
+                                            onSetFieldSorting(index, newSorting);
+                                        }
+                                    }}>
+                                    {locale.members.fields[id]}
+                                </TableSortLabel>
+                            </TableCell>
+                        );
+                    }
+                })}
+            </TableRow>
+        </TableHead>
+    );
+}
+
+TableHeader.propTypes = {
+    fields: PropTypes.arrayOf(PropTypes.object).isRequired,
+    fieldSpec: PropTypes.object.isRequired,
+    configColumn: PropTypes.string,
+    onEditFields: PropTypes.func.isRequired,
+    onAddField: PropTypes.func.isRequired,
+    onSetFieldSorting: PropTypes.func.isRequired,
+};
+
+function TableItem ({ fields, fieldSpec, value, isSelected, onClick, onSelectChange, linkTarget }) {
+    return (
+        <TableRow className="list-item" onClick={onClick}>
+            <TableCell className="li-column select-column" onClick={e => {
+                e.stopPropagation();
+            }}>
+                <Checkbox
+                    checked={isSelected}
+                    onChange={() => onSelectChange(!isSelected)} />
+            </TableCell>
+            {fields.map(id => {
+                const Field = (fieldSpec[id] && fieldSpec[id].component) || NullField;
+                return (
+                    <TableCell className="li-column" key={id}>
+                        <Link
+                            target={linkTarget}
+                            className="li-link"
+                            onClick={e => {
+                                if (e.shiftKey || e.metaKey || e.ctrlKey) return;
+                                e.preventDefault();
+                            }}>
+                            <Field
+                                field={id}
+                                value={value[id]}
+                                item={value}
+                                fields={fields} />
+                        </Link>
+                    </TableCell>
+                );
+            })}
+        </TableRow>
+    );
+}
+
+TableItem.propTypes = {
+    fields: PropTypes.arrayOf(PropTypes.string).isRequired,
+    fieldSpec: PropTypes.object.isRequired,
+    value: PropTypes.any,
+    isSelected: PropTypes.bool,
+    onClick: PropTypes.func.isRequired,
+    onSelectChange: PropTypes.func.isRequired,
+    linkTarget: PropTypes.string,
+};
+
+function NullField ({ field }) {
+    return <code>missing field component for {field}</code>;
+}
+NullField.propTypes = { field: PropTypes.any };

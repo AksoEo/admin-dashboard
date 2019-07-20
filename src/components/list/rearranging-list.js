@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import DragHandleIcon from '@material-ui/icons/DragHandle';
-import { Spring, globalAnimator } from '../../../animation';
+import { Spring, globalAnimator } from '../../animation';
 
 // constant li height
 const LI_HEIGHT = 56;
