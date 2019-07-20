@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { createStore, applyMiddleware } from 'redux';
 import { connect, Provider } from 'react-redux';
@@ -11,12 +11,13 @@ import SearchInput from './search-input';
 import Filter from './filter';
 import Results, { ErrorResult } from './results';
 import FieldPicker from './field-picker';
+import PaperList from './paper-list';
 import './style';
 
+const JSONEditor = lazy(() => import('./json-editor'));
+
 // TODO: fix locale
-// TODO: use JSON editor
 // TODO: JSON editor switch
-// TODO: use PaperList
 // TODO: handle filter constraints (e.g. codeholderType <= age)
 // TODO: handle hideColumn
 // TODO: CSV export
@@ -29,6 +30,7 @@ const reloadingActions = [
     actions.SET_JSON_FILTER_ENABLED,
     actions.SET_JSON_FILTER,
     actions.ADD_FIELD,
+    actions.SET_FIELD_SORTING,
     actions.SET_FIELDS,
     actions.ADD_FILTER,
     actions.REMOVE_FILTER,
@@ -176,12 +178,12 @@ export default class ListView extends React.PureComponent {
                         onClose={() => this.setState({ fieldPickerOpen: false })}
                         available={fields}
                         sortables={fields.filter(id => this.props.fields[id].sortable)} />
-                    <div className="list-view-search-list-container-goes-here">
-                        <ConnectedSearchInput
-                            fields={this.props.searchFields || []} />
-                        <Filters
-                            filters={this.props.filters || {}} />
-                    </div>
+                    <SearchFilters
+                        searchInput={(
+                            <ConnectedSearchInput
+                                fields={this.props.searchFields || []} />
+                        )}
+                        filters={this.props.filters || {}} />
                     <ConnectedResults
                         isRestrictedByGlobalFilter={this.props.isRestrictedByGlobalFilter}
                         fieldSpec={this.props.fields || {}}
@@ -222,7 +224,9 @@ const ConnectedSearchInput = connect(state => ({
     onQueryChange: query => dispatch(actions.setSearchQuery(query)),
 }))(SearchInput);
 
-const Filters = connect(state => ({
+const SearchFilters = connect(state => ({
+    jsonFilterEnabled: state.jsonFilter.enabled,
+    jsonFilter: state.jsonFilter.filter,
     expanded: state.filters.enabled,
     filterStates: state.filters.filters,
     submitted: state.list.submitted,
@@ -230,20 +234,48 @@ const Filters = connect(state => ({
     onChange: (id, value) => dispatch(actions.setFilterValue(id, value)),
     onEnabledChange: (id, enabled) => dispatch(actions.setFilterEnabled(id, enabled)),
     onFiltersEnabledChange: (enabled) => dispatch(actions.setFiltersEnabled(enabled)),
-}))(function Filters (props) {
-    const filters = Object.entries(props.filters);
+    onJSONChange: (filter) => dispatch(actions.setJSONFilter(filter)),
+    onSubmit: () => dispatch(actions.submit()),
+}))(function SearchFilters (props) {
+    const items = [{ node: props.searchInput }];
 
-    return (
-        <React.Fragment>
-            {filters.length ? (
-                <FilterDisclosureButton
+    if (props.jsonFilterEnabled) {
+        items.push({
+            node: (
+                <Suspense fallback={<div className="json-filter-loading">
+                    {locale.members.search.json.loading}
+                </div>}>
+                    <JSONEditor
+                        value={props.jsonFilter}
+                        onChange={props.onJSONChange}
+                        submitted={props.submitted}
+                        onSubmit={props.onSubmit} />
+                </Suspense>
+            ),
+        });
+    } else {
+        const filters = Object.entries(props.filters);
+        let hasEnabledFilters = false;
+        for (const id of filters) {
+            if (props.filterStates[id] && props.filterStates[id].enabled) {
+                hasEnabledFilters = true;
+                break;
+            }
+        }
+
+        if (filters.length) {
+            items.push({
+                node: <FilterDisclosureButton
                     expanded={props.expanded}
-                    onChange={props.onFiltersEnabledChange}/>
-            ) : null}
-            {filters
-                .filter(([id]) => (id in props.filterStates))
-                .map(([id, filter]) => (
-                    <Filter
+                    onChange={props.onFiltersEnabledChange} />,
+                hidden: props.submitted && !hasEnabledFilters,
+            });
+        }
+
+        items.push(
+            ...filters.filter(([id]) => (id in props.filterStates))
+                .map(([id, filter]) => ({
+                    node: <Filter
                         key={id}
                         id={id}
                         filter={filter}
@@ -251,10 +283,14 @@ const Filters = connect(state => ({
                         value={props.filterStates[id].value}
                         onChange={value => props.onChange(id, value)}
                         onEnabledChange={value => props.onEnabledChange(id, value)}
-                        submitted={props.submitted} />
-                ))}
-        </React.Fragment>
-    );
+                        submitted={props.submitted} />,
+                    hidden: !props.expanded || props.submitted && !props.filterStates[id].enabled,
+                    staticHeight: true,
+                }))
+        );
+    }
+
+    return <PaperList className="search-filters-container">{items}</PaperList>;
 });
 
 function FilterDisclosureButton (props) {

@@ -6,6 +6,7 @@ import JSON5 from 'json5';
 import client from '../../../client';
 import FILTERS from './filters';
 import FIELDS from './fields';
+import './style';
 
 const SEARCHABLE_FIELDS = [
     'nameOrCode',

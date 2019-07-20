@@ -1,4 +1,10 @@
-// TODO: add support for variable number of children
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Spring, globalAnimator, lerp, clamp } from '../../animation';
+import ResizeObserver from 'resize-observer-polyfill';
+
+const DAMPING = 1;
+const RESPONSE = 0.4;
 
 /**
  * Renders a vertical array of animatable material paper.
@@ -76,6 +82,8 @@ export default class PaperList extends React.PureComponent {
             }
         }
 
+        this.nodeHeight = yAccum;
+
         if (!wantsUpdate) {
             globalAnimator.deregister(this);
         }
@@ -102,8 +110,10 @@ export default class PaperList extends React.PureComponent {
         this.update(0, true);
     }
 
-    componentDidUpdate () {
-        globalAnimator.register(this);
+    componentDidUpdate (prevProps) {
+        if (prevProps.children !== this.props.children) {
+            globalAnimator.register(this);
+        }
     }
 
     componentWillUnmount () {
@@ -142,19 +152,8 @@ export default class PaperList extends React.PureComponent {
             this.childNodes.pop();
         }
 
-        // find current total height
-        const style = {};
-        let lastStateIndex = this.childStates.length - 1;
-        while (lastStateIndex > 0 && this.props.children[lastStateIndex].hidden) {
-            lastStateIndex--;
-        }
-        const lastState = this.childStates[lastStateIndex];
-        if (lastState) {
-            style.height = lastState.y.value + lastState.height.value;
-        }
-
         return (
-            <div {...props} style={style}>
+            <div {...props} style={{ height: this.nodeHeight }}>
                 {items}
             </div>
         );
