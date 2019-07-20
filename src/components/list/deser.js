@@ -183,6 +183,7 @@ export function decodeURLQuery (data, filters) {
             }
         } else if (section[1] === 'fields') {
             cmds.push(actions.setUserFields([]));
+            let index = 0;
             while (data.length) {
                 const [id, idLen] = maybeDecodeParens(data, ':),');
                 data = data.substr(idLen);
@@ -194,11 +195,12 @@ export function decodeURLQuery (data, filters) {
                     const [sorting, sortingLen] = maybeDecodeParens(data, ':),');
                     data = data.substr(sortingLen);
 
-                    cmds.push(actions.setFieldSorting(id, sorting));
+                    cmds.push(actions.setFieldSorting(index, sorting));
                 }
 
                 if (data[0] !== ',') break;
                 else data = data.substr(1);
+                index++;
             }
         } else if (section[1] === 'page') {
             const match = data.match(/^(\d+),(\d+)/);
