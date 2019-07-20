@@ -103,6 +103,8 @@ function fields (state = { fixed: [], user: [] }, action) {
     switch (action.type) {
     case actions.SET_FIELDS:
         return { ...state, fixed: action.fixed, user: action.user };
+    case actions.SET_USER_FIELDS:
+        return { ...state, user: action.user };
     default:
         return { ...state, user: userFields(state.user, action) };
     }

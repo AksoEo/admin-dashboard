@@ -144,6 +144,15 @@ export default {
             }
             return { $or: filterItems };
         },
+        serialize (value) {
+            const type = value.type === 'fee' ? 'f' : value.type === 'address' ? 'a' : '*';
+            return type + '$' + value.countries.join(',');
+        },
+        deserialize (value) {
+            const type = value[0] === 'f' ? 'fee' : value[0] === 'a' ? 'address' : null;
+            const countries = value.substr(2).split(',');
+            return { type, countries };
+        },
         editor: class CountryEditor extends React.PureComponent {
             state = { countries: null, countryGroups: null };
 
@@ -233,18 +242,25 @@ export default {
             };
         },
         serialize (value) {
-            return {
-                rs: value.range.start,
-                re: value.range.end,
-                rsi: value.range.startInclusive,
-                rei: value.range.endInclusive,
-                asoy: value.atStartOfYear,
-            };
+            return value.range.start
+                + (value.range.startInclusive ? '<=' : '<')
+                + 'x'
+                + (value.range.endInclusive ? '<=' : '<')
+                + value.range.end
+                + (value.atStartOfYear ? '^' : '');
         },
         deserialize (value) {
+            const match = value.match(/^(\d+)(<=?)x(<=?)(\d+)(\^?)/);
+            if (!match) throw new Error('value does not match pattern');
+            const rangeStart = +match[1] | 0;
+            const startInclusive = match[2] === '<=';
+            const endInclusive = match[3] === '<=';
+            const rangeEnd = +match[4] | 0;
+            const atStartOfYear = match[5] === '^';
+
             return {
-                range: new NumericRange(value.rs, value.re, value.rsi, value.rei),
-                atStartOfYear: value.asoy,
+                range: new NumericRange(rangeStart, rangeEnd, startInclusive, endInclusive),
+                atStartOfYear,
             };
         },
         toRequest (value) {
@@ -399,7 +415,7 @@ export default {
             return { $membership: { $and: items } };
         },
         serialize (value) {
-            return value.map(({
+            return JSON.stringify(value.map(({
                 invert, lifetime, givesMembership, useRange, range, categories,
             }) => ({
                 i: invert,
@@ -412,12 +428,12 @@ export default {
                     e: range.end,
                 } : null,
                 c: categories,
-            }));
+            })));
         },
         deserialize (value) {
             const thisYear = new Date().getFullYear();
 
-            return value.map(({ i, l, g, r, c }) => ({
+            return JSON.parse(value).map(({ i, l, g, r, c }) => ({
                 invert: i,
                 lifetime: l,
                 givesMembership: g,
@@ -641,10 +657,20 @@ export default {
             return new NumericRange(thisYear, thisYear, true, true);
         },
         serialize (value) {
-            return [value.start, value.end, value.startInclusive, value.endInclusive];
+            return value.start
+                + (value.startInclusive ? '<=' : '<')
+                + 'x'
+                + (value.endInclusive ? '<=' : '<')
+                + value.end;
         },
         deserialize (value) {
-            return new NumericRange(...value);
+            const match = value.match(/^(\d+)(<=?)x(<=?)(\d+)/);
+            if (!match) throw new Error('value does not match pattern');
+            const rangeStart = +match[1] | 0;
+            const startInclusive = match[2] === '<=';
+            const endInclusive = match[3] === '<=';
+            const rangeEnd = +match[4] | 0;
+            return new NumericRange(rangeStart, rangeEnd, startInclusive, endInclusive);
         },
         toRequest (value) {
             const range = {};

@@ -53,7 +53,13 @@ function currentPageFromLocation () {
     let items = routes.flatMap(category => category.contents);
 
     // default null page
-    const page = { id: null, component: null, query: queryString, match: null };
+    const page = {
+        id: null,
+        component: null,
+        path: pagePath,
+        query: queryString,
+        match: null,
+    };
 
     for (const part of pathParts) {
         for (const item of items) {
@@ -338,6 +344,7 @@ export default class App extends React.PureComponent {
                 </div>
             }>
                 <PageComponent
+                    path={this.state.currentPage.path}
                     match={this.state.currentPage.match}
                     query={this.state.currentPage.query}
                     ref={page => this.currentPage = page} />

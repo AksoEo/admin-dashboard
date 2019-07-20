@@ -1,7 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { UEACode, util } from 'akso-client';
 import JSON5 from 'json5';
+import { appContext } from '../../../router';
 import ListView from '../../../components/list';
 import Sorting from '../../../components/list/sorting';
 import locale from '../../../locale';
@@ -21,10 +23,48 @@ const SEARCHABLE_FIELDS = [
 ];
 
 export default class MembersList extends React.PureComponent {
+    static propTypes = {
+        path: PropTypes.string.isRequired,
+        query: PropTypes.string.isRequired,
+    };
+
+    static contextType = appContext;
+
+    onURLQueryChange = query => {
+        if (this.currentQuery === query) return;
+        this.currentQuery = query;
+        this.context.navigate(this.props.path + '?q=' + query);
+    };
+
+    componentDidMount () {
+        this.tryDecodeURLQuery();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.query !== this.props.query) {
+            this.tryDecodeURLQuery();
+        }
+    }
+
+    tryDecodeURLQuery () {
+        if (!this.props.query.startsWith('?q=')) return;
+        const query = this.props.query.substr(3);
+        if (query === this.currentQuery) return;
+        this.currentQuery = query;
+
+        try {
+            this.listView.decodeURLQuery(query);
+        } catch (err) {
+            // TODO: error?
+            console.error('Failed to decode URL query', err); // eslint-disable-line no-console
+        }
+    }
+
     render () {
         return (
             <div className="app-page members-page">
                 <ListView
+                    ref={view => this.listView = view}
                     defaults={{
                         searchField: 'nameOrCode',
                         fixedFields: [{
@@ -60,7 +100,8 @@ export default class MembersList extends React.PureComponent {
                     fields={FIELDS}
                     fieldConfigColumn={'codeholderType'}
                     onRequest={handleRequest}
-                    isRestrictedByGlobalFilter={/* TODO */ false} />
+                    isRestrictedByGlobalFilter={/* TODO */ false}
+                    onURLQueryChange={this.onURLQueryChange} />
             </div>
         );
     }

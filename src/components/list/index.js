@@ -12,6 +12,7 @@ import Filter from './filter';
 import Results, { ErrorResult } from './results';
 import FieldPicker from './field-picker';
 import PaperList from './paper-list';
+import { encodeURLQuery, decodeURLQuery } from './deser';
 import './style';
 
 const JSONEditor = lazy(() => import('./json-editor'));
@@ -19,7 +20,6 @@ const JSONEditor = lazy(() => import('./json-editor'));
 // TODO: fix locale
 // TODO: JSON editor switch
 // TODO: CSV export
-// TODO: URL queries
 
 const reloadingActions = [
     actions.SET_SEARCH_QUERY,
@@ -37,9 +37,18 @@ const reloadingActions = [
     actions.SET_ITEMS_PER_PAGE,
 ];
 
+const urlQueryActions = reloadingActions.concat([
+    actions.MOVE_FIELD,
+    actions.REMOVE_FIELD,
+    actions.SUBMIT,
+]);
+
 const reloadMiddleware = listView => () => next => action => {
     if (reloadingActions.includes(action.type)) {
         listView.scheduleReload();
+    }
+    if (urlQueryActions.includes(action.type)) {
+        listView.updateURLQuery();
     }
     next(action);
 };
@@ -86,6 +95,9 @@ export default class ListView extends React.PureComponent {
 
         /// If true, will show a notice about being restricted by a global filter.
         isRestrictedByGlobalFilter: PropTypes.bool,
+
+        /// Fired whenever the URL query changes.
+        onURLQueryChange: PropTypes.func,
     };
 
     /// State store.
@@ -203,6 +215,30 @@ export default class ListView extends React.PureComponent {
     /// Internal function to handle a removed filter.
     removeFilter (id) {
         this.store.dispatch(actions.removeFilter(id));
+    }
+
+    emitURLQuery () {
+        if (!this.props.onURLQueryChange) return;
+
+        const state = this.store.getState();
+        if (state.list.submitted) {
+            const query = encodeURLQuery(state, this.props.filters || {});
+            this.props.onURLQueryChange(query);
+        }
+    }
+
+    /// Call this whenever the URL query changes.
+    decodeURLQuery (query) {
+        const decoded = decodeURLQuery(query);
+        this.resetStore(this.props.defaults || {});
+        decoded.forEach(action => this.store.dispatch(action));
+        this.store.dispatch(actions.submit());
+        clearTimeout(this.scheduledReload);
+    }
+
+    updateURLQuery () {
+        clearTimeout(this.urlQueryUpdateTimeout);
+        this.urlQueryUpdateTimeout = setTimeout(() => this.emitURLQuery(), RELOAD_DEBOUNCE_TIME);
     }
 
     render () {

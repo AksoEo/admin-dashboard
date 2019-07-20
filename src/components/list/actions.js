@@ -40,6 +40,9 @@ export const moveField = (index, target) => ({ type: MOVE_FIELD, index, target }
 export const SET_FIELDS = 'set-fields';
 export const setFields = (fixed, user) => ({ type: SET_FIELDS, fixed, user });
 
+export const SET_USER_FIELDS = 'set-user-fields';
+export const setUserFields = (user) => ({ type: SET_USER_FIELDS, user });
+
 export const RECEIVE_SUCCESS = 'receive-success';
 const receiveSuccess = (items, transientFields, stats) => ({
     type: RECEIVE_SUCCESS, items, transientFields, stats,
