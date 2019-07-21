@@ -30,8 +30,13 @@ export default class MembersList extends React.PureComponent {
 
     static contextType = appContext;
 
+    isQueryUnchanged (query) {
+        return this.currentQuery === query
+            || decodeURIComponent(this.currentQuery) === decodeURIComponent(query);
+    }
+
     onURLQueryChange = query => {
-        if (this.currentQuery === query) return;
+        if (this.isQueryUnchanged(query)) return;
         this.currentQuery = query;
         if (query) this.context.navigate(this.props.path + '?q=' + query);
         else this.context.navigate(this.props.path);
@@ -55,7 +60,7 @@ export default class MembersList extends React.PureComponent {
         }
         if (!this.props.query.startsWith('?q=')) return;
         const query = this.props.query.substr(3);
-        if (query === this.currentQuery) return;
+        if (this.isQueryUnchanged(query)) return;
         this.currentQuery = query;
 
         try {
@@ -64,6 +69,39 @@ export default class MembersList extends React.PureComponent {
             // TODO: error?
             console.error('Failed to decode URL query', err); // eslint-disable-line no-console
         }
+    }
+
+    getOverflowMenu () {
+        const items = [];
+
+        const isJSONFilterEnabled = this.listView.isJSONFilterEnabled();
+
+        items.push({
+            label: isJSONFilterEnabled
+                ? locale.listView.json.disable
+                : locale.listView.json.enable,
+            action: () => {
+                this.listView.setJSONFilterEnabled(!isJSONFilterEnabled);
+            },
+        });
+
+        if (this.listView.isSubmitted()) {
+            items.push({
+                label: locale.members.csvExport.menuItem,
+                action: () => {
+                    // TODO
+                },
+            });
+        }
+
+        items.push({
+            label: locale.members.addMember.menuItem,
+            action: () => {
+                // TODO
+            },
+        });
+
+        return items;
     }
 
     render () {

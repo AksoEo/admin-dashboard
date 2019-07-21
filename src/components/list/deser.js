@@ -32,7 +32,11 @@ function encodeParens (str) {
 }
 
 function encodePercent (s) {
-    return s.replace(/%/g, '%25').replace(/#/g, '%23');
+    return s
+        .replace(/%/g, '%25')
+        .replace(/#/g, '%23')
+        .replace(/\n/g, '%0A')
+        .replace(/\t/g, '%09');
 }
 
 function decodePercent (s) {

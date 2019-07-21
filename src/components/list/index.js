@@ -17,9 +17,6 @@ import './style';
 
 const JSONEditor = lazy(() => import('./json-editor'));
 
-// TODO: JSON editor switch
-// TODO: CSV export
-
 const reloadingActions = [
     actions.SET_SEARCH_QUERY,
     actions.SET_FILTERS_ENABLED,
@@ -254,6 +251,18 @@ export default class ListView extends React.PureComponent {
     updateURLQuery () {
         clearTimeout(this.urlQueryUpdateTimeout);
         this.urlQueryUpdateTimeout = setTimeout(() => this.emitURLQuery(), RELOAD_DEBOUNCE_TIME);
+    }
+
+    isSubmitted () {
+        return this.store.getState().list.submitted;
+    }
+
+    isJSONFilterEnabled () {
+        return this.store.getState().jsonFilter.enabled;
+    }
+
+    setJSONFilterEnabled (enabled) {
+        this.store.dispatch(actions.setJSONFilterEnabled(enabled));
     }
 
     render () {
