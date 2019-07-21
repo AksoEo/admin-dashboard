@@ -41,7 +41,10 @@ export default class SearchInput extends React.PureComponent {
                     value={this.props.query}
                     onChange={e => this.props.onQueryChange(e.target.value)}
                     onClick={e => this.props.submitted && e.stopPropagation()}
-                    placeholder={this.props.localizedPlaceholders[this.props.field]} />
+                    placeholder={this.props.localizedPlaceholders[this.props.field]}
+                    onKeyDown={e => {
+                        if (e.key === 'Enter') this.props.onSubmit();
+                    }} />
                 {this.props.submitted ? (
                     <IconButton
                         className="search-action search-expand"
