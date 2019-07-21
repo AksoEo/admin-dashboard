@@ -84,14 +84,87 @@ export default {
         genericTotpError: 'Ne sukcesis ensaluti, bv. reprovi poste',
         invalidTotp: 'Nevalida sekurkodo',
     },
+    listView: {
+        filters: 'Filtriloj',
+        submit: 'Serĉi',
+        unsubmit: '[[expand options]]',
+        fieldPicker: {
+            title: 'Montrotaj kampoj',
+            searchPlaceholder: 'Serĉi kampon',
+        },
+        sorting: {
+            none: 'ne ordigata',
+            asc: 'kreskanta',
+            desc: 'malkreskanta',
+        },
+        json: {
+            loading: 'Ŝarĝas...',
+            enable: 'Uzi JSON-filtrilojn',
+            disable: 'Uzi facilajn filtrilojn',
+            help: {
+                title: 'JSON-helpo',
+                content: `[[json help content goes here. if you would like this to be raw html\
+                that can be arranged (it’s not like we’re going to html inject ourselves though\
+                this locale object isn’t immutable so technically that is a possibility but who\
+                would even do that)\
+                if this is going to be interactive (api doc browser?) that too can be\
+                arranged]]`,
+            },
+        },
+        resultStats: (count, filtered, total, time) => {
+            const plural = n => n === 1 ? '' : 'j';
+            return `Montras ${count} rezulto${plural(count)}n ${
+                filtered ? `filtrita${plural(count)}n ` : ''}el entute ${
+                total} trovita${plural(total)} en ${time}`;
+        },
+        globalFilterNotice: 'Ĉiuj viaj serĉoj estas limigitaj laŭ membrofiltrilo. Okaze de demandoj, kontaktu vian administranton.',
+        noResults: 'Trovis neniujn rezultojn',
+        pagination: {
+            displayedRows: ({ from, to, count }) => `${from}–${to} el ${count}`,
+            rowsPerPage: 'Rezultoj po paĝo',
+        },
+        error: 'Eraro',
+        errors: {
+            invalidSearchQuery: 'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj. Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon: `*` post vorto por permesi ajnajn sekvantajn signojn post la vorto, `+` antaŭ vorto por postuli ĝian ekziston, `-` antaŭ vorto por postuli ĝian malekziston kaj `""`-citilojn ĉirkaŭ frazo aŭ vorto por postuli la ekzaktan kombinon de la vortoj. Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.',
+            invalidJSON: 'Estas tajperaro en la JSON-filtriloj. Detalaj informoj troviĝas en la JSON-filtrilkampo.',
+        },
+    },
     // Members page
     members: {
         search: {
             title: 'Serĉi membrojn',
             titleFilter: 'Filtri membrojn',
-            submit: 'Serĉi',
-            submitFilter: 'Filtri',
-            filters: 'Filtriloj',
+            fields: {
+                nameOrCode: 'Nomo aŭ UEA-kodo',
+                email: 'Retpoŝtadreso',
+                landlinePhone: 'Hejma telefono',
+                cellphone: 'Poŝtelefono',
+                officePhone: 'Oficeja telefono',
+                address: 'Adreso',
+                notes: 'Notoj',
+            },
+            placeholders: {
+                nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
+                email: 'Ekz. zamenhof@co.uea.org',
+                landlinePhone: 'Ekz. +314666…',
+                cellphone: 'Ekz. +314666…',
+                officePhone: 'Ekz. +314666…',
+                address: 'Ekz. Nieuwe Binnenweg',
+                notes: 'Serĉi en notoj',
+            },
+            filters: {
+                age: 'Aĝo',
+                hasOldCode: 'Malnova UEA-kodo',
+                hasEmail: 'Retpoŝtadreso',
+                codeholderType: 'Membrospeco',
+                enabled: 'Konto ŝaltita',
+                isDead: 'Mortinta',
+                country: 'Lando',
+                birthdate: 'Naskiĝtago',
+                hasPassword: 'Kreis konton',
+                membership: 'Membreckategorioj',
+                isActiveMember: 'Aktiva membro en',
+            },
             agePrime: 'jarkomence',
             ageBirthYear: range => `naskiĝintoj en ${range}`,
             codeholderTypes: {
@@ -113,26 +186,6 @@ export default {
                 all: 'ne gravas',
                 yes: 'ekzistas',
                 no: 'ne ekzistas',
-            },
-            fields: {
-                age: 'Aĝo',
-                nameOrCode: 'Nomo aŭ UEA-kodo',
-                email: 'Retpoŝtadreso',
-                notes: 'Notoj',
-                hasOldCode: 'Malnova UEA-kodo',
-                hasEmail: 'Retpoŝtadreso',
-                codeholderType: 'Membrospeco',
-                landlinePhone: 'Hejma telefono',
-                cellphone: 'Poŝtelefono',
-                officePhone: 'Oficeja telefono',
-                enabled: 'Konto ŝaltita',
-                isDead: 'Mortinta',
-                country: 'Lando',
-                birthdate: 'Naskiĝtago',
-                address: 'Adreso',
-                hasPassword: 'Kreis konton',
-                membership: 'Membreckategorioj',
-                isActiveMember: 'Aktiva membro en',
             },
             countries: {
                 // section labels in <select>
@@ -166,37 +219,6 @@ export default {
                 conjunction: 'kaj',
                 placeholder: 'Elekti kategoriojn',
             },
-            fieldPlaceholders: {
-                nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
-                email: 'Ekz. zamenhof@co.uea.org',
-                landlinePhone: 'Ekz. +314666...',
-                cellphone: 'Ekz. +314666...',
-                officePhone: 'Ekz. +314666...',
-                address: 'Ekz. Nieuwe Binnenweg',
-                notes: 'Serĉi en notoj',
-            },
-            json: {
-                loading: 'Ŝarĝas...',
-                menuLabel: {
-                    enable: 'Uzi JSON-filtrilojn',
-                    disable: 'Uzi facilajn filtrilojn',
-                },
-                help: {
-                    title: 'JSON-helpo',
-                    content: `[[json help content goes here. if you would like this to be raw html\
-                    that can be arranged (it’s not like we’re going to html inject ourselves though\
-                    this locale object isn’t immutable so technically that is a possibility but who\
-                    would even do that)\
-                    if this is going to be interactive (api doc browser?) that too can be\
-                    arranged]]`,
-                },
-            },
-        },
-        resultStats: (count, filtered, total, time) => {
-            const plural = n => n === 1 ? '' : 'j';
-            return `Montras ${count} rezulto${plural(count)}n ${
-                filtered ? `filtrita${plural(count)}n ` : ''}el entute ${
-                total} trovita${plural(total)} en ${time}`;
         },
         fields: {
             codeholderType: 'Membrospeco',
@@ -232,26 +254,6 @@ export default {
             honorific: 'Titolo',
             profession: 'Profesio',
             membership: 'Membreco',
-        },
-        fieldPicker: {
-            title: 'Montrotaj kampoj',
-            searchPlaceholder: 'Serĉi kampon',
-        },
-        sorting: {
-            none: 'ne ordigata',
-            asc: 'kreskanta',
-            desc: 'malkreskanta',
-        },
-        pagination: {
-            displayedRows: ({ from, to, count }) => `${from}–${to} el ${count}`,
-            rowsPerPage: 'Rezultoj po paĝo',
-        },
-        globalFilterNotice: 'Ĉiuj viaj serĉoj estas limigitaj laŭ membrofiltrilo. Okaze de demandoj, kontaktu vian administranton.',
-        noResults: 'Trovis neniujn rezultojn',
-        error: 'Eraro',
-        errors: {
-            invalidSearchQuery: 'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj. Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon: `*` post vorto por permesi ajnajn sekvantajn signojn post la vorto, `+` antaŭ vorto por postuli ĝian ekziston, `-` antaŭ vorto por postuli ĝian malekziston kaj `""`-citilojn ĉirkaŭ frazo aŭ vorto por postuli la ekzaktan kombinon de la vortoj. Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.',
-            invalidJSON: 'Estas tajperaro en la JSON-filtriloj. Detalaj informoj troviĝas en la JSON-filtrilkampo.',
         },
         csvExport: {
             menuItem: 'Elporti kiel CSV',

@@ -107,7 +107,13 @@ export default class MembersList extends React.PureComponent {
                     fieldConfigColumn={'codeholderType'}
                     onRequest={handleRequest}
                     isRestrictedByGlobalFilter={/* TODO */ false}
-                    onURLQueryChange={this.onURLQueryChange} />
+                    onURLQueryChange={this.onURLQueryChange}
+                    locale={{
+                        searchFields: locale.members.search.fields,
+                        placeholders: locale.members.search.placeholders,
+                        filters: locale.members.search.filters,
+                        fields: locale.members.fields,
+                    }} />
             </div>
         );
     }

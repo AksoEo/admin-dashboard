@@ -14,8 +14,6 @@ import 'codemirror/addon/edit/closebrackets';
 import locale from '../../locale';
 import './json-editor.less';
 
-// TODO: fix locale
-
 // after the tab on the second line
 // (see ./index.js for the default value)
 const DEFAULT_CURSOR_POS = [1, 1];
@@ -122,10 +120,10 @@ export default class JSONEditor extends React.PureComponent {
                     open={this.state.helpOpen}
                     onClose={() => this.setState({ helpOpen: false })}>
                     <DialogTitle>
-                        {locale.members.search.json.help.title}
+                        {locale.listView.json.help.title}
                     </DialogTitle>
                     <DialogContent>
-                        {locale.members.search.json.help.content}
+                        {locale.listView.json.help.content}
                     </DialogContent>
                 </Dialog>
             </div>

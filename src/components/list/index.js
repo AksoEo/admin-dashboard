@@ -17,7 +17,6 @@ import './style';
 
 const JSONEditor = lazy(() => import('./json-editor'));
 
-// TODO: fix locale
 // TODO: JSON editor switch
 // TODO: CSV export
 
@@ -99,6 +98,14 @@ export default class ListView extends React.PureComponent {
 
         /// Fired whenever the URL query changes.
         onURLQueryChange: PropTypes.func,
+
+        /// Locale data.
+        ///
+        /// - `searchFields`: translations for search fields
+        /// - `placeholders`: translations for search placeholders
+        /// - `filters`: translations for filters
+        /// - `fields`: translations for fields
+        locale: PropTypes.object.isRequired,
     };
 
     /// State store.
@@ -260,14 +267,18 @@ export default class ListView extends React.PureComponent {
                         open={this.state.fieldPickerOpen}
                         onClose={() => this.setState({ fieldPickerOpen: false })}
                         available={fields}
-                        sortables={fields.filter(id => this.props.fields[id].sortable)} />
+                        sortables={fields.filter(id => this.props.fields[id].sortable)}
+                        localizedFields={this.props.locale.fields} />
                     <SearchFilters
                         title={this.props.title}
                         searchInput={(
                             <ConnectedSearchInput
-                                fields={this.props.searchFields || []} />
+                                fields={this.props.searchFields || []}
+                                localizedFields={this.props.locale.searchFields}
+                                localizedPlaceholders={this.props.locale.placeholders} />
                         )}
-                        filters={this.props.filters || {}} />
+                        filters={this.props.filters || {}}
+                        localizedFilters={this.props.locale.filters} />
                     <ConnectedResults
                         isRestrictedByGlobalFilter={this.props.isRestrictedByGlobalFilter}
                         fieldSpec={this.props.fields || {}}
@@ -276,7 +287,8 @@ export default class ListView extends React.PureComponent {
                         onAddField={(...args) => this.store.dispatch(actions.addField(...args))}
                         onSetFieldSorting={(...args) => {
                             this.store.dispatch(actions.setFieldSorting(...args));
-                        }} />
+                        }}
+                        localizedFields={this.props.locale.fields} />
                 </div>
             </Provider>
         );
@@ -332,7 +344,7 @@ const SearchFilters = connect(state => ({
         items.push({
             node: (
                 <Suspense fallback={<div className="json-filter-loading">
-                    {locale.members.search.json.loading}
+                    {locale.listView.json.loading}
                 </div>}>
                     <JSONEditor
                         value={props.jsonFilter}
@@ -367,6 +379,7 @@ const SearchFilters = connect(state => ({
                     node: <Filter
                         key={id}
                         id={id}
+                        localizedName={props.localizedFilters[id]}
                         filter={filter}
                         enabled={props.filterStates[id].enabled}
                         value={props.filterStates[id].value}
@@ -387,7 +400,7 @@ function FilterDisclosureButton (props) {
         <button
             className={'filter-disclosure' + (props.expanded ? ' expanded' : '')}
             onClick={() => props.onChange(!props.expanded)}>
-            {locale.members.search.filters}
+            {locale.listView.filters}
             <KeyboardArrowDownIcon className="filter-disclosure-icon" />
         </button>
     );

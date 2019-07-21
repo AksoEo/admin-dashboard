@@ -6,8 +6,6 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import SearchIcon from '@material-ui/icons/Search';
 import locale from '../../locale';
 
-// TODO: fix locale
-
 /** Primary search field. */
 export default class SearchInput extends React.PureComponent {
     static propTypes = {
@@ -19,6 +17,8 @@ export default class SearchInput extends React.PureComponent {
         submitted: PropTypes.bool.isRequired,
         query: PropTypes.string.isRequired,
         onQueryChange: PropTypes.func.isRequired,
+        localizedFields: PropTypes.object.isRequired,
+        localizedPlaceholders: PropTypes.object.isRequired,
     };
 
     render () {
@@ -31,7 +31,7 @@ export default class SearchInput extends React.PureComponent {
                     onChange={e => this.props.onFieldChange(e.target.value)}>
                     {this.props.fields.map(field => (
                         <option value={field} key={field}>
-                            {locale.members.search.fields[field]}
+                            {this.props.localizedFields[field]}
                         </option>
                     ))}
                 </NativeSelect>
@@ -41,11 +41,11 @@ export default class SearchInput extends React.PureComponent {
                     value={this.props.query}
                     onChange={e => this.props.onQueryChange(e.target.value)}
                     onClick={e => this.props.submitted && e.stopPropagation()}
-                    placeholder={locale.members.search.fieldPlaceholders[this.props.field]} />
+                    placeholder={this.props.localizedPlaceholders[this.props.field]} />
                 {this.props.submitted ? (
                     <IconButton
                         className="search-action search-expand"
-                        aria-label={locale.members.search.expand}
+                        aria-label={locale.listView.unsubmit}
                         onClick={this.props.onUnsubmit}>
                         <KeyboardArrowDownIcon />
                     </IconButton>
@@ -53,7 +53,7 @@ export default class SearchInput extends React.PureComponent {
                     <IconButton
                         className="search-action search-submit"
                         color="primary"
-                        aria-label={locale.members.search.submit}
+                        aria-label={locale.listView.submit}
                         onClick={this.props.onSubmit}>
                         <SearchIcon />
                     </IconButton>

@@ -18,8 +18,6 @@ import locale from '../../locale';
 import Sorting from './sorting';
 import './field-picker.less';
 
-// TODO: fix locale
-
 /**
  * Width below which the field picker will be a full-screen modal.
  */
@@ -48,6 +46,7 @@ export default class FieldPicker extends React.PureComponent {
         open: PropTypes.bool.isRequired,
         /** Close handler. */
         onClose: PropTypes.func.isRequired,
+        localizedFields: PropTypes.object.isRequired,
     };
 
     state = {
@@ -73,7 +72,7 @@ export default class FieldPicker extends React.PureComponent {
 
         let searchResults = this.props.available.map(field => ({
             id: field,
-            name: locale.members.fields[field],
+            name: this.props.localizedFields[field],
         }));
         if (this.state.search) {
             searchResults = fuzzaldrin.filter(searchResults, this.state.search, { key: 'name' });
@@ -101,7 +100,7 @@ export default class FieldPicker extends React.PureComponent {
                 <div className="field-picker-field selected" key={field.id}>
                     <Checkbox checked={true} onClick={onCheckboxClick} />
                     <label className="field-label" onClick={onCheckboxClick}>
-                        {locale.members.fields[field.id]}
+                        {this.props.localizedFields[field.id]}
                     </label>
                     {sortingControl}
                 </div>
@@ -118,7 +117,7 @@ export default class FieldPicker extends React.PureComponent {
                     onClick={() => this.props.onAddField(field)}>
                     <Checkbox checked={false} />
                     <div className="field-label">
-                        {locale.members.fields[field]}
+                        {this.props.localizedFields[field]}
                     </div>
                 </div>
             );
@@ -142,7 +141,7 @@ export default class FieldPicker extends React.PureComponent {
                                 <CloseIcon />
                             </IconButton>
                             <Typography variant="h6" color="inherit">
-                                {locale.members.fieldPicker.title}
+                                {locale.listView.fieldPicker.title}
                             </Typography>
                         </Toolbar>
                     </AppBar>
@@ -154,7 +153,7 @@ export default class FieldPicker extends React.PureComponent {
                             className="close-button">
                             <CloseIcon />
                         </IconButton>
-                        {locale.members.fieldPicker.title}
+                        {locale.listView.fieldPicker.title}
                     </DialogTitle>
                 )}
                 <DialogContent>
@@ -162,7 +161,7 @@ export default class FieldPicker extends React.PureComponent {
                         <input
                             value={this.state.search}
                             onChange={e => this.setState({ search: e.target.value })}
-                            placeholder={locale.members.fieldPicker.searchPlaceholder} />
+                            placeholder={locale.listView.fieldPicker.searchPlaceholder} />
                     </div>
                     <RearrangingList
                         onMove={(fromIndex, toIndex) => this.props.onMoveField(fromIndex, toIndex)}
@@ -217,10 +216,10 @@ export class SortingControl extends React.PureComponent {
             <div className={className} onClick={this.onClick}>
                 {!this.props.hideLabel && <label className="sorting-label">
                     {this.props.value === Sorting.NONE
-                        ? locale.members.sorting.none
+                        ? locale.listView.sorting.none
                         : this.props.value === Sorting.ASC
-                            ? locale.members.sorting.asc
-                            : locale.members.sorting.desc}
+                            ? locale.listView.sorting.asc
+                            : locale.listView.sorting.desc}
                 </label>}
                 <IconButton className="sorting-icon">
                     {this.props.value === Sorting.NONE

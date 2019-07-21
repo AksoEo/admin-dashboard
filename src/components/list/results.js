@@ -15,8 +15,6 @@ import locale from '../../locale';
 import Sorting from './sorting';
 import { Link } from '../../router';
 
-// TODO: fix locale
-
 /// Renders the list view results.
 export default function Results ({
     list,
@@ -36,9 +34,10 @@ export default function Results ({
     onEditFields,
     onAddField,
     onSetFieldSorting,
+    localizedFields,
 }) {
     const count = list ? list.length : 0;
-    const statsText = locale.members.resultStats(count, isFiltered, totalItems || 0, time || '?');
+    const statsText = locale.listView.resultStats(count, isFiltered, totalItems || 0, time || '?');
 
     return (
         <div className="list-view-results">
@@ -49,7 +48,7 @@ export default function Results ({
             ) : null}
             {isRestrictedByGlobalFilter ? (
                 <div className="global-filter-notice">
-                    {locale.members.globalFilterNotice}
+                    {locale.listView.globalFilterNotice}
                 </div>
             ) : null}
             {count ? (
@@ -63,11 +62,12 @@ export default function Results ({
                         configColumn={configColumn}
                         onEditFields={onEditFields}
                         onAddField={onAddField}
-                        onSetFieldSorting={onSetFieldSorting} />
+                        onSetFieldSorting={onSetFieldSorting}
+                        localizedFields={localizedFields} />
                 </div>
             ) : time ? (
                 <div className="no-results">
-                    {locale.members.noResults}
+                    {locale.listView.noResults}
                 </div>
             ) : null}
             {totalItems ? (
@@ -75,8 +75,8 @@ export default function Results ({
                     className="table-pagination"
                     component="div"
                     count={totalItems}
-                    labelDisplayedRows={locale.members.pagination.displayedRows}
-                    labelRowsPerPage={locale.members.pagination.rowsPerPage}
+                    labelDisplayedRows={locale.listView.pagination.displayedRows}
+                    labelRowsPerPage={locale.listView.pagination.rowsPerPage}
                     page={page}
                     rowsPerPage={itemsPerPage}
                     onChangePage={(e, page) => onSetPage(page)}
@@ -104,6 +104,7 @@ Results.propTypes = {
     onEditFields: PropTypes.func.isRequired,
     onAddField: PropTypes.func.isRequired,
     onSetFieldSorting: PropTypes.func.isRequired,
+    localizedFields: PropTypes.object.isRequired,
 };
 
 export function ErrorResult ({ error }) {
@@ -113,18 +114,18 @@ export function ErrorResult ({ error }) {
     switch (error.id) {
     case 'invalid-search-query':
         errorIsLocalized = true;
-        errorDetails = locale.members.errors.invalidSearchQuery;
+        errorDetails = locale.listView.errors.invalidSearchQuery;
         break;
     case 'invalid-json':
         errorIsLocalized = true;
-        errorDetails = locale.members.errors.invalidJSON;
+        errorDetails = locale.listView.errors.invalidJSON;
         break;
     }
 
     return (
         <div className="list-view-error">
             <div className="error-title">
-                {locale.members.error}
+                {locale.listView.error}
             </div>
             {errorIsLocalized ? (
                 <div className="error-details">
@@ -153,6 +154,7 @@ function ResultsTable ({
     onEditFields,
     onAddField,
     onSetFieldSorting,
+    localizedFields,
 }) {
     const selectedFields = fields.user.map((field, i) => ({ ...field, index: i }));
     const selectedFieldIds = selectedFields.map(x => x.id);
@@ -181,7 +183,8 @@ function ResultsTable ({
                 configColumn={configColumn}
                 onEditFields={onEditFields}
                 onAddField={onAddField}
-                onSetFieldSorting={onSetFieldSorting} />
+                onSetFieldSorting={onSetFieldSorting}
+                localizedFields={localizedFields} />
             <TableBody>
                 {list.map(id => (
                     <TableItem
@@ -211,6 +214,7 @@ ResultsTable.propTypes = {
     onEditFields: PropTypes.func.isRequired,
     onAddField: PropTypes.func.isRequired,
     onSetFieldSorting: PropTypes.func.isRequired,
+    localizedFields: PropTypes.object.isRequired,
 };
 
 function TableHeader ({
@@ -220,6 +224,7 @@ function TableHeader ({
     onEditFields,
     onAddField,
     onSetFieldSorting,
+    localizedFields,
 }) {
     return (
         <TableHead className="table-header">
@@ -237,8 +242,8 @@ function TableHeader ({
                                 <IconButton
                                     key={id}
                                     className="table-header-fields-btn"
-                                    aria-label={locale.members.fieldPicker.title}
-                                    title={locale.members.fieldPicker.title}
+                                    aria-label={locale.listView.fieldPicker.title}
+                                    title={locale.listView.fieldPicker.title}
                                     onClick={onEditFields}>
                                     <ListAltIcon />
                                 </IconButton>
@@ -270,7 +275,7 @@ function TableHeader ({
                                             onSetFieldSorting(index, newSorting);
                                         }
                                     }}>
-                                    {locale.members.fields[id]}
+                                    {localizedFields[id]}
                                 </TableSortLabel>
                             </TableCell>
                         );
@@ -288,6 +293,7 @@ TableHeader.propTypes = {
     onEditFields: PropTypes.func.isRequired,
     onAddField: PropTypes.func.isRequired,
     onSetFieldSorting: PropTypes.func.isRequired,
+    localizedFields: PropTypes.object.isRequired,
 };
 
 function TableItem ({ fields, fieldSpec, value, isSelected, onClick, onSelectChange, linkTarget }) {

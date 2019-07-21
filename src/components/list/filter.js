@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Checkbox from '@material-ui/core/Checkbox';
-import locale from '../../locale';
-
-// TODO: fix locale
 
 /** A single filter. */
 export default class Filter extends React.PureComponent {
     static propTypes = {
+        id: PropTypes.string.isRequired,
+        localizedName: PropTypes.string,
         /**
          * The filter spec.
          *
@@ -18,7 +17,6 @@ export default class Filter extends React.PureComponent {
          * - `default: (() => T)?`
          * - `editor: Component?`
          */
-        id: PropTypes.string.isRequired,
         filter: PropTypes.object.isRequired,
         enabled: PropTypes.bool.isRequired,
         value: PropTypes.any,
@@ -51,7 +49,7 @@ export default class Filter extends React.PureComponent {
                         this.props.onEnabledChange(!this.props.enabled);
                     }
                 }}>
-                    {locale.members.search.fields[id]}
+                    {this.props.localizedName || `(${id})`}
                 </div>
             </div>
         );
