@@ -10,7 +10,8 @@ import * as actions from './actions';
 // If the string begins with a ( itself, then a * is prepended. The first * after the opening
 // parentheses is always ignored.
 //
-// Also, # is encoded as @h and @ is encoded as @@.
+// Also, # is encoded as %23 and % as %25. All percent-encoding should be resolved when decoding
+// to account for automatic encoding in browsers.
 function encodeParens (str) {
     let parens = 1;
 
@@ -18,7 +19,7 @@ function encodeParens (str) {
         str = '*' + str;
     }
 
-    str = str.replace(/@/g, '@@').replace(/#/g, '@h');
+    str = encodePercent(str);
 
     let streak = 0;
     for (const c of str) {
@@ -29,6 +30,15 @@ function encodeParens (str) {
 
     return '('.repeat(parens) + str + ')'.repeat(parens);
 }
+
+function encodePercent (s) {
+    return s.replace(/%/g, '%25').replace(/#/g, '%23');
+}
+
+function decodePercent (s) {
+    return s.replace(/%[0-9a-f]{2}/ig, m => String.fromCharCode(parseInt(m.substr(1), 16)));
+}
+
 // Returns an array: [string, length of parentheses encoding]. Ignores the rest
 function decodeParens (str) {
     let cursor = 0;
@@ -49,9 +59,7 @@ function decodeParens (str) {
             break;
         }
     }
-    const decoded = str.substring(headerSize, cursor - parens)
-        .replace(/@h/g, '#')
-        .replace(/@@/g, '@');
+    const decoded = decodePercent(str.substring(headerSize, cursor - parens));
     return [decoded, cursor];
 }
 
@@ -59,7 +67,7 @@ function decodeParens (str) {
 function maybeEncodeParens (str, unsafeChars) {
     if (str.startsWith('(')) return encodeParens(str);
     for (const c of unsafeChars) if (str.includes(c)) return encodeParens(str);
-    return str;
+    return encodePercent(str);
 }
 function maybeDecodeParens (str, unsafeChars) {
     if (str.startsWith('(')) {
@@ -72,7 +80,7 @@ function maybeDecodeParens (str, unsafeChars) {
             }
             s += c;
         }
-        return [s, s.length];
+        return [decodePercent(s), s.length];
     }
 }
 
