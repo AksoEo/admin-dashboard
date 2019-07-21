@@ -1,0 +1,106 @@
+@import '../../../prelude';
+
+.detail-view-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 14;
+
+    .detail-view-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.2);
+        transition: opacity 0.5s @easing;
+    }
+
+    .detail-view {
+        position: absolute;
+        top: 32px;
+        left: 16px;
+        right: 16px;
+        bottom: 0;
+        margin: 0 auto;
+        max-width: 800px;
+        background: @card-background;
+        .elevation(4);
+        border-radius: 8px 8px 0 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        transition: transform 0.5s @easing;
+
+        .tmp {
+            padding: 24px;
+
+            .tmp-3 {
+                display: flex;
+                align-items: center;
+                margin-bottom: 24px;
+            }
+
+            .tmp-2 {
+                background: #999;
+                border-radius: 50%;
+                width: 96px;
+                height: 96px;
+                vertical-align: middle;
+                margin-right: 16px;
+            }
+
+            .tmp-1 {
+                flex: 1;
+
+                .tmp-4 {
+                    margin: 0;
+                }
+
+                .tmp-5 {
+                    margin-top: 8px;
+                    font-family: @monospace;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                    background: #ddd;
+                    border: 1px solid #aaa;
+                    display: inline-block;
+                    font-size: 14px;
+                }
+            }
+
+            .tmp-6 {
+                margin: 16px 8px;
+                display: flex;
+
+                .tmp-7 {
+                    width: 30%;
+                    margin-left: 16px;
+                    background: #555;
+                    border-radius: 100px;
+                    height: 1em;
+                }
+
+                .tmp-8 {
+                    width: 40%;
+                    margin-left: 16px;
+                    background: #777;
+                    border-radius: 100px;
+                    height: 1em;
+                }
+            }
+        }
+    }
+
+    &.closed {
+        pointer-events: none;
+
+        .detail-view-backdrop {
+            opacity: 0;
+        }
+        .detail-view {
+            transform: translateY(100%);
+        }
+    }
+}

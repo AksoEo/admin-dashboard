@@ -20,8 +20,8 @@ export const NewspaperIcon = function NewspaperIcon () {
     );
 };
 
-// trailing commas are not allowed inside import()
-/* eslint-disable comma-dangle */
+const membersList = lazy(() =>
+    import(/* webpackChunkName: "members", webpackPrefetch: true */ './members/list'));
 
 /**
  * App routes.
@@ -39,21 +39,9 @@ export default [
             },
             {
                 id: 'members',
-                component: lazy(() => import(
-                    /* webpackChunkName: "members", webpackPrefetch: true */
-                    './members/list'
-                )),
+                component: membersList,
                 icon: <AssignmentIndIcon />,
                 url: 'membroj',
-                routes: [
-                    {
-                        component: lazy(() => import(
-                            /* webpackChunkName: "members", webpackPrefetch: true */
-                            './members/list' // TODO; dummy placeholder
-                        )),
-                        url: /^(\d+)$/,
-                    }
-                ]
             },
             {
                 id: 'membership',

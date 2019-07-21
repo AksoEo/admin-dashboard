@@ -30,29 +30,39 @@ export default class MembersList extends React.PureComponent {
 
     static contextType = appContext;
 
+    state = {
+        detail: null,
+    };
+
     isQueryUnchanged (query) {
         return this.currentQuery === query
             || decodeURIComponent(this.currentQuery) === decodeURIComponent(query);
     }
 
-    onURLQueryChange = query => {
-        if (this.isQueryUnchanged(query)) return;
+    onURLQueryChange = (query, force = false) => {
+        if (this.isDetailView && !force) return;
+        if (this.isQueryUnchanged(query) && !force) return;
         this.currentQuery = query;
-        if (query) this.context.navigate(this.props.path + '?q=' + query);
-        else this.context.navigate(this.props.path);
+        if (query) this.context.navigate('/membroj?q=' + query);
+        else this.context.navigate('/membroj');
     };
 
     componentDidMount () {
+        this.tryDecodePath();
         this.tryDecodeURLQuery();
     }
 
     componentDidUpdate (prevProps) {
+        if (prevProps.path !== this.props.path) {
+            this.tryDecodePath();
+        }
         if (prevProps.query !== this.props.query) {
             this.tryDecodeURLQuery();
         }
     }
 
     tryDecodeURLQuery () {
+        if (this.isDetailView) return;
         if (!this.props.query && this.currentQuery) {
             this.currentQuery = '';
             this.listView.decodeURLQuery('');
@@ -68,6 +78,16 @@ export default class MembersList extends React.PureComponent {
         } catch (err) {
             // TODO: error?
             console.error('Failed to decode URL query', err); // eslint-disable-line no-console
+        }
+    }
+
+    tryDecodePath () {
+        const detailView = this.props.path.match(/^\/membroj\/(\d+)(\/|$)/);
+        this.isDetailView = !!detailView;
+        if (detailView) {
+            this.setState({ detail: +detailView[1] });
+        } else {
+            this.setState({ detail: null });
         }
     }
 
@@ -151,7 +171,10 @@ export default class MembersList extends React.PureComponent {
                         placeholders: locale.members.search.placeholders,
                         filters: locale.members.search.filters,
                         fields: locale.members.fields,
-                    }} />
+                    }}
+                    detailView={this.state.detail}
+                    onDetailClose={() => this.onURLQueryChange(this.currentQuery, true)}
+                    getLinkTarget={id => `/membroj/${id}`} />
             </div>
         );
     }

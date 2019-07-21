@@ -35,6 +35,7 @@ export default function Results ({
     onAddField,
     onSetFieldSorting,
     localizedFields,
+    getLinkTarget,
 }) {
     const count = list ? list.length : 0;
     const statsText = locale.listView.resultStats(count, isFiltered, totalItems || 0, time || '?');
@@ -63,7 +64,8 @@ export default function Results ({
                         onEditFields={onEditFields}
                         onAddField={onAddField}
                         onSetFieldSorting={onSetFieldSorting}
-                        localizedFields={localizedFields} />
+                        localizedFields={localizedFields}
+                        getLinkTarget={getLinkTarget} />
                 </div>
             ) : time ? (
                 <div className="no-results">
@@ -105,6 +107,7 @@ Results.propTypes = {
     onAddField: PropTypes.func.isRequired,
     onSetFieldSorting: PropTypes.func.isRequired,
     localizedFields: PropTypes.object.isRequired,
+    getLinkTarget: PropTypes.func.isRequired,
 };
 
 export function ErrorResult ({ error }) {
@@ -155,6 +158,7 @@ function ResultsTable ({
     onAddField,
     onSetFieldSorting,
     localizedFields,
+    getLinkTarget,
 }) {
     const selectedFields = fields.user.map((field, i) => ({ ...field, index: i }));
     const selectedFieldIds = selectedFields.map(x => x.id);
@@ -197,7 +201,7 @@ function ResultsTable ({
                         onSelectChange={() => {
                             // TODO
                         }}
-                        linkTarget={/* TODO */ '/'} />
+                        linkTarget={getLinkTarget(id)} />
                 ))}
             </TableBody>
         </Table>
@@ -215,6 +219,7 @@ ResultsTable.propTypes = {
     onAddField: PropTypes.func.isRequired,
     onSetFieldSorting: PropTypes.func.isRequired,
     localizedFields: PropTypes.object.isRequired,
+    getLinkTarget: PropTypes.func.isRequired,
 };
 
 function TableHeader ({

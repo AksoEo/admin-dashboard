@@ -12,6 +12,7 @@ import Filter from './filter';
 import Results, { ErrorResult } from './results';
 import FieldPicker from './field-picker';
 import PaperList from './paper-list';
+import DetailView from './detail';
 import { encodeURLQuery, decodeURLQuery } from './deser';
 import './style';
 
@@ -103,6 +104,15 @@ export default class ListView extends React.PureComponent {
         /// - `filters`: translations for filters
         /// - `fields`: translations for fields
         locale: PropTypes.object.isRequired,
+
+        /// Should return the URL target for a given detail view.
+        getLinkTarget: PropTypes.func.isRequired,
+
+        /// Detail view identifier. If given, a detail view will be shown.
+        detailView: PropTypes.any,
+
+        /// Called when the detail view requests to be closed.
+        onDetailClose: PropTypes.func,
     };
 
     /// State store.
@@ -266,12 +276,14 @@ export default class ListView extends React.PureComponent {
     }
 
     render () {
+        const isDetailView = this.props.detailView !== undefined && this.props.detailView !== null;
+
         const fields = Object.keys(this.props.fields || {})
             .filter(id => !this.props.fields[id].hideColumn);
 
         return (
             <Provider store={this.store}>
-                <div className="list-view">
+                <div className={'list-view' + (isDetailView ? ' detail-open' : '')}>
                     <ConnectedFieldPicker
                         open={this.state.fieldPickerOpen}
                         onClose={() => this.setState({ fieldPickerOpen: false })}
@@ -297,8 +309,13 @@ export default class ListView extends React.PureComponent {
                         onSetFieldSorting={(...args) => {
                             this.store.dispatch(actions.setFieldSorting(...args));
                         }}
-                        localizedFields={this.props.locale.fields} />
+                        localizedFields={this.props.locale.fields}
+                        getLinkTarget={this.props.getLinkTarget} />
                 </div>
+                <DetailView
+                    open={isDetailView}
+                    id={this.props.detailView}
+                    onClose={this.props.onDetailClose} />
             </Provider>
         );
     }
