@@ -13,6 +13,7 @@ import Results, { ErrorResult } from './results';
 import FieldPicker from './field-picker';
 import PaperList from './paper-list';
 import DetailView from './detail';
+import CSVExport from './csv-export';
 import { encodeURLQuery, decodeURLQuery } from './deser';
 import './style';
 
@@ -45,6 +46,9 @@ const reloadMiddleware = listView => () => next => action => {
     if (reloadingActions.includes(action.type)) {
         listView.scheduleReload();
     }
+    if (action.type === actions.SUBMIT) {
+        listView.cancelReload(); // no double-reloading
+    }
     if (urlQueryActions.includes(action.type)) {
         listView.updateURLQuery();
     }
@@ -57,6 +61,13 @@ const filterConstraintMiddleware = listView => () => next => action => {
         // actions issued by constraints must skip constraints (see below) because bad
         // applyConstraints implementations might cause an infinite loop otherwise
         if (!action.skipConstraints) listView.scheduleFilterConstraintsUpdate();
+    }
+    next(action);
+};
+
+const csvExportMiddleware = listView => () => next => action => {
+    if (action.type === actions.RECEIVE_FAILURE || action.type === actions.RECEIVE_SUCCESS) {
+        listView.csvExport.receiveAction(action);
     }
     next(action);
 };
@@ -103,6 +114,7 @@ export default class ListView extends React.PureComponent {
         /// - `placeholders`: translations for search placeholders
         /// - `filters`: translations for filters
         /// - `fields`: translations for fields
+        /// - `csvFilename`: file name prefix for CSV exports
         locale: PropTypes.object.isRequired,
 
         /// Should return the URL target for a given detail view.
@@ -120,10 +132,12 @@ export default class ListView extends React.PureComponent {
         thunk.withExtraArgument(this),
         reloadMiddleware(this),
         filterConstraintMiddleware(this),
+        csvExportMiddleware(this),
     ));
 
     state = {
         fieldPickerOpen: false,
+        csvExportOpen: false,
     };
 
     constructor (props) {
@@ -181,8 +195,12 @@ export default class ListView extends React.PureComponent {
         }
     }
 
-    scheduleReload () {
+    cancelReload () {
         clearTimeout(this.scheduledReload);
+    }
+
+    scheduleReload () {
+        this.cancelReload();
         this.scheduledReload = setTimeout(() => this.reload(), RELOAD_DEBOUNCE_TIME);
     }
 
@@ -255,7 +273,6 @@ export default class ListView extends React.PureComponent {
         this.resetStore(this.props.defaults || {});
         decoded.forEach(action => this.store.dispatch(action));
         this.store.dispatch(actions.submit());
-        clearTimeout(this.scheduledReload);
     }
 
     updateURLQuery () {
@@ -273,6 +290,10 @@ export default class ListView extends React.PureComponent {
 
     setJSONFilterEnabled (enabled) {
         this.store.dispatch(actions.setJSONFilterEnabled(enabled));
+    }
+
+    openCSVExport () {
+        this.setState({ csvExportOpen: true });
     }
 
     render () {
@@ -311,6 +332,11 @@ export default class ListView extends React.PureComponent {
                         }}
                         localizedFields={this.props.locale.fields}
                         getLinkTarget={this.props.getLinkTarget} />
+                    <ConnectedCSVExport
+                        innerRef={view => this.csvExport = view}
+                        open={this.state.csvExportOpen}
+                        onClose={() => this.setState({ csvExportOpen: false })}
+                        filename={this.props.locale.csvFilename} />
                 </div>
                 <DetailView
                     open={isDetailView}
@@ -459,3 +485,11 @@ const ConnectedResults = connect(state => ({
     }
     return null;
 });
+
+const ConnectedCSVExport = connect(state => ({
+    state: state,
+}), dispatch => ({
+    onSetPage: page => dispatch(actions.setPage(page)),
+    onSetItemsPerPage: itemsPerPage => dispatch(actions.setItemsPerPage(itemsPerPage)),
+    onSubmit: () => dispatch(actions.submit()),
+}))(CSVExport);

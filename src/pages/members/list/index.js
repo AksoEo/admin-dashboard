@@ -100,17 +100,13 @@ export default class MembersList extends React.PureComponent {
             label: isJSONFilterEnabled
                 ? locale.listView.json.disable
                 : locale.listView.json.enable,
-            action: () => {
-                this.listView.setJSONFilterEnabled(!isJSONFilterEnabled);
-            },
+            action: () => this.listView.setJSONFilterEnabled(!isJSONFilterEnabled),
         });
 
         if (this.listView.isSubmitted()) {
             items.push({
-                label: locale.members.csvExport.menuItem,
-                action: () => {
-                    // TODO
-                },
+                label: locale.listView.csvExport.menuItem,
+                action: () => this.listView.openCSVExport(),
             });
         }
 
@@ -171,6 +167,7 @@ export default class MembersList extends React.PureComponent {
                         placeholders: locale.members.search.placeholders,
                         filters: locale.members.search.filters,
                         fields: locale.members.fields,
+                        csvFilename: locale.members.csvFilename,
                     }}
                     detailView={this.state.detail}
                     onDetailClose={() => this.onURLQueryChange(this.currentQuery, true)}

@@ -128,6 +128,14 @@ export default {
             invalidSearchQuery: 'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj. Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon: `*` post vorto por permesi ajnajn sekvantajn signojn post la vorto, `+` antaŭ vorto por postuli ĝian ekziston, `-` antaŭ vorto por postuli ĝian malekziston kaj `""`-citilojn ĉirkaŭ frazo aŭ vorto por postuli la ekzaktan kombinon de la vortoj. Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.',
             invalidJSON: 'Estas tajperaro en la JSON-filtriloj. Detalaj informoj troviĝas en la JSON-filtrilkampo.',
         },
+        csvExport: {
+            menuItem: 'Elporti kiel CSV',
+            title: 'Elporti kiel CSV',
+            beginExport: '[[export]]',
+            tryResumeExport: '[[try resume]]',
+            abortExport: '[[cancel]]',
+            download: '[[download]]',
+        },
     },
     // Members page
     members: {
@@ -255,11 +263,7 @@ export default {
             profession: 'Profesio',
             membership: 'Membreco',
         },
-        csvExport: {
-            menuItem: 'Elporti kiel CSV',
-            title: 'Elporti kiel CSV',
-            filename: 'data.csv',
-        },
+        csvFilename: 'membroj',
         addMember: {
             menuItem: 'Aldoni membron',
             title: 'Aldoni membron',
