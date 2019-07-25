@@ -42,35 +42,42 @@ const urlQueryActions = reloadingActions.concat([
     actions.UNSUBMIT,
 ]);
 
-const reloadMiddleware = listView => () => next => action => {
+const listViewMiddleware = listView => () => next => action => {
+    // reloading
     if (reloadingActions.includes(action.type)) {
         listView.scheduleReload();
     }
     if (action.type === actions.SUBMIT) {
         listView.cancelReload(); // no double-reloading
     }
+
+    // url query
     if (urlQueryActions.includes(action.type)) {
         listView.updateURLQuery();
     }
-    next(action);
-};
-const RELOAD_DEBOUNCE_TIME = 500; // ms
 
-const filterConstraintMiddleware = listView => () => next => action => {
+    // filter constraints
     if ([actions.SET_FILTER_VALUE, actions.SET_FILTER_ENABLED].includes(action.type)) {
         // actions issued by constraints must skip constraints (see below) because bad
         // applyConstraints implementations might cause an infinite loop otherwise
         if (!action.skipConstraints) listView.scheduleFilterConstraintsUpdate();
     }
-    next(action);
-};
 
-const csvExportMiddleware = listView => () => next => action => {
+    // csv export
     if (action.type === actions.RECEIVE_FAILURE || action.type === actions.RECEIVE_SUCCESS) {
         listView.csvExport.receiveAction(action);
     }
+
+    // onChangePage
+    if (action.type === actions.SET_PAGE) {
+        listView.didSetPage = true;
+    } else if (action.type === actions.SUBMIT) {
+        listView.onSubmit();
+    }
+
     next(action);
 };
+const RELOAD_DEBOUNCE_TIME = 500; // ms
 
 /// Renders a searchable and filterable list of items, each with a detail view.
 export default class ListView extends React.PureComponent {
@@ -125,14 +132,15 @@ export default class ListView extends React.PureComponent {
 
         /// Called when the detail view requests to be closed.
         onDetailClose: PropTypes.func,
+
+        /// Called when the page changes.
+        onChangePage: PropTypes.func,
     };
 
     /// State store.
     store = createStore(listViewReducer, applyMiddleware(
         thunk.withExtraArgument(this),
-        reloadMiddleware(this),
-        filterConstraintMiddleware(this),
-        csvExportMiddleware(this),
+        listViewMiddleware(this),
     ));
 
     state = {
@@ -248,6 +256,13 @@ export default class ListView extends React.PureComponent {
     /// Internal function to handle a removed filter.
     removeFilter (id) {
         this.store.dispatch(actions.removeFilter(id));
+    }
+
+    onSubmit () {
+        if (this.didSetPage) {
+            this.didSetPage = false;
+            this.props.onChangePage();
+        }
     }
 
     emitURLQuery () {

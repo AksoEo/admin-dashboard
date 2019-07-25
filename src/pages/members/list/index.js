@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { UEACode, util } from 'akso-client';
 import JSON5 from 'json5';
 import { appContext } from '../../../router';
+import { Spring } from '../../../animation';
 import ListView from '../../../components/list';
 import Sorting from '../../../components/list/sorting';
 import locale from '../../../locale';
@@ -32,6 +33,21 @@ export default class MembersList extends React.PureComponent {
 
     state = {
         detail: null,
+    };
+
+    scrollSpring = new Spring(1, 0.4);
+
+    constructor (props) {
+        super(props);
+
+        this.scrollSpring.on('update', value => this.node.scrollTop = value);
+    }
+
+    scrollToTop = () => {
+        if (this.node.scrollTop > 0) {
+            this.scrollSpring.value = this.node.scrollTop;
+            this.scrollSpring.start();
+        }
     };
 
     isQueryUnchanged (query) {
@@ -91,6 +107,10 @@ export default class MembersList extends React.PureComponent {
         }
     }
 
+    componentWillUnmount () {
+        this.scrollSpring.stop();
+    }
+
     getOverflowMenu () {
         const items = [];
 
@@ -122,7 +142,7 @@ export default class MembersList extends React.PureComponent {
 
     render () {
         return (
-            <div className="app-page members-page">
+            <div className="app-page members-page" ref={node => this.node = node}>
                 <ListView
                     ref={view => this.listView = view}
                     defaults={{
@@ -171,7 +191,8 @@ export default class MembersList extends React.PureComponent {
                     }}
                     detailView={this.state.detail}
                     onDetailClose={() => this.onURLQueryChange(this.currentQuery, true)}
-                    getLinkTarget={id => `/membroj/${id}`} />
+                    getLinkTarget={id => `/membroj/${id}`}
+                    onChangePage={this.scrollToTop} />
             </div>
         );
     }
