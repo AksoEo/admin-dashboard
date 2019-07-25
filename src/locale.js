@@ -87,7 +87,7 @@ export default {
     listView: {
         filters: 'Filtriloj',
         submit: 'Serĉi',
-        unsubmit: '[[expand options]]',
+        unsubmit: 'Reveni al serĉilo',
         fieldPicker: {
             title: 'Montrotaj kampoj',
             searchPlaceholder: 'Serĉi kampon',
@@ -131,10 +131,10 @@ export default {
         csvExport: {
             menuItem: 'Elporti kiel CSV',
             title: 'Elporti kiel CSV',
-            beginExport: '[[export]]',
-            tryResumeExport: '[[try resume]]',
-            abortExport: '[[cancel]]',
-            download: '[[download]]',
+            beginExport: 'Elporti',
+            tryResumeExport: 'Provi daŭrigi',
+            abortExport: 'Nuligi',
+            download: 'Elŝuti CSV',
         },
     },
     // Members page
