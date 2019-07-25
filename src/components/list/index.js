@@ -351,7 +351,9 @@ export default class ListView extends React.PureComponent {
                         innerRef={view => this.csvExport = view}
                         open={this.state.csvExportOpen}
                         onClose={() => this.setState({ csvExportOpen: false })}
-                        filename={this.props.locale.csvFilename} />
+                        filename={this.props.locale.csvFilename}
+                        localizedFields={this.props.locale.fields}
+                        fieldSpec={this.props.fields || {}} />
                 </div>
                 <DetailView
                     open={isDetailView}

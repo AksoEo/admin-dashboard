@@ -211,7 +211,7 @@ const Title = connect(state => ({
 
 const fieldMapping = {
     codeholderType: {
-        fields: ['codeholderType', 'enabled'],
+        fields: ['codeholderType', 'enabled', 'isDead'],
         sort: ['codeholderType'],
     },
     code: {
@@ -227,6 +227,7 @@ const fieldMapping = {
             'fullName',
             'fullNameLocal',
             'nameAbbrev',
+            'codeholderType',
             'isDead',
         ],
         sort: ['lastNameLegal'], // FIXME: this is probably wrong

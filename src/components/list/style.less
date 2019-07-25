@@ -227,3 +227,23 @@
         // but that’s laggy in every browser but Safari
     }
 }
+
+.list-view-csv-export {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .export-error {
+        font-family: @monospace;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .progress-bar {
+        flex-shrink: 0;
+        align-self: stretch;
+        margin-bottom: 8px;
+    }
+}

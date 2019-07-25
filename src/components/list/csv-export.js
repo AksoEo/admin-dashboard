@@ -21,6 +21,8 @@ export default class CSVExport extends React.PureComponent {
         onSetItemsPerPage: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
         filename: PropTypes.string.isRequired,
+        localizedFields: PropTypes.object.isRequired,
+        fieldSpec: PropTypes.object.isRequired,
     };
 
     originalPage = 0;
@@ -88,34 +90,66 @@ export default class CSVExport extends React.PureComponent {
         });
     };
 
-    endExport () {
-        this.abortExport();
-        this.setState({ exporting: true });
+    async endExport () {
+        try {
+            this.abortExport();
+            this.setState({ exporting: true });
 
-        const stringifier = stringify();
-        const rows = [];
-        stringifier.on('readable', () => {
-            let row;
-            while ((row = stringifier.read())) rows.push(row);
-        });
-        stringifier.on('error', err => {
-            this.setState({ exporting: false, error: err });
-        });
-        stringifier.on('finish', () => {
-            const blob = new Blob(rows, { type: 'text/csv' });
-            const objectURL = URL.createObjectURL(blob);
-            const filename = `${this.props.filename}-${new Date().toISOString()}.csv`;
-            this.setState({ objectURL, filename, exporting: false });
-        });
+            const stringifier = stringify();
+            const rows = [];
+            stringifier.on('readable', () => {
+                let row;
+                while ((row = stringifier.read())) rows.push(row);
+            });
+            stringifier.on('error', err => {
+                this.setState({ exporting: false, error: err });
+            });
+            stringifier.on('finish', () => {
+                const blob = new Blob(rows, { type: 'text/csv' });
+                const objectURL = URL.createObjectURL(blob);
+                const filename = `${this.props.filename}-${new Date().toISOString()}.csv`;
+                this.setState({ objectURL, filename, exporting: false });
+            });
 
-        if (this.state.data.length) {
-            // header
-            stringifier.write(
-                Object.fromEntries(Object.keys(this.state.data[0]).map(x => ([x, x]))),
-            );
+            // compile selected fields
+            const fields = [];
+            for (const field of this.props.state.results.transientFields) {
+                if (!fields.includes(field)) fields.push(field);
+            }
+            for (const field of this.props.state.fields.fixed) {
+                if (!fields.includes(field.id)) fields.push(field.id);
+            }
+            for (const field of this.props.state.fields.user) {
+                if (!fields.includes(field.id)) fields.push(field.id);
+            }
+
+            // write header
+            stringifier.write(fields.map(id => {
+                const localized = this.props.localizedFields[id];
+                if (!localized) throw new Error(`missing field name for ${id}`);
+                return localized;
+            }));
+
+            // write data
+            for (const item of this.state.data) {
+                const data = [];
+
+                for (const id of fields) {
+                    const fieldSpec = this.props.fieldSpec[id];
+                    if (!fieldSpec) throw new Error(`missing field spec for ${id}`);
+                    if (!fieldSpec.stringify) throw new Error(`missing stringify for ${id}`);
+                    const stringified = fieldSpec.stringify(item[id], item, fields);
+                    if (stringified instanceof Promise) data.push(await stringified);
+                    else data.push(stringified);
+                }
+
+                stringifier.write(data);
+            }
+            stringifier.end();
+        } catch (err) {
+            console.error(err); // eslint-disable-line no-console
+            this.setState({ error: err, exporting: false });
         }
-        for (const item of this.state.data) stringifier.write(item);
-        stringifier.end();
     }
 
     onClose = () => {
@@ -130,12 +164,17 @@ export default class CSVExport extends React.PureComponent {
         return (
             <Dialog open={this.props.open} onClose={this.onClose}>
                 <DialogTitle>{locale.listView.csvExport.title}</DialogTitle>
-                <DialogContent>
+                <DialogContent className="list-view-csv-export">
                     {!this.state.exporting ? (
                         this.state.error ? (
-                            <Button onClick={this.resumeExport}>
-                                {locale.listView.csvExport.tryResumeExport}
-                            </Button>
+                            <React.Fragment>
+                                <div className="export-error">
+                                    {this.state.error.toString()}
+                                </div>
+                                <Button onClick={this.resumeExport}>
+                                    {locale.listView.csvExport.tryResumeExport}
+                                </Button>
+                            </React.Fragment>
                         ) : this.state.objectURL ? (
                             <Button
                                 component="a"
@@ -151,6 +190,7 @@ export default class CSVExport extends React.PureComponent {
                     ) : (
                         <React.Fragment>
                             <LinearProgress
+                                className="progress-bar"
                                 value={(this.state.data.length / this.state.totalItems * 100) | 0}
                                 variant={'determinate'} />
                             {!this.state.error && <Button onClick={this.abortExport}>

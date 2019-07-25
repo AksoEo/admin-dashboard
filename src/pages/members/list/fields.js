@@ -38,6 +38,15 @@ export default {
                 </span>
             );
         },
+        stringify (value, item) {
+            const { enabled, isDead } = item;
+
+            let title = locale.members.fields.codeholderTypes[value];
+            if (!enabled && !isDead) title += ` (${locale.members.fields.codeholderDisabledTitle})`;
+            else if (!enabled) title += ` (${locale.members.fields.codeholderDeadTitle})`;
+
+            return title;
+        },
     },
     name: {
         sortable: true,
@@ -116,6 +125,20 @@ export default {
                 }
             }
         },
+        stringify (value, item) {
+            const { codeholderType } = item;
+            if (codeholderType === 'human') {
+                const { firstName, firstNameLegal, lastName, lastNameLegal } = item;
+                const honorific = item.honorific;
+                const first = firstName || firstNameLegal;
+                const last = lastName || lastNameLegal;
+                return `${(honorific ? (honorific + ' ') : '')} ${first} ${last}`;
+            } else if (codeholderType === 'org') {
+                return item.fullName;
+            } else {
+                throw new Error('unknown codeholder type');
+            }
+        },
     },
     code: {
         sortable: true,
@@ -136,6 +159,13 @@ export default {
                 return <span className="uea-code">{newCode}</span>;
             }
         },
+        stringify (value, item) {
+            const { oldCode, newCode } = item;
+            if (oldCode) {
+                const oldCodeCheckLetter = new UEACode(oldCode).getCheckLetter();
+                return `${newCode} (${oldCode}-${oldCodeCheckLetter})`;
+            } else return newCode;
+        },
     },
     age: {
         sortable: true,
@@ -147,6 +177,10 @@ export default {
             const label = locale.members.fields.ageFormat(value, atStartOfYear);
             return <span className="age">{label}</span>;
         },
+        stringify (value) {
+            if (value === null || value === undefined) return '';
+            return value.toString();
+        },
     },
     birthdate: {
         sortable: true,
@@ -155,6 +189,9 @@ export default {
             const formatted = value ? moment(value).format('D[-a de] MMMM Y') : '';
 
             return <span className="birthdate-deathdate" title={value}>{formatted}</span>;
+        },
+        stringify (value) {
+            return value ? moment(value).format('D[-a de] MMMM Y') : '';
         },
     },
     deathdate: {
@@ -166,10 +203,16 @@ export default {
 
             return <span className="birthdate-deathdate" title={value}>{formatted}</span>;
         },
+        stringify (value) {
+            return value ? moment(value).format('D[-a de] MMMM Y') : '';
+        },
     },
     email: {
         component ({ value }) {
             return <span className="email">{value}</span>;
+        },
+        stringify (value) {
+            return value;
         },
     },
     addressLatin: {
@@ -211,17 +254,45 @@ export default {
                 );
             }
         },
+        stringify: async (value = {}, item, fields) => {
+            const streetAddress = (value.streetAddress || '').split('\n');
+            const showCity = !fields.includes('addressCity');
+            const showCountryArea = !fields.includes('addressCountryArea');
+            const city = showCity ? value.city : '';
+            const countryArea = showCountryArea ? value.countryArea : '';
+            const showCountry = !fields.includes('country');
+            const countries = await cache.getCountries();
+            const country = showCountry ? countries[value.country] : '';
+
+            const addressPseudolines = [
+                ...streetAddress,
+                [
+                    [value.postalCode, value.cityArea].filter(x => x).join(' '),
+                    city,
+                ].filter(x => x).join(', '),
+                countryArea,
+                country,
+            ].filter(x => x);
+
+            return addressPseudolines.join(', ');
+        },
     },
     addressCity: {
         sortable: true,
         component ({ item }) {
             return <span className="address-city">{item.addressLatin.city}</span>;
         },
+        stringify (value, item) {
+            return item.addressLatin.city;
+        },
     },
     addressCountryArea: {
         sortable: true,
         component ({ item }) {
             return <span className="address-country-area">{item.addressLatin.countryArea}</span>;
+        },
+        stringify (value, item) {
+            return item.addressLatin.countryArea;
         },
     },
     country: {
@@ -242,7 +313,7 @@ export default {
                 const { feeCountry, addressLatin } = this.props.item;
                 const addressCountry = addressLatin ? addressLatin.country : null;
 
-                if (!feeCountry || !addressCountry || feeCountry == addressCountry) {
+                if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
                     const country = addressCountry || feeCountry;
                     if (!country) return '';
 
@@ -264,25 +335,50 @@ export default {
                 }
             }
         },
+        stringify: async (value, item) => {
+            const { feeCountry, addressLatin } = item;
+            const addressCountry = addressLatin ? addressLatin.country : null;
+            const countries = await cache.getCountries();
+
+            if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
+                return countries[addressCountry || feeCountry];
+            } else {
+                const feeCountryName = countries[feeCountry];
+                const countryName = countries[addressCountry];
+                return locale.members.fields.disjunctCountry(feeCountryName, countryName);
+            }
+        },
     },
     officePhone: {
         component ({ item }) {
             return <span className="office-phone">{item.officePhoneFormatted}</span>;
+        },
+        stringify (value, item) {
+            return item.officePhoneFormatted;
         },
     },
     cellphone: {
         component ({ item }) {
             return <span className="cellphone">{item.cellphoneFormatted}</span>;
         },
+        stringify (value, item) {
+            return item.cellphoneFormatted;
+        },
     },
     landlinePhone: {
         component ({ item }) {
             return <span className="landline-phone">{item.landlinePhoneFormatted}</span>;
         },
+        stringify (value, item) {
+            return item.landlinePhoneFormatted;
+        },
     },
     profession: {
         component ({ value }) {
             return <span className="profession">{value}</span>;
+        },
+        stringify (value) {
+            return value;
         },
     },
     notes: {
@@ -306,6 +402,10 @@ export default {
                     )]))}
                 </span>
             );
+        },
+        stringify (value) {
+            if (!value) return '';
+            return value.map(item => `${item.nameAbbrev} ${item.year}`).join(', ');
         },
     },
 };
