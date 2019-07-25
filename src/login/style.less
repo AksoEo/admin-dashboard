@@ -110,7 +110,9 @@
 
             .login-progress {
                 position: relative;
-                height: 1em;
+                height: 2em;
+                margin-bottom: -1em;
+                overflow: hidden;
 
                 .login-progress-item {
                     position: absolute;
@@ -177,6 +179,7 @@
 
         .totp-bypass-container {
             text-align: center;
+            position: relative;
         }
 
         .totp-bypass-switch {
@@ -193,6 +196,20 @@
 
         .totp-bypass-switch.is-checked + .totp-bypass-label {
             opacity: 1;
+        }
+
+        .totp-bypass-description {
+            margin-top: 4px;
+            transition: visibility 0.2s, opacity 0.2s;
+            font-size: small;
+            width: calc(100% - 40px);
+            box-sizing: border-box;
+
+            &.hidden {
+                visibility: hidden;
+                opacity: 0;
+                position: absolute;
+            }
         }
 
         .form-footer {

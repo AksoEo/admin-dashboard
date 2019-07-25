@@ -57,6 +57,7 @@ export default {
         createPasswordPlaceholder: 'Skribu pasvorton',
         confirmPasswordPlaceholder: 'Skribu pasvorton denove',
         bypassTotp: 'Memori tiun ĉi aparaton dum 60 tagoj',
+        bypassTotpDescription: '[[this option should only be used on private computers]]',
         // Text shown above the security code input
         securityCodeDescription: 'Bonvolu enmeti sekurkodon generitan de via duafaktora aplikaĵo.',
         // The following three are both a link and a title

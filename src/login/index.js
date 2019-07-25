@@ -6,6 +6,7 @@ import { Button, Checkbox, TextField, CircularProgress } from 'yamdl';
 import locale from '../locale';
 import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';
+import { Spring } from '../animation';
 import client from '../client';
 import './style';
 
@@ -222,7 +223,8 @@ export default class Login extends Component {
                             ref={stage => this.securityCodeStage = stage}
                             onSuccess={this.props.onLogin}
                             onShouldLoginFirst={() => this.setState({ stage: Stage.DETAILS })}
-                            onLostCode={() => this.setState({ stage: Stage.LOST_SECURITY_CODE })} />
+                            onLostCode={() => this.setState({ stage: Stage.LOST_SECURITY_CODE })}
+                            onHeightChange={() => this.pageView.pageHeightChanged()} />
                     </AutosizingPageView>
                     {meta}
                 </div>
@@ -398,6 +400,7 @@ class SecurityCodeStage extends Component {
         onSuccess: PropTypes.func.isRequired,
         onShouldLoginFirst: PropTypes.func.isRequired,
         onLostCode: PropTypes.func.isRequired,
+        onHeightChange: PropTypes.func.isRequired,
     };
 
     state = {
@@ -469,18 +472,10 @@ class SecurityCodeStage extends Component {
                             throw { error: locale.login.invalidSecurityCode };
                         }
                     }} />
-                <p class="totp-bypass-container">
-                    <Checkbox
-                        class="totp-bypass-switch"
-                        id="totp-bypass-switch"
-                        checked={this.state.bypassTotp}
-                        onChange={bypassTotp => this.setState({ bypassTotp })} />
-                    <label
-                        class="totp-bypass-label"
-                        for="totp-bypass-switch">
-                        {locale.login.bypassTotp}
-                    </label>
-                </p>
+                <TotpBypassSwitch
+                    value={this.state.bypassTotp}
+                    onChange={bypassTotp => this.setState({ bypassTotp })}
+                    onHeightChange={this.props.onHeightChange} />
                 <footer class="form-footer">
                     <div class="help-links">
                         <a
@@ -504,6 +499,71 @@ class SecurityCodeStage extends Component {
                     </Button>
                 </footer>
             </Form>
+        );
+    }
+}
+
+class TotpBypassSwitch extends Component {
+    static propTypes = {
+        value: PropTypes.bool,
+        onChange: PropTypes.func.isRequired,
+        onHeightChange: PropTypes.func.isRequired,
+    };
+
+    heightSpring = new Spring(1, 0.3);
+
+    state = {
+        height: 0,
+    };
+
+    constructor (props) {
+        super(props);
+        this.heightSpring.on('update', height => {
+            this.setState({ height });
+            this.props.onHeightChange();
+        });
+    }
+
+    componentDidMount () {
+        this.updateHeight();
+        this.heightSpring.finish();
+    }
+
+    updateHeight () {
+        const height = this.node.style.height;
+        this.node.style.height = '';
+        this.heightSpring.target = this.node.offsetHeight;
+        this.node.style.height = height;
+        this.heightSpring.start();
+    }
+
+    componentWillUnmount () {
+        this.heightSpring.stop();
+    }
+
+    render ({ value, onChange }, { height }) {
+        return (
+            <p
+                class="totp-bypass-container"
+                ref={node => this.node = node}
+                style={{ height }}>
+                <Checkbox
+                    class="totp-bypass-switch"
+                    id="totp-bypass-switch"
+                    checked={value}
+                    onChange={value => {
+                        onChange(value);
+                        requestAnimationFrame(() => this.updateHeight());
+                    }} />
+                <label
+                    class="totp-bypass-label"
+                    for="totp-bypass-switch">
+                    {locale.login.bypassTotp}
+                </label>
+                <p class={'totp-bypass-description' + (value ? '' : ' hidden')}>
+                    {locale.login.bypassTotpDescription}
+                </p>
+            </p>
         );
     }
 }
