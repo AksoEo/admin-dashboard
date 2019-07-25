@@ -5,6 +5,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
+import NativeSelect from '@material-ui/core/NativeSelect';
 import stringify from 'csv-stringify';
 import * as actions from './actions';
 import Segmented from '../segmented';
@@ -23,6 +24,8 @@ export default class CSVExport extends React.PureComponent {
         onSubmit: PropTypes.func.isRequired,
         filename: PropTypes.string.isRequired,
         localizedFields: PropTypes.object.isRequired,
+        localizedCSVFields: PropTypes.object.isRequired,
+        userOptions: PropTypes.object,
         fieldSpec: PropTypes.object.isRequired,
     };
 
@@ -37,6 +40,7 @@ export default class CSVExport extends React.PureComponent {
         error: null,
         objectURL: null,
         mode: 'csv',
+        options: {},
     };
 
     beginExport () {
@@ -131,10 +135,13 @@ export default class CSVExport extends React.PureComponent {
 
             // write header
             stringifier.write(fields.map(id => {
-                const localized = this.props.localizedFields[id];
+                const localized = this.props.localizedCSVFields[id]
+                    || this.props.localizedFields[id];
                 if (!localized) throw new Error(`missing field name for ${id}`);
                 return localized;
             }));
+
+            const options = this.state.options;
 
             // write data
             for (const item of this.state.data) {
@@ -144,7 +151,7 @@ export default class CSVExport extends React.PureComponent {
                     const fieldSpec = this.props.fieldSpec[id];
                     if (!fieldSpec) throw new Error(`missing field spec for ${id}`);
                     if (!fieldSpec.stringify) throw new Error(`missing stringify for ${id}`);
-                    const stringified = fieldSpec.stringify(item[id], item, fields);
+                    const stringified = fieldSpec.stringify(item[id], item, fields, options);
                     if (stringified instanceof Promise) data.push(await stringified);
                     else data.push(stringified);
                 }
@@ -205,6 +212,10 @@ export default class CSVExport extends React.PureComponent {
                                         },
                                     ]}
                                 </Segmented>
+                                <UserOptions
+                                    options={this.props.userOptions || {}}
+                                    value={this.state.options}
+                                    onChange={options => this.setState({ options })} />
                                 <Button onClick={this.resumeExport}>
                                     {locale.listView.csvExport.beginExport}
                                 </Button>
@@ -223,6 +234,81 @@ export default class CSVExport extends React.PureComponent {
                     )}
                 </DialogContent>
             </Dialog>
+        );
+    }
+}
+
+class UserOptions extends React.PureComponent {
+    static propTypes = {
+        options: PropTypes.object.isRequired,
+        value: PropTypes.object.isRequired,
+        onChange: PropTypes.func.isRequired,
+    };
+
+    componentDidMount () {
+        this.updateValue();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.options !== this.props.options) this.updateValue();
+    }
+
+    updateValue () {
+        const value = { ...this.props.value };
+        let didChange = false;
+
+        for (const key in this.props.options) {
+            if (!(key in value)) {
+                value[key] = this.props.options[key].default;
+                didChange = true;
+            }
+        }
+
+        if (didChange) this.props.onChange(value);
+    }
+
+    render () {
+        const options = [];
+
+        for (const key in this.props.options) {
+            if (!(key in this.props.value)) continue;
+
+            const spec = this.props.options[key];
+            let control;
+
+            if (spec.type === 'select') {
+                control = (
+                    <NativeSelect
+                        value={this.props.value[key]}
+                        onChange={e => {
+                            this.props.onChange({
+                                ...this.props.value,
+                                [key]: e.target.value,
+                            });
+                        }}>
+                        {spec.options.map(([id, label]) => (
+                            <option key={id} value={id}>{label}</option>
+                        ))}
+                    </NativeSelect>
+                );
+            } else {
+                throw new Error('unknown option type');
+            }
+
+            options.push(
+                <tr className="option" key={key}>
+                    <td className="option-label">{spec.name}</td>
+                    <td className="option-control">{control}</td>
+                </tr>
+            );
+        }
+
+        return (
+            <table className="user-options">
+                <tbody>
+                    {options}
+                </tbody>
+            </table>
         );
     }
 }

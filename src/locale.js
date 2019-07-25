@@ -267,7 +267,24 @@ export default {
             profession: 'Profesio',
             membership: 'Membreco',
         },
+        csvFields: {
+            membership: 'Membreco (resumo)',
+        },
         csvFilename: 'membroj',
+        csvOptions: {
+            countryLocale: '[[country locale]]',
+            countryLocales: {
+                eo: 'Esperanto',
+                en: 'English',
+                fr: 'Français',
+                es: 'Español',
+                nl: 'Nederlands',
+                pt: 'Português',
+                sk: 'Slovenčina',
+                zh: '中文',
+                de: 'Deutsch',
+            },
+        },
         addMember: {
             menuItem: 'Aldoni membron',
             title: 'Aldoni membron',

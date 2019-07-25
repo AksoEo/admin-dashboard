@@ -187,12 +187,21 @@ export default class MembersList extends React.PureComponent {
                         placeholders: locale.members.search.placeholders,
                         filters: locale.members.search.filters,
                         fields: locale.members.fields,
+                        csvFields: locale.members.csvFields,
                         csvFilename: locale.members.csvFilename,
                     }}
                     detailView={this.state.detail}
                     onDetailClose={() => this.onURLQueryChange(this.currentQuery, true)}
                     getLinkTarget={id => `/membroj/${id}`}
-                    onChangePage={this.scrollToTop} />
+                    onChangePage={this.scrollToTop}
+                    csvExportOptions={{
+                        countryLocale: {
+                            name: locale.members.csvOptions.countryLocale,
+                            type: 'select',
+                            options: Object.entries(locale.members.csvOptions.countryLocales),
+                            default: 'eo',
+                        },
+                    }} />
             </div>
         );
     }

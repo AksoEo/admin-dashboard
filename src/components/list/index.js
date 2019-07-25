@@ -122,6 +122,7 @@ export default class ListView extends React.PureComponent {
         /// - `filters`: translations for filters
         /// - `fields`: translations for fields
         /// - `csvFilename`: file name prefix for CSV exports
+        /// - `csvFields`: translations for exported fields. Will use `fields` as fallback
         locale: PropTypes.object.isRequired,
 
         /// Should return the URL target for a given detail view.
@@ -135,6 +136,9 @@ export default class ListView extends React.PureComponent {
 
         /// Called when the page changes.
         onChangePage: PropTypes.func,
+
+        /// User-defined options for CSV export.
+        csvExportOptions: PropTypes.object,
     };
 
     /// State store.
@@ -353,6 +357,8 @@ export default class ListView extends React.PureComponent {
                         onClose={() => this.setState({ csvExportOpen: false })}
                         filename={this.props.locale.csvFilename}
                         localizedFields={this.props.locale.fields}
+                        localizedCSVFields={this.props.locale.csvFields || {}}
+                        userOptions={this.props.csvExportOptions}
                         fieldSpec={this.props.fields || {}} />
                 </div>
                 <DetailView

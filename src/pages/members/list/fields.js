@@ -335,16 +335,17 @@ export default {
                 }
             }
         },
-        stringify: async (value, item) => {
+        stringify: async (value, item, fields, options) => {
             const { feeCountry, addressLatin } = item;
             const addressCountry = addressLatin ? addressLatin.country : null;
-            const countries = await cache.getCountries();
+            const countries = await cache.getCountriesLocalized(options.countryLocale || 'eo');
 
             if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
-                return countries[addressCountry || feeCountry];
+                const country = addressCountry || feeCountry;
+                return country.toUpperCase() + ' ' + countries[country];
             } else {
-                const feeCountryName = countries[feeCountry];
-                const countryName = countries[addressCountry];
+                const feeCountryName = feeCountry.toUpperCase() + ' ' + countries[feeCountry];
+                const countryName = addressCountry.toUpperCase() + ' ' + countries[addressCountry];
                 return locale.members.fields.disjunctCountry(feeCountryName, countryName);
             }
         },
