@@ -151,8 +151,13 @@ export default class Segmented extends React.PureComponent {
         // drop excess child refs
         this.childRefs.splice(this.props.children.length);
 
+        const nodeProps = { ...this.props };
+        delete nodeProps.selected;
+        delete nodeProps.onSelect;
+        nodeProps.className = (nodeProps.className || '') + ' segmented-control';
+
         return (
-            <div className="segmented-control" ref={node => this.node = node}>
+            <div {...nodeProps} ref={node => this.node = node}>
                 {animatedBackground}
                 {options}
             </div>

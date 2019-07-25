@@ -135,6 +135,9 @@ export default {
             tryResumeExport: 'Provi daŭrigi',
             abortExport: 'Nuligi',
             download: 'Elŝuti CSV',
+
+            commaSeparated: '[[CSV]]',
+            tabSeparated: '[[TSV]]',
         },
     },
     // Members page

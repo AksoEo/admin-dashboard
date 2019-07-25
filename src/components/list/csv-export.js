@@ -7,6 +7,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Button from '@material-ui/core/Button';
 import stringify from 'csv-stringify';
 import * as actions from './actions';
+import Segmented from '../segmented';
 import locale from '../../locale';
 
 const ITEMS_PER_PAGE = 100;
@@ -35,6 +36,7 @@ export default class CSVExport extends React.PureComponent {
         exporting: false,
         error: null,
         objectURL: null,
+        mode: 'csv',
     };
 
     beginExport () {
@@ -95,7 +97,9 @@ export default class CSVExport extends React.PureComponent {
             this.abortExport();
             this.setState({ exporting: true });
 
-            const stringifier = stringify();
+            const stringifier = stringify({
+                delimiter: this.state.mode === 'csv' ? ',' : '\t',
+            });
             const rows = [];
             stringifier.on('readable', () => {
                 let row;
@@ -105,9 +109,11 @@ export default class CSVExport extends React.PureComponent {
                 this.setState({ exporting: false, error: err });
             });
             stringifier.on('finish', () => {
-                const blob = new Blob(rows, { type: 'text/csv' });
+                const ext = this.state.mode;
+                const mime = this.state.mode === 'csv' ? 'text/csv' : 'text/tab-separated-values';
+                const blob = new Blob(rows, { type: mime });
                 const objectURL = URL.createObjectURL(blob);
-                const filename = `${this.props.filename}-${new Date().toISOString()}.csv`;
+                const filename = `${this.props.filename}-${new Date().toISOString()}.${ext}`;
                 this.setState({ objectURL, filename, exporting: false });
             });
 
@@ -183,9 +189,26 @@ export default class CSVExport extends React.PureComponent {
                                 {locale.listView.csvExport.download}
                             </Button>
                         ) : (
-                            <Button onClick={this.resumeExport}>
-                                {locale.listView.csvExport.beginExport}
-                            </Button>
+                            <React.Fragment>
+                                <Segmented
+                                    className="mode-switch"
+                                    selected={this.state.mode}
+                                    onSelect={mode => this.setState({ mode })}>
+                                    {[
+                                        {
+                                            id: 'csv',
+                                            label: locale.listView.csvExport.commaSeparated,
+                                        },
+                                        {
+                                            id: 'tsv',
+                                            label: locale.listView.csvExport.tabSeparated,
+                                        },
+                                    ]}
+                                </Segmented>
+                                <Button onClick={this.resumeExport}>
+                                    {locale.listView.csvExport.beginExport}
+                                </Button>
+                            </React.Fragment>
                         )
                     ) : (
                         <React.Fragment>
