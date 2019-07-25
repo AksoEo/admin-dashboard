@@ -132,7 +132,7 @@ export default {
                 const honorific = item.honorific;
                 const first = firstName || firstNameLegal;
                 const last = lastName || lastNameLegal;
-                return `${(honorific ? (honorific + ' ') : '')} ${first} ${last}`;
+                return `${(honorific ? (honorific + ' ') : '')}${first} ${last}`;
             } else if (codeholderType === 'org') {
                 return item.fullName;
             } else {

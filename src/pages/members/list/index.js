@@ -227,6 +227,7 @@ const fieldMapping = {
             'fullName',
             'fullNameLocal',
             'nameAbbrev',
+            'honorific',
             'codeholderType',
             'isDead',
         ],
