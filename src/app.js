@@ -158,10 +158,6 @@ export default class App extends React.PureComponent {
         });
     };
 
-    goBack = () => {
-        window.history.back();
-    };
-
     onActiveRequestsUpdate = () => {
         this.setState({
             hasActiveRequest: !!Object.keys(activeRequests).length,

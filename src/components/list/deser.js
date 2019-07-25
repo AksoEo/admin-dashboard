@@ -133,7 +133,9 @@ export function encodeURLQuery (state, filters) {
                 : serializeFilterValue(state.filters.filters[id].value);
             data += maybeEncodeParens(serialized, ':),');
         }
-        data += ')';
+        // undo filter( if no filters are enabled
+        if (!count) data = data.substr(0, data.length - 'filter('.length);
+        else data += ')';
     }
     {
         // fields(field:sorting, ...)
