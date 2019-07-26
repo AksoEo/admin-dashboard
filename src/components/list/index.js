@@ -455,7 +455,10 @@ const SearchFilters = connect(state => ({
                 </Suspense>
             ),
         });
+        items.push({ node: <div className="dummy-filters-placeholder" />, hidden: true });
     } else {
+        items.push({ node: <div className="dummy-json-filter-placeholder" />, hidden: true });
+
         const filters = Object.entries(props.filters);
         let hasEnabledFilters = false;
         for (const id of filters) {

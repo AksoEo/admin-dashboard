@@ -8,11 +8,11 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CheckIcon from '@material-ui/icons/Check';
 import moment from 'moment';
-import NumericRangeEditor, { NumericRange } from '../editors/numeric-range';
-import Segmented from '../../../components/segmented';
-import locale from '../../../locale';
+import NumericRangeEditor, { NumericRange } from './editors/numeric-range';
+import Segmented from '../../components/segmented';
+import locale from '../../locale';
 import CountryPicker from './country-picker';
-import cache from '../../../cache';
+import cache from '../../cache';
 
 /* eslint-disable react/prop-types */
 

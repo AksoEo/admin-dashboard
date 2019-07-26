@@ -117,7 +117,17 @@ export function ErrorResult ({ error }) {
     switch (error.id) {
     case 'invalid-search-query':
         errorIsLocalized = true;
-        errorDetails = locale.listView.errors.invalidSearchQuery;
+        errorDetails = (
+            <div className="invalid-search-query-error">
+                {locale.listView.errors.invalidSearchQuery.pre.map((x, i) => (<p key={i}>{x}</p>))}
+                <ul>
+                    {locale.listView.errors.invalidSearchQuery.list.map(([x, y], i) => (
+                        <li key={i}><code>{x}</code>{y}</li>
+                    ))}
+                </ul>
+                {locale.listView.errors.invalidSearchQuery.post.map((x, i) => (<p key={i}>{x}</p>))}
+            </div>
+        );
         break;
     case 'invalid-json':
         errorIsLocalized = true;

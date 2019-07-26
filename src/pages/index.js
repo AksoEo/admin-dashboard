@@ -20,9 +20,6 @@ export const NewspaperIcon = function NewspaperIcon () {
     );
 };
 
-const membersList = lazy(() =>
-    import(/* webpackChunkName: "members", webpackPrefetch: true */ './members/list'));
-
 /**
  * App routes.
  * IDs are `locale.pages[id]` keys and are also used to identify pages elsewhere.
@@ -39,7 +36,8 @@ export default [
             },
             {
                 id: 'members',
-                component: membersList,
+                component: lazy(() =>
+                    import(/* webpackChunkName: "members", webpackPrefetch: true */ './members')),
                 icon: <AssignmentIndIcon />,
                 url: 'membroj',
             },

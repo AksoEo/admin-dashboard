@@ -126,7 +126,19 @@ export default {
         },
         error: 'Eraro',
         errors: {
-            invalidSearchQuery: 'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj. Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon: `*` post vorto por permesi ajnajn sekvantajn signojn post la vorto, `+` antaŭ vorto por postuli ĝian ekziston, `-` antaŭ vorto por postuli ĝian malekziston kaj `""`-citilojn ĉirkaŭ frazo aŭ vorto por postuli la ekzaktan kombinon de la vortoj. Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.',
+            invalidSearchQuery: {
+                pre: [
+                    'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj.',
+                    'Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon:',
+                ],
+                list: [
+                    ['*', ' post vorto por permesi ajnajn sekvantajn signojn post la vorto'],
+                    ['+', ' antaŭ vorto por postuli ĝian ekziston'],
+                    ['-', ' antaŭ vorto por postuli ĝian malekziston'],
+                    ['""', '-citilojn ĉirkaŭ frazo aŭ vorto por postuli la ekzaktan kombinon de la vortoj'],
+                ],
+                post: ['Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.'],
+            },
             invalidJSON: 'Estas tajperaro en la JSON-filtriloj. Detalaj informoj troviĝas en la JSON-filtrilkampo.',
         },
         csvExport: {

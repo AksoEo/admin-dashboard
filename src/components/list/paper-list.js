@@ -106,8 +106,11 @@ export default class PaperList extends React.PureComponent {
         };
     }
 
+    onWindowResize = () => globalAnimator.register(this);
+
     componentDidMount () {
         this.update(0, true);
+        window.addEventListener('resize', this.onWindowResize);
     }
 
     componentDidUpdate (prevProps) {
@@ -118,6 +121,7 @@ export default class PaperList extends React.PureComponent {
 
     componentWillUnmount () {
         globalAnimator.deregister(this);
+        window.removeEventListener('resize', this.onWindowResize);
     }
 
     render () {
