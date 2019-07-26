@@ -180,7 +180,9 @@ export default class MembersList extends React.PureComponent {
                     fields={FIELDS}
                     fieldConfigColumn={'codeholderType'}
                     onRequest={handleRequest}
-                    isRestrictedByGlobalFilter={/* TODO */ false}
+                    isRestrictedByGlobalFilter={!!(
+                        Object.keys(this.context.permissions.memberFilter).length
+                    )}
                     onURLQueryChange={this.onURLQueryChange}
                     locale={{
                         searchFields: locale.members.search.fields,
@@ -201,7 +203,9 @@ export default class MembersList extends React.PureComponent {
                             options: Object.entries(locale.members.csvOptions.countryLocales),
                             default: 'eo',
                         },
-                    }} />
+                    }}
+                    canSaveFilters={this.context.hasPermission('queries.create')}
+                    savedFilterCategory={'codeholders'} />
             </div>
         );
     }

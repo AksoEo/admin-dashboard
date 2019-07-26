@@ -14,6 +14,7 @@ import FieldPicker from './field-picker';
 import PaperList from './paper-list';
 import DetailView from './detail';
 import CSVExport from './csv-export';
+import SavedFilters from './saved-filters';
 import { encodeURLQuery, decodeURLQuery } from './deser';
 import './style';
 
@@ -139,6 +140,12 @@ export default class ListView extends React.PureComponent {
 
         /// User-defined options for CSV export.
         csvExportOptions: PropTypes.object,
+
+        /// If true, will be able to save filters.
+        canSaveFilters: PropTypes.bool,
+
+        /// The category name for saved filters.
+        savedFilterCategory: PropTypes.string.isRequired,
     };
 
     /// State store.
@@ -338,6 +345,11 @@ export default class ListView extends React.PureComponent {
                                 localizedFields={this.props.locale.searchFields}
                                 localizedPlaceholders={this.props.locale.placeholders} />
                         )}
+                        savedFilters={(
+                            <ConnectedSavedFilters
+                                category={this.props.savedFilterCategory}
+                                canSaveFilters={this.props.canSaveFilters} />
+                        )}
                         filters={this.props.filters || {}}
                         localizedFilters={this.props.locale.filters} />
                     <ConnectedResults
@@ -395,6 +407,15 @@ const ConnectedSearchInput = connect(state => ({
     onQueryChange: query => dispatch(actions.setSearchQuery(query)),
 }))(SearchInput);
 
+const ConnectedSavedFilters = connect(state => ({
+    jsonFilterEnabled: state.jsonFilter.enabled,
+    jsonFilter: state.jsonFilter.filter,
+}), dispatch => ({
+    onSetJSONFilter: filter => dispatch(actions.setJSONFilter(filter)),
+    onSetJSONFilterEnabled: enabled => dispatch(actions.setJSONFilterEnabled(enabled)),
+    onSubmit: () => dispatch(actions.submit()),
+}))(SavedFilters);
+
 const SearchFilters = connect(state => ({
     jsonFilterEnabled: state.jsonFilter.enabled,
     jsonFilter: state.jsonFilter.filter,
@@ -414,6 +435,11 @@ const SearchFilters = connect(state => ({
         hidden: props.submitted,
     });
     items.push({ node: props.searchInput });
+    items.push({
+        node: props.savedFilters,
+        hidden: props.submitted,
+        staticHeight: true,
+    });
 
     if (props.jsonFilterEnabled) {
         items.push({

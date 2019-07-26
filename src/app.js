@@ -95,6 +95,7 @@ export default class App extends React.PureComponent {
         overflowMenu: null,
         permissions: {
             // dummy defaults
+            permissions: [],
             memberFields: null,
             memberFilter: {},
         },
@@ -206,6 +207,13 @@ export default class App extends React.PureComponent {
             this.tryGetPerms();
         });
     }
+
+    hasPermission = permission => {
+        const perms = this.state.permissions.permissions;
+        if (perms.includes('*')) return true;
+        if (perms.includes(permission)) return true;
+        return false;
+    };
 
     componentDidMount () {
         this.onResize();
@@ -354,6 +362,7 @@ export default class App extends React.PureComponent {
                         navigate: this.onNavigate,
                         replace: this.onReplace,
                         permissions: this.state.permissions,
+                        hasPermission: this.hasPermission,
                     }}>
                         {appHeader}
                         <div className="app-contents">

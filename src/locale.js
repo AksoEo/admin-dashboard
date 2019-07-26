@@ -140,6 +140,11 @@ export default {
             commaSeparated: '[[CSV]]',
             tabSeparated: '[[TSV]]',
         },
+        savedFilters: {
+            savedFilters: '[[saved filters]]',
+            load: '[[load]]',
+            save: '[[save]]',
+        },
     },
     // Members page
     members: {
