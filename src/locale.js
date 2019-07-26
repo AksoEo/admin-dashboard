@@ -144,6 +144,9 @@ export default {
             savedFilters: '[[saved filters]]',
             load: '[[load]]',
             save: '[[save]]',
+            error: '[[failed to save]]',
+            name: '[[name]]',
+            description: '[[description]]',
         },
     },
     // Members page

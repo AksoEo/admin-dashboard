@@ -311,7 +311,39 @@
             left: 0;
             width: 100%;
             height: 56px;
-            padding: 0 24px;
+            box-sizing: border-box;
+
+            .list-item-inner {
+                padding-left: 24px;
+                padding-right: 24px;
+                height: 56px;
+            }
+
+            .list-item-extra {
+                right: 16px;
+            }
         }
+    }
+}
+
+.list-view-saved-filters-save {
+    .save-button-container {
+        margin-top: 8px;
+        text-align: right;
+    }
+
+    .form-field {
+        margin-top: 8px;
+
+        .text-field {
+            width: 300px;
+        }
+    }
+
+    .save-error {
+        margin-top: 8px;
+        text-align: right;
+        color: @error;
+        font-size: small;
     }
 }

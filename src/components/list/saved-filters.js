@@ -7,9 +7,11 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import TextField from '@material-ui/core/TextField';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
+import DeleteIcon from '@material-ui/icons/Delete';
 import JSON5 from 'json5';
 import locale from '../../locale';
 import client from '../../client';
@@ -124,17 +126,33 @@ export default class SavedFiltersBar extends React.PureComponent {
                         {locale.listView.savedFilters.save}
                     </DialogTitle>
                     <DialogContent className="list-view-saved-filters-save">
-                        todo: polish this
-                        {this.state.saveError && this.state.saveError.toString()}
-                        <TextField
-                            value={this.state.name}
-                            onChange={e => this.setState({ name: e.target.value })} />
-                        <TextField
-                            value={this.state.description || ''}
-                            onChange={e => this.setState({ description: e.target.value })} />
-                        <Button onClick={this.save}>
-                            {locale.listView.savedFilters.save}
-                        </Button>
+                        <div className="form-field">
+                            <TextField
+                                className="text-field"
+                                required
+                                label={locale.listView.savedFilters.name}
+                                value={this.state.name}
+                                onChange={e =>
+                                    this.setState({ name: e.target.value })} />
+                        </div>
+                        <div className="form-field">
+                            <TextField
+                                className="text-field"
+                                label={locale.listView.savedFilters.description}
+                                value={this.state.description || ''}
+                                onChange={e =>
+                                    this.setState({ description: e.target.value })} />
+                        </div>
+                        <div className="save-button-container">
+                            <Button className="save-button" onClick={this.save}>
+                                {locale.listView.savedFilters.save}
+                            </Button>
+                        </div>
+                        {this.state.saveError && (
+                            <div className="save-error">
+                                {locale.listView.savedFilters.error}
+                            </div>
+                        )}
                     </DialogContent>
                 </Dialog>
             </div>
@@ -193,6 +211,16 @@ class SavedFiltersList extends React.PureComponent {
         }
     };
 
+    deleteItem (index) {
+        const item = this.state.items[index];
+        if (!item) return;
+        client.delete(`/queries/${item.id}`).then(() => {
+            const items = this.state.items.slice();
+            items.splice(index, 1);
+            this.setState({ items, totalItems: this.state.totalItems - 1 });
+        });
+    }
+
     componentDidMount () {
         this.maySetState = true;
         this.fetchChunk(0);
@@ -213,8 +241,12 @@ class SavedFiltersList extends React.PureComponent {
                     <ListItem
                         button
                         key={item.id}
-                        className="list-item"
-                        style={{ transform: `translateY(${y}px)` }}
+                        className="list-item-inner"
+                        ContainerComponent="div"
+                        ContainerProps={{
+                            className: 'list-item',
+                            style: { transform: `translateY(${y}px)` },
+                        }}
                         onClick={() => {
                             this.props.onLoad(
                                 item.name,
@@ -225,6 +257,14 @@ class SavedFiltersList extends React.PureComponent {
                             );
                         }}>
                         <ListItemText primary={item.name} secondary={item.description} />
+                        <ListItemSecondaryAction className="list-item-extra">
+                            <IconButton
+                                edge="end"
+                                aria-label={locale.listView.savedFilters.delete}
+                                onClick={() => this.deleteItem(i)}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </ListItemSecondaryAction>
                     </ListItem>
                 );
             }
