@@ -11,6 +11,7 @@ import locale from '../../locale';
 import client from '../../client';
 import FILTERS from './filters';
 import FIELDS from './fields';
+import AddMemberDialog from './add-member';
 import './style';
 
 const SEARCHABLE_FIELDS = [
@@ -33,6 +34,7 @@ export default class MembersList extends React.PureComponent {
 
     state = {
         detail: null,
+        addMemberOpen: false,
     };
 
     scrollSpring = new Spring(1, 0.4);
@@ -132,9 +134,7 @@ export default class MembersList extends React.PureComponent {
 
         items.push({
             label: locale.members.addMember.menuItem,
-            action: () => {
-                // TODO
-            },
+            action: () => this.setState({ addMemberOpen: true }),
         });
 
         return items;
@@ -206,6 +206,9 @@ export default class MembersList extends React.PureComponent {
                     }}
                     canSaveFilters={this.context.hasPermission('queries.create')}
                     savedFilterCategory={'codeholders'} />
+                <AddMemberDialog
+                    open={this.state.addMemberOpen}
+                    onClose={() => this.setState({ addMemberOpen: false })} />
             </div>
         );
     }
@@ -244,7 +247,7 @@ const fieldMapping = {
             'codeholderType',
             'isDead',
         ],
-        sort: ['lastNameLegal'], // FIXME: this is probably wrong
+        sort: ['lastNameLegal', 'firstNameLegal'], // FIXME: this is probably wrong
     },
     country: {
         fields: ['feeCountry', 'addressLatin.country'],

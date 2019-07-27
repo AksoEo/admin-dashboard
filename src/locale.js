@@ -309,6 +309,7 @@ export default {
         addMember: {
             menuItem: 'Aldoni membron',
             title: 'Aldoni membron',
+            firstNameLegal: '[[first name (legal)]]',
         },
     },
 };
