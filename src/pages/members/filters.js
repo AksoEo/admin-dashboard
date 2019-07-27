@@ -599,7 +599,7 @@ export default {
                                 }} />
                             <NumericRangeEditor
                                 min={1887}
-                                max={new Date().getFullYear()}
+                                max={new Date().getFullYear() + 4}
                                 value={range}
                                 disabled={!useRange}
                                 onChange={range => {
@@ -651,7 +651,7 @@ export default {
     isActiveMember: {
         needsSwitch: true,
         min: 1887,
-        max: new Date().getFullYear(),
+        max: new Date().getFullYear() + 4,
         default () {
             const thisYear = new Date().getFullYear();
             return new NumericRange(thisYear, thisYear, true, true);
