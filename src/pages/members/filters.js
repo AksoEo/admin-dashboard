@@ -111,6 +111,7 @@ export default {
         applyConstraints (value, filters) {
             let humanOnly = false;
             if (filters.age && filters.age.enabled) humanOnly = true;
+            if (filters.deathdate && filters.deathdate.enabled) humanOnly = true;
 
             if (humanOnly && !value._restricted) {
                 return { value: { human: true, org: false, _restricted: true } };
@@ -704,6 +705,60 @@ export default {
 
             return (
                 <div className="active-member-editor">
+                    {filterHeader}
+                    <NumericRangeEditor
+                        min={filter.min}
+                        max={filter.max}
+                        value={value}
+                        disabled={disabled}
+                        onChange={onChange} />
+                </div>
+            );
+        },
+    },
+    // FIXME: duplicate code
+    deathdate: {
+        needsSwitch: true,
+        min: 1887,
+        max: new Date().getFullYear(),
+        default () {
+            const thisYear = new Date().getFullYear();
+            return new NumericRange(thisYear, thisYear, true, true);
+        },
+        serialize (value) {
+            return value.start
+                + (value.startInclusive ? '<=' : '<')
+                + 'x'
+                + (value.endInclusive ? '<=' : '<')
+                + value.end;
+        },
+        deserialize (value) {
+            const match = value.match(/^(\d+)(<=?)x(<=?)(\d+)/);
+            if (!match) throw new Error('value does not match pattern');
+            const rangeStart = +match[1] | 0;
+            const startInclusive = match[2] === '<=';
+            const endInclusive = match[3] === '<=';
+            const rangeEnd = +match[4] | 0;
+            return new NumericRange(rangeStart, rangeEnd, startInclusive, endInclusive);
+        },
+        toRequest (value) {
+            const lowerYear = value.isCollapsed()
+                ? value.collapsedValue()
+                : value.start + (value.startInclusive ? 0 : 1);
+            const upperYear = value.isCollapsed()
+                ? lowerYear
+                : value.end - (value.endInclusive ? 0 : 1);
+
+            const lowerDate = new Date(`${lowerYear}-01-01T00:00Z`);
+            const upperDate = new Date(`${upperYear + 1}-01-01T00:00Z`);
+
+            return { deathdate: { $gte: +lowerDate, $lt: +upperDate } };
+        },
+        editor (props) {
+            const { filter, value, onChange, filterHeader, disabled } = props;
+
+            return (
+                <div className="death-date-editor">
                     {filterHeader}
                     <NumericRangeEditor
                         min={filter.min}

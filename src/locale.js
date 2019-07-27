@@ -196,6 +196,7 @@ export default {
                 hasPassword: 'Kreis konton',
                 membership: 'Membreckategorioj',
                 isActiveMember: 'Aktiva membro en',
+                deathdate: '[[deathdate]]',
             },
             agePrime: 'jarkomence',
             ageBirthYear: range => `naskiĝintoj en ${range}`,
