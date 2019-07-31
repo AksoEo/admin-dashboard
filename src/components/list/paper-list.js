@@ -100,7 +100,7 @@ export default class PaperList extends React.PureComponent {
 
         return {
             transform: `translateY(${state.y.value}px) scaleY(${scaleY})`,
-            zIndex: Math.round(lerp(this.childStates.length - index, -1, state.hidden.value)),
+            zIndex: Math.round(lerp(this.props.children[index].zIndex | 0, -1, state.hidden.value)),
             opacity: clamp(1 - state.hidden.value, 0, 1),
             pointerEvents: state.hidden.value > 0.5 ? 'none' : '',
         };

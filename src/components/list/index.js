@@ -434,11 +434,12 @@ const SearchFilters = connect(state => ({
         node: props.title,
         hidden: props.submitted,
     });
-    items.push({ node: props.searchInput });
+    items.push({ node: props.searchInput, zIndex: 3 });
     items.push({
         node: props.savedFilters,
         hidden: props.submitted,
         staticHeight: true,
+        zIndex: 2,
     });
 
     if (props.jsonFilterEnabled) {
@@ -474,6 +475,7 @@ const SearchFilters = connect(state => ({
                     expanded={props.expanded}
                     onChange={props.onFiltersEnabledChange} />,
                 hidden: props.submitted && !hasEnabledFilters,
+                zIndex: 1,
             });
         }
 

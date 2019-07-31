@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import NativeSelect from '@material-ui/core/NativeSelect';
-import IconButton from '@material-ui/core/IconButton';
+import { Button } from 'yamdl';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import SearchIcon from '@material-ui/icons/Search';
 import locale from '../../locale';
@@ -46,20 +46,21 @@ export default class SearchInput extends React.PureComponent {
                         if (e.key === 'Enter') this.props.onSubmit();
                     }} />
                 {this.props.submitted ? (
-                    <IconButton
-                        className="search-action search-expand"
+                    <Button
+                        icon
+                        class="search-action search-expand"
                         aria-label={locale.listView.unsubmit}
                         onClick={this.props.onUnsubmit}>
                         <KeyboardArrowDownIcon />
-                    </IconButton>
+                    </Button>
                 ) : (
-                    <IconButton
-                        className="search-action search-submit"
-                        color="primary"
+                    <Button
+                        icon
+                        class="search-action search-submit"
                         aria-label={locale.listView.submit}
                         onClick={this.props.onSubmit}>
                         <SearchIcon />
-                    </IconButton>
+                    </Button>
                 )}
             </div>
         );

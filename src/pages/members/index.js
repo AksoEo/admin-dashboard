@@ -204,6 +204,8 @@ export default class MembersList extends React.PureComponent {
                             default: 'eo',
                         },
                     }}
+                    // TODO: move this into a prop instead of using a context
+                    // so it updates when it changes/loads
                     canSaveFilters={this.context.hasPermission('queries.create')}
                     savedFilterCategory={'codeholders'} />
                 <AddMemberDialog

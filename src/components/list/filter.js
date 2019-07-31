@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Checkbox from '@material-ui/core/Checkbox';
+import { Checkbox } from 'yamdl';
 
 /** A single filter. */
 export default class Filter extends React.PureComponent {
@@ -41,7 +41,7 @@ export default class Filter extends React.PureComponent {
                         className="filter-checkbox"
                         checked={this.props.enabled}
                         disabled={!userCanToggleEnabled}
-                        onChange={(e, checked) => this.props.onEnabledChange(checked)} />
+                        onChange={checked => this.props.onEnabledChange(checked)} />
                 ) : <div className="filter-checkbox-placeholder" />}
                 <div className="filter-label" onClick={() => {
                     // also toggle enabled state when clicking on the label

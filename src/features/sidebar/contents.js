@@ -7,9 +7,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import { Button, Menu } from 'yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link  } from '../../router';
 import pages from '../../pages';
@@ -138,26 +136,33 @@ export default class SidebarContents extends React.PureComponent {
                             color="inherit">
                             {this.state.userName}
                         </Typography>
-                        <IconButton
-                            color="inherit"
-                            className="user-options"
+                        <Button
+                            icon
+                            class="user-options"
                             aria-owns={this.state.userMenuOpen ? 'sidebar-user-popup-menu' : null}
                             aria-haspopup="true"
-                            buttonRef={node => this.userMenuButton = node}
-                            onClick={e => this.setState({ userMenuOpen: e.currentTarget })}>
+                            onClick={e => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                this.userMenuPosition = [
+                                    rect.right - rect.width / 3,
+                                    rect.top + rect.height / 3,
+                                ];
+                                this.setState({ userMenuOpen: true });
+                            }}>
                             <ExpandMoreIcon color="inherit" />
-                        </IconButton>
+                        </Button>
                         <Menu
                             id="sidebar-user-popup-menu"
-                            anchorEl={this.userMenuButton}
+                            position={this.userMenuPosition}
                             open={!!this.state.userMenuOpen}
-                            onClose={() => this.setState({ userMenuOpen: false })}>
-                            <MenuItem onClick={() => {
-                                this.setState({ userMenuOpen: false }, this.props.onLogout);
-                            }}>
-                                {locale.sidebar.logout}
-                            </MenuItem>
-                        </Menu>
+                            anchor={[1, 0]}
+                            onClose={() => this.setState({ userMenuOpen: false })}
+                            items={[
+                                {
+                                    label: locale.sidebar.logout,
+                                    action: this.props.onLogout,
+                                },
+                            ]} />
                     </div>
                 </div>
                 <div className="sidebar-nav-container">

@@ -9,13 +9,10 @@ import './app.less';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
+import { Button, CircularProgress, Menu } from 'yamdl';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 import MenuIcon from '@material-ui/icons/Menu';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Sidebar from './features/sidebar';
@@ -171,26 +168,12 @@ export default class App extends React.PureComponent {
             const menuSpec = this.currentPage.getOverflowMenu();
             if (!menuSpec.length) return;
 
-            const items = [];
-            for (const item of menuSpec) {
-                items.push(
-                    <MenuItem
-                        key={item.label}
-                        onClick={() => {
-                            item.action();
-                            this.setState({
-                                overflowMenu: { ...this.state.overflowMenu, open: false },
-                            });
-                        }}>
-                        {item.label}
-                    </MenuItem>
-                );
-            }
+            const anchorRect = e.currentTarget.getBoundingClientRect();
 
             this.setState({
                 overflowMenu: {
-                    items,
-                    anchor: e.currentTarget,
+                    items: menuSpec,
+                    position: [anchorRect.right, anchorRect.top],
                     open: true,
                 },
             });
@@ -274,15 +257,15 @@ export default class App extends React.PureComponent {
                     {this.state.permaSidebar ? (
                         <HeaderLogo onClick={() => this.onNavigate('/')} />
                     ) : (
-                        <IconButton
-                            className="menu-button"
-                            color="inherit"
+                        <Button
+                            icon
+                            class="menu-button"
                             aria-label={locale.header.menu}
                             onClick={() => this.setState({
                                 sidebarOpen: !this.state.sidebarOpen,
                             })}>
                             <MenuIcon />
-                        </IconButton>
+                        </Button>
                     )}
                     <Typography
                         className="header-title"
@@ -291,21 +274,21 @@ export default class App extends React.PureComponent {
                         {locale.pages[this.state.currentPage.id]}
                     </Typography>
                     <div style={{ flexGrow: 1 }} />
-                    <IconButton
+                    <Button
+                        icon
                         aria-label={locale.header.overflow}
-                        color="inherit"
                         onClick={this.onOverflowClick}>
                         <MoreVertIcon />
-                    </IconButton>
+                    </Button>
                     {this.state.overflowMenu && (
                         <Menu
                             open={this.state.overflowMenu.open}
-                            anchorEl={this.state.overflowMenu.anchor}
+                            position={this.state.overflowMenu.position}
+                            anchor={[1, 0]}
                             onClose={() => this.setState({
                                 overflowMenu: { ...this.state.overflowMenu, open: false },
-                            })}>
-                            {this.state.overflowMenu.items}
-                        </Menu>
+                            })}
+                            items={this.state.overflowMenu.items} />
                     )}
                 </Toolbar>
                 {isLoading ? (
@@ -344,7 +327,7 @@ export default class App extends React.PureComponent {
         pageContents = (
             <Suspense fallback={
                 <div className="app-page loading">
-                    <CircularProgress className="page-loading-indicator" />
+                    <CircularProgress class="page-loading-indicator" indeterminate />
                 </div>
             }>
                 <PageComponent

@@ -6,9 +6,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import AppBar from '@material-ui/core/AppBar';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
-import IconButton from '@material-ui/core/IconButton';
 import Slide from '@material-ui/core/Slide';
-import Checkbox from '@material-ui/core/Checkbox';
+import { Checkbox, Button } from 'yamdl';
 import CloseIcon from '@material-ui/icons/Close';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -86,7 +85,7 @@ export default class FieldPicker extends React.PureComponent {
 
             if (!searchResults.includes(field.id)) continue;
 
-            const onCheckboxClick = () => this.props.onRemoveField(index);
+            const onCheckboxClick = () => setImmediate(() => this.props.onRemoveField(index));
 
             const sortingControl = this.props.sortables.includes(field.id)
                 ? (
@@ -134,12 +133,12 @@ export default class FieldPicker extends React.PureComponent {
                 {this.state.fullScreen ? (
                     <AppBar position="sticky">
                         <Toolbar>
-                            <IconButton
-                                color="inherit"
+                            <Button
+                                icon
                                 onClick={this.props.onClose}
-                                className="close-button">
+                                class="close-button">
                                 <CloseIcon />
-                            </IconButton>
+                            </Button>
                             <Typography variant="h6" color="inherit">
                                 {locale.listView.fieldPicker.title}
                             </Typography>
@@ -147,12 +146,12 @@ export default class FieldPicker extends React.PureComponent {
                     </AppBar>
                 ) : (
                     <DialogTitle>
-                        <IconButton
-                            color="inherit"
+                        <Button
+                            icon
                             onClick={this.props.onClose}
-                            className="close-button">
+                            class="close-button">
                             <CloseIcon />
-                        </IconButton>
+                        </Button>
                         {locale.listView.fieldPicker.title}
                     </DialogTitle>
                 )}
@@ -221,11 +220,11 @@ export class SortingControl extends React.PureComponent {
                             ? locale.listView.sorting.asc
                             : locale.listView.sorting.desc}
                 </label>}
-                <IconButton className="sorting-icon">
+                <Button icon class="sorting-icon">
                     {this.props.value === Sorting.NONE
                         ? <RemoveIcon className="none-icon" />
                         : <ArrowUpwardIcon className="arrow-icon" />}
-                </IconButton>
+                </Button>
             </div>
         );
     }

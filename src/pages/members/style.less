@@ -75,22 +75,31 @@
 
     // filters
 
-    .numeric-range-editor {
-        position: relative;
-        width: 0;
-        flex: 1;
-        height: 48px;
-        max-width: 100%;
-        margin-right: 20px;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
+    .range-editor {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        width: 100%;
 
-        canvas {
-            position: absolute;
+        .bound-editor {
+            width: auto;
+            font-size: small;
+            flex: 0 0 4em;
+
+            input {
+                padding: 6px 0 6px 8px;
+            }
         }
 
-        &:focus {
-            outline: none;
+        .editor-inner {
+            width: 100%;
+            flex: 1;
+            margin: 0 8px;
+            z-index: 2;
+        }
+
+        &.disabled {
+            filter: saturate(0) brightness(1.4);
         }
     }
 
@@ -142,12 +151,15 @@
             opacity: 0.8;
         }
 
+        .age-prime-switch .inner-switch {
+            margin-left: 16px;
+        }
+
         &.disabled .age-prime-switch {
             opacity: 0.5;
         }
 
-        .numeric-range-editor {
-            display: block;
+        .range-editor {
             width: calc(100% - 40px);
             margin: 0 20px;
         }
@@ -168,7 +180,7 @@
             flex-shrink: 0;
         }
 
-        .numeric-range-editor {
+        .range-editor {
             width: 0;
             flex: 1;
             margin-left: 16px;
@@ -177,8 +189,7 @@
         @media (max-width: 600px) {
             display: block;
 
-            .numeric-range-editor {
-                display: block;
+            .range-editor {
                 margin: 0 20px;
                 width: calc(100% - 40px);
             }
@@ -264,8 +275,8 @@
                         margin-left: 8px;
                     }
 
-                    .numeric-range-editor {
-                        display: inline-block;
+                    .range-editor {
+                        display: inline-flex;
                         width: calc(100% - 50px - 56px);
                         // firefox has weird flexbox behavior with this element
                         max-width: calc(100% - 50px - 56px);
@@ -409,6 +420,7 @@
         display: flex;
         justify-content: space-between;
         flex-shrink: 0;
+        padding: 8px 0;
 
         .selection-button {
             font-size: small;

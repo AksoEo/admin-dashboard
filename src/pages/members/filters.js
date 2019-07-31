@@ -1,20 +1,56 @@
 import React from 'react';
-import Switch from '@material-ui/core/Switch';
+import { Checkbox, Slider, TextField } from 'yamdl';
 import IconButton from '@material-ui/core/IconButton';
 import MenuItem from '@material-ui/core/MenuItem';
-import Checkbox from '@material-ui/core/Checkbox';
 import Select from '@material-ui/core/Select';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CheckIcon from '@material-ui/icons/Check';
 import moment from 'moment';
-import NumericRangeEditor, { NumericRange } from './editors/numeric-range';
 import Segmented from '../../components/segmented';
 import locale from '../../locale';
 import CountryPicker from './country-picker';
 import cache from '../../cache';
 
 /* eslint-disable react/prop-types */
+
+function RangeEditor ({ min, max, value, onChange, tickDistance, disabled }) {
+    return (
+        <div class={'range-editor' + (disabled ? ' disabled' : '')}>
+            <TextField
+                type="number"
+                class="bound-editor"
+                center
+                min={min}
+                max={max}
+                value={value[0]}
+                onChange={e => onChange([
+                    +e.target.value,
+                    Math.max(+e.target.value, value[1]),
+                ])} />
+            <Slider
+                min={min}
+                max={max}
+                value={value}
+                popout
+                discrete
+                tickDistance={tickDistance}
+                class="editor-inner"
+                onChange={value => onChange(value)} />
+            <TextField
+                type="number"
+                class="bound-editor"
+                center
+                min={min}
+                max={max}
+                value={value[1]}
+                onChange={e => onChange([
+                    Math.min(+e.target.value, value[0]),
+                    +e.target.value,
+                ])} />
+        </div>
+    );
+}
 
 /**
  * Renders a segmented control with three options, [a] [b] [all].
@@ -238,42 +274,32 @@ export default {
         max: 150,
         default () {
             return {
-                range: new NumericRange(0, 35, true, true),
+                range: [0, 35],
                 atStartOfYear: true,
             };
         },
         serialize (value) {
-            return value.range.start
-                + (value.range.startInclusive ? '<=' : '<')
-                + 'x'
-                + (value.range.endInclusive ? '<=' : '<')
-                + value.range.end
-                + (value.atStartOfYear ? '^' : '');
+            return value.range[0] + '-' + value.range[1] + (value.atStartOfYear ? '^' : '');
         },
         deserialize (value) {
-            const match = value.match(/^(\d+)(<=?)x(<=?)(\d+)(\^?)/);
+            const match = value.match(/^(\d+)-(\d+)(\^?)/);
             if (!match) throw new Error('value does not match pattern');
             const rangeStart = +match[1] | 0;
-            const startInclusive = match[2] === '<=';
-            const endInclusive = match[3] === '<=';
-            const rangeEnd = +match[4] | 0;
-            const atStartOfYear = match[5] === '^';
+            const rangeEnd = +match[2] | 0;
+            const atStartOfYear = match[3] === '^';
 
             return {
-                range: new NumericRange(rangeStart, rangeEnd, startInclusive, endInclusive),
+                range: [rangeStart, rangeEnd],
                 atStartOfYear,
             };
         },
         toRequest (value) {
             const field = value.atStartOfYear ? 'agePrimo' : 'age';
-            if (value.range.isCollapsed()) {
-                return { [field]: { $eq: value.range.collapsedValue() } };
+            if (value.range[0] === value.range[1]) {
+                return { [field]: { $eq: value.range[0] } };
             }
             return {
-                [field]: {
-                    [value.range.startInclusive ? '$gte' : '$gt']: value.range.start,
-                    [value.range.endInclusive ? '$lte' : '$lt']: value.range.end,
-                },
+                [field]: { $gte: value.range[0], $lte: value.range[1] },
             };
         },
         editor (props) {
@@ -298,8 +324,7 @@ export default {
                 return { lowerBound, upperBound };
             };
 
-            const start = value.range.startInclusive ? value.range.start : value.range.start + 1;
-            const end = value.range.endInclusive ? value.range.end : value.range.end - 1;
+            const [start, end] = value.range;
             // age is the inverse of birth date; so end comes first
             const lowerBound = ageToBirthYearRange(end).lowerBound;
             const upperBound = ageToBirthYearRange(start).upperBound;
@@ -317,19 +342,22 @@ export default {
                         </span>
                         <div className="age-prime-switch">
                             <label>{locale.members.search.agePrime}</label>
-                            <Switch
+                            <Checkbox
+                                class="inner-switch"
+                                switch
                                 checked={value.atStartOfYear}
-                                onChange={e => {
-                                    onChange({ ...topValue, atStartOfYear: e.target.checked });
+                                onChange={checked => {
+                                    onChange({ ...topValue, atStartOfYear: checked });
                                 }} />
                         </div>
                     </div>
-                    <NumericRangeEditor
+                    <RangeEditor
                         min={filter.min}
                         max={filter.max}
                         value={value.range}
                         disabled={disabled}
-                        onChange={value => onChange({ ...topValue, range: value })} />
+                        onChange={range => onChange({ ...topValue, range })}
+                        tickDistance={5} />
                 </div>
             );
         },
@@ -395,8 +423,8 @@ export default {
                         const value = range.collapsedValue();
                         filter.year = invert ? { $neq: value } : value;
                     } else {
-                        const rangeMin = range.startInclusive ? range.start : range.start + 1;
-                        const rangeMax = range.endInclusive ? range.end : range.end - 1;
+                        const rangeMin = range[0];
+                        const rangeMax = range[1];
                         if (invert) {
                             filter.$or = [
                                 { year: { $gt: rangeMax } },
@@ -422,12 +450,7 @@ export default {
                 i: invert,
                 l: lifetime,
                 g: givesMembership,
-                r: useRange ? {
-                    si: range.startInclusive,
-                    s: range.start,
-                    ei: range.endInclusive,
-                    e: range.end,
-                } : null,
+                r: useRange ? range : null,
                 c: categories,
             })));
         },
@@ -439,9 +462,7 @@ export default {
                 lifetime: l,
                 givesMembership: g,
                 useRange: r !== null,
-                range: r
-                    ? new NumericRange(r.s, r.e, r.si, r.ei)
-                    : new NumericRange(thisYear, thisYear, true, true),
+                range: r ? r : [thisYear, thisYear],
                 categories: c,
             }));
         },
@@ -588,21 +609,22 @@ export default {
                         </div>
                         <div className="membership-item-line membership-range-line">
                             <Checkbox
-                                className="membership-range-checkbox"
+                                class="membership-range-checkbox"
                                 checked={useRange}
-                                onChange={e => {
+                                onChange={checked => {
                                     const newValue = [...value];
                                     newValue[index] = {
                                         ...newValue[index],
-                                        useRange: e.target.checked,
+                                        useRange: checked,
                                     };
                                     onChange(newValue);
                                 }} />
-                            <NumericRangeEditor
+                            <RangeEditor
                                 min={1887}
                                 max={new Date().getFullYear() + 4}
                                 value={range}
                                 disabled={!useRange}
+                                tickDistance={10}
                                 onChange={range => {
                                     const newValue = [...value];
                                     newValue[index] = { ...newValue[index], range, useRange: true };
@@ -631,7 +653,7 @@ export default {
                                 lifetime: null,
                                 givesMembership: null,
                                 useRange: true,
-                                range: new NumericRange(thisYear, thisYear, true, true),
+                                range: [thisYear, thisYear],
                                 categories: [],
                             }]));
                         }}>
@@ -655,33 +677,25 @@ export default {
         max: new Date().getFullYear() + 4,
         default () {
             const thisYear = new Date().getFullYear();
-            return new NumericRange(thisYear, thisYear, true, true);
+            return [thisYear, thisYear];
         },
         serialize (value) {
-            return value.start
-                + (value.startInclusive ? '<=' : '<')
-                + 'x'
-                + (value.endInclusive ? '<=' : '<')
-                + value.end;
+            return value.start + '-' + value.end;
         },
         deserialize (value) {
-            const match = value.match(/^(\d+)(<=?)x(<=?)(\d+)/);
+            const match = value.match(/^(\d+)-(\d+)/);
             if (!match) throw new Error('value does not match pattern');
             const rangeStart = +match[1] | 0;
-            const startInclusive = match[2] === '<=';
-            const endInclusive = match[3] === '<=';
-            const rangeEnd = +match[4] | 0;
-            return new NumericRange(rangeStart, rangeEnd, startInclusive, endInclusive);
+            const rangeEnd = +match[2] | 0;
+            return [rangeStart, rangeEnd];
         },
         toRequest (value) {
             const range = {};
-            if (value.isCollapsed()) {
-                range.$eq = value.collapsedValue();
+            if (value[0] === value[1]) {
+                range.$eq = value[0];
             } else {
-                if (value.startInclusive) range.$gte = value.start;
-                else range.$gt = value.start;
-                if (value.endInclusive) range.$lte = value.end;
-                else range.$lt = value.end;
+                range.$gte = value[0];
+                range.$lte = value[1];
             }
 
             return {
@@ -694,7 +708,7 @@ export default {
                         },
                         {
                             lifetime: true,
-                            year: { $leq: range.start },
+                            year: { $lte: value[0] },
                         },
                     ],
                 },
@@ -706,11 +720,12 @@ export default {
             return (
                 <div className="active-member-editor">
                     {filterHeader}
-                    <NumericRangeEditor
+                    <RangeEditor
                         min={filter.min}
                         max={filter.max}
                         value={value}
                         disabled={disabled}
+                        tickDistance={10}
                         onChange={onChange} />
                 </div>
             );
@@ -723,31 +738,21 @@ export default {
         max: new Date().getFullYear(),
         default () {
             const thisYear = new Date().getFullYear();
-            return new NumericRange(thisYear, thisYear, true, true);
+            return [thisYear, thisYear];
         },
         serialize (value) {
-            return value.start
-                + (value.startInclusive ? '<=' : '<')
-                + 'x'
-                + (value.endInclusive ? '<=' : '<')
-                + value.end;
+            return value.start + '-' + value.end;
         },
         deserialize (value) {
-            const match = value.match(/^(\d+)(<=?)x(<=?)(\d+)/);
+            const match = value.match(/^(\d+)-(\d+)/);
             if (!match) throw new Error('value does not match pattern');
             const rangeStart = +match[1] | 0;
-            const startInclusive = match[2] === '<=';
-            const endInclusive = match[3] === '<=';
-            const rangeEnd = +match[4] | 0;
-            return new NumericRange(rangeStart, rangeEnd, startInclusive, endInclusive);
+            const rangeEnd = +match[2] | 0;
+            return [rangeStart, rangeEnd];
         },
         toRequest (value) {
-            const lowerYear = value.isCollapsed()
-                ? value.collapsedValue()
-                : value.start + (value.startInclusive ? 0 : 1);
-            const upperYear = value.isCollapsed()
-                ? lowerYear
-                : value.end - (value.endInclusive ? 0 : 1);
+            const lowerYear = value[0];
+            const upperYear = value[1];
 
             const lowerDate = new Date(`${lowerYear}-01-01T00:00Z`);
             const upperDate = new Date(`${upperYear + 1}-01-01T00:00Z`);
@@ -760,11 +765,12 @@ export default {
             return (
                 <div className="death-date-editor">
                     {filterHeader}
-                    <NumericRangeEditor
+                    <RangeEditor
                         min={filter.min}
                         max={filter.max}
                         value={value}
                         disabled={disabled}
+                        tickDistance={10}
                         onChange={onChange} />
                 </div>
             );

@@ -4,7 +4,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import Button from '@material-ui/core/Button';
+import { Button } from 'yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import stringify from 'csv-stringify';
 import * as actions from './actions';
@@ -73,14 +73,14 @@ export default class CSVExport extends React.PureComponent {
                 data: this.state.data.concat(action.items),
                 totalItems: action.stats.total,
                 error: null,
+            }, () => {
+                if (this.state.page < Math.floor(action.stats.total / ITEMS_PER_PAGE)) {
+                    this.setState({ page: this.state.page + 1 }, () => {
+                        this.props.onSetPage(this.state.page);
+                        this.props.onSubmit();
+                    });
+                } else this.endExport();
             });
-
-            if (this.state.page < Math.floor(action.stats.total / ITEMS_PER_PAGE)) {
-                this.setState({ page: this.state.page + 1 }, () => {
-                    this.props.onSetPage(this.state.page);
-                    this.props.onSubmit();
-                });
-            } else this.endExport();
         } else if (action.type === actions.RECEIVE_FAILURE) {
             this.setState({
                 error: action.error,
@@ -184,13 +184,17 @@ export default class CSVExport extends React.PureComponent {
                                 <div className="export-error">
                                     {this.state.error.toString()}
                                 </div>
-                                <Button onClick={this.resumeExport}>
+                                <Button
+                                    key="resume"
+                                    class="action-button"
+                                    onClick={this.resumeExport}>
                                     {locale.listView.csvExport.tryResumeExport}
                                 </Button>
                             </React.Fragment>
                         ) : this.state.objectURL ? (
                             <Button
-                                component="a"
+                                key="download"
+                                class="action-button"
                                 href={this.state.objectURL}
                                 download={this.state.filename}>
                                 {locale.listView.csvExport.download}
@@ -216,7 +220,10 @@ export default class CSVExport extends React.PureComponent {
                                     options={this.props.userOptions || {}}
                                     value={this.state.options}
                                     onChange={options => this.setState({ options })} />
-                                <Button onClick={this.resumeExport}>
+                                <Button
+                                    key="begin"
+                                    class="action-button"
+                                    onClick={this.resumeExport}>
                                     {locale.listView.csvExport.beginExport}
                                 </Button>
                             </React.Fragment>
@@ -227,7 +234,10 @@ export default class CSVExport extends React.PureComponent {
                                 className="progress-bar"
                                 value={(this.state.data.length / this.state.totalItems * 100) | 0}
                                 variant={'determinate'} />
-                            {!this.state.error && <Button onClick={this.abortExport}>
+                            {!this.state.error && <Button
+                                key="abort"
+                                class="action-button"
+                                onClick={this.abortExport}>
                                 {locale.listView.csvExport.abortExport}
                             </Button>}
                         </React.Fragment>

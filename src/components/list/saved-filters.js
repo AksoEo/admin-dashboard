@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
+import { Button } from 'yamdl';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -72,28 +71,30 @@ export default class SavedFiltersBar extends React.PureComponent {
                     {jsonFilterEnabled ? (
                         <React.Fragment>
                             <div>
-                                <IconButton
+                                <Button
+                                    icon
                                     aria-label={locale.listView.savedFilters.load}
                                     onClick={() => this.setState({ action: Action.LOAD })}>
                                     <FolderOpenIcon />
-                                </IconButton>
+                                </Button>
                                 {this.props.canSaveFilters ? (
-                                    <IconButton
+                                    <Button
+                                        icon
                                         aria-label={locale.listView.savedFilters.save}
                                         onClick={() => this.setState({ action: Action.SAVE })}>
                                         <SaveIcon />
-                                    </IconButton>
+                                    </Button>
                                 ) : null}
                             </div>
                             <Button
-                                className="disable-json-button"
+                                class="disable-json-button"
                                 onClick={() => this.props.onSetJSONFilterEnabled(false)}>
                                 {locale.listView.json.disable}
                             </Button>
                         </React.Fragment>
                     ) : (
                         <Button
-                            className="saved-filters-button"
+                            class="saved-filters-button"
                             onClick={() => this.setState({ action: Action.LOAD })}>
                             {locale.listView.savedFilters.savedFilters}
                         </Button>
@@ -126,6 +127,7 @@ export default class SavedFiltersBar extends React.PureComponent {
                         {locale.listView.savedFilters.save}
                     </DialogTitle>
                     <DialogContent className="list-view-saved-filters-save">
+                        todo: use login form for this
                         <div className="form-field">
                             <TextField
                                 className="text-field"
@@ -258,12 +260,13 @@ class SavedFiltersList extends React.PureComponent {
                         }}>
                         <ListItemText primary={item.name} secondary={item.description} />
                         <ListItemSecondaryAction className="list-item-extra">
-                            <IconButton
-                                edge="end"
+                            <Button
+                                icon
+                                class="list-item-delete-button"
                                 aria-label={locale.listView.savedFilters.delete}
                                 onClick={() => this.deleteItem(i)}>
                                 <DeleteIcon />
-                            </IconButton>
+                            </Button>
                         </ListItemSecondaryAction>
                     </ListItem>
                 );

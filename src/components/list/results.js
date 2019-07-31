@@ -6,9 +6,8 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+import { Checkbox, Button } from 'yamdl';
 import TablePagination from '@material-ui/core/TablePagination';
-import IconButton from '@material-ui/core/IconButton';
 import SearchIcon from '@material-ui/icons/Search';
 import ListAltIcon from '@material-ui/icons/ListAlt';
 import locale from '../../locale';
@@ -254,14 +253,15 @@ function TableHeader ({
                     if (id === configColumn) {
                         return (
                             <TableCell key={id} className="table-header-fields-btn-container">
-                                <IconButton
+                                <Button
+                                    icon
                                     key={id}
-                                    className="table-header-fields-btn"
+                                    class="table-header-fields-btn"
                                     aria-label={locale.listView.fieldPicker.title}
                                     title={locale.listView.fieldPicker.title}
                                     onClick={onEditFields}>
                                     <ListAltIcon />
-                                </IconButton>
+                                </Button>
                             </TableCell>
                         );
                     } else {

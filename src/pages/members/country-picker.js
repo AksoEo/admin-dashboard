@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
+import { Button } from 'yamdl';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
@@ -169,10 +169,10 @@ export default class CountryPicker extends React.PureComponent {
                             {selectedItems.concat(availableItems)}
                         </MulticolList>
                         <div className="selection-controls">
-                            <Button onClick={this.selectAll} className="selection-button">
+                            <Button onClick={this.selectAll} class="selection-button">
                                 {locale.members.search.countries.selectAll}
                             </Button>
-                            <Button onClick={this.deselectAll} className="selection-button">
+                            <Button onClick={this.deselectAll} class="selection-button">
                                 {locale.members.search.countries.deselectAll}
                             </Button>
                         </div>

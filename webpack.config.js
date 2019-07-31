@@ -48,9 +48,8 @@ module.exports = function (env, argv) {
                 // (such as source-map-support being loaded)
                 'akso-client': 'akso-client/src',
 
-                // soon™ (maybe)
-                // 'react': 'preact/compat',
-                // 'react-dom': 'preact/compat',
+                'react': 'preact/compat',
+                'react-dom': 'preact/compat',
             }
         },
         devtool: prod ? 'source-map' : 'inline-source-map',
