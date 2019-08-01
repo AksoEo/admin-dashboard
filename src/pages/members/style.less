@@ -174,7 +174,7 @@
 
     .active-member-editor, .death-date-editor {
         display: flex;
-        padding: 8px 0; // numeric range editor gets clipped otherwise
+        padding-right: 16px;
 
         .filter-header {
             flex-shrink: 0;
@@ -251,9 +251,10 @@
 
             .membership-remove {
                 float: left;
+                --md-button-color: fade(@text, 70%);
 
                 &:hover {
-                    color: @danger;
+                    --md-button-color: @danger;
                 }
             }
 

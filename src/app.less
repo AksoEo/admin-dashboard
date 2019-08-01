@@ -54,6 +54,7 @@
         background: @primary;
         padding-left: env(safe-area-inset-left);
         padding-right: env(safe-area-inset-right);
+        z-index: 10;
 
         &::before {
             content: '';
@@ -66,8 +67,9 @@
         }
 
         .header-logo {
+            position: absolute;
+            left: 16px;
             user-select: none;
-            width: @perma-sidebar-width;
 
             .logo, .logo-label {
                 vertical-align: middle;
@@ -85,8 +87,6 @@
             }
         }
 
-        --md-button-color: currentColor;
-
         .header-progress {
             position: absolute;
             left: 0;
@@ -98,6 +98,9 @@
     &.perma-sidebar #app-header {
         background: #eee;
         color: inherit;
+        padding-left: @perma-sidebar-width;
+
+        --md-button-color: fade(@text, 70%);
 
         &::before {
             background: #000;

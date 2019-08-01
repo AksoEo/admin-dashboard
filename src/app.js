@@ -7,14 +7,11 @@ import locale from './locale';
 import { activeRequests, activeRequestsEmitter } from './client';
 import './app.less';
 
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import { Button, CircularProgress, Menu } from 'yamdl';
+import {
+    AppBarProvider, AppBarConsumer, AppBarProxy, MenuIcon, Button, CircularProgress,
+} from 'yamdl';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import Typography from '@material-ui/core/Typography';
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import MenuIcon from '@material-ui/icons/Menu';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Sidebar from './features/sidebar';
 import HeaderLogo from './components/header-logo';
 import routes from './pages';
@@ -162,24 +159,6 @@ export default class App extends React.PureComponent {
         });
     };
 
-    onOverflowClick = e => {
-        // ask the current page for an overflow menu
-        if (this.currentPage && this.currentPage.getOverflowMenu) {
-            const menuSpec = this.currentPage.getOverflowMenu();
-            if (!menuSpec.length) return;
-
-            const anchorRect = e.currentTarget.getBoundingClientRect();
-
-            this.setState({
-                overflowMenu: {
-                    items: menuSpec,
-                    position: [anchorRect.right, anchorRect.top],
-                    open: true,
-                },
-            });
-        }
-    };
-
     tryGetPerms () {
         cache.getPerms().then(permissions => {
             this.setState({ permissions });
@@ -252,49 +231,28 @@ export default class App extends React.PureComponent {
      */
     renderAppHeader (isLoading) {
         return (
-            <AppBar position="sticky" id="app-header">
-                <Toolbar>
-                    {this.state.permaSidebar ? (
-                        <HeaderLogo onClick={() => this.onNavigate('/')} />
-                    ) : (
-                        <Button
-                            icon
-                            class="menu-button"
-                            aria-label={locale.header.menu}
-                            onClick={() => this.setState({
-                                sidebarOpen: !this.state.sidebarOpen,
-                            })}>
-                            <MenuIcon />
-                        </Button>
-                    )}
-                    <Typography
-                        className="header-title"
-                        color="inherit"
-                        variant="h6">
-                        {locale.pages[this.state.currentPage.id]}
-                    </Typography>
-                    <div style={{ flexGrow: 1 }} />
+            <AppBarConsumer
+                menu={!this.state.permaSidebar ? (
                     <Button
                         icon
-                        aria-label={locale.header.overflow}
-                        onClick={this.onOverflowClick}>
-                        <MoreVertIcon />
+                        small
+                        class="menu-button"
+                        aria-label={locale.header.menu}
+                        onClick={() => this.setState({
+                            sidebarOpen: !this.state.sidebarOpen,
+                        })}>
+                        <MenuIcon />
                     </Button>
-                    {this.state.overflowMenu && (
-                        <Menu
-                            open={this.state.overflowMenu.open}
-                            position={this.state.overflowMenu.position}
-                            anchor={[1, 0]}
-                            onClose={() => this.setState({
-                                overflowMenu: { ...this.state.overflowMenu, open: false },
-                            })}
-                            items={this.state.overflowMenu.items} />
-                    )}
-                </Toolbar>
+                ) : null}
+                title={locale.pages[this.state.currentPage.id]}
+                id="app-header">
+                {this.state.permaSidebar ? (
+                    <HeaderLogo onClick={() => this.onNavigate('/')} />
+                ) : null}
                 {isLoading ? (
                     <LinearProgress className="header-progress" />
                 ) : null}
-            </AppBar>
+            </AppBarConsumer>
         );
     }
 
@@ -341,20 +299,25 @@ export default class App extends React.PureComponent {
         return (
             <div id="app" className={className}>
                 <MuiThemeProvider theme={theme}>
-                    <appContext.Provider value={{
-                        navigate: this.onNavigate,
-                        replace: this.onReplace,
-                        permissions: this.state.permissions,
-                        hasPermission: this.hasPermission,
-                    }}>
-                        {appHeader}
-                        <div className="app-contents">
-                            {appDrawer}
-                            <div className="page-container" ref={node => this.pageContainer = node}>
-                                {pageContents}
+                    <AppBarProvider>
+                        <appContext.Provider value={{
+                            navigate: this.onNavigate,
+                            replace: this.onReplace,
+                            permissions: this.state.permissions,
+                            hasPermission: this.hasPermission,
+                        }}>
+                            {appHeader}
+                            <div className="app-contents">
+                                {appDrawer}
+                                <div
+                                    className="page-container"
+                                    ref={node => this.pageContainer = node}>
+                                    <AppBarProxy />
+                                    {pageContents}
+                                </div>
                             </div>
-                        </div>
-                    </appContext.Provider>
+                        </appContext.Provider>
+                    </AppBarProvider>
                 </MuiThemeProvider>
             </div>
         );

@@ -76,6 +76,16 @@ const listViewMiddleware = listView => () => next => action => {
         listView.onSubmit();
     }
 
+    // events
+    if (action.type === actions.SET_JSON_FILTER_ENABLED
+        && listView.props.onJSONFilterEnabledChange) {
+        listView.props.onJSONFilterEnabledChange(action.enabled);
+    }
+    if (listView.props.onSubmittedChange) {
+        if (action.type === actions.SUBMIT) listView.props.onSubmittedChange(true);
+        if (action.type === actions.UNSUBMIT) listView.props.onSubmittedChange(false);
+    }
+
     next(action);
 };
 const RELOAD_DEBOUNCE_TIME = 500; // ms
@@ -146,6 +156,10 @@ export default class ListView extends React.PureComponent {
 
         /// The category name for saved filters.
         savedFilterCategory: PropTypes.string.isRequired,
+
+        /// Various events.
+        onJSONFilterEnabledChange: PropTypes.func,
+        onSubmittedChange: PropTypes.func,
     };
 
     /// State store.

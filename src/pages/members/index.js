@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { UEACode, util } from 'akso-client';
 import JSON5 from 'json5';
+import AddIcon from '@material-ui/icons/Add';
+import { AppBarProxy } from 'yamdl';
 import { appContext } from '../../router';
 import { Spring } from '../../animation';
 import ListView from '../../components/list';
@@ -35,6 +37,8 @@ export default class MembersList extends React.PureComponent {
     state = {
         detail: null,
         addMemberOpen: false,
+        lvJSONFilterEnabled: false,
+        lvSubmitted: false,
     };
 
     scrollSpring = new Spring(1, 0.4);
@@ -113,36 +117,29 @@ export default class MembersList extends React.PureComponent {
         this.scrollSpring.stop();
     }
 
-    getOverflowMenu () {
-        const items = [];
-
-        const isJSONFilterEnabled = this.listView.isJSONFilterEnabled();
-
-        items.push({
-            label: isJSONFilterEnabled
+    render () {
+        const menu = [];
+        menu.push({
+            label: this.state.lvJSONFilterEnabled
                 ? locale.listView.json.disable
                 : locale.listView.json.enable,
-            action: () => this.listView.setJSONFilterEnabled(!isJSONFilterEnabled),
+            action: () => this.listView.setJSONFilterEnabled(!this.state.lvJSONFilterEnabled),
         });
-
-        if (this.listView.isSubmitted()) {
-            items.push({
+        if (this.state.lvSubmitted) {
+            menu.push({
                 label: locale.listView.csvExport.menuItem,
                 action: () => this.listView.openCSVExport(),
             });
         }
-
-        items.push({
+        menu.push({
+            icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
             label: locale.members.addMember.menuItem,
             action: () => this.setState({ addMemberOpen: true }),
         });
 
-        return items;
-    }
-
-    render () {
         return (
             <div className="app-page members-page" ref={node => this.node = node}>
+                <AppBarProxy actions={menu} priority={1} />
                 <ListView
                     ref={view => this.listView = view}
                     defaults={{
@@ -207,7 +204,10 @@ export default class MembersList extends React.PureComponent {
                     // TODO: move this into a prop instead of using a context
                     // so it updates when it changes/loads
                     canSaveFilters={this.context.hasPermission('queries.create')}
-                    savedFilterCategory={'codeholders'} />
+                    savedFilterCategory={'codeholders'}
+                    onJSONFilterEnabledChange={enabled =>
+                        this.setState({ lvJSONFilterEnabled: enabled })}
+                    onSubmittedChange={submitted => this.setState({ lvSubmitted: submitted })} />
                 <AddMemberDialog
                     open={this.state.addMemberOpen}
                     onClose={() => this.setState({ addMemberOpen: false })} />

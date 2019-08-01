@@ -38,7 +38,7 @@ export default class Filter extends React.PureComponent {
             <div className="filter-header">
                 {(filter.needsSwitch && !filter.autoSwitch && !this.props.submitted) ? (
                     <Checkbox
-                        className="filter-checkbox"
+                        class="filter-checkbox"
                         checked={this.props.enabled}
                         disabled={!userCanToggleEnabled}
                         onChange={checked => this.props.onEnabledChange(checked)} />

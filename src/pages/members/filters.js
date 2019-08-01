@@ -1,6 +1,5 @@
 import React from 'react';
-import { Checkbox, Slider, TextField } from 'yamdl';
-import IconButton from '@material-ui/core/IconButton';
+import { Checkbox, Slider, TextField, Button } from 'yamdl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import AddIcon from '@material-ui/icons/Add';
@@ -485,13 +484,13 @@ export default {
                     <div
                         className="membership-item"
                         key={index}>
-                        <IconButton className="membership-remove" onClick={() => {
+                        <Button icon class="membership-remove" onClick={() => {
                             const newValue = [...value];
                             newValue.splice(index, 1);
                             onChange(newValue);
                         }}>
                             <RemoveIcon />
-                        </IconButton>
+                        </Button>
                         <div className="membership-item-line">
                             <Segmented selected={invert ? 'yes' : 'no'} onSelect={selected => {
                                 const newValue = [...value];
@@ -645,7 +644,7 @@ export default {
 
                 items.push(
                     <div className="membership-add-container" key={-1}>
-                        <IconButton className="membership-add-button" onClick={() => {
+                        <Button icon class="membership-add-button" onClick={() => {
                             const thisYear = new Date().getFullYear();
 
                             onChange(value.concat([{
@@ -658,7 +657,7 @@ export default {
                             }]));
                         }}>
                             <AddIcon />
-                        </IconButton>
+                        </Button>
                     </div>
                 );
 

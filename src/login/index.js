@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import UEACode from 'akso-client/uea-code';
-import Form, { Validator } from './form';
+import Form, { Validator } from '../components/form';
 import { Button, Checkbox, TextField, CircularProgress } from 'yamdl';
 import locale from '../locale';
 import ProgressIndicator from './progress-indicator';
