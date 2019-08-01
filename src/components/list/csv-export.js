@@ -202,7 +202,7 @@ export default class CSVExport extends React.PureComponent {
                         ) : (
                             <React.Fragment>
                                 <Segmented
-                                    className="mode-switch"
+                                    class="mode-switch"
                                     selected={this.state.mode}
                                     onSelect={mode => this.setState({ mode })}>
                                     {[

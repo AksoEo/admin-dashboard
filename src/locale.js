@@ -309,7 +309,17 @@ export default {
         addMember: {
             menuItem: 'Aldoni membron',
             title: 'Aldoni membron',
+            newCode: '[[new uea code]]',
             firstNameLegal: '[[first name (legal)]]',
+            fullName: '[[full name]]',
+            newCodePlaceholder: 'xxxxxx',
+            add: '[[add]]',
+            invalidUEACode: '[[Nevalida UEA-kodo (maybe also note that it’s the new format?)]]',
+            noName: '[[name is required]]',
+            invalidHumanCode: '[[human code must not begin with xx]]',
+            invalidOrgCode: '[[org code must begin with xx]]',
+            newCodeTaken: '[[newCode is taken]]',
+            genericError: '[[failed to create, maybe try again later]]',
         },
     },
 };

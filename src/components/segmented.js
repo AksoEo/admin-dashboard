@@ -31,11 +31,15 @@ export default class Segmented extends React.PureComponent {
          */
         children: PropTypes.arrayOf(PropTypes.object).isRequired,
 
+        class: PropTypes.string,
+
         /** The selected option’s id. */
         selected: PropTypes.string,
 
         /** Callback for when an option is selected. */
         onSelect: PropTypes.func.isRequired,
+
+        disabled: PropTypes.bool,
     };
 
     state = {
@@ -124,7 +128,7 @@ export default class Segmented extends React.PureComponent {
                 const sy = styleHeight / height;
                 const transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
                 const style = { transform, width: styleWidth, height: styleHeight };
-                animatedBackground = <div className="segmented-control-background" style={style} />;
+                animatedBackground = <div class="segmented-control-background" style={style} />;
             }
         }
 
@@ -137,10 +141,11 @@ export default class Segmented extends React.PureComponent {
             return (
                 <button
                     key={option.id}
-                    className={className}
+                    class={className}
+                    type="button"
                     role="radio"
                     aria-checked={option.id === this.props.selected}
-                    disabled={option.disabled}
+                    disabled={this.props.disabled || option.disabled}
                     onClick={() => !option.disabled && this.props.onSelect(option.id)}
                     ref={node => this.childRefs[index] = node}>
                     {option.label}
@@ -154,7 +159,7 @@ export default class Segmented extends React.PureComponent {
         const nodeProps = { ...this.props };
         delete nodeProps.selected;
         delete nodeProps.onSelect;
-        nodeProps.className = (nodeProps.className || '') + ' segmented-control';
+        nodeProps.class = (nodeProps.class || '') + ' segmented-control';
 
         return (
             <div {...nodeProps} ref={node => this.node = node}>
