@@ -160,6 +160,11 @@ export default {
             name: '[[name]]',
             description: '[[description]]',
         },
+        detail: {
+            edit: '[[edit]]',
+            editCancel: '[[cancel]]',
+            editSave: '[[save]]',
+        },
     },
     // Members page
     members: {
@@ -320,6 +325,18 @@ export default {
             invalidOrgCode: '[[org code must begin with xx]]',
             newCodeTaken: '[[newCode is taken]]',
             genericError: '[[failed to create, maybe try again later]]',
+        },
+        detail: {
+            fallbackTitle: 'Membro',
+            editingTitle: '[[edit member]]',
+            fields: {
+                // TODO: deduplicate with above
+                codeholderType: 'Membrospeco',
+                code: 'UEA-kodo',
+                newCode: 'Novan UEA-kodo',
+                oldCode: '[[old]] UEA-kodo',
+                email: 'Retpoŝtadreso',
+            },
         },
     },
 };

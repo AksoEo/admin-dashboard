@@ -33,61 +33,32 @@
         overflow-y: auto;
         transition: transform 0.5s @easing;
 
-        .tmp {
-            padding: 24px;
+        @media (max-width: 800px) {
+            top: -8px;
+            left: 0;
+            right: 0;
+            padding-top: 8px;
+        }
 
-            .tmp-3 {
-                display: flex;
-                align-items: center;
-                margin-bottom: 24px;
-            }
+        .fields-table {
+            margin: 24px;
 
-            .tmp-2 {
-                background: #999;
-                border-radius: 50%;
-                width: 96px;
-                height: 96px;
-                vertical-align: middle;
-                margin-right: 16px;
-            }
-
-            .tmp-1 {
-                flex: 1;
-
-                .tmp-4 {
-                    margin: 0;
+            .field-row {
+                .field-name {
+                    border-left: 2px solid transparent;
+                    padding: 8px 16px;
+                    vertical-align: middle;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    font-size: small;
                 }
 
-                .tmp-5 {
-                    margin-top: 8px;
-                    font-family: @monospace;
-                    padding: 2px 4px;
-                    border-radius: 4px;
-                    background: #ddd;
-                    border: 1px solid #aaa;
-                    display: inline-block;
-                    font-size: 14px;
-                }
-            }
-
-            .tmp-6 {
-                margin: 16px 8px;
-                display: flex;
-
-                .tmp-7 {
-                    width: 30%;
-                    margin-left: 16px;
-                    background: #555;
-                    border-radius: 100px;
-                    height: 1em;
+                &.tall .field-name {
+                    vertical-align: top;
                 }
 
-                .tmp-8 {
-                    width: 40%;
-                    margin-left: 16px;
-                    background: #777;
-                    border-radius: 100px;
-                    height: 1em;
+                &.changed .field-name {
+                    border-left-color: @control-primary;
                 }
             }
         }
@@ -102,5 +73,17 @@
         .detail-view {
             transform: translateY(100%);
         }
+    }
+}
+
+#app #app-header.list-view-detail-editing-app-bar,
+.list-view-detail-editing-app-bar {
+    background: #222;
+    color: #fff;
+    --md-button-color: #fff;
+
+    .header-logo {
+        filter: brightness(5);
+        transition: filter 0.4s;
     }
 }

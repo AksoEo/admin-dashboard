@@ -13,6 +13,7 @@ import locale from '../../locale';
 import client from '../../client';
 import FILTERS from './filters';
 import FIELDS from './fields';
+import detailFields from './detail-fields';
 import AddMemberDialog from './add-member';
 import './style';
 
@@ -190,9 +191,15 @@ export default class MembersList extends React.PureComponent {
                         fields: locale.members.fields,
                         csvFields: locale.members.csvFields,
                         csvFilename: locale.members.csvFilename,
+                        detail: locale.members.detail,
                     }}
                     detailView={this.state.detail}
                     onDetailClose={() => this.onURLQueryChange(this.currentQuery, true)}
+                    getDetailTitle={itemToTitle}
+                    detailFields={detailFields.fields}
+                    detailHeader={detailFields.header}
+                    detailFooter={detailFields.footer}
+                    onDetailRequest={handleDetailRequest}
                     getLinkTarget={id => `/membroj/${id}`}
                     onChangePage={this.scrollToTop}
                     csvExportOptions={{
@@ -437,4 +444,28 @@ async function handleRequest (state) {
             filtered: usedFilters,
         },
     };
+}
+
+async function handleDetailRequest (id) {
+    const res = await client.get(`/codeholders/${id}`, {
+        fields: Object.keys(FIELDS)
+            .flatMap(id => fieldMapping[id] ? fieldMapping[id].fields : [id]),
+    });
+    return res.body;
+}
+
+function itemToTitle (item) {
+    let title;
+    if (item.codeholderType === 'human') {
+        const { honorific, firstName, firstNameLegal, lastName, lastNameLegal } = item;
+        const first = firstName || firstNameLegal;
+        const last = lastName || lastNameLegal;
+        title = '';
+        title += honorific || '';
+        title += (title ? ' ' : '') + (first || '');
+        title += (title ? ' ' : '') + (last || '');
+    } else if (item.codeholderType === 'org') {
+        title = item.nameAbbrev || item.fullName;
+    }
+    return title;
 }

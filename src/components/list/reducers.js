@@ -118,6 +118,10 @@ function items (state = {}, action) {
             state[item.id] = item;
         }
         return state;
+    case actions.UPDATE_ITEM:
+        state = { ...state };
+        state[action.id] = { ...state[action.id], ...action.data };
+        return state;
     default:
         return state;
     }

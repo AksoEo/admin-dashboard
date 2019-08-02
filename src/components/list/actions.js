@@ -74,3 +74,6 @@ export const addFilter = (id, data) => ({ type: ADD_FILTER, id, data });
 
 export const REMOVE_FILTER = 'remove-filter';
 export const removeFilter = (id) => ({ type: REMOVE_FILTER, id });
+
+export const UPDATE_ITEM = 'update-item';
+export const updateItem = (id, data) => ({ type: UPDATE_ITEM, id, data });

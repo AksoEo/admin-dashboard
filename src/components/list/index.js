@@ -134,6 +134,8 @@ export default class ListView extends React.PureComponent {
         /// - `fields`: translations for fields
         /// - `csvFilename`: file name prefix for CSV exports
         /// - `csvFields`: translations for exported fields. Will use `fields` as fallback
+        /// - `detail`: translations for detail view stuff
+        ///   - `fields`: translations for fields
         locale: PropTypes.object.isRequired,
 
         /// Should return the URL target for a given detail view.
@@ -144,6 +146,21 @@ export default class ListView extends React.PureComponent {
 
         /// Called when the detail view requests to be closed.
         onDetailClose: PropTypes.func,
+
+        /// Detail request handler.
+        onDetailRequest: PropTypes.func,
+
+        /// Callback that should try to extract a title from a given item.
+        getDetailTitle: PropTypes.func,
+
+        /// Object of all detail fields that will be displayed in a table.
+        ///
+        /// Keyed by their name (which should match the locale key in detail.fields).
+        detailFields: PropTypes.object,
+
+        /// Detail header component. Works like a field component but isn’t in the table.
+        detailHeader: PropTypes.any,
+        detailFooter: PropTypes.any,
 
         /// Called when the page changes.
         onChangePage: PropTypes.func,
@@ -387,10 +404,16 @@ export default class ListView extends React.PureComponent {
                         userOptions={this.props.csvExportOptions}
                         fieldSpec={this.props.fields || {}} />
                 </div>
-                <DetailView
+                <ConnectedDetailView
                     open={isDetailView}
                     id={this.props.detailView}
-                    onClose={this.props.onDetailClose} />
+                    onRequest={this.props.onDetailRequest}
+                    onClose={this.props.onDetailClose}
+                    locale={this.props.locale.detail}
+                    getTitle={this.props.getDetailTitle}
+                    fields={this.props.detailFields}
+                    headerComponent={this.props.detailHeader}
+                    footerComponent={this.props.detailFooter} />
             </Provider>
         );
     }
@@ -561,3 +584,9 @@ const ConnectedCSVExport = connect(state => ({
     onSetItemsPerPage: itemsPerPage => dispatch(actions.setItemsPerPage(itemsPerPage)),
     onSubmit: () => dispatch(actions.submit()),
 }))(CSVExport);
+
+const ConnectedDetailView = connect(state => ({
+    items: state.items,
+}), dispatch => ({
+    onUpdateItem: (id, data) => dispatch(actions.updateItem(id, data)),
+}))(DetailView);
