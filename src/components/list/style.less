@@ -279,11 +279,13 @@
 }
 
 .list-view-csv-export {
-    width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    .paper-dialog-contents {
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
 
     .export-error {
         font-family: @monospace;
@@ -318,8 +320,10 @@
 }
 
 .list-view-saved-filters-load {
-    display: flex;
-    padding: 0;
+    &.paper-dialog .paper-dialog-contents {
+        display: flex;
+        padding: 0;
+    }
 
     .saved-filters-list {
         position: relative;

@@ -2,10 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import JSON5 from 'json5';
-import { Button } from 'yamdl';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
+import { Dialog, Button } from 'yamdl';
 import HelpIcon from '@material-ui/icons/Help';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
@@ -119,13 +116,11 @@ export default class JSONEditor extends React.PureComponent {
                     onBeforeChange={(editor, data, value) => this.props.onChange(value)} />
                 <Dialog
                     open={this.state.helpOpen}
-                    onClose={() => this.setState({ helpOpen: false })}>
-                    <DialogTitle>
-                        {locale.listView.json.help.title}
-                    </DialogTitle>
-                    <DialogContent>
-                        {locale.listView.json.help.content}
-                    </DialogContent>
+                    backdrop
+                    onClose={() => this.setState({ helpOpen: false })}
+                    fullScreen={width => width < 500}
+                    title={locale.listView.json.help.title}>
+                    {locale.listView.json.help.content}
                 </Dialog>
             </div>
         );

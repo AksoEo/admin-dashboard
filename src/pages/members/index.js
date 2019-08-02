@@ -124,11 +124,13 @@ export default class MembersList extends React.PureComponent {
                 ? locale.listView.json.disable
                 : locale.listView.json.enable,
             action: () => this.listView.setJSONFilterEnabled(!this.state.lvJSONFilterEnabled),
+            overflow: true,
         });
         if (this.state.lvSubmitted) {
             menu.push({
                 label: locale.listView.csvExport.menuItem,
                 action: () => this.listView.openCSVExport(),
+                overflow: true,
             });
         }
         menu.push({

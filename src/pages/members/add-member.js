@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
 import { appContext } from '../../router';
-import { TextField, Button, CircularProgress } from 'yamdl';
+import { Dialog, TextField, Button, CircularProgress } from 'yamdl';
 import Form, { Validator } from '../../components/form';
 import Segmented from '../../components/segmented';
 import UEACode from 'akso-client/uea-code';
@@ -19,13 +16,14 @@ export default class AddMemberDialog extends React.PureComponent {
 
     render () {
         return (
-            <Dialog open={this.props.open} onClose={this.props.onClose}>
-                <DialogTitle>
-                    {locale.members.addMember.title}
-                </DialogTitle>
-                <DialogContent className="members-add-member-dialog">
-                    <AddMember onSuccess={this.props.onClose} />
-                </DialogContent>
+            <Dialog
+                open={this.props.open}
+                onClose={this.props.onClose}
+                backdrop
+                fullScreen={width => width < 400}
+                class="members-add-member-dialog"
+                title={locale.members.addMember.title}>
+                <AddMember onSuccess={this.props.onClose} />
             </Dialog>
         );
     }

@@ -1,11 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import { Button } from 'yamdl';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import { Dialog, Button } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -77,17 +72,17 @@ export default class CountryPicker extends React.PureComponent {
         const selectedItems = this.props.value.map(id => ({
             key: id,
             column: 0,
-            node: <div className="country-item" onClick={onItemClick(id)}>
-                <div className="country-icon">
+            node: <div class="country-item" onClick={onItemClick(id)}>
+                <div class="country-icon">
                     {id in this.state.countries
                         ? <span>{countryCodeToEmoji(id)}</span>
                         : <LanguageIcon />}
                 </div>
-                <div className="country-name">
+                <div class="country-name">
                     {this.state.countries[id]
                         || this.state.countryGroups[id] && this.state.countryGroups[id].name}
                 </div>
-                <div className="country-check">
+                <div class="country-check">
                     <CheckIcon />
                 </div>
             </div>,
@@ -111,9 +106,9 @@ export default class CountryPicker extends React.PureComponent {
             .map(group => ({
                 key: group,
                 column: 1,
-                node: <div className="country-item" onClick={onItemClick(group)}>
-                    <div className="country-icon"><LanguageIcon /></div>
-                    <div className="country-name">{this.state.countryGroups[group].name}</div>
+                node: <div class="country-item" onClick={onItemClick(group)}>
+                    <div class="country-icon"><LanguageIcon /></div>
+                    <div class="country-name">{this.state.countryGroups[group].name}</div>
                 </div>,
             })).concat(Object.keys(this.state.countries)
                 .filter(country => !this.props.value.includes(country))
@@ -121,19 +116,19 @@ export default class CountryPicker extends React.PureComponent {
                 .map(country => ({
                     key: country,
                     column: 1,
-                    node: <div className="country-item" onClick={onItemClick(country)}>
-                        <div className="country-icon"><span>{countryCodeToEmoji(country)}</span></div>
-                        <div className="country-name">{this.state.countries[country]}</div>
+                    node: <div class="country-item" onClick={onItemClick(country)}>
+                        <div class="country-icon"><span>{countryCodeToEmoji(country)}</span></div>
+                        <div class="country-name">{this.state.countries[country]}</div>
                     </div>,
                 })));
 
         return (
-            <div className="country-picker" onClick={() => this.setState({ dialogOpen: true })}>
-                <span className="picked-countries">
+            <div class="country-picker" onClick={() => this.setState({ dialogOpen: true })}>
+                <span class="picked-countries">
                     {pickedCountries
                         ? pickedCountries
                         : (
-                            <span className="countries-placeholder">
+                            <span class="countries-placeholder">
                                 {locale.members.search.countries.placeholder}
                             </span>
                         )
@@ -143,40 +138,40 @@ export default class CountryPicker extends React.PureComponent {
 
                 <Dialog
                     onClick={e => e.stopPropagation()}
+                    backdrop
+                    fullScreen={width => width < 650}
                     onClose={() => this.setState({ dialogOpen: false })}
-                    className="country-picker-dialog"
-                    PaperProps={{ className: 'country-picker-dialog-paper' }}
-                    open={this.state.dialogOpen}>
-                    <DialogTitle className="dialog-title">
-                        <IconButton onClick={() => this.setState({ dialogOpen: false })}>
-                            <CloseIcon />
-                        </IconButton>
-                        {locale.members.search.countries.dialogTitle}
-                        <div className="search-box-container">
-                            <div className="search-icon-container">
-                                <SearchIcon />
-                            </div>
-                            <input
-                                className="search-box"
-                                value={this.state.search}
-                                onChange={e => this.setState({ search: e.target.value })}
-                                ref={node => this.searchBox = node}
-                                placeholder={locale.members.search.countries.search} />
-                        </div>
-                    </DialogTitle>
-                    <DialogContent className="dialog-content">
-                        <MulticolList columns={2} ref={node => this.multicolList = node}>
-                            {selectedItems.concat(availableItems)}
-                        </MulticolList>
-                        <div className="selection-controls">
-                            <Button onClick={this.selectAll} class="selection-button">
-                                {locale.members.search.countries.selectAll}
-                            </Button>
-                            <Button onClick={this.deselectAll} class="selection-button">
-                                {locale.members.search.countries.deselectAll}
-                            </Button>
-                        </div>
-                    </DialogContent>
+                    class="country-picker-dialog"
+                    open={this.state.dialogOpen}
+                    title={locale.members.search.countries.dialogTitle}
+                    appBarProps={{
+                        actions: [
+                            {
+                                node: <div class="country-picker-search-box-container">
+                                    <div class="search-icon-container">
+                                        <SearchIcon />
+                                    </div>
+                                    <input
+                                        class="search-box"
+                                        value={this.state.search}
+                                        onChange={e => this.setState({ search: e.target.value })}
+                                        ref={node => this.searchBox = node}
+                                        placeholder={locale.members.search.countries.search} />
+                                </div>,
+                            },
+                        ],
+                    }}>
+                    <MulticolList columns={2} ref={node => this.multicolList = node}>
+                        {selectedItems.concat(availableItems)}
+                    </MulticolList>
+                    <div class="selection-controls">
+                        <Button onClick={this.selectAll} class="selection-button">
+                            {locale.members.search.countries.selectAll}
+                        </Button>
+                        <Button onClick={this.deselectAll} class="selection-button">
+                            {locale.members.search.countries.deselectAll}
+                        </Button>
+                    </div>
                 </Dialog>
             </div>
         );
@@ -281,7 +276,7 @@ class MulticolList extends React.PureComponent {
 
                 return (
                     <div
-                        className="list-item floating"
+                        class="list-item floating"
                         key={item.key}
                         style={{
                             width: `${100 / columns.length}%`,
@@ -295,12 +290,12 @@ class MulticolList extends React.PureComponent {
 
         columns = columns.map((column, i) => (
             <div
-                className="column"
+                class="column"
                 ref={node => node && (this.columnRefs[i] = node)}
                 key={i}>
                 {column.filter(isItemFixed).map(item => (
                     <div
-                        className="list-item"
+                        class="list-item"
                         key={item.key}
                         style={{
                             width: '100%',
@@ -311,14 +306,14 @@ class MulticolList extends React.PureComponent {
                         {item.vnode}
                     </div>
                 ))}
-                <div className="column-scroll-height" style={{
+                <div class="column-scroll-height" style={{
                     height: column.length * LI_HEIGHT,
                 }} />
             </div>
         ));
 
         return (
-            <div className="multicol-list">
+            <div class="multicol-list">
                 {columns}
                 {floatingItems}
             </div>

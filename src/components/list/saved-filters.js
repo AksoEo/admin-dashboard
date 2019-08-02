@@ -1,9 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'yamdl';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
+import { Dialog, Button } from 'yamdl';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -102,60 +99,56 @@ export default class SavedFiltersBar extends React.PureComponent {
                 </div>
                 <Dialog
                     open={this.state.action === Action.LOAD}
-                    onClose={() => this.setState({ action: Action.NONE })}>
-                    <DialogTitle>
-                        {locale.listView.savedFilters.load}
-                    </DialogTitle>
-                    <DialogContent className="list-view-saved-filters-load">
-                        <SavedFiltersList
-                            category={this.props.category}
-                            onLoad={(name, description, query) => {
-                                this.props.onSetJSONFilter(query);
-                                this.setState({ name, description, action: Action.NONE });
-                                if (!this.props.jsonFilterEnabled) {
-                                    this.props.onSetJSONFilterEnabled(true);
-                                    this.props.onSubmit();
-                                }
-                            }} />
-                    </DialogContent>
+                    class="list-view-saved-filters-load"
+                    backdrop
+                    onClose={() => this.setState({ action: Action.NONE })}
+                    title={locale.listView.savedFilters.load}>
+                    <SavedFiltersList
+                        category={this.props.category}
+                        onLoad={(name, description, query) => {
+                            this.props.onSetJSONFilter(query);
+                            this.setState({ name, description, action: Action.NONE });
+                            if (!this.props.jsonFilterEnabled) {
+                                this.props.onSetJSONFilterEnabled(true);
+                                this.props.onSubmit();
+                            }
+                        }} />
                 </Dialog>
                 <Dialog
                     open={this.state.action === Action.SAVE || this.state.action === Action.SAVING}
+                    class="list-view-saved-filters-save"
+                    backdrop
                     onClose={() => this.state.action === Action.SAVE
-                        && this.setState({ action: Action.NONE })}>
-                    <DialogTitle>
-                        {locale.listView.savedFilters.save}
-                    </DialogTitle>
-                    <DialogContent className="list-view-saved-filters-save">
-                        todo: use login form for this
-                        <div className="form-field">
-                            <TextField
-                                className="text-field"
-                                required
-                                label={locale.listView.savedFilters.name}
-                                value={this.state.name}
-                                onChange={e =>
-                                    this.setState({ name: e.target.value })} />
+                        && this.setState({ action: Action.NONE })}
+                    title={locale.listView.savedFilters.save}>
+                    todo: use login form for this
+                    <div className="form-field">
+                        <TextField
+                            className="text-field"
+                            required
+                            label={locale.listView.savedFilters.name}
+                            value={this.state.name}
+                            onChange={e =>
+                                this.setState({ name: e.target.value })} />
+                    </div>
+                    <div className="form-field">
+                        <TextField
+                            className="text-field"
+                            label={locale.listView.savedFilters.description}
+                            value={this.state.description || ''}
+                            onChange={e =>
+                                this.setState({ description: e.target.value })} />
+                    </div>
+                    <div className="save-button-container">
+                        <Button className="save-button" onClick={this.save}>
+                            {locale.listView.savedFilters.save}
+                        </Button>
+                    </div>
+                    {this.state.saveError && (
+                        <div className="save-error">
+                            {locale.listView.savedFilters.error}
                         </div>
-                        <div className="form-field">
-                            <TextField
-                                className="text-field"
-                                label={locale.listView.savedFilters.description}
-                                value={this.state.description || ''}
-                                onChange={e =>
-                                    this.setState({ description: e.target.value })} />
-                        </div>
-                        <div className="save-button-container">
-                            <Button className="save-button" onClick={this.save}>
-                                {locale.listView.savedFilters.save}
-                            </Button>
-                        </div>
-                        {this.state.saveError && (
-                            <div className="save-error">
-                                {locale.listView.savedFilters.error}
-                            </div>
-                        )}
-                    </DialogContent>
+                    )}
                 </Dialog>
             </div>
         );
@@ -200,7 +193,7 @@ class SavedFiltersList extends React.PureComponent {
 
     onScroll = () => {
         if (!this.node) return;
-        const lower = Math.floor(this.node.scrollTop / FILTER_ITEM_HEIGHT);
+        const lower = Math.max(0, Math.floor(this.node.scrollTop / FILTER_ITEM_HEIGHT));
         const upper = Math.ceil((this.node.scrollTop + this.node.offsetHeight) / FILTER_ITEM_HEIGHT);
 
         const lowerChunk = Math.floor(lower / VLIST_CHUNK_SIZE);

@@ -1,14 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import AppBar from '@material-ui/core/AppBar';
-import Typography from '@material-ui/core/Typography';
-import Toolbar from '@material-ui/core/Toolbar';
-import Slide from '@material-ui/core/Slide';
-import { Checkbox, Button } from 'yamdl';
-import CloseIcon from '@material-ui/icons/Close';
+import { Dialog, Checkbox, Button } from 'yamdl';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
@@ -21,10 +13,6 @@ import './field-picker.less';
  * Width below which the field picker will be a full-screen modal.
  */
 const FULLSCREEN_WIDTH = 600;
-
-function SlideUp (props) {
-    return <Slide direction="up" {...props} />;
-}
 
 /**
  * Displays a modal for picking, ordering, and setting sorting for a list of fields.
@@ -49,21 +37,8 @@ export default class FieldPicker extends React.PureComponent {
     };
 
     state = {
-        fullScreen: window.innerWidth <= FULLSCREEN_WIDTH,
         search: '',
     };
-
-    onResize = () => {
-        this.setState({ fullScreen: window.innerWidth <= FULLSCREEN_WIDTH });
-    };
-
-    componentDidMount () {
-        window.addEventListener('resize', this.onResize);
-    }
-
-    componentWillUnmount () {
-        window.removeEventListener('resize', this.onResize);
-    }
 
     render () {
         const fields = [];
@@ -124,51 +99,24 @@ export default class FieldPicker extends React.PureComponent {
 
         return (
             <Dialog
-                className="members-field-picker"
-                fullScreen={this.state.fullScreen}
+                class="members-field-picker"
+                backdrop
+                fullScreen={width => width <= FULLSCREEN_WIDTH}
                 open={this.props.open}
                 onClose={this.props.onClose}
-                PaperProps={{ className: 'members-field-picker-paper' }}
-                TransitionComponent={this.state.fullScreen ? SlideUp : undefined}>
-                {this.state.fullScreen ? (
-                    <AppBar position="sticky">
-                        <Toolbar>
-                            <Button
-                                icon
-                                onClick={this.props.onClose}
-                                class="close-button">
-                                <CloseIcon />
-                            </Button>
-                            <Typography variant="h6" color="inherit">
-                                {locale.listView.fieldPicker.title}
-                            </Typography>
-                        </Toolbar>
-                    </AppBar>
-                ) : (
-                    <DialogTitle>
-                        <Button
-                            icon
-                            onClick={this.props.onClose}
-                            class="close-button">
-                            <CloseIcon />
-                        </Button>
-                        {locale.listView.fieldPicker.title}
-                    </DialogTitle>
-                )}
-                <DialogContent>
-                    <div className="field-search">
-                        <input
-                            value={this.state.search}
-                            onChange={e => this.setState({ search: e.target.value })}
-                            placeholder={locale.listView.fieldPicker.searchPlaceholder} />
-                    </div>
-                    <RearrangingList
-                        onMove={(fromIndex, toIndex) => this.props.onMoveField(fromIndex, toIndex)}
-                        canMove={index => index < this.props.selected.length}
-                        isItemDraggable={index => index < this.props.selected.length}>
-                        {fields}
-                    </RearrangingList>
-                </DialogContent>
+                title={locale.listView.fieldPicker.title}>
+                <div className="field-search">
+                    <input
+                        value={this.state.search}
+                        onChange={e => this.setState({ search: e.target.value })}
+                        placeholder={locale.listView.fieldPicker.searchPlaceholder} />
+                </div>
+                <RearrangingList
+                    onMove={(fromIndex, toIndex) => this.props.onMoveField(fromIndex, toIndex)}
+                    canMove={index => index < this.props.selected.length}
+                    isItemDraggable={index => index < this.props.selected.length}>
+                    {fields}
+                </RearrangingList>
             </Dialog>
         );
     }

@@ -232,19 +232,21 @@ export default class App extends React.PureComponent {
     renderAppHeader (isLoading) {
         return (
             <AppBarConsumer
-                menu={!this.state.permaSidebar ? (
-                    <Button
-                        icon
-                        small
-                        class="menu-button"
-                        aria-label={locale.header.menu}
-                        onClick={() => this.setState({
-                            sidebarOpen: !this.state.sidebarOpen,
-                        })}>
-                        <MenuIcon />
-                    </Button>
-                ) : null}
-                title={locale.pages[this.state.currentPage.id]}
+                prependedProps={{
+                    menu: !this.state.permaSidebar ? (
+                        <Button
+                            icon
+                            small
+                            class="menu-button"
+                            aria-label={locale.header.menu}
+                            onClick={() => this.setState({
+                                sidebarOpen: !this.state.sidebarOpen,
+                            })}>
+                            <MenuIcon />
+                        </Button>
+                    ) : null,
+                    title: locale.pages[this.state.currentPage.id],
+                }}
                 id="app-header">
                 {this.state.permaSidebar ? (
                     <HeaderLogo onClick={() => this.onNavigate('/')} />

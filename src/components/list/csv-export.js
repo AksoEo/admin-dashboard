@@ -1,10 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import { Button } from 'yamdl';
+import { Dialog, Button } from 'yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import stringify from 'csv-stringify';
 import * as actions from './actions';
@@ -175,74 +172,76 @@ export default class CSVExport extends React.PureComponent {
         if (this.props.innerRef) this.props.innerRef(this);
 
         return (
-            <Dialog open={this.props.open} onClose={this.onClose}>
-                <DialogTitle>{locale.listView.csvExport.title}</DialogTitle>
-                <DialogContent className="list-view-csv-export">
-                    {!this.state.exporting ? (
-                        this.state.error ? (
-                            <React.Fragment>
-                                <div className="export-error">
-                                    {this.state.error.toString()}
-                                </div>
-                                <Button
-                                    key="resume"
-                                    class="action-button"
-                                    onClick={this.resumeExport}>
-                                    {locale.listView.csvExport.tryResumeExport}
-                                </Button>
-                            </React.Fragment>
-                        ) : this.state.objectURL ? (
+            <Dialog
+                open={this.props.open}
+                backdrop
+                class="list-view-csv-export"
+                onClose={this.onClose}
+                title={locale.listView.csvExport.title}>
+                {!this.state.exporting ? (
+                    this.state.error ? (
+                        <React.Fragment>
+                            <div className="export-error">
+                                {this.state.error.toString()}
+                            </div>
                             <Button
-                                key="download"
+                                key="resume"
                                 class="action-button"
-                                href={this.state.objectURL}
-                                download={this.state.filename}>
-                                {locale.listView.csvExport.download}
+                                onClick={this.resumeExport}>
+                                {locale.listView.csvExport.tryResumeExport}
                             </Button>
-                        ) : (
-                            <React.Fragment>
-                                <Segmented
-                                    class="mode-switch"
-                                    selected={this.state.mode}
-                                    onSelect={mode => this.setState({ mode })}>
-                                    {[
-                                        {
-                                            id: 'csv',
-                                            label: locale.listView.csvExport.commaSeparated,
-                                        },
-                                        {
-                                            id: 'tsv',
-                                            label: locale.listView.csvExport.tabSeparated,
-                                        },
-                                    ]}
-                                </Segmented>
-                                <UserOptions
-                                    options={this.props.userOptions || {}}
-                                    value={this.state.options}
-                                    onChange={options => this.setState({ options })} />
-                                <Button
-                                    key="begin"
-                                    class="action-button"
-                                    onClick={this.resumeExport}>
-                                    {locale.listView.csvExport.beginExport}
-                                </Button>
-                            </React.Fragment>
-                        )
+                        </React.Fragment>
+                    ) : this.state.objectURL ? (
+                        <Button
+                            key="download"
+                            class="action-button"
+                            href={this.state.objectURL}
+                            download={this.state.filename}>
+                            {locale.listView.csvExport.download}
+                        </Button>
                     ) : (
                         <React.Fragment>
-                            <LinearProgress
-                                className="progress-bar"
-                                value={(this.state.data.length / this.state.totalItems * 100) | 0}
-                                variant={'determinate'} />
-                            {!this.state.error && <Button
-                                key="abort"
+                            <Segmented
+                                class="mode-switch"
+                                selected={this.state.mode}
+                                onSelect={mode => this.setState({ mode })}>
+                                {[
+                                    {
+                                        id: 'csv',
+                                        label: locale.listView.csvExport.commaSeparated,
+                                    },
+                                    {
+                                        id: 'tsv',
+                                        label: locale.listView.csvExport.tabSeparated,
+                                    },
+                                ]}
+                            </Segmented>
+                            <UserOptions
+                                options={this.props.userOptions || {}}
+                                value={this.state.options}
+                                onChange={options => this.setState({ options })} />
+                            <Button
+                                key="begin"
                                 class="action-button"
-                                onClick={this.abortExport}>
-                                {locale.listView.csvExport.abortExport}
-                            </Button>}
+                                onClick={this.resumeExport}>
+                                {locale.listView.csvExport.beginExport}
+                            </Button>
                         </React.Fragment>
-                    )}
-                </DialogContent>
+                    )
+                ) : (
+                    <React.Fragment>
+                        <LinearProgress
+                            className="progress-bar"
+                            value={(this.state.data.length / this.state.totalItems * 100) | 0}
+                            variant={'determinate'} />
+                        {!this.state.error && <Button
+                            key="abort"
+                            class="action-button"
+                            onClick={this.abortExport}>
+                            {locale.listView.csvExport.abortExport}
+                        </Button>}
+                    </React.Fragment>
+                )}
             </Dialog>
         );
     }
