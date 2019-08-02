@@ -101,6 +101,7 @@ export default class SavedFiltersBar extends React.PureComponent {
                     open={this.state.action === Action.LOAD}
                     class="list-view-saved-filters-load"
                     backdrop
+                    fullScreen={width => width < 500}
                     onClose={() => this.setState({ action: Action.NONE })}
                     title={locale.listView.savedFilters.load}>
                     <SavedFiltersList

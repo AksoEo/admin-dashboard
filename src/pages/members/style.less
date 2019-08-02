@@ -10,6 +10,13 @@
     }
 
     // fields
+    .codeholder-type {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+        vertical-align: middle;
+    }
+
     .codeholder-type.disabled {
         color: @error;
     }
@@ -74,6 +81,12 @@
     }
 
     // filters
+    @media (max-width: 600px) {
+        .search-filter {
+            border-top: 1px solid @separator;
+            margin-bottom: 8px;
+        }
+    }
 
     .range-editor {
         display: flex;
@@ -143,6 +156,15 @@
         justify-content: space-between;
         align-items: center;
         padding-right: 16px;
+
+        @media (max-width: 600px) {
+            flex-direction: column;
+            align-items: flex-end;
+
+            .filter-header {
+                align-self: flex-start;
+            }
+        }
     }
 
     .age-editor {
@@ -163,6 +185,12 @@
             width: calc(100% - 40px);
             margin: 0 20px;
         }
+
+        @media (max-width: 600px) {
+            .age-birth-year, .age-prime-switch {
+                margin-bottom: 8px;
+            }
+        }
     }
 
     .left-right-editor {
@@ -170,6 +198,18 @@
         align-items: center;
         justify-content: space-between;
         padding-right: 16px;
+
+        @media (max-width: 600px) {
+            flex-direction: column;
+
+            *:first-child {
+                align-self: flex-start;
+            }
+
+            *:last-child {
+                align-self: flex-end;
+            }
+        }
     }
 
     .active-member-editor, .death-date-editor {
@@ -239,6 +279,10 @@
             border-radius: 4px;
             animation: members-search-membership-item-in 0.4s @easing;
 
+            @media (max-width: 600px) {
+                border: none;
+            }
+
             @keyframes members-search-membership-item-in {
                 from {
                     transform: translateY(-50%);
@@ -270,18 +314,25 @@
                 &.membership-range-line {
                     display: flex;
                     margin-top: 16px;
+                    align-items: center;
 
                     .membership-range-checkbox {
                         margin: 16px;
                         margin-left: 8px;
+                        flex-shrink: 0;
                     }
+                }
 
-                    .range-editor {
-                        display: inline-flex;
-                        width: calc(100% - 50px - 56px);
-                        // firefox has weird flexbox behavior with this element
-                        max-width: calc(100% - 50px - 56px);
-                        margin: 16px 30px 0 20px;
+                @media (max-width: 450px) {
+                    font-size: 14px;
+                }
+                @media (max-width: 400px) {
+                    font-size: 12px;
+                }
+                @media (max-width: 370px) {
+                    .segmented-control-option {
+                        padding-left: 4px;
+                        padding-right: 4px;
                     }
                 }
             }

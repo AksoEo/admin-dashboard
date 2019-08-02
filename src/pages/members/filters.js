@@ -418,9 +418,8 @@ export default {
                     filter.lifetime = invert ? !lifetime : lifetime;
                 }
                 if (useRange) {
-                    if (range.isCollapsed()) {
-                        const value = range.collapsedValue();
-                        filter.year = invert ? { $neq: value } : value;
+                    if (range[0] === range[1]) {
+                        filter.year = invert ? { $neq: range[0] } : range[0];
                     } else {
                         const rangeMin = range[0];
                         const rangeMax = range[1];
