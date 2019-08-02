@@ -127,8 +127,12 @@
         border-bottom: 2px solid @control-idle;
         border-radius: 4px 4px 0 0;
 
-        &:hover {
+        &:hover, &:focus {
             border-bottom-color: @control-primary;
+        }
+
+        &:focus {
+            outline: none;
         }
 
         .picked-countries {

@@ -123,7 +123,13 @@ export default class CountryPicker extends React.PureComponent {
                 })));
 
         return (
-            <div class="country-picker" onClick={() => this.setState({ dialogOpen: true })}>
+            <div
+                class="country-picker"
+                tabIndex={0}
+                onKeyDown={e => {
+                    if (e.key === ' ' || e.key === 'Enter') this.setState({ dialogOpen: true });
+                }}
+                onClick={() => this.setState({ dialogOpen: true })}>
                 <span class="picked-countries">
                     {pickedCountries
                         ? pickedCountries

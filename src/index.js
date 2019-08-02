@@ -4,6 +4,8 @@ import Login, { isSpecialPage } from './login';
 import client from './client';
 import './style';
 
+import './chrome-focus';
+
 /** @jsx h */
 
 /** Shows the login screen if not logged in and opens the app. */

@@ -31,9 +31,21 @@
             color: @text-on-primary;
         }
 
+        &:focus {
+            outline: none;
+        }
+
         &.selected:not(.hidden-background) {
             background: @control-primary;
             .elevation(4);
+
+            &:focus {
+                background: lighten(@control-primary, 10%);
+            }
+        }
+
+        &:not(.selected):focus {
+            text-decoration: underline;
         }
 
         &[disabled] {

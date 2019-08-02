@@ -342,6 +342,7 @@ export default {
 
             if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
                 const country = addressCountry || feeCountry;
+                if (!country) return '';
                 return country.toUpperCase() + ' ' + countries[country];
             } else {
                 const feeCountryName = feeCountry.toUpperCase() + ' ' + countries[feeCountry];
