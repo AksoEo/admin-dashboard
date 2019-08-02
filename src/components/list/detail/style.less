@@ -51,6 +51,7 @@
                     font-weight: bold;
                     text-transform: uppercase;
                     font-size: small;
+                    text-align: right;
                 }
 
                 &.tall .field-name {
@@ -59,6 +60,10 @@
 
                 &.changed .field-name {
                     border-left-color: @control-primary;
+                }
+
+                .field-container {
+                    padding: 8px 0;
                 }
             }
         }
@@ -85,5 +90,11 @@
     .header-logo {
         filter: brightness(5);
         transition: filter 0.4s;
+    }
+}
+
+.list-view-detail-delete-dialog {
+    .p-action:last-of-type {
+        --md-button-color: @danger;
     }
 }

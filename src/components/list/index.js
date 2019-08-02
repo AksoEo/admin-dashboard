@@ -150,9 +150,6 @@ export default class ListView extends React.PureComponent {
         /// Detail request handler.
         onDetailRequest: PropTypes.func,
 
-        /// Callback that should try to extract a title from a given item.
-        getDetailTitle: PropTypes.func,
-
         /// Object of all detail fields that will be displayed in a table.
         ///
         /// Keyed by their name (which should match the locale key in detail.fields).
@@ -161,6 +158,9 @@ export default class ListView extends React.PureComponent {
         /// Detail header component. Works like a field component but isn’t in the table.
         detailHeader: PropTypes.any,
         detailFooter: PropTypes.any,
+
+        /// Called when an item is deleted.
+        onDetailDelete: PropTypes.func,
 
         /// Called when the page changes.
         onChangePage: PropTypes.func,
@@ -409,8 +409,8 @@ export default class ListView extends React.PureComponent {
                     id={this.props.detailView}
                     onRequest={this.props.onDetailRequest}
                     onClose={this.props.onDetailClose}
+                    onDelete={this.props.onDetailDelete}
                     locale={this.props.locale.detail}
-                    getTitle={this.props.getDetailTitle}
                     fields={this.props.detailFields}
                     headerComponent={this.props.detailHeader}
                     footerComponent={this.props.detailFooter} />

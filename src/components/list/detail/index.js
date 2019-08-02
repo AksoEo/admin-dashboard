@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { AppBarProxy, Button, MenuIcon } from 'yamdl';
+import { AppBarProxy, Button, MenuIcon, Dialog } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import locale from '../../../locale';
 import './style';
@@ -11,7 +11,7 @@ export default class DetailView extends React.PureComponent {
         onClose: PropTypes.func,
         onRequest: PropTypes.func,
         onUpdateItem: PropTypes.func.isRequired,
-        getTitle: PropTypes.func,
+        onDelete: PropTypes.func,
         items: PropTypes.object.isRequired,
         id: PropTypes.any,
         locale: PropTypes.object.isRequired,
@@ -25,6 +25,9 @@ export default class DetailView extends React.PureComponent {
         id: null,
         error: null,
         editingCopy: null,
+
+        confirmDeleteOpen: false,
+        deleting: false,
     };
 
     onClose = () => {
@@ -71,7 +74,7 @@ export default class DetailView extends React.PureComponent {
     }
 
     render () {
-        const { items, open, locale, getTitle } = this.props;
+        const { items, open, locale: detailLocale }  = this.props;
         const { id } = this.state;
 
         const item = id && items[id] ? items[id] : null;
@@ -83,13 +86,13 @@ export default class DetailView extends React.PureComponent {
                     <DetailAppBar
                         item={item}
                         open={open}
-                        locale={locale}
+                        locale={detailLocale}
                         onClose={this.onClose}
-                        getTitle={getTitle}
                         editing={!!this.state.editingCopy}
                         onEdit={() => this.beginEdit()}
                         onEditCancel={() => this.cancelEdit()}
-                        onEditSave={() => this.saveEdit()} />
+                        onEditSave={() => this.saveEdit()}
+                        onDelete={() => this.setState({ confirmDeleteOpen: true })} />
                     <DetailViewContents
                         original={item}
                         item={this.state.editingCopy || item}
@@ -100,7 +103,42 @@ export default class DetailView extends React.PureComponent {
                         fields={this.props.fields}
                         headerComponent={this.props.headerComponent}
                         footerComponent={this.props.footerComponent}
-                        locale={locale} />
+                        locale={detailLocale} />
+
+                    <Dialog
+                        open={this.state.confirmDeleteOpen}
+                        backdrop
+                        class="list-view-detail-delete-dialog"
+                        onClose={() => !this.state.deleting
+                            && this.setState({ confirmDeleteOpen: false })}
+                        actions={[
+                            {
+                                label: locale.listView.detail.deleteCancel,
+                                action: () => !this.state.deleting
+                                    && this.setState({ confirmDeleteOpen: false }),
+                            },
+                            {
+                                label: locale.listView.detail.delete,
+                                action: () => {
+                                    if (this.state.deleting) return;
+                                    this.setState({ deleting: true });
+                                    this.props.onDelete(id).then(() => {
+                                        this.setState({
+                                            deleting: false,
+                                            confirmDeleteOpen: false,
+                                        }, this.props.onClose);
+                                    }).catch(err => {
+                                        console.error(
+                                            'Failed to delete',
+                                            err,
+                                        ); // eslint-disable-line no-console
+                                        this.setState({ deleting: false });
+                                    });
+                                },
+                            },
+                        ]}>
+                        {detailLocale.deleteConfirm}
+                    </Dialog>
                 </div>
             </div>
         );
@@ -111,25 +149,28 @@ function DetailAppBar ({
     item,
     open,
     onClose,
-    getTitle,
     locale: detailLocale,
     editing,
     onEdit,
     onEditCancel,
     onEditSave,
+    onDelete,
 }) {
-    let title;
-    if (getTitle && item) title = getTitle(item);
-    if (!title) title = detailLocale.fallbackTitle;
+    let title = detailLocale.title;
     if (editing) title = detailLocale.editingTitle;
 
     const actions = [];
     if (!editing) {
         actions.push({
             key: 'edit',
-            icon: <EditIcon />,
+            icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
             label: locale.listView.detail.edit,
             action: onEdit,
+        }, {
+            key: 'delete',
+            label: locale.listView.detail.delete,
+            action: onDelete,
+            overflow: true,
         });
     } else {
         actions.push({
@@ -165,6 +206,7 @@ DetailAppBar.propTypes = {
     onEdit: PropTypes.func.isRequired,
     onEditCancel: PropTypes.func.isRequired,
     onEditSave: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
 };
 
 function DetailViewContents ({
@@ -173,14 +215,11 @@ function DetailViewContents ({
     editing,
     onItemChange,
     fields,
-    headerComponent,
-    footerComponent,
+    headerComponent: Header,
+    footerComponent: Footer,
     locale,
 }) {
     if (!item) return null;
-
-    const Header = headerComponent;
-    const Footer = footerComponent;
 
     const makeFieldProps = () => ({
         editing,

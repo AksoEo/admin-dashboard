@@ -164,6 +164,8 @@ export default {
             edit: '[[edit]]',
             editCancel: '[[cancel]]',
             editSave: '[[save]]',
+            delete: '[[delete]]',
+            deleteCancel: '[[cancel]]',
         },
     },
     // Members page
@@ -327,8 +329,9 @@ export default {
             genericError: '[[failed to create, maybe try again later]]',
         },
         detail: {
-            fallbackTitle: 'Membro',
+            title: 'Membro',
             editingTitle: '[[edit member]]',
+            deleteConfirm: '[[delete this member?]]',
             fields: {
                 // TODO: deduplicate with above
                 codeholderType: 'Membrospeco',
@@ -336,6 +339,16 @@ export default {
                 newCode: 'Novan UEA-kodo',
                 oldCode: '[[old]] UEA-kodo',
                 email: 'Retpoŝtadreso',
+                nameLegal: '[[legal name]]',
+                nameAbbrev: '[[abbreviated]]',
+                honorific: '[[honorific]]',
+                firstNameLegal: '[[first name legal]]',
+                lastNameLegal: '[[last name legal]]',
+                firstName: '[[first name]]',
+                lastName: '[[last name]]',
+                fullName: '[[full name]]',
+                address: 'Adreso',
+                feeCountry: 'Paglando',
             },
         },
     },

@@ -195,11 +195,11 @@ export default class MembersList extends React.PureComponent {
                     }}
                     detailView={this.state.detail}
                     onDetailClose={() => this.onURLQueryChange(this.currentQuery, true)}
-                    getDetailTitle={itemToTitle}
                     detailFields={detailFields.fields}
                     detailHeader={detailFields.header}
                     detailFooter={detailFields.footer}
                     onDetailRequest={handleDetailRequest}
+                    onDetailDelete={id => client.delete(`/codeholders/${id}`)}
                     getLinkTarget={id => `/membroj/${id}`}
                     onChangePage={this.scrollToTop}
                     csvExportOptions={{
@@ -446,26 +446,13 @@ async function handleRequest (state) {
     };
 }
 
+const additionalDetailFields = ['id', 'hasProfilePicture'];
+
 async function handleDetailRequest (id) {
     const res = await client.get(`/codeholders/${id}`, {
         fields: Object.keys(FIELDS)
-            .flatMap(id => fieldMapping[id] ? fieldMapping[id].fields : [id]),
+            .flatMap(id => fieldMapping[id] ? fieldMapping[id].fields : [id])
+            .concat(additionalDetailFields),
     });
     return res.body;
-}
-
-function itemToTitle (item) {
-    let title;
-    if (item.codeholderType === 'human') {
-        const { honorific, firstName, firstNameLegal, lastName, lastNameLegal } = item;
-        const first = firstName || firstNameLegal;
-        const last = lastName || lastNameLegal;
-        title = '';
-        title += honorific || '';
-        title += (title ? ' ' : '') + (first || '');
-        title += (title ? ' ' : '') + (last || '');
-    } else if (item.codeholderType === 'org') {
-        title = item.nameAbbrev || item.fullName;
-    }
-    return title;
 }

@@ -353,6 +353,90 @@
             align-items: center;
         }
     }
+
+    .detail-view {
+        .member-header {
+            display: flex;
+            padding: 24px;
+            align-items: center;
+
+            .member-picture-container {
+                width: 96px;
+                height: 96px;
+                border-radius: 50%;
+                background: fade(@text, 20%);
+                flex-shrink: 0;
+                margin-right: 24px;
+
+                &:empty {
+                    display: none;
+                }
+            }
+
+            .member-info {
+                .member-name {
+                    .type-icon {
+                        vertical-align: -4px;
+                        margin-right: 8px;
+                    }
+
+                    .name-primary {
+                        font-size: 1.4em;
+                        font-weight: bold;
+                    }
+                    .name-legal, .name-abbrev {
+                        font-size: small;
+                        margin-top: 8px;
+
+                        .name-legal-inner, .name-abbrev-inner {
+                            font-weight: 600;
+                        }
+                    }
+
+                    .name-editor-line {
+                        margin-bottom: 8px;
+
+                        .paper-text-field {
+                            margin-right: 8px;
+                        }
+
+                        .full-name-editor {
+                            width: 100%;
+                        }
+                    }
+
+                    &.editing {
+                        margin-bottom: 32px;
+                    }
+                }
+
+                .member-code {
+                    margin-top: 8px;
+
+                    .uea-code-editor {
+                        .paper-text-field {
+                            margin-bottom: 8px;
+                            margin-right: 8px;
+
+                            input {
+                                font-family: @monospace;
+                            }
+                        }
+                    }
+                }
+            }
+
+            @media (max-width: 400px) {
+                display: block;
+
+                .member-picture-container {
+                    margin-left: auto;
+                    margin-right: auto;
+                    margin-bottom: 16px;
+                }
+            }
+        }
+    }
 }
 
 .country-picker-dialog {
