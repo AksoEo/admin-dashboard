@@ -166,6 +166,13 @@ export default {
             editSave: '[[save]]',
             delete: '[[delete]]',
             deleteCancel: '[[cancel]]',
+            saveDialog: {
+                title: '[[save]]',
+                modComment: '[[mod comment]]',
+                diffTitle: '[[changed fields]]',
+                noChanges: '[[no changes]]',
+                commit: '[[commit]]',
+            },
         },
     },
     // Members page
@@ -334,12 +341,13 @@ export default {
             deleteConfirm: '[[delete this member?]]',
             fields: {
                 // TODO: deduplicate with above
+                name: 'Nomo',
+                code: 'UEA-kodo',
                 enabled: 'Konto ŝaltita',
                 isDead: 'Mortinta',
                 birthdate: 'Naskiĝtago',
                 deathdate: '[[deathdate]]',
                 codeholderType: 'Membrospeco',
-                code: 'UEA-kodo',
                 newCode: 'Novan UEA-kodo',
                 oldCode: '[[old]] UEA-kodo',
                 email: 'Retpoŝtadreso',

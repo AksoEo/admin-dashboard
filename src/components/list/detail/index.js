@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { AppBarProxy, Button, MenuIcon, Dialog } from 'yamdl';
+import { AppBarProxy, Button, MenuIcon, Dialog, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import locale from '../../../locale';
 import './style';
@@ -11,6 +11,7 @@ export default class DetailView extends React.PureComponent {
         onClose: PropTypes.func,
         onRequest: PropTypes.func,
         onUpdateItem: PropTypes.func.isRequired,
+        onPatch: PropTypes.func,
         onDelete: PropTypes.func,
         items: PropTypes.object.isRequired,
         id: PropTypes.any,
@@ -27,7 +28,7 @@ export default class DetailView extends React.PureComponent {
         editingCopy: null,
 
         confirmDeleteOpen: false,
-        deleting: false,
+        saveOpen: false,
     };
 
     onClose = () => {
@@ -64,13 +65,8 @@ export default class DetailView extends React.PureComponent {
         this.setState({ editingCopy: this.props.items[this.state.id] });
     }
 
-    cancelEdit () {
+    endEdit () {
         this.setState({ editingCopy: null });
-    }
-
-    saveEdit () {
-        this.setState({ editingCopy: null });
-        // TODO: save
     }
 
     render () {
@@ -90,8 +86,8 @@ export default class DetailView extends React.PureComponent {
                         onClose={this.onClose}
                         editing={!!this.state.editingCopy}
                         onEdit={() => this.beginEdit()}
-                        onEditCancel={() => this.cancelEdit()}
-                        onEditSave={() => this.saveEdit()}
+                        onEditCancel={() => this.endEdit()}
+                        onEditSave={() => this.setState({ saveOpen: true })}
                         onDelete={() => this.setState({ confirmDeleteOpen: true })} />
                     <DetailViewContents
                         original={item}
@@ -103,40 +99,26 @@ export default class DetailView extends React.PureComponent {
                         footerComponent={this.props.footerComponent}
                         locale={detailLocale} />
 
-                    <Dialog
+                    <ConfirmDeleteDialog
+                        id={id}
                         open={this.state.confirmDeleteOpen}
-                        backdrop
-                        class="list-view-detail-delete-dialog"
-                        onClose={() => !this.state.deleting
-                            && this.setState({ confirmDeleteOpen: false })}
-                        actions={[
-                            {
-                                label: locale.listView.detail.deleteCancel,
-                                action: () => !this.state.deleting
-                                    && this.setState({ confirmDeleteOpen: false }),
-                            },
-                            {
-                                label: locale.listView.detail.delete,
-                                action: () => {
-                                    if (this.state.deleting) return;
-                                    this.setState({ deleting: true });
-                                    this.props.onDelete(id).then(() => {
-                                        this.setState({
-                                            deleting: false,
-                                            confirmDeleteOpen: false,
-                                        }, this.props.onClose);
-                                    }).catch(err => {
-                                        console.error(
-                                            'Failed to delete',
-                                            err,
-                                        ); // eslint-disable-line no-console
-                                        this.setState({ deleting: false });
-                                    });
-                                },
-                            },
-                        ]}>
-                        {detailLocale.deleteConfirm}
-                    </Dialog>
+                        onClose={() => this.setState({ confirmDeleteOpen: false })}
+                        onDelete={this.props.onDelete}
+                        onDeleted={this.props.onClose}
+                        detailLocale={detailLocale} />
+                    <DetailSaveDialog
+                        id={id}
+                        open={this.state.saveOpen}
+                        onClose={() => this.setState({ saveOpen: false })}
+                        onSuccess={() => {
+                            this.props.onUpdateItem(id, this.state.editingCopy);
+                            this.endEdit();
+                        }}
+                        onPatch={this.props.onPatch}
+                        original={item}
+                        value={this.state.editingCopy || item}
+                        fields={this.props.fields}
+                        detailLocale={detailLocale} />
                 </div>
             </div>
         );
@@ -286,4 +268,128 @@ DetailViewContents.propTypes = {
     headerComponent: PropTypes.any,
     footerComponent: PropTypes.any,
     locale: PropTypes.object.isRequired,
+};
+
+function DetailSaveDialog({
+    id, open, onClose, onSuccess, onPatch, original, value, fields, detailLocale,
+}) {
+    const [saving, setSaving] = useState(false);
+    const [comment, setComment] = useState('');
+
+    let diff = [];
+    if (open && fields) {
+        for (const id in fields) {
+            const field = fields[id];
+            if (field.hasDiff ? field.hasDiff(original, value) : true) {
+                diff.push(<li class="diff-field" key={id}>{detailLocale.fields[id]}</li>);
+            }
+        }
+    }
+
+    if (!diff.length) {
+        diff = <span class="no-changes">{locale.listView.detail.saveDialog.noChanges}</span>;
+    } else {
+        diff = <ul>{diff}</ul>;
+    }
+
+    const save = () => {
+        setSaving(true);
+
+        onPatch(id, original, value, comment).then(() => {
+            setSaving(false);
+            onClose();
+            onSuccess();
+            setComment('');
+        }).catch(err => {
+            console.error('Failed to save', err); // eslint-disable-line no-console
+            setSaving(false);
+        });
+    };
+
+    return (
+        <Dialog
+            open={open}
+            backdrop
+            class="list-view-detail-save-dialog"
+            onClose={() => !saving && onClose()}
+            title={locale.listView.detail.saveDialog.title}
+            actions={[
+                {
+                    label: locale.listView.detail.saveDialog.commit,
+                    disabled: saving,
+                    action: save,
+                },
+            ]}>
+            <div class="diff-fields">
+                <div class="diff-title">{locale.listView.detail.saveDialog.diffTitle}</div>
+                {diff}
+            </div>
+            <TextField
+                label={locale.listView.detail.saveDialog.modComment}
+                value={comment}
+                disabled={saving}
+                onChange={e => setComment(e.target.value)}
+                maxLength={500} />
+        </Dialog>
+    );
+}
+
+DetailSaveDialog.propTypes = {
+    id: PropTypes.any,
+    open: PropTypes.bool,
+    onClose: PropTypes.func,
+    onSuccess: PropTypes.func.isRequired,
+    onPatch: PropTypes.func.isRequired,
+    original: PropTypes.object.isRequired,
+    value: PropTypes.object.isRequired,
+    fields: PropTypes.object,
+    detailLocale: PropTypes.object.isRequired,
+};
+
+function ConfirmDeleteDialog ({ id, open, onClose, onDelete, onDeleted, detailLocale }) {
+    const [deleting, setDeleting] = useState(false);
+
+    return (
+        <Dialog
+            open={open}
+            backdrop
+            class="list-view-detail-delete-dialog"
+            onClose={() => !deleting && onClose()}
+            actions={[
+                {
+                    label: locale.listView.detail.deleteCancel,
+                    disabled: deleting,
+                    action: () => onClose(),
+                },
+                {
+                    label: locale.listView.detail.delete,
+                    disabled: deleting,
+                    action: () => {
+                        setDeleting(true);
+                        this.props.onDelete(id).then(() => {
+                            setDeleting(false);
+                            onClose();
+                            onDeleted();
+                        }).catch(err => {
+                            console.error(
+                                'Failed to delete',
+                                err,
+                            ); // eslint-disable-line no-console
+                            setDeleting(false);
+                        });
+                    },
+                },
+            ]}>
+            {detailLocale.deleteConfirm}
+        </Dialog>
+    );
+}
+
+ConfirmDeleteDialog.propTypes = {
+    id: PropTypes.any,
+    open: PropTypes.bool,
+    onClose: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    onDeleted: PropTypes.func.isRequired,
+    detailLocale: PropTypes.object.isRequired,
 };

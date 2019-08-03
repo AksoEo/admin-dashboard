@@ -159,6 +159,9 @@ export default class ListView extends React.PureComponent {
         detailHeader: PropTypes.any,
         detailFooter: PropTypes.any,
 
+        /// Called when an item is edited.
+        onDetailPatch: PropTypes.func,
+
         /// Called when an item is deleted.
         onDetailDelete: PropTypes.func,
 
@@ -409,6 +412,7 @@ export default class ListView extends React.PureComponent {
                     id={this.props.detailView}
                     onRequest={this.props.onDetailRequest}
                     onClose={this.props.onDetailClose}
+                    onPatch={this.props.onDetailPatch}
                     onDelete={this.props.onDetailDelete}
                     locale={this.props.locale.detail}
                     fields={this.props.detailFields}

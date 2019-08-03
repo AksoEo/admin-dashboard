@@ -199,6 +199,7 @@ export default class MembersList extends React.PureComponent {
                     detailHeader={detailFields.header}
                     detailFooter={detailFields.footer}
                     onDetailRequest={handleDetailRequest}
+                    onDetailPatch={handleDetailPatch}
                     onDetailDelete={id => client.delete(`/codeholders/${id}`)}
                     getLinkTarget={id => `/membroj/${id}`}
                     onChangePage={this.scrollToTop}
@@ -455,4 +456,38 @@ async function handleDetailRequest (id) {
             .concat(additionalDetailFields),
     });
     return res.body;
+}
+
+function deepEq (a, b) {
+    if (a === b) return true;
+    if (Array.isArray(a) && Array.isArray(b)) {
+        if (a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+            if (!deepEq(a[i], b[i])) return false;
+        }
+        return true;
+    }
+    if (typeof a === 'object' && typeof b === 'object') {
+        const aKeys = Object.keys(a);
+        const bKeys = Object.keys(b);
+        for (const k of aKeys) if (!bKeys.includes(k)) return false;
+        for (const k of bKeys) if (!aKeys.includes(k)) return false;
+
+        for (const k of aKeys) {
+            if (!deepEq(a[k], b[k])) return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+function handleDetailPatch (id, original, value, modCmt) {
+    const diff = {};
+    for (const key in value) {
+        if (!deepEq(original[key], value[key])) {
+            diff[key] = value[key];
+        }
+    }
+
+    return client.patch(`/codeholders/${id}`, diff, { modCmt });
 }

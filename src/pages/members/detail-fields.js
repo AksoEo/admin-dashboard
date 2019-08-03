@@ -250,6 +250,29 @@ class AddressRenderer extends React.PureComponent {
 }
 
 const fields = {
+    name: {
+        // virtual for diffing
+        shouldHide: () => true,
+        hasDiff (original, value) {
+            const fields = [
+                'honorific',
+                'fullName',
+                'nameAbbrev',
+                'firstNameLegal',
+                'lastNameLegal',
+                'firstName',
+                'lastName',
+            ];
+            for (const f of fields) if (original[f] !== value[f]) return true;
+        },
+    },
+    code: {
+        // virtual for diffing
+        shouldHide: () => true,
+        hasDiff (original, value) {
+            return original.newCode !== value.newCode || original.oldCode !== value.oldCode;
+        }
+    },
     codeholderType: {
         component ({ value, onChange }) {
             return (
