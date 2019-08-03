@@ -97,9 +97,7 @@ export default class DetailView extends React.PureComponent {
                         original={item}
                         item={this.state.editingCopy || item}
                         editing={!!this.state.editingCopy}
-                        onItemChange={item => {
-                            if (this.state.editingCopy) this.setState({ editingCopy: item });
-                        }}
+                        onItemChange={item => this.setState({ editingCopy: item })}
                         fields={this.props.fields}
                         headerComponent={this.props.headerComponent}
                         footerComponent={this.props.footerComponent}
@@ -236,6 +234,7 @@ function DetailViewContents ({
         for (const id in fields) {
             const field = fields[id];
             if (field.editingOnly && !editing) continue;
+            if (field.shouldHide && field.shouldHide(item)) continue;
             const Component = field.component;
 
             let changed = true;

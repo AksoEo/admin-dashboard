@@ -164,9 +164,9 @@ export default class App extends React.PureComponent {
             this.setState({ permissions });
         }).catch(err => {
             /* eslint-disable no-console */
-            console.error('Failed to get permissions, trying again', err);
+            console.error('Failed to get permissions, trying again in a second', err);
             /* eslint-enable no-console */
-            this.tryGetPerms();
+            this.tryGetPermsTimeout = setTimeout(() => this.tryGetPerms(), 1000);
         });
     }
 
@@ -190,6 +190,7 @@ export default class App extends React.PureComponent {
         window.removeEventListener('resize', this.onResize);
         window.removeEventListener('popstate', this.onPopState);
         activeRequestsEmitter.removeListener('update', this.onActiveRequestsUpdate);
+        clearTimeout(this.tryGetPermsTimeout);
     }
 
     componentDidUpdate () {

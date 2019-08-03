@@ -3,12 +3,63 @@ import PropTypes from 'prop-types';
 import Segmented from '../../components/segmented';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
-import { TextField } from 'yamdl';
+import { Checkbox, TextField } from 'yamdl';
 import locale from '../../locale';
 import client from '../../client';
 import tableFields from './fields';
 
 /* eslint-disable react/prop-types */
+
+// Lots of text fields
+function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
+    const getKeyedValue = (value, key) => {
+        let v = value;
+        for (const p of key.split('.')) {
+            if (!(p in v)) return null;
+            v = v[p];
+        }
+        return v;
+    };
+    const replaceKeyedValue = (value, key, newValue) => {
+        value = { ...value };
+        const keyPath = key.split('.');
+        const last = keyPath.pop();
+        let v = value;
+        for (const p of keyPath) {
+            if (!(p in v)) return null;
+            v = v[p] = { ...v[p] };
+        }
+        v[last] = newValue;
+        return value;
+    };
+
+    return (
+        <div {...restProps}>
+            {lines.map((line, i) => (
+                <div class="editor-line" key={i + (restProps.key || '')}>
+                    {line.map((editor, i) => (
+                        <TextField
+                            key={i}
+                            label={editor.label}
+                            value={editor.fromValue
+                                ? editor.fromValue(getKeyedValue(value, editor.key))
+                                : getKeyedValue(value, editor.key)}
+                            onChange={e => onChange(
+                                replaceKeyedValue(
+                                    value,
+                                    editor.key,
+                                    editor.intoValue
+                                        ? editor.intoValue(e.target.value)
+                                        : e.target.value,
+                                )
+                            )}
+                            {...(editor.props || {})} />
+                    ))}
+                </div>
+            ))}
+        </div>
+    );
+}
 
 function NameEditor ({ value, editing, onChange }) {
     if (!editing) {
@@ -60,61 +111,56 @@ function NameEditor ({ value, editing, onChange }) {
             </div>
         );
     } else if (value.codeholderType === 'human') {
-        return (
-            <div class="member-name editing" key="human">
-                <div class="name-editor-line">
-                    <TextField
-                        label={locale.members.detail.fields.honorific}
-                        value={value.honorific}
-                        maxLength={15}
-                        onChange={e => onChange({ ...value, honorific: e.target.value })} />
-                </div>
-                <div class="name-editor-line">
-                    <TextField
-                        label={locale.members.detail.fields.firstNameLegal}
-                        value={value.firstNameLegal}
-                        maxLength={50}
-                        onChange={e => onChange({ ...value, firstNameLegal: e.target.value })} />
-                    <TextField
-                        label={locale.members.detail.fields.lastNameLegal}
-                        value={value.lastNameLegal}
-                        maxLength={50}
-                        onChange={e => onChange({ ...value, lastNameLegal: e.target.value })} />
-                </div>
-                <div class="name-editor-line">
-                    <TextField
-                        label={locale.members.detail.fields.firstName}
-                        value={value.firstName}
-                        maxLength={50}
-                        onChange={e => onChange({ ...value, firstName: e.target.value })} />
-                    <TextField
-                        label={locale.members.detail.fields.lastName}
-                        value={value.lastName}
-                        maxLength={50}
-                        onChange={e => onChange({ ...value, lastName: e.target.value })} />
-                </div>
-            </div>
-        );
+        return lotsOfTextFields([
+            [
+                {
+                    key: 'honorific',
+                    label: locale.members.detail.fields.honorific,
+                    props: { maxLength: 15 },
+                },
+            ],
+            [
+                {
+                    key: 'firstNameLegal',
+                    label: locale.members.detail.fields.firstNameLegal,
+                    props: { maxLength: 50 },
+                },
+                {
+                    key: 'lastNameLegal',
+                    label: locale.members.detail.fields.lastNameLegal,
+                    props: { maxLength: 50 },
+                },
+            ],
+            [
+                {
+                    key: 'firstName',
+                    label: locale.members.detail.fields.firstName,
+                    props: { maxLength: 50 },
+                },
+                {
+                    key: 'lastName',
+                    label: locale.members.detail.fields.lastName,
+                    props: { maxLength: 50 },
+                },
+            ],
+        ], { value, onChange, class: 'member-name editing', key: 'human' });
     } else if (value.codeholderType === 'org') {
-        return (
-            <div class="member-name editing" key="org">
-                <div class="name-editor-line">
-                    <TextField
-                        class="full-name-editor"
-                        label={locale.members.detail.fields.fullName}
-                        value={value.fullName}
-                        maxLength={100}
-                        onChange={e => onChange({ ...value, fullName: e.target.value })} />
-                </div>
-                <div class="name-editor-line">
-                    <TextField
-                        label={locale.members.detail.fields.nameAbbrev}
-                        value={value.nameAbbrev}
-                        maxLength={12}
-                        onChange={e => onChange({ ...value, nameAbbrev: e.target.value })} />
-                </div>
-            </div>
-        );
+        return lotsOfTextFields([
+            [
+                {
+                    key: 'fullName',
+                    label: locale.members.detail.fields.fullName,
+                    props: { maxLength: 100, class: 'full-name-editor' },
+                },
+            ],
+            [
+                {
+                    key: 'nameAbbrev',
+                    label: locale.members.detail.fields.nameAbbrev,
+                    props: { maxLength: 12 },
+                },
+            ],
+        ], { value, onChange, class: 'member-name editing', key: 'org' });
     }
 }
 
@@ -123,20 +169,18 @@ function CodeEditor ({ value, editing, onChange }) {
         const Code = tableFields.code.component;
         return <Code item={value} />;
     } else if (editing) {
-        return (
-            <div class="uea-code-editor">
-                <TextField
-                    label={locale.members.detail.fields.newCode}
-                    value={value.newCode}
-                    maxLength={6}
-                    onChange={e => onChange({ ...value, newCode: e.target.value })} />
-                <TextField
-                    label={locale.members.detail.fields.oldCode}
-                    value={value.oldCode}
-                    maxLength={6}
-                    onChange={e => onChange({ ...value, oldCode: e.target.value })} />
-            </div>
-        );
+        return lotsOfTextFields([[
+            {
+                key: 'newCode',
+                label: locale.members.detail.fields.newCode,
+                props: { maxLength: 6 },
+            },
+            {
+                key: 'oldCode',
+                label: locale.members.detail.fields.oldCode,
+                props: { maxLength: 4 },
+            },
+        ]], { value, onChange, class: 'uea-code-editor' });
     }
 }
 
@@ -160,6 +204,7 @@ function Header ({ value, editing, onChange }) {
     );
 }
 
+// TODO: some way to pick language
 class AddressRenderer extends React.PureComponent {
     static propTypes = {
         id: PropTypes.any,
@@ -182,7 +227,9 @@ class AddressRenderer extends React.PureComponent {
     load () {
         if (!this.props.id) return;
         const id = this.props.id;
-        client.get(`/codeholders/${this.props.id}/address/eo`).then(res => {
+        client.get(`/codeholders/${this.props.id}/address/eo`, {
+            formatAs: 'displayLatin',
+        }).then(res => {
             if (id !== this.props.id) return;
             this.setState({ address: res.body[this.props.id] });
         }).catch(() => {
@@ -227,16 +274,84 @@ const fields = {
             return value.codeholderType !== original.codeholderType;
         },
     },
-    address: {
+    enabled: {
+        component ({ value, onChange }) {
+            return (
+                <Checkbox
+                    switch
+                    checked={value.enabled}
+                    onChange={enabled => onChange({ ...value, enabled })} />
+            );
+        },
+        hasDiff (original, value) {
+            return original.enabled !== value.enabled;
+        },
+    },
+    isDead: {
+        component ({ value, onChange }) {
+            return (
+                <Checkbox
+                    switch
+                    checked={value.isDead}
+                    onChange={isDead => onChange({ ...value, isDead })} />
+            );
+        },
+        hasDiff (original, value) {
+            return original.isDead !== value.isDead;
+        },
+    },
+    birthdate: {
         component ({ value, editing, onChange }) {
             if (!editing) {
-                return <AddressRenderer id={value.id} />;
+                const Component = tableFields.birthdate.component;
+                return <Component value={value.birthdate} />;
             } else {
                 // TODO
             }
         },
         hasDiff (original, value) {
-            // TODO
+            return original.birthdate !== value.birthdate;
+        },
+    },
+    deathdate: {
+        component ({ value, editing, onChange }) {
+            if (!editing) {
+                const Component = tableFields.deathdate.component;
+                return <Component value={value.deathdate} />;
+            } else {
+                // TODO
+            }
+        },
+        hasDiff (original, value) {
+            return original.deathdate !== value.deathdate;
+        },
+        shouldHide (value) {
+            return !value.isDead;
+        },
+    },
+    address: {
+        component ({ value, editing, onChange }) {
+            if (!editing) {
+                return <AddressRenderer id={value.id} />;
+            } else {
+                const fields = [
+                    ['country', 'countryArea'],
+                    ['city', 'cityArea'],
+                    ['streetAddress', 'postalCode', 'sortingCode'],
+                ];
+
+                return lotsOfTextFields(fields.map(items => items.map(item => ({
+                    key: `addressLatin.${item}`,
+                    label: locale.members.detail.fields.addressFields[item],
+                }))), { value, onChange });
+            }
+        },
+        hasDiff (original, value) {
+            return !(original.addressLatin === value.addressLatin
+                || (value.addressLatin
+                    && Object.keys(value.addressLatin)
+                        .map(a => value.addressLatin[a] === original.addressLatin[a])
+                        .reduce((a, b) => a && b)));
         },
         tall: true,
     },

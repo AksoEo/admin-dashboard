@@ -334,6 +334,10 @@ export default {
             deleteConfirm: '[[delete this member?]]',
             fields: {
                 // TODO: deduplicate with above
+                enabled: 'Konto ŝaltita',
+                isDead: 'Mortinta',
+                birthdate: 'Naskiĝtago',
+                deathdate: '[[deathdate]]',
                 codeholderType: 'Membrospeco',
                 code: 'UEA-kodo',
                 newCode: 'Novan UEA-kodo',
@@ -349,6 +353,15 @@ export default {
                 fullName: '[[full name]]',
                 address: 'Adreso',
                 feeCountry: 'Paglando',
+                addressFields: {
+                    country: 'Lando',
+                    countryArea: 'Regiono',
+                    city: 'Urbo',
+                    cityArea: '[[cityarea]]',
+                    streetAddress: '[[street address]]',
+                    postalCode: '[[postal code]]',
+                    sortingCode: '[[sorting code]]',
+                },
             },
         },
     },
