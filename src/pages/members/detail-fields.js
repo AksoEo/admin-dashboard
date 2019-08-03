@@ -1,12 +1,13 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
-import Segmented from '../../components/segmented';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
+import NativeSelect from '@material-ui/core/NativeSelect';
 import { Checkbox, TextField } from 'yamdl';
 import locale from '../../locale';
 import client from '../../client';
+import cache from '../../cache';
 import tableFields from './fields';
 
 /* eslint-disable react/prop-types */
@@ -38,7 +39,22 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
         <div {...restProps}>
             {lines.map((line, i) => (
                 <div class="editor-line" key={i + (restProps.key || '')}>
-                    {line.map((editor, i) => (
+                    {line.map((editor, i) => editor.component ? (
+                        h(editor.component, {
+                            key: i,
+                            value: editor.fromValue
+                                ? editor.fromValue(getKeyedValue(value, editor.key))
+                                : getKeyedValue(value, editor.key),
+                            onChange: value => onChange(
+                                replaceKeyedValue(
+                                    value,
+                                    editor.key,
+                                    editor.intoValue ? editor.intoValue(value) : value,
+                                )
+                            ),
+                            ...(editor.props || {}),
+                        })
+                    ) : (
                         <TextField
                             key={i}
                             label={editor.label}
@@ -123,7 +139,7 @@ function NameEditor ({ value, editing, onChange }) {
             [
                 {
                     key: 'firstNameLegal',
-                    label: locale.members.detail.fields.firstNameLegal,
+                    label: locale.members.detail.fields.firstNameLegal + '*', // required
                     props: { maxLength: 50 },
                 },
                 {
@@ -150,7 +166,7 @@ function NameEditor ({ value, editing, onChange }) {
             [
                 {
                     key: 'fullName',
-                    label: locale.members.detail.fields.fullName,
+                    label: locale.members.detail.fields.fullName + '*', // required
                     props: { maxLength: 100, class: 'full-name-editor' },
                 },
             ],
@@ -173,7 +189,7 @@ function CodeEditor ({ value, editing, onChange }) {
         return lotsOfTextFields([[
             {
                 key: 'newCode',
-                label: locale.members.detail.fields.newCode,
+                label: locale.members.detail.fields.newCode + '*', // required
                 props: { maxLength: 6 },
             },
             {
@@ -250,6 +266,48 @@ class AddressRenderer extends PureComponent {
     }
 }
 
+class CountryEditor extends PureComponent {
+    state = {
+        countries: {},
+    };
+
+    componentDidMount () {
+        cache.getCountries().then(countries => this.setState({ countries }));
+    }
+
+    render () {
+        return (
+            <div class="country-editor">
+                <NativeSelect
+                    value={this.props.value}
+                    onChange={e => this.props.onChange(e.target.value)}>
+                    <option value={''}>—</option>
+                    {Object.entries(this.state.countries).map(([id, name]) => (
+                        <option value={id} key={id}>
+                            {name}
+                        </option>
+                    ))}
+                </NativeSelect>
+            </div>
+        );
+    }
+}
+
+function simpleField (key, extraProps = {}) {
+    return {
+        component ({ value, editing, onChange }) {
+            if (!editing) return value[key];
+            else return <TextField
+                value={value[key]}
+                onChange={e => onChange({ ...value, [key]: e.target.value })}
+                {...extraProps} />;
+        },
+        hasDiff (original, value) {
+            return value[key] !== original[key];
+        },
+    };
+}
+
 const fields = {
     name: {
         // virtual for diffing
@@ -272,30 +330,6 @@ const fields = {
         shouldHide: () => true,
         hasDiff (original, value) {
             return original.newCode !== value.newCode || original.oldCode !== value.oldCode;
-        },
-    },
-    codeholderType: {
-        component ({ value, onChange }) {
-            return (
-                <Segmented
-                    selected={value.codeholderType}
-                    onSelect={selected => onChange({ ...value, codeholderType: selected })}>
-                    {[
-                        {
-                            id: 'human',
-                            label: locale.members.search.codeholderTypes.human,
-                        },
-                        {
-                            id: 'org',
-                            label: locale.members.search.codeholderTypes.org,
-                        },
-                    ]}
-                </Segmented>
-            );
-        },
-        editingOnly: true,
-        hasDiff (original, value) {
-            return value.codeholderType !== original.codeholderType;
         },
     },
     enabled: {
@@ -359,22 +393,24 @@ const fields = {
                 return <AddressRenderer id={value.id} />;
             } else {
                 const fields = [
-                    ['country', 'countryArea'],
+                    ['country'],
+                    ['countryArea'],
                     ['city', 'cityArea'],
                     ['streetAddress', 'postalCode', 'sortingCode'],
                 ];
 
                 return lotsOfTextFields(fields.map(items => items.map(item => ({
-                    key: `addressLatin.${item}`,
+                    key: `address.${item}`,
                     label: locale.members.detail.fields.addressFields[item],
+                    component: item === 'country' ? CountryEditor : null,
                 }))), { value, onChange });
             }
         },
         hasDiff (original, value) {
-            return !(original.addressLatin === value.addressLatin
-                || (value.addressLatin
-                    && Object.keys(value.addressLatin)
-                        .map(a => value.addressLatin[a] === original.addressLatin[a])
+            return !(original.address === value.address
+                || (value.address
+                    && Object.keys(value.address)
+                        .map(a => value.address[a] === original.address[a])
                         .reduce((a, b) => a && b)));
         },
         tall: true,
@@ -385,7 +421,9 @@ const fields = {
                 // TODO: fancy country
                 return value.feeCountry;
             } else {
-                // TODO
+                return <CountryEditor
+                    value={value.feeCountry}
+                    onChange={feeCountry => onChange({ ...value, feeCountry })} />;
             }
         },
         hasDiff (original, value) {
@@ -410,9 +448,43 @@ const fields = {
             return value.email !== original.email;
         },
     },
+    profession: simpleField('profession', { maxLength: 50 }),
+    landlinePhone: simpleField('landlinePhone', { type: 'tel', maxLength: 50 }),
+    officePhone: simpleField('officePhone', { type: 'tel', maxLength: 50 }),
+    cellphone: simpleField('cellphone', { type: 'tel', maxLength: 50 }),
+    notes: {
+        component ({ value, editing, onChange }) {
+            if (!editing) {
+                if (!value.notes) return null;
+                return (
+                    <div class="member-notes">
+                        {value.notes}
+                    </div>
+                );
+            } else {
+                return (
+                    <div class="member-notes">
+                        <textarea
+                            value={value.notes}
+                            onChange={e => onChange({ ...value, notes: e.target.value })} />
+                    </div>
+                );
+            }
+        },
+        hasDiff (original, value) {
+            return original.notes !== value.notes;
+        },
+        tall: true,
+    },
 };
 
-const Footer = () => {};
+function Footer () {
+    return (
+        <div class="member-footer">
+            todo: files
+        </div>
+    );
+}
 
 export default {
     header: Header,

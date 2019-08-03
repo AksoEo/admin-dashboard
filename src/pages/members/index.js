@@ -448,7 +448,17 @@ async function handleRequest (state) {
     };
 }
 
-const additionalDetailFields = ['id', 'hasProfilePicture'];
+const additionalDetailFields = [
+    'id',
+    'hasProfilePicture',
+    'address.country',
+    'address.countryArea',
+    'address.city',
+    'address.cityArea',
+    'address.streetAddress',
+    'address.postalCode',
+    'address.sortingCode',
+];
 
 async function handleDetailRequest (id) {
     const res = await client.get(`/codeholders/${id}`, {
