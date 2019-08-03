@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Checkbox, Slider, TextField, Button } from 'yamdl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -189,7 +190,7 @@ export default {
             const countries = value.substr(2).split(',');
             return { type, countries };
         },
-        editor: class CountryEditor extends React.PureComponent {
+        editor: class CountryEditor extends PureComponent {
             state = { countries: null, countryGroups: null };
 
             componentDidMount () {
@@ -464,7 +465,7 @@ export default {
                 categories: c,
             }));
         },
-        editor: class Membership extends React.PureComponent {
+        editor: class Membership extends PureComponent {
             state = {
                 categories: [],
             }

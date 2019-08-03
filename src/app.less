@@ -207,7 +207,7 @@
 
     &.animate-init {
         #app-header {
-            animation: animate-init-header-in 0.5s @easing;
+            animation: animate-init-header-in 0.5s 0.3s @easing backwards;
 
             @keyframes animate-init-header-in {
                 from {
@@ -216,10 +216,10 @@
             }
         }
 
-        .app-contents {
-            animation: animate-init-contents-in 0.7s @easing;
+        .page-container {
+            animation: animate-init-page-container-in 0.5s 0.5s @easing backwards;
 
-            @keyframes animate-init-contents-in {
+            @keyframes animate-init-page-container-in {
                 from {
                     opacity: 0;
                 }

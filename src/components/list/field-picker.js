@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { Dialog, Checkbox, Button } from 'yamdl';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
@@ -17,7 +18,7 @@ const FULLSCREEN_WIDTH = 600;
 /**
  * Displays a modal for picking, ordering, and setting sorting for a list of fields.
  */
-export default class FieldPicker extends React.PureComponent {
+export default class FieldPicker extends PureComponent {
     static propTypes = {
         /** The list of available fields. */
         available: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -125,7 +126,7 @@ export default class FieldPicker extends React.PureComponent {
 /**
  * Lets the user click through sorting types for a field.
  */
-export class SortingControl extends React.PureComponent {
+export class SortingControl extends PureComponent {
     static propTypes = {
         /** The current Sorting. */
         value: PropTypes.string.isRequired,

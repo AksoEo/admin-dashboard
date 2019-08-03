@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { Spring, globalAnimator, lerp, clamp } from '../../animation';
 import ResizeObserver from 'resize-observer-polyfill';
@@ -9,7 +10,7 @@ const RESPONSE = 0.4;
 /**
  * Renders a vertical array of animatable material paper.
  */
-export default class PaperList extends React.PureComponent {
+export default class PaperList extends PureComponent {
     static propTypes = {
         children: PropTypes.arrayOf(PropTypes.object).isRequired,
     };

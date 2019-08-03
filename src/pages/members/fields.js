@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import ResizeObserver from 'resize-observer-polyfill';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
@@ -50,7 +51,7 @@ export default {
     },
     name: {
         sortable: true,
-        component: class Name extends React.PureComponent {
+        component: class Name extends PureComponent {
             node = null;
             prefixName = null;
             truncatingName = null;
@@ -217,7 +218,7 @@ export default {
     },
     addressLatin: {
         sortable: true,
-        component: class AddressLatin extends React.PureComponent {
+        component: class AddressLatin extends PureComponent {
             state = {};
             componentDidMount () {
                 cache.getCountries().then(countries => this.setState({ countries }));
@@ -297,7 +298,7 @@ export default {
     },
     country: {
         sortable: true,
-        component: class Country extends React.PureComponent {
+        component: class Country extends PureComponent {
             state = {};
 
             componentDidMount () {

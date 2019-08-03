@@ -1,4 +1,5 @@
-import React, { lazy, Suspense } from 'react';
+import { h } from 'preact';
+import { PureComponent, lazy, Suspense } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { createStore, applyMiddleware } from 'redux';
 import { connect, Provider } from 'react-redux';
@@ -91,7 +92,7 @@ const listViewMiddleware = listView => () => next => action => {
 const RELOAD_DEBOUNCE_TIME = 500; // ms
 
 /// Renders a searchable and filterable list of items, each with a detail view.
-export default class ListView extends React.PureComponent {
+export default class ListView extends PureComponent {
     static propTypes = {
         /// Defaults for various things.
         ///

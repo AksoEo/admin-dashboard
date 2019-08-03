@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { Spring, lerp } from '../animation';
 import './segmented.less';
@@ -20,7 +21,7 @@ import './segmented.less';
  * </Segmented>
  * ```
  */
-export default class Segmented extends React.PureComponent {
+export default class Segmented extends PureComponent {
     static propTypes = {
         /**
          * A list of objects with the following properties:

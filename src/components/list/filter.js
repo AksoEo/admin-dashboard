@@ -1,9 +1,10 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { Checkbox } from 'yamdl';
 
 /** A single filter. */
-export default class Filter extends React.PureComponent {
+export default class Filter extends PureComponent {
     static propTypes = {
         id: PropTypes.string.isRequired,
         localizedName: PropTypes.string,

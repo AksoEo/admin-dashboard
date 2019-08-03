@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import { Button } from 'yamdl';
@@ -7,7 +8,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import locale from '../../locale';
 
 /** Primary search field. */
-export default class SearchInput extends React.PureComponent {
+export default class SearchInput extends PureComponent {
     static propTypes = {
         field: PropTypes.string,
         fields: PropTypes.arrayOf(PropTypes.string).isRequired,

@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { UEACode, util } from 'akso-client';
@@ -27,7 +28,7 @@ const SEARCHABLE_FIELDS = [
     'notes',
 ];
 
-export default class MembersList extends React.PureComponent {
+export default class MembersList extends PureComponent {
     static propTypes = {
         path: PropTypes.string.isRequired,
         query: PropTypes.string.isRequired,

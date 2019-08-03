@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import DragHandleIcon from '@material-ui/icons/DragHandle';
 import { Spring, globalAnimator } from '../../animation';
@@ -7,7 +8,7 @@ import { Spring, globalAnimator } from '../../animation';
 const LI_HEIGHT = 56;
 
 /** Material list with drag controls, for the field picker. */
-export default class RearrangingList extends React.PureComponent {
+export default class RearrangingList extends PureComponent {
     static propTypes = {
         children: PropTypes.arrayOf(PropTypes.element).isRequired,
         /** `fn(index: number) -> bool` */

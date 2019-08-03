@@ -1,4 +1,4 @@
-import React from 'react';
+import { h } from 'preact';
 import SvgIcon from '@material-ui/core/SvgIcon';
 
 /** The TEJO icon, rendered as inline SVG. */

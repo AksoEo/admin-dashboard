@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import Avatar from '@material-ui/core/Avatar';
 import List from '@material-ui/core/List';
@@ -60,7 +61,7 @@ NavCategory.propTypes = {
 };
 
 /** Renders the sidebar contents. */
-export default class SidebarContents extends React.PureComponent {
+export default class SidebarContents extends PureComponent {
     static propTypes = {
         /** The current page ID. Used to highlight the corresponding sidebar item. */
         currentPage: PropTypes.string.isRequired,

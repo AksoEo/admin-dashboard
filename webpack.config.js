@@ -14,10 +14,6 @@ const browserTargets = {
     chrome: '49',
     firefox: '63',
     safari: '10',
-    // FIXME: did browserslist remove these? babel fails when they’re added
-    // and_chr: '70',
-    // and_uc: '11.8',
-    // ios_saf: '11'
 };
 
 global.aksoConfig = {
@@ -94,39 +90,9 @@ module.exports = function (env, argv) {
                 },
                 {
                     test: /\.m?js$/,
-                    // exclude all node_modules (except akso-client; see above)
-                    exclude: /node_modules\/(?!akso-client)/,
-                    use: [
-                        {
-                            loader: 'babel-loader',
-                            options: {
-                                presets: [
-                                    [
-                                        '@babel/preset-env',
-                                        {
-                                            targets: browserTargets,
-                                            useBuiltIns: 'usage',
-                                            corejs: '3.1.4',
-                                        }
-                                    ],
-                                    [
-                                        '@babel/preset-react'
-                                    ]
-                                ],
-                                plugins: [
-                                    '@babel/plugin-proposal-class-properties',
-                                    '@babel/plugin-proposal-export-default-from',
-                                    '@babel/plugin-syntax-dynamic-import'
-                                ]
-                            }
-                        }, {
-                            loader: 'eslint-loader'
-                        }
-                    ]
-                },
-                {
-                    // temporary solution to yamdl preact pragma h
-                    test: /node_modules\/yamdl\/.+\.js$/,
+                    // exclude all node_modules
+                    // (except akso-client and yamdl which are git dependencies)
+                    exclude: /node_modules\/(?!akso-client|yamdl)/,
                     use: [
                         {
                             loader: 'babel-loader',
@@ -154,7 +120,7 @@ module.exports = function (env, argv) {
                         }, {
                             loader: 'eslint-loader'
                         }
-                    ],
+                    ]
                 },
                 {
                     // some dependencies seem to have syntax not supported by MS Edge

@@ -2,15 +2,15 @@ import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import UEACode from 'akso-client/uea-code';
 import Form, { Validator } from '../components/form';
+import LogoTransition from './logo-transition';
 import { Button, Checkbox, TextField, CircularProgress } from 'yamdl';
 import locale from '../locale';
 import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';
 import { Spring } from '../animation';
 import client from '../client';
+import { getPageMode, Mode } from './is-special-page';
 import './style';
-
-/** @jsx h */
 
 const Stage = {
     LOST_SECURITY_CODE: -3,
@@ -18,12 +18,6 @@ const Stage = {
     FORGOT_PASSWORD: -1,
     DETAILS: 0,
     SECURITY_CODE: 1,
-};
-
-const Mode = {
-    NORMAL: 0, // must be falsy for isSpecialPage
-    CREATING_PASSWORD: 1,
-    RESETTING_PASSWORD: 2,
 };
 
 const MIN_INDEX = -3;
@@ -35,27 +29,14 @@ const temporaryBackLinkStyle = {
     color: 'inherit',
 };
 
-/** Returns the mode and possibly additional data for the current page. */
-function getPageMode () {
-    const pathname = document.location.pathname;
-    const match = pathname.match(/^\/krei_pasvorton\/([^/]+)\/([\da-fA-f]+)\/?$/);
-    if (match) return { mode: Mode.CREATING_PASSWORD, username: match[1] };
-    return { mode: Mode.NORMAL };
-}
-
-/**
- * Returns true if the current page is a special page (such as the “create password” page) and
- * should always show the login screen.
- */
-export function isSpecialPage () {
-    return getPageMode().mode !== Mode.NORMAL;
-}
-
 /** The login screen. */
 export default class Login extends Component {
     static propTypes = {
         /** Login callback. */
         onLogin: PropTypes.func.isRequired,
+
+        /** End callback—signals that the component should be unmounted. */
+        onEnd: PropTypes.func,
     };
 
     state = {
@@ -63,6 +44,7 @@ export default class Login extends Component {
         stage: Stage.DETAILS,
         loading: false,
         mode: Mode.NORMAL,
+        loggedIn: false,
     };
 
     pageView = null;
@@ -96,6 +78,20 @@ export default class Login extends Component {
         }, 100);
     }
 
+    onLogin = () => {
+        let logoRect;
+        if (getComputedStyle(this.logoNode).opacity) {
+            logoRect = this.logoNode.getBoundingClientRect();
+        } else {
+            logoRect = this.smallLogoNode.getBoundingClientRect();
+        }
+        this.setState({ loggedIn: true });
+
+        setTimeout(() => this.props.onEnd(), 300);
+
+        this.props.onLogin({ component: LogoTransition, props: { initialRect: logoRect } });
+    };
+
     render () {
         const meta = (
             <div class="login-meta">
@@ -114,11 +110,12 @@ export default class Login extends Component {
         );
 
         return (
-            <div class="login">
+            <div class={'login' + (this.state.loggedIn ? ' logged-in' : '')}>
                 <div class="login-dialog">
                     <header class="login-header">
                         <img
                             class="login-logo"
+                            ref={node => this.logoNode = node}
                             src="/assets/logo-dark.svg"
                             aria-hidden="true"
                             role="presentation"
@@ -126,6 +123,7 @@ export default class Login extends Component {
                         <div class="login-label">
                             <img
                                 class="login-small-logo"
+                                ref={node => this.smallLogoNode = node}
                                 src="/assets/logo-dark.svg"
                                 aria-hidden="true"
                                 role="presentation"
@@ -215,13 +213,13 @@ export default class Login extends Component {
                                     throw new Error('unimplemented');
                                 } else if (!totpUsed) {
                                     this.setState({ stage: Stage.SECURITY_CODE });
-                                } else this.props.onLogin();
+                                } else this.onLogin();
                             }}
                             onForgotPassword={() => this.setState({ stage: Stage.FORGOT_PASSWORD })}
                             onForgotCode={() => this.setState({ stage: Stage.FORGOT_CODE })} />
                         <SecurityCodeStage
                             ref={stage => this.securityCodeStage = stage}
-                            onSuccess={this.props.onLogin}
+                            onSuccess={this.onLogin}
                             onShouldLoginFirst={() => this.setState({ stage: Stage.DETAILS })}
                             onLostCode={() => this.setState({ stage: Stage.LOST_SECURITY_CODE })}
                             onHeightChange={() => this.pageView.pageHeightChanged()} />

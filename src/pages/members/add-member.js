@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { appContext } from '../../router';
 import { Dialog, TextField, Button, CircularProgress } from 'yamdl';
@@ -8,7 +9,7 @@ import UEACode from 'akso-client/uea-code';
 import locale from '../../locale';
 import client from '../../client';
 
-export default class AddMemberDialog extends React.PureComponent {
+export default class AddMemberDialog extends PureComponent {
     static propTypes = {
         open: PropTypes.bool,
         onClose: PropTypes.func,
@@ -36,7 +37,7 @@ const KNOWN_ERRORS = {
     'newCode is taken': () => locale.members.addMember.newCodeTaken,
 };
 
-class AddMember extends React.PureComponent {
+class AddMember extends PureComponent {
     static propTypes = {
         onSuccess: PropTypes.func.isRequired,
     };

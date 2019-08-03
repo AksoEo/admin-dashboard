@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent, Fragment } from 'preact/compat';
 import PropTypes from 'prop-types';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { Dialog, Button } from 'yamdl';
@@ -10,7 +11,7 @@ import locale from '../../locale';
 
 const ITEMS_PER_PAGE = 100;
 
-export default class CSVExport extends React.PureComponent {
+export default class CSVExport extends PureComponent {
     static propTypes = {
         open: PropTypes.bool,
         onClose: PropTypes.func,
@@ -180,7 +181,7 @@ export default class CSVExport extends React.PureComponent {
                 title={locale.listView.csvExport.title}>
                 {!this.state.exporting ? (
                     this.state.error ? (
-                        <React.Fragment>
+                        <Fragment>
                             <div className="export-error">
                                 {this.state.error.toString()}
                             </div>
@@ -190,7 +191,7 @@ export default class CSVExport extends React.PureComponent {
                                 onClick={this.resumeExport}>
                                 {locale.listView.csvExport.tryResumeExport}
                             </Button>
-                        </React.Fragment>
+                        </Fragment>
                     ) : this.state.objectURL ? (
                         <Button
                             key="download"
@@ -200,7 +201,7 @@ export default class CSVExport extends React.PureComponent {
                             {locale.listView.csvExport.download}
                         </Button>
                     ) : (
-                        <React.Fragment>
+                        <Fragment>
                             <Segmented
                                 class="mode-switch"
                                 selected={this.state.mode}
@@ -226,10 +227,10 @@ export default class CSVExport extends React.PureComponent {
                                 onClick={this.resumeExport}>
                                 {locale.listView.csvExport.beginExport}
                             </Button>
-                        </React.Fragment>
+                        </Fragment>
                     )
                 ) : (
-                    <React.Fragment>
+                    <Fragment>
                         <LinearProgress
                             className="progress-bar"
                             value={(this.state.data.length / this.state.totalItems * 100) | 0}
@@ -240,14 +241,14 @@ export default class CSVExport extends React.PureComponent {
                             onClick={this.abortExport}>
                             {locale.listView.csvExport.abortExport}
                         </Button>}
-                    </React.Fragment>
+                    </Fragment>
                 )}
             </Dialog>
         );
     }
 }
 
-class UserOptions extends React.PureComponent {
+class UserOptions extends PureComponent {
     static propTypes = {
         options: PropTypes.object.isRequired,
         value: PropTypes.object.isRequired,

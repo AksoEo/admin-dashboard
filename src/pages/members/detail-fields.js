@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import Segmented from '../../components/segmented';
 import PersonIcon from '@material-ui/icons/Person';
@@ -205,7 +206,7 @@ function Header ({ value, editing, onChange }) {
 }
 
 // TODO: some way to pick language
-class AddressRenderer extends React.PureComponent {
+class AddressRenderer extends PureComponent {
     static propTypes = {
         id: PropTypes.any,
     };
@@ -271,7 +272,7 @@ const fields = {
         shouldHide: () => true,
         hasDiff (original, value) {
             return original.newCode !== value.newCode || original.oldCode !== value.oldCode;
-        }
+        },
     },
     codeholderType: {
         component ({ value, onChange }) {

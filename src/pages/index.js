@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { lazy } from 'preact/compat';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import HomeIcon from '@material-ui/icons/Home';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
@@ -18,26 +19,6 @@ export const NewspaperIcon = function NewspaperIcon () {
             <path fillRule="evenodd" fill="currentColor" d="M4 19a2 2 0 0 0 2-2V5h16v12a2 2 0 0 1-2 2H4zm4-7v4h5v-4H8zm7 0v4h5v-4h-5zM8 7v3h12V7H8z M4 19a2 2 0 0 1-2-2V7h3v10c0 1.1-.4 2-1 2z"/>
         </SvgIcon>
     );
-};
-
-// until preact #1812 is fixed
-const lazy = function (loader) {
-    let promise, Component, error;
-
-    function Lazy (props, ref) {
-        if (!promise) {
-            promise = loader();
-            promise.then(
-                exports => (Component = exports.default),
-                e => (error = e),
-            );
-        }
-        if (error) throw error;
-        if (!Component) throw promise;
-        return <Component {...props} ref={ref} />;
-    }
-    Lazy.displayName = 'Lazy';
-    return React.forwardRef(Lazy);
 };
 
 /**

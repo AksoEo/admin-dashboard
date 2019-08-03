@@ -1,107 +1,151 @@
-import { h, render } from 'preact';
+import { h, render, Component } from 'preact';
 import { CircularProgress } from 'yamdl';
-import Login, { isSpecialPage } from './login';
+import isSpecialPage from './login/is-special-page';
 import client from './client';
 import './style';
 
 import './chrome-focus';
 
-/** @jsx h */
+/* eslint-disable react/prop-types */
 
-/** Shows the login screen if not logged in and opens the app. */
-function beginSession () {
-    client.restoreSession().catch(err => {
-        // TODO: handle error properly
-        /* eslint-disable no-console */
-        console.error('failed to restore session', err);
-        /* eslint-enable no-console */
-        return false;
-    }).then(response => {
-        if (response && !response.isAdmin) return client.logOut();
-        else return response;
-    }).then(response => {
-        const app = import(/* webpackChunkName: "app", webpackPrefetch: true */ './app');
+class Session extends Component {
+    state = {
+        login: null,
+        app: null,
+        transition: null,
+        showLogin: false,
+        loggedIn: false,
+        limbo: false,
+    };
 
-        if (isSpecialPage() || !response || !response.totpUsed) {
-            const loginRoot = document.createElement('div');
-            loginRoot.id = 'login-root';
-            loginRoot.className = 'root-container';
-            document.body.appendChild(loginRoot);
-
-            let virtualLoginRoot; // eslint-disable-line prefer-const
-            let didLogin = false;
-            const onLogin = function () {
-                // FIXME: sometimes it creates two react roots? i suspect it calls onLogin twice
-                // so here’s a quick fix
-                if (didLogin) return;
-                didLogin = true;
-                loginRoot.classList.add('animate-out');
-                setTimeout(() => {
-                    // unmount to clean up
-                    render(() => null, loginRoot, virtualLoginRoot);
-                    document.body.removeChild(loginRoot);
-                }, 1000);
-
-                setTimeout(() => initApp(app, true), 300);
-            };
-
-            virtualLoginRoot = render(<Login onLogin={onLogin} />, loginRoot);
-        } else {
-            initApp(app);
+    loadLogin () {
+        if (!this.loginPromise) {
+            this.loginPromise =
+                import(/* webpackChunkName: "login", webpackPrefetch: true */ './login');
+            this.loginPromise.then(e => this.setState({ login: e.default }));
         }
-    });
-}
+    }
 
-/**
- * Opens the app.
- * @param {Promise<Object>} app - the result of `import('./app')`
- * @param {boolean} shouldPlayLoginAnimation - if false, will not play the “logged in” animation
- */
-function initApp (app, shouldPlayLoginAnimation = false) {
-    const loadingRoot = document.createElement('div');
-    loadingRoot.id = 'app-loading';
-    let virtualLoadingRoot;
-
-    let appLoaded = false;
-    let addedLoadingIndicator = false;
-    setTimeout(() => {
-        if (appLoaded) return;
-        render(<CircularProgress indeterminate />, loadingRoot);
-        document.body.appendChild(loadingRoot);
-        addedLoadingIndicator = true;
-    }, 500);
-
-    app.then(app => {
-        appLoaded = true;
-        if (addedLoadingIndicator) {
-            loadingRoot.classList.add('animate-out');
-            setTimeout(() => {
-                // unmount to clean up
-                render(() => null, loadingRoot, virtualLoadingRoot);
-                document.body.removeChild(loadingRoot);
-            }, 1000);
+    loadApp () {
+        if (!this.appPromise) {
+            this.appPromise =
+                import(/* webpackChunkName: "app", webpackPrefetch: true */ './app');
+            this.appPromise.then(e => this.setState({ app: e.default }));
         }
+    }
 
-        const appRoot = app.init(shouldPlayLoginAnimation, () => {
-            // logged out
-            client.logOut().then(() => {
-                // TODO: unmountComponentAtNode here
-                document.body.removeChild(appRoot);
-                beginSession();
-            });
+    componentDidMount () {
+        client.restoreSession().catch(err => {
+            // TODO: handle error properly
+            console.error('failed to restore session', err); // eslint-disable-line no-console
+            return false;
+        }).then(response => {
+            if (response && !response.isAdmin) return client.logOut();
+            else return response;
+        }).then(response => {
+            if (isSpecialPage() || !response || !response.totpUsed) {
+                this.setState({ showLogin: true });
+                this.loadLogin();
+            } else this.setState({ loggedIn: true });
+
+            this.loadApp();
         });
-    }).catch(err => {
-        const errorContainer = document.createElement('pre');
-        errorContainer.classList.add('global-error-container');
-        errorContainer.textContent = `Error rendering application: ${err.message}\n\n${err.stack}`;
-        document.body.appendChild(errorContainer);
-        /* eslint-disable no-console */
-        console.error(err);
-        /* eslint-enable no-console */
-    });
+    }
+
+    onLogin = (transition) => {
+        this.setState({ loggedIn: true, transition });
+        this.loadApp();
+    };
+    onLogout = () => {
+        this.setState({ loggedIn: false, showLogin: true, limbo: true, transition: null });
+        this.loadLogin();
+        client.logOut().then(() => this.setState({ limbo: false })).catch(err => {
+            console.error('failed to log out', err); // eslint-disable-line no-console
+            this.setState({ loggedIn: true, limbo: false });
+        });
+    };
+
+    render () {
+        const { loggedIn, showLogin, login: Login, app: App, transition, limbo } = this.state;
+
+        let login = null;
+        let app = null;
+        if (!limbo) {
+            if (Login && showLogin) {
+                login = <Login
+                    onLogin={this.onLogin}
+                    onEnd={() => this.setState({ showLogin: false })} />;
+            }
+            if (loggedIn && App) {
+                app = <App
+                    onDirectTransition={(...a) => this.transition && this.transition.direct(...a)}
+                    onLogout={this.onLogout} />;
+            }
+        }
+
+        let extra = null;
+        if (transition) {
+            const { component: Transition, props } = transition;
+            extra = <Transition
+                ref={transition => this.transition = transition}
+                onEnd={() => this.setState({ transition: null })}
+                {...props} />;
+        }
+
+        return (
+            <span>
+                <LoadingIndicator loading={!login && !app && !extra} />
+                {app}
+                {login}
+                {extra}
+            </span>
+        );
+    }
 }
 
-beginSession();
+class LoadingIndicator extends Component {
+    state = {
+        visible: false,
+    };
+
+    componentDidMount () {
+        this.setState({ visible: this.props.loading });
+        if (this.props.loading) this.visibleTime = Date.now();
+    }
+    componentDidUpdate (prevProps) {
+        if (prevProps.loading !== this.props.loading) {
+            if (!this.props.loading) {
+                if (Date.now() - this.visibleTime < 500) {
+                    // loading indicator never appeared
+                    this.setState({ visible: false });
+                } else {
+                    this.hideTimeout = setTimeout(() => {
+                        this.setState({ visible: false });
+                    }, 1000);
+                }
+            } else {
+                clearTimeout(this.hideTimeout);
+                this.setState({ visible: true });
+                this.visibleTime = Date.now();
+            }
+        }
+    }
+
+    render () {
+        if (!this.state.visible) return null;
+        return (
+            <div id="app-loading-indicator" class={!this.props.loading ? 'animate-out' : ''}>
+                <CircularProgress indeterminate />
+            </div>
+        );
+    }
+}
+
+const sessionRoot = document.createElement('div');
+sessionRoot.id = 'session-root';
+sessionRoot.className = 'root-container';
+document.body.appendChild(sessionRoot);
+render(<Session />, sessionRoot);
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/**service worker file name (see webpack config)**');

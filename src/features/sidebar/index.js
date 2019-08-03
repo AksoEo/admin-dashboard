@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { Spring } from '../../animation';
 import SidebarContents from './contents';
@@ -8,7 +9,7 @@ import './style';
 const EDGE_DRAG_WIDTH = 50;
 
 /** Renders the sidebar. */
-export default class Sidebar extends React.PureComponent {
+export default class Sidebar extends PureComponent {
     static propTypes = {
         /**
          * Whether or not the sidebar should be permanent and inline or slide out temporarily.
@@ -21,8 +22,6 @@ export default class Sidebar extends React.PureComponent {
         onOpen: PropTypes.func,
         /** Close callback. Called when a drag gesture opens the sidebar. */
         onClose: PropTypes.func,
-        /** If true, will animate the permanent sidebar sliding in. */
-        animateIn: PropTypes.bool,
         /** Current page identifier passed to the SidebarContents. */
         currentPage: PropTypes.string.isRequired,
         /** Called when the log out button is pressed. */
@@ -83,12 +82,20 @@ export default class Sidebar extends React.PureComponent {
 
     componentDidMount () {
         this.updateSpringTarget();
-        if ((this.props.permanent || this.props.open) && !this.props.animateIn) {
+        if (this.props.permanent || this.props.open) {
             this.spring.value = 1;
         }
         this.spring.start();
         if (!this.props.permanent) this.sidebarDragHandler.bind();
         this.sidebarDragHandler.setSidebarNode(this.node);
+    }
+
+    /** Will animate the sidebar sliding in. */
+    animateIn (delay) {
+        this.spring.value = 0;
+        this.onSpringUpdate(0);
+        this.spring.stop();
+        setTimeout(() => this.spring.start(), delay);
     }
 
     componentDidUpdate (prevProps) {

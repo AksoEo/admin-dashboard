@@ -14,7 +14,7 @@
     "json5": "^2.1.0",
     "moment": "^2.24.0",
     "msgpack-lite": "^0.1.26",
-    "preact": "^10.0.0-rc.0",
+    "preact": "^10.0.0-rc.1",
     "prop-types": "^15.7.2",
     "react-codemirror2": "^6.0.0",
     "react-redux": "^7.1.0",

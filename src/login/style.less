@@ -11,6 +11,13 @@
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
+    animation: login-in 0.2s;
+
+    @keyframes login-in {
+        0% {
+            opacity: 0;
+        }
+    }
 
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
@@ -258,6 +265,22 @@
             a:hover {
                 color: @text;
             }
+        }
+    }
+
+    &.logged-in {
+        animation: login-out 0.3s;
+        opacity: 0;
+        pointer-events: none;
+
+        @keyframes login-out {
+            0% {
+                opacity: 1;
+            }
+        }
+
+        .login-logo, &.logged-in .login-small-logo {
+            visibility: hidden;
         }
     }
 

@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent, Fragment } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { Dialog, Button } from 'yamdl';
 import ListItem from '@material-ui/core/ListItem';
@@ -19,7 +20,7 @@ const Action = {
     SAVING: 'saving',
 };
 
-export default class SavedFiltersBar extends React.PureComponent {
+export default class SavedFiltersBar extends PureComponent {
     static propTypes = {
         jsonFilterEnabled: PropTypes.bool,
         jsonFilter: PropTypes.string.isRequired,
@@ -66,7 +67,7 @@ export default class SavedFiltersBar extends React.PureComponent {
             <div className={'saved-filters-bar' + (jsonFilterEnabled ? '' : ' collapsed')}>
                 <div className="saved-filters-inner">
                     {jsonFilterEnabled ? (
-                        <React.Fragment>
+                        <Fragment>
                             <div>
                                 <Button
                                     icon
@@ -88,7 +89,7 @@ export default class SavedFiltersBar extends React.PureComponent {
                                 onClick={() => this.props.onSetJSONFilterEnabled(false)}>
                                 {locale.listView.json.disable}
                             </Button>
-                        </React.Fragment>
+                        </Fragment>
                     ) : (
                         <Button
                             class="saved-filters-button"
@@ -158,7 +159,7 @@ export default class SavedFiltersBar extends React.PureComponent {
 
 const FILTER_ITEM_HEIGHT = 56;
 const VLIST_CHUNK_SIZE = 100;
-class SavedFiltersList extends React.PureComponent {
+class SavedFiltersList extends PureComponent {
     static propTypes = {
         category: PropTypes.string.isRequired,
         onLoad: PropTypes.func.isRequired,

@@ -21,7 +21,7 @@ noscript {
     justify-content: center;
 }
 
-#app-loading {
+#app-loading-indicator {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -33,7 +33,7 @@ noscript {
     z-index: 10;
     .elevation(8);
 
-    animation: app-loading-in 0.3s;
+    animation: app-loading-in 0.3s 0.5s backwards;
 
     @keyframes app-loading-in {
         0% {
@@ -63,6 +63,29 @@ noscript {
             100% {
                 // using scale(0) breaks the animation in Safari
                 transform: translate(-50%, -50%) scale(0.0001);
+            }
+        }
+    }
+}
+
+.akso-logo-transition {
+    position: fixed;
+    top: -32px;
+    left: -32px;
+    width: 64px;
+    height: 64px;
+    z-index: 221;
+
+    svg {
+        overflow: visible;
+    }
+
+    .corner {
+        animation: logo-transition-corner-white 0.5s;
+
+        @keyframes logo-transition-corner-white {
+            from {
+                fill: #fff;
             }
         }
     }

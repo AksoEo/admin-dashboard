@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import JSON5 from 'json5';
@@ -15,7 +16,7 @@ import './json-editor.less';
 // (see ./index.js for the default value)
 const DEFAULT_CURSOR_POS = [1, 1];
 
-export default class JSONEditor extends React.PureComponent {
+export default class JSONEditor extends PureComponent {
     static propTypes = {
         value: PropTypes.string.isRequired,
         onChange: PropTypes.func.isRequired,

@@ -1,5 +1,5 @@
-import React, { Suspense } from 'react';
-import ReactDOM from 'react-dom';
+import { h } from 'preact';
+import { PureComponent, Suspense } from 'preact/compat';
 import PropTypes from 'prop-types';
 
 import { appContext } from './router';
@@ -75,9 +75,9 @@ function currentPageFromLocation () {
 }
 
 /** The main app. */
-export default class App extends React.PureComponent {
+export default class App extends PureComponent {
     static propTypes = {
-        shouldPlayLoginAnimation: PropTypes.bool.isRequired,
+        onDirectTransition: PropTypes.func.isRequired,
         onLogout: PropTypes.func.isRequired,
     };
 
@@ -98,11 +98,8 @@ export default class App extends React.PureComponent {
     /** The current page component. */
     currentPage = null;
 
-    /** If true, will play the logged-in animation. */
-    shouldPlayLoginAnimation = this.props.shouldPlayLoginAnimation;
-
-    onResize = () => {
-        this.setState({ permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH });
+    onResize = (cb) => {
+        this.setState({ permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH }, cb);
     }
 
     currentPageNode () {
@@ -123,7 +120,14 @@ export default class App extends React.PureComponent {
 
     /** `routerContext` handler. */
     onNavigate = target => {
+        const current = document.location.pathname
+            + document.location.search
+            + document.location.hash;
+
+        if (target === current) return; // nothing to do
+
         this.saveCurrentScrollPosition();
+
         window.history.pushState(null, '', target);
         this.setState({
             currentPage: currentPageFromLocation(),
@@ -178,7 +182,13 @@ export default class App extends React.PureComponent {
     };
 
     componentDidMount () {
-        this.onResize();
+        this.onResize(() => {
+            if (!this.state.permaSidebar) {
+                if (this.props.onDirectTransition(null)) {
+                    this.setState({ animateIn: true });
+                }
+            }
+        });
         window.addEventListener('resize', this.onResize);
         window.addEventListener('popstate', this.onPopState);
         this.updatePageTitle();
@@ -209,7 +219,7 @@ export default class App extends React.PureComponent {
             return this.state.currentPage.component;
         }
 
-        return class NullPage extends React.PureComponent {
+        return class NullPage extends PureComponent {
             render () {
                 return (
                     <div style={{
@@ -250,7 +260,13 @@ export default class App extends React.PureComponent {
                 }}
                 id="app-header">
                 {this.state.permaSidebar ? (
-                    <HeaderLogo onClick={() => this.onNavigate('/')} />
+                    <HeaderLogo
+                        onDirectTransition={this.props.onDirectTransition}
+                        onDoAnimateIn={() => {
+                            this.setState({ animateIn: true });
+                            this.sidebar.animateIn(300);
+                        }}
+                        onClick={() => this.onNavigate('/')} />
                 ) : null}
                 {isLoading ? (
                     <LinearProgress className="header-progress" />
@@ -262,7 +278,7 @@ export default class App extends React.PureComponent {
     render () {
         let className = '';
         if (this.state.permaSidebar) className += ' perma-sidebar';
-        if (this.shouldPlayLoginAnimation) className += ' animate-init';
+        if (this.state.animateIn) className += ' animate-init';
 
         let appHeader = null;
         let appDrawer = null;
@@ -274,11 +290,11 @@ export default class App extends React.PureComponent {
 
         appDrawer = (
             <Sidebar
+                ref={view => this.sidebar = view}
                 permanent={this.state.permaSidebar}
                 open={this.state.sidebarOpen || this.state.permaSidebar}
                 onOpen={() => this.setState({ sidebarOpen: true })}
                 onClose={() => this.setState({ sidebarOpen: false })}
-                animateIn={this.shouldPlayLoginAnimation}
                 currentPage={this.state.currentPage.id}
                 onLogout={this.props.onLogout} />
         );
@@ -295,7 +311,8 @@ export default class App extends React.PureComponent {
                     path={this.state.currentPage.path}
                     match={this.state.currentPage.match}
                     query={this.state.currentPage.query}
-                    ref={page => this.currentPage = page} />
+                    ref={page => this.currentPage = page}
+                    permissions={this.state.permissions} />
             </Suspense>
         );
 
@@ -325,29 +342,4 @@ export default class App extends React.PureComponent {
             </div>
         );
     }
-}
-
-/**
- * Initializes the app.
- * @param {boolean} shouldPlayLoginAnimation - if true, will play the “logged in” animation
- * @param {Function} onLogout - logout callback
- */
-export function init (shouldPlayLoginAnimation, onLogout) {
-    const root = document.createElement('div');
-    root.id = 'react-root';
-    root.className = 'root-container';
-    document.body.appendChild(root);
-
-    ReactDOM.render(
-        <App
-            shouldPlayLoginAnimation={shouldPlayLoginAnimation}
-            onLogout={() => {
-                // unmount to clean up
-                ReactDOM.unmountComponentAtNode(root);
-                onLogout();
-            }} />,
-        root
-    );
-
-    return root;
 }

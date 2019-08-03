@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { Dialog, Button } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
@@ -16,7 +17,7 @@ const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x
 const countryCodeToEmoji = code => toRI(code[0]) + toRI(code[1]);
 
 /** Renders a country picker. */
-export default class CountryPicker extends React.PureComponent {
+export default class CountryPicker extends PureComponent {
     static propTypes = {
         onChange: PropTypes.func.isRequired,
         value: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -189,7 +190,7 @@ const LI_HEIGHT = 48;
 /**
  * Renders multiple columns with fixed order, with items able to be animated in between.
  */
-class MulticolList extends React.PureComponent {
+class MulticolList extends PureComponent {
     static propTypes = {
         children: PropTypes.arrayOf(PropTypes.object).isRequired,
         columns: PropTypes.number.isRequired,

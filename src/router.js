@@ -1,4 +1,5 @@
-import React from 'react';
+import { h } from 'preact';
+import { createContext } from 'preact/compat';
 import PropTypes from 'prop-types';
 
 /**
@@ -8,7 +9,7 @@ import PropTypes from 'prop-types';
  * - `replace: (string) => void`: function that may be called to replaceState in-app
  * - `permissions: Object`: permissions object, as defined in the AKSO API
  */
-export const appContext = React.createContext({
+export const appContext = createContext({
     navigate: null,
     replace: null,
     permissions: null,

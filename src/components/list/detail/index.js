@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import { h } from 'preact';
+import { PureComponent, useState } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { AppBarProxy, Button, MenuIcon, Dialog, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import locale from '../../../locale';
 import './style';
 
-export default class DetailView extends React.PureComponent {
+export default class DetailView extends PureComponent {
     static propTypes = {
         open: PropTypes.bool,
         onClose: PropTypes.func,
@@ -126,7 +127,6 @@ export default class DetailView extends React.PureComponent {
 }
 
 function DetailAppBar ({
-    item,
     open,
     onClose,
     locale: detailLocale,
@@ -177,7 +177,6 @@ function DetailAppBar ({
 }
 
 DetailAppBar.propTypes = {
-    item: PropTypes.object,
     open: PropTypes.bool,
     onClose: PropTypes.func,
     getTitle: PropTypes.func,
@@ -270,7 +269,7 @@ DetailViewContents.propTypes = {
     locale: PropTypes.object.isRequired,
 };
 
-function DetailSaveDialog({
+function DetailSaveDialog ({
     id, open, onClose, onSuccess, onPatch, original, value, fields, detailLocale,
 }) {
     const [saving, setSaving] = useState(false);
@@ -366,15 +365,12 @@ function ConfirmDeleteDialog ({ id, open, onClose, onDelete, onDeleted, detailLo
                     disabled: deleting,
                     action: () => {
                         setDeleting(true);
-                        this.props.onDelete(id).then(() => {
+                        onDelete(id).then(() => {
                             setDeleting(false);
                             onClose();
                             onDeleted();
                         }).catch(err => {
-                            console.error(
-                                'Failed to delete',
-                                err,
-                            ); // eslint-disable-line no-console
+                            console.error('Failed to delete', err); // eslint-disable-line no-console
                             setDeleting(false);
                         });
                     },
