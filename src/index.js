@@ -40,11 +40,8 @@ class Session extends Component {
             console.error('failed to restore session', err); // eslint-disable-line no-console
             return false;
         }).then(response => {
-            if (response && !response.isAdmin) return client.logOut();
-            else return response;
-        }).then(response => {
-            if (isSpecialPage() || !response || !response.totpUsed) {
-                this.setState({ showLogin: true });
+            if (isSpecialPage() || !response || !response.totpUsed || !response.isAdmin) {
+                this.setState({ showLogin: true, authCheck: response });
                 this.loadLogin();
             } else this.setState({ loggedIn: true });
 
@@ -74,6 +71,7 @@ class Session extends Component {
             if (Login && showLogin) {
                 login = <Login
                     onLogin={this.onLogin}
+                    authCheck={this.state.authCheck}
                     onEnd={() => this.setState({ showLogin: false })} />;
             }
             if (loggedIn && App) {

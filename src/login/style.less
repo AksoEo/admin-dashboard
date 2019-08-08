@@ -159,7 +159,10 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        button .progress-overlay + span {
+        button span:last-child {
+            transition: opacity 0.3s;
+        }
+        button.with-progress span:last-child {
             opacity: 0;
         }
 
@@ -310,32 +313,20 @@
     }
 }
 
-#login-root {
-    &.animate-out {
-        .login {
-            animation: login-out 0.5s cubic-bezier(0.8, 0.1, 0.4, 0.7);
-            opacity: 0;
-            pointer-events: none;
-
-            @keyframes login-out {
-                from {
-                    opacity: 1;
-                }
-            }
-
-            .login-dialog {
-                animation: login-dialog-out 0.5s cubic-bezier(0.8, 0.1, 0.4, 0.7);
-
-                @keyframes login-dialog-out {
-                    to {
-                        transform: scale(0.9);
-                    }
-                }
-
-                @media (max-width: 420px) {
-                    animation: none;
-                }
-            }
-        }
+.not-admin-logout-dialog {
+    footer {
+        text-align: right;
+    }
+    button .progress-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    button span:last-child {
+        transition: opacity 0.3s;
+    }
+    button.with-progress span:last-child {
+        opacity: 0;
     }
 }

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import UEACode from 'akso-client/uea-code';
 import Form, { Validator } from '../components/form';
 import LogoTransition from './logo-transition';
-import { Button, Checkbox, TextField, CircularProgress } from 'yamdl';
+import { Button, Checkbox, TextField, CircularProgress, Dialog } from 'yamdl';
 import locale from '../locale';
 import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';
@@ -37,6 +37,9 @@ export default class Login extends Component {
 
         /** End callback—signals that the component should be unmounted. */
         onEnd: PropTypes.func,
+
+        /** The response object from client#restoreSession */
+        authCheck: PropTypes.object.isRequired,
     };
 
     state = {
@@ -45,6 +48,9 @@ export default class Login extends Component {
         loading: false,
         mode: Mode.NORMAL,
         loggedIn: false,
+
+        // if the user isn’t an admin, they need to log out before they can use AKSO
+        needsLogout: false,
     };
 
     pageView = null;
@@ -62,6 +68,11 @@ export default class Login extends Component {
 
     componentDidMount () {
         document.title = locale.documentTitleTemplate(locale.login.title);
+
+        if (client.loggedIn && !this.props.authCheck.isAdmin) {
+            this.setState({ needsLogout: true });
+            return;
+        }
 
         if (client.loggedIn && client.totpRequired) {
             // setTimeout to fix weird glitchiness
@@ -227,6 +238,41 @@ export default class Login extends Component {
                     {meta}
                 </div>
                 {meta}
+
+                <Dialog
+                    backdrop
+                    open={this.state.needsLogout}
+                    class="not-admin-logout-dialog">
+                    <p>
+                        {locale.login.notAdmin}
+                    </p>
+                    <p>
+                        {locale.login.notAdminLogout}
+                    </p>
+                    <footer>
+                        <Validator
+                            component={Button}
+                            validate={() => {}}
+                            class={this.state.loggingOut ? 'with-progress' : ''}
+                            ref={view => this.logoutView = view}
+                            onClick={() => {
+                                this.setState({ loggingOut: true });
+                                client.logOut().then(() => {
+                                    this.setState({ loggingOut: false, needsLogout: false });
+                                }).catch(err => {
+                                    console.error(err); // eslint-disable-line no-console
+                                    this.logoutView.shake();
+                                    this.setState({ loggingOut: false });
+                                });
+                            }} disabled={this.state.loggingOut}>
+                            <CircularProgress
+                                class="progress-overlay"
+                                indeterminate={this.state.loggingOut}
+                                small />
+                            <span>{locale.login.logout}</span>
+                        </Validator>
+                    </footer>
+                </Dialog>
             </div>
         );
     }
@@ -377,13 +423,15 @@ class DetailsStage extends Component {
                             </a>
                         </div>
                     ) : <div class="help-links" />}
-                    <Button type="submit" class="raised" disabled={this.state.loading}>
-                        {this.state.loading ? (
-                            <CircularProgress
-                                class="progress-overlay"
-                                indeterminate
-                                small />
-                        ) : null}
+                    <Button
+                        type="submit"
+                        raised
+                        class={this.state.loading ? 'with-progress' : ''}
+                        disabled={this.state.loading}>
+                        <CircularProgress
+                            class="progress-overlay"
+                            indeterminate={this.state.loading}
+                            small />
                         <span>{locale.login.continue}</span>
                     </Button>
                 </footer>
@@ -486,13 +534,15 @@ class SecurityCodeStage extends Component {
                             {locale.login.lostSecurityCode}
                         </a>
                     </div>
-                    <Button type="submit" class="raised" disabled={this.state.loading}>
-                        {this.state.loading ? (
-                            <CircularProgress
-                                class="progress-overlay"
-                                indeterminate
-                                small />
-                        ) : null}
+                    <Button
+                        type="submit"
+                        raised
+                        class={this.state.loading ? 'with-progress' : ''}
+                        disabled={this.state.loading}>
+                        <CircularProgress
+                            class="progress-overlay"
+                            indeterminate={this.state.loading}
+                            small />
                         <span>{locale.login.login}</span>
                     </Button>
                 </footer>

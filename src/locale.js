@@ -72,6 +72,8 @@ export default {
         // Login button
         login: 'Ensaluti',
 
+        logout: 'Elsaluti',
+
         // Errors
         invalidUEACode: 'Nevalida UEA-kodo aŭ retpoŝtadreso',
         invalidSecurityCode: 'Bonvolu enmeti vian sesciferan sekurkodon',
@@ -82,6 +84,7 @@ export default {
         },
         genericError: 'Ne sukcesis ensaluti, bv. reprovi poste',
         notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon',
+        notAdminLogout: '[[please log out and log in with an admin account to use AKSO]]',
         genericTotpError: 'Ne sukcesis ensaluti, bv. reprovi poste',
         invalidTotp: 'Nevalida sekurkodo',
     },

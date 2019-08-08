@@ -51,6 +51,10 @@ export default class AutosizingPageView extends Component {
         this.updatePageHeights();
         this.heightSpring.value = this.currentHeight();
         this.forceUpdate();
+
+        // sometimes, the styles are applied *after* the vdom renders, so the page heights need
+        // to be updated again
+        setTimeout(() => this.pageHeightChanged(), 100);
     }
 
     componentWillUnmount () {
