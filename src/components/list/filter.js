@@ -25,6 +25,8 @@ export default class Filter extends PureComponent {
         onEnabledChange: PropTypes.func.isRequired,
         /** Should be set to true if the form was submitted and the checkboxes should be hidden. */
         submitted: PropTypes.bool.isRequired,
+        isFirst: PropTypes.bool,
+        isLast: PropTypes.bool,
     };
 
     render () {
@@ -36,15 +38,15 @@ export default class Filter extends PureComponent {
             && !this.props.submitted;
 
         const filterHeader = (
-            <div className="filter-header">
+            <div class="filter-header">
                 {(filter.needsSwitch && !filter.autoSwitch && !this.props.submitted) ? (
                     <Checkbox
                         class="filter-checkbox"
                         checked={this.props.enabled}
                         disabled={!userCanToggleEnabled}
                         onChange={checked => this.props.onEnabledChange(checked)} />
-                ) : <div className="filter-checkbox-placeholder" />}
-                <div className="filter-label" onClick={() => {
+                ) : <div class="filter-checkbox-placeholder" />}
+                <div class="filter-label" onClick={() => {
                     // also toggle enabled state when clicking on the label
                     if (userCanToggleEnabled) {
                         this.props.onEnabledChange(!this.props.enabled);
@@ -77,9 +79,11 @@ export default class Filter extends PureComponent {
 
         let className = 'search-filter';
         if (!this.props.enabled) className += ' disabled';
+        if (this.props.isFirst) className += ' is-first';
+        if (this.props.isLast) className += ' is-last';
 
         return (
-            <div className={className}>
+            <div class={className}>
                 {editor}
             </div>
         );

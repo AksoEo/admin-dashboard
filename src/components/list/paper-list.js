@@ -129,16 +129,44 @@ export default class PaperList extends PureComponent {
         const props = { ...this.props };
         delete props.layout;
 
+        const paper = [];
+        let paperSpanStart = null;
+        let paperSpanEnd = null;
+        let paperKey = 0;
+        const startPaper = (top, height) => {
+            if (paperSpanStart === null) {
+                paperSpanStart = paperSpanEnd = top;
+            }
+            paperSpanEnd += height;
+        };
+        const endPaper = () => {
+            if (paperSpanStart !== null) {
+                const top = paperSpanStart;
+                const bottom = paperSpanEnd;
+                paper.push(
+                    <div
+                        key={paperKey++}
+                        class="paper"
+                        style={{
+                            transform: `translateY(${top}px)`,
+                            height: bottom - top,
+                        }} />
+                );
+                paperSpanStart = null;
+            }
+        };
+
         const items = [];
         for (let i = 0; i < this.props.children.length; i++) {
-            const { node } = this.props.children[i];
-            const hidden = this.childStates[i] ? !!this.childStates[i].hidden.target : true;
+            const { node, paper, flush } = this.props.children[i];
+            const state = this.childStates[i];
+            const hidden = state ? !!state.hidden.target : true;
             const style = this.getChildStyle(i);
             const index = i;
             items.push(
                 <div
                     key={i}
-                    className="paper-list-item"
+                    class="paper-list-item"
                     style={style}
                     aria-hidden={hidden}
                     ref={node => {
@@ -150,6 +178,13 @@ export default class PaperList extends PureComponent {
                     {node}
                 </div>
             );
+
+            if (state && paper) {
+                startPaper(
+                    state.y.value + state.height.value * state.hidden.value / 2,
+                    state.height.value * (1 - state.hidden.value),
+                );
+            } else if (state && (state.hidden.value < 0.9 || flush)) endPaper();
         }
 
         // GC node refs
@@ -159,6 +194,7 @@ export default class PaperList extends PureComponent {
 
         return (
             <div {...props} style={{ height: this.nodeHeight }}>
+                {paper}
                 {items}
             </div>
         );

@@ -476,7 +476,7 @@ const SearchFilters = connect(state => ({
         node: props.title,
         hidden: props.submitted,
     });
-    items.push({ node: props.searchInput, zIndex: 3 });
+    items.push({ node: props.searchInput, paper: true, zIndex: 3 });
     items.push({
         node: props.savedFilters,
         hidden: props.submitted,
@@ -502,7 +502,7 @@ const SearchFilters = connect(state => ({
     } else {
         items.push({ node: <div className="dummy-json-filter-placeholder" />, hidden: true });
 
-        const filters = Object.entries(props.filters);
+        let filters = Object.entries(props.filters);
         let hasEnabledFilters = false;
         for (const id of filters) {
             if (props.filterStates[id] && props.filterStates[id].enabled) {
@@ -521,24 +521,42 @@ const SearchFilters = connect(state => ({
             });
         }
 
+        filters = filters.filter(([id]) => (id in props.filterStates))
+            .map(([id, filter]) => ({
+                id,
+                filter,
+                hidden: !props.expanded || props.submitted && !props.filterStates[id].enabled,
+            }));
+
+        let firstVisibleFilter = null;
+        let lastVisibleFilter = null;
+        for (const filter of filters) {
+            if (!filter.hidden && !firstVisibleFilter) firstVisibleFilter = filter.id;
+            if (!filter.hidden) lastVisibleFilter = filter.id;
+        }
+
         items.push(
-            ...filters.filter(([id]) => (id in props.filterStates))
-                .map(([id, filter]) => ({
-                    node: <Filter
-                        key={id}
-                        id={id}
-                        localizedName={props.localizedFilters[id]}
-                        filter={filter}
-                        enabled={props.filterStates[id].enabled}
-                        value={props.filterStates[id].value}
-                        onChange={value => props.onChange(id, value)}
-                        onEnabledChange={value => props.onEnabledChange(id, value)}
-                        submitted={props.submitted} />,
-                    hidden: !props.expanded || props.submitted && !props.filterStates[id].enabled,
-                    staticHeight: true,
-                }))
+            ...filters.map(({ id, filter, hidden }) => ({
+                node: <Filter
+                    key={id}
+                    id={id}
+                    localizedName={props.localizedFilters[id]}
+                    filter={filter}
+                    enabled={props.filterStates[id].enabled}
+                    value={props.filterStates[id].value}
+                    onChange={value => props.onChange(id, value)}
+                    onEnabledChange={value => props.onEnabledChange(id, value)}
+                    submitted={props.submitted}
+                    isFirst={id === firstVisibleFilter}
+                    isLast={id === lastVisibleFilter} />,
+                hidden,
+                paper: true,
+                staticHeight: true,
+            }))
         );
     }
+
+    items.push({ node: <div class="bottom-padding" />, hidden: props.submitted, flush: true });
 
     return <PaperList className="search-filters-container">{items}</PaperList>;
 });

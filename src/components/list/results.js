@@ -65,23 +65,23 @@ export default function Results ({
                         onSetFieldSorting={onSetFieldSorting}
                         localizedFields={localizedFields}
                         getLinkTarget={getLinkTarget} />
+                    {totalItems ? (
+                        <TablePagination
+                            className="table-pagination"
+                            component="div"
+                            count={totalItems}
+                            labelDisplayedRows={locale.listView.pagination.displayedRows}
+                            labelRowsPerPage={locale.listView.pagination.rowsPerPage}
+                            page={page}
+                            rowsPerPage={itemsPerPage}
+                            onChangePage={(e, page) => onSetPage(page)}
+                            onChangeRowsPerPage={e => onSetItemsPerPage(e.target.value)} />
+                    ) : null}
                 </div>
             ) : time ? (
                 <div className="no-results">
                     {locale.listView.noResults}
                 </div>
-            ) : null}
-            {totalItems ? (
-                <TablePagination
-                    className="table-pagination"
-                    component="div"
-                    count={totalItems}
-                    labelDisplayedRows={locale.listView.pagination.displayedRows}
-                    labelRowsPerPage={locale.listView.pagination.rowsPerPage}
-                    page={page}
-                    rowsPerPage={itemsPerPage}
-                    onChangePage={(e, page) => onSetPage(page)}
-                    onChangeRowsPerPage={e => onSetItemsPerPage(e.target.value)} />
             ) : null}
         </div>
     );
