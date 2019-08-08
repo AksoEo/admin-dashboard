@@ -9,27 +9,15 @@ import './app.less';
 
 import {
     AppBarProvider, AppBarConsumer, AppBarProxy, MenuIcon, Button, CircularProgress,
+    LinearProgress,
 } from 'yamdl';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Sidebar from './features/sidebar';
-import HeaderLogo from './components/header-logo';
 import routes from './pages';
 import cache from './cache';
 
 import moment from 'moment';
 import 'moment/locale/eo';
 moment.locale('eo');
-
-const theme = createMuiTheme({
-    palette: {
-        primary: { main: '#31a64f' },
-        secondary: { main: '#31a64f' },
-    },
-    typography: {
-        useNextVariants: true,
-    },
-});
 
 /** Minimum width for a perma-sidebar. */
 const PERMA_SIDEBAR_WIDTH = 900;
@@ -98,9 +86,7 @@ export default class App extends PureComponent {
     /** The current page component. */
     currentPage = null;
 
-    onResize = (cb) => {
-        this.setState({ permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH }, cb);
-    }
+    onResize = () => this.setState({ permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH });
 
     currentPageNode () {
         return this.pageContainer ? this.pageContainer.children[0] : {};
@@ -182,13 +168,7 @@ export default class App extends PureComponent {
     };
 
     componentDidMount () {
-        this.onResize(() => {
-            if (!this.state.permaSidebar) {
-                if (this.props.onDirectTransition(null)) {
-                    this.setState({ animateIn: true });
-                }
-            }
-        });
+        this.onResize();
         window.addEventListener('resize', this.onResize);
         window.addEventListener('popstate', this.onPopState);
         this.updatePageTitle();
@@ -259,18 +239,10 @@ export default class App extends PureComponent {
                     title: locale.pages[this.state.currentPage.id],
                 }}
                 id="app-header">
-                {this.state.permaSidebar ? (
-                    <HeaderLogo
-                        onDirectTransition={this.props.onDirectTransition}
-                        onDoAnimateIn={() => {
-                            this.setState({ animateIn: true });
-                            this.sidebar.animateIn(300);
-                        }}
-                        onClick={() => this.onNavigate('/')} />
-                ) : null}
-                {isLoading ? (
-                    <LinearProgress className="header-progress" />
-                ) : null}
+                <LinearProgress
+                    class="header-progress"
+                    indeterminate={isLoading}
+                    hideIfNone />
             </AppBarConsumer>
         );
     }
@@ -290,12 +262,13 @@ export default class App extends PureComponent {
 
         appDrawer = (
             <Sidebar
-                ref={view => this.sidebar = view}
                 permanent={this.state.permaSidebar}
                 open={this.state.sidebarOpen || this.state.permaSidebar}
                 onOpen={() => this.setState({ sidebarOpen: true })}
                 onClose={() => this.setState({ sidebarOpen: false })}
                 currentPage={this.state.currentPage.id}
+                onDirectTransition={this.props.onDirectTransition}
+                onDoAnimateIn={() => this.setState({ animateIn: true })}
                 onLogout={this.props.onLogout} />
         );
 
@@ -318,27 +291,25 @@ export default class App extends PureComponent {
 
         return (
             <div id="app" className={className}>
-                <MuiThemeProvider theme={theme}>
-                    <AppBarProvider>
-                        <appContext.Provider value={{
-                            navigate: this.onNavigate,
-                            replace: this.onReplace,
-                            permissions: this.state.permissions,
-                            hasPermission: this.hasPermission,
-                        }}>
+                <AppBarProvider>
+                    <appContext.Provider value={{
+                        navigate: this.onNavigate,
+                        replace: this.onReplace,
+                        permissions: this.state.permissions,
+                        hasPermission: this.hasPermission,
+                    }}>
+                        {appDrawer}
+                        <div className="app-contents">
                             {appHeader}
-                            <div className="app-contents">
-                                {appDrawer}
-                                <div
-                                    className="page-container"
-                                    ref={node => this.pageContainer = node}>
-                                    <AppBarProxy />
-                                    {pageContents}
-                                </div>
+                            <div
+                                className="page-container"
+                                ref={node => this.pageContainer = node}>
+                                <AppBarProxy />
+                                {pageContents}
                             </div>
-                        </appContext.Provider>
-                    </AppBarProvider>
-                </MuiThemeProvider>
+                        </div>
+                    </appContext.Provider>
+                </AppBarProvider>
             </div>
         );
     }

@@ -50,6 +50,7 @@ export default class LogoTransition extends Component {
         } else {
             this.x.target = this.x.value;
             this.y.target = this.y.value;
+            this.scale.target = 1;
             this.opacity.target = 0;
         }
 

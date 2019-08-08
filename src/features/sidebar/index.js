@@ -26,6 +26,10 @@ export default class Sidebar extends PureComponent {
         currentPage: PropTypes.string.isRequired,
         /** Called when the log out button is pressed. */
         onLogout: PropTypes.func.isRequired,
+        /** Forwarded from app. */
+        onDirectTransition: PropTypes.func.isRequired,
+        /** Forwarded from app. */
+        onDoAnimateIn: PropTypes.func.isRequired,
     };
 
     /**
@@ -82,7 +86,7 @@ export default class Sidebar extends PureComponent {
 
     componentDidMount () {
         this.updateSpringTarget();
-        if (this.props.permanent || this.props.open) {
+        if ((this.props.permanent || this.props.open) && !this.animatingIn) {
             this.spring.value = 1;
         }
         this.spring.start();
@@ -95,6 +99,7 @@ export default class Sidebar extends PureComponent {
         this.spring.value = 0;
         this.onSpringUpdate(0);
         this.spring.stop();
+        this.animatingIn = true;
         setTimeout(() => this.spring.start(), delay);
     }
 
@@ -139,7 +144,12 @@ export default class Sidebar extends PureComponent {
                     }}>
                     <SidebarContents
                         currentPage={this.props.currentPage}
-                        onLogout={this.props.onLogout} />
+                        onLogout={this.props.onLogout}
+                        onDirectTransition={this.props.onDirectTransition}
+                        onDoAnimateIn={() => {
+                            this.props.onDoAnimateIn();
+                            this.animateIn(300);
+                        }} />
                 </div>
             </div>
         );

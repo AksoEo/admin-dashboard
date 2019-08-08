@@ -1,16 +1,12 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { PureComponent, Fragment } from 'preact/compat';
 import PropTypes from 'prop-types';
 import Avatar from '@material-ui/core/Avatar';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import Typography from '@material-ui/core/Typography';
-import { Button, Menu } from 'yamdl';
+import { Button, Menu, DrawerItem, DrawerLabel } from 'yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Link  } from '../../router';
+import { Link, appContext } from '../../router';
+import SidebarLogo from './sidebar-logo';
 import pages from '../../pages';
 import locale from '../../locale';
 import { TEJOIcon, UEAIcon } from './icons';
@@ -20,13 +16,12 @@ import client from '../../client';
 function NavItem (props) {
     const { id, icon, url } = props.item;
     return (
-        <Link target={`/${url}`} className="sidebar-link">
-            <ListItem
-                button
-                selected={props.currentPage === id}>
-                <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText>{locale.pages[id]}</ListItemText>
-            </ListItem>
+        <Link target={`/${url}`} class="sidebar-link">
+            <DrawerItem
+                selected={props.currentPage === id}
+                icon={icon}>
+                {locale.pages[id]}
+            </DrawerItem>
         </Link>
     );
 }
@@ -39,19 +34,17 @@ NavItem.propTypes = {
 /** Renders a category in `pages`. */
 function NavCategory (props) {
     const { id, contents } = props.item;
+    const label = locale.pages[id] ? <DrawerLabel>{locale.pages[id]}</DrawerLabel> : null;
     return (
-        <List subheader={
-            <ListSubheader>
-                {locale.pages[id]}
-            </ListSubheader>
-        }>
+        <Fragment>
+            {label}
             {contents.map(item => (
                 <NavItem
                     key={item.id}
                     item={item}
                     currentPage={props.currentPage} />
             ))}
-        </List>
+        </Fragment>
     );
 }
 
@@ -67,7 +60,13 @@ export default class SidebarContents extends PureComponent {
         currentPage: PropTypes.string.isRequired,
         /** Logout callback. */
         onLogout: PropTypes.func.isRequired,
+        /** Forwarded from app. */
+        onDirectTransition: PropTypes.func.isRequired,
+        /** Forwarded from app. */
+        onDoAnimateIn: PropTypes.func.isRequired,
     };
+
+    static contextType = appContext;
 
     state = {
         userMenuOpen: false,
@@ -107,32 +106,24 @@ export default class SidebarContents extends PureComponent {
         const avatarSrcSet = [32, 64, 128, 256].map(w => `${avatarURLBase}${w}px ${w}w`).join(', ');
 
         return (
-            <div className="app-sidebar-contents">
-                <div className="sidebar-header">
-                    <div className="sidebar-logo">
-                        <img
-                            className="logo"
-                            src="/assets/logo.svg"
-                            draggable={0}
-                            aria-hidden="true"
-                            role="presentation" />
-                        <img
-                            className="logo-label"
-                            src="/assets/logo-label.svg"
-                            draggable={0}
-                            aria-label="AKSO"
-                            alt="AKSO" />
-                    </div>
-                    <div className="sidebar-user">
+            <div class="app-sidebar-contents">
+                <div class="sidebar-header">
+                    <SidebarLogo
+                        onDirectTransition={this.props.onDirectTransition}
+                        onDoAnimateIn={() => {
+                            this.props.onDoAnimateIn();
+                        }}
+                        onClick={() => this.context.navigate('/')} />
+                    <div class="sidebar-user">
                         <Avatar
-                            className="user-avatar"
+                            class="user-avatar"
                             srcSet={this.state.hasProfilePicture ? avatarSrcSet : null}>
                             {!this.state.hasProfilePicture && this.state.userName
                                 ? this.state.userName[0]
                                 : null}
                         </Avatar>
                         <Typography
-                            className="user-name"
+                            class="user-name"
                             variant="subtitle1"
                             color="inherit">
                             {this.state.userName}
@@ -166,9 +157,9 @@ export default class SidebarContents extends PureComponent {
                             ]} />
                     </div>
                 </div>
-                <div className="sidebar-nav-container">
-                    <div className="sidebar-nav">
-                        <nav className="sidebar-nav-list" role="navigation">
+                <div class="sidebar-nav-container">
+                    <div class="sidebar-nav">
+                        <nav class="sidebar-nav-list" role="navigation">
                             {pages.map(item => (
                                 <NavCategory
                                     key={item.id}
@@ -177,12 +168,12 @@ export default class SidebarContents extends PureComponent {
                             ))}
                         </nav>
                     </div>
-                    <div className="sidebar-meta-info">
-                        <div className="info-logos">
+                    <div class="sidebar-meta-info">
+                        <div class="info-logos">
                             <UEAIcon />
                             <TEJOIcon />
                         </div>
-                        <div className="info-line">
+                        <div class="info-line">
                             {locale.meta.copyright} <a
                                 href={locale.meta.copyrightHref}
                                 target="_blank"

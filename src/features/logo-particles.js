@@ -107,7 +107,7 @@ function particleVortex (logo) {
 
     const root = document.createElement('div');
     root.className = 'root-container';
-    root.style.zIndex = 2019 - 7 - 18;
+    root.style.zIndex = 100 + 2019 - 7 - 18;
     document.body.appendChild(root);
 
     const backdrop = document.createElement('div');

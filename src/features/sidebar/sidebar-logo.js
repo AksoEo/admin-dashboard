@@ -1,13 +1,13 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
-import Logo from './logo';
+import Logo from '../../components/logo';
 
 // lazy-loaded particles
 let particlesPromise, triggerParticles;
 function loadParticles () {
     if (!particlesPromise) {
-        particlesPromise = import('../features/logo-particles');
+        particlesPromise = import('../logo-particles');
         particlesPromise.then(e => {
             triggerParticles = e.default;
         }).catch(() => {
@@ -17,7 +17,7 @@ function loadParticles () {
     }
 }
 
-export default class HeaderLogo extends PureComponent {
+export default class SidebarLogo extends PureComponent {
     static propTypes = {
         onClick: PropTypes.func,
         onDirectTransition: PropTypes.func,
@@ -36,7 +36,9 @@ export default class HeaderLogo extends PureComponent {
 
     componentDidMount () {
         if (this.props.onDirectTransition) {
-            if (this.props.onDirectTransition(
+            if (window.innerWidth < 900) { // FIXME: hardcoded perma sidebar width
+                this.props.onDirectTransition();
+            } else if (this.props.onDirectTransition(
                 this.logo.node.getBoundingClientRect(),
                 () => this.setState({ logoVisible: true }),
             )) {
@@ -48,7 +50,7 @@ export default class HeaderLogo extends PureComponent {
 
     render () {
         return (
-            <div className="header-logo" onClick={this.onClick} ref={node => this.node = node}>
+            <div class="sidebar-logo" onClick={this.onClick} ref={node => this.node = node}>
                 <Logo
                     ref={view => this.logo = view}
                     style={!this.state.logoVisible && ({ opacity: 0 })}
@@ -65,7 +67,7 @@ export default class HeaderLogo extends PureComponent {
                         }
                     }} />
                 <img
-                    className="logo-label"
+                    class="logo-label"
                     src="/assets/logo-label.svg"
                     draggable="false"
                     aria-label="AKSO"
