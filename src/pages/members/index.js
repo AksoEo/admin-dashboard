@@ -140,6 +140,11 @@ export default class MembersList extends PureComponent {
             label: locale.members.addMember.menuItem,
             action: () => this.setState({ addMemberOpen: true }),
         });
+        menu.push({
+            label: locale.members.search.resetFilters,
+            action: () => this.listView.resetFilters(),
+            overflow: true,
+        });
 
         return (
             <div className="app-page members-page" ref={node => this.node = node}>

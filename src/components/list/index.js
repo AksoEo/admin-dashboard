@@ -198,11 +198,11 @@ export default class ListView extends PureComponent {
         super(props);
 
         this.resetStore(props.defaults || {});
+    }
 
-        if (props.filters) {
-            for (const id of Object.keys(props.filters)) {
-                this.addFilter(id, props.filters[id]);
-            }
+    resetFilters () {
+        for (const id of (this.props.filters ? Object.keys(this.props.filters) : [])) {
+            this.addFilter(id, this.props.filters[id]);
         }
     }
 
@@ -218,6 +218,7 @@ export default class ListView extends PureComponent {
             actions.setPage(0),
             actions.setItemsPerPage(10),
         ].forEach(i => this.store.dispatch(i));
+        this.resetFilters();
     }
 
     componentDidUpdate (prevProps) {

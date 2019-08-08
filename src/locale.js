@@ -269,6 +269,7 @@ export default {
                 conjunction: 'kaj',
                 placeholder: 'Elekti kategoriojn',
             },
+            resetFilters: '[[clear filters]]',
         },
         fields: {
             codeholderType: 'Membrospeco',
