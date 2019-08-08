@@ -351,7 +351,7 @@ export default {
                 birthdate: 'Naskiĝtago',
                 deathdate: '[[deathdate]]',
                 codeholderType: 'Membrospeco',
-                newCode: 'Novan UEA-kodo',
+                newCode: 'Nova UEA-kodo',
                 oldCode: '[[old]] UEA-kodo',
                 email: 'Retpoŝtadreso',
                 nameLegal: '[[legal name]]',

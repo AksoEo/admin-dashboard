@@ -195,7 +195,7 @@ function CodeEditor ({ value, editing, onChange }) {
             {
                 key: 'oldCode',
                 label: locale.members.detail.fields.oldCode,
-                props: { maxLength: 4 },
+                props: { maxLength: 4, disabled: true },
             },
         ]], { value, onChange, class: 'uea-code-editor' });
     }
@@ -333,12 +333,12 @@ const fields = {
         },
     },
     enabled: {
-        component ({ value, onChange }) {
+        component ({ value, editing, onChange }) {
             return (
                 <Checkbox
-                    switch
+                    class={!editing ? 'fixed-checkbox' : ''}
                     checked={value.enabled}
-                    onChange={enabled => onChange({ ...value, enabled })} />
+                    onChange={enabled => editing && onChange({ ...value, enabled })} />
             );
         },
         hasDiff (original, value) {
@@ -346,12 +346,12 @@ const fields = {
         },
     },
     isDead: {
-        component ({ value, onChange }) {
+        component ({ value, editing, onChange }) {
             return (
                 <Checkbox
-                    switch
+                    class={!editing ? 'fixed-checkbox' : ''}
                     checked={value.isDead}
-                    onChange={isDead => onChange({ ...value, isDead })} />
+                    onChange={isDead => editing && onChange({ ...value, isDead })} />
             );
         },
         hasDiff (original, value) {
