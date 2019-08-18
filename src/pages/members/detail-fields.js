@@ -5,10 +5,10 @@ import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import { Checkbox, TextField } from 'yamdl';
+import { UEACode, WithCountries, CountryFlag } from './fields';
 import locale from '../../locale';
 import client from '../../client';
-import cache from '../../cache';
-import tableFields from './fields';
+import tableFields from './table-fields';
 
 /* eslint-disable react/prop-types */
 
@@ -183,8 +183,13 @@ function NameEditor ({ value, editing, onChange }) {
 
 function CodeEditor ({ value, editing, onChange }) {
     if (!editing) {
-        const Code = tableFields.code.component;
-        return <Code item={value} />;
+        return (
+            <div class="uea-codes">
+                <UEACode code={value.newCode} />
+                {' '}
+                {value.oldCode && <UEACode old code={value.oldCode} />}
+            </div>
+        );
     } else if (editing) {
         return lotsOfTextFields([[
             {
@@ -205,7 +210,7 @@ function Header ({ value, editing, onChange }) {
     return (
         <div class="member-header">
             <div class="member-picture-container">
-                {value.hasProfilePicture ? (
+                {(value.hasProfilePicture || editing) ? (
                     <img
                         class="member-picture"
                         src={`/codeholders/${value.id}/profile_picture/128px`} />
@@ -266,31 +271,25 @@ class AddressRenderer extends PureComponent {
     }
 }
 
-class CountryEditor extends PureComponent {
-    state = {
-        countries: {},
-    };
-
-    componentDidMount () {
-        cache.getCountries().then(countries => this.setState({ countries }));
-    }
-
-    render () {
-        return (
-            <div class="country-editor">
-                <NativeSelect
-                    value={this.props.value}
-                    onChange={e => this.props.onChange(e.target.value)}>
-                    <option value={''}>—</option>
-                    {Object.entries(this.state.countries).map(([id, name]) => (
-                        <option value={id} key={id}>
-                            {name}
-                        </option>
-                    ))}
-                </NativeSelect>
-            </div>
-        );
-    }
+function CountryEditor ({ value, onChange }) {
+    return (
+        <div class="country-editor">
+            <WithCountries>
+                {countries => (
+                    <NativeSelect
+                        value={value}
+                        onChange={e => onChange(e.target.value)}>
+                        <option value={''}>—</option>
+                        {Object.entries(countries).map(([id, name]) => (
+                            <option value={id} key={id}>
+                                {name}
+                            </option>
+                        ))}
+                    </NativeSelect>
+                )}
+            </WithCountries>
+        </div>
+    );
 }
 
 function simpleField (key, extraProps = {}) {
@@ -418,8 +417,16 @@ const fields = {
     feeCountry: {
         component ({ value, editing, onChange }) {
             if (!editing) {
-                // TODO: fancy country
-                return value.feeCountry;
+                return (
+                    <WithCountries>
+                        {countries => (
+                            <span class="fee-country">
+                                <CountryFlag country={value.feeCountry} />
+                                {countries[value.feeCountry]}
+                            </span>
+                        )}
+                    </WithCountries>
+                );
             } else {
                 return <CountryEditor
                     value={value.feeCountry}

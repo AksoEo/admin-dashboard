@@ -8,13 +8,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
 import fuzzaldrin from 'fuzzaldrin';
 import { Spring, globalAnimator, lerp } from '../../animation';
+import { CountryFlag } from './fields';
 import locale from '../../locale';
 import cache from '../../cache';
-
-/** Converts a letter to a regional indicator */
-const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
-/** Converts a two-letter country code to its corresponding emoji */
-const countryCodeToEmoji = code => toRI(code[0]) + toRI(code[1]);
 
 /** Renders a country picker. */
 export default class CountryPicker extends PureComponent {
@@ -46,10 +42,17 @@ export default class CountryPicker extends PureComponent {
 
     render () {
         // TODO: twemojify
-        const pickedCountries = this.props.value.map(id =>
-            id in this.state.countries
-                ? countryCodeToEmoji(id)
-                : this.state.countryGroups[id] && this.state.countryGroups[id].name).join(', ');
+        const pickedCountries = [];
+
+        for (let i = 0; i < this.props.value.length; i++) {
+            const id = this.props.value[i];
+            if (id in this.state.countries) {
+                pickedCountries.push(<CountryFlag key={i} country={id} />);
+            } else if (this.state.countryGroups[id]) {
+                pickedCountries.push(<span key={i}>{this.state.countryGroups[id].name}</span>);
+            }
+            if (i < this.props.value.length - 1) pickedCountries.push(<span key={'s' + i}>, </span>);
+        }
 
         // Event handler for when a country item is clicked; moves it to the other column
         const onItemClick = id => () => {
@@ -76,7 +79,7 @@ export default class CountryPicker extends PureComponent {
             node: <div class="country-item" onClick={onItemClick(id)}>
                 <div class="country-icon">
                     {id in this.state.countries
-                        ? <span>{countryCodeToEmoji(id)}</span>
+                        ? <CountryFlag country={id} />
                         : <LanguageIcon />}
                 </div>
                 <div class="country-name">
@@ -118,7 +121,7 @@ export default class CountryPicker extends PureComponent {
                     key: country,
                     column: 1,
                     node: <div class="country-item" onClick={onItemClick(country)}>
-                        <div class="country-icon"><span>{countryCodeToEmoji(country)}</span></div>
+                        <div class="country-icon"><CountryFlag country={country} /></div>
                         <div class="country-name">{this.state.countries[country]}</div>
                     </div>,
                 })));
@@ -132,7 +135,7 @@ export default class CountryPicker extends PureComponent {
                 }}
                 onClick={() => this.setState({ dialogOpen: true })}>
                 <span class="picked-countries">
-                    {pickedCountries
+                    {pickedCountries.length
                         ? pickedCountries
                         : (
                             <span class="countries-placeholder">

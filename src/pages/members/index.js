@@ -13,7 +13,7 @@ import Sorting from '../../components/list/sorting';
 import locale from '../../locale';
 import client from '../../client';
 import FILTERS from './filters';
-import FIELDS from './fields';
+import FIELDS from './table-fields';
 import detailFields from './detail-fields';
 import AddMemberDialog from './add-member';
 import './style';
