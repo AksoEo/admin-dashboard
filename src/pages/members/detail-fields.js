@@ -45,11 +45,11 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                             value: editor.fromValue
                                 ? editor.fromValue(getKeyedValue(value, editor.key))
                                 : getKeyedValue(value, editor.key),
-                            onChange: value => onChange(
+                            onChange: newValue => onChange(
                                 replaceKeyedValue(
                                     value,
                                     editor.key,
-                                    editor.intoValue ? editor.intoValue(value) : value,
+                                    editor.intoValue ? editor.intoValue(newValue) : newValue,
                                 )
                             ),
                             ...(editor.props || {}),
@@ -106,14 +106,13 @@ function NameEditor ({ value, editing, onChange }) {
         } else if (value.codeholderType === 'org') {
             IconType = BusinessIcon;
 
-            primaryName = value.fullName;
+            primaryName = [value.fullName];
             if (value.nameAbbrev) {
-                secondaryName = (
-                    <div class="name-abbrev">
-                        {locale.members.detail.fields.nameAbbrev}: <span class="name-abbrev-inner">
-                            {value.nameAbbrev}
-                        </span>
-                    </div>
+                primaryName.push(' ');
+                primaryName.push(
+                    <span class="name-abbrev" key={0}>
+                        ({value.nameAbbrev})
+                    </span>
                 );
             }
         }
@@ -304,6 +303,7 @@ function simpleField (key, extraProps = {}) {
         hasDiff (original, value) {
             return value[key] !== original[key];
         },
+        shouldHide: (value, editing) => !editing && !value[key],
     };
 }
 
@@ -356,6 +356,7 @@ const fields = {
         hasDiff (original, value) {
             return original.isDead !== value.isDead;
         },
+        shouldHide: (value, editing) => !editing && !value.isDead,
     },
     birthdate: {
         component ({ value, editing, onChange }) {
@@ -369,6 +370,7 @@ const fields = {
         hasDiff (original, value) {
             return original.birthdate !== value.birthdate;
         },
+        shouldHide: (value, editing) => !editing && !value.birthdate,
     },
     deathdate: {
         component ({ value, editing, onChange }) {
@@ -382,9 +384,7 @@ const fields = {
         hasDiff (original, value) {
             return original.deathdate !== value.deathdate;
         },
-        shouldHide (value) {
-            return !value.isDead;
-        },
+        shouldHide: (value) => !value.isDead,
     },
     address: {
         component ({ value, editing, onChange }) {
@@ -454,6 +454,7 @@ const fields = {
         hasDiff (original, value) {
             return value.email !== original.email;
         },
+        shouldHide: (value, editing) => !editing && !value.email,
     },
     profession: simpleField('profession', { maxLength: 50 }),
     landlinePhone: simpleField('landlinePhone', { type: 'tel', maxLength: 50 }),
@@ -481,6 +482,7 @@ const fields = {
         hasDiff (original, value) {
             return original.notes !== value.notes;
         },
+        shouldHide: (value, editing) => !editing && !value.notes,
         tall: true,
     },
 };

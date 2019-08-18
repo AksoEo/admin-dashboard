@@ -215,7 +215,7 @@ function DetailViewContents ({
         for (const id in fields) {
             const field = fields[id];
             if (field.editingOnly && !editing) continue;
-            if (field.shouldHide && field.shouldHide(item)) continue;
+            if (field.shouldHide && field.shouldHide(item, editing)) continue;
             const Component = field.component;
 
             let changed = true;
