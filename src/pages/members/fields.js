@@ -61,7 +61,6 @@ UEACode.propTypes = {
 };
 
 export function DateFmt ({ date }) {
-    // FIXME: displays as “15-a de December 1859”
     return date ? moment(date).format('D[-a de] MMMM Y') : '';
 }
 

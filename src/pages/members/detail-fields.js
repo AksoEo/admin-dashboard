@@ -9,6 +9,7 @@ import { UEACode, WithCountries, CountryFlag } from './fields';
 import locale from '../../locale';
 import client from '../../client';
 import tableFields from './table-fields';
+import { parsePhoneNumber, AsYouType as AsYouTypePhoneFmt } from 'libphonenumber-js';
 
 /* eslint-disable react/prop-types */
 
@@ -291,21 +292,55 @@ function CountryEditor ({ value, onChange }) {
     );
 }
 
-function simpleField (key, extraProps = {}) {
+function simpleField (key, extraProps = (() => {}), mapValue = (ident => ident)) {
     return {
         component ({ value, editing, onChange }) {
-            if (!editing) return value[key];
+            const onInputChange = v => onChange({ ...value, [key]: mapValue(v) });
+
+            if (!editing) return mapValue(value[key]);
             else return <TextField
                 value={value[key]}
-                onChange={e => onChange({ ...value, [key]: e.target.value })}
-                {...extraProps} />;
+                onChange={e => onInputChange(e.target.value)}
+                {...extraProps(value[key], onInputChange)} />;
         },
         hasDiff (original, value) {
+            // '' should still be considered the same as null
+            if (!value[key] && !original[key]) return false;
             return value[key] !== original[key];
         },
         shouldHide: (value, editing) => !editing && !value[key],
     };
 }
+
+const phoneProps = (value, onChange) => {
+    let trailing = '';
+    try {
+        const num = parsePhoneNumber(value);
+        if (num.country) {
+            trailing = <CountryFlag country={num.country.toLowerCase()} />;
+        }
+    } catch (_) {
+        // this comment exists because eslint
+    }
+
+    return {
+        type: 'tel',
+        maxLength: 50,
+        placeholder: '+',
+        trailing,
+        onFocus () {
+            if (!value) onChange('+');
+        },
+        onBlur () {
+            if (value.trim() === '+') onChange('');
+        },
+    };
+};
+
+const mapPhoneValue = value => {
+    if (value && !value.startsWith('+')) value = '+' + value;
+    return new AsYouTypePhoneFmt().input(value);
+};
 
 const fields = {
     name: {
@@ -456,10 +491,10 @@ const fields = {
         },
         shouldHide: (value, editing) => !editing && !value.email,
     },
-    profession: simpleField('profession', { maxLength: 50 }),
-    landlinePhone: simpleField('landlinePhone', { type: 'tel', maxLength: 50 }),
-    officePhone: simpleField('officePhone', { type: 'tel', maxLength: 50 }),
-    cellphone: simpleField('cellphone', { type: 'tel', maxLength: 50 }),
+    profession: simpleField('profession', () => ({ maxLength: 50 })),
+    landlinePhone: simpleField('landlinePhone', phoneProps, mapPhoneValue),
+    officePhone: simpleField('officePhone', phoneProps, mapPhoneValue),
+    cellphone: simpleField('cellphone', phoneProps, mapPhoneValue),
     notes: {
         component ({ value, editing, onChange }) {
             if (!editing) {
