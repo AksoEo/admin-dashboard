@@ -211,11 +211,12 @@ function DetailViewContents ({
     const footer = Footer ? <Footer {...makeFieldProps()} /> : null;
 
     const tableRows = [];
+    const emptyTableRows = [];
     if (fields) {
         for (const id in fields) {
             const field = fields[id];
             if (field.editingOnly && !editing) continue;
-            if (field.shouldHide && field.shouldHide(item, editing)) continue;
+            if (field.shouldHide && field.shouldHide(item)) continue;
             const Component = field.component;
 
             let changed = true;
@@ -236,12 +237,21 @@ function DetailViewContents ({
             if (changed) className += ' changed';
             if (field.tall) className += ' tall';
 
-            tableRows.push(
-                <tr key={id} class={className}>
-                    {keyCell}
-                    {valueCell}
-                </tr>
-            );
+            if (!editing && field.isEmpty && field.isEmpty(item)) {
+                emptyTableRows.push(
+                    <tr key={id} class={className + ' is-empty'}>
+                        {keyCell}
+                        <td class="field-container">—</td>
+                    </tr>
+                );
+            } else {
+                tableRows.push(
+                    <tr key={id} class={className}>
+                        {keyCell}
+                        {valueCell}
+                    </tr>
+                );
+            }
         }
     }
 
@@ -251,6 +261,7 @@ function DetailViewContents ({
             <table class="fields-table">
                 <tbody>
                     {tableRows}
+                    {emptyTableRows}
                 </tbody>
             </table>
             {footer}

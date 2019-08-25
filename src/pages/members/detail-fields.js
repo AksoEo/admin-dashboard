@@ -308,7 +308,7 @@ function simpleField (key, extraProps = (() => {}), mapValue = (ident => ident))
             if (!value[key] && !original[key]) return false;
             return value[key] !== original[key];
         },
-        shouldHide: (value, editing) => !editing && !value[key],
+        isEmpty: (value) => !value[key],
     };
 }
 
@@ -368,6 +368,7 @@ const fields = {
     },
     enabled: {
         component ({ value, editing, onChange }) {
+            if (!editing && !value.enabled) return '—';
             return (
                 <Checkbox
                     class={!editing ? 'fixed-checkbox' : ''}
@@ -391,7 +392,7 @@ const fields = {
         hasDiff (original, value) {
             return original.isDead !== value.isDead;
         },
-        shouldHide: (value, editing) => !editing && !value.isDead,
+        isEmpty: value => !value.isDead,
     },
     birthdate: {
         component ({ value, editing, onChange }) {
@@ -405,7 +406,7 @@ const fields = {
         hasDiff (original, value) {
             return original.birthdate !== value.birthdate;
         },
-        shouldHide: (value, editing) => !editing && !value.birthdate,
+        isEmpty: value => !value.birthdate,
     },
     deathdate: {
         component ({ value, editing, onChange }) {
@@ -419,7 +420,7 @@ const fields = {
         hasDiff (original, value) {
             return original.deathdate !== value.deathdate;
         },
-        shouldHide: (value) => !value.isDead,
+        isEmpty: value => !value.isDead,
     },
     address: {
         component ({ value, editing, onChange }) {
@@ -447,6 +448,7 @@ const fields = {
                         .map(a => value.address[a] === original.address[a])
                         .reduce((a, b) => a && b)));
         },
+        isEmpty: value => !value.address || !Object.values(value.address).filter(x => x).length,
         tall: true,
     },
     feeCountry: {
@@ -457,6 +459,7 @@ const fields = {
                         {countries => (
                             <span class="fee-country">
                                 <CountryFlag country={value.feeCountry} />
+                                {' '}
                                 {countries[value.feeCountry]}
                             </span>
                         )}
@@ -471,6 +474,7 @@ const fields = {
         hasDiff (original, value) {
             return original.feeCountry !== value.feeCountry;
         },
+        isEmpty: value => !value.feeCountry,
     },
     email: {
         component ({ value, editing, onChange }) {
@@ -489,7 +493,7 @@ const fields = {
         hasDiff (original, value) {
             return value.email !== original.email;
         },
-        shouldHide: (value, editing) => !editing && !value.email,
+        isEmpty: value => !value.email,
     },
     profession: simpleField('profession', () => ({ maxLength: 50 })),
     landlinePhone: simpleField('landlinePhone', phoneProps, mapPhoneValue),
@@ -517,7 +521,7 @@ const fields = {
         hasDiff (original, value) {
             return original.notes !== value.notes;
         },
-        shouldHide: (value, editing) => !editing && !value.notes,
+        isEmpty: value => !value.notes,
         tall: true,
     },
 };
