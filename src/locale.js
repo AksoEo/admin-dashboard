@@ -36,7 +36,7 @@ export default {
         home: 'Hejmo',
         members: 'Membroj',
         membership: 'Membreco',
-        email: 'Retpoŝto',
+        email: 'Amasmesaĝoj',
         magazines: 'Revuoj',
         statistics: 'Statistiko',
         congresses: 'Kongresoj',
