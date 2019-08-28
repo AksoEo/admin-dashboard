@@ -50,7 +50,7 @@ export default [
             {
                 id: 'email',
                 icon: <EmailIcon />,
-                url: 'retposhto',
+                url: 'amasmesaghoj',
             },
             {
                 id: 'magazines',
