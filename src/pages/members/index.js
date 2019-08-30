@@ -243,6 +243,7 @@ const Title = connect(state => ({
     return <div className="members-search-title">{title}</div>;
 });
 
+// maps client fields to api fields
 const fieldMapping = {
     codeholderType: {
         fields: ['codeholderType', 'enabled', 'isDead'],

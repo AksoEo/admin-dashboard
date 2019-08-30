@@ -55,6 +55,8 @@ export default class SidebarLogo extends PureComponent {
                     ref={view => this.logo = view}
                     style={!this.state.logoVisible && ({ opacity: 0 })}
                     onUpdate={logo => {
+                        // trigger particles when the user pointlessly clicks the logo quickly
+                        // enough for it to bounce 96 px far
                         if (logo.states[0].bounce.value > 96) {
                             if (triggerParticles) {
                                 triggerParticles(this.node);

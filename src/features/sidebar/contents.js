@@ -12,7 +12,9 @@ import locale from '../../locale';
 import { TEJOIcon, UEAIcon } from './icons';
 import client from '../../client';
 
-/** Renders a single item in `ROUTES`. */
+// also see src/pages/index.js
+
+/** Renders a single item in the sidebar. */
 function NavItem (props) {
     const { id, icon, url } = props.item;
     return (
@@ -31,7 +33,7 @@ NavItem.propTypes = {
     currentPage: PropTypes.string.isRequired,
 };
 
-/** Renders a category in `pages`. */
+/** Renders a sidebar category. */
 function NavCategory (props) {
     const { id, contents } = props.item;
     const label = locale.pages[id] ? <DrawerLabel>{locale.pages[id]}</DrawerLabel> : null;
@@ -96,7 +98,7 @@ export default class SidebarContents extends PureComponent {
                 userName: name,
                 hasProfilePicture: data.hasProfilePicture,
             });
-        });
+        })
     }
 
     render () {

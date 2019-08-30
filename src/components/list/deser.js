@@ -12,6 +12,16 @@ import * as actions from './actions';
 //
 // Also, # is encoded as %23 and % as %25. All percent-encoding should be resolved when decoding
 // to account for automatic encoding in browsers.
+//
+// # Examples
+// ```
+// cats -> (cats)
+// cats() -> ((cats()))
+// cats(()) -> (((cats())))
+// (cats) -> ((*(cats)))
+// *cats -> (**cats)
+// cats#% -> (cats%23%25)
+// ```
 function encodeParens (str) {
     let parens = 1;
 
@@ -67,7 +77,8 @@ function decodeParens (str) {
     return [decoded, cursor];
 }
 
-// Will only use parenthesis encoding if the string is deemed unsafe
+// Will only use parenthesis encoding if the string is deemed unsafe, i.e. if it may be ambiguous
+// where the string ends in a given context
 function maybeEncodeParens (str, unsafeChars) {
     if (str.startsWith('(')) return encodeParens(str);
     for (const c of unsafeChars) if (str.includes(c)) return encodeParens(str);

@@ -21,6 +21,7 @@ import './style';
 
 const JSONEditor = lazy(() => import('./json-editor'));
 
+// redux actions that trigger a debounced reload
 const reloadingActions = [
     actions.SET_SEARCH_QUERY,
     actions.SET_FILTERS_ENABLED,
@@ -37,6 +38,7 @@ const reloadingActions = [
     actions.SET_ITEMS_PER_PAGE,
 ];
 
+// actions that cause the url query to change
 const urlQueryActions = reloadingActions.concat([
     actions.MOVE_FIELD,
     actions.REMOVE_FIELD,
@@ -170,6 +172,12 @@ export default class ListView extends PureComponent {
         onChangePage: PropTypes.func,
 
         /// User-defined options for CSV export.
+        ///
+        /// Should be an object of `id => spec`, where spec is an object with a `type` field.
+        ///
+        /// ## Types
+        /// - `select`: will render a select with options given by the `options` field in the spec.
+        ///   Each option should be an (array) tuple like `[id, label]`.
         csvExportOptions: PropTypes.object,
 
         /// If true, will be able to save filters.

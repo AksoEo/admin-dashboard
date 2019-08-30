@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { createContext } from 'preact/compat';
 import PropTypes from 'prop-types';
 
+// FIXME: permissions should not be here; just use this for routing
 /**
  * A React context for in-app navigation.
  *

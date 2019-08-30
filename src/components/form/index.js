@@ -4,9 +4,16 @@ import PropTypes from 'prop-types';
 import { Spring } from '../../animation';
 import './style';
 
-/** Context that contains an interface to the Form component. */
+/**
+ * Context that contains an interface to the [Form] component.
+ *
+ * Every Form will create an instance of this context, allowing form components to register
+ * themselves.
+ */
 export const FormContext = createContext({
+    /** Register a form component (should be passed the component instance as the first arg). */
     register: () => {},
+    /** Deregisters a previously registered component (pass component as first arg). */
     deregister: () => {},
 });
 
@@ -98,6 +105,21 @@ export default class Form extends Component {
  * Must be used inside a Form component.
  *
  * All props (except the ones listed below) will be passed directly to the wrapped component.
+ *
+ * # Examples
+ * ```jsx
+ * <Validator
+ *     // this can be any kind of component
+ *     component={TextField}
+ *     value={state.value}
+ *     // this will be called at appropriate times to see if a value is valid
+ *     validate={value => {
+ *         // if the value is invalid, the thrown object will be appended as props
+ *         if (!isValid(value)) throw { error: 'invalid', style: { color: 'red' } };
+ *     }} />
+ * ```
+ *
+ * Additionally, there is a `shake` method for shaking the validator manually.
  */
 export class Validator extends Component {
     static propTypes = {

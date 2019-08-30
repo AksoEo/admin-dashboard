@@ -14,6 +14,7 @@ import cache from '../../cache';
 
 /* eslint-disable react/prop-types */
 
+/// Renders a range editor with inputs on either side.
 function RangeEditor ({ min, max, value, onChange, tickDistance, disabled }) {
     return (
         <div class={'range-editor' + (disabled ? ' disabled' : '')}>

@@ -1,8 +1,8 @@
+//! This file is secret and contains vfx à la video games.
+
 import { globalAnimator, lerp, clamp } from '../animation';
 import client from '../client';
 import locale from '../locale';
-
-/** @jsx h */
 
 function shakeScreen () {
     globalAnimator.register({

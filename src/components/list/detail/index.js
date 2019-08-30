@@ -6,29 +6,60 @@ import EditIcon from '@material-ui/icons/Edit';
 import locale from '../../../locale';
 import './style';
 
+/**
+ * The detail view in a list view, which is shown as a modal overlay and contains details about a
+ * selected item.
+ */
 export default class DetailView extends PureComponent {
     static propTypes = {
+        /** Whether the detail view is open. */
         open: PropTypes.bool,
+        /** Close handler. Called e.g. when the user taps the backdrop. */
         onClose: PropTypes.func,
+        /** Detail view data request handler, with `(id) => Promise<Object>`. */
         onRequest: PropTypes.func,
+        /**
+         * Called when the item is updated *from the database*, meaning the full data was loaded
+         * and should be used to patch the potentially only partial data in the redux store.
+         */
         onUpdateItem: PropTypes.func.isRequired,
+        /**
+         * Called when the item is edited and saved, with `(id, original, value, comment)`.
+         *
+         * - `id`: the unique ID of the item
+         * - `original`: the original value
+         * - `value`: the edited value
+         * - `comment`: the commit message
+         */
         onPatch: PropTypes.func,
+        /** Called when an item is deleted, with `(id) => Promise<void>`. */
         onDelete: PropTypes.func,
+        /** Item data from the redux store. */
         items: PropTypes.object.isRequired,
+        /** Current item id. */
         id: PropTypes.any,
+        /** Locale data for the detail view (see list view docs for details). */
         locale: PropTypes.object.isRequired,
+        /** Spec for all the detail fields. */
         fields: PropTypes.object,
+        /** Component that renders the header. Same structure as a field. */
         headerComponent: PropTypes.any,
+        /** Component that renders the footer. Same structure as a field. */
         footerComponent: PropTypes.any,
     };
 
     state = {
-        // id is derived state so it lingers when the detail view is closed
+        // id is in derived state so it can linger while the detail view is closing, because
+        // the id field is also used as the open state in the list view
         id: null,
+        // any kind of error while loading the detail view data
         error: null,
+        // a temporary copy of the data that is meant to be mutable and is used in edit mode
         editingCopy: null,
 
+        // if true, the “are you sure you want to delete x” dialog is open
         confirmDeleteOpen: false,
+        // if true, the “commit and save” dialog is open
         saveOpen: false,
     };
 
@@ -44,6 +75,7 @@ export default class DetailView extends PureComponent {
     componentDidUpdate (prevProps) {
         if (prevProps.id !== this.props.id) {
             if (this.props.id) {
+                // id changed; reload
                 this.setState({ id: this.props.id }, () => this.load());
             }
         }

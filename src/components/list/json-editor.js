@@ -16,6 +16,7 @@ import './json-editor.less';
 // (see ./index.js for the default value)
 const DEFAULT_CURSOR_POS = [1, 1];
 
+/// JSON editor for advanced search filters.
 export default class JSONEditor extends PureComponent {
     static propTypes = {
         value: PropTypes.string.isRequired,

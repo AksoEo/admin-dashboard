@@ -9,6 +9,7 @@ import UEACode from 'akso-client/uea-code';
 import locale from '../../locale';
 import client from '../../client';
 
+/// Add member dialog.
 export default class AddMemberDialog extends PureComponent {
     static propTypes = {
         open: PropTypes.bool,
@@ -30,6 +31,7 @@ export default class AddMemberDialog extends PureComponent {
     }
 }
 
+// the api returns errors as strings so i guess here’s a hacky way of localizing those
 const KNOWN_ERRORS = {
     'Org UEA codes must begin with xx': state => state.codeholderType === 'human'
         ? locale.members.addMember.invalidHumanCode

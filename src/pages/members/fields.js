@@ -1,3 +1,5 @@
+//! Common objects for detail and table fields.
+
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import cache from '../../cache';

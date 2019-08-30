@@ -11,15 +11,19 @@ import locale from '../../locale';
 
 const ITEMS_PER_PAGE = 100;
 
+/// The CSV export dialog.
 export default class CSVExport extends PureComponent {
     static propTypes = {
         open: PropTypes.bool,
         onClose: PropTypes.func,
+        /// For getting a ref to this component (because redux wrapper components, apparently)
         innerRef: PropTypes.func,
+        /// The entire redux state.
         state: PropTypes.object.isRequired,
         onSetPage: PropTypes.func.isRequired,
         onSetItemsPerPage: PropTypes.func.isRequired,
         onSubmit: PropTypes.func.isRequired,
+        /// File name prefix.
         filename: PropTypes.string.isRequired,
         localizedFields: PropTypes.object.isRequired,
         localizedCSVFields: PropTypes.object.isRequired,
@@ -248,6 +252,7 @@ export default class CSVExport extends PureComponent {
     }
 }
 
+/// Renders user-defined options. See list view docs for details.
 class UserOptions extends PureComponent {
     static propTypes = {
         options: PropTypes.object.isRequired,
