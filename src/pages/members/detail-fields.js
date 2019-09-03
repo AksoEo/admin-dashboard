@@ -1,15 +1,18 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import { Checkbox, TextField } from 'yamdl';
-import { UEACode, WithCountries, CountryFlag } from './fields';
 import locale from '../../locale';
-import client from '../../client';
-import tableFields from './table-fields';
-import { parsePhoneNumber, AsYouType as AsYouTypePhoneFmt } from 'libphonenumber-js';
+import {
+    UEACode,
+    WithCountries,
+    CountryFlag,
+    DateEditor,
+    AddressRenderer,
+    PhoneNumber,
+    Email,
+} from '../../components/data';
 
 /* eslint-disable react/prop-types */
 
@@ -197,11 +200,6 @@ function CodeEditor ({ value, editing, onChange }) {
                 label: locale.members.detail.fields.newCode + '*', // required
                 props: { maxLength: 6 },
             },
-            {
-                key: 'oldCode',
-                label: locale.members.detail.fields.oldCode,
-                props: { maxLength: 4, disabled: true },
-            },
         ]], { value, onChange, class: 'uea-code-editor' });
     }
 }
@@ -226,51 +224,6 @@ function Header ({ value, editing, onChange }) {
     );
 }
 
-// TODO: some way to pick language
-class AddressRenderer extends PureComponent {
-    static propTypes = {
-        id: PropTypes.any,
-    };
-
-    state = {
-        address: null,
-    };
-
-    componentDidMount () {
-        this.load();
-    }
-    componentDidUpdate (prevProps) {
-        if (prevProps.id !== this.props.id) this.load();
-    }
-    componentWillUnmount () {
-        clearTimeout(this.reloadTimeout);
-    }
-
-    load () {
-        if (!this.props.id) return;
-        const id = this.props.id;
-        client.get(`/codeholders/${this.props.id}/address/eo`, {
-            formatAs: 'displayLatin',
-        }).then(res => {
-            if (id !== this.props.id) return;
-            this.setState({ address: res.body[this.props.id] });
-        }).catch(() => {
-            this.reloadTimeout = setTimeout(() => this.load(), 1000);
-        });
-    }
-
-    render () {
-        if (!this.state.address) return;
-        return (
-            <div class="address-rendered">
-                {this.state.address
-                    .split('\n')
-                    .map((x, i) => (<div class="address-line" key={i}>{x}</div>))}
-            </div>
-        );
-    }
-}
-
 function CountryEditor ({ value, onChange }) {
     return (
         <div class="country-editor">
@@ -292,16 +245,11 @@ function CountryEditor ({ value, onChange }) {
     );
 }
 
-function simpleField (key, extraProps = (() => {}), mapValue = (ident => ident)) {
+function simpleField (key, Component) {
     return {
         component ({ value, editing, onChange }) {
-            const onInputChange = v => onChange({ ...value, [key]: mapValue(v) });
-
-            if (!editing) return mapValue(value[key]);
-            else return <TextField
-                value={value[key]}
-                onChange={e => onInputChange(e.target.value)}
-                {...extraProps(value[key], onInputChange)} />;
+            const onInputChange = v => onChange({ ...value, [key]: v });
+            return <Component value={value[key]} editing={editing} onChange={onInputChange} />;
         },
         hasDiff (original, value) {
             // '' should still be considered the same as null
@@ -311,36 +259,6 @@ function simpleField (key, extraProps = (() => {}), mapValue = (ident => ident))
         isEmpty: (value) => !value[key],
     };
 }
-
-const phoneProps = (value, onChange) => {
-    let trailing = '';
-    try {
-        const num = parsePhoneNumber(value);
-        if (num.country) {
-            trailing = <CountryFlag country={num.country.toLowerCase()} />;
-        }
-    } catch (_) {
-        // this comment exists because eslint
-    }
-
-    return {
-        type: 'tel',
-        maxLength: 50,
-        placeholder: '+',
-        trailing,
-        onFocus () {
-            if (!value) onChange('+');
-        },
-        onBlur () {
-            if (value.trim() === '+') onChange('');
-        },
-    };
-};
-
-const mapPhoneValue = value => {
-    if (value && !value.startsWith('+')) value = '+' + value;
-    return new AsYouTypePhoneFmt().input(value);
-};
 
 const fields = {
     name: {
@@ -396,12 +314,10 @@ const fields = {
     },
     birthdate: {
         component ({ value, editing, onChange }) {
-            if (!editing) {
-                const Component = tableFields.birthdate.component;
-                return <Component value={value.birthdate} />;
-            } else {
-                // TODO
-            }
+            return <DateEditor
+                value={value.birthdate}
+                editing={editing}
+                onChange={v => onChange({ ...value, birthdate: v })} />;
         },
         hasDiff (original, value) {
             return original.birthdate !== value.birthdate;
@@ -410,12 +326,10 @@ const fields = {
     },
     deathdate: {
         component ({ value, editing, onChange }) {
-            if (!editing) {
-                const Component = tableFields.deathdate.component;
-                return <Component value={value.deathdate} />;
-            } else {
-                // TODO
-            }
+            return <DateEditor
+                value={value.deathdate}
+                editing={editing}
+                onChange={v => onChange({ ...value, deathdate: v })} />;
         },
         hasDiff (original, value) {
             return original.deathdate !== value.deathdate;
@@ -476,29 +390,14 @@ const fields = {
         },
         isEmpty: value => !value.feeCountry,
     },
-    email: {
-        component ({ value, editing, onChange }) {
-            if (!editing) {
-                const Email = tableFields.email.component;
-                return <Email item={value} value={value.email} />;
-            } else {
-                return (
-                    <TextField
-                        value={value.email}
-                        type="email"
-                        onChange={e => onChange({ ...value, email: e.target.value })} />
-                );
-            }
-        },
-        hasDiff (original, value) {
-            return value.email !== original.email;
-        },
-        isEmpty: value => !value.email,
-    },
-    profession: simpleField('profession', () => ({ maxLength: 50 })),
-    landlinePhone: simpleField('landlinePhone', phoneProps, mapPhoneValue),
-    officePhone: simpleField('officePhone', phoneProps, mapPhoneValue),
-    cellphone: simpleField('cellphone', phoneProps, mapPhoneValue),
+    email: simpleField('email', Email),
+    profession: simpleField('profession', function ({ value, editing, onChange }) {
+        if (!editing) return value;
+        return <TextField value={value} onChange={e => onChange(e.target.value)} maxLength={50} />;
+    }),
+    landlinePhone: simpleField('landlinePhone', PhoneNumber),
+    officePhone: simpleField('officePhone', PhoneNumber),
+    cellphone: simpleField('cellphone', PhoneNumber),
     notes: {
         component ({ value, editing, onChange }) {
             if (!editing) {
@@ -526,7 +425,8 @@ const fields = {
     },
 };
 
-function Footer () {
+function Footer ({ editing }) {
+    if (editing) return '';
     return (
         <div class="member-footer">
             todo: files

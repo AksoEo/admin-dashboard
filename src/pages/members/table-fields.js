@@ -9,7 +9,7 @@ import { UEACode as AKSOUEACode } from 'akso-client';
 import moment from 'moment';
 import locale from '../../locale';
 import cache from '../../cache';
-import { WithCountries, CountryFlag, UEACode, DateFmt } from './fields';
+import { WithCountries, CountryFlag, UEACode, DateFmt } from '../../components/data';
 
 // TODO: order fields in some sensible order
 

@@ -98,7 +98,7 @@ export default class SidebarContents extends PureComponent {
                 userName: name,
                 hasProfilePicture: data.hasProfilePicture,
             });
-        })
+        });
     }
 
     render () {

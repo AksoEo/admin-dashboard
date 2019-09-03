@@ -8,7 +8,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
 import fuzzaldrin from 'fuzzaldrin';
 import { Spring, globalAnimator, lerp } from '../../animation';
-import { CountryFlag } from './fields';
+import { CountryFlag } from '../../components/data';
 import locale from '../../locale';
 import cache from '../../cache';
 
