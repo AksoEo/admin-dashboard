@@ -207,6 +207,7 @@ export default class MembersList extends PureComponent {
                     onDetailRequest={handleDetailRequest}
                     onDetailPatch={handleDetailPatch}
                     onDetailDelete={id => client.delete(`/codeholders/${id}`)}
+                    onOpenFieldHistory={handleFieldHistory}
                     getLinkTarget={id => `/membroj/${id}`}
                     onChangePage={this.scrollToTop}
                     csvExportOptions={{
@@ -507,4 +508,8 @@ function handleDetailPatch (id, original, value, modCmt) {
     }
 
     return client.patch(`/codeholders/${id}`, diff, { modCmt });
+}
+
+function handleFieldHistory () {
+    // TODO
 }

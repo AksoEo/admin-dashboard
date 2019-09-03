@@ -3,6 +3,7 @@ import { PureComponent, useState } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { AppBarProxy, Button, MenuIcon, Dialog, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
+import HistoryIcon from '@material-ui/icons/History';
 import locale from '../../../locale';
 import './style';
 
@@ -46,6 +47,7 @@ export default class DetailView extends PureComponent {
         headerComponent: PropTypes.any,
         /** Component that renders the footer. Same structure as a field. */
         footerComponent: PropTypes.any,
+        onOpenFieldHistory: PropTypes.func,
     };
 
     state = {
@@ -77,6 +79,9 @@ export default class DetailView extends PureComponent {
             if (this.props.id) {
                 // id changed; reload
                 this.setState({ id: this.props.id }, () => this.load());
+
+                // and reset scroll position
+                this.detailViewNode.scrollTop = 0;
             }
         }
     }
@@ -111,7 +116,7 @@ export default class DetailView extends PureComponent {
         return (
             <div className={'detail-view-container' + (open ? '' : ' closed')}>
                 <div className="detail-view-backdrop" onClick={this.onClose} />
-                <div className="detail-view">
+                <div className="detail-view" ref={node => this.detailViewNode = node}>
                     <DetailAppBar
                         item={item}
                         open={open}
@@ -130,7 +135,8 @@ export default class DetailView extends PureComponent {
                         fields={this.props.fields}
                         headerComponent={this.props.headerComponent}
                         footerComponent={this.props.footerComponent}
-                        locale={detailLocale} />
+                        locale={detailLocale}
+                        onOpenFieldHistory={this.props.onOpenFieldHistory} />
 
                     <ConfirmDeleteDialog
                         id={id}
@@ -229,8 +235,11 @@ function DetailViewContents ({
     headerComponent: Header,
     footerComponent: Footer,
     locale,
+    onOpenFieldHistory,
 }) {
     if (!item) return null;
+
+    const [openHistory, setOpenHistory] = useState(null);
 
     const makeFieldProps = () => ({
         editing,
@@ -254,9 +263,21 @@ function DetailViewContents ({
             let changed = true;
             if (field.hasDiff) changed = field.hasDiff(original, item);
 
+            let historyButton;
+            if (onOpenFieldHistory) {
+                historyButton = (
+                    <Button icon small class="field-history-button" onClick={() => {
+                        setOpenHistory(id);
+                    }}>
+                        <HistoryIcon />
+                    </Button>
+                );
+            }
+
             const keyCell = (
                 <td class="field-name">
                     {locale.fields[id]}
+                    {historyButton}
                 </td>
             );
             const valueCell = (
@@ -310,6 +331,7 @@ DetailViewContents.propTypes = {
     headerComponent: PropTypes.any,
     footerComponent: PropTypes.any,
     locale: PropTypes.object.isRequired,
+    onOpenFieldHistory: PropTypes.func,
 };
 
 function DetailSaveDialog ({
