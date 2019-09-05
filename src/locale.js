@@ -178,6 +178,17 @@ export default {
             },
         },
     },
+    data: {
+        addressFields: {
+            country: 'Lando',
+            countryArea: 'Regiono',
+            city: 'Urbo',
+            cityArea: 'Urboparto',
+            streetAddress: 'Stratadreso',
+            postalCode: 'Poŝtkodo',
+            sortingCode: 'Ordigkodo',
+        },
+    },
     // Members page
     members: {
         search: {
@@ -365,15 +376,6 @@ export default {
                 fullName: 'Plena nomo',
                 address: 'Adreso',
                 feeCountry: 'Paglando',
-                addressFields: {
-                    country: 'Lando',
-                    countryArea: 'Regiono',
-                    city: 'Urbo',
-                    cityArea: 'Urboparto',
-                    streetAddress: 'Stratadreso',
-                    postalCode: 'Poŝtkodo',
-                    sortingCode: 'Ordigkodo',
-                },
                 profession: 'Profesio',
                 landlinePhone: 'Hejma telefono',
                 cellphone: 'Poŝtelefono',

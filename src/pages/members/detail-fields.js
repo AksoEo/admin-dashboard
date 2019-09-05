@@ -1,16 +1,18 @@
-import { h } from 'preact';
+import { h, Component } from 'preact';
+import PropTypes from 'prop-types';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
-import NativeSelect from '@material-ui/core/NativeSelect';
 import { Checkbox, TextField } from 'yamdl';
 import locale from '../../locale';
+import client from '../../client';
 import {
     UEACode,
     WithCountries,
     CountryFlag,
     DateEditor,
-    AddressRenderer,
     PhoneNumber,
+    CountryEditor,
+    AddressEditor,
     Email,
 } from '../../components/data';
 
@@ -49,6 +51,7 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                             value: editor.fromValue
                                 ? editor.fromValue(getKeyedValue(value, editor.key))
                                 : getKeyedValue(value, editor.key),
+                            item: value,
                             onChange: newValue => onChange(
                                 replaceKeyedValue(
                                     value,
@@ -224,25 +227,49 @@ function Header ({ value, editing, onChange }) {
     );
 }
 
-function CountryEditor ({ value, onChange }) {
-    return (
-        <div class="country-editor">
-            <WithCountries>
-                {countries => (
-                    <NativeSelect
-                        value={value}
-                        onChange={e => onChange(e.target.value)}>
-                        <option value={''}>—</option>
-                        {Object.entries(countries).map(([id, name]) => (
-                            <option value={id} key={id}>
-                                {name}
-                            </option>
-                        ))}
-                    </NativeSelect>
-                )}
-            </WithCountries>
-        </div>
-    );
+// TODO: some way to pick language
+export class AddressRenderer extends Component {
+    static propTypes = {
+        id: PropTypes.any,
+    };
+
+    state = {
+        address: null,
+    };
+
+    componentDidMount () {
+        this.load();
+    }
+    componentDidUpdate (prevProps) {
+        if (prevProps.id !== this.props.id) this.load();
+    }
+    componentWillUnmount () {
+        clearTimeout(this.reloadTimeout);
+    }
+
+    load () {
+        if (!this.props.id) return;
+        const id = this.props.id;
+        client.get(`/codeholders/${this.props.id}/address/eo`, {
+            formatAs: 'displayLatin',
+        }).then(res => {
+            if (id !== this.props.id) return;
+            this.setState({ address: res.body[this.props.id] });
+        }).catch(() => {
+            this.reloadTimeout = setTimeout(() => this.load(), 1000);
+        });
+    }
+
+    render () {
+        if (!this.state.address) return;
+        return (
+            <div class="address-rendered">
+                {this.state.address
+                    .split('\n')
+                    .map((x, i) => (<div class="address-line" key={i}>{x}</div>))}
+            </div>
+        );
+    }
 }
 
 function simpleField (key, Component) {
@@ -341,18 +368,9 @@ const fields = {
             if (!editing) {
                 return <AddressRenderer id={value.id} />;
             } else {
-                const fields = [
-                    ['country'],
-                    ['countryArea'],
-                    ['city', 'cityArea'],
-                    ['streetAddress', 'postalCode', 'sortingCode'],
-                ];
-
-                return lotsOfTextFields(fields.map(items => items.map(item => ({
-                    key: `address.${item}`,
-                    label: locale.members.detail.fields.addressFields[item],
-                    component: item === 'country' ? CountryEditor : null,
-                }))), { value, onChange });
+                return <AddressEditor
+                    value={value.address}
+                    onChange={v => onChange({ ...value, address: v })} />;
             }
         },
         hasDiff (original, value) {

@@ -507,7 +507,10 @@ function handleDetailPatch (id, original, value, modCmt) {
         }
     }
 
-    return client.patch(`/codeholders/${id}`, diff, { modCmt });
+    const options = {};
+    if (modCmt) options.modCmt = modCmt;
+
+    return client.patch(`/codeholders/${id}`, diff, options);
 }
 
 function handleFieldHistory () {

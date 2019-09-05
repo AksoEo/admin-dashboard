@@ -5,10 +5,13 @@ import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import { TextField } from 'yamdl';
 import { parsePhoneNumber, AsYouType as AsYouTypePhoneFmt } from 'libphonenumber-js';
-import cache from '../../cache';
-import client from '../../client';
+import NativeSelect from '@material-ui/core/NativeSelect';
 import { UEACode as AKSOUEACode } from 'akso-client';
 import moment from 'moment';
+import i18naddress from 'google-i18n-address';
+import cache from '../../cache';
+import client from '../../client';
+import locale from '../../locale';
 
 /// Creates a simple field renderer.
 function simpleField (extraProps = (() => {}), mapValue = (ident => ident)) {
@@ -132,47 +135,67 @@ export function DateEditor ({ value, editing }) {
     return 'unimplemented!';
 }
 
-// TODO: some way to pick language
-export class AddressRenderer extends Component {
-    static propTypes = {
-        id: PropTypes.any,
-    };
+/// Renders a countries dropdown.
+export function CountryEditor ({ value, onChange }) {
+    return (
+        <div class="country-editor">
+            <WithCountries>
+                {countries => (
+                    <NativeSelect
+                        value={value}
+                        onChange={e => onChange(e.target.value)}>
+                        <option value={''}>—</option>
+                        {Object.entries(countries).map(([id, name]) => (
+                            <option value={id} key={id}>
+                                {name}
+                            </option>
+                        ))}
+                    </NativeSelect>
+                )}
+            </WithCountries>
+        </div>
+    );
+}
 
-    state = {
-        address: null,
-    };
-
-    componentDidMount () {
-        this.load();
-    }
-    componentDidUpdate (prevProps) {
-        if (prevProps.id !== this.props.id) this.load();
-    }
-    componentWillUnmount () {
-        clearTimeout(this.reloadTimeout);
-    }
-
-    load () {
-        if (!this.props.id) return;
-        const id = this.props.id;
-        client.get(`/codeholders/${this.props.id}/address/eo`, {
-            formatAs: 'displayLatin',
-        }).then(res => {
-            if (id !== this.props.id) return;
-            this.setState({ address: res.body[this.props.id] });
-        }).catch(() => {
-            this.reloadTimeout = setTimeout(() => this.load(), 1000);
-        });
-    }
-
+export class AddressEditor extends Component {
     render () {
-        if (!this.state.address) return;
-        return (
-            <div class="address-rendered">
-                {this.state.address
-                    .split('\n')
-                    .map((x, i) => (<div class="address-line" key={i}>{x}</div>))}
-            </div>
-        );
+        const { value, onChange } = this.props;
+        const country = value.country;
+
+        const onChangeField = (key, map = (x => x)) => v => onChange({ ...value, [key]: map(v) });
+
+        const items = [
+            <CountryEditor key="country" value={country} onChange={onChangeField('country')} />,
+        ];
+
+        const rules = i18naddress.getValidationRules({ countryCode: country });
+        const requiredFields = rules.requiredFields || [];
+
+        if (requiredFields.includes('countryArea')) {
+            items.push(
+                <NativeSelect
+                    class="address-editor-line"
+                    key="countryArea"
+                    value={value.countryArea}
+                    onChange={onChangeField('countryArea', e => e.target.value)}>
+                    <option value="">—</option>
+                    {rules.countryAreaChoices.map(([id, area]) => (
+                        <option key={id} value={id}>{area}</option>)
+                    )}
+                </NativeSelect>
+            );
+        }
+
+        for (const k of ['city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode']) {
+            const isRequired = requiredFields.includes(k);
+            items.push(<TextField
+                class="address-editor-line"
+                key={k}
+                value={value[k]}
+                label={locale.data.addressFields[k] + (isRequired ? '*' : '')}
+                onChange={onChangeField(k, e => e.target.value)} />);
+        }
+
+        return <div class="address-editor">{items}</div>;
     }
 }
