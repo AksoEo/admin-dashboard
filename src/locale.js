@@ -354,6 +354,7 @@ export default {
             title: 'Membro',
             editingTitle: 'Redakti membron',
             deleteConfirm: 'Ĉu vi certas, ke vi volas forigi tiun ĉi membron? Ne eblas malfari tion ĉi.',
+            historyTitle: field => `[[${field} history title]]`,
             fields: {
                 // TODO: deduplicate with above
                 name: 'Nomo',

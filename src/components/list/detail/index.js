@@ -5,6 +5,7 @@ import { AppBarProxy, Button, MenuIcon, Dialog, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import HistoryIcon from '@material-ui/icons/History';
 import locale from '../../../locale';
+import FieldHistory from './history';
 import './style';
 
 /**
@@ -47,7 +48,7 @@ export default class DetailView extends PureComponent {
         headerComponent: PropTypes.any,
         /** Component that renders the footer. Same structure as a field. */
         footerComponent: PropTypes.any,
-        onOpenFieldHistory: PropTypes.func,
+        onFetchFieldHistory: PropTypes.func,
     };
 
     state = {
@@ -130,13 +131,14 @@ export default class DetailView extends PureComponent {
                     <DetailViewContents
                         original={item}
                         item={this.state.editingCopy || item}
+                        itemId={id}
                         editing={!!this.state.editingCopy}
                         onItemChange={item => this.setState({ editingCopy: item })}
                         fields={this.props.fields}
                         headerComponent={this.props.headerComponent}
                         footerComponent={this.props.footerComponent}
                         locale={detailLocale}
-                        onOpenFieldHistory={this.props.onOpenFieldHistory} />
+                        onFetchFieldHistory={this.props.onFetchFieldHistory} />
 
                     <ConfirmDeleteDialog
                         id={id}
@@ -229,13 +231,14 @@ DetailAppBar.propTypes = {
 function DetailViewContents ({
     original,
     item,
+    itemId,
     editing,
     onItemChange,
     fields,
     headerComponent: Header,
     footerComponent: Footer,
     locale,
-    onOpenFieldHistory,
+    onFetchFieldHistory,
 }) {
     if (!item) return null;
 
@@ -264,7 +267,7 @@ function DetailViewContents ({
             if (field.hasDiff) changed = field.hasDiff(original, item);
 
             let historyButton;
-            if (onOpenFieldHistory) {
+            if (onFetchFieldHistory) {
                 historyButton = (
                     <Button icon small class="field-history-button" onClick={() => {
                         setOpenHistory(id);
@@ -318,6 +321,14 @@ function DetailViewContents ({
                 </tbody>
             </table>
             {footer}
+
+            <FieldHistory
+                onFetchFieldHistory={onFetchFieldHistory}
+                fields={fields}
+                locale={locale}
+                itemId={itemId}
+                id={openHistory}
+                onClose={() => setOpenHistory(null)} />
         </div>
     );
 }
@@ -331,7 +342,7 @@ DetailViewContents.propTypes = {
     headerComponent: PropTypes.any,
     footerComponent: PropTypes.any,
     locale: PropTypes.object.isRequired,
-    onOpenFieldHistory: PropTypes.func,
+    onFetchFieldHistory: PropTypes.func,
 };
 
 function DetailSaveDialog ({

@@ -169,7 +169,7 @@ export default class ListView extends PureComponent {
         onDetailDelete: PropTypes.func,
 
         /// Called when the field history for a field is opened.
-        onOpenFieldHistory: PropTypes.func,
+        onFetchFieldHistory: PropTypes.func,
 
         /// Called when the page changes.
         onChangePage: PropTypes.func,
@@ -431,7 +431,7 @@ export default class ListView extends PureComponent {
                     fields={this.props.detailFields}
                     headerComponent={this.props.detailHeader}
                     footerComponent={this.props.detailFooter}
-                    onOpenFieldHistory={this.props.onOpenFieldHistory} />
+                    onFetchFieldHistory={this.props.onFetchFieldHistory} />
             </Provider>
         );
     }

@@ -207,7 +207,7 @@ export default class MembersList extends PureComponent {
                     onDetailRequest={handleDetailRequest}
                     onDetailPatch={handleDetailPatch}
                     onDetailDelete={id => client.delete(`/codeholders/${id}`)}
-                    onOpenFieldHistory={handleFieldHistory}
+                    onFetchFieldHistory={handleFieldHistory}
                     getLinkTarget={id => `/membroj/${id}`}
                     onChangePage={this.scrollToTop}
                     csvExportOptions={{
@@ -513,6 +513,26 @@ function handleDetailPatch (id, original, value, modCmt) {
     return client.patch(`/codeholders/${id}`, diff, options);
 }
 
-function handleFieldHistory () {
-    // TODO
+async function handleFieldHistory (id, field, offset) {
+    const mappedFields = [field]; // TODO: map
+    const history = new Map();
+
+    for (const field of mappedFields) {
+        const res = await client.get(`/codeholders/${id}/hist/${field}`, {
+            fields: ['val', 'modId', 'modTime', 'modBy', 'modCmt'],
+            limit: 100,
+            offset,
+        });
+        for (const item of res.body) {
+            let value = {};
+            if (history.has(item.modId)) {
+                value = history.get(item.modId).val;
+            }
+            Object.assign(value, item.val);
+            item.val = value;
+            history.set(item.modId, item);
+        }
+    }
+
+    return [...history.values()].sort((a, b) => a.modTime - b.modTime);
 }
