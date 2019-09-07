@@ -6,6 +6,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import HistoryIcon from '@material-ui/icons/History';
 import locale from '../../../locale';
 import FieldHistory from './history';
+import Form from '../../form';
 import './style';
 
 /**
@@ -126,10 +127,15 @@ export default class DetailView extends PureComponent {
                         editing={!!this.state.editingCopy}
                         onEdit={() => this.beginEdit()}
                         onEditCancel={() => this.endEdit()}
-                        onEditSave={() => this.setState({ saveOpen: true })}
+                        onEditSave={() => {
+                            if (this.formRef.validate()) {
+                                this.setState({ saveOpen: true });
+                            }
+                        }}
                         onDelete={() => this.setState({ confirmDeleteOpen: true })} />
                     <DetailViewContents
                         original={item}
+                        formRef={form => this.formRef = form}
                         item={this.state.editingCopy || item}
                         itemId={id}
                         editing={!!this.state.editingCopy}
@@ -230,6 +236,7 @@ DetailAppBar.propTypes = {
 
 function DetailViewContents ({
     original,
+    formRef,
     item,
     itemId,
     editing,
@@ -312,7 +319,7 @@ function DetailViewContents ({
     }
 
     return (
-        <div class="detail-view-contents">
+        <Form class="detail-view-contents" ref={formRef} onSubmit={() => { /* nope */ }}>
             {header}
             <table class="fields-table">
                 <tbody>
@@ -329,21 +336,9 @@ function DetailViewContents ({
                 itemId={itemId}
                 id={openHistory}
                 onClose={() => setOpenHistory(null)} />
-        </div>
+        </Form>
     );
 }
-
-DetailViewContents.propTypes = {
-    original: PropTypes.object, // for diffing
-    item: PropTypes.object,
-    editing: PropTypes.bool,
-    onItemChange: PropTypes.func.isRequired,
-    fields: PropTypes.array,
-    headerComponent: PropTypes.any,
-    footerComponent: PropTypes.any,
-    locale: PropTypes.object.isRequired,
-    onFetchFieldHistory: PropTypes.func,
-};
 
 function DetailSaveDialog ({
     id, open, onClose, onSuccess, onPatch, original, value, fields, detailLocale,

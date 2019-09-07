@@ -179,6 +179,7 @@ export default {
         },
     },
     data: {
+        requiredField: '[[this field is required]]',
         addressFields: {
             country: 'Lando',
             countryArea: 'Regiono',

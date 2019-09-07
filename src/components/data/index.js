@@ -9,6 +9,7 @@ import NativeSelect from '@material-ui/core/NativeSelect';
 import { UEACode as AKSOUEACode } from 'akso-client';
 import moment from 'moment';
 import i18naddress from 'google-i18n-address';
+import { Validator } from '../../components/form';
 import cache from '../../cache';
 import client from '../../client';
 import locale from '../../locale';
@@ -173,7 +174,11 @@ export class AddressEditor extends Component {
 
         if (requiredFields.includes('countryArea')) {
             items.push(
-                <NativeSelect
+                <Validator
+                    component={NativeSelect}
+                    validate={value => {
+                        if (!value) throw { error: locale.data.requiredField };
+                    }}
                     class="address-editor-line"
                     key="countryArea"
                     value={value.countryArea}
@@ -182,13 +187,17 @@ export class AddressEditor extends Component {
                     {rules.countryAreaChoices.map(([id, area]) => (
                         <option key={id} value={id}>{area}</option>)
                     )}
-                </NativeSelect>
+                </Validator>
             );
         }
 
         for (const k of ['city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode']) {
             const isRequired = requiredFields.includes(k);
-            items.push(<TextField
+            items.push(<Validator
+                component={TextField}
+                validate={value => {
+                    if (!value && isRequired) throw { error: locale.data.requiredField };
+                }}
                 class="address-editor-line"
                 key={k}
                 value={value[k]}

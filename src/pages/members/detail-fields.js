@@ -5,6 +5,8 @@ import BusinessIcon from '@material-ui/icons/Business';
 import { Checkbox, TextField } from 'yamdl';
 import locale from '../../locale';
 import client from '../../client';
+import { Validator } from '../../components/form';
+import { UEACode as AKSOUEACode } from 'akso-client';
 import {
     UEACode,
     WithCountries,
@@ -15,8 +17,6 @@ import {
     AddressEditor,
     Email,
 } from '../../components/data';
-
-/* eslint-disable react/prop-types */
 
 // Lots of text fields
 function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
@@ -62,7 +62,9 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                             ...(editor.props || {}),
                         })
                     ) : (
-                        <TextField
+                        <Validator
+                            component={TextField}
+                            validate={editor.validate || (() => {})}
                             key={i}
                             label={editor.label}
                             value={editor.fromValue
@@ -84,6 +86,13 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
         </div>
     );
 }
+
+const validators = {
+    required: (prev = (() => {})) => value => {
+        prev(value);
+        if (!value) throw { error: locale.data.requiredField };
+    },
+};
 
 function NameEditor ({ value, editing, onChange }) {
     if (!editing) {
@@ -147,6 +156,7 @@ function NameEditor ({ value, editing, onChange }) {
                     key: 'firstNameLegal',
                     label: locale.members.detail.fields.firstNameLegal + '*', // required
                     props: { maxLength: 50 },
+                    validate: validators.required(),
                 },
                 {
                     key: 'lastNameLegal',
@@ -174,6 +184,7 @@ function NameEditor ({ value, editing, onChange }) {
                     key: 'fullName',
                     label: locale.members.detail.fields.fullName + '*', // required
                     props: { maxLength: 100, class: 'full-name-editor' },
+                    validate: validators.required(),
                 },
             ],
             [
@@ -202,6 +213,16 @@ function CodeEditor ({ value, editing, onChange }) {
                 key: 'newCode',
                 label: locale.members.detail.fields.newCode + '*', // required
                 props: { maxLength: 6 },
+                validate: (prev => value => {
+                    prev(value);
+
+                    try {
+                        const code = new AKSOUEACode(value);
+                        if (code.type !== 'new') throw 0;
+                    } catch (_) {
+                        throw { error: locale.members.addMember.invalidUEACode };
+                    }
+                })(validators.required()),
             },
         ]], { value, onChange, class: 'uea-code-editor' });
     }
@@ -211,11 +232,9 @@ function Header ({ value, editing, onChange }) {
     return (
         <div class="member-header">
             <div class="member-picture-container">
-                {(value.hasProfilePicture || editing) ? (
-                    <img
-                        class="member-picture"
-                        src={`/codeholders/${value.id}/profile_picture/128px`} />
-                ) : null}
+                <img
+                    class="member-picture"
+                    src={`/codeholders/${value.id}/profile_picture/128px`} />
             </div>
             <div class="member-info">
                 <NameEditor value={value} editing={editing} onChange={onChange} />
