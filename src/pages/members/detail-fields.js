@@ -17,6 +17,7 @@ import {
     AddressEditor,
     Email,
 } from '../../components/data';
+import MembershipEditor from './membership';
 
 // Lots of text fields
 function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
@@ -241,6 +242,7 @@ function Header ({ value, editing, onChange }) {
                 <div class="member-code">
                     <CodeEditor value={value} editing={editing} onChange={onChange} />
                 </div>
+                <MembershipEditor id={value.id} />
             </div>
         </div>
     );

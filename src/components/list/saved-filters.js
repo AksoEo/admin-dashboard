@@ -157,6 +157,7 @@ export default class SavedFiltersBar extends PureComponent {
     }
 }
 
+// TODO: use ../data-list
 const FILTER_ITEM_HEIGHT = 56;
 const VLIST_CHUNK_SIZE = 100;
 class SavedFiltersList extends PureComponent {

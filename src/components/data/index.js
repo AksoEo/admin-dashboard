@@ -11,7 +11,6 @@ import moment from 'moment';
 import i18naddress from 'google-i18n-address';
 import { Validator } from '../../components/form';
 import cache from '../../cache';
-import client from '../../client';
 import locale from '../../locale';
 
 /// Creates a simple field renderer.
@@ -185,8 +184,8 @@ export class AddressEditor extends Component {
                     onChange={onChangeField('countryArea', e => e.target.value)}>
                     <option value="">—</option>
                     {rules.countryAreaChoices.map(([id, area]) => (
-                        <option key={id} value={id}>{area}</option>)
-                    )}
+                        <option key={id} value={id}>{area}</option>
+                    ))}
                 </Validator>
             );
         }

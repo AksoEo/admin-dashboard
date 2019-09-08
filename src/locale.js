@@ -384,6 +384,7 @@ export default {
                 officePhone: 'Oficeja telefono',
                 notes: 'Notoj',
             },
+            membership: 'Membreckategorioj',
         },
     },
 };

@@ -358,17 +358,47 @@
         .editor-line {
             margin-bottom: 8px;
 
-            .paper-text-field {
+            .paper-text-field, .form-validator {
                 margin-right: 8px;
             }
 
-            .full-name-editor {
+            .full-name-editor, .form-validator {
                 width: 100%;
             }
         }
 
         .email, .phone-number {
             color: inherit;
+        }
+
+        .membership-editor {
+            padding: 8px 0;
+
+            .membership {
+                display: inline-flex;
+                align-items: center;
+                border: 1px solid fade(@text, 20%);
+                border-radius: 4px;
+                margin-right: 4px;
+
+                .membership-name {
+                    display: inline-block;
+                    background: fade(@text, 20%);
+                    padding: 2px 4px;
+                    border-radius: 3px;
+                    font-size: small;
+                }
+
+                .membership-year {
+                    display: inline-block;
+                    padding: 0 2px;
+                }
+            }
+
+            .membership-edit-button {
+                --md-button-color: fade(@text, 60%);
+                vertical-align: middle;
+            }
         }
 
         .country-editor {
@@ -638,5 +668,34 @@
         text-align: center;
         padding-bottom: 16px;
         color: @error;
+    }
+}
+
+.membership-editor-dialog {
+    width: 100%;
+    max-width: 400px;
+
+    .data-list {
+        position: relative;
+        height: 100%;
+        overflow-y: scroll;
+
+        .data-list-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 56px;
+            display: flex;
+            align-items: center;
+
+            .list-item-contents {
+                flex: 1;
+            }
+
+            .list-item-delete-button {
+                --md-button-color: @danger;
+            }
+        }
     }
 }
