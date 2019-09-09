@@ -44,6 +44,9 @@ export default {
         elections: 'Voĉdonado',
         newsletters: 'Bultenoj',
         administration: 'Administrado',
+        lists: 'Listoj',
+        reports: 'Raportoj',
+        documents: '[[Ŝpureblaj dokumentoj]]',
     },
     // Login screen
     login: {
