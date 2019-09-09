@@ -395,6 +395,11 @@
                 }
             }
 
+            .membership-empty {
+                opacity: 0.8;
+                margin-right: 4px;
+            }
+
             .membership-edit-button {
                 --md-button-color: fade(@text, 60%);
                 vertical-align: middle;
@@ -679,6 +684,14 @@
         position: relative;
         height: 100%;
         overflow-y: scroll;
+
+        .data-list-empty {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+        }
 
         .data-list-item {
             position: absolute;

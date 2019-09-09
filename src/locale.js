@@ -385,6 +385,7 @@ export default {
                 notes: 'Notoj',
             },
             membership: 'Membreckategorioj',
+            noMembership: '[[no memberships]]',
         },
     },
 };

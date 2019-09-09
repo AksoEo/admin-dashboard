@@ -7,11 +7,12 @@ const VLIST_CHUNK_SIZE = 100;
 /// Virtual list with auto-sorting and remove/load callbacks.
 ///
 /// # Props
-/// - onLoad: async (offset, limit) -> { items: [item], totalItems: number } callback
+/// - onLoad: async (offset, limit) -> { items: [item], totalItems: number } callback (required)
+/// - renderItem: (item) -> VNode callback (required)
 /// - onRemove: async (item) -> void callback
 /// - onItemClick: (item) -> void callback
-/// - renderItem: (item) -> VNode callback
 /// - itemHeight: fixed item height in pixels
+/// - emptyLabel: label to show when there are no items
 export default class DataList extends Component {
     state = {
         items: [],
@@ -88,20 +89,28 @@ export default class DataList extends Component {
                         <div class="list-item-contents">
                             {this.props.renderItem(item)}
                         </div>
-                        <div class="list-item-extra">
-                            <Button
-                                icon
-                                class="list-item-delete-button"
-                                onClick={() => {
-                                    // TODO: confirmation step
-                                    this.deleteItem(i);
-                                }}>
-                                <DeleteIcon />
-                            </Button>
-                        </div>
+                        {this.props.onRemove && (
+                            <div class="list-item-extra">
+                                <Button
+                                    icon
+                                    class="list-item-delete-button"
+                                    onClick={() => {
+                                        // TODO: confirmation step
+                                        this.deleteItem(i);
+                                    }}>
+                                    <DeleteIcon />
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 );
             }
+        }
+
+        let totalItems = this.state.totalItems;
+        if (totalItems === 0 && this.props.emptyLabel) {
+            totalItems++;
+            items.push(<div class="data-list-empty" key={0}>{this.props.emptyLabel}</div>);
         }
 
         return (
@@ -111,7 +120,7 @@ export default class DataList extends Component {
                 onScroll={this.onScroll}>
                 <div
                     class="vlist-spacer"
-                    style={{ height: this.state.totalItems * this.props.itemHeight }} />
+                    style={{ height: totalItems * this.props.itemHeight }} />
                 {items}
             </div>
         );

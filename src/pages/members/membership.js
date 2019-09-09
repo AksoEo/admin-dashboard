@@ -51,6 +51,14 @@ export default class MembershipEditor extends Component {
             );
         });
 
+        if (!memberships.length) {
+            memberships.push(
+                <span key={0} class="membership-empty">
+                    {locale.members.detail.noMembership}
+                </span>
+            );
+        }
+
         return (
             <div class="membership-editor">
                 {memberships}
@@ -65,6 +73,7 @@ export default class MembershipEditor extends Component {
                 <Dialog
                     backdrop
                     class="membership-editor-dialog"
+                    fullScreen={width => width < 400}
                     open={this.state.editing}
                     onClose={() => {
                         this.setState({ editing: false });
@@ -89,6 +98,7 @@ export default class MembershipEditor extends Component {
                                 items: res.body,
                                 totalItems: +res.res.headers.map['x-total-items'],
                             }))}
+                        emptyLabel={locale.members.detail.noMembership}
                         itemHeight={56}
                         onRemove={item =>
                             client.delete(`/codeholders/${this.prosp.id}/membership/${item.id}`)}
