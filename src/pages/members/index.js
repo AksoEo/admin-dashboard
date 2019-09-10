@@ -277,15 +277,6 @@ const fieldMapping = {
         fields: ['age', 'agePrimo'],
         sort: ['age'],
     },
-    officePhone: {
-        fields: ['officePhone', 'officePhoneFormatted'],
-    },
-    landlinePhone: {
-        fields: ['landlinePhone', 'landlinePhoneFormatted'],
-    },
-    cellphone: {
-        fields: ['cellphone', 'cellphoneFormatted'],
-    },
     addressLatin: {
         fields: [
             'country',

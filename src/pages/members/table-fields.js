@@ -9,7 +9,8 @@ import { UEACode as AKSOUEACode } from 'akso-client';
 import moment from 'moment';
 import locale from '../../locale';
 import cache from '../../cache';
-import { WithCountries, CountryFlag, UEACode, DateFmt } from '../../components/data';
+import data from '../../components/data';
+import { WithCountries, CountryFlag } from '../../components/data/country';
 
 // TODO: order fields in some sensible order
 
@@ -146,15 +147,7 @@ export default {
         sortable: true,
         component ({ item }) {
             const { oldCode, newCode } = item;
-            if (oldCode) {
-                return (
-                    <span className="uea-codes">
-                        <UEACode code={newCode} /> <UEACode old code={oldCode} />
-                    </span>
-                );
-            } else {
-                return <UEACode code={newCode} />;
-            }
+            return <data.ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
         },
         stringify (value, item) {
             const { oldCode, newCode } = item;
@@ -181,34 +174,20 @@ export default {
     },
     birthdate: {
         sortable: true,
-        component ({ value }) {
-            return (
-                <span className="birthdate-deathdate" title={value}>
-                    <DateFmt date={value} />
-                </span>
-            );
-        },
+        component: data.date.inlineRenderer,
         stringify (value) {
             return value ? moment(value).format('D[-a de] MMMM Y') : '';
         },
     },
     deathdate: {
         sortable: true,
-        component ({ value }) {
-            return (
-                <span className="birthdate-deathdate" title={value}>
-                    <DateFmt date={value} />
-                </span>
-            );
-        },
+        component: data.date.inlineRenderer,
         stringify (value) {
             return value ? moment(value).format('D[-a de] MMMM Y') : '';
         },
     },
     email: {
-        component ({ value }) {
-            return <span className="email">{value}</span>;
-        },
+        component: data.email.inlineRenderer,
         stringify (value) {
             return value;
         },
@@ -240,7 +219,7 @@ export default {
                 (<span className="address-pseudoline" key={i}>{x}</span>));
 
             return (
-                <div className="address">
+                <div className="codeholder-address">
                     {addressPseudolines}
                 </div>
             );
@@ -338,25 +317,19 @@ export default {
         },
     },
     officePhone: {
-        component ({ item }) {
-            return <span className="office-phone">{item.officePhoneFormatted}</span>;
-        },
+        component: data.phoneNumber.inlineRenderer,
         stringify (value, item) {
             return item.officePhoneFormatted;
         },
     },
     cellphone: {
-        component ({ item }) {
-            return <span className="cellphone">{item.cellphoneFormatted}</span>;
-        },
+        component: data.phoneNumber.inlineRenderer,
         stringify (value, item) {
             return item.cellphoneFormatted;
         },
     },
     landlinePhone: {
-        component ({ item }) {
-            return <span className="landline-phone">{item.landlinePhoneFormatted}</span>;
-        },
+        component: data.phoneNumber.inlineRenderer,
         stringify (value, item) {
             return item.landlinePhoneFormatted;
         },

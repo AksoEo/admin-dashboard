@@ -6,18 +6,22 @@ import { Checkbox, TextField } from 'yamdl';
 import locale from '../../locale';
 import client from '../../client';
 import { Validator } from '../../components/form';
-import { UEACode as AKSOUEACode } from 'akso-client';
-import {
-    UEACode,
-    WithCountries,
-    CountryFlag,
-    DateEditor,
-    PhoneNumber,
-    CountryEditor,
-    AddressEditor,
-    Email,
-} from '../../components/data';
+import data from '../../components/data';
 import MembershipEditor from './membership';
+
+const makeEditable = (Renderer, Editor) => function EditableField ({ value, onChange, editing }) {
+    if (!editing) return <Renderer value={value} />;
+    return <Editor value={value} onChange={onChange} />;
+};
+
+const makeDataEditable = data => makeEditable(data.renderer, data.editor);
+
+const mapField = (Component, map, unmap) => function MappedField ({ value, onChange, ...restProps }) {
+    return <Component {...restProps} value={map(value)} onChange={v => onChange(unmap(value, v))} />;
+};
+
+const mapObjectField = (component, key) =>
+    mapField(component, i => i[key], (i, v) => ({ ...i, [key]: v }));
 
 // Lots of text fields
 function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
@@ -200,33 +204,10 @@ function NameEditor ({ value, editing, onChange }) {
 }
 
 function CodeEditor ({ value, editing, onChange }) {
-    if (!editing) {
-        return (
-            <div class="uea-codes">
-                <UEACode code={value.newCode} />
-                {' '}
-                {value.oldCode && <UEACode old code={value.oldCode} />}
-            </div>
-        );
-    } else if (editing) {
-        return lotsOfTextFields([[
-            {
-                key: 'newCode',
-                label: locale.members.detail.fields.newCode + '*', // required
-                props: { maxLength: 6 },
-                validate: (prev => value => {
-                    prev(value);
-
-                    try {
-                        const code = new AKSOUEACode(value);
-                        if (code.type !== 'new') throw 0;
-                    } catch (_) {
-                        throw { error: locale.members.addMember.invalidUEACode };
-                    }
-                })(validators.required()),
-            },
-        ]], { value, onChange, class: 'uea-code-editor' });
-    }
+    if (!editing) return <data.ueaCode.renderer value={value.newCode} value2={value.oldCode} />;
+    return <data.ueaCode.editor
+        value={value.newCode}
+        onChange={v => onChange({ ...value, newCode: v })} />;
 }
 
 function Header ({ value, editing, onChange }) {
@@ -249,7 +230,7 @@ function Header ({ value, editing, onChange }) {
 }
 
 // TODO: some way to pick language
-export class AddressRenderer extends Component {
+export class CodeholderAddressRenderer extends Component {
     static propTypes = {
         id: PropTypes.any,
     };
@@ -293,12 +274,9 @@ export class AddressRenderer extends Component {
     }
 }
 
-function simpleField (key, Component) {
+function simpleField (key, component) {
     return {
-        component ({ value, editing, onChange }) {
-            const onInputChange = v => onChange({ ...value, [key]: v });
-            return <Component value={value[key]} editing={editing} onChange={onInputChange} />;
-        },
+        component: mapObjectField(component, key),
         hasDiff (original, value) {
             // '' should still be considered the same as null
             if (!value[key] && !original[key]) return false;
@@ -361,24 +339,14 @@ const fields = {
         isEmpty: value => !value.isDead,
     },
     birthdate: {
-        component ({ value, editing, onChange }) {
-            return <DateEditor
-                value={value.birthdate}
-                editing={editing}
-                onChange={v => onChange({ ...value, birthdate: v })} />;
-        },
+        component: mapObjectField(makeDataEditable(data.date), 'birthdate'),
         hasDiff (original, value) {
             return original.birthdate !== value.birthdate;
         },
         isEmpty: value => !value.birthdate,
     },
     deathdate: {
-        component ({ value, editing, onChange }) {
-            return <DateEditor
-                value={value.deathdate}
-                editing={editing}
-                onChange={v => onChange({ ...value, deathdate: v })} />;
-        },
+        component: mapObjectField(makeDataEditable(data.date), 'deathdate'),
         hasDiff (original, value) {
             return original.deathdate !== value.deathdate;
         },
@@ -387,9 +355,9 @@ const fields = {
     address: {
         component ({ value, editing, onChange }) {
             if (!editing) {
-                return <AddressRenderer id={value.id} />;
+                return <CodeholderAddressRenderer id={value.id} />;
             } else {
-                return <AddressEditor
+                return <data.address.editor
                     value={value.address}
                     onChange={v => onChange({ ...value, address: v })} />;
             }
@@ -405,38 +373,20 @@ const fields = {
         tall: true,
     },
     feeCountry: {
-        component ({ value, editing, onChange }) {
-            if (!editing) {
-                return (
-                    <WithCountries>
-                        {countries => (
-                            <span class="fee-country">
-                                <CountryFlag country={value.feeCountry} />
-                                {' '}
-                                {countries[value.feeCountry]}
-                            </span>
-                        )}
-                    </WithCountries>
-                );
-            } else {
-                return <CountryEditor
-                    value={value.feeCountry}
-                    onChange={feeCountry => onChange({ ...value, feeCountry })} />;
-            }
-        },
+        component: mapObjectField(makeDataEditable(data.country), 'feeCountry'),
         hasDiff (original, value) {
             return original.feeCountry !== value.feeCountry;
         },
         isEmpty: value => !value.feeCountry,
     },
-    email: simpleField('email', Email),
+    email: simpleField('email', makeDataEditable(data.email)),
     profession: simpleField('profession', function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value)} maxLength={50} />;
     }),
-    landlinePhone: simpleField('landlinePhone', PhoneNumber),
-    officePhone: simpleField('officePhone', PhoneNumber),
-    cellphone: simpleField('cellphone', PhoneNumber),
+    landlinePhone: simpleField('landlinePhone', makeDataEditable(data.phoneNumber)),
+    officePhone: simpleField('officePhone', makeDataEditable(data.phoneNumber)),
+    cellphone: simpleField('cellphone', makeDataEditable(data.phoneNumber)),
     notes: {
         component ({ value, editing, onChange }) {
             if (!editing) {

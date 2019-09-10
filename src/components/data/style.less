@@ -1,0 +1,43 @@
+@import '../../prelude';
+
+.data {
+    &.address-editor {
+        .form-validator, .country-editor {
+            display: block;
+            margin-bottom: 16px;
+        }
+    }
+
+    &.country-editor {
+        width: 200px;
+    }
+
+    &.email {
+        color: inherit;
+        word-wrap: break-word;
+    }
+
+    &.phone-number {
+        color: inherit;
+    }
+
+    &.uea-code {
+        font-family: @monospace;
+        font-size: 0.75em;
+        border: 1px solid @separator;
+        background: @hover-background;
+        padding: 2px;
+        border-radius: 4px;
+        white-space: nowrap;
+
+        &.is-old {
+            background: none;
+        }
+    }
+
+    &.uea-code-editor {
+        &.paper-text-field .p-contents .p-input {
+            font-family: @monospace;
+        }
+    }
+}

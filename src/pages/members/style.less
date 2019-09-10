@@ -40,25 +40,7 @@
         }
     }
 
-    .old-uea-code, .uea-code {
-        font-family: @monospace;
-        font-size: 0.75em;
-        border: 1px solid @separator;
-        background: @hover-background;
-        padding: 2px;
-        border-radius: 4px;
-        white-space: nowrap;
-    }
-
-    .email {
-        word-wrap: break-word;
-    }
-
-    .old-uea-code {
-        background: none;
-    }
-
-    .address {
+    .codeholder-address {
         .address-pseudoline {
             &:not(:first-of-type)::before {
                 content: ', ';
@@ -367,10 +349,6 @@
             }
         }
 
-        .email, .phone-number {
-            color: inherit;
-        }
-
         .membership-editor {
             padding: 8px 0;
 
@@ -403,17 +381,6 @@
             .membership-edit-button {
                 --md-button-color: fade(@text, 60%);
                 vertical-align: middle;
-            }
-        }
-
-        .country-editor {
-            width: 200px;
-        }
-
-        .address-editor {
-            .form-validator, .country-editor {
-                display: block;
-                margin-bottom: 16px;
             }
         }
 
@@ -471,14 +438,7 @@
                     margin-top: 8px;
 
                     .uea-code-editor {
-                        .paper-text-field {
-                            margin-bottom: 8px;
-                            margin-right: 8px;
-
-                            input {
-                                font-family: @monospace;
-                            }
-                        }
+                        margin-bottom: 8px;
                     }
                 }
             }

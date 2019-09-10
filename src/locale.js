@@ -192,6 +192,10 @@ export default {
             postalCode: 'Poŝtkodo',
             sortingCode: 'Ordigkodo',
         },
+        ueaCode: {
+            newCode: 'Seslitera UEA-kodo',
+            invalidUEACode: 'Nevalida seslitera UEA-kodo',
+        },
     },
     // Members page
     members: {
