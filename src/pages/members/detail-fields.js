@@ -1,8 +1,9 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
+import NativeSelect from '@material-ui/core/NativeSelect';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
-import { Checkbox, TextField } from 'yamdl';
+import { Button, Checkbox, TextField, Dialog } from 'yamdl';
 import locale from '../../locale';
 import client from '../../client';
 import { Validator } from '../../components/form';
@@ -229,7 +230,6 @@ function Header ({ value, editing, onChange }) {
     );
 }
 
-// TODO: some way to pick language
 export class CodeholderAddressRenderer extends Component {
     static propTypes = {
         id: PropTypes.any,
@@ -237,6 +237,9 @@ export class CodeholderAddressRenderer extends Component {
 
     state = {
         address: null,
+        postalOpen: false,
+        postalLang: 'eo',
+        postalAddress: null,
     };
 
     componentDidMount () {
@@ -247,6 +250,7 @@ export class CodeholderAddressRenderer extends Component {
     }
     componentWillUnmount () {
         clearTimeout(this.reloadTimeout);
+        clearTimeout(this.reloadTimeout2);
     }
 
     load () {
@@ -262,13 +266,63 @@ export class CodeholderAddressRenderer extends Component {
         });
     }
 
+    loadPostal () {
+        if (!this.props.id) return;
+        const id = this.props.id;
+        const lang = this.state.postalLang;
+        this.setState({ postalAddress: '' }, () => {
+            client.get(`/codeholders/${this.props.id}/address/${lang}`, {
+                formatAs: 'postalLatin',
+            }).then(res => {
+                if (id !== this.props.id || lang !== this.state.postalLang) return;
+                this.setState({ postalAddress: res.body[this.props.id] });
+            }).catch(() => {
+                this.reloadTimeout2 = setTimeout(() => this.loadPostal(), 1000);
+            });
+        });
+    }
+
     render () {
         if (!this.state.address) return;
         return (
-            <div class="address-rendered">
+            <div class="codeholder-address-rendered">
                 {this.state.address
                     .split('\n')
                     .map((x, i) => (<div class="address-line" key={i}>{x}</div>))}
+                <Button
+                    class="address-postal-button"
+                    onClick={() => {
+                        this.setState({ postalOpen: true });
+                        this.loadPostal();
+                    }}>
+                    {locale.members.detail.postalAddress}
+                </Button>
+
+                <Dialog
+                    // FIXME: this is kind of a terrible hack
+                    class="codeholder-postal-address-dialog"
+                    backdrop
+                    open={this.state.postalOpen}
+                    onClose={() => this.setState({ postalOpen: false })}
+                    title={locale.members.detail.postalAddress}>
+                    {locale.members.detail.postalLocale}{' '}
+                    <NativeSelect
+                        value={this.state.postalLang}
+                        onChange={e => {
+                            this.setState({ postalLang: e.target.value }, () => this.loadPostal());
+                        }}>
+                        {Object.entries(locale.members.csvOptions.countryLocales)
+                            .map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                    </NativeSelect>
+
+                    <textarea
+                        class="postal-address"
+                        value={this.state.postalAddress}
+                        spellCheck="false"
+                        onFocus={e => e.target.select()}
+                        onMouseUp={e => setImmediate(() => e.target.select())}
+                        onChange={() => this.forceUpdate()} />
+                </Dialog>
             </div>
         );
     }
