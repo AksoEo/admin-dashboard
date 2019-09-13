@@ -8,6 +8,7 @@ import locale from '../../locale';
 import client from '../../client';
 import { Validator } from '../../components/form';
 import data from '../../components/data';
+import SuggestionField from '../../components/suggestion-field';
 import MembershipEditor from './membership';
 
 const makeEditable = (Renderer, Editor) => function EditableField ({ value, onChange, editing }) {
@@ -152,9 +153,13 @@ function NameEditor ({ value, editing, onChange }) {
         return lotsOfTextFields([
             [
                 {
+                    component: SuggestionField,
                     key: 'honorific',
                     label: locale.members.detail.fields.honorific,
-                    props: { maxLength: 15 },
+                    props: {
+                        maxLength: 15,
+                        suggestions: locale.members.detail.honorificSuggestions,
+                    },
                 },
             ],
             [

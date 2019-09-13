@@ -7,6 +7,7 @@ import { Validator } from '../form';
 import countryField from './country';
 
 function AddressEditor ({ value, onChange }) {
+    if (!value) return null;
     const country = value.country;
 
     const onChangeField = (key, map = (x => x)) => v => onChange({ ...value, [key]: map(v) });
