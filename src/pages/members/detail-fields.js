@@ -9,6 +9,7 @@ import client from '../../client';
 import { Validator } from '../../components/form';
 import data from '../../components/data';
 import SuggestionField from '../../components/suggestion-field';
+import ProfilePicture from './profile-picture';
 import MembershipEditor from './membership';
 
 const makeEditable = (Renderer, Editor) => function EditableField ({ value, onChange, editing }) {
@@ -220,9 +221,7 @@ function Header ({ value, editing, onChange }) {
     return (
         <div class="member-header">
             <div class="member-picture-container">
-                <img
-                    class="member-picture"
-                    src={`/codeholders/${value.id}/profile_picture/128px`} />
+                <ProfilePicture id={value.id} hasProfilePicture={value.hasProfilePicture} />
             </div>
             <div class="member-info">
                 <NameEditor value={value} editing={editing} onChange={onChange} />

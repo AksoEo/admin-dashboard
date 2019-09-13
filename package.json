@@ -12,6 +12,7 @@
     "csv-stringify": "^5.3.0",
     "fuzzaldrin": "^2.1.0",
     "google-i18n-address": "git+https://github.com/cpsdqs/google-i18n-address.git",
+    "jdenticon": "^2.2.0",
     "json5": "^2.1.0",
     "libphonenumber-js": "^1.7.22",
     "moment": "^2.24.0",

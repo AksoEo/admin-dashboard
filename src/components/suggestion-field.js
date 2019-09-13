@@ -23,7 +23,7 @@ export default function SuggestionField ({ value, onChange, suggestions, ...extr
         setFocused(true);
     };
 
-    const onBlur = e => {
+    const onBlur = () => {
         setFocused(false);
         setHighlight(-1);
     };
@@ -86,7 +86,7 @@ function highlightSuggestion (suggestion, value) {
     let bold = false;
     const result = [];
     for (const c of suggestion) {
-        let newBold = (value[0] || '').toLowerCase() === c.toLowerCase();
+        const newBold = (value[0] || '').toLowerCase() === c.toLowerCase();
         if (newBold !== bold || !result.length) {
             result.push({ content: '', bold: newBold });
         }
