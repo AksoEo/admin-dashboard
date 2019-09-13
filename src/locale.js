@@ -393,6 +393,7 @@ export default {
             },
             membership: 'Membreckategorioj',
             noMembership: '[[no memberships]]',
+            addMembership: '[[add membership]]',
             postalAddress: '[[postal address]]',
             postalLocale: '[[lingvo de adreso]]',
         },

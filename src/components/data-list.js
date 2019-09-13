@@ -85,7 +85,7 @@ export default class DataList extends Component {
                         key={item.id}
                         class="data-list-item"
                         style={{ transform: `translateY(${y}px)` }}
-                        onClick={() => this.props.onItemClick(item)}>
+                        onClick={() => this.props.onItemClick && this.props.onItemClick(item)}>
                         <div class="list-item-contents">
                             {this.props.renderItem(item)}
                         </div>
