@@ -144,7 +144,8 @@ export default class DetailView extends PureComponent {
                         headerComponent={this.props.headerComponent}
                         footerComponent={this.props.footerComponent}
                         locale={detailLocale}
-                        onFetchFieldHistory={this.props.onFetchFieldHistory} />
+                        onFetchFieldHistory={this.props.onFetchFieldHistory}
+                        forceReload={() => this.load()} />
 
                     <ConfirmDeleteDialog
                         id={id}
@@ -246,6 +247,7 @@ function DetailViewContents ({
     footerComponent: Footer,
     locale,
     onFetchFieldHistory,
+    forceReload,
 }) {
     if (!item) return null;
 
@@ -256,6 +258,7 @@ function DetailViewContents ({
         original,
         value: item,
         onChange: onItemChange,
+        forceReload,
     });
 
     const header = Header ? <Header {...makeFieldProps()} /> : null;

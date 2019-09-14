@@ -415,6 +415,9 @@ export default {
                 'Civitano',
                 'Ges-ro',
             ],
+            cropProfilePicture: '[[crop profile picture]]',
+            cancelProfilePicture: 'Nuligi',
+            setProfilePicture: '[[set/upload]]',
         },
     },
 };
