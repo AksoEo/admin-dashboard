@@ -367,14 +367,13 @@ class FileCropDialog extends Component {
             );
         }
         canvas.toBlob(blob => {
-            const fileReader = new FileReader();
             const file = new File([blob], 'picture', { type: 'image/png' });
             // FIXME: client-js is weird and requires this
             file.value = file;
-            client.put(`/codeholders/${this.props.id}/profile_picture`, null, {}, [file],
-            ).then(this.props.onSuccess).catch(err => {
-                console.error('failed to upload pp', err); // eslint-disable-line no-console
-            }).then(() => this.setState({ uploading: false }));
+            client.put(`/codeholders/${this.props.id}/profile_picture`, null, {}, [file])
+                .then(this.props.onSuccess).catch(err => {
+                    console.error('failed to upload pp', err); // eslint-disable-line no-console
+                }).then(() => this.setState({ uploading: false }));
         }, 'image/png');
     };
 
