@@ -366,6 +366,8 @@
 
         .membership-editor {
             padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
 
             .membership {
                 display: inline-flex;
@@ -373,6 +375,7 @@
                 border: 1px solid fade(@text, 20%);
                 border-radius: 4px;
                 margin-right: 4px;
+                margin-bottom: 4px;
 
                 .membership-name {
                     display: inline-block;
@@ -388,14 +391,33 @@
                 }
             }
 
-            .membership-empty {
-                opacity: 0.8;
-                margin-right: 4px;
+            .memberships {
+                position: relative;
+                overflow: hidden;
+                height: calc(2em + 8px);
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: calc(1em + 4px);
+                    .log-gradient-background(to bottom, white);
+                }
+
+                &.is-empty {
+                    .membership-empty {
+                        opacity: 0.8;
+                        margin-right: 4px;
+                    }
+                }
             }
 
             .membership-edit-button {
                 --md-button-color: fade(@text, 60%);
-                vertical-align: middle;
+                flex-shrink: 0;
+                margin-top: -0.7em; // eyeballed
             }
         }
 

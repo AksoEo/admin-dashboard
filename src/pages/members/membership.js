@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { useState, useEffect } from 'preact/compat';
 import { Button, Dialog } from 'yamdl';
-import EditIcon from '@material-ui/icons/Edit';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import DataList from '../../components/data-list';
 import client from '../../client';
 import locale from '../../locale';
@@ -53,7 +53,9 @@ export default class MembershipEditor extends Component {
             );
         });
 
+        let noMemberships = false;
         if (!memberships.length) {
+            noMemberships = true;
             memberships.push(
                 <span key={0} class="membership-empty">
                     {locale.members.detail.noMembership}
@@ -63,13 +65,15 @@ export default class MembershipEditor extends Component {
 
         return (
             <div class="membership-editor">
-                {memberships}
+                <div class={'memberships' + (noMemberships ? ' is-empty' : '')}>
+                    {memberships}
+                </div>
                 <Button
                     icon
                     small
                     class="membership-edit-button"
                     onClick={() => this.setState({ editing: true })}>
-                    <EditIcon />
+                    <MoreHorizIcon />
                 </Button>
 
                 <Dialog
