@@ -57,7 +57,14 @@ export default class ProfilePictureEditor extends Component {
     }
 
     beginUpload () {
-        const input = document.createElement('input');
+        if (this.mountedInput) this.mountedInput.parentNode.removeChild(this.mountedInput);
+        const input = this.mountedInput = document.createElement('input');
+        Object.assign(input.style, {
+            left: '-1887px',
+        });
+        // the input needs to be mounted, else Safari may just decide it’s not important and
+        // skip firing onchange
+        document.body.appendChild(input);
         input.type = 'file';
         input.accept = 'image/png, image/jpeg';
         input.click();
@@ -66,7 +73,14 @@ export default class ProfilePictureEditor extends Component {
             if (!file) return;
             const fileURL = URL.createObjectURL(file);
             this.setState({ uploading: true, croppingFile: fileURL });
+
+            document.body.removeChild(input);
+            if (this.mountedInput === input) this.mountedInput = null;
         };
+    }
+
+    componentWillUnmount () {
+        if (this.mountedInput) this.mountedInput.parentNode.removeChild(this.mountedInput);
     }
 
     render () {
