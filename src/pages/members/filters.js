@@ -485,7 +485,7 @@ export default {
                     <div
                         className="membership-item"
                         key={index}>
-                        <Button icon class="membership-remove" onClick={() => {
+                        <Button icon small class="membership-remove" onClick={() => {
                             const newValue = [...value];
                             newValue.splice(index, 1);
                             onChange(newValue);
@@ -595,6 +595,7 @@ export default {
                                         <div className="membership-category-id">
                                             {availableCategories[id].nameAbbrev}
                                         </div>
+                                        <span>{'\u00a0'}</span>
                                         <div className="membership-category-name">
                                             {availableCategories[id].name}
                                         </div>
@@ -645,7 +646,7 @@ export default {
 
                 items.push(
                     <div className="membership-add-container" key={-1}>
-                        <Button icon class="membership-add-button" onClick={() => {
+                        <Button icon small class="membership-add-button" onClick={() => {
                             const thisYear = new Date().getFullYear();
 
                             onChange(value.concat([{
