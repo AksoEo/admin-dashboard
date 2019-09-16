@@ -7,7 +7,7 @@ import { Button, Checkbox, TextField, Dialog } from 'yamdl';
 import locale from '../../locale';
 import client from '../../client';
 import { Validator } from '../../components/form';
-import data from '../../components/data';
+import data, { Required } from '../../components/data';
 import SuggestionField from '../../components/suggestion-field';
 import ProfilePictureEditor from './profile-picture';
 import MembershipEditor from './membership';
@@ -166,7 +166,7 @@ function NameEditor ({ value, editing, onChange }) {
             [
                 {
                     key: 'firstNameLegal',
-                    label: locale.members.detail.fields.firstNameLegal + '*', // required
+                    label: <Required>{locale.members.detail.fields.firstNameLegal}</Required>,
                     props: { maxLength: 50 },
                     validate: validators.required(),
                 },
@@ -194,7 +194,7 @@ function NameEditor ({ value, editing, onChange }) {
             [
                 {
                     key: 'fullName',
-                    label: locale.members.detail.fields.fullName + '*', // required
+                    label: <Required>{locale.members.detail.fields.fullName}</Required>,
                     props: { maxLength: 100, class: 'full-name-editor' },
                     validate: validators.required(),
                 },

@@ -5,6 +5,7 @@ import NativeSelect from '@material-ui/core/NativeSelect';
 import locale from '../../locale';
 import { Validator } from '../form';
 import countryField from './country';
+import Required from './required';
 
 function AddressEditor ({ value, onChange }) {
     if (!value) return null;
@@ -48,7 +49,9 @@ function AddressEditor ({ value, onChange }) {
             class="address-editor-line"
             key={k}
             value={value[k]}
-            label={locale.data.addressFields[k] + (isRequired ? '*' : '')}
+            label={isRequired
+                ? <Required>{locale.data.addressFields[k]}</Required>
+                : locale.data.addressFields[k]}
             onChange={onChangeField(k, e => e.target.value)} />);
     }
 

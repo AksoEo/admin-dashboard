@@ -5,6 +5,8 @@ import email from './email';
 import phoneNumber from './phone-number';
 import ueaCode from './uea-code';
 
+export Required from './required';
+
 import './style';
 
 /// Data types.
