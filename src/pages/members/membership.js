@@ -1,6 +1,7 @@
-import { h, Component } from 'preact';
-import { useState, useEffect } from 'preact/compat';
-import { Button, Dialog } from 'yamdl';
+import { h } from 'preact';
+import { PureComponent, useState, useEffect } from 'preact/compat';
+import { Button, Dialog, AppBarProxy, MenuIcon } from 'yamdl';
+import { CardStackItem } from '../../components/card-stack';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import DataList from '../../components/data-list';
 import client from '../../client';
@@ -10,7 +11,7 @@ import locale from '../../locale';
 ///
 /// # Props
 /// - `id`: codeholder ID
-export default class MembershipEditor extends Component {
+export default class MembershipEditor extends PureComponent {
     state = {
         // first 100 items (maybe there’s more? We Just Don’t Know)
         preview: [],
@@ -76,20 +77,27 @@ export default class MembershipEditor extends Component {
                     <MoreHorizIcon />
                 </Button>
 
-                <Dialog
-                    backdrop
+                <CardStackItem
+                    depth={1}
                     class="membership-editor-dialog"
-                    fullScreen={width => width < 400}
                     open={this.state.editing}
                     onClose={() => {
                         this.setState({ editing: false });
                         this.loadPreview();
-                    }}
-                    title={locale.members.detail.membership}
-                    actions={[{
-                        label: '[[add]]',
-                        action: () => this.setState({ addingMembership: true, editing: false }),
-                    }]}>
+                    }}>
+                    <AppBarProxy
+                        menu={<Button icon small onClick={() => {
+                            this.setState({ editing: false });
+                            this.loadPreview();
+                        }}>
+                            <MenuIcon type='close' />
+                        </Button>}
+                        title={locale.members.detail.membership}
+                        priority={9}
+                        actions={[{
+                            label: '[[add]]',
+                            action: () => this.setState({ addingMembership: true }),
+                        }]} />
                     <DataList
                         onLoad={(offset, limit) =>
                             client.get(`/codeholders/${this.props.id}/membership`, {
@@ -128,14 +136,13 @@ export default class MembershipEditor extends Component {
                                 </div>
                             </div>
                         )} />
-                </Dialog>
+                </CardStackItem>
 
                 <Dialog
-                    // FIXME: double dialogs (very bad!!)
                     backdrop
                     class="membership-editor-add-dialog"
                     open={this.state.addingMembership}
-                    onClose={() => this.setState({ addingMembership: false, editing: true })}
+                    onClose={() => this.setState({ addingMembership: false })}
                     title={locale.members.detail.addMembership}>
                     <AddMembership id={this.props.id} onSuccess={() => this.setState({ addingMembership: false, editing: true })} />
                 </Dialog>

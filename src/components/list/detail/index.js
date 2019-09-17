@@ -7,13 +7,25 @@ import HistoryIcon from '@material-ui/icons/History';
 import locale from '../../../locale';
 import FieldHistory from './history';
 import Form from '../../form';
+import { CardStackProvider, CardStackRenderer, CardStackItem } from '../../card-stack';
 import './style';
+
+export default class DetailViewContainer extends PureComponent {
+    render () {
+        return (
+            <CardStackProvider>
+                <CardStackRenderer class="detail-view-card-stack" />
+                <DetailView {...this.props} />
+            </CardStackProvider>
+        );
+    }
+}
 
 /**
  * The detail view in a list view, which is shown as a modal overlay and contains details about a
  * selected item.
  */
-export default class DetailView extends PureComponent {
+class DetailView extends PureComponent {
     static propTypes = {
         /** Whether the detail view is open. */
         open: PropTypes.bool,
@@ -83,7 +95,7 @@ export default class DetailView extends PureComponent {
                 this.setState({ id: this.props.id }, () => this.load());
 
                 // and reset scroll position
-                this.detailViewNode.scrollTop = 0;
+                if (this.scrollViewNode) this.scrollViewNode.scrollTop = 0;
             }
         }
     }
@@ -116,59 +128,61 @@ export default class DetailView extends PureComponent {
         const item = id && items[id] ? items[id] : null;
 
         return (
-            <div className={'detail-view-container' + (open ? '' : ' closed')}>
-                <div className="detail-view-backdrop" onClick={this.onClose} />
-                <div className="detail-view" ref={node => this.detailViewNode = node}>
-                    <DetailAppBar
-                        item={item}
-                        open={open}
-                        locale={detailLocale}
-                        onClose={this.onClose}
-                        editing={!!this.state.editingCopy}
-                        onEdit={() => this.beginEdit()}
-                        onEditCancel={() => this.endEdit()}
-                        onEditSave={() => {
-                            if (this.formRef.validate()) {
-                                this.setState({ saveOpen: true });
-                            }
-                        }}
-                        onDelete={() => this.setState({ confirmDeleteOpen: true })} />
-                    <DetailViewContents
-                        original={item}
-                        formRef={form => this.formRef = form}
-                        item={this.state.editingCopy || item}
-                        itemId={id}
-                        editing={!!this.state.editingCopy}
-                        onItemChange={item => this.setState({ editingCopy: item })}
-                        fields={this.props.fields}
-                        headerComponent={this.props.headerComponent}
-                        footerComponent={this.props.footerComponent}
-                        locale={detailLocale}
-                        onFetchFieldHistory={this.props.onFetchFieldHistory}
-                        forceReload={() => this.load()} />
+            <CardStackItem
+                class="detail-view"
+                depth={0}
+                open={open}
+                onClose={this.onClose}
+                scrollViewRef={node => this.scrollViewNode = node}>
+                <DetailAppBar
+                    item={item}
+                    open={open}
+                    locale={detailLocale}
+                    onClose={this.onClose}
+                    editing={!!this.state.editingCopy}
+                    onEdit={() => this.beginEdit()}
+                    onEditCancel={() => this.endEdit()}
+                    onEditSave={() => {
+                        if (this.formRef.validate()) {
+                            this.setState({ saveOpen: true });
+                        }
+                    }}
+                    onDelete={() => this.setState({ confirmDeleteOpen: true })} />
+                <DetailViewContents
+                    original={item}
+                    formRef={form => this.formRef = form}
+                    item={this.state.editingCopy || item}
+                    itemId={id}
+                    editing={!!this.state.editingCopy}
+                    onItemChange={item => this.setState({ editingCopy: item })}
+                    fields={this.props.fields}
+                    headerComponent={this.props.headerComponent}
+                    footerComponent={this.props.footerComponent}
+                    locale={detailLocale}
+                    onFetchFieldHistory={this.props.onFetchFieldHistory}
+                    forceReload={() => this.load()} />
 
-                    <ConfirmDeleteDialog
-                        id={id}
-                        open={this.state.confirmDeleteOpen}
-                        onClose={() => this.setState({ confirmDeleteOpen: false })}
-                        onDelete={this.props.onDelete}
-                        onDeleted={this.props.onClose}
-                        detailLocale={detailLocale} />
-                    <DetailSaveDialog
-                        id={id}
-                        open={this.state.saveOpen}
-                        onClose={() => this.setState({ saveOpen: false })}
-                        onSuccess={() => {
-                            this.props.onUpdateItem(id, this.state.editingCopy);
-                            this.endEdit();
-                        }}
-                        onPatch={this.props.onPatch}
-                        original={item}
-                        value={this.state.editingCopy || item}
-                        fields={this.props.fields}
-                        detailLocale={detailLocale} />
-                </div>
-            </div>
+                <ConfirmDeleteDialog
+                    id={id}
+                    open={this.state.confirmDeleteOpen}
+                    onClose={() => this.setState({ confirmDeleteOpen: false })}
+                    onDelete={this.props.onDelete}
+                    onDeleted={this.props.onClose}
+                    detailLocale={detailLocale} />
+                <DetailSaveDialog
+                    id={id}
+                    open={this.state.saveOpen}
+                    onClose={() => this.setState({ saveOpen: false })}
+                    onSuccess={() => {
+                        this.props.onUpdateItem(id, this.state.editingCopy);
+                        this.endEdit();
+                    }}
+                    onPatch={this.props.onPatch}
+                    original={item}
+                    value={this.state.editingCopy || item}
+                    fields={this.props.fields}
+                    detailLocale={detailLocale} />
+            </CardStackItem>
         );
     }
 }
