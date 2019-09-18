@@ -3,6 +3,7 @@ import './card-stack.less';
 
 const CONTEXT_KEY = 'akso-card-stack-provider';
 
+/// Interface between CardStackRenderers and CardStackItems that provides the card stack context.
 export class CardStackProvider extends Component {
     getChildContext () {
         return {
@@ -57,6 +58,10 @@ export class CardStackProvider extends Component {
     }
 }
 
+// FIXME: sometimes this causes infinite loops because all stack items are rendered simultaneously
+// even though they’re nested, and because every stack item will run register(..) and update the
+// renderer, this will cause all stack items to be re-rendered and may cause an infinite loop
+/// A card stack renderer.
 export class CardStackRenderer extends Component {
     state = {
         stack: [],
@@ -64,6 +69,9 @@ export class CardStackRenderer extends Component {
     };
 
     update (stack) {
+        // the answer to why the update mechanism is so convoluted is that when stack items are
+        // removed, they still need to be animated out so they have to linger for a while
+
         const newStack = this.state.stack.slice();
         for (let i = 0; i < newStack.length && i < stack.length; i++) {
             newStack[i] = { item: stack[i], ageMarker: 0 };
@@ -71,7 +79,10 @@ export class CardStackRenderer extends Component {
         for (let i = newStack.length; i < stack.length; i++) {
             newStack.push({ item: stack[i], ageMarker: 0 });
         }
-        let ageMarker = Date.now();
+
+        // all stack items that have technically been removed will instead be marked with an
+        // age marker and then cleared after their animation finishes
+        const ageMarker = Date.now();
         for (let i = stack.length; i < newStack.length; i++) {
             newStack[i].ageMarker = ageMarker;
         }
@@ -133,7 +144,7 @@ export class CardStackRenderer extends Component {
                                 <div class={className} ref={item.scrollViewRef}>
                                     {item.children}
                                 </div>
-                            </div>
+                            </div>,
                         ];
                     })}
                 </div>
