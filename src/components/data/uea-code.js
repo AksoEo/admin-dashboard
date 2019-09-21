@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { TextField, CircularProgress } from 'yamdl';
+import { CircularProgress } from 'yamdl';
 import { UEACode as AKSOUEACode } from 'akso-client';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -38,8 +38,16 @@ class UEACodeEditor extends Component {
     };
 
     checkTaken () {
-        if (!this.props.id) return;
-        if (!AKSOUEACode.validate(this.props.value)) return;
+        let isNewCode = false;
+        try {
+            isNewCode = new AKSOUEACode(this.props.value).type === 'new';
+        } catch (_) {
+            //
+        }
+        if (!this.props.id || !isNewCode) {
+            this.setState({ takenState: null });
+            return;
+        }
         this.setState({ takenState: 'loading' });
         return client.get('/codeholders', {
             limit: 1,
@@ -50,7 +58,7 @@ class UEACodeEditor extends Component {
             else this.setState({ takenState: 'available' });
         }).catch(err => {
             if (this.doNotUpdate) return;
-            console.error(err);
+            console.error(err); // eslint-disable-line no-console
             this.setState({ takenState: null });
         });
     }
@@ -73,7 +81,7 @@ class UEACodeEditor extends Component {
             trailing = <CloseIcon class="taken-state is-taken" />;
         }
 
-        let className = 'data uea-code-editor' + (extraProps.class ? ' ' + extraProps.class : '');
+        const className = 'data uea-code-editor' + (extraProps.class ? ' ' + extraProps.class : '');
         delete extraProps.class;
 
         return <Validator
