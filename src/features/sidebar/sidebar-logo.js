@@ -68,12 +68,20 @@ export default class SidebarLogo extends PureComponent {
                             } else loadParticles();
                         }
                     }} />
-                <img
-                    class="logo-label"
-                    src="/assets/logo-label.svg"
-                    draggable="false"
-                    aria-label="AKSO"
-                    alt="AKSO" />
+                <div class="logo-labels">
+                    <img
+                        class="logo-label"
+                        src="/assets/logo-label.svg"
+                        draggable="false"
+                        aria-label="AKSO"
+                        alt="AKSO" />
+                    <img
+                        class="logo-label2"
+                        src="/assets/logo-label2.svg"
+                        draggable="false"
+                        aria-label="Administranto"
+                        alt="Administranto" />
+                </div>
             </div>
         );
     }
