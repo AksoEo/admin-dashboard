@@ -11,6 +11,7 @@ import data, { Required } from '../../components/data';
 import SuggestionField from '../../components/suggestion-field';
 import ProfilePictureEditor from './profile-picture';
 import MembershipEditor from './membership';
+import Files from './files';
 
 const makeEditable = (Renderer, Editor) => function EditableField ({ value, onChange, editing }) {
     if (!editing) return <Renderer value={value} />;
@@ -473,11 +474,11 @@ const fields = {
     },
 };
 
-function Footer ({ editing }) {
+function Footer ({ value, editing }) {
     if (editing) return '';
     return (
         <div class="member-footer">
-            todo: files
+            <Files id={value.id} />
         </div>
     );
 }
