@@ -4,6 +4,7 @@ import NativeSelect from '@material-ui/core/NativeSelect';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import { Button, Checkbox, TextField, Dialog } from 'yamdl';
+import { UEACode } from 'akso-client';
 import locale from '../../locale';
 import client from '../../client';
 import { Validator } from '../../components/form';
@@ -213,9 +214,20 @@ function NameEditor ({ value, editing, onChange }) {
 
 function CodeEditor ({ value, editing, onChange }) {
     if (!editing) return <data.ueaCode.renderer value={value.newCode} value2={value.oldCode} />;
+
+    const suggestions = UEACode.suggestCodes({
+        type: value.codeholderType,
+        firstNames: [value.firstNameLegal, value.firstName].filter(x => x),
+        lastNames: [value.lastNameLegal, value.lastName].filter(x => x),
+        fullName: value.fullName,
+        nameAbbrev: value.nameAbbrev,
+    });
+
     return <data.ueaCode.editor
         value={value.newCode}
-        onChange={v => onChange({ ...value, newCode: v })} />;
+        onChange={v => onChange({ ...value, newCode: v })}
+        id={value.id}
+        suggestions={suggestions} />;
 }
 
 function Header ({ value, editing, onChange, forceReload }) {

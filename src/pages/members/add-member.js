@@ -3,9 +3,10 @@ import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { appContext } from '../../router';
 import { Dialog, TextField, Button, CircularProgress } from 'yamdl';
+import { UEACode } from 'akso-client';
 import Form, { Validator } from '../../components/form';
 import Segmented from '../../components/segmented';
-import UEACode from 'akso-client/uea-code';
+import data from '../../components/data';
 import locale from '../../locale';
 import client from '../../client';
 
@@ -58,6 +59,12 @@ class AddMember extends PureComponent {
 
     render () {
         const nameField = this.state.codeholderType === 'human' ? 'firstNameLegal' : 'fullName';
+
+        const codeSuggestions = UEACode.suggestCodes({
+            type: this.state.codeholderType,
+            firstNames: [this.state.name],
+            fullName: this.state.name,
+        });
 
         return (
             <Form onSubmit={() => {
@@ -128,22 +135,6 @@ class AddMember extends PureComponent {
                 <Validator
                     component={TextField}
                     class="form-field text-field"
-                    ref={validator => this.codeValidator = validator}
-                    outline
-                    label={locale.members.addMember.newCode}
-                    value={this.state.newCode}
-                    onChange={e => this.setState({ newCode: e.target.value })}
-                    placeholder={locale.members.addMember.newCodePlaceholder}
-                    maxLength={6}
-                    disabled={this.state.loading}
-                    validate={value => {
-                        if (!UEACode.validate(value) || (new UEACode(value)).type !== 'new') {
-                            throw { error: locale.members.addMember.invalidUEACode };
-                        }
-                    }} />
-                <Validator
-                    component={TextField}
-                    class="form-field text-field"
                     outline
                     label={locale.members.addMember[nameField]}
                     value={this.state.name}
@@ -151,6 +142,22 @@ class AddMember extends PureComponent {
                     disabled={this.state.loading}
                     validate={value => {
                         if (!value) throw { error: locale.members.addMember.noName };
+                    }} />
+                <Validator
+                    component={data.ueaCode.editor}
+                    outerClass="form-field"
+                    class="text-field"
+                    ref={validator => this.codeValidator = validator}
+                    outline
+                    value={this.state.newCode}
+                    suggestions={codeSuggestions}
+                    onChange={newCode => this.setState({ newCode })}
+                    disabled={this.state.loading}
+                    id={-1} // pass nonsense id to check if it’s taken
+                    validate={value => {
+                        if (!UEACode.validate(value) || (new UEACode(value)).type !== 'new') {
+                            throw { error: locale.members.addMember.invalidUEACode };
+                        }
                     }} />
                 <footer class="form-footer">
                     <Button type="submit" class="raised" disabled={this.state.loading}>

@@ -195,6 +195,7 @@ export default {
         ueaCode: {
             newCode: 'Seslitera UEA-kodo',
             invalidUEACode: 'Nevalida seslitera UEA-kodo',
+            codeTaken: 'La UEA-kodo estas jam uzata',
         },
     },
     // Members page

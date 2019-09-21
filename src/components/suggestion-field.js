@@ -9,7 +9,7 @@ import './suggestion-field.less';
 /// # Props
 /// - `value`, `onChange`: as expected
 /// - `suggestions`: array of strings
-export default function SuggestionField ({ value, onChange, suggestions, ...extraProps }) {
+export default function SuggestionField ({ value, onChange, suggestions, outerClass, ...extraProps }) {
     suggestions = fuzzaldrin.filter(suggestions, value);
 
     const [isFocused, setFocused] = useState(false);
@@ -56,10 +56,15 @@ export default function SuggestionField ({ value, onChange, suggestions, ...extr
         e.preventDefault();
     };
 
-    const onButtonClick = suggestion => () => onChange(suggestion);
+    const onButtonClick = suggestion => e => {
+        e.preventDefault(); // prevent form submit
+        onChange(suggestion);
+    };
+
+    outerClass = ' ' + (outerClass || '');
 
     return (
-        <div class={'suggestion-field-container' + (isFocused ? ' is-focused' : '')}>
+        <div class={'suggestion-field-container' + (isFocused ? ' is-focused' : '') + outerClass}>
             <TextField
                 value={value}
                 onChange={e => onChange(e.target.value)}
