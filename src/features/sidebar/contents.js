@@ -7,7 +7,7 @@ import { Button, Menu, DrawerItem, DrawerLabel } from 'yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link, appContext } from '../../router';
 import SidebarLogo from './sidebar-logo';
-import pages from '../../pages';
+import pages from '../pages';
 import locale from '../../locale';
 import { TEJOIcon, UEAIcon } from './icons';
 import client from '../../client';

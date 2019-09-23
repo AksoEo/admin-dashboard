@@ -30,7 +30,7 @@ export default {
         search: 'Serĉi',
         logout: 'Elsaluti',
     },
-    documentTitleTemplate: pageTitle => `${pageTitle} | AKSO`,
+    documentTitleTemplate: pageTitle => `${pageTitle} | AKSO-Administranto`,
     // Page titles
     pages: {
         home: 'Hejmo',

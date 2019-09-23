@@ -1,6 +1,6 @@
 import { h, render, Component } from 'preact';
 import { CircularProgress } from 'yamdl';
-import isSpecialPage from './login/is-special-page';
+import isSpecialPage from './features/login/is-special-page';
 import client from './client';
 import './style';
 
@@ -21,7 +21,7 @@ class Session extends Component {
     loadLogin () {
         if (!this.loginPromise) {
             this.loginPromise =
-                import(/* webpackChunkName: "login", webpackPrefetch: true */ './login');
+                import(/* webpackChunkName: "login", webpackPrefetch: true */ './features/login');
             this.loginPromise.then(e => this.setState({ login: e.default }));
         }
     }

@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
-import { Spring, lerp } from '../animation';
+import { Spring, lerp } from '../../animation';
 
 /**
  * Container for multiple pages of varying height and fixed width.

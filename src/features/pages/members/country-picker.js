@@ -7,10 +7,10 @@ import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
 import fuzzaldrin from 'fuzzaldrin';
-import { Spring, globalAnimator, lerp } from '../../animation';
-import { CountryFlag } from '../../components/data/country';
-import locale from '../../locale';
-import cache from '../../cache';
+import { Spring, globalAnimator, lerp } from '../../../animation';
+import { CountryFlag } from '../../../components/data/country';
+import locale from '../../../locale';
+import cache from '../../../cache';
 
 /** Renders a country picker. */
 export default class CountryPicker extends PureComponent {

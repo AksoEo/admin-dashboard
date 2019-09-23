@@ -2,9 +2,9 @@ import { h, Component } from 'preact';
 import jdenticon from 'jdenticon';
 import { Button, Dialog, Slider, CircularProgress } from 'yamdl';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
-import client from '../../client';
-import { Spring, globalAnimator, clamp, lerp } from '../../animation';
-import locale from '../../locale';
+import client from '../../../client';
+import { Spring, globalAnimator, clamp, lerp } from '../../../animation';
+import locale from '../../../locale';
 
 // to avoid using the cardinal 1, 2, 3 ... identicons
 const DECARDINALIFY = id => [

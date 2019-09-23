@@ -12,7 +12,7 @@ import {
     LinearProgress,
 } from 'yamdl';
 import Sidebar from './features/sidebar';
-import routes from './pages';
+import routes from './features/pages';
 import cache from './cache';
 
 import moment from 'moment';

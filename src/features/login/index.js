@@ -1,14 +1,14 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import UEACode from 'akso-client/uea-code';
-import Form, { Validator } from '../components/form';
+import Form, { Validator } from '../../components/form';
 import LogoTransition from './logo-transition';
 import { Button, Checkbox, TextField, CircularProgress, Dialog } from 'yamdl';
-import locale from '../locale';
+import locale from '../../locale';
 import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';
-import { Spring } from '../animation';
-import client from '../client';
+import { Spring } from '../../animation';
+import client from '../../client';
 import { getPageMode, Mode } from './is-special-page';
 import './style';
 

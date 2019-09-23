@@ -1,14 +1,14 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
-import { appContext } from '../../router';
+import { appContext } from '../../../router';
 import { Dialog, TextField, Button, CircularProgress } from 'yamdl';
 import { UEACode } from 'akso-client';
-import Form, { Validator } from '../../components/form';
-import Segmented from '../../components/segmented';
-import data from '../../components/data';
-import locale from '../../locale';
-import client from '../../client';
+import Form, { Validator } from '../../../components/form';
+import Segmented from '../../../components/segmented';
+import data from '../../../components/data';
+import locale from '../../../locale';
+import client from '../../../client';
 
 /// Add member dialog.
 export default class AddMemberDialog extends PureComponent {

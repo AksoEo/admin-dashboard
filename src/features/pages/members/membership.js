@@ -1,11 +1,11 @@
 import { h } from 'preact';
 import { PureComponent, useState, useEffect } from 'preact/compat';
 import { Button, Dialog, AppBarProxy, MenuIcon } from 'yamdl';
-import { CardStackItem } from '../../components/card-stack';
+import { CardStackItem } from '../../../components/card-stack';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import DataList from '../../components/data-list';
-import client from '../../client';
-import locale from '../../locale';
+import DataList from '../../../components/data-list';
+import client from '../../../client';
+import locale from '../../../locale';
 
 /// Membership editor.
 ///

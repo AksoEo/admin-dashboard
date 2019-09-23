@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import DataList from '../../components/data-list';
-import client from '../../client';
+import DataList from '../../../components/data-list';
+import client from '../../../client';
 
 // TODO
 

@@ -7,10 +7,10 @@ import { CodeholderDisabledIcon } from './icons';
 import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
 import { UEACode as AKSOUEACode } from 'akso-client';
 import moment from 'moment';
-import locale from '../../locale';
-import cache from '../../cache';
-import data from '../../components/data';
-import { WithCountries, CountryFlag } from '../../components/data/country';
+import locale from '../../../locale';
+import cache from '../../../cache';
+import data from '../../../components/data';
+import { WithCountries, CountryFlag } from '../../../components/data/country';
 
 // TODO: order fields in some sensible order
 

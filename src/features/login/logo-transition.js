@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
-import Logo from '../components/logo';
-import { Spring, globalAnimator, lerp, clamp } from '../animation';
+import Logo from '../../components/logo';
+import { Spring, globalAnimator, lerp, clamp } from '../../animation';
 
 // renders the logo transition when the user logs in
 export default class LogoTransition extends Component {
