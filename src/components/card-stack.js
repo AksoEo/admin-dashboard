@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { AppBarProxy } from 'yamdl';
 import './card-stack.less';
 
 const CONTEXT_KEY = 'akso-card-stack-provider';
@@ -141,6 +142,7 @@ export class CardStackRenderer extends Component {
                                 class={'card-stack-item' + (ageMarker ? ' is-phantom' : '')}
                                 style={style}
                                 key={'a' + i}>
+                                {!ageMarker ? item.appBar : null}
                                 <div class={className} ref={item.scrollViewRef}>
                                     {item.children}
                                 </div>
@@ -161,6 +163,7 @@ export class CardStackRenderer extends Component {
 /// - `open`: open state
 /// - `onClose`: onClose handler
 /// - `scrollViewRef`: refs the card stack item’s scroll view
+/// - `appBar`: special slot for an app bar proxy to handle closing correctly
 export class CardStackItem extends Component {
     id = Math.random().toString();
 

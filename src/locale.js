@@ -420,5 +420,32 @@ export default {
             cancelProfilePicture: 'Nuligi',
             setProfilePicture: '[[set/upload]]',
         },
+        addrLabelGen: {
+            menuItem: '[[gen address labels]]', // translation note: pls keep it short
+            title: '[[gen address labels]]',
+            labels: {
+                language: '[[language]]',
+                latin: '[[latin]]',
+                includeCode: '[[includeCode]]',
+                paper: '[[paper]]',
+                margins: '[[margins]]',
+                cols: '[[cols]]',
+                rows: '[[rows]]',
+                colGap: '[[colGap]]',
+                rowGap: '[[rowGap]]',
+                cellPadding: '[[cellPadding]]',
+                fontSize: '[[fontSize]]',
+                drawOutline: '[[drawOutline]]',
+            },
+            paperSizes: {
+                A3: 'A3',
+                A4: 'A4',
+                A5: 'A5',
+                LETTER: '[[letter]]',
+                FOLIO: '[[folio]]',
+                LEGAL: '[[legal]]',
+                EXECUTIVE: '[[executive]]',
+            },
+        },
     },
 };

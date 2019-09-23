@@ -84,20 +84,22 @@ export default class MembershipEditor extends PureComponent {
                     onClose={() => {
                         this.setState({ editing: false });
                         this.loadPreview();
-                    }}>
-                    <AppBarProxy
-                        menu={<Button icon small onClick={() => {
-                            this.setState({ editing: false });
-                            this.loadPreview();
-                        }}>
-                            <MenuIcon type="close" />
-                        </Button>}
-                        title={locale.members.detail.membership}
-                        priority={9}
-                        actions={[{
-                            label: '[[add]]',
-                            action: () => this.setState({ addingMembership: true }),
-                        }]} />
+                    }}
+                    appBar={
+                        <AppBarProxy
+                            menu={<Button icon small onClick={() => {
+                                this.setState({ editing: false });
+                                this.loadPreview();
+                            }}>
+                                <MenuIcon type="close" />
+                            </Button>}
+                            title={locale.members.detail.membership}
+                            priority={9}
+                            actions={[{
+                                label: '[[add]]',
+                                action: () => this.setState({ addingMembership: true }),
+                            }]} />
+                    }>
                     <DataList
                         onLoad={(offset, limit) =>
                             client.get(`/codeholders/${this.props.id}/membership`, {

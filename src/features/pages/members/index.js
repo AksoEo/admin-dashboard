@@ -16,6 +16,7 @@ import FILTERS from './filters';
 import FIELDS from './table-fields';
 import detailFields from './detail-fields';
 import AddMemberDialog from './add-member';
+import AddrLabelGen from './addr-label-gen';
 import './style';
 
 const SEARCHABLE_FIELDS = [
@@ -28,6 +29,7 @@ const SEARCHABLE_FIELDS = [
     'notes',
 ];
 
+/// The members list page.
 export default class MembersList extends PureComponent {
     static propTypes = {
         path: PropTypes.string.isRequired,
@@ -37,12 +39,18 @@ export default class MembersList extends PureComponent {
     static contextType = appContext;
 
     state = {
+        /// The member ID of the currently open detail view.
         detail: null,
+        /// If true, the add member dialog is open.
         addMemberOpen: false,
+        /// If true, the address label generator dialog is open.
+        addrLabelGenOpen: false,
+        /// Derived from list view state.
         lvJSONFilterEnabled: false,
         lvSubmitted: false,
     };
 
+    /// Used to animate the scroll position when the page changes.
     scrollSpring = new Spring(1, 0.4);
 
     constructor (props) {
@@ -63,6 +71,7 @@ export default class MembersList extends PureComponent {
             || decodeURIComponent(this.currentQuery) === decodeURIComponent(query);
     }
 
+    /// Updates the url query in the address bar; called by the list view.
     onURLQueryChange = (query, force = false) => {
         if (this.isDetailView && !force) return;
         if (this.isQueryUnchanged(query) && !force) return;
@@ -85,6 +94,7 @@ export default class MembersList extends PureComponent {
         }
     }
 
+    /// Attempts to decode the URL query to get the search parameters.
     tryDecodeURLQuery () {
         if (this.isDetailView) return;
         if (!this.props.query && this.currentQuery) {
@@ -105,6 +115,7 @@ export default class MembersList extends PureComponent {
         }
     }
 
+    /// Attempts to decode the path to get the currently open detail view.
     tryDecodePath () {
         const detailView = this.props.path.match(/^\/membroj\/(\d+)(\/|$)/);
         this.isDetailView = !!detailView;
@@ -120,6 +131,7 @@ export default class MembersList extends PureComponent {
     }
 
     render () {
+        // overflow menu
         const menu = [];
         menu.push({
             label: this.state.lvJSONFilterEnabled
@@ -132,6 +144,11 @@ export default class MembersList extends PureComponent {
             menu.push({
                 label: locale.listView.csvExport.menuItem,
                 action: () => this.listView.openCSVExport(),
+                overflow: true,
+            });
+            menu.push({
+                label: locale.members.addrLabelGen.menuItem,
+                action: () => this.setState({ addrLabelGenOpen: true }),
                 overflow: true,
             });
         }
@@ -225,9 +242,13 @@ export default class MembersList extends PureComponent {
                     onJSONFilterEnabledChange={enabled =>
                         this.setState({ lvJSONFilterEnabled: enabled })}
                     onSubmittedChange={submitted => this.setState({ lvSubmitted: submitted })} />
+
                 <AddMemberDialog
                     open={this.state.addMemberOpen}
                     onClose={() => this.setState({ addMemberOpen: false })} />
+                <AddrLabelGen
+                    open={this.state.addrLabelGenOpen}
+                    onClose={() => this.setState({ addrLabelGenOpen: false })} />
             </div>
         );
     }

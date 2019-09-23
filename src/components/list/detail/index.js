@@ -133,21 +133,23 @@ class DetailView extends PureComponent {
                 depth={0}
                 open={open}
                 onClose={this.onClose}
-                scrollViewRef={node => this.scrollViewNode = node}>
-                <DetailAppBar
-                    item={item}
-                    open={open}
-                    locale={detailLocale}
-                    onClose={this.onClose}
-                    editing={!!this.state.editingCopy}
-                    onEdit={() => this.beginEdit()}
-                    onEditCancel={() => this.endEdit()}
-                    onEditSave={() => {
-                        if (this.formRef.validate()) {
-                            this.setState({ saveOpen: true });
-                        }
-                    }}
-                    onDelete={() => this.setState({ confirmDeleteOpen: true })} />
+                scrollViewRef={node => this.scrollViewNode = node}
+                appBar={
+                    <DetailAppBar
+                        item={item}
+                        open={open}
+                        locale={detailLocale}
+                        onClose={this.onClose}
+                        editing={!!this.state.editingCopy}
+                        onEdit={() => this.beginEdit()}
+                        onEditCancel={() => this.endEdit()}
+                        onEditSave={() => {
+                            if (this.formRef.validate()) {
+                                this.setState({ saveOpen: true });
+                            }
+                        }}
+                        onDelete={() => this.setState({ confirmDeleteOpen: true })} />
+                }>
                 <DetailViewContents
                     original={item}
                     formRef={form => this.formRef = form}
