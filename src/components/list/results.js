@@ -312,8 +312,11 @@ TableHeader.propTypes = {
 };
 
 function TableItem ({ fields, fieldSpec, value, isSelected, onClick, onSelectChange, linkTarget }) {
+    let className = 'list-item';
+    if (value.isCursed) className += ' is-cursed';
+
     return (
-        <TableRow className="list-item" onClick={onClick}>
+        <TableRow className={className} onClick={onClick}>
             <TableCell className="li-column select-column" onClick={e => {
                 e.stopPropagation();
             }}>

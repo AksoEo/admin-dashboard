@@ -239,15 +239,27 @@ export default class MembersList extends PureComponent {
                     // so it updates when it changes/loads
                     canSaveFilters={this.context.hasPermission('queries.create')}
                     savedFilterCategory={'codeholders'}
-                    onJSONFilterEnabledChange={enabled =>
-                        this.setState({ lvJSONFilterEnabled: enabled })}
-                    onSubmittedChange={submitted => this.setState({ lvSubmitted: submitted })} />
+                    onStateChange={state => {
+                        if (state.jsonFilter.enabled !== this.state.lvJSONFilterEnabled) {
+                            this.setState({ lvJSONFilterEnabled: state.jsonFilter.enabled });
+                        }
+                        if (state.list.submitted !== this.state.lvSubmitted) {
+                            this.setState({ lvSubmitted: state.list.submitted });
+                        }
+                        if (state.results.stats.cursed !== this.state.lvIsCursed) {
+                            this.setState({ lvIsCursed: state.results.stats.cursed });
+                        }
+                        // deliberately not a state field to avoid frequent updates
+                        this.reduxState = state;
+                    }} />
 
                 <AddMemberDialog
                     open={this.state.addMemberOpen}
                     onClose={() => this.setState({ addMemberOpen: false })} />
                 <AddrLabelGen
                     open={this.state.addrLabelGenOpen}
+                    lvIsCursed={this.state.lvIsCursed}
+                    getRequestData={() => stateToRequestData(this.reduxState)}
                     onClose={() => this.setState({ addrLabelGenOpen: false })} />
             </div>
         );
@@ -326,7 +338,7 @@ const searchFieldToSelectedFields = {
     address: ['addressLatin'],
 };
 
-async function handleRequest (state) {
+function stateToRequestData (state) {
     const useJSONFilters = state.jsonFilter.enabled;
 
     const options = {};
@@ -419,6 +431,19 @@ async function handleRequest (state) {
         }
     }
 
+    return {
+        options,
+        prependedUeaCodeSearch,
+        usedFilters,
+        transientFields,
+    };
+}
+
+async function handleRequest (state) {
+    const {
+        options, prependedUeaCodeSearch, usedFilters, transientFields,
+    } = stateToRequestData(state);
+
     let itemToPrepend = null;
     if (prependedUeaCodeSearch) {
         itemToPrepend = (await client.get('/codeholders', {
@@ -427,6 +452,7 @@ async function handleRequest (state) {
             fields: options.offset === 0 ? options.fields : [],
             limit: 1,
         })).body[0];
+        if (itemToPrepend) itemToPrepend.isCursed = true;
     }
 
     if (itemToPrepend) {
@@ -440,8 +466,10 @@ async function handleRequest (state) {
     const result = await client.get('/codeholders', options);
     const list = result.body;
     let totalItems = +result.res.headers.map['x-total-items'];
+    let cursed = false;
 
     if (itemToPrepend) {
+        cursed = true;
         let isDuplicate = false;
         for (const item of list) {
             if (item.id === itemToPrepend.id) {
@@ -463,6 +491,7 @@ async function handleRequest (state) {
             time: result.resTime,
             total: totalItems,
             filtered: usedFilters,
+            cursed,
         },
     };
 }

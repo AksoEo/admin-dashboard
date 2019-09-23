@@ -278,6 +278,10 @@
             .list-item {
                 transition: background 0.2s @easing;
 
+                &.is-cursed {
+                    background: @golden-background;
+                }
+
                 &:active {
                     background: @hover-background;
                 }

@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import { AppBarProxy } from 'yamdl';
 import './card-stack.less';
 
 const CONTEXT_KEY = 'akso-card-stack-provider';

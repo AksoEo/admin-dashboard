@@ -79,16 +79,6 @@ const listViewMiddleware = listView => () => next => action => {
         listView.onSubmit();
     }
 
-    // events
-    if (action.type === actions.SET_JSON_FILTER_ENABLED
-        && listView.props.onJSONFilterEnabledChange) {
-        listView.props.onJSONFilterEnabledChange(action.enabled);
-    }
-    if (listView.props.onSubmittedChange) {
-        if (action.type === actions.SUBMIT) listView.props.onSubmittedChange(true);
-        if (action.type === actions.UNSUBMIT) listView.props.onSubmittedChange(false);
-    }
-
     next(action);
 };
 const RELOAD_DEBOUNCE_TIME = 500; // ms
@@ -189,9 +179,7 @@ export default class ListView extends PureComponent {
         /// The category name for saved filters.
         savedFilterCategory: PropTypes.string.isRequired,
 
-        /// Various events.
-        onJSONFilterEnabledChange: PropTypes.func,
-        onSubmittedChange: PropTypes.func,
+        onStateChange: PropTypes.func,
     };
 
     /// State store.
@@ -377,6 +365,7 @@ export default class ListView extends PureComponent {
 
         return (
             <Provider store={this.store}>
+                <StateChangeListener onStateChange={this.props.onStateChange} />
                 <div className={'list-view' + (isDetailView ? ' detail-open' : '')}>
                     <ConnectedFieldPicker
                         open={this.state.fieldPickerOpen}
@@ -436,6 +425,12 @@ export default class ListView extends PureComponent {
         );
     }
 }
+
+const StateChangeListener = connect(state => ({
+    state,
+}))(function StateChangeListener ({ state, onStateChange }) {
+    if (onStateChange) onStateChange(state);
+});
 
 const ConnectedFieldPicker = connect(state => ({
     selected: state.fields.user,

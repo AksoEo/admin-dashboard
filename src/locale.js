@@ -446,6 +446,12 @@ export default {
                 LEGAL: '[[legal]]',
                 EXECUTIVE: '[[executive]]',
             },
+            cursedNotice: '[[there are items with a golden shine in the search results. they won’t show up in the generated data]]',
+            generate: '[[send request]]',
+            success: '[[successfully sent request, you’ll get a notification with it in a moment]]',
+            genericError: '[[failed to send request]]',
+            alreadySubmitted: '[[you already submitted a request, please wait for it to finish]]',
+            closeDialog: '[[close]]',
         },
     },
 };

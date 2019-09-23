@@ -1,35 +1,60 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
-import { AppBarProxy, Button, MenuIcon, Checkbox } from 'yamdl';
+import { useState, Fragment } from 'preact/compat';
+import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog } from 'yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import {
     CardStackProvider, CardStackRenderer, CardStackItem,
 } from '../../../components/card-stack';
 import locale from '../../../locale';
+import client from '../../../client';
 
-export default function AddrLabelGenContainer ({ open, onClose }) {
+export default function AddrLabelGenContainer ({
+    open, lvIsCursed, getRequestData, onClose,
+}) {
+    const [showSuccess, setShowSuccess] = useState(false);
+
     return (
-        <CardStackProvider>
-            <CardStackRenderer class="addr-label-gen-card-stack" />
-            <CardStackItem
-                open={open}
-                onClose={onClose}
-                depth={0}
-                appBar={
-                    <AppBarProxy
-                        menu={<Button icon small onClick={onClose}>
-                            <MenuIcon type="close" />
-                        </Button>}
-                        title={locale.members.addrLabelGen.title}
-                        priority={9} />
-                }>
-                <AddrLabelGen />
-            </CardStackItem>
-        </CardStackProvider>
+        <Fragment>
+            <CardStackProvider>
+                <CardStackRenderer class="addr-label-gen-card-stack" />
+                <CardStackItem
+                    open={open}
+                    onClose={onClose}
+                    depth={0}
+                    appBar={
+                        <AppBarProxy
+                            menu={<Button icon small onClick={onClose}>
+                                <MenuIcon type="close" />
+                            </Button>}
+                            title={locale.members.addrLabelGen.title}
+                            priority={9} />
+                    }>
+                    <AddrLabelGen
+                        lvIsCursed={lvIsCursed}
+                        getRequestData={getRequestData}
+                        onSuccess={() => {
+                            onClose();
+                            setShowSuccess(true);
+                        }} />
+                </CardStackItem>
+            </CardStackProvider>
+            <Dialog
+                backdrop
+                open={showSuccess}
+                onClose={() => setShowSuccess(false)}
+                actions={[
+                    {
+                        label: locale.members.addrLabelGen.closeDialog,
+                        action: () => setShowSuccess(false),
+                    },
+                ]}>
+                {locale.members.addrLabelGen.success}
+            </Dialog>
+        </Fragment>
     );
 }
 
-function AddrLabelGen () {
+function AddrLabelGen ({ lvIsCursed, onSuccess, getRequestData }) {
     const [settings, setSettings] = useState({
         language: 'eo',
         latin: false,
@@ -49,10 +74,54 @@ function AddrLabelGen () {
         fontSize: 12,
         drawOutline: false,
     });
+    const [isLoading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [resultOpen, setResultOpen] = useState(false);
+
+    const sendRequest = () => {
+        const { options } = getRequestData();
+        setLoading(true);
+
+        delete options.limit;
+        delete options.offset;
+        delete options.fields;
+
+        client.post('/codeholders/!make_address_labels', settings, options)
+            .then(onSuccess).catch(err => {
+                setError(err);
+                console.error(err); // eslint-disable-line no-console
+                setResultOpen(true);
+            }).then(() => setLoading(false));
+    };
 
     return (
         <div class="addr-label-gen">
-            <GenSettings value={settings} onChange={setSettings} />
+            {lvIsCursed ? <div class="cursed-notice">
+                {locale.members.addrLabelGen.cursedNotice}
+            </div> : null}
+            <div class="addr-label-gen-inner">
+                <GenPreview value={settings} />
+                <GenSettings value={settings} onChange={setSettings} />
+            </div>
+            <footer class="addr-label-gen-footer">
+                <Button raised class="generate-btn" onClick={sendRequest} disabled={isLoading}>
+                    {locale.members.addrLabelGen.generate}
+                </Button>
+            </footer>
+            <Dialog
+                backdrop
+                open={!!resultOpen}
+                onClose={() => setResultOpen(false)}
+                actions={[
+                    {
+                        label: locale.members.addrLabelGen.closeDialog,
+                        action: () => setResultOpen(false),
+                    },
+                ]}>
+                {(error || '').toString().includes('423')
+                    ? locale.members.addrLabelGen.alreadySubmitted
+                    : locale.members.addrLabelGen.genericError}
+            </Dialog>
         </div>
     );
 }
@@ -97,4 +166,12 @@ function GenSettings ({ value, onChange }) {
 
 function MarginsEditor ({ value, onChange }) {
     return 'unimplemented';
+}
+
+function GenPreview ({ value }) {
+    return (
+        <div class="gen-preview">
+            todo: preview
+        </div>
+    );
 }
