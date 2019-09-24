@@ -55,9 +55,17 @@
             justify-content: space-between;
             border-bottom: 1px solid @separator;
 
-            .user-avatar {
-                border: 2px solid currentColor;
+            .user-profile-picture {
+                border: 2px solid fade(@text, 20%);
                 margin-right: 8px;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+
+                .profile-picture {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
             }
 
             .user-name {

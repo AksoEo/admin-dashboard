@@ -443,23 +443,17 @@
                 width: 96px;
                 height: 96px;
                 border-radius: 50%;
-                background: fade(@text, 20%);
+                border: 2px solid fade(@text, 20%);
                 flex-shrink: 0;
                 margin-right: 24px;
                 overflow: hidden;
+                box-sizing: border-box;
 
-                .member-picture {
+                .profile-picture {
                     max-width: 100%;
                     max-height: 100%;
                 }
 
-                &.is-identicon {
-                    background: #f0f0f0;
-
-                    .member-picture {
-                        transform: scale(.9);
-                    }
-                }
 
                 .edit-overlay {
                     position: absolute;

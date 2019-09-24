@@ -1,18 +1,10 @@
 import { h, Component } from 'preact';
-import jdenticon from 'jdenticon';
 import { Button, Dialog, Slider, CircularProgress } from 'yamdl';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import client from '../../../client';
+import ProfilePicture from '../../../components/profile-picture';
 import { Spring, globalAnimator, clamp, lerp } from '../../../animation';
 import locale from '../../../locale';
-
-// to avoid using the cardinal 1, 2, 3 ... identicons
-const DECARDINALIFY = id => [
-    `we don’t seem to have a profile picture for ${id} on file`,
-    `${id} is now represented by a bunch of geometric shapes`,
-    `this is the identicon hash for ${id}`,
-    `${id} vershajne parolas Esperanton (auh estas organizo)`,
-][id % 4];
 
 /// Renders an editable codeholder profile picture or identicon.
 ///
@@ -21,40 +13,9 @@ const DECARDINALIFY = id => [
 /// - `hasProfilePicture`: whether the identicon should be used or not
 export default class ProfilePictureEditor extends Component {
     state = {
-        imgSrcSet: '',
-        isIdenticon: false,
         uploading: false,
         croppingFile: null,
     };
-
-    load () {
-        const { id, hasProfilePicture } = this.props;
-        if (!id) return;
-
-        if (hasProfilePicture) {
-            let urlBase = new URL(client.client.host);
-            urlBase.pathname = `/codeholders/${id}/profile_picture/`;
-            urlBase = urlBase.toString();
-            const imgSrcSet = [32, 64, 128, 256].map(w => `${urlBase}${w}px ${w}w`).join(', ');
-            this.setState({ imgSrcSet, isIdenticon: false });
-        } else {
-            const blobURL = URL.createObjectURL(new Blob([
-                jdenticon.toSvg(DECARDINALIFY(id), 128),
-            ], {
-                type: 'image/svg+xml',
-            }));
-            this.setState({ imgSrcSet: `${blobURL} 128w`, isIdenticon: true });
-        }
-    }
-
-    componentDidMount () {
-        this.load();
-    }
-
-    componentDidUpdate (prevProps) {
-        if (prevProps.id !== this.props.id
-            || prevProps.hasProfilePicture !== this.props.hasProfilePicture) this.load();
-    }
 
     beginUpload () {
         if (this.mountedInput) this.mountedInput.parentNode.removeChild(this.mountedInput);
@@ -85,10 +46,8 @@ export default class ProfilePictureEditor extends Component {
 
     render () {
         return (
-            <div class={'member-picture-container' + (this.state.isIdenticon ? ' is-identicon' : '')}>
-                <img
-                    class="member-picture"
-                    srcSet={this.state.imgSrcSet} />
+            <div class="member-picture-container">
+                <ProfilePicture {...this.props} />
                 <Button icon class="edit-overlay" onClick={() => this.beginUpload()}>
                     <AddAPhotoIcon class="edit-icon" />
                 </Button>

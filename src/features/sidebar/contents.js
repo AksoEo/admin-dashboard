@@ -1,10 +1,10 @@
 import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
 import PropTypes from 'prop-types';
-import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import { Button, Menu, DrawerItem, DrawerLabel } from 'yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ProfilePicture from '../../components/profile-picture';
 import { Link, appContext } from '../../router';
 import SidebarLogo from './sidebar-logo';
 import pages from '../pages';
@@ -73,12 +73,14 @@ export default class SidebarContents extends PureComponent {
     state = {
         userMenuOpen: false,
         userName: null,
+        id: null,
         hasProfilePicture: false,
     };
 
     componentDidMount () {
         client.get('/codeholders/self', {
             fields: [
+                'id',
                 'hasProfilePicture',
                 'codeholderType',
                 'firstName',
@@ -95,6 +97,7 @@ export default class SidebarContents extends PureComponent {
                     + (data.lastName || data.lastNameLegal)
                 : (data.fullName.length > 20 && data.nameAbbrev) || data.fullName;
             this.setState({
+                id: data.id,
                 userName: name,
                 hasProfilePicture: data.hasProfilePicture,
             });
@@ -102,11 +105,6 @@ export default class SidebarContents extends PureComponent {
     }
 
     render () {
-        let avatarURLBase = new URL(client.client.host);
-        avatarURLBase.pathname = '/codeholders/self/profile_picture/';
-        avatarURLBase = avatarURLBase.toString();
-        const avatarSrcSet = [32, 64, 128, 256].map(w => `${avatarURLBase}${w}px ${w}w`).join(', ');
-
         return (
             <div class="app-sidebar-contents">
                 <div class="sidebar-header">
@@ -117,13 +115,11 @@ export default class SidebarContents extends PureComponent {
                         }}
                         onClick={() => this.context.navigate('/')} />
                     <div class="sidebar-user">
-                        <Avatar
-                            class="user-avatar"
-                            srcSet={this.state.hasProfilePicture ? avatarSrcSet : null}>
-                            {!this.state.hasProfilePicture && this.state.userName
-                                ? this.state.userName[0]
-                                : null}
-                        </Avatar>
+                        <div class="user-profile-picture">
+                            <ProfilePicture
+                                id={this.state.id}
+                                hasProfilePicture={this.state.hasProfilePicture} />
+                        </div>
                         <Typography
                             class="user-name"
                             variant="subtitle1"
