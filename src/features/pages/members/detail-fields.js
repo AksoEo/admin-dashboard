@@ -141,6 +141,17 @@ function NameEditor ({ value, editing, onChange }) {
                     </span>
                 );
             }
+
+            if (value.fullNameLocal) {
+                secondaryName = (
+                    <div class="name-legal">
+                        {locale.members.detail.fields.fullNameLocal}: <span
+                            class="name-legal-inner">
+                            {value.fullNameLocal}
+                        </span>
+                    </div>
+                );
+            }
         }
 
         return (
@@ -158,10 +169,10 @@ function NameEditor ({ value, editing, onChange }) {
                 {
                     component: SuggestionField,
                     key: 'honorific',
-                    label: locale.members.detail.fields.honorific,
                     props: {
                         maxLength: 15,
                         suggestions: locale.members.detail.honorificSuggestions,
+                        label: locale.members.detail.fields.honorific,
                     },
                 },
             ],
@@ -197,8 +208,21 @@ function NameEditor ({ value, editing, onChange }) {
                 {
                     key: 'fullName',
                     label: <Required>{locale.members.detail.fields.fullName}</Required>,
-                    props: { maxLength: 100, class: 'full-name-editor' },
+                    props: {
+                        maxLength: 100,
+                        validatorProps: { class: 'full-name-editor' },
+                    },
                     validate: validators.required(),
+                },
+            ],
+            [
+                {
+                    key: 'fullNameLocal',
+                    label: <Required>{locale.members.detail.fields.fullNameLocal}</Required>,
+                    props: {
+                        maxLength: 100,
+                        validatorProps: { class: 'full-name-editor' },
+                    },
                 },
             ],
             [

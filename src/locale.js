@@ -179,6 +179,9 @@ export default {
                 noChanges: 'Neniuj ŝanĝoj faritaj',
                 commit: 'Aktualigi',
             },
+            history: {
+                error: '[[failed to fetch history]]',
+            },
         },
     },
     data: {
@@ -384,6 +387,7 @@ export default {
                 firstName: 'Persona nomo',
                 lastName: 'Familia nomo',
                 fullName: 'Plena nomo',
+                fullNameLocal: '[[fullNameLocal]]',
                 address: 'Adreso',
                 feeCountry: 'Paglando',
                 profession: 'Profesio',

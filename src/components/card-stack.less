@@ -10,7 +10,6 @@
         right: 0;
         bottom: 0;
         background: rgba(0, 0, 0, 0.2);
-        transition: opacity 0.5s @easing;
         animation: card-stack-backdrop-in 0.5s @easing forwards;
 
         @keyframes card-stack-backdrop-in {
@@ -20,8 +19,14 @@
         }
 
         &.is-phantom {
-            opacity: 0;
             pointer-events: none;
+            animation: card-stack-backdrop-out 0.5s @easing forwards;
+
+            @keyframes card-stack-backdrop-out {
+                100% {
+                    opacity: 0;
+                }
+            }
         }
     }
 

@@ -6,7 +6,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import { Checkbox, Button } from 'yamdl';
+import { Button } from 'yamdl';
 import TablePagination from '@material-ui/core/TablePagination';
 import SearchIcon from '@material-ui/icons/Search';
 import ListAltIcon from '@material-ui/icons/ListAlt';
@@ -205,11 +205,6 @@ function ResultsTable ({
                         fields={fieldIDs}
                         fieldSpec={fieldSpec}
                         value={items[id]}
-                        onClick={/* TODO */ () => {}}
-                        isSelected={/* TODO */ false}
-                        onSelectChange={() => {
-                            // TODO
-                        }}
                         linkTarget={getLinkTarget(id)} />
                 ))}
             </TableBody>
@@ -243,12 +238,6 @@ function TableHeader ({
     return (
         <TableHead className="table-header">
             <TableRow>
-                <TableCell className="select-column">
-                    <Checkbox
-                        // TODO: this
-                        checked={false}
-                        onChange={() => {}} />
-                </TableCell>
                 {fields.map(({ id, sorting, transient, index }) => {
                     if (id === configColumn) {
                         return (
@@ -311,19 +300,12 @@ TableHeader.propTypes = {
     localizedFields: PropTypes.object.isRequired,
 };
 
-function TableItem ({ fields, fieldSpec, value, isSelected, onClick, onSelectChange, linkTarget }) {
+function TableItem ({ fields, fieldSpec, value, onClick, linkTarget }) {
     let className = 'list-item';
     if (value.isCursed) className += ' is-cursed';
 
     return (
         <TableRow className={className} onClick={onClick}>
-            <TableCell className="li-column select-column" onClick={e => {
-                e.stopPropagation();
-            }}>
-                <Checkbox
-                    checked={isSelected}
-                    onChange={() => onSelectChange(!isSelected)} />
-            </TableCell>
             {fields.map(id => {
                 const Field = (fieldSpec[id] && fieldSpec[id].component) || NullField;
                 return (

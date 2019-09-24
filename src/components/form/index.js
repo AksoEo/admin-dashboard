@@ -205,6 +205,8 @@ export class Validator extends Component {
         const props = { ...this.props };
         delete props.validate;
         delete props.component;
+        const { validatorProps } = props;
+        delete props.validatorProps;
         props.ref = this.props.innerRef;
 
         if (this.state.error) {
@@ -218,7 +220,7 @@ export class Validator extends Component {
                     return (
                         <span class="form-validator" style={{
                             transform: `translateX(${this.state.translateX}px)`,
-                        }}>
+                        }} {...validatorProps}>
                             {h(this.props.component, props, this.props.children)}
                         </span>
                     );

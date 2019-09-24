@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent, useState } from 'preact/compat';
+import { memo, PureComponent, useState } from 'preact/compat';
 import PropTypes from 'prop-types';
 import { AppBarProxy, Button, MenuIcon, Dialog, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
@@ -251,7 +251,7 @@ DetailAppBar.propTypes = {
     onDelete: PropTypes.func.isRequired,
 };
 
-function DetailViewContents ({
+const DetailViewContents = memo(function DetailViewContents ({
     original,
     formRef,
     item,
@@ -357,7 +357,7 @@ function DetailViewContents ({
                 onClose={() => setOpenHistory(null)} />
         </Form>
     );
-}
+});
 
 function DetailSaveDialog ({
     id, open, onClose, onSuccess, onPatch, original, value, fields, detailLocale,

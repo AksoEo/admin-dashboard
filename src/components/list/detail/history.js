@@ -1,10 +1,13 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/compat';
-import { Dialog } from 'yamdl';
+import { Button, AppBarProxy, MenuIcon } from 'yamdl';
+import { CardStackItem } from '../../card-stack';
+import locale from '../../../locale';
 
-export default function FieldHistory ({ fields, locale, itemId, id, onClose, onFetchFieldHistory }) {
+export default function FieldHistory ({ fields, locale: historyLocale, itemId, id, onClose, onFetchFieldHistory }) {
     const [currentId, setCurrentId] = useState(null);
     const [mods, setMods] = useState(null);
+    const [error, setError] = useState(null);
 
     if (id && currentId !== id) {
         setCurrentId(id);
@@ -16,19 +19,29 @@ export default function FieldHistory ({ fields, locale, itemId, id, onClose, onF
                 // TODO: handle error
                 console.error('Failed to fetch field history', err); // eslint-disable-line no-console
                 setMods([]);
+                setError(err);
             });
         }
     }, [currentId]);
 
-    const title = currentId && locale.historyTitle(locale.fields[currentId]);
+    const title = currentId && historyLocale.historyTitle(historyLocale.fields[currentId]);
 
     return (
-        <Dialog
+        <CardStackItem
             open={!!id}
             onClose={onClose}
-            title={title}
-            backdrop>
-
-        </Dialog>
+            depth={1}
+            appBar={<AppBarProxy
+                menu={<Button icon small onClick={onClose}><MenuIcon type="close" /></Button>}
+                title={title}
+                priority={13} />}>
+            <div class="list-view-field-history">
+                {error ? (
+                    <div class="error-container">
+                        {locale.listView.detail.history.error}
+                    </div>
+                ) : null}
+            </div>
+        </CardStackItem>
     );
 }

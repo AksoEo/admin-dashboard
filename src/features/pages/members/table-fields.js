@@ -51,6 +51,20 @@ export default {
             return title;
         },
     },
+    code: {
+        sortable: true,
+        component ({ item }) {
+            const { oldCode, newCode } = item;
+            return <data.ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
+        },
+        stringify (value, item) {
+            const { oldCode, newCode } = item;
+            if (oldCode) {
+                const oldCodeCheckLetter = new AKSOUEACode(oldCode).getCheckLetter();
+                return `${newCode} (${oldCode}-${oldCodeCheckLetter})`;
+            } else return newCode;
+        },
+    },
     name: {
         sortable: true,
         component: class Name extends PureComponent {
@@ -143,20 +157,6 @@ export default {
             }
         },
     },
-    code: {
-        sortable: true,
-        component ({ item }) {
-            const { oldCode, newCode } = item;
-            return <data.ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
-        },
-        stringify (value, item) {
-            const { oldCode, newCode } = item;
-            if (oldCode) {
-                const oldCodeCheckLetter = new AKSOUEACode(oldCode).getCheckLetter();
-                return `${newCode} (${oldCode}-${oldCodeCheckLetter})`;
-            } else return newCode;
-        },
-    },
     age: {
         sortable: true,
         component ({ value, item }) {
@@ -170,6 +170,81 @@ export default {
         stringify (value) {
             if (value === null || value === undefined) return '';
             return value.toString();
+        },
+    },
+    membership: {
+        component ({ value }) {
+            if (!value) return null;
+            return (
+                <span className="memberships">
+                    {value.flatMap((item, i) => (i == 0 ? [] : [', ']).concat([(
+                        <span
+                            className="membership-item"
+                            key={`${item.categoryId}-${item.year}`}
+                            data-category-id={item.categoryId}>
+                            <abbr className="membership-item-id" title={item.name}>
+                                {item.nameAbbrev}
+                            </abbr>
+                            <span className="membership-year">{item.year}</span>
+                        </span>
+                    )]))}
+                </span>
+            );
+        },
+        stringify (value) {
+            if (!value) return '';
+            return value.map(item => `${item.nameAbbrev} ${item.year}`).join(', ');
+        },
+    },
+    country: {
+        sortable: true,
+        component ({ item }) {
+            const { feeCountry, addressLatin } = item;
+            const addressCountry = addressLatin ? addressLatin.country : null;
+
+            if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
+                const country = addressCountry || feeCountry;
+                if (!country) return '';
+
+                return (
+                    <WithCountries>
+                        {countries => {
+                            const name = countries[country];
+                            return <span><CountryFlag country={country} /> {name}</span>;
+                        }}
+                    </WithCountries>
+                );
+            } else {
+                return (
+                    <WithCountries>
+                        {countries => {
+                            const feeCountryName = countries[feeCountry];
+                            const countryName = countries[addressCountry];
+                            return (
+                                <span>
+                                    {locale.members.fields
+                                        .disjunctCountry(feeCountryName, countryName)}
+                                </span>
+                            );
+                        }}
+                    </WithCountries>
+                );
+            }
+        },
+        stringify: async (value, item, fields, options) => {
+            const { feeCountry, addressLatin } = item;
+            const addressCountry = addressLatin ? addressLatin.country : null;
+            const countries = await cache.getCountriesLocalized(options.countryLocale || 'eo');
+
+            if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
+                const country = addressCountry || feeCountry;
+                if (!country) return '';
+                return country.toUpperCase() + ' ' + countries[country];
+            } else {
+                const feeCountryName = feeCountry.toUpperCase() + ' ' + countries[feeCountry];
+                const countryName = addressCountry.toUpperCase() + ' ' + countries[addressCountry];
+                return locale.members.fields.disjunctCountry(feeCountryName, countryName);
+            }
         },
     },
     birthdate: {
@@ -265,57 +340,6 @@ export default {
             return item.addressLatin.countryArea;
         },
     },
-    country: {
-        sortable: true,
-        component ({ item }) {
-            const { feeCountry, addressLatin } = item;
-            const addressCountry = addressLatin ? addressLatin.country : null;
-
-            if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
-                const country = addressCountry || feeCountry;
-                if (!country) return '';
-
-                return (
-                    <WithCountries>
-                        {countries => {
-                            const name = countries[country];
-                            return <span><CountryFlag country={country} /> {name}</span>;
-                        }}
-                    </WithCountries>
-                );
-            } else {
-                return (
-                    <WithCountries>
-                        {countries => {
-                            const feeCountryName = countries[feeCountry];
-                            const countryName = countries[addressCountry];
-                            return (
-                                <span>
-                                    {locale.members.fields
-                                        .disjunctCountry(feeCountryName, countryName)}
-                                </span>
-                            );
-                        }}
-                    </WithCountries>
-                );
-            }
-        },
-        stringify: async (value, item, fields, options) => {
-            const { feeCountry, addressLatin } = item;
-            const addressCountry = addressLatin ? addressLatin.country : null;
-            const countries = await cache.getCountriesLocalized(options.countryLocale || 'eo');
-
-            if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
-                const country = addressCountry || feeCountry;
-                if (!country) return '';
-                return country.toUpperCase() + ' ' + countries[country];
-            } else {
-                const feeCountryName = feeCountry.toUpperCase() + ' ' + countries[feeCountry];
-                const countryName = addressCountry.toUpperCase() + ' ' + countries[addressCountry];
-                return locale.members.fields.disjunctCountry(feeCountryName, countryName);
-            }
-        },
-    },
     officePhone: {
         component: data.phoneNumber.inlineRenderer,
         stringify (value, item) {
@@ -344,29 +368,5 @@ export default {
     },
     notes: {
         hideColumn: true,
-    },
-    membership: {
-        component ({ value }) {
-            if (!value) return null;
-            return (
-                <span className="memberships">
-                    {value.flatMap((item, i) => (i == 0 ? [] : [', ']).concat([(
-                        <span
-                            className="membership-item"
-                            key={`${item.categoryId}-${item.year}`}
-                            data-category-id={item.categoryId}>
-                            <abbr className="membership-item-id" title={item.name}>
-                                {item.nameAbbrev}
-                            </abbr>
-                            <span className="membership-year">{item.year}</span>
-                        </span>
-                    )]))}
-                </span>
-            );
-        },
-        stringify (value) {
-            if (!value) return '';
-            return value.map(item => `${item.nameAbbrev} ${item.year}`).join(', ');
-        },
     },
 };

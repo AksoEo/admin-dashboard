@@ -87,7 +87,7 @@ export default function SuggestionField ({ value, onChange, suggestions, outerCl
 }
 
 function highlightSuggestion (suggestion, value) {
-    value = [...value];
+    value = value ? [...value] : [];
     let bold = false;
     const result = [];
     for (const c of suggestion) {

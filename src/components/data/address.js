@@ -25,7 +25,7 @@ function AddressEditor ({ value, onChange }) {
             <Validator
                 component={NativeSelect}
                 validate={value => {
-                    if (!value) throw { error: locale.data.requiredField };
+                    if (country && !value) throw { error: locale.data.requiredField };
                 }}
                 class="address-editor-line"
                 key="countryArea"
@@ -44,7 +44,7 @@ function AddressEditor ({ value, onChange }) {
         items.push(<Validator
             component={TextField}
             validate={value => {
-                if (!value && isRequired) throw { error: locale.data.requiredField };
+                if (country && !value && isRequired) throw { error: locale.data.requiredField };
             }}
             class="address-editor-line"
             key={k}
