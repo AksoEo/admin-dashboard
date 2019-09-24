@@ -449,9 +449,11 @@ export default {
             cursedNotice: '[[there are items with a golden shine in the search results. they won’t show up in the generated data]]',
             generate: '[[send request]]',
             success: '[[successfully sent request, you’ll get a notification with it in a moment]]',
+            extraDesc: '[[a short text explaining that the results will be emailed/telegramed according to preferences]]',
             genericError: '[[failed to send request]]',
             alreadySubmitted: '[[you already submitted a request, please wait for it to finish]]',
             closeDialog: '[[close]]',
+            stats: ({ perPage, pages, total, withAddresses }) => `[[Found ${withAddresses} results (of a total ${total}) with postal addresses on record. On ${perPage} address${perPage === 1 ? '' : 'es'} per page that’s ${pages} page${pages === 1 ? '' : 's'}]]`,
         },
     },
 };
