@@ -65,16 +65,6 @@
             overflow-y: auto;
         }
 
-        @media (max-width: 800px) {
-            top: -8px;
-            left: 0;
-            right: 0;
-
-            .card-stack-item-contents {
-                top: 8px;
-            }
-        }
-
         &.is-phantom {
             animation: card-stack-item-out 0.5s @easing forwards;
             pointer-events: none;
@@ -82,6 +72,33 @@
             @keyframes card-stack-item-out {
                 100% {
                     transform: translateY(100%);
+                }
+            }
+        }
+
+        @media (max-width: 800px) {
+            top: -8px;
+            left: 0;
+            right: 0;
+            animation-name: card-stack-item-in-fs;
+
+            @keyframes card-stack-item-in-fs {
+                0% {
+                    transform: translateX(100%);
+                }
+            }
+
+            .card-stack-item-contents {
+                top: 8px;
+            }
+
+            &.is-phantom {
+                animation-name: card-stack-item-out-fs;
+
+                @keyframes card-stack-item-out-fs {
+                    100% {
+                        transform: translateX(100%);
+                    }
                 }
             }
         }

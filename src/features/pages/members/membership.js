@@ -91,7 +91,7 @@ export default class MembershipEditor extends PureComponent {
                                 this.setState({ editing: false });
                                 this.loadPreview();
                             }}>
-                                <MenuIcon type="close" />
+                                <MenuIcon type="back" />
                             </Button>}
                             title={locale.members.detail.membership}
                             priority={9}

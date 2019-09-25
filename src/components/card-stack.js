@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import './card-stack.less';
 
 const CONTEXT_KEY = 'akso-card-stack-provider';
+const FULL_SCREEN_LAYOUT_MAX_WIDTH = 800;
 
 /// Interface between CardStackRenderers and CardStackItems that provides the card stack context.
 export class CardStackProvider extends Component {
@@ -121,13 +122,22 @@ export class CardStackRenderer extends Component {
                 <div class="card-stack-items">
                     {this.state.stack.flatMap(({ item, ageMarker }, i) => {
                         const off = this.state.stackSize - 1 - i;
-                        const dy = -12 * (4 - 4 * 2 ** (-off));
-                        const s = 0.5 / Math.sqrt(off + 1) + 0.5;
+                        let style;
 
-                        const style = {
-                            transform: `translateY(${dy}px) scale(${s})`,
-                            transformOrigin: '50% 0',
-                        };
+                        if (window.innerWidth <= FULL_SCREEN_LAYOUT_MAX_WIDTH) {
+                            const dx = -off * 50;
+                            style = {
+                                transform: `translateX(${dx}vw)`,
+                            };
+                        } else {
+                            const dy = -12 * (4 - 4 * 2 ** (-off));
+                            const s = 0.5 / Math.sqrt(off + 1) + 0.5;
+
+                            style = {
+                                transform: `translateY(${dy}px) scale(${s})`,
+                                transformOrigin: '50% 0',
+                            };
+                        }
 
                         let className = 'card-stack-item-contents';
                         if (item.class) className += ' ' + item.class;

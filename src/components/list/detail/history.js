@@ -32,7 +32,7 @@ export default function FieldHistory ({ fields, locale: historyLocale, itemId, i
             onClose={onClose}
             depth={1}
             appBar={<AppBarProxy
-                menu={<Button icon small onClick={onClose}><MenuIcon type="close" /></Button>}
+                menu={<Button icon small onClick={onClose}><MenuIcon type="back" /></Button>}
                 title={title}
                 priority={13} />}>
             <div class="list-view-field-history">
