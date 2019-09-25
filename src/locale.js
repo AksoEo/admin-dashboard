@@ -75,6 +75,8 @@ export default {
         // Login button
         login: 'Ensaluti',
 
+        totpSetupDescription: '[[scan this QR code in your TOTP application to set up TOTP]]',
+
         logout: 'Elsaluti',
 
         // Errors
@@ -86,10 +88,13 @@ export default {
             email: 'Nevalida retpoŝtadreso aŭ pasvorto',
         },
         genericError: 'Ne sukcesis ensaluti, bv. reprovi poste',
-        notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon',
-        notAdminLogout: 'Bonvolu elsaluti kaj reensaluti per konto de administranto se vi volas uzi la administran sistemon.',
+        genericCreationError: '[[failed to create password]]',
         genericTotpError: 'Ne sukcesis ensaluti, bv. reprovi poste',
         invalidTotp: 'Nevalida sekurkodo',
+
+        notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon.',
+        notAdminButPasswordResetWasSuccessful: '[[however, your password was successfully reset.]]',
+        notAdminLogout: 'Bonvolu elsaluti kaj reensaluti per konto de administranto se vi volas uzi la administran sistemon.',
     },
     listView: {
         filters: 'Filtriloj',

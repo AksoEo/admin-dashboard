@@ -44,13 +44,18 @@ export default class Login extends Component {
 
     state = {
         username: '',
+        token: '', // url key in create password/reset password
         stage: Stage.DETAILS,
         loading: false,
         mode: Mode.NORMAL,
         loggedIn: false,
+        needsTotpSetup: false,
 
         // if the user isn’t an admin, they need to log out before they can use AKSO
         needsLogout: false,
+        // if they used AKSO to reset their password anyway, they should know that that
+        // *was* successful
+        butPasswordResetWasSuccessful: false,
     };
 
     pageView = null;
@@ -216,21 +221,31 @@ export default class Login extends Component {
                         <DetailsStage
                             ref={stage => this.detailsStage = stage}
                             username={this.state.username}
+                            token={this.state.token}
                             mode={this.state.mode}
                             onUsernameChange={username => this.setState({ username })}
                             onSuccess={(totpSetUp, totpUsed) => {
                                 if (!totpSetUp) {
-                                    // TODO: this
-                                    throw new Error('unimplemented');
+                                    this.setState({
+                                        needsTotpSetup: true,
+                                        stage: Stage.SECURITY_CODE,
+                                    });
                                 } else if (!totpUsed) {
                                     this.setState({ stage: Stage.SECURITY_CODE });
                                 } else this.onLogin();
+                            }}
+                            onSuccessButNotAdmin={() => {
+                                this.setState({
+                                    needsLogout: true,
+                                    butPasswordResetWasSuccessful: true,
+                                });
                             }}
                             onForgotPassword={() => this.setState({ stage: Stage.FORGOT_PASSWORD })}
                             onForgotCode={() => this.setState({ stage: Stage.FORGOT_CODE })} />
                         <SecurityCodeStage
                             ref={stage => this.securityCodeStage = stage}
                             onSuccess={this.onLogin}
+                            needsTotpSetup={this.state.needsTotpSetup}
                             onShouldLoginFirst={() => this.setState({ stage: Stage.DETAILS })}
                             onLostCode={() => this.setState({ stage: Stage.LOST_SECURITY_CODE })}
                             onHeightChange={() => this.pageView.pageHeightChanged()} />
@@ -246,6 +261,11 @@ export default class Login extends Component {
                     <p>
                         {locale.login.notAdmin}
                     </p>
+                    {this.state.butPasswordResetWasSuccessful ? (
+                        <p>
+                            <b>{locale.login.notAdminButPasswordResetWasSuccessful}</b>
+                        </p>
+                    ) : null}
                     <p>
                         {locale.login.notAdminLogout}
                     </p>
@@ -258,7 +278,11 @@ export default class Login extends Component {
                             onClick={() => {
                                 this.setState({ loggingOut: true });
                                 client.logOut().then(() => {
-                                    this.setState({ loggingOut: false, needsLogout: false });
+                                    this.setState({
+                                        loggingOut: false,
+                                        needsLogout: false,
+                                        butPasswordResetWasSuccessful: false,
+                                    });
                                 }).catch(err => {
                                     console.error(err); // eslint-disable-line no-console
                                     this.logoutView.shake();
@@ -279,15 +303,6 @@ export default class Login extends Component {
 }
 
 class DetailsStage extends Component {
-    propTypes = {
-        onSuccess: PropTypes.func.isRequired,
-        onForgotPassword: PropTypes.func.isRequired,
-        onForgotCode: PropTypes.func.isRequired,
-        username: PropTypes.string.isRequired,
-        onUsernameChange: PropTypes.func.isRequired,
-        mode: PropTypes.number.isRequired,
-    };
-
     state = {
         password: '',
         confirmPassword: '',
@@ -312,50 +327,70 @@ class DetailsStage extends Component {
                 if (this.state.loading) return;
                 this.setState({ loading: true });
 
+                let username = this.props.username;
+                try {
+                    // remove check letters in old UEA codes
+                    username = new UEACode(username).code;
+                } catch (_) { /* not a UEA code */ }
+
+                let loginPromise;
+
                 if (this.props.mode === Mode.NORMAL) {
-                    let username = this.props.username;
-                    try {
-                        // remove check letters in old UEA codes
-                        username = new UEACode(username).code;
-                    } catch (_) { /* not a UEA code */ }
+                    loginPromise = client.logIn(username, this.state.password);
+                } else if (this.props.mode === Mode.CREATING_PASSWORD
+                    || this.props.mode === Mode.RESETTING_PASSWORD) {
+                    // FIXME: uses internal API [1]
+                    loginPromise = client.encodeQueryAndReq(
+                        'POST',
+                        `/codeholders/${username}/!create_password_use`,
+                        {},
+                        {
+                            body: {
+                                key: Buffer.from(this.props.token, 'hex'),
+                                password: this.state.password,
+                            },
+                            _allowLoggedOut: true, // [1]: this is why
+                        },
+                    ).then(() => client.logIn(username, this.state.password));
+                }
 
-                    client.logIn(username, this.state.password).then(response => {
-                        if (response.isAdmin) {
-                            this.setState({
-                                loading: false,
-                                password: '',
-                                confirmPassword: '',
-                            });
-                            this.props.onSuccess(response.totpSetUp, response.totpUsed);
-                        } else throw { statusCode: 'not-admin' };
-                    }).catch(err => {
-                        let error = locale.login.genericError;
-                        if (err.statusCode === 401) {
-                            if (this.props.username.includes('@')) {
-                                error = locale.login.invalidLogin.email;
-                            } else {
-                                error = locale.login.invalidLogin.ueaCode;
-                            }
-                        } else if (err.statusCode === 409) error = locale.login.noPassword;
+                loginPromise.then(response => {
+                    if (response.isAdmin) {
+                        this.setState({
+                            loading: false,
+                            password: '',
+                            confirmPassword: '',
+                        });
+                        this.props.onSuccess(response.totpSetUp, response.totpUsed);
+                    } else throw { statusCode: 'not-admin' };
+                }).catch(err => {
+                    let error = this.props.mode === Mode.NORMAL
+                        ? locale.login.genericError
+                        : locale.login.genericCreationError;
+                    if (err.statusCode === 401) {
+                        if (this.props.username.includes('@')) {
+                            error = locale.login.invalidLogin.email;
+                        } else {
+                            error = locale.login.invalidLogin.ueaCode;
+                        }
+                    } else if (err.statusCode === 409) error = locale.login.noPassword;
 
-                        if (err.statusCode === 'not-admin') {
+                    if (err.statusCode === 'not-admin') {
+                        if (this.props.mode === Mode.NORMAL) {
                             error = locale.login.notAdmin;
 
                             client.logOut().then(() => {
                                 this.passwordValidator.shake();
                                 this.passwordValidator.setError({ error });
-                                this.setState({ loading: false });
                             });
                         } else {
-                            this.passwordValidator.shake();
-                            this.passwordValidator.setError({ error });
-                            this.setState({ loading: false });
+                            this.props.onSuccessButNotAdmin();
                         }
-                    });
-                } else {
-                    // TODO: this
-                    throw new Error('unimplemented');
-                }
+                    } else {
+                        this.passwordValidator.shake();
+                        this.passwordValidator.setError({ error });
+                    }
+                }).then(() => this.setState({ loading: false }));
             }}>
                 <Validator component={TextField}
                     class="form-field"
@@ -442,13 +477,6 @@ class DetailsStage extends Component {
 
 // TODO: mode for creating a TOTP code or something
 class SecurityCodeStage extends Component {
-    propTypes = {
-        onSuccess: PropTypes.func.isRequired,
-        onShouldLoginFirst: PropTypes.func.isRequired,
-        onLostCode: PropTypes.func.isRequired,
-        onHeightChange: PropTypes.func.isRequired,
-    };
-
     state = {
         securityCode: '',
         bypassTotp: false,
@@ -464,6 +492,8 @@ class SecurityCodeStage extends Component {
     }
 
     render () {
+        const { needsTotpSetup } = this.props;
+
         return (
             <Form ref={node => this.form = node} onSubmit={() => {
                 this.setState({ loading: true });
@@ -471,6 +501,7 @@ class SecurityCodeStage extends Component {
                     this.setState({ loading: false });
                     this.props.onSuccess();
                 }).catch(err => {
+                    if (!this.securityCodeValidator) return; // probably unmounted
                     this.securityCodeValidator.shake();
                     let error = locale.login.genericTotpError;
                     if (err.statusCode === 401) error = locale.login.invalidTotp;

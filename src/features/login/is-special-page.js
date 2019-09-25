@@ -7,8 +7,14 @@ export const Mode = {
 /** Returns the mode and possibly additional data for the current page. */
 export function getPageMode () {
     const pathname = document.location.pathname;
-    const match = pathname.match(/^\/krei_pasvorton\/([^/]+)\/([\da-fA-f]+)\/?$/);
-    if (match) return { mode: Mode.CREATING_PASSWORD, username: match[1] };
+    const match = pathname.match(/^\/(krei_pasvorton|nova_pasvorto)\/([^/]+)\/([\da-fA-f]+)\/?$/);
+    if (match) return {
+        mode: match[1] === 'krei_pasvorton'
+            ? Mode.CREATING_PASSWORD
+            : Mode.RESETTING_PASSWORD,
+        username: match[2],
+        token: match[3],
+    };
     return { mode: Mode.NORMAL };
 }
 
