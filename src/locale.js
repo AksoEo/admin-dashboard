@@ -92,7 +92,7 @@ export default {
         genericTotpError: 'Ne sukcesis ensaluti, bv. reprovi poste',
         invalidTotp: 'Nevalida sekurkodo',
 
-        notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon.',
+        notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon',
         notAdminButPasswordResetWasSuccessful: '[[however, your password was successfully reset.]]',
         notAdminLogout: 'Bonvolu elsaluti kaj reensaluti per konto de administranto se vi volas uzi la administran sistemon.',
     },

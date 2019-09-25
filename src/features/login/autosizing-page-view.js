@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 import PropTypes from 'prop-types';
 import { Spring, lerp } from '../../animation';
 
+const OVERFLOW_HEIGHT = () => window.innerHeight - 120;
+
 /**
  * Container for multiple pages of varying height and fixed width.
  * Assumes fixed child count and mostly fixed child heights.
@@ -52,14 +54,18 @@ export default class AutosizingPageView extends Component {
         this.heightSpring.value = this.currentHeight();
         this.forceUpdate();
 
+        window.addEventListener('resize', this.pageHeightChanged);
+
         // sometimes, the styles are applied *after* the vdom renders, so the page heights need
         // to be updated again
-        setTimeout(() => this.pageHeightChanged(), 100);
+        setTimeout(this.pageHeightChanged, 100);
     }
 
     componentWillUnmount () {
         this.xSpring.stop();
         this.heightSpring.stop();
+
+        window.removeEventListener('resize', this.pageHeightChanged);
     }
 
     componentWillUpdate (newProps) {
@@ -86,10 +92,10 @@ export default class AutosizingPageView extends Component {
     }
 
     /** Updates page heights and triggers a re-render. */
-    pageHeightChanged () {
+    pageHeightChanged = () => {
         this.updatePageHeights();
         this.forceUpdate();
-    }
+    };
 
     /**
      * Returns the current height, i.e. the height of the current page or an interpolated value
@@ -137,8 +143,17 @@ export default class AutosizingPageView extends Component {
             );
         }
 
+        const currentHeight = this.currentHeight();
+        let mayOverflow = false;
+
+        if (currentHeight > OVERFLOW_HEIGHT()) {
+            mayOverflow = true;
+        }
+
         return (
-            <div class="autosizing-page-view" style={{ height: this.currentHeight() }}>
+            <div
+                class={'autosizing-page-view' + (mayOverflow ? ' may-overflow' : '')}
+                style={{ height: Math.min(OVERFLOW_HEIGHT(), currentHeight) }}>
                 {children}
             </div>
         );

@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { lazy, Suspense, Fragment } from 'preact/compat';
 import PropTypes from 'prop-types';
 import UEACode from 'akso-client/uea-code';
 import Form, { Validator } from '../../components/form';
@@ -475,12 +476,14 @@ class DetailsStage extends Component {
     }
 }
 
-// TODO: mode for creating a TOTP code or something
+const TotpSetup = lazy(() => import('./totp-setup'));
+
 class SecurityCodeStage extends Component {
     state = {
         securityCode: '',
         bypassTotp: false,
         loading: false,
+        secret: null, // used when generating the totp code
     }
 
     form = null;
@@ -488,34 +491,14 @@ class SecurityCodeStage extends Component {
     securityCodeValidator = null;
 
     focus () {
-        this.securityCodeField.focus();
+        if (this.securityCodeField && !this.props.needsTotpSetup) this.securityCodeField.focus();
     }
 
     render () {
         const { needsTotpSetup } = this.props;
 
-        return (
-            <Form ref={node => this.form = node} onSubmit={() => {
-                this.setState({ loading: true });
-                client.totpLogIn(this.state.securityCode, this.state.bypassTotp).then(() => {
-                    this.setState({ loading: false });
-                    this.props.onSuccess();
-                }).catch(err => {
-                    if (!this.securityCodeValidator) return; // probably unmounted
-                    this.securityCodeValidator.shake();
-                    let error = locale.login.genericTotpError;
-                    if (err.statusCode === 401) error = locale.login.invalidTotp;
-                    else if (err.statusCode === 403) {
-                        // already logged in
-                        this.props.onSuccess();
-                    } else if (err.statusCode === 404) {
-                        // no session found
-                        this.props.onShouldLoginFirst();
-                    }
-                    this.securityCodeValidator.setError({ error });
-                    this.setState({ loading: false });
-                });
-            }}>
+        const contents = (
+            <Fragment>
                 <p>
                     {locale.login.securityCodeDescription}
                 </p>
@@ -553,17 +536,72 @@ class SecurityCodeStage extends Component {
                     value={this.state.bypassTotp}
                     onChange={bypassTotp => this.setState({ bypassTotp })}
                     onHeightChange={this.props.onHeightChange} />
+            </Fragment>
+        );
+
+        return (
+            <Form ref={node => this.form = node} onSubmit={() => {
+                this.setState({ loading: true });
+
+                let loginPromise;
+
+                if (this.props.needsTotpSetup) {
+                    // FIXME: client does not support totpLogin with secret
+                    loginPromise = client.req({
+                        method: 'POST',
+                        path: '/auth/totp',
+                        body: {
+                            totp: this.state.securityCode,
+                            remember: this.state.bypassTotp,
+                            secret: this.state.secret,
+                        },
+                    });
+                } else {
+                    loginPromise = client.totpLogIn(this.state.securityCode, this.state.bypassTotp);
+                }
+
+                loginPromise.then(() => {
+                    this.setState({ loading: false });
+                    this.props.onSuccess();
+                }).catch(err => {
+                    if (!this.securityCodeValidator) return; // probably unmounted
+                    this.securityCodeValidator.shake();
+                    let error = locale.login.genericTotpError;
+                    if (err.statusCode === 401) error = locale.login.invalidTotp;
+                    else if (err.statusCode === 403) {
+                        // already logged in
+                        this.props.onSuccess();
+                    } else if (err.statusCode === 404) {
+                        // no session found
+                        this.props.onShouldLoginFirst();
+                    }
+                    this.securityCodeValidator.setError({ error });
+                    this.setState({ loading: false });
+                });
+            }}>
+                {needsTotpSetup ? (
+                    <Suspense
+                        fallback={<CircularProgress class="totp-setup-loading"
+                            indeterminate />}>
+                        <TotpSetup
+                            onHeightChange={this.props.onHeightChange}
+                            onGenerateSecret={secret => this.setState({ secret })}
+                            contents={contents} />
+                    </Suspense>
+                ) : contents}
                 <footer class="form-footer">
                     <div class="help-links">
-                        <a
-                            class="help-link"
-                            href="#"
-                            onClick={e => {
-                                e.preventDefault();
-                                this.props.onLostCode();
-                            }}>
-                            {locale.login.lostSecurityCode}
-                        </a>
+                        {!needsTotpSetup && (
+                            <a
+                                class="help-link"
+                                href="#"
+                                onClick={e => {
+                                    e.preventDefault();
+                                    this.props.onLostCode();
+                                }}>
+                                {locale.login.lostSecurityCode}
+                            </a>
+                        )}
                     </div>
                     <Button
                         type="submit"
