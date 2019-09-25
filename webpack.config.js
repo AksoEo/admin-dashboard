@@ -40,6 +40,8 @@ module.exports = function (env, argv) {
         resolve: {
             extensions: ['.js', '.json', '.less'],
             alias: {
+                'yamdl': '@cpsdqs/yamdl',
+
                 // use source files from akso-client directly to avoid a bunch of issues
                 // (such as source-map-support being loaded)
                 'akso-client': 'akso-client/src',
@@ -92,7 +94,7 @@ module.exports = function (env, argv) {
                     test: /\.m?js$/,
                     // exclude all node_modules
                     // (except akso-client and yamdl which are git dependencies)
-                    exclude: /node_modules\/(?!akso-client|yamdl)/,
+                    exclude: /node_modules\/(?!akso-client|@cpsdqs\/yamdl)/,
                     use: [
                         {
                             loader: 'babel-loader',
