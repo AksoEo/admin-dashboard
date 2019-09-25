@@ -203,6 +203,8 @@ export default class ListView extends PureComponent {
         for (const id of (this.props.filters ? Object.keys(this.props.filters) : [])) {
             this.addFilter(id, this.props.filters[id]);
         }
+        this.store.dispatch(actions.setJSONFilterEnabled(false));
+        this.store.dispatch(actions.setJSONFilter('{\n\t\n}'));
     }
 
     resetStore (defaults) {

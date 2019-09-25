@@ -414,6 +414,7 @@ function DetailSaveDialog ({
                 {diff}
             </div>
             <TextField
+                class="commit-msg"
                 label={locale.listView.detail.saveDialog.modComment}
                 value={comment}
                 disabled={saving}

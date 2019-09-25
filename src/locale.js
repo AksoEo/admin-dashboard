@@ -165,6 +165,7 @@ export default {
             error: 'Ne sukcesis konservi',
             name: 'Nomo',
             description: 'Priskribo',
+            empty: '[[no saved filters]]',
         },
         detail: {
             edit: 'Redakti',
@@ -185,6 +186,7 @@ export default {
         },
     },
     data: {
+        delete: 'Forigi',
         requiredField: '[[this field is required]]',
         addressFields: {
             country: 'Lando',

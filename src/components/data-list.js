@@ -1,6 +1,8 @@
 import { h, Component } from 'preact';
-import { Button } from 'yamdl';
-import DeleteIcon from '@material-ui/icons/Delete';
+import { useState } from 'preact/compat';
+import { Button, Menu } from 'yamdl';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import locale from '../locale';
 
 const VLIST_CHUNK_SIZE = 100;
 
@@ -80,8 +82,9 @@ export default class DataList extends Component {
             const item = this.state.items[i];
             if (item) {
                 const y = i * this.props.itemHeight;
+                const Component = this.props.onItemClick ? Button : 'div';
                 items.push(
-                    <div
+                    <Component
                         key={item.id}
                         class="data-list-item"
                         style={{ transform: `translateY(${y}px)` }}
@@ -91,18 +94,10 @@ export default class DataList extends Component {
                         </div>
                         {this.props.onRemove && (
                             <div class="list-item-extra">
-                                <Button
-                                    icon
-                                    class="list-item-delete-button"
-                                    onClick={() => {
-                                        // TODO: confirmation step
-                                        this.deleteItem(i);
-                                    }}>
-                                    <DeleteIcon />
-                                </Button>
+                                <ListItemDeleteOverflow onDelete={() => this.deleteItem(i)} />
                             </div>
                         )}
-                    </div>
+                    </Component>
                 );
             }
         }
@@ -115,7 +110,7 @@ export default class DataList extends Component {
 
         return (
             <div
-                class="data-list"
+                class={'data-list ' + (this.props.class || '')}
                 ref={node => this.node = node}
                 onScroll={this.onScroll}>
                 <div
@@ -125,4 +120,29 @@ export default class DataList extends Component {
             </div>
         );
     }
+}
+
+function ListItemDeleteOverflow ({ onDelete }) {
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [menuPos, setMenuPos] = useState([0, 0]);
+
+    return (
+        <Button small icon class="list-item-overflow" onClick={e => {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            setMenuPos([rect.right - rect.width / 3, rect.top + rect.height / 3]);
+            setMenuOpen(true);
+        }}>
+            <MoreVertIcon />
+            <Menu
+                open={menuOpen}
+                onClose={() => setMenuOpen(false)}
+                position={menuPos}
+                anchor={[1, 0]}
+                items={[{
+                    label: locale.data.delete,
+                    action: onDelete,
+                }]} />
+        </Button>
+    );
 }
