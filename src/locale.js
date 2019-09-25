@@ -75,6 +75,9 @@ export default {
         // Login button
         login: 'Ensaluti',
 
+        passwordSetupDescription: login => `[[your account ${login} doesn’t seem to have a password]]`,
+        passwordSetupSendMail: '[[send password setup email]]',
+        sentPasswordSetupMail: '[[sent password setup email, you should find it in your inbox soon (check junk too)]]',
         totpSetupDescription: '[[scan this QR code in your TOTP application to set up TOTP]]',
 
         logout: 'Elsaluti',

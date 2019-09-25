@@ -82,7 +82,9 @@ class AddMember extends PureComponent {
                     codeholderType: this.state.codeholderType,
                     newCode: this.state.newCode,
                     [nameField]: this.state.name,
-                    ...Object.fromEntries(extraNameFields.map(id => [id, this.state[id]])),
+                    ...Object.fromEntries(extraNameFields
+                        .filter(id => this.state[id])
+                        .map(id => [id, this.state[id]])),
                 }).then(() => {
                     // find codeholder ID and open their page
                     client.get('/codeholders', {

@@ -13,6 +13,8 @@ import client from '../../client';
 import { getPageMode, Mode } from './is-special-page';
 import './style';
 
+const DEBUG_ALLOW_NON_ADMIN = false;
+
 const Stage = {
     LOST_SECURITY_CODE: -3,
     FORGOT_CODE: -2,
@@ -75,7 +77,7 @@ export default class Login extends Component {
     componentDidMount () {
         document.title = locale.documentTitleTemplate(locale.login.title);
 
-        if (client.loggedIn && !this.props.authCheck.isAdmin) {
+        if (client.loggedIn && !this.props.authCheck.isAdmin && !DEBUG_ALLOW_NON_ADMIN) {
             this.setState({ needsLogout: true });
             return;
         }
@@ -234,6 +236,11 @@ export default class Login extends Component {
                                 } else if (!totpUsed) {
                                     this.setState({ stage: Stage.SECURITY_CODE });
                                 } else this.onLogin();
+
+                                if (this.state.mode !== Mode.NORMAL) {
+                                    // need to remove krei/nova-pasvorto link
+                                    window.history.pushState({}, null, '/');
+                                }
                             }}
                             onSuccessButNotAdmin={() => {
                                 this.setState({
@@ -308,6 +315,7 @@ class DetailsStage extends Component {
         password: '',
         confirmPassword: '',
         loading: false,
+        needsPasswordSetup: false,
     };
 
     usernameField = null;
@@ -320,6 +328,23 @@ class DetailsStage extends Component {
         } else {
             this.passwordField.focus();
         }
+    }
+
+    checkIfNoPassword () {
+        client.req({
+            method: 'PUT',
+            path: '/auth',
+            body: {
+                login: this.props.username,
+                password: 'cats',
+            },
+            _allowLoggedOut: true,
+        }).then(() => { /* uhm, nice password */ }).catch(err => {
+            if (err.statusCode === 409) {
+                // user has no password
+                this.setState({ needsPasswordSetup: true });
+            }
+        });
     }
 
     render () {
@@ -356,7 +381,7 @@ class DetailsStage extends Component {
                 }
 
                 loginPromise.then(response => {
-                    if (response.isAdmin) {
+                    if (response.isAdmin || DEBUG_ALLOW_NON_ADMIN) {
                         this.setState({
                             loading: false,
                             password: '',
@@ -374,7 +399,10 @@ class DetailsStage extends Component {
                         } else {
                             error = locale.login.invalidLogin.ueaCode;
                         }
-                    } else if (err.statusCode === 409) error = locale.login.noPassword;
+                    } else if (err.statusCode === 409) {
+                        // user has no password
+                        this.setState({ needsPasswordSetup: true });
+                    }
 
                     if (err.statusCode === 'not-admin') {
                         if (this.props.mode === Mode.NORMAL) {
@@ -401,7 +429,15 @@ class DetailsStage extends Component {
                     type={this.props.username.includes('@') ? 'email' : 'text'}
                     autocapitalize="none"
                     value={this.props.username}
-                    onChange={e => this.props.onUsernameChange(e.target.value)}
+                    onChange={e => {
+                        this.props.onUsernameChange(e.target.value);
+                        clearTimeout(this.nopwCheckTimeout);
+                        this.nopwCheckTimeout = setTimeout(() => this.checkIfNoPassword(), 2000);
+                    }}
+                    onBlur={() => {
+                        clearTimeout(this.nopwCheckTimeout);
+                        this.checkIfNoPassword();
+                    }}
                     validate={value => {
                         if (!value.includes('@') && !UEACode.validate(value)) {
                             throw { error: locale.login.invalidUEACode };
@@ -471,6 +507,45 @@ class DetailsStage extends Component {
                         <span>{locale.login.continue}</span>
                     </Button>
                 </footer>
+
+                <Dialog
+                    backdrop
+                    open={this.state.needsPasswordSetup}
+                    onClose={() => !this.state.sendingPWSMail
+                        && this.setState({ needsPasswordSetup: false, sentPWSMail: false })}>
+                    {this.state.sentPWSMail ? (
+                        <p>
+                            {locale.login.sentPasswordSetupMail}
+                        </p>
+                    ) : (
+                        <Fragment>
+                            <p>
+                                {locale.login.passwordSetupDescription(this.props.username)}
+                            </p>
+                            <Validator
+                                component={Button}
+                                ref={node => this.pwsMailSender = node}
+                                disabled={this.state.sendingPWSMail}
+                                onClick={() => {
+                                    this.setState({ sendingPWSMail: true });
+                                    client.req({
+                                        method: 'POST',
+                                        path: `/codeholders/${this.props.username}/!create_password`,
+                                        _allowLoggedOut: true,
+                                    }).then(() => {
+                                        this.setState({ sentPWSMail: true });
+                                    }).catch(err => {
+                                        console.error(err); // eslint-disable-line no-console
+                                        this.pwsMailSender.shake();
+                                    }).then(() => this.setState({ sendingPWSMail: false }));
+                                }}>
+                                {locale.login.passwordSetupSendMail}
+                                {this.state.sendingPWSMail
+                                    ? <CircularProgress small indeterminate /> : null}
+                            </Validator>
+                        </Fragment>
+                    )}
+                </Dialog>
             </Form>
         );
     }
