@@ -51,6 +51,10 @@ class AddMember extends PureComponent {
         codeholderType: 'human',
         newCode: '',
         name: '',
+        nameAbbrev: '',
+        lastNameLegal: '',
+        firstName: '',
+        lastName: '',
         loading: false,
         error: null,
     };
@@ -59,10 +63,14 @@ class AddMember extends PureComponent {
 
     render () {
         const nameField = this.state.codeholderType === 'human' ? 'firstNameLegal' : 'fullName';
+        const extraNameFields = this.state.codeholderType === 'human'
+            ? ['lastNameLegal', 'firstName', 'lastName']
+            : ['nameAbbrev'];
 
         const codeSuggestions = UEACode.suggestCodes({
             type: this.state.codeholderType,
-            firstNames: [this.state.name],
+            firstNames: [this.state.name, this.state.firstName],
+            lastNames: [this.state.lastNameLegal, this.state.lastName],
             fullName: this.state.name,
         });
 
@@ -74,6 +82,7 @@ class AddMember extends PureComponent {
                     codeholderType: this.state.codeholderType,
                     newCode: this.state.newCode,
                     [nameField]: this.state.name,
+                    ...Object.fromEntries(extraNameFields.map(id => [id, this.state[id]])),
                 }).then(() => {
                     // find codeholder ID and open their page
                     client.get('/codeholders', {
@@ -136,13 +145,25 @@ class AddMember extends PureComponent {
                     component={TextField}
                     class="form-field text-field"
                     outline
-                    label={locale.members.addMember[nameField]}
+                    label={locale.members.addMember[nameField] + '*'}
                     value={this.state.name}
                     onChange={e => this.setState({ name: e.target.value })}
                     disabled={this.state.loading}
                     validate={value => {
-                        if (!value) throw { error: locale.members.addMember.noName };
+                        if (!value.trim()) throw { error: locale.members.addMember.noName };
                     }} />
+                {extraNameFields.map(id => (
+                    <Validator
+                        key={id}
+                        component={TextField}
+                        class="form-field text-field"
+                        outline
+                        label={locale.members.addMember[id]}
+                        value={this.state[id]}
+                        onChange={e => this.setState({ [id]: e.target.value })}
+                        disabled={this.state.loading}
+                        validate={() => {}} />
+                ))}
                 <Validator
                     component={data.ueaCode.editor}
                     outerClass="form-field"
