@@ -338,7 +338,10 @@ const DetailViewContents = memo(function DetailViewContents ({
     }
 
     return (
-        <Form class="detail-view-contents" ref={formRef} onSubmit={() => { /* nope */ }}>
+        <Form
+            class={'detail-view-contents' + (editing ? ' is-editing' : '')}
+            ref={formRef}
+            onSubmit={() => { /* nope */ }}>
             {header}
             <table class="fields-table">
                 <tbody>
