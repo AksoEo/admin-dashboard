@@ -52,7 +52,7 @@
         .membership-item {
             .membership-item-id {
                 display: inline-block;
-                background: fade(@text, 20%);
+                background: @text-fade-20;
                 padding: 2px 4px;
                 border-radius: 4px;
                 margin-right: 2px;
@@ -110,7 +110,7 @@
         border-radius: 4px 4px 0 0;
 
         &:hover, &:focus {
-            border-bottom-color: @control-primary;
+            border-bottom-color: @secondary;
         }
 
         &:focus {
@@ -265,7 +265,7 @@
 
         .membership-item {
             padding: 16px;
-            border: 1px solid fade(@text, 20%);
+            border: 1px solid @text-fade-20;
             border-radius: 4px;
             animation: members-search-membership-item-in 0.4s @easing;
 
@@ -285,7 +285,7 @@
 
             .membership-remove {
                 float: left;
-                --md-button-color: fade(@text, 70%);
+                --md-button-color: @gray-button-color;
 
                 &:hover {
                     --md-button-color: @danger;
@@ -377,14 +377,14 @@
             .membership {
                 display: inline-flex;
                 align-items: center;
-                border: 1px solid fade(@text, 20%);
+                border: 1px solid @text-fade-20;
                 border-radius: 4px;
                 margin-right: 4px;
                 margin-bottom: 4px;
 
                 .membership-name {
                     display: inline-block;
-                    background: fade(@text, 20%);
+                    background: @text-fade-20;
                     padding: 2px 4px;
                     border-radius: 3px;
                     font-size: small;
@@ -408,7 +408,7 @@
                     left: 0;
                     width: 100%;
                     height: calc(1em + 4px);
-                    .log-gradient-background(to bottom, white);
+                    .log-gradient-background-to-card-background(to bottom);
                 }
 
                 &.is-empty {
@@ -420,7 +420,7 @@
             }
 
             .membership-edit-button {
-                --md-button-color: fade(@text, 60%);
+                --md-button-color: @gray-button-color;
                 flex-shrink: 0;
                 margin-top: -0.7em; // eyeballed
             }
@@ -428,7 +428,7 @@
 
         .fixed-checkbox {
             pointer-events: none;
-            --md-checkbox-check: @control-primary;
+            --md-checkbox-check: @secondary;
             --md-checkbox-color: transparent;
             --md-checkbox-idle: transparent;
         }
@@ -443,7 +443,7 @@
                 width: 96px;
                 height: 96px;
                 border-radius: 50%;
-                border: 2px solid fade(@text, 20%);
+                border: 2px solid @picture-outline;
                 flex-shrink: 0;
                 margin-right: 24px;
                 overflow: hidden;
@@ -543,7 +543,7 @@
 
                 &:focus {
                     outline: none;
-                    border: 1px solid @control-primary;
+                    border: 1px solid @secondary;
                 }
             }
         }
@@ -690,7 +690,7 @@
             }
 
             &.floating {
-                background: @card-background;
+                background: var(--md-dialog-background);
             }
 
             .country-item {
@@ -847,7 +847,7 @@
             }
 
             .list-item-overflow {
-                --md-button-color: fade(@text, 60%);
+                --md-button-color: @gray-button-color;
             }
         }
     }
@@ -859,10 +859,11 @@
         width: 100%;
         height: 6em;
         margin-top: 8px;
+        background: none;
         font: inherit;
         color: inherit;
         border-radius: 4px;
-        border: 1px solid fade(@text, 20%);
+        border: 1px solid @text-fade-20;
         padding: 4px 8px;
         box-sizing: border-box;
     }

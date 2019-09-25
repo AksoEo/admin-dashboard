@@ -43,11 +43,25 @@ export default class Logo extends Component {
         if (this.props.onUpdate) this.props.onUpdate(this);
     }
 
+    darkModeListener = () => this.forceUpdate();
+
+    componentDidMount () {
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addListener(this.darkModeListener);
+        }
+    }
+
     componentWillUnmount () {
         globalAnimator.deregister(this);
+
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').removeListener(this.darkModeListener);
+        }
     }
 
     render () {
+        const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
         return (
             <svg
                 class="logo"
@@ -60,7 +74,7 @@ export default class Logo extends Component {
                     <path
                         class="corner"
                         key={i}
-                        fill={i % 2 === 0 ? '#31a64f' : '#363636'}
+                        fill={dark ? '#fff' : i % 2 === 0 ? '#31a64f' : '#363636'}
                         d={PATH}
                         style={{
                             transformOrigin: '32px 32px',

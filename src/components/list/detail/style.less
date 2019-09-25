@@ -48,7 +48,7 @@
 
                 .field-history-button {
                     vertical-align: middle;
-                    --md-button-color: fade(@text, 70%);
+                    --md-button-color: @gray-button-color;
                     margin-left: 8px;
                 }
 
@@ -57,7 +57,7 @@
                 }
 
                 &.changed .field-name {
-                    border-left-color: @control-primary;
+                    border-left-color: @secondary;
                 }
 
                 .field-container {
@@ -97,7 +97,7 @@
     width: 600px;
 
     .diff-fields {
-        background: fade(@text, 10%);
+        background: @text-fade-10;
         padding: 16px;
         border-radius: 4px;
         margin-bottom: 8px;

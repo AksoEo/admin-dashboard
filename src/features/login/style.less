@@ -13,6 +13,10 @@
     box-sizing: border-box;
     animation: login-in 0.2s;
 
+    @media (prefers-color-scheme: dark) {
+        background-image: linear-gradient(to bottom left, darken(rgb(137, 178, 227), 50%), darken(rgb(106, 111, 43), 50%));
+    }
+
     @keyframes login-in {
         0% {
             opacity: 0;
@@ -251,7 +255,7 @@
             left: 20px;
             text-align: center;
             right: 20px;
-            color: fade(@text, 60%);
+            color: @text-fade-60;
             display: none;
             padding: 0;
 
@@ -291,7 +295,7 @@
         position: absolute;
         bottom: 10px;
         right: 10px;
-        color: fade(@text-on-primary, 60%);
+        color: @text-on-primary-fade-60;
         font-size: 0.8em;
         // can’t use bottom: max(..) because it’s broken in Firefox (checked version 67)
         padding-bottom: env(safe-area-inset-bottom);

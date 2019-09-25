@@ -36,6 +36,9 @@
         .search-field {
             flex-shrink: 0;
             margin-left: 16px;
+
+            // MUI fixes
+            color: inherit;
         }
 
         .search-query {
@@ -58,7 +61,7 @@
             margin-right: 8px;
 
             &.search-expand {
-                --md-button-color: fade(@text, 70%);
+                --md-button-color: @gray-button-color;
             }
         }
 
@@ -97,7 +100,7 @@
                 .saved-filters-button {
                     position: absolute;
                     font-size: small;
-                    --md-button-color: fade(@text, 50%);
+                    --md-button-color: @gray-button-color;
                     top: 8px;
                     right: 16px;
                 }
@@ -251,12 +254,31 @@
 
                 .table-header-field {
                     padding: 4px 16px;
+
+                    // MUI fixes
+                    color: @text-fade-80;
+                    border-bottom-color: @separator;
+
+                    .sort-label {
+                        color: @text-fade-80;
+
+                        // MUI fixes
+                        & > svg {
+                            @media (prefers-color-scheme: dark) {
+                                filter: invert(1);
+                            }
+                        }
+                    }
                 }
 
                 .table-header-fields-btn-container {
                     padding-left: 12px;
                     padding-right: 12px;
                     text-align: center;
+
+                    // MUI fixes
+                    color: @text-fade-80;
+                    border-bottom-color: @separator;
 
                     .table-header-fields-btn {
                         --md-button-color: currentColor;
@@ -290,6 +312,10 @@
                     font-size: 1em;
                     padding: 0;
                     max-width: 15em;
+
+                    // MUI fixes
+                    color: inherit;
+                    border-bottom-color: @subtle-separator;
 
                     .li-link {
                         display: block;
@@ -392,7 +418,7 @@
             font-size: inherit;
             letter-spacing: normal;
             text-transform: none;
-            --md-button-color: fade(@text, 60%);
+            --md-button-color: @gray-button-color;
             color: @text;
             padding: 0;
 
@@ -421,7 +447,7 @@
                 align-items: center;
 
                 .list-item-overflow {
-                    --md-button-color: fade(@text, 60%);
+                    --md-button-color: @gray-button-color;
                 }
             }
         }

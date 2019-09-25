@@ -1,38 +1,79 @@
-// FIXME: this is a mess
-@primary: #004c3f;
-@control-primary: #31a64f;
-@secondary: #363636;
-@error: #f44336;
-@danger: @error;
-@positive: @control-primary;
-@text: black;
-@text-on-primary: white;
-@ripple-color: fade(#000, 20%);
-@ripple-color-on-primary: fade(@text-on-primary, 70%);
-@ripple-highlight: fade(#000, 8%);
-@ripple-highlight-on-primary: fade(@text-on-primary, 12%);
-@hover-background: fade(#000, 10%);
-@control-idle: fade(#000, 50%);
-@placeholder: fade(#000, 50%);
-@control-idle-on-primary: fade(#fff, 50%);
-@disabled: fade(#000, 40%);
-@disabled-background: fade(#000, 20%);
-@text-field-filled-background: fade(#000, 10%);
-@text-field-filled-disabled-background: fade(#000, 5%);
-@separator: fade(#000, 20%);
-@page-background: #eee;
-@card-background: #fff;
-@sidebar-background: #f9f9f9;
-@sidebar-border: #ddd;
-@sidebar-text: inherit;
-@golden-background: fade(#fee12a, 20%);
-@monospace: Menlo, Roboto Mono, Consolas, monospace;
-
-// yamdl style setup
 @import '../node_modules/@cpsdqs/yamdl/src/prelude';
+
 :root {
-    .md-light-theme(@primary, @control-primary, @error);
+    @primary--internal: #004c3f;
+    @secondary--internal: #31a64f;
+    @danger--internal: #f44336;
+
+    --primary: @primary--internal;
+    --secondary: @secondary--internal;
+    --secondary-lighten-10: lighten(@secondary--internal, 10%);
+    --danger: @danger--internal;
+    --danger-fade-20: fade(@danger--internal, 20%);
+
+    .gen-text(@text--internal, @text-on-primary--internal) {
+        --text: @text--internal;
+        --text-fade-10: fade(@text--internal, 10%);
+        --text-fade-20: fade(@text--internal, 20%);
+        --text-fade-40: fade(@text--internal, 40%);
+        --text-fade-50: fade(@text--internal, 50%);
+        --text-fade-60: fade(@text--internal, 60%);
+        --text-fade-80: fade(@text--internal, 80%);
+        --text-on-primary: @text-on-primary--internal;
+        --text-on-primary-fade-60: fade(@text-on-primary--internal, 60%);
+    }
+    .gen-text(black, white);
+
+    --page-background: #eee;
+    --card-background: #fff;
+    --sidebar-background: #f9f9f9;
+    --sidebar-border: #ddd;
+    --golden-background: fade(#fee12a, 20%);
+
+    .md-light-theme(@primary--internal, @secondary--internal, @danger--internal);
+
+    @media (prefers-color-scheme: dark) {
+        .md-dark-theme(@primary--internal, @secondary--internal, @danger--internal);
+
+        .gen-text(white, white);
+
+        --page-background: #111;
+        --card-background: #222;
+        --sidebar-background: #222;
+        --sidebar-border: #333;
+    }
 }
+
+@primary: var(--primary);
+@secondary: var(--secondary);
+@secondary-lighten-10: var(--secondary-lighten-10);
+@danger: var(--danger);
+@error: @danger;
+@danger-fade-20: var(--danger-fade-20);
+@error-fade-20: @danger-fade-20;
+@positive: @secondary;
+@text: var(--text);
+@text-fade-10: var(--text-fade-10);
+@text-fade-40: var(--text-fade-40);
+@text-fade-20: var(--text-fade-20);
+@text-fade-50: var(--text-fade-50);
+@text-fade-60: var(--text-fade-60);
+@text-fade-80: var(--text-fade-80);
+@gray-button-color: @text-fade-60;
+@picture-outline: @text-fade-20;
+@text-on-primary: var(--text-on-primary);
+@text-on-primary-fade-60: var(--text-on-primary-fade-60);
+@hover-background: @text-fade-10;
+@control-idle: @text-fade-50;
+@separator: @text-fade-20;
+@subtle-separator: @text-fade-10;
+@page-background: var(--page-background);
+@card-background: var(--card-background);
+@sidebar-background: var(--sidebar-background);
+@sidebar-border: var(--sidebar-border);
+@sidebar-text: inherit;
+@golden-background: var(--golden-background);
+@monospace: Menlo, Roboto Mono, Consolas, monospace;
 
 @easing: cubic-bezier(0.2, 0.3, 0, 1);
 
@@ -141,4 +182,13 @@
         fade(@color, (@most - @least) * 0.53 + @least) 75%,
         fade(@color, (@most - @least) * 0.75 + @least) 88%,
         fade(@color, (@most - @least) * 1.00 + @least) 100%);
+}
+
+// FIXME: kinda hacky
+.log-gradient-background-to-card-background(@direction: to bottom) {
+    .log-gradient-background(@direction, #fff);
+
+    @media (prefers-color-scheme: dark) {
+        .log-gradient-background(@direction, #222);
+    }
 }

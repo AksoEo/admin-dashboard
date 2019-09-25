@@ -265,6 +265,7 @@ function TableHeader ({
                                 sortDirection={sortDirection}>
                                 {transient && <SearchIcon className="transient-field-icon" />}
                                 <TableSortLabel
+                                    class="sort-label"
                                     active={!!sortDirection}
                                     direction={sortDirection || 'asc'}
                                     onClick={() => {
