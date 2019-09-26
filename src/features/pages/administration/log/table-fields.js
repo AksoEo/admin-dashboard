@@ -1,4 +1,7 @@
+import { h } from 'preact';
 import moment from 'moment';
+import locale from '../../../../locale';
+import data from '../../../../components/data';
 
 const identityComponent = {
     component: ({ value }) => value ? '' + value : '',
@@ -9,15 +12,20 @@ export default {
     time: {
         sortable: true,
         component ({ value }) {
-            return value ? moment(value * 1000).format('D[-a de] MMMM Y, h:mm:ss.SSS') : '';
+            return value ? moment(value * 1000).format('YYYY-MM-DDTHH:mm:ssZ') : '';
         },
         stringify (value) {
-            return value ? moment(value * 1000).format('D[-a de] MMMM Y, h:mm:ss.SSS') : '';
+            return value ? moment(value * 1000).format('YYYY-MM-DDTHH:mm:ssZ') : '';
         },
     },
-    codeholderId: {
+    codeholder: {
         sortable: true,
-        ...identityComponent,
+        component ({ item }) {
+            return <data.ueaCode.inlineRenderer value={item.newCode} />;
+        },
+        stringify (value, item) {
+            return item.newCode;
+        },
     },
     apiKey: {
         sortable: true,
@@ -43,7 +51,9 @@ export default {
     },
     query: {
         component ({ value }) {
-            return JSON.stringify(value); // TODO: prettify
+            return value
+                ? locale.administration.log.query.some
+                : locale.administration.log.query.none;
         },
         stringify (value) {
             return JSON.stringify(value);

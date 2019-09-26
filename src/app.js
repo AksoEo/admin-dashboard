@@ -17,8 +17,10 @@ import client from './client';
 import cache from './cache';
 
 import moment from 'moment';
+import 'moment-timezone';
 import 'moment/locale/eo';
 moment.locale('eo');
+moment.tz.setDefault('UTC');
 
 /** Minimum width for a perma-sidebar. */
 const PERMA_SIDEBAR_WIDTH = 900;

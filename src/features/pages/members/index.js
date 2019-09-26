@@ -8,8 +8,8 @@ import AddIcon from '@material-ui/icons/Add';
 import { AppBarProxy } from 'yamdl';
 import { routerContext } from '../../../router';
 import { Spring } from '../../../animation';
-import ListView from '../../../components/list';
-import Sorting from '../../../components/list/sorting';
+import ListView, { Sorting } from '../../../components/list';
+import ListViewURLHandler from '../../../components/list/url-handler';
 import locale from '../../../locale';
 import client from '../../../client';
 import FILTERS from './filters';
@@ -57,6 +57,11 @@ export default class MembersList extends PureComponent {
         super(props);
 
         this.scrollSpring.on('update', value => this.node.scrollTop = value);
+
+        this.urlHandler = new ListViewURLHandler('/membroj', true);
+        this.urlHandler.on('navigate', target => this.context.navigate(target));
+        this.urlHandler.on('decodeURLQuery', query => this.listView.decodeURLQuery(query));
+        this.urlHandler.on('detail', detail => this.setState({ detail }));
     }
 
     scrollToTop = () => {
@@ -66,64 +71,12 @@ export default class MembersList extends PureComponent {
         }
     };
 
-    isQueryUnchanged (query) {
-        return this.currentQuery === query
-            || decodeURIComponent(this.currentQuery) === decodeURIComponent(query);
-    }
-
-    /// Updates the url query in the address bar; called by the list view.
-    onURLQueryChange = (query, force = false) => {
-        if (this.isDetailView && !force) return;
-        if (this.isQueryUnchanged(query) && !force) return;
-        this.currentQuery = query;
-        if (query) this.context.navigate('/membroj?q=' + query);
-        else this.context.navigate('/membroj');
-    };
-
     componentDidMount () {
-        this.tryDecodePath();
-        this.tryDecodeURLQuery();
+        this.urlHandler.update(this.props.path, this.props.query);
     }
 
-    componentDidUpdate (prevProps) {
-        if (prevProps.path !== this.props.path) {
-            this.tryDecodePath();
-        }
-        if (prevProps.query !== this.props.query) {
-            this.tryDecodeURLQuery();
-        }
-    }
-
-    /// Attempts to decode the URL query to get the search parameters.
-    tryDecodeURLQuery () {
-        if (this.isDetailView) return;
-        if (!this.props.query && this.currentQuery) {
-            this.currentQuery = '';
-            this.listView.decodeURLQuery('');
-            return;
-        }
-        if (!this.props.query.startsWith('?q=')) return;
-        const query = this.props.query.substr(3);
-        if (this.isQueryUnchanged(query)) return;
-        this.currentQuery = query;
-
-        try {
-            this.listView.decodeURLQuery(query);
-        } catch (err) {
-            // TODO: error?
-            console.error('Failed to decode URL query', err); // eslint-disable-line no-console
-        }
-    }
-
-    /// Attempts to decode the path to get the currently open detail view.
-    tryDecodePath () {
-        const detailView = this.props.path.match(/^\/membroj\/(\d+)(\/|$)/);
-        this.isDetailView = !!detailView;
-        if (detailView) {
-            this.setState({ detail: +detailView[1] });
-        } else {
-            this.setState({ detail: null });
-        }
+    componentDidUpdate () {
+        this.urlHandler.update(this.props.path, this.props.query);
     }
 
     componentWillUnmount () {
@@ -208,7 +161,6 @@ export default class MembersList extends PureComponent {
                     isRestrictedByGlobalFilter={!!(
                         Object.keys(this.props.permissions.memberFilter).length
                     )}
-                    onURLQueryChange={this.onURLQueryChange}
                     locale={{
                         searchFields: locale.members.search.fields,
                         placeholders: locale.members.search.placeholders,
@@ -219,7 +171,9 @@ export default class MembersList extends PureComponent {
                         detail: locale.members.detail,
                     }}
                     detailView={this.state.detail}
-                    onDetailClose={() => this.onURLQueryChange(this.currentQuery, true)}
+                    onURLQueryChange={this.urlHandler.onURLQueryChange}
+                    onDetailClose={this.urlHandler.onDetailClose}
+                    getLinkTarget={this.urlHandler.getLinkTarget}
                     detailFields={detailFields.fields}
                     detailHeader={detailFields.header}
                     detailFooter={detailFields.footer}
@@ -232,7 +186,6 @@ export default class MembersList extends PureComponent {
                         this.props.permissions.hasPermission('codeholders_hist.read')
                             && handleFieldHistory
                     }
-                    getLinkTarget={id => `/membroj/${id}`}
                     onChangePage={this.scrollToTop}
                     csvExportOptions={{
                         countryLocale: {

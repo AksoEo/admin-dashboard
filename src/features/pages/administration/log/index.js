@@ -1,57 +1,38 @@
 import { h, Component } from 'preact';
 import { util } from 'akso-client';
 import ListView, { Sorting } from '../../../../components/list';
+import ListViewURLHandler from '../../../../components/list/url-handler';
 import { routerContext } from '../../../../router';
 import client from '../../../../client';
 import locale from '../../../../locale';
 import FIELDS from './table-fields';
+import DETAIL_FIELDS from './detail-fields';
 
 // TODO: permissions
 
 export default class APILogListView extends Component {
     static contextType = routerContext;
 
-    componentDidMount () {
-        this.tryDecodeURLQuery();
-    }
-
-    componentDidUpdate (prevProps) {
-        if (prevProps.query !== this.props.query) {
-            this.tryDecodeURLQuery();
-        }
-    }
-
-    tryDecodeURLQuery () {
-        if (!this.props.query && this.currentQuery) {
-            this.currentQuery = '';
-            this.listView.decodeURLQuery('');
-            return;
-        }
-        if (!this.props.query.startsWith('?q=')) return;
-        const query = this.props.query.substr(3);
-        if (this.isQueryUnchanged(query)) return;
-        this.currentQuery = query;
-
-        try {
-            this.listView.decodeURLQuery(query);
-        } catch (err) {
-            // TODO: error?
-            console.error('Failed to decode URL query', err); // eslint-disable-line no-console
-        }
-    }
-
-    isQueryUnchanged (query) {
-        return this.currentQuery === query
-            || decodeURIComponent(this.currentQuery) === decodeURIComponent(query);
-    }
-
-    /// Updates the url query in the address bar; called by the list view.
-    onURLQueryChange = (query, force = false) => {
-        if (this.isQueryUnchanged(query) && !force) return;
-        this.currentQuery = query;
-        if (query) this.context.navigate('/administrado?q=' + query);
-        else this.context.navigate('/administrado');
+    state = {
+        detail: null,
     };
+
+    constructor (props) {
+        super(props);
+
+        this.urlHandler = new ListViewURLHandler('/administrado/log', true);
+        this.urlHandler.on('navigate', target => this.context.navigate(target));
+        this.urlHandler.on('decodeURLQuery', query => this.listView.decodeURLQuery(query));
+        this.urlHandler.on('detail', detail => this.setState({ detail }));
+    }
+
+    componentDidMount () {
+        this.urlHandler.update(this.props.path, this.props.query);
+    }
+
+    componentDidUpdate () {
+        this.urlHandler.update(this.props.path, this.props.query);
+    }
 
     render () {
         return (
@@ -62,7 +43,7 @@ export default class APILogListView extends Component {
                     searchField: 'userAgent',
                     fields: [
                         { id: 'time', sorting: Sorting.DESC },
-                        { id: 'codeholderId', sorting: Sorting.NONE },
+                        { id: 'codeholder', sorting: Sorting.NONE },
                         { id: 'apiKey', sorting: Sorting.NONE },
                         { id: 'ip', sorting: Sorting.NONE },
                         { id: 'origin', sorting: Sorting.NONE },
@@ -81,13 +62,28 @@ export default class APILogListView extends Component {
                     searchFields: locale.administration.log.fields,
                     fields: locale.administration.log.fields,
                     placeholders: locale.administration.log.placeholders,
+                    detail: {
+                        title: locale.administration.log.detailTitle,
+                        fields: locale.administration.log.fields,
+                    },
                 }}
+                detailView={this.state.detail}
+                getLinkTarget={this.urlHandler.getLinkTarget}
+                onURLQueryChange={this.urlHandler.onURLQueryChange}
+                onDetailClose={this.urlHandler.onDetailClose}
                 fields={FIELDS}
-                onURLQueryChange={this.onURLQueryChange}
-                onRequest={handleRequest} />
+                detailFields={DETAIL_FIELDS}
+                onRequest={handleRequest}
+                onDetailRequest={handleDetailRequest} />
         );
     }
 }
+
+const fieldMapping = {
+    codeholder: 'codeholderId',
+};
+
+const mapField = id => fieldMapping[id] || id;
 
 async function handleRequest (state) {
     const transientFields = [];
@@ -109,19 +105,39 @@ async function handleRequest (state) {
     }
 
     options.fields = ['id'];
-    options.fields.push(...state.fields.fixed.map(f => f.id));
-    options.fields.push(...state.fields.user.map(f => f.id));
+    options.fields.push(...state.fields.fixed.map(f => mapField(f.id)));
+    options.fields.push(...state.fields.user.map(f => mapField(f.id)));
 
     options.order = [];
     for (const field of state.fields.fixed.concat(state.fields.user)) {
         if (field.sorting !== Sorting.NONE) {
-            options.order.push([field.id, field.sorting === Sorting.ASC ? 'asc' : 'desc']);
+            options.order.push([
+                mapField(field.id),
+                field.sorting === Sorting.ASC ? 'asc' : 'desc',
+            ]);
         }
     }
 
     const result = await client.get('/http_log', options);
     const items = result.body;
     const total = +result.res.headers.map['x-total-items'];
+
+    if (options.fields.includes('codeholderId')) {
+        const codeholderMapRes = await client.get('/codeholders', {
+            filter: {
+                id: { $in: items.map(item => item.codeholderId) },
+            },
+            fields: ['id', 'newCode'],
+            limit: options.limit,
+        });
+        const mapping = {};
+        for (const item of codeholderMapRes.body) {
+            mapping[item.id] = item.newCode;
+        }
+        for (const item of items) {
+            item.newCode = mapping[item.codeholderId];
+        }
+    }
 
     return {
         items,
@@ -131,4 +147,36 @@ async function handleRequest (state) {
             total,
         },
     };
+}
+
+async function handleDetailRequest (id) {
+    const res = await client.get('/http_log', {
+        filter: { id },
+        fields: [
+            'id',
+            'time',
+            'codeholderId',
+            'apiKey',
+            'ip',
+            'origin',
+            'userAgent',
+            'userAgentParsed',
+            'method',
+            'path',
+            'query',
+            'resStatus',
+            'resTime',
+            'resLocation',
+        ],
+        limit: 1,
+    });
+    const item = res.body[0];
+    if (!item) throw new Error('no such item');
+    const codeholderMap = await client.get('/codeholders', {
+        filter: { id: item.codeholderId },
+        fields: ['id', 'newCode'],
+        limit: 1,
+    });
+    item.newCode = codeholderMap.body[0].newCode;
+    return item;
 }

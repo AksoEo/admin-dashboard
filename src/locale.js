@@ -223,7 +223,7 @@ export default {
         log: {
             fields: {
                 time: '[[time]]',
-                codeholderId: '[[codeholderId]]',
+                codeholder: '[[codeholder]]',
                 apiKey: '[[apiKey]]',
                 ip: '[[ip]]',
                 origin: '[[origin]]',
@@ -240,6 +240,12 @@ export default {
                 userAgent: '[[search for user agent]]',
                 userAgentParsed: '[[search for parsed user agent]]',
             },
+            query: {
+                some: '[[has query]]',
+                none: '',
+            },
+            detailTitle: '[[http request]]',
+            viewCodeholder: '[[view codeholder]]',
         },
     },
     // Members page
