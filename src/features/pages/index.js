@@ -104,6 +104,8 @@ export default [
             },
             {
                 id: 'administration',
+                component: lazy(() =>
+                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
                 icon: <SupervisorAccountIcon />,
                 url: 'administrado',
                 hasPermission: () => true,

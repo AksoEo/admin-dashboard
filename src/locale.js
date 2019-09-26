@@ -219,6 +219,29 @@ export default {
             codeTaken: 'La UEA-kodo estas jam uzata',
         },
     },
+    administration: {
+        log: {
+            fields: {
+                time: '[[time]]',
+                codeholderId: '[[codeholderId]]',
+                apiKey: '[[apiKey]]',
+                ip: '[[ip]]',
+                origin: '[[origin]]',
+                userAgent: '[[userAgent]]',
+                userAgentParsed: '[[userAgentParsed]]',
+                method: '[[method]]',
+                path: '[[path]]',
+                query: '[[query]]',
+                resStatus: '[[resStatus]]',
+                resTime: '[[resTime]]',
+                resLocation: '[[resLocation]]',
+            },
+            placeholders: {
+                userAgent: '[[search for user agent]]',
+                userAgentParsed: '[[search for parsed user agent]]',
+            },
+        },
+    },
     // Members page
     members: {
         search: {

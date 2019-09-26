@@ -14,8 +14,6 @@ import { WithCountries, CountryFlag } from '../../../components/data/country';
 
 // TODO: order fields in some sensible order
 
-/* eslint-disable react/prop-types */
-
 /** List of all member fields. */
 export default {
     codeholderType: {

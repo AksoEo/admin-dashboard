@@ -106,7 +106,7 @@ Results.propTypes = {
     onAddField: PropTypes.func.isRequired,
     onSetFieldSorting: PropTypes.func.isRequired,
     localizedFields: PropTypes.object.isRequired,
-    getLinkTarget: PropTypes.func.isRequired,
+    getLinkTarget: PropTypes.func,
 };
 
 export function ErrorResult ({ error }) {
@@ -205,7 +205,7 @@ function ResultsTable ({
                         fields={fieldIDs}
                         fieldSpec={fieldSpec}
                         value={items[id]}
-                        linkTarget={getLinkTarget(id)} />
+                        linkTarget={getLinkTarget && getLinkTarget(id)} />
                 ))}
             </TableBody>
         </Table>
@@ -223,7 +223,7 @@ ResultsTable.propTypes = {
     onAddField: PropTypes.func.isRequired,
     onSetFieldSorting: PropTypes.func.isRequired,
     localizedFields: PropTypes.object.isRequired,
-    getLinkTarget: PropTypes.func.isRequired,
+    getLinkTarget: PropTypes.func,
 };
 
 function TableHeader ({

@@ -166,7 +166,7 @@ export default class MembersList extends PureComponent {
         });
 
         return (
-            <div className="app-page members-page" ref={node => this.node = node}>
+            <div class="app-page members-page" ref={node => this.node = node}>
                 <AppBarProxy actions={menu} priority={1} />
                 <ListView
                     ref={view => this.listView = view}

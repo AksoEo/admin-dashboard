@@ -19,6 +19,8 @@ import SavedFilters from './saved-filters';
 import { encodeURLQuery, decodeURLQuery } from './deser';
 import './style';
 
+export Sorting from './sorting';
+
 const JSONEditor = lazy(() => import('./json-editor'));
 
 // redux actions that trigger a debounced reload
@@ -134,7 +136,7 @@ export default class ListView extends PureComponent {
         locale: PropTypes.object.isRequired,
 
         /// Should return the URL target for a given detail view.
-        getLinkTarget: PropTypes.func.isRequired,
+        getLinkTarget: PropTypes.func,
 
         /// Detail view identifier. If given, a detail view will be shown.
         detailView: PropTypes.any,
@@ -314,7 +316,7 @@ export default class ListView extends PureComponent {
     onSubmit () {
         if (this.didSetPage) {
             this.didSetPage = false;
-            this.props.onChangePage();
+            if (this.props.onChangePage) this.props.onChangePage();
         }
     }
 
