@@ -5,7 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import { Button, Menu, DrawerItem, DrawerLabel } from 'yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ProfilePicture from '../../components/profile-picture';
-import { Link, appContext } from '../../router';
+import { Link, routerContext } from '../../router';
 import SidebarLogo from './sidebar-logo';
 import pages from '../pages';
 import locale from '../../locale';
@@ -15,12 +15,12 @@ import client from '../../client';
 // also see src/pages/index.js
 
 /** Renders a single item in the sidebar. */
-function NavItem (props) {
-    const { id, icon, url } = props.item;
+function NavItem ({ item, currentPage }) {
+    const { id, icon, url } = item;
     return (
         <Link target={`/${url}`} class="sidebar-link">
             <DrawerItem
-                selected={props.currentPage === id}
+                selected={currentPage === id}
                 icon={icon}>
                 {locale.pages[id]}
             </DrawerItem>
@@ -34,17 +34,20 @@ NavItem.propTypes = {
 };
 
 /** Renders a sidebar category. */
-function NavCategory (props) {
-    const { id, contents } = props.item;
+function NavCategory ({ item, currentPage, permissions }) {
+    const { id, contents } = item;
     const label = locale.pages[id] ? <DrawerLabel>{locale.pages[id]}</DrawerLabel> : null;
+
+    const filteredContents = contents.filter(item => item.hasPermission(permissions));
+
     return (
         <Fragment>
             {label}
-            {contents.map(item => (
+            {filteredContents.map(item => (
                 <NavItem
                     key={item.id}
                     item={item}
-                    currentPage={props.currentPage} />
+                    currentPage={currentPage} />
             ))}
         </Fragment>
     );
@@ -66,9 +69,11 @@ export default class SidebarContents extends PureComponent {
         onDirectTransition: PropTypes.func.isRequired,
         /** Forwarded from app. */
         onDoAnimateIn: PropTypes.func.isRequired,
+
+        permissions: PropTypes.object.isRequired,
     };
 
-    static contextType = appContext;
+    static contextType = routerContext;
 
     state = {
         userMenuOpen: false,
@@ -162,7 +167,8 @@ export default class SidebarContents extends PureComponent {
                                 <NavCategory
                                     key={item.id}
                                     item={item}
-                                    currentPage={this.props.currentPage} />
+                                    currentPage={this.props.currentPage}
+                                    permissions={this.props.permissions} />
                             ))}
                         </nav>
                     </div>

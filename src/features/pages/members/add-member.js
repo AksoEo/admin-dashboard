@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
-import { appContext } from '../../../router';
+import { routerContext } from '../../../router';
 import { Dialog, TextField, Button, CircularProgress } from 'yamdl';
 import { UEACode } from 'akso-client';
 import Form, { Validator } from '../../../components/form';
@@ -45,7 +45,7 @@ class AddMember extends PureComponent {
         onSuccess: PropTypes.func.isRequired,
     };
 
-    static contextType = appContext;
+    static contextType = routerContext;
 
     state = {
         codeholderType: 'human',

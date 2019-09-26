@@ -11,6 +11,7 @@ import locale from '../../../locale';
 ///
 /// # Props
 /// - `id`: codeholder ID
+/// - `canEdit`: edit permission
 export default class MembershipEditor extends PureComponent {
     state = {
         // first 100 items (maybe there’s more? We Just Don’t Know)
@@ -42,6 +43,8 @@ export default class MembershipEditor extends PureComponent {
     }
 
     render () {
+        const { canEdit } = this.props;
+
         const memberships = this.state.preview.map(item => {
             let className = 'membership';
             if (item.givesMembership) className += ' gives-membership';
@@ -95,10 +98,10 @@ export default class MembershipEditor extends PureComponent {
                             </Button>}
                             title={locale.members.detail.membership}
                             priority={9}
-                            actions={[{
+                            actions={[canEdit && {
                                 label: '[[add]]',
                                 action: () => this.setState({ addingMembership: true }),
-                            }]} />
+                            }].filter(x => x)} />
                     }>
                     <DataList
                         onLoad={(offset, limit) =>
@@ -120,8 +123,8 @@ export default class MembershipEditor extends PureComponent {
                             }))}
                         emptyLabel={locale.members.detail.noMembership}
                         itemHeight={56}
-                        onRemove={item =>
-                            client.delete(`/codeholders/${this.props.id}/membership/${item.id}`)}
+                        onRemove={canEdit && (item =>
+                            client.delete(`/codeholders/${this.props.id}/membership/${item.id}`))}
                         renderItem={item => (
                             <div class="membership-item">
                                 <div class="item-name">

@@ -114,6 +114,7 @@ class DetailView extends PureComponent {
     }
 
     beginEdit () {
+        if (!this.props.onPatch) return;
         this.setState({ editingCopy: this.props.items[this.state.id] });
     }
 
@@ -141,6 +142,7 @@ class DetailView extends PureComponent {
                         locale={detailLocale}
                         onClose={this.onClose}
                         editing={!!this.state.editingCopy}
+                        canEdit={!!this.props.onPatch}
                         onEdit={() => this.beginEdit()}
                         onEditCancel={() => this.endEdit()}
                         onEditSave={() => {
@@ -148,6 +150,7 @@ class DetailView extends PureComponent {
                                 this.setState({ saveOpen: true });
                             }
                         }}
+                        canDelete={!!this.props.onDelete}
                         onDelete={() => this.setState({ confirmDeleteOpen: true })} />
                 }>
                 <DetailViewContents
@@ -156,13 +159,15 @@ class DetailView extends PureComponent {
                     item={this.state.editingCopy || item}
                     itemId={id}
                     editing={!!this.state.editingCopy}
-                    onItemChange={item => this.setState({ editingCopy: item })}
+                    onItemChange={item =>
+                        this.props.onPatch && this.setState({ editingCopy: item })}
                     fields={this.props.fields}
                     headerComponent={this.props.headerComponent}
                     footerComponent={this.props.footerComponent}
                     locale={detailLocale}
                     onFetchFieldHistory={this.props.onFetchFieldHistory}
-                    forceReload={() => this.load()} />
+                    forceReload={() => this.load()}
+                    userData={this.props.userData} />
 
                 <ConfirmDeleteDialog
                     id={id}
@@ -194,22 +199,25 @@ function DetailAppBar ({
     onClose,
     locale: detailLocale,
     editing,
+    canEdit,
     onEdit,
     onEditCancel,
     onEditSave,
     onDelete,
+    canDelete,
 }) {
     let title = detailLocale.title;
     if (editing) title = detailLocale.editingTitle;
 
     const actions = [];
     if (!editing) {
-        actions.push({
+        if (canEdit) actions.push({
             key: 'edit',
             icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
             label: locale.listView.detail.edit,
             action: onEdit,
-        }, {
+        });
+        if (canDelete) actions.push({
             key: 'delete',
             label: locale.listView.detail.delete,
             action: onDelete,
@@ -264,6 +272,7 @@ const DetailViewContents = memo(function DetailViewContents ({
     locale,
     onFetchFieldHistory,
     forceReload,
+    userData,
 }) {
     if (!item) return null;
 
@@ -275,6 +284,7 @@ const DetailViewContents = memo(function DetailViewContents ({
         value: item,
         onChange: onItemChange,
         forceReload,
+        userData,
     });
 
     const header = Header ? <Header {...makeFieldProps()} /> : null;

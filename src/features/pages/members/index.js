@@ -6,7 +6,7 @@ import { UEACode, util } from 'akso-client';
 import JSON5 from 'json5';
 import AddIcon from '@material-ui/icons/Add';
 import { AppBarProxy } from 'yamdl';
-import { appContext } from '../../../router';
+import { routerContext } from '../../../router';
 import { Spring } from '../../../animation';
 import ListView from '../../../components/list';
 import Sorting from '../../../components/list/sorting';
@@ -36,7 +36,7 @@ export default class MembersList extends PureComponent {
         query: PropTypes.string.isRequired,
     };
 
-    static contextType = appContext;
+    static contextType = routerContext;
 
     state = {
         /// The member ID of the currently open detail view.
@@ -152,11 +152,13 @@ export default class MembersList extends PureComponent {
                 overflow: true,
             });
         }
-        menu.push({
-            icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
-            label: locale.members.addMember.menuItem,
-            action: () => this.setState({ addMemberOpen: true }),
-        });
+        if (this.props.permissions.hasPermission('codeholders.create')) {
+            menu.push({
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.members.addMember.menuItem,
+                action: () => this.setState({ addMemberOpen: true }),
+            });
+        }
         menu.push({
             label: locale.members.search.resetFilters,
             action: () => this.listView.resetFilters(),
@@ -204,7 +206,7 @@ export default class MembersList extends PureComponent {
                     fieldConfigColumn={'codeholderType'}
                     onRequest={handleRequest}
                     isRestrictedByGlobalFilter={!!(
-                        Object.keys(this.context.permissions.memberFilter).length
+                        Object.keys(this.props.permissions.memberFilter).length
                     )}
                     onURLQueryChange={this.onURLQueryChange}
                     locale={{
@@ -222,9 +224,14 @@ export default class MembersList extends PureComponent {
                     detailHeader={detailFields.header}
                     detailFooter={detailFields.footer}
                     onDetailRequest={handleDetailRequest}
-                    onDetailPatch={handleDetailPatch}
-                    onDetailDelete={id => client.delete(`/codeholders/${id}`)}
-                    onFetchFieldHistory={handleFieldHistory}
+                    onDetailPatch={this.props.permissions.hasPermission('codeholders.update')
+                        && handleDetailPatch}
+                    onDetailDelete={this.props.permissions.hasPermission('codeholders.delete')
+                        && (id => client.delete(`/codeholders/${id}`))}
+                    onFetchFieldHistory={
+                        this.props.permissions.hasPermission('codeholders_hist.read')
+                            && handleFieldHistory
+                    }
                     getLinkTarget={id => `/membroj/${id}`}
                     onChangePage={this.scrollToTop}
                     csvExportOptions={{
@@ -235,9 +242,7 @@ export default class MembersList extends PureComponent {
                             default: 'eo',
                         },
                     }}
-                    // TODO: move this into a prop instead of using a context
-                    // so it updates when it changes/loads
-                    canSaveFilters={this.context.hasPermission('queries.create')}
+                    canSaveFilters={this.props.permissions.hasPermission('queries.create')}
                     savedFilterCategory={'codeholders'}
                     onStateChange={state => {
                         if (state.jsonFilter.enabled !== this.state.lvJSONFilterEnabled) {
@@ -251,7 +256,8 @@ export default class MembersList extends PureComponent {
                         }
                         // deliberately not a state field to avoid frequent updates
                         this.reduxState = state;
-                    }} />
+                    }}
+                    userData={{ permissions: this.props.permissions }} />
 
                 <AddMemberDialog
                     open={this.state.addMemberOpen}
@@ -544,7 +550,7 @@ function handleDetailPatch (id, original, value, modCmt) {
     const diff = {};
     for (const key in value) {
         if (!deepEq(original[key], value[key])) {
-            diff[key] = value[key];
+            diff[key] = value[key] || null;
         }
     }
 

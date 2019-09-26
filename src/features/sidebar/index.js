@@ -30,6 +30,8 @@ export default class Sidebar extends PureComponent {
         onDirectTransition: PropTypes.func.isRequired,
         /** Forwarded from app. */
         onDoAnimateIn: PropTypes.func.isRequired,
+
+        permissions: PropTypes.object.isRequired,
     };
 
     /**
@@ -149,7 +151,8 @@ export default class Sidebar extends PureComponent {
                         onDoAnimateIn={() => {
                             this.props.onDoAnimateIn();
                             this.animateIn(300);
-                        }} />
+                        }}
+                        permissions={this.props.permissions} />
                 </div>
             </div>
         );

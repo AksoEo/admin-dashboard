@@ -180,6 +180,9 @@ export default class ListView extends PureComponent {
         savedFilterCategory: PropTypes.string.isRequired,
 
         onStateChange: PropTypes.func,
+
+        /// User data, will be passed as-is.
+        userData: PropTypes.object,
     };
 
     /// State store.
@@ -422,7 +425,8 @@ export default class ListView extends PureComponent {
                     fields={this.props.detailFields}
                     headerComponent={this.props.detailHeader}
                     footerComponent={this.props.detailFooter}
-                    onFetchFieldHistory={this.props.onFetchFieldHistory} />
+                    onFetchFieldHistory={this.props.onFetchFieldHistory}
+                    userData={this.props.userData} />
             </Provider>
         );
     }

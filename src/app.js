@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { PureComponent, Suspense } from 'preact/compat';
 import PropTypes from 'prop-types';
 
-import { appContext } from './router';
+import { routerContext } from './router';
 import locale from './locale';
 import { activeRequests, activeRequestsEmitter } from './client';
 import './app.less';
@@ -80,6 +80,7 @@ export default class App extends PureComponent {
             permissions: [],
             memberFields: null,
             memberFilter: {},
+            hasPermission: () => false,
         },
     };
 
@@ -151,6 +152,7 @@ export default class App extends PureComponent {
 
     tryGetPerms () {
         cache.getPerms().then(permissions => {
+            permissions.hasPermission = this.hasPermission;
             this.setState({ permissions });
         }).catch(err => {
             /* eslint-disable no-console */
@@ -269,7 +271,8 @@ export default class App extends PureComponent {
                 currentPage={this.state.currentPage.id}
                 onDirectTransition={this.props.onDirectTransition}
                 onDoAnimateIn={() => this.setState({ animateIn: true })}
-                onLogout={this.props.onLogout} />
+                onLogout={this.props.onLogout}
+                permissions={this.state.permissions} />
         );
 
         // TODO: remove Todo fallback
@@ -292,11 +295,9 @@ export default class App extends PureComponent {
         return (
             <div id="app" className={className}>
                 <AppBarProvider>
-                    <appContext.Provider value={{
+                    <routerContext.Provider value={{
                         navigate: this.onNavigate,
                         replace: this.onReplace,
-                        permissions: this.state.permissions,
-                        hasPermission: this.hasPermission,
                     }}>
                         {appDrawer}
                         <div className="app-contents">
@@ -308,7 +309,7 @@ export default class App extends PureComponent {
                                 {pageContents}
                             </div>
                         </div>
-                    </appContext.Provider>
+                    </routerContext.Provider>
                 </AppBarProvider>
             </div>
         );

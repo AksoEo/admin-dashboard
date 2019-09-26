@@ -11,6 +11,7 @@ import locale from '../../../locale';
 /// # Props
 /// - `id`: the member ID
 /// - `hasProfilePicture`: whether the identicon should be used or not
+/// - `canEdit`: bool
 export default class ProfilePictureEditor extends Component {
     state = {
         uploading: false,
@@ -48,9 +49,11 @@ export default class ProfilePictureEditor extends Component {
         return (
             <div class="member-picture-container">
                 <ProfilePicture {...this.props} />
-                <Button icon class="edit-overlay" onClick={() => this.beginUpload()}>
-                    <AddAPhotoIcon class="edit-icon" />
-                </Button>
+                {this.props.canEdit && (
+                    <Button icon class="edit-overlay" onClick={() => this.beginUpload()}>
+                        <AddAPhotoIcon class="edit-icon" />
+                    </Button>
+                )}
 
                 <Dialog
                     class="member-picture-crop-dialog"

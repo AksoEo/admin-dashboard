@@ -254,19 +254,22 @@ function CodeEditor ({ value, editing, onChange }) {
         suggestions={suggestions} />;
 }
 
-function Header ({ value, editing, onChange, forceReload }) {
+function Header ({ value, editing, onChange, forceReload, userData }) {
     return (
         <div class="member-header">
             <ProfilePictureEditor
                 id={value.id}
                 hasProfilePicture={value.hasProfilePicture}
-                onSuccess={forceReload} />
+                onSuccess={forceReload}
+                canEdit={userData.permissions.hasPermission('codeholders.update')} />
             <div class="member-info">
                 <NameEditor value={value} editing={editing} onChange={onChange} />
                 <div class="member-code">
                     <CodeEditor value={value} editing={editing} onChange={onChange} />
                 </div>
-                <MembershipEditor id={value.id} />
+                <MembershipEditor
+                    id={value.id}
+                    canEdit={userData.permissions.hasPermission('codeholders.update')} />
             </div>
         </div>
     );
