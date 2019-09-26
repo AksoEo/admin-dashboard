@@ -1,5 +1,9 @@
 import client from './client';
 
+// Note: this file MUST only contain data that is not tied to a specific account because it will
+// persist over several logins
+// (e.g. permissions should not be cached here)
+
 function cachedRequest (endpoint, options = {}, handle = (result => result.body)) {
     let cached;
     return function getCached () {
@@ -52,7 +56,6 @@ export default {
         }
         return map;
     }),
-    getPerms: cachedRequest('/perms'),
     getMembershipCategories: cachedRequest('/membership_categories', {
         limit: 100,
         fields: ['id', 'nameAbbrev', 'name'],

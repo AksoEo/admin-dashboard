@@ -13,6 +13,7 @@ import {
 } from 'yamdl';
 import Sidebar from './features/sidebar';
 import routes from './features/pages';
+import client from './client';
 import cache from './cache';
 
 import moment from 'moment';
@@ -151,9 +152,8 @@ export default class App extends PureComponent {
     };
 
     tryGetPerms () {
-        cache.getPerms().then(permissions => {
-            permissions.hasPermission = this.hasPermission;
-            this.setState({ permissions });
+        client.refreshPerms().then(permissions => {
+            this.setState({ permissions: { ...permissions, hasPermission: this.hasPermission } });
         }).catch(err => {
             /* eslint-disable no-console */
             console.error('Failed to get permissions, trying again in a second', err);
@@ -162,12 +162,7 @@ export default class App extends PureComponent {
         });
     }
 
-    hasPermission = permission => {
-        const perms = this.state.permissions.permissions;
-        if (perms.includes('*')) return true;
-        if (perms.includes(permission)) return true;
-        return false;
-    };
+    hasPermission = permission => client.hasPermSync(permission);
 
     componentDidMount () {
         this.onResize();

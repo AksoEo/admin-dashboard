@@ -23,6 +23,7 @@ const JSONEditor = lazy(() => import('./json-editor'));
 
 // redux actions that trigger a debounced reload
 const reloadingActions = [
+    actions.SET_SEARCH_FIELD,
     actions.SET_SEARCH_QUERY,
     actions.SET_FILTERS_ENABLED,
     actions.SET_FILTER_ENABLED,
@@ -70,6 +71,7 @@ const listViewMiddleware = listView => () => next => action => {
     // csv export
     if (action.type === actions.RECEIVE_FAILURE || action.type === actions.RECEIVE_SUCCESS) {
         listView.csvExport.receiveAction(action);
+        listView.onReceiveAction(action);
     }
 
     // onChangePage
@@ -313,6 +315,18 @@ export default class ListView extends PureComponent {
         if (this.didSetPage) {
             this.didSetPage = false;
             this.props.onChangePage();
+        }
+    }
+
+    onReceiveAction (action) {
+        if (action.type === actions.RECEIVE_SUCCESS) {
+            // TODO
+            const state = this.store.getState();
+            if (action.stats.total < state.list.page * state.list.itemsPerPage) {
+                this.store.dispatch(actions.setPage(
+                    Math.floor(action.stats.total / state.list.itemsPerPage) | 0,
+                ));
+            }
         }
     }
 
