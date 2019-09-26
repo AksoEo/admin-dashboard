@@ -75,6 +75,14 @@ export default {
         // Login button
         login: 'Ensaluti',
 
+        lostSecurityCodeDescription: '[[contact your local sysadmin]]',
+        forgotCodeDescription: '[[try using your email i guess??]]',
+        forgotPasswordDescription: '[[press button to send password reset email]]',
+        sendPasswordReset: '[[reset password]]',
+        back: 'Reiri',
+        passwordResetSent: '[[sent email, check your inbox (or junk)]]',
+        close: '[[close]]',
+
         passwordSetupDescription: login => `[[your account ${login} doesn’t seem to have a password]]`,
         passwordSetupSendMail: '[[send password setup email]]',
         sentPasswordSetupMail: '[[sent password setup email, you should find it in your inbox soon (check junk too)]]',

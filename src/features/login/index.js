@@ -25,13 +25,6 @@ const Stage = {
 
 const MIN_INDEX = -3;
 
-const temporaryBackLinkStyle = {
-    display: 'block',
-    textAlign: 'center',
-    fontSize: '1.2em',
-    color: 'inherit',
-};
-
 /** The login screen. */
 export default class Login extends Component {
     static propTypes = {
@@ -185,42 +178,43 @@ export default class Login extends Component {
                         selected={this.state.stage}
                         minIndex={MIN_INDEX}
                         onPageChange={this.onPageChange}>
-                        <p>
-                            (...)<br />
-                            <a
-                                style={temporaryBackLinkStyle}
-                                href="#"
-                                onClick={e => {
-                                    e.preventDefault();
-                                    this.setState({ stage: Stage.SECURITY_CODE });
-                                }}>
-                                Reiri
-                            </a>
-                        </p>
-                        <p>
-                           (...)<br />
-                            <a
-                                style={temporaryBackLinkStyle}
-                                href="#"
-                                onClick={e => {
-                                    e.preventDefault();
-                                    this.setState({ stage: Stage.DETAILS });
-                                }}>
-                                Reiri
-                            </a>
-                        </p>
-                        <p>
-                            (...)<br />
-                            <a
-                                style={temporaryBackLinkStyle}
-                                href="#"
-                                onClick={e => {
-                                    e.preventDefault();
-                                    this.setState({ stage: Stage.DETAILS });
-                                }}>
-                                Reiri
-                            </a>
-                        </p>
+                        <div>
+                            <p>
+                                {locale.login.lostSecurityCodeDescription}
+                            </p>
+                            <Button class="help-back-button" onClick={e => {
+                                e.preventDefault();
+                                this.setState({ stage: Stage.SECURITY_CODE });
+                            }}>
+                                {locale.login.back}
+                            </Button>
+                        </div>
+                        <div>
+                            <p>
+                                {locale.login.forgotCodeDescription}
+                            </p>
+                            <Button class="help-back-button" onClick={e => {
+                                e.preventDefault();
+                                this.setState({ stage: Stage.DETAILS });
+                            }}>
+                                {locale.login.back}
+                            </Button>
+                        </div>
+                        <div>
+                            <p>
+                                {locale.login.forgotPasswordDescription}
+                            </p>
+                            <PasswordResetForm
+                                onSuccess={() => this.setState({ stage: Stage.DETAILS })}
+                                username={this.state.username}
+                                onUsernameChange={username => this.setState({ username })} />
+                            <Button class="help-back-button" onClick={e => {
+                                e.preventDefault();
+                                this.setState({ stage: Stage.DETAILS });
+                            }}>
+                                {locale.login.back}
+                            </Button>
+                        </div>
                         <DetailsStage
                             ref={stage => this.detailsStage = stage}
                             username={this.state.username}
@@ -539,9 +533,11 @@ class DetailsStage extends Component {
                                         this.pwsMailSender.shake();
                                     }).then(() => this.setState({ sendingPWSMail: false }));
                                 }}>
-                                {locale.login.passwordSetupSendMail}
-                                {this.state.sendingPWSMail
-                                    ? <CircularProgress small indeterminate /> : null}
+                                <CircularProgress
+                                    class="progress-overlay"
+                                    small
+                                    indeterminate={this.state.sendingPWSMail} />
+                                <span>{locale.login.passwordSetupSendMail}</span>
                             </Validator>
                         </Fragment>
                     )}
@@ -756,6 +752,74 @@ class TotpBypassSwitch extends Component {
                     {locale.login.bypassTotpDescription}
                 </p>
             </p>
+        );
+    }
+}
+
+class PasswordResetForm extends Component {
+    state = {
+        loading: false,
+        success: false,
+    };
+
+    render () {
+        return (
+            <Form class="password-reset-form" onSubmit={() => {
+                this.setState({ laoding: true });
+                client.req({
+                    method: 'POST',
+                    path: `/codeholders/${this.props.username}/!forgot_password`,
+                    _allowLoggedOut: true,
+                }).then(() => {
+                    this.setState({ success: true });
+                    this.props.onSuccess();
+                }).catch(err => {
+                    console.error(err); // eslint-disable-line no-console
+                    this.buttonValidator.shake();
+                }).then(() => this.setState({ loading: false }));
+            }}>
+                <Validator
+                    component={TextField}
+                    class="form-field"
+                    outline
+                    label={locale.login.username}
+                    type={this.props.username.includes('@') ? 'email' : 'text'}
+                    autocapitalize="none"
+                    value={this.props.username}
+                    onChange={e => this.props.onUsernameChange(e.target.value)}
+                    validate={value => {
+                        if (!value.includes('@') && !UEACode.validate(value)) {
+                            throw { error: locale.login.invalidUEACode };
+                        }
+                    }} />
+                <footer class="form-footer should-center">
+                    <Validator
+                        component={Button}
+                        raised
+                        type="submit"
+                        disabled={this.state.loading}
+                        ref={node => this.buttonValidator = node}
+                        validate={() => {}}>
+                        <CircularProgress
+                            class="progress-overlay"
+                            indeterminate={this.state.loading}
+                            small />
+                        <span>{locale.login.sendPasswordReset}</span>
+                    </Validator>
+                </footer>
+
+                <Dialog
+                    backdrop
+                    open={this.state.success}
+                    onClose={() => this.setState({ success: false })}>
+                    <p>
+                        {locale.login.passwordResetSent}
+                    </p>
+                    <Button onClick={() => this.setState({ success: false })}>
+                        {locale.login.close}
+                    </Button>
+                </Dialog>
+            </Form>
         );
     }
 }
