@@ -1,22 +1,46 @@
-import { h } from 'preact';
-import { useState, useEffect } from 'preact/compat';
+import { h, Component } from 'preact';
+import { useState, useEffect, Fragment, createPortal } from 'preact/compat';
 import { TextField, Button } from 'yamdl';
 import fuzzaldrin from 'fuzzaldrin';
+import { globalAnimator } from '../animation';
 import './suggestion-field.less';
 
 /// A text field with suggestions that behaves like a typical browser address bar.
 ///
 /// # Props
 /// - `value`, `onChange`: as expected
-/// - `suggestions`: array of strings
-export default function SuggestionField ({ value, onChange, suggestions, outerClass, ...extraProps }) {
-    suggestions = fuzzaldrin.filter(suggestions, value);
+/// - `onSelect`: pass to handle/validate suggestions. Should return true if suggestion should be
+///   passed to onChange.
+/// - `suggestions`: array of strings or any object with `toString`
+/// - `alwaysHighlight`: set to true to always highlight an item
+/// - `skipFilter`: to skip fuzzaldrin filtering
+export default function SuggestionField ({
+    value, onChange, onSelect, suggestions, alwaysHighlight, skipFilter, ...extraProps
+}) {
+    if (!skipFilter) {
+        const filteredSuggestions = fuzzaldrin.filter(
+            suggestions.map((item, i) => ({ s: item.toString(), i })),
+            value,
+            { key: 's' },
+        );
+        suggestions = filteredSuggestions.map(({ i }) => suggestions[i]);
+    } else {
+        suggestions = suggestions.slice().sort((a, b) => {
+            return fuzzaldrin.score(a.toString(), value) - fuzzaldrin.score(b.toString(), value);
+        });
+    }
+
+    onSelect = onSelect || (() => true);
+
+    const minHighlight = alwaysHighlight ? 0 : -1;
 
     const [isFocused, setFocused] = useState(false);
-    const [highlight, setHighlight] = useState(-1);
+    const [highlight, setHighlight] = useState(minHighlight);
 
     useEffect(() => {
-        if (highlight > suggestions.length - 1) setHighlight(suggestions.length - 1);
+        if (highlight > suggestions.length - 1) {
+            setHighlight(Math.max(minHighlight, suggestions.length - 1));
+        }
     });
 
     const onFocus = () => {
@@ -25,13 +49,13 @@ export default function SuggestionField ({ value, onChange, suggestions, outerCl
 
     const onBlur = () => {
         setFocused(false);
-        setHighlight(-1);
+        setHighlight(minHighlight);
     };
 
     const onKeyDown = e => {
         switch (e.key) {
         case 'ArrowUp':
-            if (highlight > -1) {
+            if (highlight > minHighlight) {
                 setHighlight(highlight - 1);
                 e.preventDefault();
             }
@@ -44,46 +68,92 @@ export default function SuggestionField ({ value, onChange, suggestions, outerCl
             break;
         case 'Enter':
             if (highlight >= 0) {
-                onChange(suggestions[highlight]);
+                if (onSelect(suggestions[highlight])) {
+                    onChange(suggestions[highlight].toString());
+                }
                 e.preventDefault();
             }
             break;
         }
     };
 
-    const onSMouseDown = e => {
-        // prevent blur
-        e.preventDefault();
-    };
-
     const onButtonClick = suggestion => e => {
         e.preventDefault(); // prevent form submit
-        onChange(suggestion);
+        if (onSelect(suggestion)) {
+            onChange(suggestion.toString(0));
+        }
     };
 
-    outerClass = ' ' + (outerClass || '');
+    return <SuggestionFieldRender textFieldProps={{
+        value,
+        onChange: e => onChange(e.target.value),
+        onFocus,
+        onBlur,
+        onKeyDown,
+        ...extraProps,
+    }} showPopout={isFocused} popoutContents={suggestions.map((suggestion, index) => (
+        <Button
+            class={'suggestion' + (index === highlight ? ' is-highlighted' : '')}
+            key={index}
+            onClick={onButtonClick(suggestion)}>
+            {highlightSuggestion(suggestion.toString(), value)}
+        </Button>
+    ))} />;
+}
 
-    return (
-        <div class={'suggestion-field-container' + (isFocused ? ' is-focused' : '') + outerClass}>
-            <TextField
-                value={value}
-                onChange={e => onChange(e.target.value)}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                onKeyDown={onKeyDown}
-                {...extraProps} />
-            <div class="suggestions" onMouseDown={onSMouseDown}>
-                {suggestions.map((suggestion, index) => (
-                    <Button
-                        class={'suggestion' + (index === highlight ? ' is-highlighted' : '')}
-                        key={index}
-                        onClick={onButtonClick(suggestion)}>
-                        {highlightSuggestion(suggestion, value)}
-                    </Button>
-                ))}
-            </div>
-        </div>
-    );
+class SuggestionFieldRender extends Component {
+    state = { x: 0, y: 0, maxHeight: 10000 };
+
+    update () {
+        if (!this.textField || !this.textField.node) return;
+        const rect = this.textField.node.getBoundingClientRect();
+        const x = rect.left;
+        const y = rect.bottom;
+        const maxHeight = window.innerHeight - rect.bottom;
+        if (x !== this.state.x || y !== this.state.y || maxHeight !== this.state.maxHeight) {
+            this.setState({ x, y, maxHeight });
+        }
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.showPopout !== this.props.showPopout) {
+            // FIXME: kinda hacky
+            if (this.props.showPopout) globalAnimator.register(this);
+            else globalAnimator.deregister(this);
+        }
+    }
+
+    componentWillUnmount () {
+        globalAnimator.deregister(this);
+    }
+
+    render ({ textFieldProps, showPopout, popoutContents }) {
+        let popout;
+        if (showPopout) {
+            popout = createPortal(
+                <div
+                    class="suggestion-field-suggestions"
+                    style={{
+                        transform: `translate(${this.state.x}px, ${this.state.y}px)`,
+                        maxHeight: this.state.maxHeight,
+                    }}
+                    onMouseDown={e => e.preventDefault()}>
+                    {popoutContents}
+                </div>,
+                document.body,
+            );
+        }
+
+        return (
+            <Fragment>
+                <TextField {...textFieldProps} ref={view => {
+                    this.textField = view;
+                    if (textFieldProps.ref) textFieldProps.ref(view);
+                }} />
+                {popout}
+            </Fragment>
+        );
+    }
 }
 
 function highlightSuggestion (suggestion, value) {

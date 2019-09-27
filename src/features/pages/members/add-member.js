@@ -168,8 +168,7 @@ class AddMember extends PureComponent {
                 ))}
                 <Validator
                     component={data.ueaCode.editor}
-                    outerClass="form-field"
-                    class="text-field"
+                    class="form-field text-field"
                     ref={validator => this.codeValidator = validator}
                     outline
                     value={this.state.newCode}

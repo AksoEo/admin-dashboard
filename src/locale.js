@@ -249,9 +249,7 @@ export default {
             },
             detailTitle: 'HTTP-peto',
             viewCodeholder: 'Vidi membron',
-            codeholderPickerTitle: '[[pick codeholders]]',
-            searchCodeholders: '[[name or code]]',
-            noCodeholdersSelected: '[[no codeholders selected]]',
+            searchCodeholders: '[[add by name or code]]',
         },
     },
     // Members page

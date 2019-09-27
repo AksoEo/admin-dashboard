@@ -1,19 +1,17 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Dialog } from 'yamdl';
+import { Button } from 'yamdl';
 import { util } from 'akso-client';
-import SearchIcon from '@material-ui/icons/Search';
-import MulticolList from '../../../../components/multicol-list';
+import RemoveIcon from '@material-ui/icons/Remove';
+import SuggestionField from '../../../../components/suggestion-field';
 import data from '../../../../components/data';
 import client from '../../../../client';
 import locale from '../../../../locale';
 
 class CodeholderPicker extends PureComponent {
     state = {
-        dialogOpen: false,
         search: '',
-        selectedColumnAge: 0,
-        searchColumnAge: 0,
+        suggestions: [],
 
         // cached id -> uea code mappings
         codeCache: {},
@@ -25,20 +23,20 @@ class CodeholderPicker extends PureComponent {
 
     componentDidMount () {
         for (const id of this.props.value) this.loadCodeForId(id);
+        this.onSearchChange('');
     }
 
     componentDidUpdate (prevProps) {
         if (prevProps.value !== this.props.value) {
             for (const id of this.props.value) this.loadCodeForId(id);
-            this.setState({ selectedColumnAge: this.state.selectedColumnAge + 1 });
         }
     }
 
     loadCodeForId (id) {
         if (this.state.codeCache[id]) return;
-        this.scheduledLoads.add(id);
+        this.scheduledLoads.add(+id);
         clearTimeout(this.batchedCodeLoad);
-        if (this.scheduledLoads.size() >= 90) {
+        if (this.scheduledLoads.size >= 90) {
             this.flushLoad();
         } else {
             this.batchedCodeLoad = setTimeout(() => this.flushLoad(), 100);
@@ -58,26 +56,19 @@ class CodeholderPicker extends PureComponent {
             for (const item of res.body) {
                 codeCache[item.id] = item.newCode;
             }
+            this.setState({ codeCache });
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
             // TODO: handle maybe
         });
     }
 
-    onGetChunk = async (column, offset, limit) => {
-        if (column === 0) {
-            return {
-                items: this.props.value.slice(offset, offset + limit).map(id => ({
-                    key: id,
-                    column: 0,
-                    id: id,
-                })),
-                total: this.props.value.length,
-            };
-        }
+    getChunk = async (offset, limit) => {
+        const idFilter = { $nin: this.props.value };
 
         const options = {
             fields: ['id', 'newCode'],
+            filter: { id: idFilter },
             offset,
             limit,
         };
@@ -87,16 +78,14 @@ class CodeholderPicker extends PureComponent {
         }
 
         const items = [];
-        let total = 0;
 
         if (this.state.search.length === 6) {
             const codeSearch = await client.get('/codeholders', {
                 fields: ['id', 'newCode'],
-                filter: { newCode: this.state.search },
+                filter: { newCode: this.state.search, id: idFilter },
                 limit: 1,
             });
             if (codeSearch.body.length) {
-                total++;
                 if (offset === 0) {
                     items.push(codeSearch.body[0]);
                     options.limit--;
@@ -108,38 +97,33 @@ class CodeholderPicker extends PureComponent {
 
         const res = await client.get('/codeholders', options);
         items.push(...res.body);
-        total += res.res.headers.map['x-total-items'];
 
         const codeCache = { ...this.state.codeCache };
         for (const item of items) {
             codeCache[item.id] = item.newCode;
         }
-        this.setState({ codeCache });
-
-        return {
-            items: items.map(({ id }) => ({ key: id, column: 1, id: id })),
-            total,
-        };
+        await new Promise(resolve => this.setState({ codeCache }, resolve));
+        return items.map(({ id }) => id);
     };
 
-    renderItem = id => {
-        return (
-            <div class="codeholder-item" data-id={id} onClick={() => {
-                const value = this.props.value.slice();
-                if (value.includes(id)) value.splice(value.indexOf(id), 1);
-                else value.push(id);
-                this.props.onChange(value);
-            }}>
-                {this.state.codeCache[id]
-                    ? <data.ueaCode.inlineRenderer value={this.state.codeCache[id]} />
-                    : `(${id})`}
-            </div>
-        );
-    };
+    _searchReqId = 0;
 
-    onSearchChange (search) {
-        this.setState({ search, searchColumnAge: this.state.searchColumnAge + 1 });
-    }
+    onSearchChange = search => {
+        this.setState({ search }, () => {
+            const reqId = ++this._searchReqId;
+            this.getChunk(0, 7).then(items => {
+                if (this._searchReqId !== reqId) return;
+                this.setState({
+                    suggestions: items.filter(id => !this.props.value.includes(id)).map(id => ({
+                        id,
+                        toString: () => this.state.codeCache[id],
+                    })),
+                });
+            }).catch(err => {
+                console.error(err); // eslint-disable-line no-console
+            });
+        });
+    };
 
     render ({ value, onChange, filterHeader }) {
         return (
@@ -148,44 +132,39 @@ class CodeholderPicker extends PureComponent {
                 <div
                     class="selected-codeholders"
                     onClick={() => this.setState({ dialogOpen: true })}>
-                    {value.map(id => this.state.codeCache[id]
-                        ? <data.ueaCode.inlineRenderer value={this.state.codeCache[id]} />
-                        : `(${id})`)}
+                    {value.map(id => (
+                        <div class="codeholder-item" key={id}>
+                            <Button class="remove-button" icon small onClick={() => {
+                                const value = this.props.value.slice();
+                                value.splice(value.indexOf(id), 1);
+                                onChange(value);
+                            }}>
+                                <RemoveIcon />
+                            </Button>
+                            {this.state.codeCache[id]
+                                ? <data.ueaCode.inlineRenderer value={this.state.codeCache[id]} />
+                                : `(${id})`}
+                        </div>
+                    ))}
                     {!value.length && locale.administration.log.noCodeholdersSelected}
-                </div>
 
-                <Dialog
-                    backdrop
-                    open={this.state.dialogOpen}
-                    fullScreen={width => width < 650}
-                    class="codeholder-filter-picker-dialog"
-                    onClose={() => this.setState({ dialogOpen: false })}
-                    title={locale.administration.log.codeholderPickerTitle}
-                    appBarProps={{
-                        actions: [
-                            {
-                                node: <div class="picker-dialog-search-box-container">
-                                    <div class="search-icon-container">
-                                        <SearchIcon />
-                                    </div>
-                                    <input
-                                        class="search-box"
-                                        value={this.state.search}
-                                        onChange={e => this.onSearchChange(e.target.value)}
-                                        ref={node => this.searchBox = node}
-                                        placeholder={locale.administration.log.searchCodeholders} />
-                                </div>,
-                            },
-                        ],
-                    }}>
-                    <MulticolList
-                        columns={2}
-                        ref={node => this.multicolList = node}
-                        itemHeight={this.itemHeight}
-                        onGetChunk={this.onGetChunk}
-                        columnAge={[this.state.selectedColumnAge, this.state.searchColumnAge]}
-                        renderItem={this.renderItem} />
-                </Dialog>
+                    <SuggestionField
+                        class="codeholder-search"
+                        value={this.state.search}
+                        onChange={this.onSearchChange}
+                        placeholder={locale.administration.log.searchCodeholders}
+                        skipFilter={true}
+                        alwaysHighlight={true}
+                        onSelect={selected => {
+                            if (!selected) return;
+                            const value = this.props.value.slice();
+                            if (value.includes(selected.id)) return;
+                            value.push(selected.id);
+                            this.onSearchChange('');
+                            onChange(value);
+                        }}
+                        suggestions={this.state.suggestions} />
+                </div>
             </div>
         );
     }

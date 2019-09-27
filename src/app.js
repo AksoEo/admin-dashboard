@@ -14,7 +14,6 @@ import {
 import Sidebar from './features/sidebar';
 import routes from './features/pages';
 import client from './client';
-import cache from './cache';
 
 import moment from 'moment';
 import 'moment-timezone';

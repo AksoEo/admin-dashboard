@@ -1,10 +1,37 @@
-.codeholder-filter-picker-dialog {
-    width: 100%;
-    height: 100%;
-    max-width: 600px;
+@import '../../../../prelude';
 
-    .multicol-list {
-        width: 100%;
-        height: 100%;
+.administration-page .list-view {
+    .codeholder-filter {
+        .selected-codeholders {
+            margin-left: 60px;
+            margin-top: 8px;
+
+            .codeholder-item {
+                display: inline-block;
+                background: @text-fade-10;
+                border-radius: 4px;
+                padding-right: 4px;
+                margin-right: 8px;
+
+                .remove-button {
+                    vertical-align: middle;
+                    width: 24px;
+                    height: 24px;
+                    margin-right: 4px;
+                    border-radius: 4px;
+                    --md-button-color: @gray-button-color;
+                }
+
+                .uea-code {
+                    border: none;
+                    background: none;
+                }
+            }
+
+            .codeholder-search {
+                display: inline-block;
+                vertical-align: middle;
+            }
+        }
     }
 }
