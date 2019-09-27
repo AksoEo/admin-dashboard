@@ -221,6 +221,9 @@ export default {
     },
     administration: {
         log: {
+            filters: {
+                codeholders: '[[codeholders]]',
+            },
             fields: {
                 time: '[[time]]',
                 codeholder: '[[codeholder]]',
@@ -246,6 +249,9 @@ export default {
             },
             detailTitle: '[[http request]]',
             viewCodeholder: '[[view codeholder]]',
+            codeholderPickerTitle: '[[pick codeholders]]',
+            searchCodeholders: '[[name or code]]',
+            noCodeholdersSelected: '[[no codeholders selected]]',
         },
     },
     // Members page

@@ -95,6 +95,7 @@ export default class ListView extends PureComponent {
         /// - `searchField`: the default search field
         /// - `fixedFields`: list of fixed fields: `{ id: string, sorting: Sorting }[]`
         /// - `fields`: list of default fields: `{ id: string, sorting: Sorting }[]`
+        /// - `filtersEnabled`: set to enable filters by default
         defaults: PropTypes.object,
 
         /// Title component; will be put above the search field when not submitted.
@@ -218,7 +219,7 @@ export default class ListView extends PureComponent {
         [
             actions.setSearchField(defaults.searchField || null),
             actions.setSearchQuery(''),
-            actions.setFiltersEnabled(false),
+            actions.setFiltersEnabled(!!defaults.filtersEnabled),
             actions.setJSONFilterEnabled(false),
             actions.setJSONFilter('{\n\t\n}'),
             actions.setFields(defaults.fixedFields || [], defaults.fields || []),

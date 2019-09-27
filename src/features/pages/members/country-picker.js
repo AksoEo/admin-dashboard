@@ -7,10 +7,12 @@ import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
 import fuzzaldrin from 'fuzzaldrin';
-import { Spring, globalAnimator, lerp } from '../../../animation';
 import { CountryFlag } from '../../../components/data/country';
+import MulticolList from '../../../components/multicol-list';
 import locale from '../../../locale';
 import cache from '../../../cache';
+
+const LI_HEIGHT = 48;
 
 /** Renders a country picker. */
 export default class CountryPicker extends PureComponent {
@@ -171,7 +173,10 @@ export default class CountryPicker extends PureComponent {
                             },
                         ],
                     }}>
-                    <MulticolList columns={2} ref={node => this.multicolList = node}>
+                    <MulticolList
+                        columns={2}
+                        ref={node => this.multicolList = node}
+                        itemHeight={LI_HEIGHT}>
                         {selectedItems.concat(availableItems)}
                     </MulticolList>
                     <div class="selection-controls">
@@ -183,149 +188,6 @@ export default class CountryPicker extends PureComponent {
                         </Button>
                     </div>
                 </Dialog>
-            </div>
-        );
-    }
-}
-
-const LI_HEIGHT = 48;
-
-/**
- * Renders multiple columns with fixed order, with items able to be animated in between.
- */
-class MulticolList extends PureComponent {
-    static propTypes = {
-        children: PropTypes.arrayOf(PropTypes.object).isRequired,
-        columns: PropTypes.number.isRequired,
-    };
-
-    itemData = new Map();
-    columnRefs = [];
-
-    createItemData (item, index) {
-        const data = {
-            x: new Spring(1, 0.5),
-            y: new Spring(1, 0.5),
-            key: item.key,
-            column: item.column,
-            index,
-            vnode: item.node,
-        };
-        data.x.value = data.x.target = item.column;
-        data.y.value = data.y.target = index;
-        this.itemData[item.key] = data;
-    }
-
-    update (dt) {
-        let wantsUpdate = false;
-        for (const key in this.itemData) {
-            const item = this.itemData[key];
-            item.x.target = item.column;
-            item.y.target = item.index;
-            item.x.update(dt);
-            item.y.update(dt);
-
-            if (!wantsUpdate && (item.x.wantsUpdate() || item.y.wantsUpdate())) wantsUpdate = true;
-        }
-
-        if (!wantsUpdate) globalAnimator.deregister(this);
-        this.forceUpdate();
-    }
-
-    componentDidUpdate (prevProps) {
-        if (prevProps.children !== this.props.children) globalAnimator.register(this);
-    }
-
-    componentWillUnmount () {
-        globalAnimator.deregister(this);
-    }
-
-    render () {
-        let columns = [];
-        const columnHeights = [];
-        for (let i = 0; i < this.props.columns; i++) {
-            columns.push([]);
-            columnHeights.push(0);
-        }
-
-        const itemKeys = new Set();
-        for (const item of this.props.children) {
-            if (!item.key) throw new Error('MulticolList: child has no key');
-            itemKeys.add(item.key);
-            if (!this.itemData[item.key]) {
-                this.createItemData(item, columns[item.column].length);
-            } else {
-                const data = this.itemData[item.key];
-                data.index = columnHeights[item.column];
-                columnHeights[item.column]++;
-                data.vnode = item.node;
-                data.column = item.column;
-            }
-            const data = this.itemData[item.key];
-            columns[Math.round(data.x.value)].push(data);
-        }
-
-        const isItemFixed = item => item.x.value === Math.round(item.x.value);
-        const columnScrollOffsets = this.columnRefs.map(column => column.scrollTop);
-        const maxColumnPixelHeight = this.columnRefs
-            .map(column => column.offsetHeight)
-            .reduce((a, b) => Math.max(a, b), 0);
-
-        const floatingItems = columns.flatMap(column => (
-            column.filter(item => !isItemFixed(item)).map(item => {
-                const leftCol = Math.floor(item.x.value);
-                const rightCol = Math.ceil(item.x.value);
-                const leftScroll = columnScrollOffsets[leftCol] | 0;
-                const rightScroll = columnScrollOffsets[rightCol] | 0;
-                const scrollOffset = lerp(leftScroll, rightScroll, item.x.value - leftCol);
-                const y = item.y.value * LI_HEIGHT - scrollOffset;
-
-                if (y > maxColumnPixelHeight) {
-                    return null;
-                }
-
-                return (
-                    <div
-                        class="list-item floating"
-                        key={item.key}
-                        style={{
-                            width: `${100 / columns.length}%`,
-                            transform: `translate(${item.x.value * 100}%, ${y}px)`,
-                        }}>
-                        {item.vnode}
-                    </div>
-                );
-            })
-        )).filter(x => x);
-
-        columns = columns.map((column, i) => (
-            <div
-                class="column"
-                ref={node => node && (this.columnRefs[i] = node)}
-                key={i}>
-                {column.filter(isItemFixed).map(item => (
-                    <div
-                        class="list-item"
-                        key={item.key}
-                        style={{
-                            width: '100%',
-                            transform: `translate(${
-                                (item.x.value - i) * 100}%, ${
-                                item.y.value * LI_HEIGHT}px)`,
-                        }}>
-                        {item.vnode}
-                    </div>
-                ))}
-                <div class="column-scroll-height" style={{
-                    height: column.length * LI_HEIGHT,
-                }} />
-            </div>
-        ));
-
-        return (
-            <div class="multicol-list">
-                {columns}
-                {floatingItems}
             </div>
         );
     }
