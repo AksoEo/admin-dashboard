@@ -221,6 +221,9 @@ export default {
     },
     administration: {
         log: {
+            filters: {
+                codeholders: '[[codeholders]]',
+            },
             fields: {
                 time: 'Horo',
                 codeholder: 'Membro',
@@ -246,6 +249,9 @@ export default {
             },
             detailTitle: 'HTTP-peto',
             viewCodeholder: 'Vidi membron',
+            codeholderPickerTitle: '[[pick codeholders]]',
+            searchCodeholders: '[[name or code]]',
+            noCodeholdersSelected: '[[no codeholders selected]]',
         },
     },
     // Members page

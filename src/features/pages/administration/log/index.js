@@ -5,8 +5,10 @@ import ListViewURLHandler from '../../../../components/list/url-handler';
 import { routerContext } from '../../../../router';
 import client from '../../../../client';
 import locale from '../../../../locale';
+import FILTERS from './filters';
 import FIELDS from './table-fields';
 import DETAIL_FIELDS from './detail-fields';
+import './style';
 
 // TODO: permissions
 
@@ -41,6 +43,7 @@ export default class APILogListView extends Component {
                 searchFields={['userAgent', 'userAgentParsed']}
                 defaults={{
                     searchField: 'userAgent',
+                    filtersEnabled: true,
                     fields: [
                         { id: 'time', sorting: Sorting.DESC },
                         { id: 'codeholder', sorting: Sorting.NONE },
@@ -60,6 +63,7 @@ export default class APILogListView extends Component {
                 locale={{
                     // TODO
                     searchFields: locale.administration.log.fields,
+                    filters: locale.administration.log.filters,
                     fields: locale.administration.log.fields,
                     placeholders: locale.administration.log.placeholders,
                     detail: {
@@ -71,6 +75,7 @@ export default class APILogListView extends Component {
                 getLinkTarget={this.urlHandler.getLinkTarget}
                 onURLQueryChange={this.urlHandler.onURLQueryChange}
                 onDetailClose={this.urlHandler.onDetailClose}
+                filters={FILTERS}
                 fields={FIELDS}
                 detailFields={DETAIL_FIELDS}
                 onRequest={handleRequest}
