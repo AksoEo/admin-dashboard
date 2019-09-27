@@ -91,6 +91,8 @@ const fieldMapping = {
 const mapField = id => fieldMapping[id] || id;
 
 async function handleRequest (state) {
+    // TODO: json filters
+
     const transientFields = [];
 
     const options = {
@@ -107,6 +109,20 @@ async function handleRequest (state) {
             throw error;
         }
         options.search = { str: transformedQuery, cols: [state.search.field] };
+    }
+
+    if (state.filters.enabled) {
+        const filters = [];
+        for (const id in state.filters.filters) {
+            const filter = state.filters.filters[id];
+            if (filter.enabled) {
+                filters.push(FILTERS[id].toRequest
+                    ? FILTERS[id].toRequest(filter.value)
+                    : { [id]: filter.value });
+            }
+        }
+
+        if (filters.length) options.filter = { $and: filters };
     }
 
     options.fields = ['id'];
