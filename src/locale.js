@@ -222,7 +222,15 @@ export default {
     administration: {
         log: {
             filters: {
-                codeholders: '[[codeholders]]',
+                codeholders: 'Membroj',
+                time: 'Horo',
+                apiKey: 'API',
+                ip: 'IP-adreso',
+                origin: 'Fonto',
+                method: 'Metodo',
+                path: 'Adreso',
+                resStatus: 'Rezulta stato',
+                resTime: 'Daŭro',
             },
             fields: {
                 time: 'Horo',
