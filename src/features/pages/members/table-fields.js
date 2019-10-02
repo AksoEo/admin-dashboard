@@ -20,7 +20,7 @@ export default {
         sortable: true,
         component ({ value, item }) {
             let icon;
-            if (!value) return <span className="codeholder-type-placeholder" />;
+            if (!value) return <span class="codeholder-type-placeholder" />;
             const { enabled, isDead } = item;
             if (value === 'human' && enabled) icon = <PersonIcon />;
             else if (enabled) icon = <BusinessIcon />;
@@ -33,7 +33,7 @@ export default {
 
             return (
                 <span
-                    className={'codeholder-type' + (!enabled ? ' disabled' : '')}
+                    class={'codeholder-type' + (!enabled ? ' disabled' : '')}
                     title={title}>
                     {icon}
                 </span>
@@ -90,21 +90,21 @@ export default {
                     const last = lastName || lastNameLegal;
                     return (
                         <span
-                            className={'name' + (isDead ? ' is-dead' : '')}
+                            class={'name' + (isDead ? ' is-dead' : '')}
                             title={`${honorific ? honorific + ' ' : ''}${first} ${last}`}
                             ref={node => {
                                 this.node = node;
                                 if (node) this.resizeObserver.observe(node);
                             }}>
-                            <span className="honorific" ref={node => {
+                            <span class="honorific" ref={node => {
                                 this.prefixName = node;
                                 if (node) this.resizeObserver.observe(node);
                             }}>
                                 {honorific ? honorific + '\u00a0' : ''}
                             </span>
-                            <span className="first-name" ref={node => this.truncatingName = node}>
+                            <span class="first-name" ref={node => this.truncatingName = node}>
                                 {first}
-                            </span> <span className="last-name" ref={node => {
+                            </span> <span class="last-name" ref={node => {
                                 this.fixedName = node;
                                 if (node) this.resizeObserver.observe(node);
                             }}>
@@ -117,14 +117,14 @@ export default {
 
                     return (
                         <span
-                            className={'name' + (isDead ? ' is-dead' : '')}
+                            class={'name' + (isDead ? ' is-dead' : '')}
                             title={`${fullName} ${nameAbbrev}`}
                             ref={node => {
                                 this.node = node;
                                 if (node) this.resizeObserver.observe(node);
                             }}>
                             <span
-                                className="org-full-name"
+                                class="org-full-name"
                                 ref={node => this.truncatingName = node}>
                                 {fullName}
                             </span> <span className="org-abbrev" ref={node => {
@@ -136,7 +136,7 @@ export default {
                         </span>
                     );
                 } else {
-                    return <span className="name"></span>;
+                    return <span class="name"></span>;
                 }
             }
         },
@@ -163,7 +163,7 @@ export default {
             }
             const atStartOfYear = item.agePrimo;
             const label = locale.members.fields.ageFormat(value, atStartOfYear);
-            return <span className="age">{label}</span>;
+            return <span class="age">{label}</span>;
         },
         stringify (value) {
             if (value === null || value === undefined) return '';
@@ -174,18 +174,24 @@ export default {
         component ({ value }) {
             if (!value) return null;
             return (
-                <span className="memberships">
-                    {value.flatMap((item, i) => (i == 0 ? [] : [', ']).concat([(
-                        <span
-                            className="membership-item"
-                            key={`${item.categoryId}-${item.year}`}
-                            data-category-id={item.categoryId}>
-                            <abbr className="membership-item-id" title={item.name}>
-                                {item.nameAbbrev}
-                            </abbr>
-                            <span className="membership-year">{item.year}</span>
-                        </span>
-                    )]))}
+                <span class="memberships">
+                    {value.flatMap((item, i) => {
+                        let className = 'membership-item';
+                        if (item.lifetime) className += ' is-lifetime';
+                        if (item.givesMembership) className += ' gives-membership';
+
+                        return (i == 0 ? [] : [', ']).concat([(
+                            <span
+                                class={className}
+                                key={`${item.categoryId}-${item.year}`}
+                                data-category-id={item.categoryId}>
+                                <abbr class="membership-item-id" title={item.name}>
+                                    {item.nameAbbrev}
+                                </abbr>
+                                <span class="membership-year">{item.year}</span>
+                            </span>
+                        )]);
+                    })}
                 </span>
             );
         },
@@ -289,10 +295,10 @@ export default {
                 countryArea,
                 country,
             ].filter(x => x).map((x, i) =>
-                (<span className="address-pseudoline" key={i}>{x}</span>));
+                (<span class="address-pseudoline" key={i}>{x}</span>));
 
             return (
-                <div className="codeholder-address">
+                <div class="codeholder-address">
                     {addressPseudolines}
                 </div>
             );
@@ -323,7 +329,7 @@ export default {
     addressCity: {
         sortable: true,
         component ({ item }) {
-            return <span className="address-city">{item.addressLatin.city}</span>;
+            return <span class="address-city">{item.addressLatin.city}</span>;
         },
         stringify (value, item) {
             return item.addressLatin.city;
@@ -332,7 +338,7 @@ export default {
     addressCountryArea: {
         sortable: true,
         component ({ item }) {
-            return <span className="address-country-area">{item.addressLatin.countryArea}</span>;
+            return <span class="address-country-area">{item.addressLatin.countryArea}</span>;
         },
         stringify (value, item) {
             return item.addressLatin.countryArea;
@@ -358,7 +364,7 @@ export default {
     },
     profession: {
         component ({ value }) {
-            return <span className="profession">{value}</span>;
+            return <span class="profession">{value}</span>;
         },
         stringify (value) {
             return value;

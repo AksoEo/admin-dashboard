@@ -10,7 +10,7 @@ import locale from '../../../locale';
 ///
 /// # Props
 /// - `id`: the member ID
-/// - `hasProfilePicture`: whether the identicon should be used or not
+/// - `profilePictureHash`: whether the identicon should be used or not
 /// - `canEdit`: bool
 export default class ProfilePictureEditor extends Component {
     state = {

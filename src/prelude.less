@@ -30,6 +30,10 @@
     --sidebar-border: #ddd;
     --golden-background: fade(#fee12a, 20%);
 
+    --membership-gives-membership-background: #4ebc6b;
+    --membership-is-lifetime-background: #ed9b50;
+    --membership-gives-lifetime-membership-background: #fee12a;
+
     .md-light-theme(@primary--internal, @secondary--internal, @danger--internal);
 
     @media (prefers-color-scheme: dark) {
@@ -73,6 +77,9 @@
 @sidebar-border: var(--sidebar-border);
 @sidebar-text: inherit;
 @golden-background: var(--golden-background);
+@membership-gives-membership-background: var(--membership-gives-membership-background);
+@membership-is-lifetime-background: var(--membership-is-lifetime-background);
+@membership-gives-lifetime-membership-background: var(--membership-gives-lifetime-membership-background);
 @monospace: Menlo, Roboto Mono, Consolas, monospace;
 
 @easing: cubic-bezier(0.2, 0.3, 0, 1);

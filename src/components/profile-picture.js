@@ -14,7 +14,8 @@ const DECARDINALIFY = id => [
 ///
 /// # Props
 /// - `id`: member ID
-/// - `hasProfilePicture`: whether to load the profile picture (will show an identicon otherwise)
+/// - `profilePictureHash`: if given, will load the profile picture; will show an identicon
+///   otherwise
 export default class ProfilePicture extends Component {
     state = {
         srcSet: '',
@@ -22,14 +23,15 @@ export default class ProfilePicture extends Component {
     };
 
     load () {
-        const { id, hasProfilePicture } = this.props;
+        const { id, profilePictureHash } = this.props;
         if (!id) return;
 
-        if (hasProfilePicture) {
+        if (profilePictureHash) {
+            const hash = Buffer.from(profilePictureHash).toString('base64');
             let urlBase = new URL(client.client.host);
             urlBase.pathname = `/codeholders/${id}/profile_picture/`;
             urlBase = urlBase.toString();
-            const imgSrcSet = [32, 64, 128, 256].map(w => `${urlBase}${w}px ${w}w`).join(', ');
+            const imgSrcSet = [32, 64, 128, 256].map(w => `${urlBase}${w}px?noop=${hash} ${w}w`).join(', ');
             this.setState({ imgSrcSet, isIdenticon: false });
         } else {
             const blobURL = URL.createObjectURL(new Blob([
@@ -47,7 +49,7 @@ export default class ProfilePicture extends Component {
 
     componentDidUpdate (prevProps) {
         if (prevProps.id !== this.props.id
-            || prevProps.hasProfilePicture !== this.props.hasProfilePicture) this.load();
+            || prevProps.profilePictureHash !== this.props.profilePictureHash) this.load();
     }
 
     render () {

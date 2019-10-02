@@ -259,7 +259,7 @@ function Header ({ value, editing, onChange, forceReload, userData }) {
         <div class="member-header">
             <ProfilePictureEditor
                 id={value.id}
-                hasProfilePicture={value.hasProfilePicture}
+                profilePictureHash={value.profilePictureHash}
                 onSuccess={forceReload}
                 canEdit={userData.permissions.hasPermission('codeholders.update')} />
             <div class="member-info">

@@ -59,6 +59,16 @@
                 text-decoration: none;
                 font-size: small;
             }
+
+            &.gives-membership .membership-item-id {
+                background: @membership-gives-membership-background;
+            }
+            &.is-lifetime .membership-item-id {
+                background: @membership-is-lifetime-background;
+            }
+            &.gives-membership.is-lifetime .membership-item-id {
+                background: @membership-gives-lifetime-membership-background;
+            }
         }
     }
 
@@ -576,6 +586,7 @@
                     padding-left: 24px;
 
                     .gen-preview-inner {
+                        background: white; // paper is white
                         .elevation(4);
                     }
 

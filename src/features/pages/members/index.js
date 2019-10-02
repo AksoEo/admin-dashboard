@@ -259,7 +259,7 @@ const fieldMapping = {
             'codeholderType',
             'isDead',
         ],
-        sort: ['lastNameLegal', 'firstNameLegal'], // FIXME: this is probably wrong
+        sort: ['searchName'],
     },
     country: {
         fields: ['feeCountry', 'addressLatin.country'],
@@ -313,7 +313,7 @@ function stateToRequestData (state) {
         transientFields.push(...(searchFieldToSelectedFields[searchField] || [searchField]));
 
         if (searchField === 'nameOrCode') {
-            searchField = 'name';
+            searchField = 'searchName';
 
             try {
                 // if the query is a valid UEA code; prepend search
@@ -457,7 +457,7 @@ async function handleRequest (state) {
 
 const additionalDetailFields = [
     'id',
-    'hasProfilePicture',
+    'profilePictureHash',
     'address.country',
     'address.countryArea',
     'address.city',

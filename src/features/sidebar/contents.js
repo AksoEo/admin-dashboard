@@ -79,14 +79,14 @@ export default class SidebarContents extends PureComponent {
         userMenuOpen: false,
         userName: null,
         id: null,
-        hasProfilePicture: false,
+        profilePictureHash: null,
     };
 
-    componentDidMount () {
+    loadSelf = () => {
         client.get('/codeholders/self', {
             fields: [
                 'id',
-                'hasProfilePicture',
+                'profilePictureHash',
                 'codeholderType',
                 'firstName',
                 'firstNameLegal',
@@ -104,9 +104,15 @@ export default class SidebarContents extends PureComponent {
             this.setState({
                 id: data.id,
                 userName: name,
-                hasProfilePicture: data.hasProfilePicture,
+                profilePictureHash: data.profilePictureHash,
             });
         });
+    };
+
+    componentDidMount () {
+        this.loadSelf();
+
+        // TODO: get loadSelf updates from somewhere
     }
 
     render () {
@@ -123,7 +129,7 @@ export default class SidebarContents extends PureComponent {
                         <div class="user-profile-picture">
                             <ProfilePicture
                                 id={this.state.id}
-                                hasProfilePicture={this.state.hasProfilePicture} />
+                                profilePictureHash={this.state.profilePictureHash} />
                         </div>
                         <Typography
                             class="user-name"

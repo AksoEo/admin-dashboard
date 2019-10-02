@@ -12,8 +12,6 @@ import locale from '../../../locale';
 import CountryPicker from './country-picker';
 import cache from '../../../cache';
 
-/* eslint-disable react/prop-types */
-
 /// A text editor optimized for editing integer range bounds.
 ///
 /// # Props
@@ -810,10 +808,7 @@ export default {
             const lowerYear = value[0];
             const upperYear = value[1];
 
-            const lowerDate = new Date(`${lowerYear}-01-01T00:00Z`);
-            const upperDate = new Date(`${upperYear + 1}-01-01T00:00Z`);
-
-            return { deathdate: { $gte: +lowerDate, $lt: +upperDate } };
+            return { deathdate: { $range: [`${lowerYear}-01-01`, `${upperYear}-12-31`] } };
         },
         editor (props) {
             const { filter, value, onChange, filterHeader, disabled } = props;

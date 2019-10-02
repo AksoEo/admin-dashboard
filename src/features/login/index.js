@@ -76,6 +76,10 @@ export default class Login extends Component {
         }
 
         if (client.loggedIn && client.totpRequired) {
+            if (!this.props.authCheck.totpSetUp) {
+                this.setState({ needsTotpSetup: this.props.authCheck.newCode });
+            }
+
             // setTimeout to fix weird glitchiness
             setTimeout(() => {
                 this.setState({ stage: Stage.SECURITY_CODE });
@@ -221,10 +225,10 @@ export default class Login extends Component {
                             token={this.state.token}
                             mode={this.state.mode}
                             onUsernameChange={username => this.setState({ username })}
-                            onSuccess={(totpSetUp, totpUsed) => {
+                            onSuccess={(totpSetUp, totpUsed, newCode) => {
                                 if (!totpSetUp) {
                                     this.setState({
-                                        needsTotpSetup: true,
+                                        needsTotpSetup: newCode,
                                         stage: Stage.SECURITY_CODE,
                                     });
                                 } else if (!totpUsed) {
@@ -330,10 +334,13 @@ class DetailsStage extends Component {
             path: '/auth',
             body: {
                 login: this.props.username,
-                password: 'cats',
+                password: '',
             },
             _allowLoggedOut: true,
-        }).then(() => { /* uhm, nice password */ }).catch(err => {
+        }).then(() => {
+            // FIXME: this will actually break login
+            // so for now let’s just hope no one uses U+0001 as their password
+        }).catch(err => {
             if (err.statusCode === 409) {
                 // user has no password
                 this.setState({ needsPasswordSetup: true });
@@ -381,7 +388,11 @@ class DetailsStage extends Component {
                             password: '',
                             confirmPassword: '',
                         });
-                        this.props.onSuccess(response.totpSetUp, response.totpUsed);
+                        this.props.onSuccess(
+                            response.totpSetUp,
+                            response.totpUsed,
+                            response.newCode,
+                        );
                     } else throw { statusCode: 'not-admin' };
                 }).catch(err => {
                     let error = this.props.mode === Mode.NORMAL
@@ -657,6 +668,7 @@ class SecurityCodeStage extends Component {
                         <TotpSetup
                             onHeightChange={this.props.onHeightChange}
                             onGenerateSecret={secret => this.setState({ secret })}
+                            ueaCode={this.props.needsTotpSetup}
                             contents={contents} />
                     </Suspense>
                 ) : contents}

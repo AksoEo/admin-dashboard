@@ -11,7 +11,7 @@ export default class TotpSetup extends Component {
     componentDidMount () {
         this.props.onHeightChange();
 
-        const ueaCode = 'hsdjkfhjska'; // TODO: use actual UEA code once that’s available
+        const ueaCode = this.props.ueaCode;
 
         generateTotp(ueaCode).then(secrets => {
             this.setState({ secrets }, () => {
