@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-const SERVICE_WORKER_DEV = true;
+const SERVICE_WORKER_DEV = false;
 const DEV = !SERVICE_WORKER_DEV && JSON.parse('**true if dev mode (see webpack config)**');
 /* eslint-disable quotes */
 const ASSETS = JSON.parse("**list of assets goes here (see webpack config)**")
