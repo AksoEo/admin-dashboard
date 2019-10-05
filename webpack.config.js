@@ -11,7 +11,7 @@ const express = require('express');
 const webpack = require('webpack');
 
 const browserTargets = {
-    edge: '17',
+    edge: '18',
     chrome: '49',
     firefox: '63',
     safari: '10',
@@ -53,7 +53,8 @@ module.exports = function (env, argv) {
         mode: prod ? 'production' : 'development',
         entry: {
             entry: './src/fe/index.js',
-            'service-worker': './src/service-worker.js'
+            'service-worker': './src/service-worker.js',
+            unsupported: './src/unsupported.js',
         },
         output: {
             filename: '[name].[chunkhash].js',
@@ -100,7 +101,7 @@ module.exports = function (env, argv) {
             new HtmlWebpackPlugin({
                 template: 'src/fe/index.html',
                 inject: 'body',
-                chunks: ['entry'],
+                chunks: ['unsupported', 'entry'],
             }),
             new ScriptExtHtmlWebpackPlugin({
                 defaultAttribute: 'async',
@@ -122,10 +123,11 @@ module.exports = function (env, argv) {
                     use: 'val-loader',
                 },
                 {
-                    test: /\.m?js$/,
+                    test: /()\.m?js$/,
+                    // exclude unsupported.js
                     // exclude all node_modules
                     // (except akso-client and yamdl which are git dependencies)
-                    exclude: /node_modules\/(?!akso-client|@cpsdqs\/yamdl)/,
+                    exclude: /unsupported\.js|node_modules\/(?!akso-client|@cpsdqs\/yamdl)/,
                     use: [
                         {
                             loader: 'babel-loader',
