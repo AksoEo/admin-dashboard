@@ -1,4 +1,4 @@
-import config from './config.val';
+import config from '../config.val';
 
 const startYear = 2019;
 const thisYear = new Date(config.buildTime).getUTCFullYear();

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
@@ -26,19 +27,42 @@ module.exports = function (env, argv) {
 
     if (!prod) console.warn('\x1b[33mbuilding for development\x1b[m');
 
+    const babelOptions = {
+        presets: [
+            [
+                '@babel/preset-env',
+                {
+                    targets: browserTargets,
+                    useBuiltIns: 'usage',
+                    corejs: '3.1.4',
+                }
+            ],
+            [
+                '@babel/preset-react',
+                { pragma: 'h' },
+            ]
+        ],
+        plugins: [
+            '@babel/plugin-proposal-class-properties',
+            '@babel/plugin-proposal-export-default-from',
+            '@babel/plugin-syntax-dynamic-import'
+        ],
+    };
+
     return {
         mode: prod ? 'production' : 'development',
         entry: {
-            entry: './src/index.js',
+            entry: './src/fe/index.js',
             'service-worker': './src/service-worker.js'
         },
         output: {
             filename: '[name].[chunkhash].js',
             chunkFilename: '[name].[chunkhash].js',
             path: path.resolve(__dirname, 'dist'),
+            globalObject: 'this',
         },
         resolve: {
-            extensions: ['.js', '.json', '.less'],
+            extensions: ['.js', '.ts', '.json', '.less'],
             alias: {
                 'yamdl': '@cpsdqs/yamdl',
 
@@ -46,12 +70,16 @@ module.exports = function (env, argv) {
                 // (such as source-map-support being loaded)
                 'akso-client': 'akso-client/src',
 
+                // this is because cross-fetch insists on using a polyfill even though we don’t need
+                // it according to caniuse
+                'cross-fetch': path.resolve(__dirname, 'src/fetch.js'),
+
                 'react': 'preact/compat',
                 'react-dom': 'preact/compat',
             }
         },
         devtool: prod ? 'source-map' : 'inline-source-map',
-        stats: 'minimal',
+        stats: prod ? 'minimal' : undefined,
         optimization: {
             minimizer: [
                 new TerserPlugin({
@@ -70,12 +98,15 @@ module.exports = function (env, argv) {
             }),
             new OptimizeCssAssetsPlugin(),
             new HtmlWebpackPlugin({
-                template: 'src/index.html',
+                template: 'src/fe/index.html',
                 inject: 'body',
                 chunks: ['entry'],
             }),
+            new ScriptExtHtmlWebpackPlugin({
+                defaultAttribute: 'async',
+            }),
             analyze && new BundleAnalyzerPlugin(),
-            new SWCacheGenPlugin(),
+            new AksoMagicStringReplacer(),
             new webpack.IgnorePlugin({
                 // required by akso-client but not used
                 resourceRegExp: /fetch-cookie/,
@@ -98,27 +129,7 @@ module.exports = function (env, argv) {
                     use: [
                         {
                             loader: 'babel-loader',
-                            options: {
-                                presets: [
-                                    [
-                                        '@babel/preset-env',
-                                        {
-                                            targets: browserTargets,
-                                            useBuiltIns: 'usage',
-                                            corejs: '3.1.4',
-                                        }
-                                    ],
-                                    [
-                                        '@babel/preset-react',
-                                        { pragma: 'h' },
-                                    ]
-                                ],
-                                plugins: [
-                                    '@babel/plugin-proposal-class-properties',
-                                    '@babel/plugin-proposal-export-default-from',
-                                    '@babel/plugin-syntax-dynamic-import'
-                                ]
-                            }
+                            options: babelOptions,
                         }, {
                             loader: 'eslint-loader'
                         }
@@ -168,10 +179,11 @@ module.exports = function (env, argv) {
         devServer: {
             contentBase: path.join(__dirname, 'src'),
             port: 2576,
-            stats: 'minimal',
+            stats: prod ? 'minimal' : undefined,
             historyApiFallback: true,
             before (app, server) {
                 app.use('/assets', express.static('assets'));
+                app.use('/apple-touch-icon.png', express.static('assets/apple-touch-icon.png'));
             }
         },
         node: {
@@ -180,51 +192,40 @@ module.exports = function (env, argv) {
     };
 };
 
-// kinda hacky service worker impl
-class SWCacheGenPlugin {
+// replaces magic strings in source files
+class AksoMagicStringReplacer {
     apply (compiler) {
-        compiler.hooks.emit.tapPromise('SWCacheGenPlugin', async compilation => {
-            let foundSW = false;
-            let foundEntry = false;
-
-            // make a list of all assets (except the service worker)
-            const assets = [];
-            let serviceWorkerName = null;
+        compiler.hooks.emit.tapPromise('AksoMagicStringReplacer', async compilation => {
             for (const name in compilation.assets) {
-                if (name.startsWith('service-worker') && name.endsWith('.js')) {
-                    serviceWorkerName = name;
-                } else assets.push(name);
-            }
+                const asset = compilation.assets[name];
+                const source = asset.source();
+                asset.source = function () {
+                    const re = /'@!AKSO-MAGIC:(chunk|assets|dev)(?:\:(.+))?'/;
 
-            // replace magic strings in source files
-            for (const name in compilation.assets) {
-                if (name.startsWith('service-worker.') && name.endsWith('.js')) {
-                    foundSW = true;
-                    const asset = compilation.assets[name];
-                    const source = asset.source();
-                    asset.source = function () {
-                        return source.replace(
-                            '"**list of assets goes here (see webpack config)**"',
-                            JSON.stringify(JSON.stringify(assets))
-                        ).replace(
-                            '**true if dev mode (see webpack config)**',
-                            JSON.stringify(compiler.options.mode === 'development')
-                        )
-                    };
-                } else if (name.startsWith('entry.') && name.endsWith('.js')) {
-                    foundEntry = true;
-                    const asset = compilation.assets[name];
-                    const source = asset.source();
-                    asset.source = function () {
-                        return source.replace(
-                            '**service worker file name (see webpack config)**',
-                            serviceWorkerName
-                        );
-                    };
-                }
-            }
-            if (!foundSW || !foundEntry) {
-                throw new Error('Could not find service worker file and entry file');
+                    return source.replace(
+                        new RegExp(re, 'g'),
+                        m => {
+                            const a = m.match(re);
+                            const cmd = a[1];
+                            if (cmd === 'chunk') {
+                                for (const name in compilation.assets) {
+                                    if (name.startsWith(a[2])) {
+                                        return JSON.stringify(name);
+                                    }
+                                }
+                            } else if (cmd === 'assets') {
+                                const assets = [];
+                                for (const n in compilation.assets) {
+                                    if (n === name) continue;
+                                    assets.push(n);
+                                }
+                                return JSON.stringify(assets);
+                            } else if (cmd === 'dev') {
+                                return JSON.stringify(compiler.options.mode === 'development');
+                            }
+                        },
+                    );
+                };
             }
         });
     }

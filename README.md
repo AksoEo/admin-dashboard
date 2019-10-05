@@ -15,7 +15,7 @@ Pass an environment variable named `AKSO_HOST` to override the API host (default
 - All files in `assets` should be served at `/assets`
 - Additional files to be served at `/`:
     + `src/manifest.json`
-    + `src/apple-touch-icon.png`
+    + `assets/apple-touch-icon.png`
 - All unrecognized URLs should fall back to `dist/index.html`
 
 Also see `test-server.js` for reference (or for testing).

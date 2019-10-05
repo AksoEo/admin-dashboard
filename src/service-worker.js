@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
 
 const SERVICE_WORKER_DEV = false;
-const DEV = !SERVICE_WORKER_DEV && JSON.parse('**true if dev mode (see webpack config)**');
-/* eslint-disable quotes */
-const ASSETS = JSON.parse("**list of assets goes here (see webpack config)**")
+const DEV = !SERVICE_WORKER_DEV && '@!AKSO-MAGIC:dev';
+const ASSETS = '@!AKSO-MAGIC:assets'
     .map(asset => `/${asset}`)
     .filter(asset => !asset.endsWith('.map'))
     .concat([
@@ -17,7 +16,6 @@ const ASSETS = JSON.parse("**list of assets goes here (see webpack config)**")
         '/assets/roboto/Roboto-Regular.woff2',
         '/assets/roboto/Roboto-Bold.woff2',
     ]);
-/* eslint-enable quotes */
 const VERSION = require('../package.json').version;
 const CACHE_NAME = `akso-${VERSION}`;
 

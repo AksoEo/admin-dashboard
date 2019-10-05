@@ -1,4 +1,4 @@
-let filePickerInput = document.createElement('input');
+const filePickerInput = document.createElement('input');
 filePickerInput.type = 'file';
 filePickerInput.id = 'global-invisible-file-picker-input';
 Object.assign(filePickerInput.style, {

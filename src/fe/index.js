@@ -1,12 +1,11 @@
 import { h, render, Component } from 'preact';
+import { Fragment } from 'preact/compat';
 import { CircularProgress } from 'yamdl';
 import isSpecialPage from './features/login/is-special-page';
-import client from './client';
+import { Task, DataView, Worker } from './core';
 import './style';
 
 import './chrome-focus';
-
-/* eslint-disable react/prop-types */
 
 class Session extends Component {
     state = {
@@ -91,12 +90,12 @@ class Session extends Component {
         }
 
         return (
-            <span>
+            <Fragment>
                 <LoadingIndicator loading={!login && !app && !extra} />
                 {app}
                 {login}
                 {extra}
-            </span>
+            </Fragment>
         );
     }
 }
@@ -146,7 +145,7 @@ document.body.appendChild(sessionRoot);
 render(<Session />, sessionRoot);
 
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/**service worker file name (see webpack config)**');
+    navigator.serviceWorker.register('/' + '@!AKSO-MAGIC:chunk:service-worker');
 }
 
 // don’t show “add to homescreen” prompt
