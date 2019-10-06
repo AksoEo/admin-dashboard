@@ -56,7 +56,7 @@ export const createStoreObserver = path => class StoreObserverDataView extends A
         super();
         this.path = path;
         store.subscribe(this.path, this.#onUpdate);
-        this.emit('update', store.get(this.path));
+        setImmediate(() => this.emit('update', store.get(this.path)));
     }
 
     #onUpdate = () => {

@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 
 const SERVICE_WORKER_DEV = false;
-const DEV = !SERVICE_WORKER_DEV && '@!AKSO-MAGIC:dev';
-const ASSETS = '@!AKSO-MAGIC:assets'
+const DEV = !SERVICE_WORKER_DEV && '@!AKSO-MAGIC:dev' === 'true';
+const ASSETS = JSON.parse('@!AKSO-MAGIC:assets')
     .map(asset => `/${asset}`)
     .filter(asset => !asset.endsWith('.map'))
     .concat([

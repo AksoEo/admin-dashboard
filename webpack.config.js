@@ -9,6 +9,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const express = require('express');
 const webpack = require('webpack');
+const pkg = require('./package.json');
 
 const browserTargets = {
     edge: '18',
@@ -34,7 +35,7 @@ module.exports = function (env, argv) {
                 {
                     targets: browserTargets,
                     useBuiltIns: 'usage',
-                    corejs: '3.1.4',
+                    corejs: pkg.dependencies['core-js'],
                 }
             ],
             [
@@ -65,12 +66,6 @@ module.exports = function (env, argv) {
         resolve: {
             extensions: ['.js', '.ts', '.json', '.less'],
             alias: {
-                'yamdl': '@cpsdqs/yamdl',
-
-                // use source files from akso-client directly to avoid a bunch of issues
-                // (such as source-map-support being loaded)
-                'akso-client': 'akso-client/src',
-
                 // this is because cross-fetch insists on using a polyfill even though we don’t need
                 // it according to caniuse
                 'cross-fetch': path.resolve(__dirname, 'src/fetch.js'),
@@ -108,10 +103,6 @@ module.exports = function (env, argv) {
             }),
             analyze && new BundleAnalyzerPlugin(),
             new AksoMagicStringReplacer(),
-            new webpack.IgnorePlugin({
-                // required by akso-client but not used
-                resourceRegExp: /fetch-cookie/,
-            }),
             // stop moment from loading all the locales
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         ].filter(x => x),
@@ -188,9 +179,6 @@ module.exports = function (env, argv) {
                 app.use('/apple-touch-icon.png', express.static('assets/apple-touch-icon.png'));
             }
         },
-        node: {
-            net: 'empty', // fix Can't resolve 'net' error
-        }
     };
 };
 
@@ -202,7 +190,8 @@ class AksoMagicStringReplacer {
                 const asset = compilation.assets[name];
                 const source = asset.source();
                 asset.source = function () {
-                    const re = /'@!AKSO-MAGIC:(chunk|assets|dev)(?:\:(.+))?'/;
+                    const re = /@!AKSO-MAGIC:(chunk|assets|dev)(?:\:(.+?))?(['"`])/;
+                    const stringEscape = s => s.replace(/["'`\n\r\t]/g, m => `\\${m}`);
 
                     return source.replace(
                         new RegExp(re, 'g'),
@@ -212,7 +201,7 @@ class AksoMagicStringReplacer {
                             if (cmd === 'chunk') {
                                 for (const name in compilation.assets) {
                                     if (name.startsWith(a[2])) {
-                                        return JSON.stringify(name);
+                                        return stringEscape(name) + a[3];
                                     }
                                 }
                             } else if (cmd === 'assets') {
@@ -221,9 +210,9 @@ class AksoMagicStringReplacer {
                                     if (n === name) continue;
                                     assets.push(n);
                                 }
-                                return JSON.stringify(assets);
+                                return stringEscape(JSON.stringify(assets)) + a[3];
                             } else if (cmd === 'dev') {
-                                return JSON.stringify(compiler.options.mode === 'development');
+                                return (compiler.options.mode === 'development').toString() + a[3];
                             }
                         },
                     );

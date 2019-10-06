@@ -1,5 +1,5 @@
 export const Mode = {
-    NORMAL: 0, // must be falsy for isSpecialPage
+    NORMAL: 0,
     CREATING_PASSWORD: 1,
     RESETTING_PASSWORD: 2,
 };

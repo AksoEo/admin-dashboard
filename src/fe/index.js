@@ -1,8 +1,9 @@
 import { h, render, Component } from 'preact';
 import { Fragment } from 'preact/compat';
-import { CircularProgress } from 'yamdl';
+import { CircularProgress } from '@cpsdqs/yamdl';
 import isSpecialPage from './features/login/is-special-page';
-import { Task, DataView, Worker } from './core';
+import { Worker } from './core';
+import { coreContext } from './core/connection';
 import './style';
 
 import './chrome-focus';
@@ -15,6 +16,7 @@ class Session extends Component {
         showLogin: false,
         loggedIn: false,
         limbo: false,
+        specialPage: false,
     };
 
     loadLogin () {
@@ -27,13 +29,23 @@ class Session extends Component {
 
     loadApp () {
         if (!this.appPromise) {
-            this.appPromise =
-                import(/* webpackChunkName: "app", webpackPrefetch: true */ './app');
-            this.appPromise.then(e => this.setState({ app: e.default }));
+            // TODO
+            /*this.appPromise =
+                import(/* webpackChunkName: "app", webpackPrefetch: true / './app');*/
+            // this.appPromise.then(e => this.setState({ app: e.default }));
         }
     }
 
     componentDidMount () {
+        this.core = new Worker();
+        this.loginView = this.core.createDataView('login');
+        this.loginView.on('update', this.#onLoginUpdate);
+
+        if (isSpecialPage()) {
+            this.setState({ specialPage: true });
+        }
+        this.loadApp();
+        /*
         client.restoreSession().catch(err => {
             // TODO: handle error properly
             console.error('failed to restore session', err); // eslint-disable-line no-console
@@ -45,8 +57,16 @@ class Session extends Component {
             } else this.setState({ loggedIn: true });
 
             this.loadApp();
-        });
+        });*/
     }
+
+    #onLoginUpdate = data => {
+        this.setState({ loggedIn: data.loggedIn && !data.totpRequired });
+        if (!data.loggedIn || data.totpRequired) {
+            this.setState({ showLogin: true });
+            this.loadLogin();
+        }
+    };
 
     onLogin = (transition) => {
         this.setState({ loggedIn: true, transition });
@@ -55,23 +75,20 @@ class Session extends Component {
     onLogout = () => {
         this.setState({ loggedIn: false, showLogin: true, limbo: true, transition: null });
         this.loadLogin();
-        client.logOut().then(() => this.setState({ limbo: false })).catch(err => {
+        /*client.logOut().then(() => this.setState({ limbo: false })).catch(err => {
             console.error('failed to log out', err); // eslint-disable-line no-console
             this.setState({ loggedIn: true, limbo: false });
-        });
+        });*/
     };
 
     render () {
-        const { loggedIn, showLogin, login: Login, app: App, transition, limbo } = this.state;
+        const { loggedIn, showLogin, specialPage, login: Login, app: App, transition, limbo } = this.state;
 
         let login = null;
         let app = null;
         if (!limbo) {
-            if (Login && showLogin) {
-                login = <Login
-                    onLogin={this.onLogin}
-                    authCheck={this.state.authCheck}
-                    onEnd={() => this.setState({ showLogin: false })} />;
+            if (Login && (showLogin || specialPage)) {
+                login = <Login />;
             }
             if (loggedIn && App) {
                 app = <App
@@ -90,12 +107,14 @@ class Session extends Component {
         }
 
         return (
-            <Fragment>
-                <LoadingIndicator loading={!login && !app && !extra} />
-                {app}
-                {login}
-                {extra}
-            </Fragment>
+            <coreContext.Provider value={this.core}>
+                <Fragment>
+                    <LoadingIndicator loading={!login && !app && !extra} />
+                    {app}
+                    {login}
+                    {extra}
+                </Fragment>
+            </coreContext.Provider>
         );
     }
 }

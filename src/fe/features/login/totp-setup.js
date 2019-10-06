@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
-import { CircularProgress } from 'yamdl';
-import { generateTotp } from 'akso-client/totp-utils';
-import locale from '../../locale';
+import { CircularProgress } from '@cpsdqs/yamdl';
+import { generateTotp } from '@tejo/akso-client';
+import { login as locale } from '../../locale';
 
 export default class TotpSetup extends Component {
     state = {
@@ -35,7 +35,17 @@ export default class TotpSetup extends Component {
         return (
             <div class="totp-setup">
                 <p>
-                    {locale.login.totpSetupDescription}
+                    {locale.totpSetupDescription}
+                </p>
+                <p>
+                    {locale.totpAppDescriptionPre}
+                    <a
+                        href={locale.totpAppHref}
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {locale.totpAppName}
+                    </a>
+                    {locale.totpAppDescriptionPost}
                 </p>
                 <div class="totp-setup-qr-container">
                     <img

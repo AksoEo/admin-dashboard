@@ -1,27 +1,18 @@
 import { h, Component } from 'preact';
-import PropTypes from 'prop-types';
-import { Spring, lerp } from '../../animation';
+import { Spring } from '@cpsdqs/yamdl';
+import { lerp } from '@cpsdqs/yamdl/src/animation'; // FIXME: remove this
 
+/// Returns the height above which pages should be allowed to scroll vertically.
 const OVERFLOW_HEIGHT = () => window.innerHeight - 120;
 
-/**
- * Container for multiple pages of varying height and fixed width.
- * Assumes fixed child count and mostly fixed child heights.
- *
- * Positive page indices will behave as expected and will be laid out in a linear fashion.
- * Negative page indices are meant for help pages and will always be positioned before page 0.
- */
+/// Container for multiple pages of varying height and fixed width.
+/// Assumes fixed child count and mostly fixed child heights.
+///
+/// # Props
+/// - selected: number
+/// - children: array of vnodes
+/// - onPageChange: callback for when the animation finishes
 export default class AutosizingPageView extends Component {
-    static propTypes = {
-        /** Currently selected page. */
-        selected: PropTypes.number.isRequired,
-        /** Smallest page index; determines mapping between child indices and page indices. */
-        minIndex: PropTypes.number.isRequired,
-        children: PropTypes.arrayOf(PropTypes.any).isRequired,
-        /** Called when the current page changes; shortly before the animation finishes. */
-        onPageChange: PropTypes.func,
-    };
-
     state = {
         x: 0,
         height: 0,
@@ -50,6 +41,8 @@ export default class AutosizingPageView extends Component {
     }
 
     componentDidMount () {
+        this.xSpring.target = this.props.selected;
+        this.xSpring.start();
         this.updatePageHeights();
         this.heightSpring.value = this.currentHeight();
         this.forceUpdate();
@@ -75,7 +68,7 @@ export default class AutosizingPageView extends Component {
     }
 
     componentDidUpdate (prevProps) {
-        if (prevProps.selected != this.props.selected) {
+        if (prevProps.selected !== this.props.selected) {
             this.xSpring.target = this.props.selected;
             this.xSpring.start();
             this.updatePageHeights();
@@ -102,12 +95,9 @@ export default class AutosizingPageView extends Component {
      * when animating.
      */
     currentHeight () {
-        const nonEuclidean = this.props.selected < 0 || this.prevSelected < 0;
-        const a = nonEuclidean ? this.props.selected : Math.floor(this.state.x);
-        const b = nonEuclidean ? this.prevSelected : Math.ceil(this.state.x);
-        const t = nonEuclidean
-            ? 1 - (this.state.x - this.prevSelected) / (this.props.selected - this.prevSelected)
-            : this.state.x - a;
+        const a = Math.floor(this.state.x);
+        const b = Math.ceil(this.state.x);
+        const t = this.state.x - a;
         if (this.items[a] && this.items[b]) {
             return Math.round(lerp(this.items[a].height, this.items[b].height, t));
         }
@@ -116,20 +106,15 @@ export default class AutosizingPageView extends Component {
 
     /** Returns a style object for a page with the given index. */
     pageStyle (index) {
-        const offset = index < 0
-            ? -1 + this.state.x / this.props.selected
-            : index - this.state.x;
+        const offset = index - this.state.x;
         if (Math.abs(offset) >= 1) return { visibility: 'hidden' };
-        const visibility = index < 0
-            ? (this.props.selected === index ? '' : 'hidden')
-            : '';
-        return { transform: `translateX(${offset * 100}%)`, visibility };
+        return { transform: `translateX(${offset * 100}%)` };
     }
 
     render () {
         const children = [];
 
-        let index = this.props.minIndex;
+        let index = 0;
         for (const child of this.props.children) {
             const i = index++;
             const prevItem = this.items[i];

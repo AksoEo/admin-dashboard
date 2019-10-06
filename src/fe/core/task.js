@@ -14,6 +14,12 @@ export const TaskState = {
 /// either succeed or fail. If it fails, it goes back to being idle.
 ///
 /// This object **must be dropped manually** because it subscribes to an object in another thread.
+///
+/// # Events
+/// - `success`: emitted on success with the result
+/// - `failure`: emitted on failure with the error
+/// - `result`: emitted when there is a result with the type ('success'/'failure') and the
+///   result/error
 export default class Task extends EventEmitter {
     constructor (worker, type, options, parameters = {}) {
         super();
@@ -33,20 +39,41 @@ export default class Task extends EventEmitter {
     }
 
     run () {
-        if (this.state !== TaskState.IDLE) return;
+        if (this.state !== TaskState.IDLE) throw new Error('task is already running or has ended');
         this.state = TaskState.RUNNING;
         this.worker.updateTask(this, this.parameters);
         this.worker.runTask(this);
+
+        return this;
+    }
+
+    /// Returns a promise with the result after running this task once.
+    runOnce () {
+        return new Promise((resolve, reject) => {
+            this.once('result', (type, res) => {
+                if (type === 'failure') reject(res);
+                else resolve(res);
+            });
+            this.run();
+        });
+    }
+
+    runOnceAndDrop () {
+        this.once('result', () => !this.isDropped && this.drop());
+        return this.runOnce();
     }
 
     onError ({ code, message }) {
         this.state = TaskState.IDLE;
-        this.emit('error', { code, message, valueOf: () => `Error (${code}): ${message}` });
+        const error = { code, message, valueOf: () => `Error (${code}): ${message}` };
+        this.emit('failure', error);
+        this.emit('result', 'failure', error);
     }
 
     onSuccess (result) {
         this.state = TaskState.ENDED;
         this.emit('success', result);
+        this.emit('result', 'success', result);
     }
 
     drop () {

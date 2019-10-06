@@ -12,7 +12,6 @@ const dataStore = {};
 const subscribers = new Map();
 
 const toSubscriberKey = path => path.join('~');
-const fromSubscriberKey = key => key.split('~');
 
 /// Because multiple objects in the data store are often modified at the same time, updates are
 /// batched to avoid unnecessary IPC.

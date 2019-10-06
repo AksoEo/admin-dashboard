@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { createContext } from 'preact/compat';
 import PropTypes from 'prop-types';
-import { Spring } from '../../animation';
+import { Spring } from '@cpsdqs/yamdl';
 import './style';
 
 /**

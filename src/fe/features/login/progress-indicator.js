@@ -1,19 +1,16 @@
 import { h, Component } from 'preact';
-import PropTypes from 'prop-types';
-import { Spring, lerp } from '../../animation';
+import { Spring } from '@cpsdqs/yamdl';
+import { lerp } from '@cpsdqs/yamdl/src/animation'; // FIXME: remove this
 
-/**
- * Login progress indicator.
- * Assumes that the children will never change.
- * If `selected` is `-2`, will render `helpLabel`.
- */
+/// Login progress indicator.
+/// Assumes that the children will never change.
+/// If `selected` is `-2`, will render `helpLabel`.
+///
+/// # Props
+/// - selected: number
+/// - children: list of vnodes
+/// - helpLabel: vnode
 export default class ProgressIndicator extends Component {
-    static propTypes = {
-        selected: PropTypes.number.isRequired,
-        children: PropTypes.arrayOf(PropTypes.any).isRequired,
-        helpLabel: PropTypes.any.isRequired,
-    };
-
     state = { offset: 0, currentNodeWidth: 0 };
     spring = new Spring(1, 0.5);
     nodes = [];
@@ -43,12 +40,15 @@ export default class ProgressIndicator extends Component {
     }
 
     componentDidMount () {
+        this.spring.target = this.props.selected;
+        this.spring.start();
+
         this.updateNodeWidths();
         this.updateCurrentNodeWidth();
     }
 
     componentDidUpdate (prevProps) {
-        if (prevProps.selected != this.props.selected) {
+        if (prevProps.selected !== this.props.selected) {
             this.spring.target = this.props.selected;
             this.spring.start();
         }
@@ -60,7 +60,7 @@ export default class ProgressIndicator extends Component {
         this.spring.stop();
     }
 
-    /** Returns styles for an item at the given index. */
+    /// Returns styles for an item at the given index.
     itemStyle (index) {
         const offset = index - this.state.offset;
         const nodeWidth = this.nodes[index] ? this.nodes[index].width : 0;
@@ -89,12 +89,6 @@ export default class ProgressIndicator extends Component {
                 </div>
             );
         }
-
-        items.push(
-            <div key={-2} class="login-progress-item" style={this.itemStyle(-2)}>
-                {this.props.helpLabel}
-            </div>
-        );
 
         return (
             <div class="login-progress">

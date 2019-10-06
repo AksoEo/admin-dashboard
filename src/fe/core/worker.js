@@ -1,5 +1,7 @@
 import EventEmitter from 'events';
 import Worker from 'worker-loader!../../core';
+import DataView from './view';
+import Task from './task';
 
 export default class WorkerInterface extends EventEmitter {
     tasks = new Map();
@@ -15,6 +17,14 @@ export default class WorkerInterface extends EventEmitter {
     /// Terminates the worker.
     drop () {
         this.worker.terminate();
+    }
+
+    createDataView (...args) {
+        return new DataView(this, ...args);
+    }
+
+    createTask (...args) {
+        return new Task(this, ...args);
     }
 
     registerDataView (view) {

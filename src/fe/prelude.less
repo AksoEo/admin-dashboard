@@ -1,6 +1,9 @@
 @import '../../node_modules/@cpsdqs/yamdl/src/prelude';
 
-:root {
+:root, html, body {
+    // this selector also targets html and body because FOR SOME REASON yamdl’s default styles are
+    // *appended* to this stylesheet, meaning they get higher priority
+
     @primary--internal: #004c3f;
     @secondary--internal: #31a64f;
     @danger--internal: #f44336;

@@ -1,7 +1,10 @@
 //! Data store paths for login stuff. This is here because these are used in multiple places.
 
 export const LOGIN = 'login';
-export const LOGGED_IN = [LOGIN, 'logged-in'];
-export const IS_ADMIN = [LOGIN, 'is-admin'];
-export const TOTP_REQUIRED = [LOGIN, 'totp-required'];
-export const TOTP_SETUP_REQUIRED = [LOGIN, 'totp-setup-required'];
+export const AUTH_STATE = [LOGIN, 'authState'];
+export const IS_ADMIN = [LOGIN, 'isAdmin'];
+export const TOTP_REQUIRED = [LOGIN, 'totpRequired'];
+export const TOTP_SETUP_REQUIRED = [LOGIN, 'totpSetupRequired'];
+export const PASSWORD_SETUP_REQUIRED = [LOGIN, 'passwordSetupRequired'];
+export const UEA_CODE = [LOGIN, 'ueaCode'];
+export const LOGIN_ID = [LOGIN, 'id'];

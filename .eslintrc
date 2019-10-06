@@ -100,7 +100,10 @@
         "react/no-unknown-property": ["error", {
             "ignore": ["class", "for"]
         }],
+        // preact doesn’t care
         "react/prop-types": "off",
+        // preact doesn’t care
+        "react/display-name": "off",
     },
     "settings": {
         "react": {

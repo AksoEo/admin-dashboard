@@ -1,42 +1,55 @@
 import config from '../config.val';
 import * as store from './store';
-import { LOGGED_IN, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED } from './paths/login-keys';
+import { AUTH_STATE, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED, UEA_CODE, LOGIN_ID } from './paths/login-keys';
+import { LoginAuthStates } from '../protocol';
 
 /// runs GET /auth
-const getAuth = () => {
+const getAuth = async () => {
     // this does not use akso-client so we can run this while akso-client is still loading
-    return fetch(config.host + '/auth', {
-        credentials: 'include',
-        headers: {
-            'Accept': 'application/json',
-        },
-    }).then(res => {
-        if (res.ok) {
-            return res.json();
-        } else if (res.status === 404) {
-            return false;
-        } else {
-            throw new Error('unexpected response from /auth');
+    while (true) { // eslint-disable-line no-constant-condition
+        try {
+            console.debug('[core] getting auth');
+            const res = await fetch(config.host + '/auth', {
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+            console.debug('[core] got auth');
+            if (res.ok) {
+                return res.json();
+            } else if (res.status === 404) {
+                return false;
+            } else {
+                throw new Error('unexpected response from /auth');
+            }
+        } catch (err) {
+            console.error('[core] failed to get auth', err);
         }
-    });
+    }
 };
 
-/// Initial GET /auth result (may be an error!)
+/// Initial GET /auth result
 export const initialAuth = getAuth();
 
-store.insert(LOGGED_IN, null); // we don’t know the login state yet
+store.insert(AUTH_STATE, LoginAuthStates.UNKNOWN);
 initialAuth.then(auth => {
     if (auth) {
-        store.insert(LOGGED_IN, true);
+        const totpRequired = (auth.isAdmin || auth.totpSetUp);
+        store.insert(AUTH_STATE, (totpRequired && !auth.totpUsed)
+            ? LoginAuthStates.AUTHENTICATED
+            : LoginAuthStates.LOGGED_IN);
         store.insert(IS_ADMIN, auth.isAdmin);
-        store.insert(TOTP_REQUIRED, (auth.isAdmin || auth.totpSetUp) && !auth.totpUsed);
+        store.insert(TOTP_REQUIRED, totpRequired && !auth.totpUsed);
         store.insert(TOTP_SETUP_REQUIRED, auth.isAdmin && !auth.totpSetUp);
+        store.insert(UEA_CODE, auth.newCode);
+        store.insert(LOGIN_ID, auth.id);
     } else {
-        store.insert(LOGGED_IN, false);
+        store.insert(AUTH_STATE, LoginAuthStates.LOGGED_OUT);
     }
 });
 
-const lazyUserClient = import('akso-client/src/user-client').then(res => res.default);
+const lazyUserClient = import(/* webpackChunkName: 'akso-client' */ './user-client').then(res => res.default);
 export default lazyUserClient.then(UserClient => {
     const client = new UserClient({ host: config.host });
     return initialAuth.then(auth => {

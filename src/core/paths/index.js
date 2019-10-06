@@ -9,7 +9,7 @@ const lazyPath = (f, map) => {
         if (!promise) {
             promise = f().then(map).catch(err => {
                 promise = null;
-                throw { type: 'chunk-load-failed', message: 'failed to load chunk' };
+                throw { type: 'chunk-load-failed', message: 'failed to load chunk: ' + err.toString() };
             });
         }
         return promise;
@@ -20,8 +20,8 @@ const lazyPath = (f, map) => {
 const mapTasks = res => res.tasks;
 const mapViews = res => res.views;
 
-const codeholders = () => import('./codeholders');
-const login = () => import('./login');
+const codeholders = () => import(/* webpackChunkName: 'core-codeholders' */ './codeholders');
+const login = () => import(/* webpackChunkName: 'core-login' */ './login');
 
 /// Task definitions.
 export const tasks = {
