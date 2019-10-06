@@ -3,14 +3,12 @@ var chromiumVersion = navigator.userAgent.match(/(Chromium|Chrome)\/(\d+)\.(\d+)
 var firefoxVersion = navigator.userAgent.match(/(Firefox)\/(\d+)\.(\d+)/);
 var safariVersion = navigator.userAgent.match(/(Version)\/(\d+)\.(\d+)(?:\.(\d+))?.*Safari\//);
 
-// TODO: get mia to localize strings
-
 var firefoxLink = '<a href="https://www.mozilla.org/eo/firefox/">Mozilla Firefox</a>';
 var googleLink = '<a href="https://www.google.com/chrome/">Google Chrome</a>';
 
 var isSupported = false;
 var updateLink = '';
-var browserName = '[[unknown browser]]';
+var browserName = 'Nekonata retumilo';
 var extraMessage = '';
 
 if (msEdgeVersion) {
@@ -36,7 +34,7 @@ if (
     || !window.WeakSet // we compile to ES6
 ) {
     isSupported = false;
-    extraMessage = '[[it does not appear to support apis we use]]';
+    extraMessage = 'Via retumilo ne subtenas ĉiujn la funkciojn, kiujn AKSO bezonas.';
 }
 
 if (!isSupported) {
@@ -51,10 +49,10 @@ if (!isSupported) {
     c.style.boxSizing = 'border-box';
     c.innerHTML = '<img src="/assets/logo.svg" /><img src="/assets/logo-label.svg" />';
     c.innerHTML += '<h1>Via retumilo ne estas subtenata</h1>';
-    c.innerHTML += '<p>[[you appear to be using:]] ' + browserName + '</p>';
+    c.innerHTML += '<p>Ŝajnas, ke vi uzas: ' + browserName + '</p>';
     if (extraMessage) c.innerHTML += '<p>' + extraMessage + '</p>';
     if (updateLink) {
-        c.innerHTML += '<p>[[please update your browser to a newer version or download it from here:]] ' + updateLink + '</p>';
+        c.innerHTML += '<p>Bonvolu ĝisdatigi vian retumilon al pli nova versio aŭ elŝuti de tie ĉi: ' + updateLink + '</p>';
     } else {
         c.innerHTML += '<p>Bonvolu ĝisdatigi al pli nova retumilo kiel ekz. <a href="https://www.mozilla.org/eo/firefox/">Mozilla Firefox</a> aŭ <a href="https://www.google.com/chrome/">Google Chrome</a>.</p>';
     }
