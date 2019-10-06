@@ -525,7 +525,7 @@ export default {
             cursedNotice: '[[there are items with a golden shine in the search results. they won’t show up in the generated data]]',
             generate: 'Krei etikedojn',
             success: 'Komencis generadon de viaj etikedoj. Vi ricevos sciigon/retmesaĝon kun alkroĉaĵo laŭeble baldaŭ.',
-            extraDesc: '[[a short text explaining that the results will be emailed/telegramed according to preferences]]',
+            extraDesc: '[[REMOVE THIS THANKS]]',
             genericError: '[[failed to send request]]',
             alreadySubmitted: '[[you already submitted a request, please wait for it to finish]]',
             closeDialog: 'Fermi',
