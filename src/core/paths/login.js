@@ -1,6 +1,6 @@
 import asyncClient from '../client';
 import * as store from '../store';
-import { LOGIN, AUTH_STATE, PASSWORD_SETUP_REQUIRED, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED, UEA_CODE, LOGIN_ID } from './login-keys';
+import { LOGIN, AUTH_STATE, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED, UEA_CODE, LOGIN_ID } from './login-keys';
 import { LoginAuthStates } from '../../protocol';
 import { createStoreObserver } from '../view';
 
@@ -17,7 +17,7 @@ export const tasks = {
             result = await client.logIn(login, password);
         } catch (err) {
             if (err.statusCode === 409) {
-                store.insert(PASSWORD_SETUP_REQUIRED, true);
+                throw { code: 'needs-password-setup', message: err.toString() };
             }
 
             store.insert(AUTH_STATE, LoginAuthStates.LOGGED_OUT);
@@ -87,19 +87,50 @@ export const tasks = {
             // this should not succeed under any circumstances
             throw { code: 'confused', message: 'login with empty-string password succeeded (???)' };
         } catch (err) {
-            if (err.statusCode === 409) {
-                // there is no password
-                store.insert(PASSWORD_SETUP_REQUIRED, true);
-                return false;
-            } else if (err.statusCode === 401) {
-                // they have a password
-                store.insert(PASSWORD_SETUP_REQUIRED, false);
-                return true;
-            } else {
-                throw err;
-            }
+            if (err.statusCode === 409) return false;
+            else if (err.statusCode === 401)  return true;
+            else throw { code: err.statusCode, message: err.toString() };
         }
     },
+    /// login/createPassword: creates a password
+    createPassword: async ({ login, token }, { password }) => {
+        const client = await asyncClient;
+
+        store.insert(AUTH_STATE, LoginAuthStates.AUTHENTICATING);
+
+        try {
+            // FIXME: add this to user-client.js instead of using private APIs here
+            await client.req({
+                method: 'POST',
+                path: `/codeholders/${login}/!create_password_use`,
+                body: {
+                    key: token,
+                    password,
+                },
+            });
+            await tasks.login({}, { login, password });
+        } catch (err) {
+            store.insert(AUTH_STATE, LoginAuthStates.LOGGED_OUT);
+            throw { code: err.statusCode, message: err.toString() };
+        }
+    },
+    /// login/initCreatePassword: sends password reset email
+    ///
+    /// Set create to true if the codeholder doesn’t have a password yet.
+    initCreatePassword: async ({ create = false }, { login }) => {
+        const client = await asyncClient;
+
+        try {
+            // FIXME: add this to user-client.js instead of using private APIs here
+            await client.req({
+                method: 'POST',
+                path: `/codeholders/${login}/!${create ? 'create' : 'forgot'}_password`,
+                _allowsLoggedOut: true,
+            });
+        } catch (err) {
+            throw { code: err.statusCode, message: err.toString() };
+        }
+    }
 };
 
 /// login: observes the entire login data store (it’s constant-sized that so this is fine)

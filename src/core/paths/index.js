@@ -1,3 +1,5 @@
+import { createStoreObserver } from '../view';
+
 /// Turns a path lazy by making it a function that returns a promise with the actual object when
 /// called.
 ///
@@ -32,4 +34,12 @@ export const tasks = {
 /// View definitions.
 export const views = {
     login: lazyPath(login, mapViews),
+
+    '#tasks': createStoreObserver(['#tasks'], tasks => {
+        const data = {};
+        for (const id in tasks) {
+            data[id] = tasks[id].path;
+        }
+        return data;
+    }),
 };

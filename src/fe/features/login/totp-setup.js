@@ -40,7 +40,7 @@ export default class TotpSetup extends Component {
                 <p>
                     {locale.totpAppDescriptionPre}
                     <a
-                        href={locale.totpAppHref}
+                        href={locale.totpAppHref(navigator.userAgent)}
                         target="_blank"
                         rel="noopener noreferrer">
                         {locale.totpAppName}

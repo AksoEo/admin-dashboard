@@ -1,4 +1,4 @@
-import { insert, get, TASKS, VIEWS } from './store';
+import { insert, get, remove, TASKS, VIEWS } from './store';
 import { tasks, views } from './paths';
 import Task from './task';
 import DataView from './view';
@@ -14,7 +14,7 @@ const messageHandlers = {
 
         console.debug(`[core] creating task ${id} with path ${taskPath}`);
 
-        const task = new Task(id, options, parameters);
+        const task = new Task(id, taskPath, options, parameters);
 
         const loadTask = async () => {
             const path = taskPath.split('/');
@@ -54,8 +54,11 @@ const messageHandlers = {
         }
     },
     'drop-task' ({ id }) {
-        const task = get([TASKS, id]);
-        if (task) task.drop();
+        const task = remove([TASKS, id]);
+        if (task) {
+            console.debug(`[core] dropping task ${id}`);
+            task.drop();
+        }
     },
     'create-data-view' ({ id, view: viewPath, options }) {
         if (get([VIEWS, id])) {
@@ -82,8 +85,11 @@ const messageHandlers = {
         insert([VIEWS, id], new DataView(id, loadView(), options));
     },
     'drop-data-view' ({ id }) {
-        const view = get([VIEWS, id]);
-        if (view) view.drop();
+        const view = remove([VIEWS, id]);
+        if (view) {
+            console.debug(`[core] dropping view ${id}`);
+            view.drop();
+        }
     },
 };
 

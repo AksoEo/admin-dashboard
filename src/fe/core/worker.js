@@ -19,6 +19,10 @@ export default class WorkerInterface extends EventEmitter {
         this.worker.terminate();
     }
 
+    getTask (id) {
+        return this.tasks.get(id);
+    }
+
     createDataView (...args) {
         return new DataView(this, ...args);
     }

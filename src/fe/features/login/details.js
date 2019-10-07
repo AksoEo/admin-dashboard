@@ -24,9 +24,20 @@ export default class DetailsPage extends Component {
     #passwordField;
 
     #nopwCheckTimeout;
-    #checkHasPassword = () => this.props.core.createTask('login/hasPassword', {}, {
-        login: this.props.login,
-    }).runOnceAndDrop().catch(() => {});
+    #checkHasPassword = () => {
+        if (!this.props.login) return;
+        this.props.core.createTask('login/hasPassword', {}, {
+            login: this.props.login,
+        }).runOnceAndDrop().then(hasPassword => {
+            if (!hasPassword) {
+                this.props.core.createTask('login/initCreatePassword', {
+                    create: true,
+                }, {
+                    login: this.props.login,
+                });
+            }
+        }).catch(() => {});
+    };
 
     #onSubmit = () => {
         this.props.core.createTask('login/login', {}, {
@@ -126,7 +137,9 @@ export default class DetailsPage extends Component {
                                 href="#"
                                 onClick={e => {
                                     e.preventDefault();
-                                    // TODO
+                                    this.props.core.createTask('login/initCreatePassword', {}, {
+                                        login: this.props.login,
+                                    });
                                 }}>
                                 {locale.forgotPassword}
                             </a>

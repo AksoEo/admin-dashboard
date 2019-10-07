@@ -6,8 +6,9 @@ export default class Task {
     error = null;
     isDropped = false;
 
-    constructor (id, options, parameters) {
+    constructor (id, path, options, parameters) {
         this.id = id;
+        this.path = path;
         this.options = options;
         this.pendingParameters = parameters;
     }

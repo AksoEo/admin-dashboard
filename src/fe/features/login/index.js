@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { LoginAuthStates } from '../../../protocol';
 import { connect } from '../../core/connection';
-import { login as locale } from '../../locale';
+import { login as locale, meta as localeMeta } from '../../locale';
 import ProgressIndicator from './progress-indicator';
 import AutosizingPageView from './autosizing-page-view';
 import DetailsPage from './details';
@@ -108,7 +108,9 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
                             onHeightChange={this.#onHeightChange}
                             totpSetupRequired={totpSetupRequired} />
                     </AutosizingPageView>
+                    <LoginMeta />
                 </div>
+                <LoginMeta />
             </div>
         );
     }
@@ -152,5 +154,23 @@ function LoginHeader ({ authenticated, core, mode, selectedPageIndex, showTotp }
                 </span>
             </ProgressIndicator>
         </header>
+    );
+}
+
+function LoginMeta () {
+    return (
+        <div class="login-meta">
+            {localeMeta.copyright} <a
+                href={localeMeta.copyrightHref}
+                target="_blank"
+                rel="noopener noreferrer">
+                {localeMeta.copyrightHolder}
+            </a>, {localeMeta.license} · <a
+                href={localeMeta.sourceHref}
+                target="_blank"
+                rel="noopener noreferrer">
+                {localeMeta.source}
+            </a>
+        </div>
     );
 }

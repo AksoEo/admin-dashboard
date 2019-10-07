@@ -123,7 +123,7 @@ export default class TotpPage extends Component {
                             class="progress-overlay"
                             indeterminate={isLoading}
                             small />
-                        <span>{locale.continue}</span>
+                        <span>{locale.continueTotp}</span>
                     </Button>
                 </footer>
             </Form>

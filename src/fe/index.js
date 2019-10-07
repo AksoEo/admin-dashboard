@@ -1,18 +1,50 @@
 import { h, render, Component } from 'preact';
-import { Fragment } from 'preact/compat';
+import { lazy, Suspense, Fragment } from 'preact/compat';
 import { CircularProgress } from '@cpsdqs/yamdl';
 import isSpecialPage from './features/login/is-special-page';
 import { Worker } from './core';
 import { coreContext } from './core/connection';
+import TaskView from './task-view';
 import './style';
 
 import './chrome-focus';
+
+// copy-pasted from core/paths; (is this a good idea?)
+const lazyPath = (f, map = (res => res.default)) => {
+    let promise;
+    function lazy () {
+        if (!promise) {
+            promise = f().then(map).catch(err => {
+                promise = null;
+                throw new Error('failed to load chunk: ' + err.toString());
+            });
+        }
+        return promise;
+    }
+    lazy.isLazy = true;
+    return lazy;
+};
+const taskViews = {
+    login: lazyPath(() => import(/* webpackChunkName: "login-tasks" */ './features/login/tasks')),
+};
+const loadTaskView = async (taskPath) => {
+    const path = taskPath.split('/');
+    let o = taskViews;
+    for (let i = 0; i < path.length; i++) {
+        const p = path[i];
+        if (!(p in o)) return null;
+        o = o[p];
+        if (o.isLazy) o = await o();
+        if (i === path.length - 1) {
+            return o || null;
+        }
+    }
+};
 
 class Session extends Component {
     state = {
         login: null,
         app: null,
-        transition: null,
         showLogin: false,
         loggedIn: false,
         limbo: false,
@@ -41,6 +73,9 @@ class Session extends Component {
         this.loginView = this.core.createDataView('login');
         this.loginView.on('update', this.#onLoginUpdate);
 
+        this.tasksView = this.core.createDataView('#tasks');
+        this.tasksView.on('update', this.#onTasksUpdate);
+
         if (isSpecialPage()) {
             this.setState({ specialPage: true });
         }
@@ -68,6 +103,43 @@ class Session extends Component {
         }
     };
 
+    #taskViews = new Map();
+    #tasks = new Set();
+    #onTasksUpdate = data => {
+        for (const id in data) {
+            if (!this.#tasks.has(id)) {
+                this.#onAddTask(id, data[id]);
+            }
+        }
+        for (const id of this.#tasks.keys()) {
+            if (!(id in data)) {
+                this.#onRemoveTask(id);
+            }
+        }
+        this.#cleanTasks();
+        this.forceUpdate();
+    };
+    #onAddTask = async (id, path) => {
+        this.#tasks.add(id);
+        const taskView = await loadTaskView(path);
+        if (taskView !== null) {
+            this.#taskViews.set(id, [taskView, 0]);
+            this.forceUpdate();
+        }
+    };
+    #onRemoveTask = (id) => {
+        this.#tasks.delete(id);
+        const view = this.#taskViews.get(id);
+        if (view) this.#taskViews.set(id, [view[0], Date.now()]);
+    };
+    #cleanTasks = () => {
+        const toBeRemoved = new Set();
+        for (const [id, [view, deathTime]] of this.#taskViews.entries()) {
+            if (deathTime && Date.now() - deathTime > 500) toBeRemoved.add(id);
+        }
+        for (const id of toBeRemoved) this.#taskViews.delete(id);
+    };
+
     onLogin = (transition) => {
         this.setState({ loggedIn: true, transition });
         this.loadApp();
@@ -82,7 +154,7 @@ class Session extends Component {
     };
 
     render () {
-        const { loggedIn, showLogin, specialPage, login: Login, app: App, transition, limbo } = this.state;
+        const { loggedIn, showLogin, specialPage, login: Login, app: App, limbo } = this.state;
 
         let login = null;
         let app = null;
@@ -91,28 +163,24 @@ class Session extends Component {
                 login = <Login />;
             }
             if (loggedIn && App) {
-                app = <App
-                    onDirectTransition={(...a) => this.transition && this.transition.direct(...a)}
-                    onLogout={this.onLogout} />;
+                app = <App />;
             }
         }
 
-        let extra = null;
-        if (transition) {
-            const { component: Transition, props } = transition;
-            extra = <Transition
-                ref={transition => this.transition = transition}
-                onEnd={() => this.setState({ transition: null })}
-                {...props} />;
+        const tasks = [];
+        for (const [id, [view, deathTime]] of this.#taskViews.entries()) {
+            tasks.push(
+                <TaskView id={id} core={this.core} view={view} isDead={!!deathTime} />
+            );
         }
 
         return (
             <coreContext.Provider value={this.core}>
                 <Fragment>
-                    <LoadingIndicator loading={!login && !app && !extra} />
+                    <LoadingIndicator loading={!login && !app} />
                     {app}
                     {login}
-                    {extra}
+                    {tasks}
                 </Fragment>
             </coreContext.Provider>
         );

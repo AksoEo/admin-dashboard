@@ -38,7 +38,7 @@ export const login = {
     totpSetupDescription: 'Bonvolu skani la QR-kodon per via aplikaĵo por agordi dua-faktoran ensaluton.',
     totpAppDescriptionPre: '[[if you do not have a 2fa app, we recommend]] ',
     totpAppName: 'Authy',
-    totpAppHref: 'https://authy.com/download/',
+    totpAppHref: userAgent => 'https://authy.com/download/',
     totpAppDescriptionPost: '.',
 
     totp: 'Sekurkodo',
@@ -46,6 +46,7 @@ export const login = {
     rememberTotp: 'Memori tiun ĉi aparaton dum 60 tagoj',
     rememberTotpDescription: 'Nur uzu tiun ĉi funkcion ĉe personaj komputiloj.',
     lostSecurityCode: 'Mi ne povas generi sekurkodon',
+    continueTotp: 'Ensaluti',
 
     genericTotpError: 'Ne sukcesis ensaluti, bv. reprovi poste',
     invalidTotp: 'Nevalida sekurkodo',
