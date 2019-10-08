@@ -27,21 +27,26 @@ export default class Task extends EventEmitter {
         this.type = type;
         this.worker = worker;
         this.options = options;
-        this.parameters = parameters;
+        this.parameters = {};
 
         this.state = TaskState.IDLE;
 
         this.worker.registerTask(this);
+        this.update(parameters);
     }
 
     update (parameters) {
         Object.assign(this.parameters, parameters);
+        this.worker.updateTask(this, this.parameters);
+    }
+
+    get running () {
+        return this.state == TaskState.RUNNING;
     }
 
     run () {
         if (this.state !== TaskState.IDLE) throw new Error('task is already running or has ended');
         this.state = TaskState.RUNNING;
-        this.worker.updateTask(this, this.parameters);
         this.worker.runTask(this);
 
         return this;

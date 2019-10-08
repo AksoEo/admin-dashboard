@@ -13,6 +13,10 @@ export const meta = {
     source: 'GitHub',
 };
 
+export const generic = {
+    close: 'Fermi',
+};
+
 export const login = {
     details: 'Ensaluti',
     createPassword: 'Krei pasvorton',
@@ -45,8 +49,19 @@ export const login = {
     totpDescription: 'Bonvolu enmeti sekurkodon generitan de via duafaktora aplikaĵo.',
     rememberTotp: 'Memori tiun ĉi aparaton dum 60 tagoj',
     rememberTotpDescription: 'Nur uzu tiun ĉi funkcion ĉe personaj komputiloj.',
-    lostSecurityCode: 'Mi ne povas generi sekurkodon',
+    lostTotp: 'Mi ne povas generi sekurkodon',
     continueTotp: 'Ensaluti',
+
+    createPasswordDescription: login => `[[your account ${login} doesn’t seem to have a password. press to send]] retpoŝtmesaĝon kun instrukcioj pri kiel agordi vian konton.`,
+    resetPasswordDescription: '[[if you forgot your password, enter your login and press the button to send a password reset link to your email address]]',
+    sendPasswordReset: 'Sendi retpoŝtmesaĝon',
+    sendPasswordSetup: 'Sendi retpoŝtmesaĝon',
+    createPasswordSent: 'Sendis retpoŝtmesaĝon. Bonvolu kontroli vian retpoŝtkeston (kaj spamujon).',
+    resetPasswordSent: 'Sendis retpoŝtmesaĝon. Bonvolu kontroli vian retpoŝtkeston (kaj spamujon).',
+
+    forgotCodeDescription: '[[use your email i guess?]]',
+
+    lostTotpDescription: '[[contact your local sysadmin]]',
 
     genericTotpError: 'Ne sukcesis ensaluti, bv. reprovi poste',
     invalidTotp: 'Nevalida sekurkodo',

@@ -104,9 +104,10 @@ export const tasks = {
                 method: 'POST',
                 path: `/codeholders/${login}/!create_password_use`,
                 body: {
-                    key: token,
+                    key: Buffer.from(token, 'hex'),
                     password,
                 },
+                _allowLoggedOut: true,
             });
             await tasks.login({}, { login, password });
         } catch (err) {
@@ -125,7 +126,7 @@ export const tasks = {
             await client.req({
                 method: 'POST',
                 path: `/codeholders/${login}/!${create ? 'create' : 'forgot'}_password`,
-                _allowsLoggedOut: true,
+                _allowLoggedOut: true,
             });
         } catch (err) {
             throw { code: err.statusCode, message: err.toString() };

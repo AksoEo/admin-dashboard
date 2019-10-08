@@ -109,9 +109,11 @@ export default class TotpPage extends Component {
                                 href="#"
                                 onClick={e => {
                                     e.preventDefault();
-                                    this.props.onLostCode();
+                                    this.props.core.createTask('info', {
+                                        message: locale.lostTotpDescription,
+                                    });
                                 }}>
-                                {locale.lostSecurityCode}
+                                {locale.lostTotp}
                             </a>
                         )}
                     </div>

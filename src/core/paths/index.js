@@ -27,6 +27,10 @@ const login = () => import(/* webpackChunkName: 'core-login' */ './login');
 
 /// Task definitions.
 export const tasks = {
+    // generic tasks for generic dialogs, which will be dropped as soon as they’re run
+    /// info: takes title and message options (strings probably)
+    info: async () => {},
+
     codeholders: lazyPath(codeholders, mapTasks),
     login: lazyPath(login, mapTasks),
 };

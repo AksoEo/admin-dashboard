@@ -1,14 +1,81 @@
 import { h } from 'preact';
-import { Dialog } from '@cpsdqs/yamdl';
+import { useRef } from 'preact/compat';
+import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
+import { UEACode } from '@tejo/akso-client';
+import EventProxy from '../../components/event-proxy';
+import Form, { Validator } from '../../components/form';
+import { login as locale } from '../../locale';
+import './style';
 
 // TODO
 export default {
-    initCreatePassword: ({ open, task }) => (
-        <Dialog
-            backdrop
-            open={open}
-            onClose={() => task.drop()}>
-            forgot/create password form goes here
-        </Dialog>
-    ),
+    initCreatePassword: ({ open, core, task }) => {
+        const buttonValidator = useRef(null);
+
+        const { create } = task.options;
+        const { login } = task.parameters;
+
+        const description = create
+            ? locale.createPasswordDescription(login)
+            : locale.resetPasswordDescription;
+
+        return (
+            <Dialog
+                backdrop
+                class="login-task-init-create-password"
+                open={open}
+                onClose={() => task.drop()}>
+                <Form class="init-create-password-form" onSubmit={() => {
+                    task.runOnce().then(() => {
+                        core.createTask('info', {
+                            message: create
+                                ? locale.createPasswordSent
+                                : locale.resetPasswordSent,
+                        });
+                    }).catch(() => {
+                        buttonValidator.current.shake();
+                    });
+                }}>
+                    <p>
+                        {description}
+                    </p>
+                    <Validator
+                        component={TextField}
+                        class="form-field"
+                        outline
+                        label={locale.login}
+                        type={login.includes('@') ? 'email' : 'text'}
+                        autocapitalize="none"
+                        spellcheck="false"
+                        value={login}
+                        onChange={e => task.update({ login: e.target.value })}
+                        validate={value => {
+                            if (!value.includes('@') && !UEACode.validate(value)) {
+                                throw { error: locale.invalidUEACode };
+                            }
+                        }} />
+                    <footer class="form-footer">
+                        <span class="footer-spacer" />
+                        <Validator
+                            component={Button}
+                            raised
+                            type="submit"
+                            disabled={task.running}
+                            ref={buttonValidator}
+                            validate={() => {}}>
+                            <CircularProgress
+                                class="progress-overlay"
+                                indeterminate={task.running}
+                                small />
+                            <span>
+                                {create
+                                    ? locale.sendPasswordSetup
+                                    : locale.sendPasswordReset}
+                            </span>
+                        </Validator>
+                    </footer>
+                </Form>
+            </Dialog>
+        );
+    },
 };

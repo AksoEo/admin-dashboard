@@ -25,6 +25,9 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
 
         /// Login mode; used to identify “create password” pages and such.
         mode: Mode.NORMAL,
+
+        /// Password creation token taken from the URL (if it exists)
+        token: null,
     };
 
     // record the last n keypresses and store them here
@@ -48,8 +51,8 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
     #getSelectedPageIndex = () => {
         const { authState } = this.props;
         if (authState === LoginAuthStates.AUTHENTICATED
-            || authState === LoginAuthStates.VERIFYING_TOTP
-            || authState === LoginAuthStates.LOGGED_IN) return 1;
+            || authState === LoginAuthStates.VERIFYING_TOTP) return 1;
+        if (authState === LoginAuthStates.LOGGED_IN) return 2;
         return 0;
     }
 
@@ -74,11 +77,12 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
         }, 200);
     }
 
-    render ({ core, authState, totpSetupRequired, ueaCode }, { mode, login, allowsNonAdmin }) {
+    render ({ core, authState, totpSetupRequired, ueaCode }, { mode, login, token, allowsNonAdmin }) {
         const selectedPageIndex = this.#getSelectedPageIndex();
 
         let className = 'login';
         if (allowsNonAdmin) className += ' allows-non-admin';
+        if (selectedPageIndex === 2) className += ' logged-in';
 
         return (
             <div class={className} onKeyDown={this.#onKeyDown}>
@@ -99,6 +103,7 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
                             authState={authState}
                             login={login}
                             onLoginChange={login => this.setState({ login })}
+                            token={token}
                             mode={mode} />
                         <TotpPage
                             ref={view => this.#totpPage = view}
@@ -107,6 +112,7 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
                             ueaCode={ueaCode}
                             onHeightChange={this.#onHeightChange}
                             totpSetupRequired={totpSetupRequired} />
+                        <div class="logged-in-page" />
                     </AutosizingPageView>
                     <LoginMeta />
                 </div>
@@ -152,6 +158,7 @@ function LoginHeader ({ authenticated, core, mode, selectedPageIndex, showTotp }
                 <span class={showTotp ? '' : 'is-hidden'}>
                     {locale.totp}
                 </span>
+                <span />
             </ProgressIndicator>
         </header>
     );

@@ -2,20 +2,21 @@ import config from '../config.val';
 import * as store from './store';
 import { AUTH_STATE, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED, UEA_CODE, LOGIN_ID } from './paths/login-keys';
 import { LoginAuthStates } from '../protocol';
+import * as log from './log';
 
 /// runs GET /auth
 const getAuth = async () => {
     // this does not use akso-client so we can run this while akso-client is still loading
     while (true) { // eslint-disable-line no-constant-condition
         try {
-            console.debug('[core] getting auth');
+            log.debug('getting auth');
             const res = await fetch(config.host + '/auth', {
                 credentials: 'include',
                 headers: {
                     'Accept': 'application/json',
                 },
             });
-            console.debug('[core] got auth');
+            log.debug('got auth');
             if (res.ok) {
                 return res.json();
             } else if (res.status === 404) {
@@ -24,7 +25,7 @@ const getAuth = async () => {
                 throw new Error('unexpected response from /auth');
             }
         } catch (err) {
-            console.error('[core] failed to get auth', err);
+            log.error('failed to get auth', err);
         }
     }
 };

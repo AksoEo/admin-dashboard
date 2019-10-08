@@ -1,4 +1,5 @@
 import { remove, TASKS } from './store';
+import * as log from './log';
 
 /// Abstract task container.
 export default class Task {
@@ -10,7 +11,7 @@ export default class Task {
         this.id = id;
         this.path = path;
         this.options = options;
-        this.pendingParameters = parameters;
+        this.parameters = parameters;
     }
 
     /// Yells at the user if this task has been dropped but they’re trying to perform an action.
@@ -31,7 +32,7 @@ export default class Task {
     /// Updates task parameters.
     update (parameters) {
         if (this.dropCheck('update')) return;
-        this.pendingParameters = parameters;
+        this.parameters = parameters;
     }
 
     /// Run implementation.
@@ -42,7 +43,6 @@ export default class Task {
         if (this.dropCheck('run')) return;
         if (this.running) return;
         this.running = true;
-        this.parameters = this.pendingParameters;
 
         let result, error;
         try {
@@ -54,6 +54,7 @@ export default class Task {
         if (this.isDropped) return;
 
         if (error) {
+            log.debug(`task ${this.id} failed with error`, error.code, error.message);
             self.postMessage({
                 type: 'task-error',
                 id: this.id,
@@ -63,6 +64,7 @@ export default class Task {
                 },
             });
         } else {
+            log.debug(`task ${this.id} succeeded`);
             self.postMessage({ type: 'task-success', id: this.id, result });
             this.drop();
         }

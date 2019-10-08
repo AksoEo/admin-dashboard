@@ -12,7 +12,7 @@ export function getPageMode () {
         mode: match[1] === 'krei_pasvorton'
             ? Mode.CREATING_PASSWORD
             : Mode.RESETTING_PASSWORD,
-        username: match[2],
+        login: match[2],
         token: match[3],
     };
     return { mode: Mode.NORMAL };

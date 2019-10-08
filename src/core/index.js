@@ -2,6 +2,7 @@ import { insert, get, remove, TASKS, VIEWS } from './store';
 import { tasks, views } from './paths';
 import Task from './task';
 import DataView from './view';
+import * as log from './log';
 import './client';
 
 /// Handlers for messages from the FE.
@@ -12,7 +13,7 @@ const messageHandlers = {
             return;
         }
 
-        console.debug(`[core] creating task ${id} with path ${taskPath}`);
+        log.debug(`creating task ${id} with path ${taskPath}`);
 
         const task = new Task(id, taskPath, options, parameters);
 
@@ -21,7 +22,10 @@ const messageHandlers = {
             let o = tasks;
             for (let i = 0; i < path.length; i++) {
                 const p = path[i];
-                if (!(p in o)) throw { code: 'task-not-found', message: 'task does not exist' };
+                if (!(p in o)) {
+                    log.error(`failed to find task ${taskPath}`);
+                    throw { code: 'task-not-found', message: 'task does not exist' };
+                }
                 o = o[p];
                 if (o.isLazy) o = await o();
                 if (i === path.length - 1) {
@@ -40,23 +44,23 @@ const messageHandlers = {
             task.update(parameters);
             insert([TASKS, id], task); // trigger update
         } else {
-            console.error(`[core] attempt to update nonexistent task with ID ${id}`);
+            log.error(`attempt to update nonexistent task with ID ${id}`);
         }
     },
     'run-task' ({ id }) {
         const task = get([TASKS, id]);
         if (task) {
-            console.debug(`[core] running task ${id}`);
+            log.debug(`[core] running task ${id}`);
             task.$run();
             insert([TASKS, id], task); // trigger update
         } else {
-            console.error(`[core] attempt to run nonexistent task with ID ${id}`);
+            log.error(`attempt to run nonexistent task with ID ${id}`);
         }
     },
     'drop-task' ({ id }) {
         const task = remove([TASKS, id]);
         if (task) {
-            console.debug(`[core] dropping task ${id}`);
+            log.debug(`dropping task ${id}`);
             task.drop();
         }
     },
@@ -66,14 +70,17 @@ const messageHandlers = {
             return;
         }
 
-        console.debug(`[core] creating view ${id} with path ${viewPath}`);
+        log.debug(`creating view ${id} with path ${viewPath}`);
 
         const loadView = async () => {
             const path = viewPath.split('/');
             let o = views;
             for (let i = 0; i < path.length; i++) {
                 const p = path[i];
-                if (!(p in o)) throw { code: 'view-not-found', message: 'view does not exist' };
+                if (!(p in o)) {
+                    log.error(`failed to find view ${viewPath}`);
+                    throw { code: 'view-not-found', message: 'view does not exist' };
+                }
                 o = o[p];
                 if (o.isLazy) o = await o();
                 if (i === path.length - 1) {
@@ -87,7 +94,7 @@ const messageHandlers = {
     'drop-data-view' ({ id }) {
         const view = remove([VIEWS, id]);
         if (view) {
-            console.debug(`[core] dropping view ${id}`);
+            log.debug(`dropping view ${id}`);
             view.drop();
         }
     },

@@ -12,6 +12,7 @@ import { Mode } from './is-special-page';
 /// - core: core ref
 /// - authState: core auth state
 /// - mode: login mode
+/// - token: password creation token (if given)
 /// - login/onLoginChange: login name
 export default class DetailsPage extends Component {
     state = {
@@ -23,27 +24,48 @@ export default class DetailsPage extends Component {
     #loginField;
     #passwordField;
 
+    #spawnInitCreatePassword = () => {
+        this.props.core.createTask('login/initCreatePassword', {
+            create: true,
+        }, {
+            login: this.props.login,
+        });
+    };
+
     #nopwCheckTimeout;
     #checkHasPassword = () => {
         if (!this.props.login) return;
+        clearTimeout(this.#nopwCheckTimeout);
         this.props.core.createTask('login/hasPassword', {}, {
             login: this.props.login,
         }).runOnceAndDrop().then(hasPassword => {
-            if (!hasPassword) {
-                this.props.core.createTask('login/initCreatePassword', {
-                    create: true,
-                }, {
-                    login: this.props.login,
-                });
-            }
+            if (!hasPassword) this.#spawnInitCreatePassword();
         }).catch(() => {});
     };
 
     #onSubmit = () => {
-        this.props.core.createTask('login/login', {}, {
-            login: this.props.login,
-            password: this.state.password,
-        }).runOnceAndDrop().catch(err => {
+        let task;
+
+        if (this.props.mode === Mode.NORMAL) {
+            task = this.props.core.createTask('login/login', {}, {
+                login: this.props.login,
+                password: this.state.password,
+            });
+        } else {
+            task = this.props.core.createTask('login/createPassword', {
+                login: this.props.login,
+                token: this.props.token,
+            }, {
+                password: this.state.password,
+            });
+        }
+
+        task.runOnceAndDrop().then(() => {
+            if (this.props.mode !== Mode.NORMAL) {
+                // special page; need to reset URL
+                window.history.pushState(null, null, '/');
+            }
+        }).catch(err => {
             let error = locale.genericError;
             if (err.code === 400 || err.code === 401) {
                 // conflating 400 (probably a schema error) and 401 (invalid login)
@@ -52,6 +74,8 @@ export default class DetailsPage extends Component {
                 error = this.props.login.includes('@')
                     ? locale.invalidLogin.email
                     : locale.invalidLogin.ueaCode;
+            } else if (err.code === 409) {
+                this.#spawnInitCreatePassword();
             }
 
             this.#passwordValidator.shake();
@@ -149,7 +173,9 @@ export default class DetailsPage extends Component {
                                 href="#"
                                 onClick={e => {
                                     e.preventDefault();
-                                    // TODO
+                                    this.props.core.createTask('info', {
+                                        message: locale.forgotCodeDescription,
+                                    });
                                 }}>
                                 {locale.forgotCode}
                             </a>

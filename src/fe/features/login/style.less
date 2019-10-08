@@ -1,5 +1,63 @@
 @import '../../prelude';
 
+.form-stuff(@hpad: 0px, @bpad: 0px) {
+    p {
+        margin: 0 @hpad 24px;
+    }
+
+    a {
+        color: inherit;
+        opacity: 0.8;
+    }
+
+    button .progress-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    button .progress-overlay + span {
+        transition: opacity 0.3s;
+    }
+    button .progress-overlay.indeterminate + span {
+        opacity: 0;
+    }
+
+    .form-validator {
+        display: flex;
+
+        .form-field {
+            margin: 0 @hpad 24px;
+            flex: 1;
+        }
+    }
+
+    .form-footer {
+        display: flex;
+        padding: 0 @hpad @bpad;
+        align-items: center;
+
+        .help-links {
+            flex: 1;
+            font-size: 0.8em;
+            line-height: 1.5em;
+
+            .help-link {
+                font-weight: 500;
+                text-decoration: none;
+                color: currentColor;
+                opacity: 0.7;
+                transition: opacity 0.3s @easing;
+
+                &:hover {
+                    text-decoration: underline;
+                    opacity: 1;
+                }
+            }
+        }
+    }
+}
+
 .login {
     position: fixed;
     display: flex;
@@ -55,6 +113,7 @@
         max-height: 100%;
         background: @card-background;
         border-radius: 4px;
+        transition: transform 0.5s @easing, opacity 0.5s @easing;
         .elevation(24);
 
         @media (max-width: @fullscreen-width) {
@@ -172,65 +231,7 @@
             }
         }
 
-        p {
-            margin: 0 20px 24px;
-        }
-
-        a {
-            color: inherit;
-            opacity: 0.8;
-        }
-
-        button .progress-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        button .progress-overlay + span {
-            transition: opacity 0.3s;
-        }
-        button .progress-overlay.indeterminate + span {
-            opacity: 0;
-        }
-
-        .form-validator {
-            display: flex;
-
-            .form-field {
-                margin: 0 20px 24px;
-                flex: 1;
-            }
-        }
-
-        .form-footer {
-            display: flex;
-            padding: 0 20px 20px;
-            align-items: center;
-
-            &.should-center {
-                justify-content: center;
-            }
-
-            .help-links {
-                flex: 1;
-                font-size: 0.8em;
-                line-height: 1.5em;
-
-                .help-link {
-                    font-weight: 500;
-                    text-decoration: none;
-                    color: currentColor;
-                    opacity: 0.7;
-                    transition: opacity 0.3s @easing;
-
-                    &:hover {
-                        text-decoration: underline;
-                        opacity: 1;
-                    }
-                }
-            }
-        }
+        .form-stuff(20px, 20px);
 
         .totp-setup {
             &.is-generating {
@@ -296,6 +297,10 @@
             }
         }
 
+        .logged-in-page {
+            height: 200px;
+        }
+
         .login-meta {
             left: 20px;
             text-align: center;
@@ -343,5 +348,25 @@
         @media (max-width: @fullscreen-width), (max-width: 850px) and (max-height: @fullscreen-height) {
             display: none;
         }
+    }
+
+    &.logged-in {
+        perspective: 1000px;
+
+        .login-dialog {
+            transform: translateZ(100px);
+            opacity: 0;
+        }
+    }
+}
+
+.login-task-init-create-password {
+    width: 100%;
+    max-width: 350px;
+
+    .form-stuff();
+
+    .form-footer .footer-spacer {
+        flex: 1;
     }
 }

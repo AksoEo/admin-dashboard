@@ -1,6 +1,7 @@
 import { h, render, Component } from 'preact';
 import { lazy, Suspense, Fragment } from 'preact/compat';
 import { CircularProgress } from '@cpsdqs/yamdl';
+import { LoginAuthStates } from '../protocol';
 import isSpecialPage from './features/login/is-special-page';
 import { Worker } from './core';
 import { coreContext } from './core/connection';
@@ -24,7 +25,9 @@ const lazyPath = (f, map = (res => res.default)) => {
     lazy.isLazy = true;
     return lazy;
 };
+const genericTaskViews = () => import(/* webpackChunkName: "generic-tasks" */ './tasks');
 const taskViews = {
+    info: lazyPath(genericTaskViews, res => res.info),
     login: lazyPath(() => import(/* webpackChunkName: "login-tasks" */ './features/login/tasks')),
 };
 const loadTaskView = async (taskPath) => {
@@ -45,9 +48,8 @@ class Session extends Component {
     state = {
         login: null,
         app: null,
-        showLogin: false,
         loggedIn: false,
-        limbo: false,
+        showLogin: false,
         specialPage: false,
     };
 
@@ -79,27 +81,24 @@ class Session extends Component {
         if (isSpecialPage()) {
             this.setState({ specialPage: true });
         }
-        this.loadApp();
-        /*
-        client.restoreSession().catch(err => {
-            // TODO: handle error properly
-            console.error('failed to restore session', err); // eslint-disable-line no-console
-            return false;
-        }).then(response => {
-            if (isSpecialPage() || !response || !response.totpUsed || !response.isAdmin) {
-                this.setState({ showLogin: true, authCheck: response });
-                this.loadLogin();
-            } else this.setState({ loggedIn: true });
 
-            this.loadApp();
-        });*/
+        this.loadApp();
     }
 
+    #hideLoginTimeout = null;
     #onLoginUpdate = data => {
-        this.setState({ loggedIn: data.loggedIn && !data.totpRequired });
-        if (!data.loggedIn || data.totpRequired) {
+        this.setState({ loggedIn: data.authState === LoginAuthStates.LOGGED_IN });
+        if (data.authState !== LoginAuthStates.LOGGED_IN) {
+            clearTimeout(this.#hideLoginTimeout);
             this.setState({ showLogin: true });
             this.loadLogin();
+        } else if (this.state.showLogin) {
+            if (this.#hideLoginTimeout === null) {
+                this.#hideLoginTimeout = setTimeout(() => {
+                    this.setState({ showLogin: false });
+                    this.#hideLoginTimeout = null;
+                }, 1000);
+            }
         }
     };
 
@@ -140,10 +139,6 @@ class Session extends Component {
         for (const id of toBeRemoved) this.#taskViews.delete(id);
     };
 
-    onLogin = (transition) => {
-        this.setState({ loggedIn: true, transition });
-        this.loadApp();
-    };
     onLogout = () => {
         this.setState({ loggedIn: false, showLogin: true, limbo: true, transition: null });
         this.loadLogin();

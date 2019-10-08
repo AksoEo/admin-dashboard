@@ -1,5 +1,6 @@
 import EventEmitter from 'events';
 import * as store from './store';
+import * as log from './log';
 
 /// Abstract view container.
 export default class DataView {
@@ -10,11 +11,11 @@ export default class DataView {
         this.inner = view.then(View => new View(options));
 
         this.inner.then(inner => {
-            console.debug(`[core] data view ${id} loaded`);
+            log.debug(`data view ${id} loaded`);
             inner.on('update', this.#onUpdate);
             inner.on('error', this.#onError);
         }).catch(err => {
-            console.debug(`[core] data view ${id} failed to load`, err);
+            log.debug(`data view ${id} failed to load`, err);
             this.onError(err);
         });
     }
