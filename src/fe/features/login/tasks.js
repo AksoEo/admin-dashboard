@@ -2,7 +2,6 @@ import { h } from 'preact';
 import { useRef } from 'preact/compat';
 import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
 import { UEACode } from '@tejo/akso-client';
-import EventProxy from '../../components/event-proxy';
 import Form, { Validator } from '../../components/form';
 import { login as locale } from '../../locale';
 import './style';
@@ -75,6 +74,17 @@ export default {
                         </Validator>
                     </footer>
                 </Form>
+            </Dialog>
+        );
+    },
+    logOut ({ open, core, task }) {
+        return (
+            <Dialog
+                backdrop
+                class="login-task-logout"
+                open={open}
+                onClose={() => task.drop()}>
+                <CircularProgress indeterminate />
             </Dialog>
         );
     },

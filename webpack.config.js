@@ -54,7 +54,6 @@ module.exports = function (env, argv) {
         mode: prod ? 'production' : 'development',
         entry: {
             entry: './src/fe/index.js',
-            'service-worker': './src/service-worker.js',
             unsupported: './src/unsupported.js',
         },
         output: {

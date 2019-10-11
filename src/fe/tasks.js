@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
+import { Dialog } from '@cpsdqs/yamdl';
 import { generic as locale } from './locale';
 
 export function info ({ open, task }) {
@@ -16,7 +16,7 @@ export function info ({ open, task }) {
                 {
                     label: locale.close,
                     action: close,
-                }
+                },
             ]}>
             {message}
         </Dialog>

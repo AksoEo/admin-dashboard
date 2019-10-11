@@ -1,5 +1,5 @@
 import { h, render, Component } from 'preact';
-import { lazy, Suspense, Fragment } from 'preact/compat';
+import { Fragment } from 'preact/compat';
 import { CircularProgress } from '@cpsdqs/yamdl';
 import { LoginAuthStates } from '../protocol';
 import isSpecialPage from './features/login/is-special-page';
@@ -50,6 +50,7 @@ class Session extends Component {
         app: null,
         loggedIn: false,
         showLogin: false,
+        wasLoggedOut: false,
         specialPage: false,
     };
 
@@ -63,10 +64,9 @@ class Session extends Component {
 
     loadApp () {
         if (!this.appPromise) {
-            // TODO
-            /*this.appPromise =
-                import(/* webpackChunkName: "app", webpackPrefetch: true / './app');*/
-            // this.appPromise.then(e => this.setState({ app: e.default }));
+            this.appPromise =
+                import(/* webpackChunkName: "app", webpackPrefetch: true */ './app');
+            this.appPromise.then(e => this.setState({ app: e.default }));
         }
     }
 
@@ -88,11 +88,11 @@ class Session extends Component {
     #hideLoginTimeout = null;
     #onLoginUpdate = data => {
         this.setState({ loggedIn: data.authState === LoginAuthStates.LOGGED_IN });
-        if (data.authState !== LoginAuthStates.LOGGED_IN) {
+        if (data.authState && data.authState !== LoginAuthStates.LOGGED_IN) {
             clearTimeout(this.#hideLoginTimeout);
-            this.setState({ showLogin: true });
+            this.setState({ showLogin: true, wasLoggedOut: true });
             this.loadLogin();
-        } else if (this.state.showLogin) {
+        } else if (data.authState && this.state.showLogin) {
             if (this.#hideLoginTimeout === null) {
                 this.#hideLoginTimeout = setTimeout(() => {
                     this.setState({ showLogin: false });
@@ -133,33 +133,22 @@ class Session extends Component {
     };
     #cleanTasks = () => {
         const toBeRemoved = new Set();
-        for (const [id, [view, deathTime]] of this.#taskViews.entries()) {
+        for (const [id, [, deathTime]] of this.#taskViews.entries()) {
             if (deathTime && Date.now() - deathTime > 500) toBeRemoved.add(id);
         }
         for (const id of toBeRemoved) this.#taskViews.delete(id);
     };
 
-    onLogout = () => {
-        this.setState({ loggedIn: false, showLogin: true, limbo: true, transition: null });
-        this.loadLogin();
-        /*client.logOut().then(() => this.setState({ limbo: false })).catch(err => {
-            console.error('failed to log out', err); // eslint-disable-line no-console
-            this.setState({ loggedIn: true, limbo: false });
-        });*/
-    };
-
     render () {
-        const { loggedIn, showLogin, specialPage, login: Login, app: App, limbo } = this.state;
+        const { loggedIn, showLogin, wasLoggedOut, specialPage, login: Login, app: App } = this.state;
 
         let login = null;
         let app = null;
-        if (!limbo) {
-            if (Login && (showLogin || specialPage)) {
-                login = <Login />;
-            }
-            if (loggedIn && App) {
-                app = <App />;
-            }
+        if (Login && (showLogin || specialPage)) {
+            login = <Login />;
+        }
+        if (loggedIn && App) {
+            app = <App animateIn={wasLoggedOut} />;
         }
 
         const tasks = [];
@@ -225,10 +214,6 @@ sessionRoot.id = 'session-root';
 sessionRoot.className = 'root-container';
 document.body.appendChild(sessionRoot);
 render(<Session />, sessionRoot);
-
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/' + '@!AKSO-MAGIC:chunk:service-worker');
-}
 
 // don’t show “add to homescreen” prompt
 window.addEventListener('beforeinstallprompt', e => e.preventDefault());

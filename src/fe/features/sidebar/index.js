@@ -1,64 +1,32 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { Spring } from '../../animation';
+import { Spring } from '@cpsdqs/yamdl';
 import SidebarContents from './contents';
 import './style';
 
 /** Width of the region at the left screen edge from which the sidebar may be dragged out. */
 const EDGE_DRAG_WIDTH = 50;
 
-/** Renders the sidebar. */
+/// Renders the sidebar.
+///
+/// # Props
+/// - permanent: Whether or not the sidebar should be permanent and inline or slide out temporarily.
+///   If this is true, `open` will be ignored.
+/// - open/onOpen/onClose: open state
+/// - currentPage: Current page identifier passed to the SidebarContents
 export default class Sidebar extends PureComponent {
-    static propTypes = {
-        /**
-         * Whether or not the sidebar should be permanent and inline or slide out temporarily.
-         * If this is true, `open` will be ignored.
-         */
-        permanent: PropTypes.bool,
-        /** Controls the open state of the sidebar. */
-        open: PropTypes.bool,
-        /** Open callback. Called when a drag gesture opens the sidebar. */
-        onOpen: PropTypes.func,
-        /** Close callback. Called when a drag gesture opens the sidebar. */
-        onClose: PropTypes.func,
-        /** Current page identifier passed to the SidebarContents. */
-        currentPage: PropTypes.string.isRequired,
-        /** Called when the log out button is pressed. */
-        onLogout: PropTypes.func.isRequired,
-        /** Forwarded from app. */
-        onDirectTransition: PropTypes.func.isRequired,
-        /** Forwarded from app. */
-        onDoAnimateIn: PropTypes.func.isRequired,
-
-        permissions: PropTypes.object.isRequired,
-    };
-
-    /**
-     * The DOM node.
-     * @type {Node|null}
-     */
     node = null;
-
-    /**
-     * The DOM node of the backdrop (the darkened background for the temporary sidebar).
-     * @type {Node|null}
-     */
     backdropNode = null;
 
-    /** The spring used to animate the sidebar’s X position. */
+    /// The spring used to animate the sidebar’s X position.
     spring = new Spring(1, 0.5);
 
-    /**
-     * Called when the sidebar drag ends, by the sidebar drag handler.
-     * @param {boolean} open
-     */
+    /// Called when the sidebar drag ends, by the sidebar drag handler.
     onDragEnd = (open) => {
         if (open && this.props.onOpen) this.props.onOpen();
         else if (!open && this.props.onClose) this.props.onClose();
-    }
+    };
 
-    /** The sidebar drag handler. */
     sidebarDragHandler = new SidebarDragHandler(this.spring, this.onDragEnd);
 
     constructor (props) {
@@ -66,14 +34,14 @@ export default class Sidebar extends PureComponent {
         this.spring.on('update', this.onSpringUpdate);
     }
 
-    /** Updates the spring target; called when the `open` property changes. */
+    /// Updates the spring target; called when the `open` property changes.
     updateSpringTarget () {
         this.spring.target = this.props.permanent || this.props.open ? 1 : 0;
         this.spring.locked = false;
         this.spring.start();
     }
 
-    /** Called when the position spring updates. */
+    /// Called when the position spring updates.
     onSpringUpdate = (position) => {
         position = Math.max(0, position);
         if (position <= 1) {
@@ -96,7 +64,7 @@ export default class Sidebar extends PureComponent {
         this.sidebarDragHandler.setSidebarNode(this.node);
     }
 
-    /** Will animate the sidebar sliding in. */
+    /// Will animate the sidebar sliding in.
     animateIn (delay) {
         this.spring.value = 0;
         this.onSpringUpdate(0);

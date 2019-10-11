@@ -37,6 +37,7 @@ export const tasks = {
 
 /// View definitions.
 export const views = {
+    codeholders: lazyPath(codeholders, mapViews),
     login: lazyPath(login, mapViews),
 
     '#tasks': createStoreObserver(['#tasks'], tasks => {

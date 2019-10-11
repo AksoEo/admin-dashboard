@@ -67,3 +67,7 @@ export const login = {
     invalidTotp: 'Nevalida sekurkodo',
     invalidTotpFormat: 'Bonvolu enmeti vian sesciferan sekurkodon',
 };
+
+export const app = {
+    logOut: 'Elsaluti',
+};

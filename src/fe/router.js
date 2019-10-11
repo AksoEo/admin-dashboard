@@ -1,24 +1,19 @@
 import { h } from 'preact';
 import { createContext } from 'preact/compat';
-import PropTypes from 'prop-types';
 
-/**
- * A React context for in-app navigation.
- *
- * - `navigate: (string) => void`: function that may be called to navigate in-app
- * - `replace: (string) => void`: function that may be called to replaceState in-app
- */
+/// A React context for in-app navigation.
+///
+/// - `navigate: (string) => void`: function that may be called to navigate in-app
+/// - `replace: (string) => void`: function that may be called to replaceState in-app
 export const routerContext = createContext({
     navigate: null,
     replace: null,
 });
 
-/**
- * An in-app link.
- *
- * - `target: string`: required property that contains the `routerContext`→`navigate` argument.
- * @type {React.PureComponent}
- */
+/// An in-app link.
+///
+/// # Props
+/// - `target`: the target href
 export const Link = function Link (props) {
     return (
         <routerContext.Consumer>
@@ -34,10 +29,4 @@ export const Link = function Link (props) {
             )}
         </routerContext.Consumer>
     );
-};
-
-Link.propTypes = {
-    onClick: PropTypes.func,
-    children: PropTypes.any,
-    target: PropTypes.string.isRequired,
 };

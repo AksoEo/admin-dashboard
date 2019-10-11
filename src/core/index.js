@@ -50,7 +50,7 @@ const messageHandlers = {
     'run-task' ({ id }) {
         const task = get([TASKS, id]);
         if (task) {
-            log.debug(`[core] running task ${id}`);
+            log.debug(`running task ${id}`);
             task.$run();
             insert([TASKS, id], task); // trigger update
         } else {

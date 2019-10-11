@@ -64,7 +64,7 @@ export default class Task {
                 },
             });
         } else {
-            log.debug(`task ${this.id} succeeded`);
+            log.debug(`task ${this.id} succeeded, dropping`);
             self.postMessage({ type: 'task-success', id: this.id, result });
             this.drop();
         }

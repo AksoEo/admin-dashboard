@@ -1,8 +1,10 @@
-//! This file is secret and contains vfx à la video games.
+//! easter egg for enabling devtools with vfx à la video games
 
-import { globalAnimator, lerp, clamp } from '../animation';
-import client from '../client';
-import locale from '../locale';
+import { globalAnimator } from '@cpsdqs/yamdl';
+import * as locale from '../locale';
+
+const lerp = (a, b, x) => (b - a) * x + a;
+const clamp = (x, l, h) => Math.max(l, Math.min(x, h));
 
 function shakeScreen () {
     globalAnimator.register({
@@ -98,7 +100,7 @@ const easeInCubic = t => t * t * t;
 const easeInOutCubic = t => t < 0.5 ? (4 * t * t * t) : ((t - 1) * (2 * t - 2) * (2 * t - 2) + 1);
 const easeOutExpo = t => 1 - Math.pow(2, -10 * t);
 
-function particleVortex (logo) {
+function particleVortex (logo, core) {
     const cornerPositions = [...logo.querySelectorAll('.corner')].map(corner => {
         const rect = corner.getBoundingClientRect();
         return [rect.left + rect.width / 2, rect.top + rect.height / 2];
@@ -186,7 +188,7 @@ function particleVortex (logo) {
 
             if (this.time > 2 && !this.exposed) {
                 this.exposed = true;
-                exposeAKSO();
+                exposeAKSO(core);
             }
 
             if (this.time >= 4) {
@@ -198,17 +200,17 @@ function particleVortex (logo) {
     });
 }
 
-function exposeAKSO () {
+function exposeAKSO (core) {
     window.akso = {
-        client,
+        core,
         globalAnimator,
         locale,
     };
 }
 
-export default function trigger (logo) {
+export default function trigger (logo, core) {
     shakeScreen();
-    particleVortex(logo);
+    particleVortex(logo, core);
 }
 
 // perlin noise, adapted from https://cs.nyu.edu/%7Eperlin/noise/

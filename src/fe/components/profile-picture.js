@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import jdenticon from 'jdenticon';
-import client from '../client';
+import config from '../../config.val';
 
 // to avoid using the cardinal 1, 2, 3 ... identicons
 const DECARDINALIFY = id => [
@@ -28,7 +28,7 @@ export default class ProfilePicture extends Component {
 
         if (profilePictureHash) {
             const hash = Buffer.from(profilePictureHash).toString('base64');
-            let urlBase = new URL(client.client.host);
+            let urlBase = new URL(config.host);
             urlBase.pathname = `/codeholders/${id}/profile_picture/`;
             urlBase = urlBase.toString();
             const imgSrcSet = [32, 64, 128, 256].map(w => `${urlBase}${w}px?noop=${hash} ${w}w`).join(', ');

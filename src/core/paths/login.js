@@ -131,7 +131,7 @@ export const tasks = {
         } catch (err) {
             throw { code: err.statusCode, message: err.toString() };
         }
-    }
+    },
 };
 
 /// login: observes the entire login data store (it’s constant-sized that so this is fine)
