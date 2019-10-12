@@ -54,7 +54,7 @@ if (!isSupported) {
     if (updateLink) {
         c.innerHTML += '<p>Bonvolu ĝisdatigi vian retumilon al pli nova versio aŭ elŝuti de tie ĉi: ' + updateLink + '</p>';
     } else {
-        c.innerHTML += '<p>Bonvolu ĝisdatigi al pli nova retumilo kiel ekz. <a href="https://www.mozilla.org/eo/firefox/">Mozilla Firefox</a> aŭ <a href="https://www.google.com/chrome/">Google Chrome</a>.</p>';
+        c.innerHTML += '<p>Bonvolu ĝisdatigi al pli nova retumilo kiel ekz. ' + firefoxLink + ' aŭ ' + googleLink + '.</p>';
     }
     document.body.appendChild(c);
 }

@@ -71,3 +71,24 @@ export const login = {
 export const app = {
     logOut: 'Elsaluti',
 };
+
+export const pages = {
+    home: 'Hejmo',
+    members: 'Membroj',
+    membership: 'Membreco',
+    email: 'Amasmesaĝoj',
+    magazines: 'Revuoj',
+    statistics: 'Statistiko',
+    congresses: 'Kongresoj',
+    payments: 'Pagoj',
+    elections: 'Voĉdonado',
+    newsletters: 'Bultenoj',
+    administration: 'Administrado',
+    lists: 'Listoj',
+    reports: 'Raportoj',
+    documents: 'Ŝpureblaj dokumentoj',
+};
+
+// TODO: remove this
+import compatLocale from './locale_old';
+export default compatLocale;

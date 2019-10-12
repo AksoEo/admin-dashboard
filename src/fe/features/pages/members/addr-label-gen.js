@@ -1,12 +1,12 @@
 import { h } from 'preact';
 import { useState, Fragment, PureComponent } from 'preact/compat';
-import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from 'yamdl';
+import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import {
     CardStackProvider, CardStackRenderer, CardStackItem,
 } from '../../../components/card-stack';
+import { coreContext } from '../../../core/connection';
 import locale from '../../../locale';
-import client from '../../../client';
 
 export default function AddrLabelGenContainer ({
     open, lvIsCursed, getRequestData, onClose,
@@ -29,13 +29,18 @@ export default function AddrLabelGenContainer ({
                             title={locale.members.addrLabelGen.title}
                             priority={9} />
                     }>
-                    <AddrLabelGen
-                        lvIsCursed={lvIsCursed}
-                        getRequestData={getRequestData}
-                        onSuccess={() => {
-                            onClose();
-                            setShowSuccess(true);
-                        }} />
+                    <coreContext.Consumer>
+                        {core => (
+                            <AddrLabelGen
+                                lvIsCursed={lvIsCursed}
+                                getRequestData={getRequestData}
+                                onSuccess={() => {
+                                    onClose();
+                                    setShowSuccess(true);
+                                }}
+                                core={core} />
+                        )}
+                    </coreContext.Consumer>
                 </CardStackItem>
             </CardStackProvider>
             <Dialog
@@ -54,7 +59,7 @@ export default function AddrLabelGenContainer ({
     );
 }
 
-function AddrLabelGen ({ lvIsCursed, onSuccess, getRequestData }) {
+function AddrLabelGen ({ lvIsCursed, onSuccess, getRequestData, core }) {
     const [settings, setSettings] = useState({
         language: 'eo',
         latin: false,
@@ -82,11 +87,8 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, getRequestData }) {
         const { options } = getRequestData();
         setLoading(true);
 
-        delete options.limit;
-        delete options.offset;
-        delete options.fields;
-
-        client.post('/codeholders/!make_address_labels', settings, options)
+        core.createTask('codeholders/makeAddressLabels', options, settings)
+            .runOnceAndDrop()
             .then(onSuccess).catch(err => {
                 setError(err);
                 console.error(err); // eslint-disable-line no-console
@@ -293,25 +295,29 @@ class AddrLabelStats extends PureComponent {
         total: null,
     };
 
+    static contextType = coreContext;
+
     updateMembersWithAddresses () {
         if (this.loadingMembers) return;
         this.loadingMembers = true;
 
         const { options } = this.props.getRequestData();
-        options.filter = options.filter
-            ? { $and: [options.filter, { 'addressLatin.city': { $neq: null } }] }
-            : { 'addressLatin.city': { $neq: null } };
+        const addressFilter = { 'addressLatin.city': { $neq: null } };
+        options.jsonFilter = options.jsonFilter
+            ? { $and: [options.jsonFilter, addressFilter] }
+            : addressFilter;
         options.offset = 0;
         options.limit = 1;
-        client.get('/codeholders', options).then(res => {
-            this.setState({ withAddresses: res.res.headers.map['x-total-items'] });
+
+        this.context.createTask('codeholders/list', {}, options).runOnceAndDrop().then(({ total }) => {
+            this.setState({ withAddresses: total });
         }).then(() => {
             const { options } = this.props.getRequestData();
             options.offset = 0;
             options.limit = 1;
-            return client.get('/codeholders', options);
-        }).then(res => {
-            this.setState({ total: res.res.headers.map['x-total-items'] });
+            return this.context.createTask('codeholders/list', {}, options).runOnceAndDrop();
+        }).then(({ total }) => {
+            this.setState({ total });
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
             this.reloadTimeout = setTimeout(() => this.updateMembersWithAddresses(), 1000);

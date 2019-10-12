@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
 import PropTypes from 'prop-types';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import { Dialog, Button } from 'yamdl';
+import { Dialog, Button } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import stringify from 'csv-stringify';
 import * as actions from './actions';

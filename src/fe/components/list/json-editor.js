@@ -1,9 +1,8 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import JSON5 from 'json5';
-import { Dialog, Button } from 'yamdl';
+import { Dialog, Button } from '@cpsdqs/yamdl';
 import HelpIcon from '@material-ui/icons/Help';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';
@@ -17,14 +16,12 @@ import './json-editor.less';
 const DEFAULT_CURSOR_POS = [1, 1];
 
 /// JSON editor for advanced search filters.
+///
+/// # Props
+/// - value/onChange: string value
+/// - submitted: bool
+/// - onSubmit: callback
 export default class JSONEditor extends PureComponent {
-    static propTypes = {
-        value: PropTypes.string.isRequired,
-        onChange: PropTypes.func.isRequired,
-        submitted: PropTypes.bool.isRequired,
-        onSubmit: PropTypes.func.isRequired,
-    };
-
     state = {
         helpOpen: false,
     };

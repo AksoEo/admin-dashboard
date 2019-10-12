@@ -1,41 +1,43 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { Dialog, Button } from 'yamdl';
+import { Dialog, Button } from '@cpsdqs/yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
 import fuzzaldrin from 'fuzzaldrin';
-import { CountryFlag } from '../../../components/data/country';
+import { WithCountries, CountryFlag } from '../../../components/data/country';
 import MulticolList from '../../../components/multicol-list';
 import locale from '../../../locale';
-import cache from '../../../cache';
 
 const LI_HEIGHT = 48;
 
-/** Renders a country picker. */
-export default class CountryPicker extends PureComponent {
-    static propTypes = {
-        onChange: PropTypes.func.isRequired,
-        value: PropTypes.arrayOf(PropTypes.string).isRequired,
-    };
+export default function CountryPicker (props) {
+    return (
+        <WithCountries>
+            {(countries, countryGroups) => (
+            <CountryPickerInnerComponent
+                {...props}
+                countries={countries}
+                countryGroups={countryGroups} />
+            )}
+        </WithCountries>
+    );
+}
 
+/// Renders a country picker.
+///
+/// # Props
+/// - value/onChange: array of strings
+class CountryPickerInnerComponent extends PureComponent {
     state = {
-        countries: {},
-        countryGroups: {},
         dialogOpen: false,
         search: '',
     };
 
-    componentDidMount () {
-        cache.getCountries().then(countries => this.setState({ countries }));
-        cache.getCountryGroups().then(countryGroups => this.setState({ countryGroups }));
-    }
-
     selectAll = () => {
-        this.props.onChange(Object.keys(this.state.countryGroups)
-            .concat(Object.keys(this.state.countries)));
+        this.props.onChange(Object.keys(this.props.countryGroups)
+            .concat(Object.keys(this.props.countries)));
     };
 
     deselectAll = () => {
@@ -48,10 +50,10 @@ export default class CountryPicker extends PureComponent {
 
         for (let i = 0; i < this.props.value.length; i++) {
             const id = this.props.value[i];
-            if (id in this.state.countries) {
+            if (id in this.props.countries) {
                 pickedCountries.push(<CountryFlag key={i} country={id} />);
-            } else if (this.state.countryGroups[id]) {
-                pickedCountries.push(<span key={i}>{this.state.countryGroups[id].name}</span>);
+            } else if (this.props.countryGroups[id]) {
+                pickedCountries.push(<span key={i}>{this.props.countryGroups[id].name}</span>);
             }
             if (i < this.props.value.length - 1) pickedCountries.push(<span key={'s' + i}>, </span>);
         }
@@ -80,13 +82,13 @@ export default class CountryPicker extends PureComponent {
             column: 0,
             node: <div class="country-item" onClick={onItemClick(id)}>
                 <div class="country-icon">
-                    {id in this.state.countries
+                    {id in this.props.countries
                         ? <CountryFlag country={id} />
                         : <LanguageIcon />}
                 </div>
                 <div class="country-name">
-                    {this.state.countries[id]
-                        || this.state.countryGroups[id] && this.state.countryGroups[id].name}
+                    {this.props.countries[id] ? this.props.countries[id].eo
+                        : this.props.countryGroups[id] && this.props.countryGroups[id].name}
                 </div>
                 <div class="country-check">
                     <CheckIcon />
@@ -95,10 +97,10 @@ export default class CountryPicker extends PureComponent {
         }));
 
         // list of all items that are to be visible
-        let searchResults = Object.keys(this.state.countryGroups)
-            .map(id => ({ id, name: this.state.countryGroups[id].name }))
-            .concat(Object.keys(this.state.countries)
-                .map(id => ({ id, name: this.state.countries[id] })))
+        let searchResults = Object.keys(this.props.countryGroups)
+            .map(id => ({ id, name: this.props.countryGroups[id].name }))
+            .concat(Object.keys(this.props.countries)
+                .map(id => ({ id, name: this.props.countries[id] })))
             .filter(x => !this.props.value.includes(x));
 
         if (this.state.search) {
@@ -106,7 +108,7 @@ export default class CountryPicker extends PureComponent {
         }
         searchResults = searchResults.map(x => x.id);
 
-        const availableItems = Object.keys(this.state.countryGroups)
+        const availableItems = Object.keys(this.props.countryGroups)
             .filter(group => !this.props.value.includes(group))
             .filter(group => searchResults.includes(group))
             .map(group => ({
@@ -114,9 +116,9 @@ export default class CountryPicker extends PureComponent {
                 column: 1,
                 node: <div class="country-item" onClick={onItemClick(group)}>
                     <div class="country-icon"><LanguageIcon /></div>
-                    <div class="country-name">{this.state.countryGroups[group].name}</div>
+                    <div class="country-name">{this.props.countryGroups[group].name}</div>
                 </div>,
-            })).concat(Object.keys(this.state.countries)
+            })).concat(Object.keys(this.props.countries)
                 .filter(country => !this.props.value.includes(country))
                 .filter(country => searchResults.includes(country))
                 .map(country => ({
@@ -124,7 +126,7 @@ export default class CountryPicker extends PureComponent {
                     column: 1,
                     node: <div class="country-item" onClick={onItemClick(country)}>
                         <div class="country-icon"><CountryFlag country={country} /></div>
-                        <div class="country-name">{this.state.countries[country]}</div>
+                        <div class="country-name">{this.props.countries[country].eo}</div>
                     </div>,
                 })));
 

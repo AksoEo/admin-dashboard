@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/compat';
-import { Button, AppBarProxy, MenuIcon } from 'yamdl';
+import { Button, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
 import { CardStackItem } from '../../card-stack';
 import locale from '../../../locale';
 

@@ -10,7 +10,7 @@ const getAuth = async () => {
     while (true) { // eslint-disable-line no-constant-condition
         try {
             log.debug('getting auth');
-            const res = await fetch(config.host + '/auth', {
+            const res = await fetch(new URL('auth', config.base).toString(), {
                 credentials: 'include',
                 headers: {
                     'Accept': 'application/json',
@@ -52,7 +52,7 @@ initialAuth.then(auth => {
 
 const lazyUserClient = import(/* webpackChunkName: 'akso-client' */ './user-client').then(res => res.default);
 export default lazyUserClient.then(UserClient => {
-    const client = new UserClient({ host: config.host });
+    const client = new UserClient({ host: config.base });
     return initialAuth.then(auth => {
         if (auth) {
             client.loggedIn = true;

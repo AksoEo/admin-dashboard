@@ -1,16 +1,20 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { Checkbox, Slider, TextField, Button } from 'yamdl';
+import { Checkbox, Slider, TextField, Button } from '@cpsdqs/yamdl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CheckIcon from '@material-ui/icons/Check';
 import moment from 'moment';
+import { WithCountries } from '../../../components/data/country';
 import Segmented from '../../../components/segmented';
 import locale from '../../../locale';
 import CountryPicker from './country-picker';
-import cache from '../../../cache';
+
+const cache = {
+    getMembershipCategories: async () => [], // TODO
+};
 
 /// A text editor optimized for editing integer range bounds.
 ///
@@ -244,61 +248,51 @@ export default {
             const countries = value.substr(2).split(',');
             return { type, countries };
         },
-        editor: class CountryEditor extends PureComponent {
-            state = { countries: null, countryGroups: null };
+        editor: function CountryEditor ({ filterHeader, value, onChange }) {
+            return (
+                <WithCountries>
+                    {(dCountries, dCountryGroups) => {
+                        const countryGroups = [];
+                        const countries = [];
 
-            componentDidMount () {
-                Promise.all([
-                    cache.getCountries(),
-                    cache.getCountryGroups(),
-                ])
-                    .then(([countries, countryGroups]) => this.setState({ countries, countryGroups }));
-            }
+                        for (const id in dCountryGroups) {
+                            const group = dCountryGroups[id];
+                            countryGroups.push(
+                                <MenuItem key={id} value={id}>{group.name}</MenuItem>
+                            );
+                        }
 
-            render () {
-                const { filterHeader, value, onChange } = this.props;
+                        for (const id in dCountries) {
+                            countries.push(
+                                <MenuItem key={id} value={id}>{dCountries[id]}</MenuItem>
+                            );
+                        }
 
-                const countryGroups = [];
-                const countries = [];
+                        const selectedType = value.type === null ? 'all' : value.type;
 
-                if (this.state.countryGroups && this.state.countries) {
-                    for (const id in this.state.countryGroups) {
-                        const group = this.state.countryGroups[id];
-                        countryGroups.push(
-                            <MenuItem key={id} value={id}>{group.name}</MenuItem>
+                        return (
+                            <div className="country-editor">
+                                <div className="country-editor-top">
+                                    {filterHeader}
+                                    <Segmented selected={selectedType} onSelect={selected => {
+                                        if (selected === 'all') selected = null;
+                                        onChange({ ...value, type: selected });
+                                    }}>
+                                        {[
+                                            { id: 'fee', label: locale.members.search.countries.fee },
+                                            { id: 'address', label: locale.members.search.countries.address },
+                                            { id: 'all', label: locale.members.search.countries.all },
+                                        ]}
+                                    </Segmented>
+                                </div>
+                                <CountryPicker
+                                    onChange={countries => onChange({ ...value, countries })}
+                                    value={value.countries} />
+                            </div>
                         );
-                    }
-
-                    for (const id in this.state.countries) {
-                        countries.push(
-                            <MenuItem key={id} value={id}>{this.state.countries[id]}</MenuItem>
-                        );
-                    }
-                }
-
-                const selectedType = value.type === null ? 'all' : value.type;
-
-                return (
-                    <div className="country-editor">
-                        <div className="country-editor-top">
-                            {filterHeader}
-                            <Segmented selected={selectedType} onSelect={selected => {
-                                if (selected === 'all') selected = null;
-                                onChange({ ...value, type: selected });
-                            }}>
-                                {[
-                                    { id: 'fee', label: locale.members.search.countries.fee },
-                                    { id: 'address', label: locale.members.search.countries.address },
-                                    { id: 'all', label: locale.members.search.countries.all },
-                                ]}
-                            </Segmented>
-                        </div>
-                        <CountryPicker
-                            onChange={countries => onChange({ ...value, countries })}
-                            value={value.countries} />
-                    </div>
-                );
-            }
+                    }}
+                </WithCountries>
+            );
         },
     },
     enabled: {

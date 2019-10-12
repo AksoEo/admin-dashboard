@@ -1,11 +1,13 @@
 import { h, Component } from 'preact';
-import { Button, Dialog, Slider, CircularProgress } from 'yamdl';
+import { Button, Dialog, Slider, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
-import client from '../../../client';
+import { coreContext } from '../../../core/connection';
 import ProfilePicture from '../../../components/profile-picture';
 import pickFile from '../../../components/pick-file';
-import { Spring, globalAnimator, clamp, lerp } from '../../../animation';
 import locale from '../../../locale';
+
+const clamp = (x, l, h) => Math.max(l, Math.min(x, h));
+const lerp = (a, b, x) => (b - a) * x + a;
 
 /// Renders an editable codeholder profile picture or identicon.
 ///
@@ -326,15 +328,18 @@ class FileCropDialog extends Component {
             );
         }
         canvas.toBlob(blob => {
-            const file = new File([blob], 'picture', { type: 'image/png' });
-            // FIXME: client-js is weird and requires this
-            file.value = file;
-            client.put(`/codeholders/${this.props.id}/profile_picture`, null, {}, [file])
-                .then(this.props.onSuccess).catch(err => {
-                    console.error('failed to upload pp', err); // eslint-disable-line no-console
-                }).then(() => this.setState({ uploading: false }));
+            // TODO: make this a task view instead of creating the task here
+            this.context.createTask('codeholders/setProfilePicture', {
+                id: this.props.id
+            }, {
+                blob,
+            }).runOnceAndDrop().then(this.props.onSuccess).catch(err => {
+                console.error('failed to upload pp', err); // eslint-disable-line no-console
+            }).then(() => this.setState({ uploading: false }));
         }, 'image/png');
     };
+
+    static contextType = coreContext;
 
     render () {
         return (

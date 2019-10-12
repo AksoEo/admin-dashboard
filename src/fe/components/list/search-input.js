@@ -1,27 +1,25 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
 import NativeSelect from '@material-ui/core/NativeSelect';
-import { Button } from 'yamdl';
+import { Button } from '@cpsdqs/yamdl';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import SearchIcon from '@material-ui/icons/Search';
 import locale from '../../locale';
 
-/** Primary search field. */
+/// Primary search field.
+///
+/// # Props
+/// - field: string
+/// - fields: string[]
+/// - onFieldChange: func
+/// - onSubmit: func
+/// - onUnsubmit: func
+/// - submitted: bool
+/// - query: string
+/// - onQueryChange: func
+/// - localizedFields: object
+/// - localizedPlaceholders: object
 export default class SearchInput extends PureComponent {
-    static propTypes = {
-        field: PropTypes.string,
-        fields: PropTypes.arrayOf(PropTypes.string).isRequired,
-        onFieldChange: PropTypes.func.isRequired,
-        onSubmit: PropTypes.func.isRequired,
-        onUnsubmit: PropTypes.func.isRequired,
-        submitted: PropTypes.bool.isRequired,
-        query: PropTypes.string.isRequired,
-        onQueryChange: PropTypes.func.isRequired,
-        localizedFields: PropTypes.object.isRequired,
-        localizedPlaceholders: PropTypes.object.isRequired,
-    };
-
     render () {
         return (
             <div className="search-input">

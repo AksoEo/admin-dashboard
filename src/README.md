@@ -17,6 +17,8 @@ Tasks have a very specific lifecycle:
 
 In code, tasks are simply async functions that will be called by *the system* with the given options and parameters. The immutable options/mutable parameters distinction exists to facilitate semantics for task views (see frontend).
 
+Unknown options or parameters will be ignored (this can be used e.g. to pass user data to task views).
+
 ### Views
 Views act like React props in that they are simply observed data that might change over time and can’t be mutated directly (to mutate the data, one would use a task).
 

@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import { memo, PureComponent, useState } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { AppBarProxy, Button, MenuIcon, Dialog, TextField } from 'yamdl';
+import { AppBarProxy, Button, MenuIcon, Dialog, TextField } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import HistoryIcon from '@material-ui/icons/History';
 import locale from '../../../locale';
@@ -21,49 +20,26 @@ export default class DetailViewContainer extends PureComponent {
     }
 }
 
-/**
- * The detail view in a list view, which is shown as a modal overlay and contains details about a
- * selected item.
- */
+/// The detail view in a list view, which is shown as a modal overlay and contains details about a
+/// selected item.
+/// - open/onClose: open state
+/// - onRequest: (id) => Promise<Object> - detail view request handler
+/// - onUpdateItem: Called when the item is updated *from the database*, meaning the full data was
+///   loaded and should be used to patch the potentially only partial data in the redux store.
+/// - onPatch: Called when the item is edited and saved, with `(id, original, value, comment)`.
+///   - `id`: the unique ID of the item
+///   - `original`: the original value
+///   - `value`: the edited value
+///   - `comment`: the commit message
+/// - onDelete: (id) => Promise<void> - called when an item is deleted
+/// - items: item data from the redux store
+/// - id: current item id
+/// - locale: locale data for the detail view (see list view docs for details)
+/// - fields: spec for all the detail fields
+/// - headerComponent: component that renders the header; same structure as a field
+/// - footerComponent: component that renders the footer; same structure as a field
+/// - onFetchFieldHistory: callback
 class DetailView extends PureComponent {
-    static propTypes = {
-        /** Whether the detail view is open. */
-        open: PropTypes.bool,
-        /** Close handler. Called e.g. when the user taps the backdrop. */
-        onClose: PropTypes.func,
-        /** Detail view data request handler, with `(id) => Promise<Object>`. */
-        onRequest: PropTypes.func,
-        /**
-         * Called when the item is updated *from the database*, meaning the full data was loaded
-         * and should be used to patch the potentially only partial data in the redux store.
-         */
-        onUpdateItem: PropTypes.func.isRequired,
-        /**
-         * Called when the item is edited and saved, with `(id, original, value, comment)`.
-         *
-         * - `id`: the unique ID of the item
-         * - `original`: the original value
-         * - `value`: the edited value
-         * - `comment`: the commit message
-         */
-        onPatch: PropTypes.func,
-        /** Called when an item is deleted, with `(id) => Promise<void>`. */
-        onDelete: PropTypes.func,
-        /** Item data from the redux store. */
-        items: PropTypes.object.isRequired,
-        /** Current item id. */
-        id: PropTypes.any,
-        /** Locale data for the detail view (see list view docs for details). */
-        locale: PropTypes.object.isRequired,
-        /** Spec for all the detail fields. */
-        fields: PropTypes.object,
-        /** Component that renders the header. Same structure as a field. */
-        headerComponent: PropTypes.any,
-        /** Component that renders the footer. Same structure as a field. */
-        footerComponent: PropTypes.any,
-        onFetchFieldHistory: PropTypes.func,
-    };
-
     state = {
         // id is in derived state so it can linger while the detail view is closing, because
         // the id field is also used as the open state in the list view
@@ -247,18 +223,6 @@ function DetailAppBar ({
         actions={actions} />;
 }
 
-DetailAppBar.propTypes = {
-    open: PropTypes.bool,
-    onClose: PropTypes.func,
-    getTitle: PropTypes.func,
-    locale: PropTypes.object.isRequired,
-    editing: PropTypes.bool,
-    onEdit: PropTypes.func.isRequired,
-    onEditCancel: PropTypes.func.isRequired,
-    onEditSave: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-};
-
 const DetailViewContents = memo(function DetailViewContents ({
     original,
     formRef,
@@ -437,18 +401,6 @@ function DetailSaveDialog ({
     );
 }
 
-DetailSaveDialog.propTypes = {
-    id: PropTypes.any,
-    open: PropTypes.bool,
-    onClose: PropTypes.func,
-    onSuccess: PropTypes.func.isRequired,
-    onPatch: PropTypes.func.isRequired,
-    original: PropTypes.object.isRequired,
-    value: PropTypes.object.isRequired,
-    fields: PropTypes.object,
-    detailLocale: PropTypes.object.isRequired,
-};
-
 function ConfirmDeleteDialog ({ id, open, onClose, onDelete, onDeleted, detailLocale }) {
     const [deleting, setDeleting] = useState(false);
 
@@ -484,12 +436,3 @@ function ConfirmDeleteDialog ({ id, open, onClose, onDelete, onDeleted, detailLo
         </Dialog>
     );
 }
-
-ConfirmDeleteDialog.propTypes = {
-    id: PropTypes.any,
-    open: PropTypes.bool,
-    onClose: PropTypes.func.isRequired,
-    onDelete: PropTypes.func.isRequired,
-    onDeleted: PropTypes.func.isRequired,
-    detailLocale: PropTypes.object.isRequired,
-};

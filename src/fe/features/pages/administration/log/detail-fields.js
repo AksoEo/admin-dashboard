@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button } from 'yamdl';
+import { Button } from '@cpsdqs/yamdl';
 import FIELDS from './table-fields';
 import data from '../../../../components/data';
 import { Link } from '../../../../router';

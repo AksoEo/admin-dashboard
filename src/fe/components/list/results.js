@@ -1,12 +1,11 @@
 import { h } from 'preact';
-import PropTypes from 'prop-types';
 import Table from '@material-ui/core/Table';
 import TableHead from '@material-ui/core/TableHead';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
-import { Button } from 'yamdl';
+import { Button } from '@cpsdqs/yamdl';
 import TablePagination from '@material-ui/core/TablePagination';
 import SearchIcon from '@material-ui/icons/Search';
 import ListAltIcon from '@material-ui/icons/ListAlt';
@@ -87,28 +86,6 @@ export default function Results ({
     );
 }
 
-Results.propTypes = {
-    list: PropTypes.array,
-    items: PropTypes.object,
-    page: PropTypes.number,
-    itemsPerPage: PropTypes.number,
-    isRestrictedByGlobalFilter: PropTypes.bool,
-    time: PropTypes.number,
-    isFiltered: PropTypes.bool,
-    totalItems: PropTypes.number,
-    onSetPage: PropTypes.func,
-    onSetItemsPerPage: PropTypes.func,
-    fields: PropTypes.object.isRequired,
-    transientFields: PropTypes.array.isRequired,
-    fieldSpec: PropTypes.object.isRequired,
-    configColumn: PropTypes.string,
-    onEditFields: PropTypes.func.isRequired,
-    onAddField: PropTypes.func.isRequired,
-    onSetFieldSorting: PropTypes.func.isRequired,
-    localizedFields: PropTypes.object.isRequired,
-    getLinkTarget: PropTypes.func,
-};
-
 export function ErrorResult ({ error }) {
     let errorIsLocalized = false;
     let errorDetails = error.toString();
@@ -151,10 +128,6 @@ export function ErrorResult ({ error }) {
         </div>
     );
 }
-
-ErrorResult.propTypes = {
-    error: PropTypes.any.isRequired,
-};
 
 function ResultsTable ({
     list,
@@ -211,20 +184,6 @@ function ResultsTable ({
         </Table>
     );
 }
-
-ResultsTable.propTypes = {
-    list: PropTypes.array.isRequired,
-    items: PropTypes.object.isRequired,
-    fields: PropTypes.object.isRequired,
-    transientFields: PropTypes.array.isRequired,
-    fieldSpec: PropTypes.object.isRequired,
-    configColumn: PropTypes.string,
-    onEditFields: PropTypes.func.isRequired,
-    onAddField: PropTypes.func.isRequired,
-    onSetFieldSorting: PropTypes.func.isRequired,
-    localizedFields: PropTypes.object.isRequired,
-    getLinkTarget: PropTypes.func,
-};
 
 function TableHeader ({
     fields,
@@ -291,16 +250,6 @@ function TableHeader ({
     );
 }
 
-TableHeader.propTypes = {
-    fields: PropTypes.arrayOf(PropTypes.object).isRequired,
-    fieldSpec: PropTypes.object.isRequired,
-    configColumn: PropTypes.string,
-    onEditFields: PropTypes.func.isRequired,
-    onAddField: PropTypes.func.isRequired,
-    onSetFieldSorting: PropTypes.func.isRequired,
-    localizedFields: PropTypes.object.isRequired,
-};
-
 function TableItem ({ fields, fieldSpec, value, onClick, linkTarget }) {
     let className = 'list-item';
     if (value.isCursed) className += ' is-cursed';
@@ -331,17 +280,6 @@ function TableItem ({ fields, fieldSpec, value, onClick, linkTarget }) {
     );
 }
 
-TableItem.propTypes = {
-    fields: PropTypes.arrayOf(PropTypes.string).isRequired,
-    fieldSpec: PropTypes.object.isRequired,
-    value: PropTypes.any,
-    isSelected: PropTypes.bool,
-    onClick: PropTypes.func.isRequired,
-    onSelectChange: PropTypes.func.isRequired,
-    linkTarget: PropTypes.string,
-};
-
 function NullField ({ field }) {
     return <code>missing field component for {field}</code>;
 }
-NullField.propTypes = { field: PropTypes.any };

@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { AppBarProxy } from 'yamdl';
+import { AppBarProxy } from '@cpsdqs/yamdl';
 import APILogListView from './log';
 
 export default class Administration extends Component {

@@ -6,7 +6,7 @@ import { LOGIN_ID } from './login-keys';
 
 //! # Client-side codeholder representation
 //! - fields with no value are null or an empty string
-//! - fields that have not been loaded must not be indexed (i.e. they do not exist in the object)
+//! - fields that have not been loaded must be undefined
 //!
 //! ## Fields
 //! - id: identical to API
@@ -35,6 +35,12 @@ import { LOGIN_ID } from './login-keys';
 //! - profilePictureHash: identical to API
 //! - isActiveMember: identical to API
 //! - profession: identical to API
+//!
+//! Read-only derived fields:
+//!
+//! - country: { fee, address }
+//! - addressCity: identical to addressLatin.city
+//! - addressCityArea: identical to addressLatin.cityArea
 
 /// Data store path.
 export const CODEHOLDERS = 'codeholders';
@@ -112,7 +118,8 @@ const clientFields = {
     code: {
         apiFields: ['newCode', 'oldCode'],
         fromAPI: codeholder => ({ new: codeholder.newCode, old: codeholder.oldCode }),
-        toAPI: value => ({ newCode: value.new, oldCode: value.old }),
+        // oldCode is read-only, so we only serialize newCode
+        toAPI: value => ({ newCode: value.new }),
     },
     creationTime: 'creationTime',
     hasPassword: 'hasPassword',
@@ -161,6 +168,31 @@ const clientFields = {
     profilePictureHash: 'profilePictureHash',
     isActiveMember: 'isActiveMember',
     profession: 'profession',
+
+    country: {
+        apiFields: ['addressLatin.country', 'feeCountry'],
+        fromAPI: codeholder => ({
+            fee: codeholder.feeCountry,
+            address: codeholder.addressLatin && codeholder.addressLatin.country,
+        }),
+        toAPI: () => {
+            throw new Error('derived fields cannot be serialized');
+        },
+    },
+    addressCity: {
+        apiFields: ['addressLatin.city'],
+        fromAPI: codeholder => codeholder.addressLatin && codeholder.addressLatin.city,
+        toAPI: () => {
+            throw new Error('derived fields cannot be serialized');
+        },
+    },
+    addressCityArea: {
+        apiFields: ['addressLatin.cityArea'],
+        fromAPI: codeholder => codeholder.addressLatin && codeholder.addressLatin.cityArea,
+        toAPI: () => {
+            throw new Error('derived fields cannot be serialized');
+        },
+    },
 };
 
 /// converts from API repr to client repr (see above)
@@ -368,13 +400,18 @@ function parametersToRequestData (params) {
     // list of all fields that have been selected
     const fields = params.fields.concat(transientFields.map(id => ({ id, sorting: 'none' })));
 
+    for (const field of fields) {
+        if (!(field.id in clientFields)) {
+            throw { code: 'unknown-field', message: `unknown field ${field.id}` };
+        }
+    }
+
     options.order = fields
         .filter(({ sorting }) => sorting !== 'none')
         // some fields have multiple sub-fields that must be sorted individually
         .flatMap(({ id, sorting }) => typeof clientFields[id] === 'string'
             ? [[clientFields[id], sorting]]
-            : (clientFields[id].sort || clientFields[id].apiFields).map(id => [id, sorting]))
-        .map(({ id, sorting }) => [id, sorting]);
+            : (clientFields[id].sort || clientFields[id].apiFields).map(id => [id, sorting]));
 
     // order by relevance if no order is selected
     if (options.search && !options.order.length) {
@@ -389,11 +426,22 @@ function parametersToRequestData (params) {
     options.offset = params.offset;
     options.limit = params.limit;
 
-    options.filter = params.jsonFilter;
-    if (!('jsonFilter' in params)) {
-        // TODO: filter stuff
+    const filters = [];
+    for (const filter in (params.filters || {})) {
+        if (!(filter in clientFilters)) {
+            throw { code: 'unknown-filter', message: `unknown filter ${filter}` };
+        }
+        filters.push(clientFilters[filter].toAPI(params.filters[filter]));
     }
-    const usedFilters = !!Object.keys(params.filter).length;
+    if (filters.length) {
+        options.filter = { $and: filters };
+    }
+
+    if ('jsonFilter' in params) {
+        if (options.filter) options.filter.$and.push(params.jsonFilter);
+        else options.filter = params.jsonFilter;
+    }
+    const usedFilters = 'filter' in options && !!Object.keys(options.filter).length;
 
     return {
         options,
@@ -406,7 +454,8 @@ function parametersToRequestData (params) {
 /// merges like object.assign, but deep
 /// may or may not mutate a
 function deepMerge (a, b) {
-    if (typeof a === 'object' && typeof b === 'object') {
+    if (b === undefined) return a;
+    if (a !== null && b !== null && typeof a === 'object' && typeof b === 'object') {
         if (Array.isArray(a) || Array.isArray(b)) return b;
         for (const k in b) a[k] = deepMerge(a[k], b[k]);
         return a;
@@ -436,7 +485,6 @@ export const tasks = {
         }
         return fields;
     },
-
     /// codeholders/filters: lists available filters according to permissions
     /// returns an array with filter ids
     filters: async () => {
@@ -449,13 +497,12 @@ export const tasks = {
         }
         return filters;
     },
-
     /// codeholders/list: fetches codeholders
     /// options: none
     /// parameters:
     ///    - search: { field: string, query: string }
     ///    - filters: object { [name]: value }
-    ///    - jsonFilter: object (will be preferred over filters if set)
+    ///    - jsonFilter: object (will be &&-ed with filters if set)
     ///    - fields: [{ id: string, sorting: 'asc' | 'desc' | 'none' }]
     ///    - offset: number
     ///    - limit: number
@@ -495,7 +542,7 @@ export const tasks = {
 
         const result = await client.get('/codeholders', options);
         let list = result.body;
-        let totalItems = +result.res.headers.map['x-total-items'];
+        let totalItems = +result.res.headers.get('x-total-items');
         let cursed = false;
 
         if (itemToPrepend) {
@@ -553,6 +600,159 @@ export const tasks = {
         store.insert([CODEHOLDERS, storeId], deepMerge(existing, clientFromAPI(res.body)));
 
         return id;
+    },
+    /// codeholders/create: creates a codeholder
+    ///
+    /// # Options and Parameters
+    /// - all codeholder fields, really
+    create: async (_, data) => {
+        const client = await asyncClient;
+        await client.post('/codeholders', clientToAPI(data));
+    },
+    /// codeholders/delete: deletes a codeholder
+    ///
+    /// # Options
+    /// - id: codeholder id
+    delete: async ({ id }) => {
+        const client = await asyncClient;
+        await client.delete(`/codeholders/${id}`);
+    },
+    /// codeholders/setProfilePicture: sets a codeholder’s profile picture
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id or `self`
+    /// - blob: file blob (with type)
+    setProfilePicture: async ({ id }, { blob }) => {
+        const client = await asyncClient;
+        await client.put(`/codeholders/${id}/profile_picture`, null, {}, [{
+            name: 'picture',
+            type: blob.type,
+            value: blob,
+        }]);
+        // need to update profilePictureHash
+        // but we don’t await this because when this fails it shouldn’t display an error
+        tasks.codeholder({ id, fields: ['profilePictureHash'] }).catch(() => {});
+    },
+    /// codeholders/listFiles: lists files for a codeholder
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - offset, limit
+    ///
+    /// Returns { items, total }
+    listFiles: async ({ id }, { offset, limit }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/codeholders/${id}/files`, {
+            offset,
+            limit,
+            // all the fields
+            fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime'],
+        });
+
+        return { items: res.body, total: +res.res.headers.get('x-total-items') };
+    },
+    /// codeholders/uploadFile: uploads a file
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - name: file name
+    /// - description: optional file description
+    /// - file: blob
+    uploadFile: async ({ id }, { name, description, file }) => {
+        const client = await asyncClient;
+        const options = { name };
+        if (description) options.description = description;
+        await client.post(`/codeholders/${id}/files`, options, undefined, [{
+            name: 'file',
+            type: file.type,
+            value: file,
+        }]);
+    },
+    /// codeholders/deleteFile: deletes a file
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - file: file id
+    deleteFile: async ({ id, file }) => {
+        const client = await asyncClient;
+        await client.delete(`codeholders/${id}/files/${file}`);
+    },
+    /// codeholders/listMemberships: lists memberships for a codeholder
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - offset, limit
+    ///
+    /// Returns { items, total }
+    listMemberships: async ({ id }, { offset, limit }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/codeholders/${id}/membership`, {
+            offset,
+            limit,
+            // most of the fields
+            fields: [
+                'id',
+                'categoryId',
+                'year',
+                'nameAbbrev',
+                'name',
+                'givesMembership',
+                'lifetime',
+            ],
+            order: [['year', 'desc']],
+        });
+
+        return { items: res.body, total: +res.res.headers.get('x-total-items') };
+    },
+    /// codeholders/addMembership: adds a membership
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - category: category id
+    /// - year: year
+    addMembership: async ({ id }, { category, year }) => {
+        const client = await asyncClient;
+        await client.post(`/codeholders/${id}/membership`, {
+            categoryId: category,
+            year: year,
+        });
+    },
+    /// codeholders/deleteMembership: deletes a membership
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - membership: membership id
+    deleteMembership: async ({ id }, { membership }) => {
+        const client = await asyncClient;
+        await client.delete(`/codeholders/${id}/membership/${membership}`);
+    },
+    /// codeholders/makeAddressLabels: spawns a task on the server
+    ///
+    /// # Options
+    /// see codeholders/list
+    ///
+    /// # Parameters
+    /// see api docs
+    makeAddressLabels: async ({ search, filters, jsonFilter, fields }, parameters) => {
+        const client = await asyncClient;
+        const options = parametersToRequestData({ search, filters, jsonFilter, fields });
+        delete options.fields;
+        delete options.offset;
+        delete options.limit;
+        await client.post('/codeholders/!make_address_labels', parameters, options);
+    },
+    /// codeholders/address: gets a codeholder’s formatted address
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - lang: language (defaults to eo)
+    /// - postal: whether to format as postalLatin
+    address: async ({ id }, { lang = 'eo', postal = false }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/codeholders/${id}/address/${lang}`, {
+            formatAs: postal ? 'postalLatin' : 'displayLatin',
+        });
+        return res.body[id];
     },
 };
 

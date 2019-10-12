@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { Dialog, Checkbox, Button } from 'yamdl';
+import { Dialog, Checkbox, Button } from '@cpsdqs/yamdl';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
@@ -10,33 +9,19 @@ import locale from '../../locale';
 import Sorting from './sorting';
 import './field-picker.less';
 
-/**
- * Width below which the field picker will be a full-screen modal.
- */
+/// Width below which the field picker will be a full-screen modal.
 const FULLSCREEN_WIDTH = 600;
 
-/**
- * Displays a modal for picking, ordering, and setting sorting for a list of fields.
- */
+/// Displays a modal for picking, ordering, and setting sorting for a list of fields.
+///
+/// # Props
+/// - available: string[] of available fields
+/// - sortables: string[] of sortable fields
+/// - selected: { id, sorting }[] of selected fields
+/// - onAddField, onRemoveField, onSetFieldSorting, onMoveField: callbacks
+/// - open/onClose: open state
+/// - localizedFields: locale object
 export default class FieldPicker extends PureComponent {
-    static propTypes = {
-        /** The list of available fields. */
-        available: PropTypes.arrayOf(PropTypes.string).isRequired,
-        /** The list of sortable fields. */
-        sortables: PropTypes.arrayOf(PropTypes.string).isRequired,
-        /** The list of currently selected fields with their sorting type. */
-        selected: PropTypes.arrayOf(PropTypes.object).isRequired,
-        onAddField: PropTypes.func.isRequired,
-        onRemoveField: PropTypes.func.isRequired,
-        onSetFieldSorting: PropTypes.func.isRequired,
-        onMoveField: PropTypes.func.isRequired,
-        /** If true, will show the modal. */
-        open: PropTypes.bool.isRequired,
-        /** Close handler. */
-        onClose: PropTypes.func.isRequired,
-        localizedFields: PropTypes.object.isRequired,
-    };
-
     state = {
         search: '',
     };
@@ -123,19 +108,12 @@ export default class FieldPicker extends PureComponent {
     }
 }
 
-/**
- * Lets the user click through sorting types for a field.
- */
+/// Lets the user click through sorting types for a field.
+///
+/// # Props
+/// - value/onChange: Sorting value
+/// - hideLabel: if true, will hide the label explaining the current state
 export class SortingControl extends PureComponent {
-    static propTypes = {
-        /** The current Sorting. */
-        value: PropTypes.string.isRequired,
-        /** Change handler. */
-        onChange: PropTypes.func.isRequired,
-        /** If true, will hide the label explaining the current state. */
-        hideLabel: PropTypes.bool,
-    };
-
     onClick = () => {
         if (this.props.value === Sorting.NONE) this.props.onChange(Sorting.ASC);
         else if (this.props.value === Sorting.ASC) this.props.onChange(Sorting.DESC);

@@ -1,12 +1,12 @@
 import { h, Component } from 'preact';
-import { CircularProgress } from 'yamdl';
-import { UEACode as AKSOUEACode } from 'akso-client';
+import { CircularProgress } from '@cpsdqs/yamdl';
+import { UEACode as AKSOUEACode } from '@tejo/akso-client';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
+import { coreContext } from '../../core/connection';
 import locale from '../../locale';
 import { Validator } from '../form';
 import SuggestionField from '../suggestion-field';
-import client from '../../client';
 
 /// Renders a single UEA code. Props: `value`, `old`.
 export function UEACode ({ value, old, ...extra }) {
@@ -37,6 +37,8 @@ class UEACodeEditor extends Component {
         takenState: null,
     };
 
+    static contextType = coreContext;
+
     checkTaken () {
         let isNewCode = false;
         try {
@@ -49,12 +51,13 @@ class UEACodeEditor extends Component {
             return;
         }
         this.setState({ takenState: 'loading' });
-        return client.get('/codeholders', {
+        return this.context.createTask('codeholders/list', {
+            jsonFilter: { newCode: this.props.value, id: { $neq: this.props.id } },
+            offset: 0,
             limit: 1,
-            filter: { newCode: this.props.value, id: { $neq: this.props.id } },
-        }).then(res => {
+        }).runOnceAndDrop().then(({ items }) => {
             if (this.doNotUpdate) return;
-            if (res.body.length) this.setState({ takenState: 'taken' });
+            if (items.length) this.setState({ takenState: 'taken' });
             else this.setState({ takenState: 'available' });
         }).catch(err => {
             if (this.doNotUpdate) return;

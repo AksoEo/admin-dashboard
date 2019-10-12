@@ -1,6 +1,5 @@
 import { h } from 'preact';
 import { PureComponent, lazy, Suspense } from 'preact/compat';
-import PropTypes from 'prop-types';
 import { createStore, applyMiddleware } from 'redux';
 import { connect, Provider } from 'react-redux';
 import thunk from 'redux-thunk';
@@ -88,107 +87,77 @@ const listViewMiddleware = listView => () => next => action => {
 const RELOAD_DEBOUNCE_TIME = 500; // ms
 
 /// Renders a searchable and filterable list of items, each with a detail view.
+///
+/// # Props
+/// - defaults: object
+///   Defaults for various things.
+///   - `searchField`: the default search field
+///   - `fixedFields`: list of fixed fields: `{ id: string, sorting: Sorting }[]`
+///   - `fields`: list of default fields: `{ id: string, sorting: Sorting }[]`
+///   - `filtersEnabled`: set to enable filters by default
+/// - title: element
+///   Title component; will be put above the search field when not submitted.
+/// - searchFields: string[]
+///   List of searchable fields.
+/// - filters: object
+///   List of available filters.
+///   Should be keyed by filter ID. See ./filter.js for how to write filter specs.
+/// - fields: object
+///   List of available fields.
+///   Should be keyed by field ID.
+/// - fieldConfigColumn: string
+///   Column for which the header will be replaced with the field configuration button.
+/// - onRequest: function
+///   List request handler.
+/// - isRestrictedByGlobalFilter: bool
+///   If true, will show a notice about being restricted by a global filter.
+/// - onURLQueryChange: function
+///   Fired whenever the URL query changes.
+/// - locale: object
+///   Locale data.
+///   - `searchFields`: translations for search fields
+///   - `placeholders`: translations for search placeholders
+///   - `filters`: translations for filters
+///   - `fields`: translations for fields
+///   - `csvFilename`: file name prefix for CSV exports
+///   - `csvFields`: translations for exported fields. Will use `fields` as fallback
+///   - `detail`: translations for detail view stuff
+///     - `fields`: translations for fields
+/// - getLinkTarget: function
+///   Should return the URL target for a given detail view.
+/// - detailView: any
+///   Detail view identifier. If given, a detail view will be shown.
+/// - onDetailClose: function
+///   Called when the detail view requests to be closed.
+/// - onDetailRequest: function
+///   Detail request handler.
+/// - detailFields: object
+///   Object of all detail fields that will be displayed in a table.
+///   Keyed by their name (which should match the locale key in detail.fields).
+/// - detailHeader: any
+///   Detail header component. Works like a field component but isn’t in the table.
+/// - detailFooter: any
+/// - onDetailPatch: function
+///   Called when an item is edited.
+/// - onDetailDelete: function
+///   Called when an item is deleted.
+/// - onFetchFieldHistory: function
+///   Called when the field history for a field is opened.
+/// - onChangePage: function
+///   Called when the page changes.
+/// - csvExportOptions: object
+///   User-defined options for CSV export.
+///   Should be an object of `id => spec`, where spec is an object with a `type` field. Types:
+///   - `select`: will render a select with options given by the `options` field in the spec.
+///     Each option should be an (array) tuple like `[id, label]`.
+/// - canSaveFilters: bool
+///   If true, will be able to save filters.
+/// - savedFilterCategory: string
+///   The category name for saved filters.
+/// - onStateChange: function
+/// - userData: object
+///   User data, will be passed as-is to some components.
 export default class ListView extends PureComponent {
-    static propTypes = {
-        /// Defaults for various things.
-        ///
-        /// - `searchField`: the default search field
-        /// - `fixedFields`: list of fixed fields: `{ id: string, sorting: Sorting }[]`
-        /// - `fields`: list of default fields: `{ id: string, sorting: Sorting }[]`
-        /// - `filtersEnabled`: set to enable filters by default
-        defaults: PropTypes.object,
-
-        /// Title component; will be put above the search field when not submitted.
-        title: PropTypes.element,
-
-        /// List of searchable fields.
-        searchFields: PropTypes.arrayOf(PropTypes.string),
-
-        /// List of available filters.
-        /// Should be keyed by filter ID. See ./filter.js for how to write filter specs.
-        filters: PropTypes.object,
-
-        /// List of available fields.
-        /// Should be keyed by field ID.
-        fields: PropTypes.object,
-
-        /// Column for which the header will be replaced with the field configuration button.
-        fieldConfigColumn: PropTypes.string,
-
-        /// List request handler.
-        onRequest: PropTypes.func,
-
-        /// If true, will show a notice about being restricted by a global filter.
-        isRestrictedByGlobalFilter: PropTypes.bool,
-
-        /// Fired whenever the URL query changes.
-        onURLQueryChange: PropTypes.func,
-
-        /// Locale data.
-        ///
-        /// - `searchFields`: translations for search fields
-        /// - `placeholders`: translations for search placeholders
-        /// - `filters`: translations for filters
-        /// - `fields`: translations for fields
-        /// - `csvFilename`: file name prefix for CSV exports
-        /// - `csvFields`: translations for exported fields. Will use `fields` as fallback
-        /// - `detail`: translations for detail view stuff
-        ///   - `fields`: translations for fields
-        locale: PropTypes.object.isRequired,
-
-        /// Should return the URL target for a given detail view.
-        getLinkTarget: PropTypes.func,
-
-        /// Detail view identifier. If given, a detail view will be shown.
-        detailView: PropTypes.any,
-
-        /// Called when the detail view requests to be closed.
-        onDetailClose: PropTypes.func,
-
-        /// Detail request handler.
-        onDetailRequest: PropTypes.func,
-
-        /// Object of all detail fields that will be displayed in a table.
-        ///
-        /// Keyed by their name (which should match the locale key in detail.fields).
-        detailFields: PropTypes.object,
-
-        /// Detail header component. Works like a field component but isn’t in the table.
-        detailHeader: PropTypes.any,
-        detailFooter: PropTypes.any,
-
-        /// Called when an item is edited.
-        onDetailPatch: PropTypes.func,
-
-        /// Called when an item is deleted.
-        onDetailDelete: PropTypes.func,
-
-        /// Called when the field history for a field is opened.
-        onFetchFieldHistory: PropTypes.func,
-
-        /// Called when the page changes.
-        onChangePage: PropTypes.func,
-
-        /// User-defined options for CSV export.
-        ///
-        /// Should be an object of `id => spec`, where spec is an object with a `type` field.
-        ///
-        /// ## Types
-        /// - `select`: will render a select with options given by the `options` field in the spec.
-        ///   Each option should be an (array) tuple like `[id, label]`.
-        csvExportOptions: PropTypes.object,
-
-        /// If true, will be able to save filters.
-        canSaveFilters: PropTypes.bool,
-
-        /// The category name for saved filters.
-        savedFilterCategory: PropTypes.string.isRequired,
-
-        onStateChange: PropTypes.func,
-
-        /// User data, will be passed as-is.
-        userData: PropTypes.object,
-    };
 
     /// State store.
     store = createStore(listViewReducer, applyMiddleware(
@@ -592,21 +561,16 @@ const SearchFilters = connect(state => ({
     return <PaperList className="search-filters-container">{items}</PaperList>;
 });
 
-function FilterDisclosureButton (props) {
+function FilterDisclosureButton ({ expanded, onChange }) {
     return (
         <button
-            className={'filter-disclosure' + (props.expanded ? ' expanded' : '')}
-            onClick={() => props.onChange(!props.expanded)}>
+            className={'filter-disclosure' + (expanded ? ' expanded' : '')}
+            onClick={() => onChange(!expanded)}>
             {locale.listView.filters}
             <KeyboardArrowDownIcon className="filter-disclosure-icon" />
         </button>
     );
 }
-
-FilterDisclosureButton.propTypes = {
-    expanded: PropTypes.bool.isRequired,
-    onChange: PropTypes.func.isRequired,
-};
 
 const ConnectedResults = connect(state => ({
     submitted: state.list.submitted,

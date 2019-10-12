@@ -1,24 +1,19 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
 import DragHandleIcon from '@material-ui/icons/DragHandle';
-import { Spring, globalAnimator } from '../../animation';
+import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 
 // constant li height
 const LI_HEIGHT = 56;
 
-/** Material list with drag controls, for the field picker. */
+/// Material list with drag controls, for the field picker.
+///
+/// # Props
+/// - children: array of elements
+/// - isItemDraggable: fn(index) -> bool
+/// - canMove: fn(toPos) -> bool
+/// - onMove: fn(fromPos, toPos)
 export default class RearrangingList extends PureComponent {
-    static propTypes = {
-        children: PropTypes.arrayOf(PropTypes.element).isRequired,
-        /** `fn(index: number) -> bool` */
-        isItemDraggable: PropTypes.func.isRequired,
-        /** `fn(toPos: number) -> bool` */
-        canMove: PropTypes.func.isRequired,
-        /** `fn(fromPos: number, toPos: number) -> bool` */
-        onMove: PropTypes.func.isRequired,
-    };
-
     itemData = new Map();
 
     createItemData (node, index) {

@@ -1,48 +1,34 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { Spring, lerp } from '../animation';
+import { Spring } from '@cpsdqs/yamdl';
 import './segmented.less';
 
-/**
- * A segmented selection control (see iOS).
- * Apparently these are not part of Material Design but they’re too convenient not to be used.
- *
- * Pass an array of objects as its children like so:
- *
- * ```js
- * <Segmented>
- *     {[
- *         {
- *             id: 'option-1',
- *             label: 'Option 1',
- *         },
- *     ]}
- * </Segmented>
- * ```
- */
+const lerp = (a, b, x) => (b - a) * x + a;
+
+/// A segmented selection control (see iOS).
+/// Apparently these are not part of Material Design but they’re too convenient not to be used.
+///
+/// Pass an array of objects as its children like so:
+///
+/// ```js
+/// <Segmented>
+///     {[
+///         {
+///             id: 'option-1',
+///             label: 'Option 1',
+///         },
+///     ]}
+/// </Segmented>
+/// ```
+///
+/// # Props
+/// - children: a list of objects with the following properties:
+///   - `id`: a unique identifier that will be used for the `selected` prop
+///   - `label`: a label string or component
+///   - `disabled`: if true, will render it disabled
+/// - selected/onSelect: the selected option’s id
+/// - disabled: bool
 export default class Segmented extends PureComponent {
-    static propTypes = {
-        /**
-         * A list of objects with the following properties:
-         *
-         * - `id`: a unique identifier that will be used for the `selected` prop
-         * - `label`: a label string or component
-         * - `disabled`: if true, will render it disabled
-         */
-        children: PropTypes.arrayOf(PropTypes.object).isRequired,
-
-        class: PropTypes.string,
-
-        /** The selected option’s id. */
-        selected: PropTypes.string,
-
-        /** Callback for when an option is selected. */
-        onSelect: PropTypes.func.isRequired,
-
-        disabled: PropTypes.bool,
-    };
-
     state = {
         backgroundPos: 0,
     }

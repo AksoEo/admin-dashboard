@@ -1,34 +1,23 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { Checkbox } from 'yamdl';
+import { Checkbox } from '@cpsdqs/yamdl';
 
-/** A single filter. */
+/// A single filter.
+///
+/// # Props
+/// - id: filter id (stirng)
+/// - localizedName: filter name
+/// - filter: filter spec object
+///    - needsSwitch: bool?
+///    - autoSwitch: bool?
+///    - isNone: ((any) => bool)? required if !needsSwitch
+///    - default: (() => T)?
+///    - editor: Component?
+/// - enabled/onEnabledChange: bool
+/// - value/onChange: filter value
+/// - submitted: bool, will hide checkbox
+/// - isFirst/isLast: bool
 export default class Filter extends PureComponent {
-    static propTypes = {
-        id: PropTypes.string.isRequired,
-        localizedName: PropTypes.string,
-        /**
-         * The filter spec.
-         *
-         * # Properties
-         * - `needsSwitch: bool?`
-         * - `autoSwitch: bool?`
-         * - `isNone: ((any) => bool)?` required if !needsSwitch
-         * - `default: (() => T)?`
-         * - `editor: Component?`
-         */
-        filter: PropTypes.object.isRequired,
-        enabled: PropTypes.bool.isRequired,
-        value: PropTypes.any,
-        onChange: PropTypes.func.isRequired,
-        onEnabledChange: PropTypes.func.isRequired,
-        /** Should be set to true if the form was submitted and the checkboxes should be hidden. */
-        submitted: PropTypes.bool.isRequired,
-        isFirst: PropTypes.bool,
-        isLast: PropTypes.bool,
-    };
-
     render () {
         let editor = '?';
 

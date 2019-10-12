@@ -1,21 +1,20 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { Spring, globalAnimator, lerp, clamp } from '../../animation';
+import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 import ResizeObserver from 'resize-observer-polyfill';
+
+const lerp = (a, b, x) => (b - a) * x + a;
+const clamp = (x, l, h) => Math.max(l, Math.min(x, h));
 
 const DAMPING = 1;
 const RESPONSE = 0.4;
 
-/**
- * Renders a vertical array of animatable material paper.
- */
+/// Renders a vertical array of animatable material paper.
+///
+/// # Props
+/// - children: array of objects with, uh, various properties (TODO: docs)
 export default class PaperList extends PureComponent {
-    static propTypes = {
-        children: PropTypes.arrayOf(PropTypes.object).isRequired,
-    };
-
-    /** ResizeObserver that observes all children. */
+    /// ResizeObserver that observes all children.
     resizeObserver = new ResizeObserver(() => this.update(0));
 
     childNodes = [];

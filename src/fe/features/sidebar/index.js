@@ -90,21 +90,21 @@ export default class Sidebar extends PureComponent {
     }
 
     render () {
-        let className = '';
-        if (this.props.permanent) className += 'permanent';
+        let className = 'app-sidebar-container';
+        if (this.props.permanent) className += ' permanent';
         if (!this.props.permanent && this.props.open) className += ' open';
 
         return (
-            <div id="app-sidebar-container" className={className}>
+            <div class={className}>
                 <div
-                    id="app-sidebar-backdrop"
+                    class="app-sidebar-backdrop"
                     ref={node => this.backdropNode = node}
                     onClick={() => {
                         this.spring.locked = false;
                         this.props.onClose();
                     }} />
                 <div
-                    id="app-sidebar"
+                    class="app-sidebar"
                     ref={node => this.node = node}
                     onKeyDown={e => {
                         if (e.key === 'Escape') {

@@ -1,6 +1,7 @@
 const data = {
     buildTime: new Date().toISOString(),
-    host: global.aksoConfig.host,
+    // AKSO api base url, **may include a path**
+    base: global.aksoConfig.base,
 };
 
 module.exports = () => {

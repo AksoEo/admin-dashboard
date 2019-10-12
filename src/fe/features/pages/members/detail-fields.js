@@ -1,12 +1,11 @@
 import { h, Component } from 'preact';
-import PropTypes from 'prop-types';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
-import { Button, Checkbox, TextField, Dialog } from 'yamdl';
-import { UEACode } from 'akso-client';
+import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
+import { UEACode } from '@tejo/akso-client';
+import { coreContext } from '../../../core/connection';
 import locale from '../../../locale';
-import client from '../../../client';
 import { Validator } from '../../../components/form';
 import data, { Required } from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
@@ -276,16 +275,14 @@ function Header ({ value, editing, onChange, forceReload, userData }) {
 }
 
 export class CodeholderAddressRenderer extends Component {
-    static propTypes = {
-        id: PropTypes.any,
-    };
-
     state = {
         address: null,
         postalOpen: false,
         postalLang: 'eo',
         postalAddress: null,
     };
+
+    static contextType = coreContext;
 
     componentDidMount () {
         this.load();
@@ -301,11 +298,10 @@ export class CodeholderAddressRenderer extends Component {
     load () {
         if (!this.props.id) return;
         const id = this.props.id;
-        client.get(`/codeholders/${this.props.id}/address/eo`, {
-            formatAs: 'displayLatin',
-        }).then(res => {
+
+        this.context.createTask('codeholders/address', { id: this.props.id }).runOnceAndDrop().then(res => {
             if (id !== this.props.id) return;
-            this.setState({ address: res.body[this.props.id] });
+            this.setState({ address: res });
         }).catch(() => {
             this.reloadTimeout = setTimeout(() => this.load(), 1000);
         });
@@ -316,11 +312,12 @@ export class CodeholderAddressRenderer extends Component {
         const id = this.props.id;
         const lang = this.state.postalLang;
         this.setState({ postalAddress: '' }, () => {
-            client.get(`/codeholders/${this.props.id}/address/${lang}`, {
-                formatAs: 'postalLatin',
+            this.context.createTask('codeholders/address', { id: this.props.id }, {
+                lang,
+                postal: true,
             }).then(res => {
                 if (id !== this.props.id || lang !== this.state.postalLang) return;
-                this.setState({ postalAddress: res.body[this.props.id] });
+                this.setState({ postalAddress: res });
             }).catch(() => {
                 this.reloadTimeout2 = setTimeout(() => this.loadPostal(), 1000);
             });

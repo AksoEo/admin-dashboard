@@ -1,19 +1,19 @@
 import { h } from 'preact';
 import { useState, useCallback, Fragment } from 'preact/compat';
-import { Dialog, TextField, Button } from 'yamdl';
+import { Dialog, TextField, Button } from '@cpsdqs/yamdl';
+import config from '../../../../config.val';
 import DataList from '../../../components/data-list';
 import pickFile from '../../../components/pick-file';
-import client from '../../../client';
 import locale from '../../../locale';
+import { coreContext } from '../../../core/connection';
 
-const loadFiles = id => async (offset, limit) => {
-    const res = await client.get(`/codeholders/${id}/files`, {
-        offset,
-        limit,
-        fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime'],
-    });
+// TODO: use core API properly
 
-    return { items: res.body, totalItems: +res.res.headers['x-total-items'] };
+const loadFiles = (core, id) => async (offset, limit) => {
+    const { items, total } = await core
+        .createTask('codeholders/listFiles', { id }, { offset, limit })
+        .runOnceAndDrop();
+    return { items, totalItems: total };
 };
 
 export default function Files ({ id }) {
@@ -32,39 +32,46 @@ export default function Files ({ id }) {
                 <h3 class="files-title">{locale.members.detail.filesTitle}</h3>
                 <Button onClick={uploadFile}>{locale.members.detail.uploadFile}</Button>
             </header>
-            <DataList
-                class="member-files"
-                onLoad={loadFiles(id)}
-                renderItem={item => (
-                    <div class="member-file" data-id={item.id}>
-                        <div class="file-meta">
-                            <FileThumbnail id={item.id} mime={item.mime} />
-                            <div class="file-name">{item.name}</div>
-                            <div class="file-desc">{item.description}</div>
-                            <div class="file-type">{item.mime}</div>
-                            <div class="file-added-by">{item.addedBy}</div>
-                            <div class="file-time">{item.time}</div>
-                            <Button
-                                href={`${client.client.host}/codeholders/${id}/files/${item.id}`}
-                                target="_blank"
-                                rel="noopener">
-                                {locale.members.detail.downloadFile}
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                onRemove={item => client.delete(`/codeholders/${id}/files/${item.id}`)} />
+            <coreContext.Consumer>
+                {core => <Fragment>
+                    <DataList
+                        class="member-files"
+                        onLoad={loadFiles(core, id)}
+                        renderItem={item => (
+                            <div class="member-file" data-id={item.id}>
+                                <div class="file-meta">
+                                    <FileThumbnail id={item.id} mime={item.mime} />
+                                    <div class="file-name">{item.name}</div>
+                                    <div class="file-desc">{item.description}</div>
+                                    <div class="file-type">{item.mime}</div>
+                                    <div class="file-added-by">{item.addedBy}</div>
+                                    <div class="file-time">{item.time}</div>
+                                    <Button
+                                        href={new URL(`/codeholders/${id}/files/${item.id}`, config.base).toString()}
+                                        target="_blank"
+                                        rel="noopener">
+                                        {locale.members.detail.downloadFile}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                        onRemove={item => core
+                            .createTask('codeholders/deleteFile', { id }, { id: item.id })
+                            .runOnceAndDrop()} />
 
-            <UploadDialog
-                id={id}
-                file={file}
-                open={uploading}
-                onClose={() => setUploading(false)} />
+                    <UploadDialog
+                        id={id}
+                        file={file}
+                        open={uploading}
+                        onClose={() => setUploading(false)}
+                        core={core} />
+                    </Fragment>}
+            </coreContext.Consumer>
         </div>
     );
 }
 
-function UploadDialog ({ id, open, onClose, file }) {
+function UploadDialog ({ id, open, onClose, file, core }) {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [uploading, setUploading] = useState(false);
@@ -105,14 +112,11 @@ function UploadDialog ({ id, open, onClose, file }) {
                 action: () => {
                     setUploading(true);
 
-                    const options = { name };
-                    if (description) options.description = description;
-
-                    client.post(`/codeholders/${id}/files`, options, undefined, [{
-                        name: 'file',
-                        type: file.type,
-                        value: file,
-                    }]).then(() => {
+                    core.createTask('codeholders/uploadFile', { id }, {
+                        name,
+                        description,
+                        file,
+                    }).runOnceAndDrop().then(() => {
                         onClose();
                     }).catch(err => {
                         console.error(err); // eslint-disable-line no-console

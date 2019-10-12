@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, TextField } from 'yamdl';
-import { util } from 'akso-client';
+import { Button, TextField } from '@cpsdqs/yamdl';
+import { util } from '@tejo/akso-client';
 import RemoveIcon from '@material-ui/icons/Remove';
 import SuggestionField from '../../../../components/suggestion-field';
 import data from '../../../../components/data';

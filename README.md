@@ -8,7 +8,7 @@ npx webpack --env prod
 ```
 Build output will be located at `/dist`.
 
-Pass an environment variable named `AKSO_HOST` to override the API host (default: apitest.akso.org).
+Pass an environment variable named `AKSO_BASE` to override the API url base (default: https://apitest.akso.org/).
 
 ### Server Setup
 - All files in `dist` should be served at `/`

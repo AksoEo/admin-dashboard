@@ -22,8 +22,11 @@ const lazyPath = (f, map) => {
 const mapTasks = res => res.tasks;
 const mapViews = res => res.views;
 
-const codeholders = () => import(/* webpackChunkName: 'core-codeholders' */ './codeholders');
-const login = () => import(/* webpackChunkName: 'core-login' */ './login');
+const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './codeholders');
+const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
+const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './login');
+const memberships = () => import(/* webpackChunkName: 'core-memberships', webpackPrefetch: true */ './memberships');
+const queries = () => import(/* webpackChunkName: 'core-queries', webpackPrefetch: true */ './queries');
 
 /// Task definitions.
 export const tasks = {
@@ -33,12 +36,15 @@ export const tasks = {
 
     codeholders: lazyPath(codeholders, mapTasks),
     login: lazyPath(login, mapTasks),
+    queries: lazyPath(queries, mapTasks),
 };
 
 /// View definitions.
 export const views = {
     codeholders: lazyPath(codeholders, mapViews),
+    countries: lazyPath(countries, mapViews),
     login: lazyPath(login, mapViews),
+    memberships: lazyPath(memberships, mapViews),
 
     '#tasks': createStoreObserver(['#tasks'], tasks => {
         const data = {};

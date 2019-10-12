@@ -19,7 +19,7 @@ const browserTargets = {
 };
 
 global.aksoConfig = {
-    host: process.env['AKSO_HOST'] || 'https://apitest.akso.org',
+    base: process.env['AKSO_BASE'] || 'https://apitest.akso.org/',
 };
 
 module.exports = function (env, argv) {

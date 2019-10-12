@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { util } from 'akso-client';
+import { util } from '@tejo/akso-client';
 import ListView, { Sorting } from '../../../../components/list';
 import ListViewURLHandler from '../../../../components/list/url-handler';
 import { routerContext } from '../../../../router';

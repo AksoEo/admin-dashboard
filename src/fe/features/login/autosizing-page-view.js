@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { Spring } from '@cpsdqs/yamdl';
-import { lerp } from '@cpsdqs/yamdl/src/animation'; // FIXME: remove this
+const lerp = (a, b, x) => (b - a) * x + a;
 
 /// Returns the height above which pages should be allowed to scroll vertically.
 const OVERFLOW_HEIGHT = () => window.innerHeight - 120;

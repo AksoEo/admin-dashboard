@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from 'yamdl';
+import { TextField } from '@cpsdqs/yamdl';
 import i18naddress from 'google-i18n-address';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import locale from '../../locale';

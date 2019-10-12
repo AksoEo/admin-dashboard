@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { useState } from 'preact/compat';
-import { Button, Menu } from 'yamdl';
+import { Button, Menu } from '@cpsdqs/yamdl';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import locale from '../locale';
 

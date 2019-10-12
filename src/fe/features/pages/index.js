@@ -14,7 +14,6 @@ import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import FileIcon from '@material-ui/icons/InsertDriveFile';
 
-/** A newspaper icon. */
 export function NewspaperIcon () {
     return (
         <SvgIcon>
@@ -31,10 +30,10 @@ export function ListsIcon () {
     );
 }
 
-/**
- * App routes.
- * IDs are `locale.pages[id]` keys and are also used to identify pages elsewhere.
- */
+// TODO: permissions
+
+/// App routes.
+/// IDs are `locale.pages[id]` keys and are also used to identify pages elsewhere.
 export default [
     {
         // TODO: proper grouping
@@ -44,7 +43,6 @@ export default [
                 id: 'home',
                 icon: <HomeIcon />,
                 url: '',
-                hasPermission: () => true,
             },
             {
                 id: 'members',
@@ -52,55 +50,46 @@ export default [
                     import(/* webpackChunkName: "members", webpackPrefetch: true */ './members')),
                 icon: <AssignmentIndIcon />,
                 url: 'membroj',
-                hasPermission: p => p.hasPermission('codeholders.read'),
             },
             {
                 id: 'membership',
                 icon: <CardMembershipIcon />,
                 url: 'membreco',
-                hasPermission: () => true,
             },
             {
                 id: 'email',
                 icon: <EmailIcon />,
                 url: 'amasmesaghoj',
-                hasPermission: () => true,
             },
             {
                 id: 'magazines',
                 icon: <NewspaperIcon />,
                 url: 'revuoj',
-                hasPermission: () => true,
             },
             {
                 id: 'statistics',
                 icon: <AssessmentIcon />,
                 url: 'statistiko',
-                hasPermission: () => true,
             },
             {
                 id: 'congresses',
                 icon: <BusinessIcon />,
                 url: 'kongresoj',
-                hasPermission: () => true,
             },
             {
                 id: 'payments',
                 icon: <PaymentIcon />,
                 url: 'pagoj',
-                hasPermission: () => true,
             },
             {
                 id: 'elections',
                 icon: <HowToVoteIcon />,
                 url: 'vochdonado',
-                hasPermission: () => true,
             },
             {
                 id: 'newsletters',
                 icon: <MarkunreadMailboxIcon />,
                 url: 'bultenoj',
-                hasPermission: () => true,
             },
             {
                 id: 'administration',
@@ -108,25 +97,21 @@ export default [
                     import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
                 icon: <SupervisorAccountIcon />,
                 url: 'administrado',
-                hasPermission: () => true,
             },
             {
                 id: 'lists',
                 icon: <ListsIcon />,
                 url: 'listoj',
-                hasPermission: () => true,
             },
             {
                 id: 'reports',
                 icon: <AssignmentIcon />,
                 url: 'raportoj',
-                hasPermission: () => true,
             },
             {
                 id: 'documents',
                 icon: <FileIcon />,
                 url: 'dokumentoj',
-                hasPermission: () => true,
             },
         ],
     },

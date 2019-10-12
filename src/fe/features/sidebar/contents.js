@@ -5,12 +5,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ProfilePicture from '../../components/profile-picture';
 import { Link, routerContext } from '../../router';
 import SidebarLogo from './sidebar-logo';
-// import pages from '../pages';
-import { app as locale, meta as localeMeta } from '../../locale';
+import pages from '../pages';
+import { app as locale, pages as localePages, meta as localeMeta } from '../../locale';
 import { connect } from '../../core/connection';
 import { TEJOIcon, UEAIcon } from './icons';
-
-const pages = []; // TODO
 
 // also see src/pages/index.js
 
@@ -22,7 +20,7 @@ function NavItem ({ item, currentPage }) {
             <DrawerItem
                 selected={currentPage === id}
                 icon={icon}>
-                {locale.pages[id]}
+                {localePages[id]}
             </DrawerItem>
         </Link>
     );
@@ -31,9 +29,11 @@ function NavItem ({ item, currentPage }) {
 /** Renders a sidebar category. */
 function NavCategory ({ item, currentPage, permissions }) {
     const { id, contents } = item;
-    const label = locale.pages[id] ? <DrawerLabel>{locale.pages[id]}</DrawerLabel> : null;
+    const label = localePages[id] ? <DrawerLabel>{localePages[id]}</DrawerLabel> : null;
 
-    const filteredContents = contents.filter(item => item.hasPermission(permissions));
+    // TODO: permissions
+    // const filteredContents = contents.filter(item => item.hasPermission(permissions));
+    const filteredContents = contents;
 
     return (
         <Fragment>

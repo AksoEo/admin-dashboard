@@ -1,8 +1,7 @@
 import { h, Component } from 'preact';
 import { useState, useEffect, Fragment, createPortal } from 'preact/compat';
-import { TextField, Button } from 'yamdl';
+import { TextField, Button, globalAnimator } from '@cpsdqs/yamdl';
 import fuzzaldrin from 'fuzzaldrin';
-import { globalAnimator } from '../animation';
 import './suggestion-field.less';
 
 /// A text field with suggestions that behaves like a typical browser address bar.

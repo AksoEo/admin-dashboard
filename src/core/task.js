@@ -54,7 +54,7 @@ export default class Task {
         if (this.isDropped) return;
 
         if (error) {
-            log.debug(`task ${this.id} failed with error`, error.code, error.message);
+            log.debug(`task ${this.id} failed with error`, error.code, error.message, error.stack);
             self.postMessage({
                 type: 'task-error',
                 id: this.id,

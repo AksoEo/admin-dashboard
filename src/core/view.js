@@ -14,6 +14,11 @@ export default class DataView {
             log.debug(`data view ${id} loaded`);
             inner.on('update', this.#onUpdate);
             inner.on('error', this.#onError);
+            for (const event of inner.unbindBuffered()) {
+                const name = event.shift();
+                if (name === 'update') this.#onUpdate(...event);
+                else if (name === 'error') this.#onError(...event);
+            }
         }).catch(err => {
             log.debug(`data view ${id} failed to load`, err);
             this.onError(err);
@@ -27,6 +32,7 @@ export default class DataView {
             id: this.id,
             data,
         });
+        log.debug('updating data view', this.id);
     };
 
     #onError = error => {
@@ -48,6 +54,23 @@ export default class DataView {
 }
 
 export class AbstractDataView extends EventEmitter {
+    constructor () {
+        super();
+
+        this.on('update', this.#bufOnUpdate);
+        this.on('error', this.#bufOnError);
+    }
+
+    #bufferedEvents = [];
+    #bufOnUpdate = (...data) => this.#bufferedEvents.push(['update', ...data]);
+    #bufOnError = (...data) => this.#bufferedEvents.push(['error', ...data]);
+
+    unbindBuffered () {
+        this.removeListener('update', this.#bufOnUpdate);
+        this.removeListener('error', this.#bufOnError);
+        return this.#bufferedEvents;
+    }
+
     drop () {}
 }
 

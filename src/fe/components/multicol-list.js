@@ -1,7 +1,9 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Spring, globalAnimator, lerp } from '../animation';
+import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 import './multicol-list.less';
+
+const lerp = (a, b, x) => (b - a) * x + a;
 
 const VLIST_CHUNK_SIZE = 100;
 

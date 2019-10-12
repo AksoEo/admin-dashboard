@@ -1,11 +1,13 @@
 import { h } from 'preact';
-import { PureComponent, useState, useEffect } from 'preact/compat';
-import { Button, Dialog, AppBarProxy, MenuIcon } from 'yamdl';
+import { PureComponent, useState } from 'preact/compat';
+import { Button, Dialog, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
 import { CardStackItem } from '../../../components/card-stack';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import DataList from '../../../components/data-list';
-import client from '../../../client';
+import { coreContext, connect } from '../../../core/connection';
 import locale from '../../../locale';
+
+// TODO: use core properly
 
 /// Membership editor.
 ///
@@ -21,13 +23,14 @@ export default class MembershipEditor extends PureComponent {
         addingMembership: false,
     };
 
+    static contextType = coreContext;
+
     loadPreview () {
-        client.get(`/codeholders/${this.props.id}/membership`, {
+        this.context.createTask('codeholders/listMemberships', { id: this.props.id }, {
+            offset: 0,
             limit: 100,
-            fields: ['id', 'year', 'nameAbbrev', 'givesMembership', 'lifetime'],
-            order: [['year', 'desc']],
-        }).then(res => {
-            this.setState({ preview: res.body });
+        }).runOnceAndDrop().then(res => {
+            this.setState({ preview: res.items });
         }).catch(err => {
             console.error('Failed to fetch membership', err); // eslint-disable-line no-console
         });
@@ -105,26 +108,18 @@ export default class MembershipEditor extends PureComponent {
                     }>
                     <DataList
                         onLoad={(offset, limit) =>
-                            client.get(`/codeholders/${this.props.id}/membership`, {
-                                offset,
-                                limit,
-                                fields: [
-                                    'id',
-                                    'year',
-                                    'name',
-                                    'nameAbbrev',
-                                    'givesMembership',
-                                    'lifetime',
-                                ],
-                                order: [['year', 'desc']],
-                            }).then(res => ({
+                            this.context.createTask('codeholders/listMemberships', {
+                                id: this.props.id,
+                            }, { offset, limit }).runOnceAndDrop().then(res => ({
                                 items: res.body,
                                 totalItems: +res.res.headers.map['x-total-items'],
                             }))}
                         emptyLabel={locale.members.detail.noMembership}
                         itemHeight={56}
                         onRemove={canEdit && (item =>
-                            client.delete(`/codeholders/${this.props.id}/membership/${item.id}`))}
+                            this.context.createTask('codeholders/deleteMembership', {
+                                id: this.props.id
+                            }, { membership: item.id }).runOnceAndDrop())}
                         renderItem={item => (
                             <div class="membership-item">
                                 <div class="item-name">
@@ -157,23 +152,13 @@ export default class MembershipEditor extends PureComponent {
 }
 
 // FIXME: super rudimentary
-function AddMembership ({ id, onSuccess }) {
-    const [categories, setCategories] = useState([]);
-    const [category, setCategory] = useState('');
+const AddMembership = connect('memberships/categories')((categories, core) => ({
+    categories,
+    core,
+}))(function AddMembership ({ id, onSuccess, categories, core }) {
+    categories = categories || [];
+    const [category, setCategory] = useState(null);
     const [year, setYear] = useState(new Date().getFullYear());
-
-    useEffect(() => {
-        if (categories.length) return;
-        client.get('/membership_categories', {
-            limit: 100,
-            fields: ['id', 'nameAbbrev', 'name', 'availableFrom', 'availableTo'],
-        }).then(res => {
-            // TODO: handle >100 case
-            setCategories(res.body);
-        }).catch(err => {
-            console.error('failed to fetch mcat', err); // eslint-disable-line no-console
-        });
-    });
 
     return (
         <div>
@@ -184,10 +169,10 @@ function AddMembership ({ id, onSuccess }) {
             </select>
             <input type="number" value={year} onChange={e => setYear(e.target.value)} />
             <Button onClick={() => {
-                client.post(`/codeholders/${id}/membership`, {
-                    categoryId: +category,
+                core.createTask('codeholders/addMembership', { id }, {
+                    category: +category,
                     year: +year,
-                }).then(onSuccess).catch(err => {
+                }).runOnceAndDrop().then(onSuccess).catch(err => {
                     console.error('failed to add', err); // eslint-disable-line no-console
                 });
             }}>
@@ -195,4 +180,4 @@ function AddMembership ({ id, onSuccess }) {
             </Button>
         </div>
     );
-}
+});

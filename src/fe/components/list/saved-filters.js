@@ -1,14 +1,13 @@
 import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { Dialog, Button, TextField } from 'yamdl';
+import { Dialog, Button, TextField } from '@cpsdqs/yamdl';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import SaveIcon from '@material-ui/icons/Save';
 import JSON5 from 'json5';
 import Form, { Validator } from '../form';
 import DataList from '../data-list';
 import locale from '../../locale';
-import client from '../../client';
+import { coreContext } from '../../core/connection';
 
 const Action = {
     NONE: 'none',
@@ -17,17 +16,15 @@ const Action = {
     SAVING: 'saving',
 };
 
+/// # Props
+/// - jsonFilterEnabled: bool
+/// - jsonFilter: string
+/// - category: string
+/// - canSaveFilters: bool
+/// - onSetJSONFilter: callback
+/// - onSetJSONFilterEnabled: callback
+/// - onSubmit: callback
 export default class SavedFiltersBar extends PureComponent {
-    static propTypes = {
-        jsonFilterEnabled: PropTypes.bool,
-        jsonFilter: PropTypes.string.isRequired,
-        category: PropTypes.string.isRequired,
-        canSaveFilters: PropTypes.bool,
-        onSetJSONFilter: PropTypes.func.isRequired,
-        onSetJSONFilterEnabled: PropTypes.func.isRequired,
-        onSubmit: PropTypes.func.isRequired,
-    };
-
     state = {
         action: Action.NONE,
         saveError: null,
@@ -35,18 +32,21 @@ export default class SavedFiltersBar extends PureComponent {
         description: '',
     };
 
+    static contextType = coreContext;
+
     save = () => {
         this.setState({ action: Action.SAVING, saveError: null });
 
         try {
             const query = JSON5.parse(this.props.jsonFilter);
 
-            client.post('/queries', {
+            this.context.createTask('queries/add', {
                 category: this.props.category,
+            }, {
                 name: this.state.name,
                 description: this.state.description || null,
                 query,
-            }).then(() => {
+            }).runOnceAndDrop().then(() => {
                 this.setState({ action: Action.NONE });
             }).catch(err => {
                 console.error('Failed to save query', err); // eslint-disable-line no-console
@@ -115,17 +115,15 @@ export default class SavedFiltersBar extends PureComponent {
                     <DataList
                         class="saved-filters-list"
                         onLoad={async (offset, limit) => {
-                            const result = await client.get('/queries', {
+                            const result = await this.context.createTask('queries/list', {}, {
                                 offset,
                                 limit,
-                                fields: ['id', 'name', 'description', 'query'],
-                                order: [['name', 'asc']],
-                                filter: { category: this.props.category },
-                            });
+                                category: this.props.category,
+                            }).runOnceAndDrop();
 
                             return {
-                                totalItems: +result.res.headers.map['x-total-items'],
-                                items: result.body,
+                                totalItems: result.total,
+                                items: result.items,
                             };
                         }}
                         onItemClick={({ name, description, query }) => {
@@ -138,7 +136,7 @@ export default class SavedFiltersBar extends PureComponent {
                                 this.props.onSubmit();
                             }
                         }}
-                        onRemove={item => client.delete(`/queries/${item.id}`)}
+                        onRemove={item => this.context.createTask('queries/delete', { id: item.id }).runOnceAndDrop()}
                         itemHeight={56}
                         renderItem={item => (
                             <Fragment>

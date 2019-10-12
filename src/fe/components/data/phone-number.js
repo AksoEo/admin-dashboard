@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from 'yamdl';
+import { TextField } from '@cpsdqs/yamdl';
 import { parsePhoneNumber, AsYouType as AsYouTypePhoneFmt } from 'libphonenumber-js';
 import { CountryFlag } from './country';
 

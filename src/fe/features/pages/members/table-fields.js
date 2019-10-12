@@ -5,18 +5,26 @@ import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import { CodeholderDisabledIcon } from './icons';
 import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
-import { UEACode as AKSOUEACode } from 'akso-client';
+import { UEACode as AKSOUEACode } from '@tejo/akso-client';
 import moment from 'moment';
 import locale from '../../../locale';
-import cache from '../../../cache';
 import data from '../../../components/data';
 import { WithCountries, CountryFlag } from '../../../components/data/country';
+
+const cache = {
+    getCountries: () => {
+        throw new Error('todo');
+    },
+    getCountriesLocalized: () => {
+        throw new Error('todo');
+    },
+};
 
 // TODO: order fields in some sensible order
 
 /** List of all member fields. */
 export default {
-    codeholderType: {
+    type: {
         sortable: true,
         component ({ value, item }) {
             let icon;

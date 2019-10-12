@@ -2,7 +2,7 @@
 
 import { h, Component } from 'preact';
 import NativeSelect from '@material-ui/core/NativeSelect';
-import cache from '../../cache';
+import { connect } from '../../core/connection';
 
 /// Converts a letter to a regional indicator.
 const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
@@ -17,23 +17,14 @@ export function CountryFlag ({ country }) {
 }
 
 /// Renders its inner function (children) with countries and country groups as parameters.
-export class WithCountries extends Component {
-    state = {
-        countries: {},
-        countryGroups: {},
-    }
-
-    componentDidMount () {
-        cache.getCountries().then(countries => this.setState({ countries }));
-        cache.getCountryGroups().then(countryGroups => this.setState({ countryGroups }));
-    }
-
-    render () {
-        if (this.state.countries && this.state.countryGroups) {
-            return this.props.children(this.state.countries, this.state.countryGroups);
-        } else return null;
-    }
-}
+export const WithCountries = connect('countries/countryGroups')(data => ({
+    countryGroups: data,
+}))(connect('countries/countries')(data => ({
+    countries: data,
+}))(function WithCountries ({ countries, countryGroups, children }) {
+    if (countries && countryGroups) return children(countries, countryGroups);
+    return null;
+}));
 
 function CountryRenderer ({ value }) {
     return (
