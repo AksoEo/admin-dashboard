@@ -40,7 +40,7 @@ export const login = {
     },
 
     totpSetupDescription: 'Bonvolu skani la QR-kodon per via aplikaĵo por agordi dua-faktoran ensaluton.',
-    totpAppDescriptionPre: '[[if you do not have a 2fa app, we recommend]] ',
+    totpAppDescriptionPre: 'Se vi ne havas dua-faktoran aplikaĵon, ni rekomendas ',
     totpAppName: 'Authy',
     totpAppHref: userAgent => 'https://authy.com/download/',
     totpAppDescriptionPost: '.',
@@ -52,8 +52,8 @@ export const login = {
     lostTotp: 'Mi ne povas generi sekurkodon',
     continueTotp: 'Ensaluti',
 
-    createPasswordDescription: login => `[[your account ${login} doesn’t seem to have a password. press to send]] retpoŝtmesaĝon kun instrukcioj pri kiel agordi vian konton.`,
-    resetPasswordDescription: '[[if you forgot your password, enter your login and press the button to send a password reset link to your email address]]',
+    createPasswordDescription: login => `Via konto ${login} ŝajne ne havas pasvorton. Bv. alklaki por sendi retpoŝtmesaĝon kun instrukcioj pri kiel agordi vian konton.`,
+    resetPasswordDescription: 'Se vi forgesis vian pasvorton, bv. enmeti viajn ensalutinformojn kaj premi la butonon por sendi pasvort-nuligligilon al via retpoŝtadreso.',
     sendPasswordReset: 'Sendi retpoŝtmesaĝon',
     sendPasswordSetup: 'Sendi retpoŝtmesaĝon',
     createPasswordSent: 'Sendis retpoŝtmesaĝon. Bonvolu kontroli vian retpoŝtkeston (kaj spamujon).',
