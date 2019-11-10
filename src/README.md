@@ -61,5 +61,45 @@ I (@cpsdqs) have opinions:
 - please don’t use `cursor: pointer` for button controls, it should be reserved for hyperlinks
 - please do at least try not to just make everything a 1:1 representation of the underlying data structures if it could be better
 
+### Navigation
+App navigation is strictly hierarchical, defined in `features/pages/index.js`. At the top level are several fixed paths (e.g. Home, Members, etc.) denoting sections of the app. In those views, a hamburger icon will be displayed in the app bar if applicable.
+
+Additionally, there is a global stack of pages, which will be displayed as an actual card stack on big screens, or as regular full-screen pages on small screens. Items higher in the stack are deeper in the navigation hierarchy.
+
+Each top-level path may have multiple subpaths, which may either be strings as before or regular expressions matching one path fragment. These views will always show a back button or close button instead of a hamburger icon, if applicable.
+
+There are several types of these subpaths:
+
+- `bottom` (stack bottom) will display a view as if it were a top-level page (admittedly the terminology gets a bit confusing here)
+- `stack` views will be added to the stack
+- `state` paths will not create any views but instead modify the state of the item below them in the stack (e.g. edit mode)
+- `task` paths will spawn tasks (preferably task views) instead, and will be *bound* to the task: when the task ends, the path will be removed from the url, and when the user navigates away, the task will be aborted (as best as we can; http requests aren’t exactly cancelable)
+
+#### Query Strings and URL Encoding
+Additionally, views may store state in a query string. If the view is below another in the page stack, then only the topmost view’s query string will be visible in the URL, but *all* views will have their state preserved in the `window.history` API’s state object. Views may also store additional arbitrary data in this state object, such as scroll position.
+
+If a URL exceeds encodable lengths (i.e. 2000 characters) the query string will be replaced with `?T` (“truncated”) and indicate that the page state must be loaded from the history API. If there is no such state, we pretend it never existed.
+
+#### Link Navigation
+In-app links should always use the router context instead of HTML anchors to allow for proper handling of navigation. Router context navigation will cause the current state to be saved, the new page to be loaded, and the linked URL to be decoded, and most importantly, will not cause a page load, thus preserving cached data.
+
 ### Task Views
 Tasks views are a special kind of component that are indexed in `fe/index.js` and are made to mirror tasks in the core, essentially providing users with an interface to modify task parameters and see the results. Task views will exist for as long as the task exists (plus some animation buffer time) and are usually dialogs. For example, a “crop profile picture” task would be accompanied by a dialog showing the crop interface and allowing for adjustment of the position and scale of the picture before running (and dropping) the task.
+
+### Searchable List Views
+AKSO contains a lot of searchable lists. In the interest of DRY, these have been abstracted to the One True List View:
+
+- at the top there is a search bar, where users *may* also pick a field to search
+- below is a list of filters *or* a JSON filter editor
+- below are some statistics about how long the request took and so on
+- finally, the list items
+- and at the bottom, a pagination control
+- usually, list items will link to a detail view dedicated to that one item
+- users may also pick visible fields using a field picker dialog
+- there is also an option to export to csv somewhere
+
+The search & filters control generally always follows the same format (see e.g. codeholders/list). The list of items will always be fetched using a task and not a data view, as all lists are volatile at least to some degree (see log view in administration for an extreme example). Each list item is however a data view, as that data will be fetched anew anyway.
+
+Data is rendered using data renderers (see `components/data`), *including CSV output*.
+
+On large screens, the results will usually be presented as a table, while on smaller screens they are presented as a list of lists of properties.
