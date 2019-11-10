@@ -128,6 +128,8 @@ export default class PaperList extends PureComponent {
         const props = { ...this.props };
         delete props.layout;
 
+        props.class = (props.class || '') + ' paper-list';
+
         const paper = [];
         let paperSpanStart = null;
         let paperSpanEnd = null;

@@ -212,6 +212,10 @@ function coerceToNull (value) {
     return value;
 }
 /// converts from client repr to api repr (see above)
+///
+/// FIXME: this does not handle partial objects correctly
+/// in fact, i should devise some better way of handling partial objects instead of just setting
+/// stuff to undefined
 function clientToAPI (clientRepr) {
     const apiRepr = {};
     for (const field in clientFields) {
@@ -427,19 +431,24 @@ function parametersToRequestData (params) {
     options.limit = params.limit;
 
     const filters = [];
-    for (const filter in (params.filters || {})) {
-        if (!(filter in clientFilters)) {
-            throw { code: 'unknown-filter', message: `unknown filter ${filter}` };
+    if (params.filters && !params.filters._disabled) {
+        for (const filter in params.filters) {
+            if (filter === '_disabled') continue;
+            if (!(filter in clientFilters)) {
+                throw { code: 'unknown-filter', message: `unknown filter ${filter}` };
+            }
+            filters.push(clientFilters[filter].toAPI(params.filters[filter]));
         }
-        filters.push(clientFilters[filter].toAPI(params.filters[filter]));
     }
     if (filters.length) {
         options.filter = { $and: filters };
     }
 
-    if ('jsonFilter' in params) {
-        if (options.filter) options.filter.$and.push(params.jsonFilter);
-        else options.filter = params.jsonFilter;
+    if (params.jsonFilter && !params.jsonFilter._disabled) {
+        const jsonFilter = { ...params.jsonFilter };
+        delete jsonFilter._disabled;
+        if (options.filter) options.filter.$and.push(jsonFilter);
+        else options.filter = jsonFilter;
     }
     const usedFilters = 'filter' in options && !!Object.keys(options.filter).length;
 
@@ -463,7 +472,8 @@ function deepMerge (a, b) {
 }
 
 export const tasks = {
-    /// codeholders/fields: lists available fields according to permissions
+    /// codeholders/fields: lists available fields according to permissions (it is recommended that
+    /// you use the corresponding view instead)
     /// returns an array with field ids
     fields: async () => {
         const client = await asyncClient;
@@ -485,7 +495,8 @@ export const tasks = {
         }
         return fields;
     },
-    /// codeholders/filters: lists available filters according to permissions
+    /// codeholders/filters: lists available filters according to permissions (it is recommended
+    /// that you use the corresponding view instead)
     /// returns an array with filter ids
     filters: async () => {
         const client = await asyncClient;
@@ -502,7 +513,9 @@ export const tasks = {
     /// parameters:
     ///    - search: { field: string, query: string }
     ///    - filters: object { [name]: value }
-    ///    - jsonFilter: object (will be &&-ed with filters if set)
+    ///        - if key `_disabled` is set, will be disabled
+    ///    - jsonFilter: object (will be &&-ed with filters)
+    ///        - if key `_disabled` is set, will be disabled
     ///    - fields: [{ id: string, sorting: 'asc' | 'desc' | 'none' }]
     ///    - offset: number
     ///    - limit: number
@@ -579,7 +592,7 @@ export const tasks = {
             },
         };
     },
-    /// codeholders/codeholder: gets a single codeholder
+    /// codeholders/codeholder: gets a single codeholder and puts it in the data store
     ///
     /// # Options
     /// - id: codeholder id or `self`
@@ -603,7 +616,7 @@ export const tasks = {
     },
     /// codeholders/create: creates a codeholder
     ///
-    /// # Options and Parameters
+    /// # Parameters
     /// - all codeholder fields, really
     create: async (_, data) => {
         const client = await asyncClient;
@@ -621,7 +634,7 @@ export const tasks = {
     ///
     /// # Options and Parameters
     /// - id: codeholder id or `self`
-    /// - blob: file blob (with type)
+    /// - blob: file blob (which has an appropriate mime type)
     setProfilePicture: async ({ id }, { blob }) => {
         const client = await asyncClient;
         await client.put(`/codeholders/${id}/profile_picture`, null, {}, [{
@@ -757,6 +770,27 @@ export const tasks = {
 };
 
 export const views = {
+    // FIXME: the following two views assume that permissions are **immutable**
+    // however, this is not the case and we need to handle this at some point (maybe)
+    // (edge cases don’t really seem to be a priority tbh so maybe never)
+    /// codeholders/fields: lists available fields according to permissions
+    fields: class Fields extends AbstractDataView {
+        constructor () {
+            super();
+            tasks.fields()
+                .then(fields => this.emit('update', fields))
+                .catch(err => this.emit('error', err));
+        }
+    },
+    /// codeholders/fields: lists available filters according to permissions
+    filters: class Filters extends AbstractDataView {
+        constructor () {
+            super();
+            tasks.filters()
+                .then(fields => this.emit('update', fields))
+                .catch(err => this.emit('error', err));
+        }
+    },
     /// codeholders/codeholder: observes (and fetches) a codeholder
     ///
     /// # Options

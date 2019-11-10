@@ -1,4 +1,5 @@
 import { createStoreObserver } from '../view';
+import { TASKS } from '../store';
 
 /// Turns a path lazy by making it a function that returns a promise with the actual object when
 /// called.
@@ -16,7 +17,7 @@ const lazyPath = (f, map) => {
         }
         return promise;
     }
-    lazy.isLazy = true;
+    lazy.isLazy = true; // this marks the function as a lazy path instead of a regular object
     return lazy;
 };
 const mapTasks = res => res.tasks;
@@ -46,7 +47,8 @@ export const views = {
     login: lazyPath(login, mapViews),
     memberships: lazyPath(memberships, mapViews),
 
-    '#tasks': createStoreObserver(['#tasks'], tasks => {
+    /// #tasks: a map of all current tasks to their paths; used for task views in the FE
+    [TASKS]: createStoreObserver([TASKS], tasks => {
         const data = {};
         for (const id in tasks) {
             data[id] = tasks[id].path;

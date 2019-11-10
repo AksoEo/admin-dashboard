@@ -1,22 +1,27 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { UEACode, util } from '@tejo/akso-client';
 import JSON5 from 'json5';
 import AddIcon from '@material-ui/icons/Add';
 import { AppBarProxy, Spring } from '@cpsdqs/yamdl';
 import { routerContext } from '../../../router';
-import ListView, { Sorting } from '../../../components/list';
-import ListViewURLHandler from '../../../components/list/url-handler';
+import SearchFilters from '../../../components/search-filters';
+import Page from '../../../components/page';
 import { coreContext } from '../../../core/connection';
-import locale from '../../../locale';
+import { codeholders as locale } from '../../../locale';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
 import detailFields from './detail-fields';
 import AddMemberDialog from './add-member';
 import AddrLabelGen from './addr-label-gen';
 import './style';
+
+function ListView () {
+    return 'todo: remove this behemoth';
+}
+const Sorting = {};
+const Title = () => 'title';
 
 // TODO: use core api properly
 
@@ -26,22 +31,31 @@ const SEARCHABLE_FIELDS = [
     'landlinePhone',
     'cellphone',
     'officePhone',
-    'address',
+    'searchAddress',
     'notes',
 ];
 
-/// The members list page.
-export default class MembersList extends PureComponent {
-    static propTypes = {
-        path: PropTypes.string.isRequired,
-        query: PropTypes.string.isRequired,
-    };
-
-    static contextType = routerContext;
-
+/// The codeholders list page.
+///
+/// # Props
+/// - query/onQueryChange: url query handling
+export default class CodeholdersPage extends Page {
     state = {
-        /// The member ID of the currently open detail view.
-        detail: null,
+        options: {
+            // TODO
+            search: {
+                field: SEARCHABLE_FIELDS[0],
+                query: '',
+            },
+            filters: {},
+            jsonFilter: { _disabled: true },
+            offset: 0,
+            limit: 10,
+        },
+
+        // whether the filters list is expanded
+        expanded: false,
+
         /// If true, the add member dialog is open.
         addMemberOpen: false,
         /// If true, the address label generator dialog is open.
@@ -58,11 +72,6 @@ export default class MembersList extends PureComponent {
         super(props);
 
         this.scrollSpring.on('update', value => this.node.scrollTop = value);
-
-        this.urlHandler = new ListViewURLHandler('/membroj', true);
-        this.urlHandler.on('navigate', target => this.context.navigate(target));
-        this.urlHandler.on('decodeURLQuery', query => this.listView.decodeURLQuery(query));
-        this.urlHandler.on('detail', detail => this.setState({ detail }));
     }
 
     scrollToTop = () => {
@@ -73,11 +82,11 @@ export default class MembersList extends PureComponent {
     };
 
     componentDidMount () {
-        this.urlHandler.update(this.props.path, this.props.query);
+        // TODO: url query handling
     }
 
     componentDidUpdate () {
-        this.urlHandler.update(this.props.path, this.props.query);
+        // TODO: url query handling
     }
 
     componentWillUnmount () {
@@ -87,6 +96,8 @@ export default class MembersList extends PureComponent {
     render () {
         // overflow menu
         const menu = [];
+        // TODO
+        /*
         menu.push({
             label: this.state.lvJSONFilterEnabled
                 ? locale.listView.json.disable
@@ -94,6 +105,7 @@ export default class MembersList extends PureComponent {
             action: () => this.listView.setJSONFilterEnabled(!this.state.lvJSONFilterEnabled),
             overflow: true,
         });
+        */
         if (this.state.lvSubmitted) {
             menu.push({
                 label: locale.listView.csvExport.menuItem,
@@ -106,6 +118,8 @@ export default class MembersList extends PureComponent {
                 overflow: true,
             });
         }
+        // TODO: this one
+        /*
         if (this.props.permissions.hasPermission('codeholders.create')) {
             menu.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
@@ -113,121 +127,140 @@ export default class MembersList extends PureComponent {
                 action: () => this.setState({ addMemberOpen: true }),
             });
         }
+        */
         menu.push({
-            label: locale.members.search.resetFilters,
+            label: locale.search.resetFilters,
             action: () => this.listView.resetFilters(),
             overflow: true,
         });
 
-        return (
-            <coreContext.Consumer>
-                {core => <div class="app-page members-page" ref={node => this.node = node}>
-                    <AppBarProxy actions={menu} priority={1} />
-                    <ListView
-                        ref={view => this.listView = view}
-                        defaults={{
-                            searchField: 'nameOrCode',
-                            fixedFields: [{
-                                id: 'type',
-                                sorting: Sorting.NONE,
-                            }],
-                            fields: [
-                                {
-                                    id: 'code',
-                                    sorting: Sorting.ASC,
-                                },
-                                {
-                                    id: 'name',
-                                    sorting: Sorting.NONE,
-                                },
-                                {
-                                    id: 'age',
-                                    sorting: Sorting.NONE,
-                                },
-                                {
-                                    id: 'membership',
-                                    sorting: Sorting.NONE,
-                                },
-                                {
-                                    id: 'country',
-                                    sorting: Sorting.NONE,
-                                },
-                            ],
-                        }}
-                        title={<Title />}
-                        searchFields={SEARCHABLE_FIELDS}
-                        filters={FILTERS}
-                        fields={FIELDS}
-                        fieldConfigColumn={'codeholderType'}
-                        onRequest={handleRequest(core)}
-                        isRestrictedByGlobalFilter={!!(
-                            Object.keys(this.props.permissions.memberFilter).length
-                        )}
-                        locale={{
-                            searchFields: locale.members.search.fields,
-                            placeholders: locale.members.search.placeholders,
-                            filters: locale.members.search.filters,
-                            fields: locale.members.fields,
-                            csvFields: locale.members.csvFields,
-                            csvFilename: locale.members.csvFilename,
-                            detail: locale.members.detail,
-                        }}
-                        detailView={this.state.detail}
-                        onURLQueryChange={this.urlHandler.onURLQueryChange}
-                        onDetailClose={this.urlHandler.onDetailClose}
-                        getLinkTarget={this.urlHandler.getLinkTarget}
-                        detailFields={detailFields.fields}
-                        detailHeader={detailFields.header}
-                        detailFooter={detailFields.footer}
-                        onDetailRequest={handleDetailRequest(core)}
-                        onDetailPatch={this.props.permissions.hasPermission('codeholders.update')
-                            && handleDetailPatch(core)}
-                        onDetailDelete={this.props.permissions.hasPermission('codeholders.delete')
-                            && (id => core.createTask('codeholders/delete', { id }).runOnceAndDrop())}
-                        onFetchFieldHistory={
-                            this.props.permissions.hasPermission('codeholders_hist.read')
-                                && handleFieldHistory(core)
-                        }
-                        onChangePage={this.scrollToTop}
-                        csvExportOptions={{
-                            countryLocale: {
-                                name: locale.members.csvOptions.countryLocale,
-                                type: 'select',
-                                options: Object.entries(locale.members.csvOptions.countryLocales),
-                                default: 'eo',
-                            },
-                        }}
-                        canSaveFilters={this.props.permissions.hasPermission('queries.create')}
-                        savedFilterCategory={'codeholders'}
-                        onStateChange={state => {
-                            if (state.jsonFilter.enabled !== this.state.lvJSONFilterEnabled) {
-                                this.setState({ lvJSONFilterEnabled: state.jsonFilter.enabled });
-                            }
-                            if (state.list.submitted !== this.state.lvSubmitted) {
-                                this.setState({ lvSubmitted: state.list.submitted });
-                            }
-                            if (state.results.stats.cursed !== this.state.lvIsCursed) {
-                                this.setState({ lvIsCursed: state.results.stats.cursed });
-                            }
-                            // deliberately not a state field to avoid frequent updates
-                            this.reduxState = state;
-                        }}
-                        userData={{ permissions: this.props.permissions }} />
+        const { options, expanded } = this.state;
 
-                    <AddMemberDialog
-                        open={this.state.addMemberOpen}
-                        onClose={() => this.setState({ addMemberOpen: false })} />
-                    <AddrLabelGen
-                        open={this.state.addrLabelGenOpen}
-                        lvIsCursed={this.state.lvIsCursed}
-                        getRequestData={() => stateToRequestData(this.reduxState)}
-                        onClose={() => this.setState({ addrLabelGenOpen: false })} />
-                </div>}
-            </coreContext.Consumer>
+        return (
+            <div class="codeholders-page" ref={node => this.node = node}>
+                <AppBarProxy actions={menu} priority={1} />
+                <SearchFilters
+                    value={options}
+                    onChange={options => this.setState({ options })}
+                    searchFields={SEARCHABLE_FIELDS}
+                    // TODO: use core views
+                    fields={Object.keys(FIELDS)}
+                    filters={Object.keys(FILTERS)}
+                    expanded={expanded}
+                    onExpandedChange={expanded => this.setState({ expanded })}
+                    locale={{
+                        searchFields: locale.search.fields,
+                        searchPlaceholders: locale.search.placeholders,
+                    }}
+                    category="codeholders" />
+                <ListView
+                    ref={view => this.listView = view}
+                    defaults={{
+                        searchField: 'nameOrCode',
+                        fixedFields: [{
+                            id: 'type',
+                            sorting: Sorting.NONE,
+                        }],
+                        fields: [
+                            {
+                                id: 'code',
+                                sorting: Sorting.ASC,
+                            },
+                            {
+                                id: 'name',
+                                sorting: Sorting.NONE,
+                            },
+                            {
+                                id: 'age',
+                                sorting: Sorting.NONE,
+                            },
+                            {
+                                id: 'membership',
+                                sorting: Sorting.NONE,
+                            },
+                            {
+                                id: 'country',
+                                sorting: Sorting.NONE,
+                            },
+                        ],
+                    }}
+                    title={<Title />}
+                    searchFields={SEARCHABLE_FIELDS}
+                    filters={FILTERS}
+                    fields={FIELDS}
+                    fieldConfigColumn={'codeholderType'}
+                    onRequest={handleRequest(core)}
+                    isRestrictedByGlobalFilter={!!(
+                        // TODO: this
+                        // Object.keys(this.props.permissions.memberFilter).length
+                        false
+                    )}
+                    locale={{
+                        searchFields: locale.search.fields,
+                        placeholders: locale.search.placeholders,
+                        filters: locale.search.filters,
+                        fields: locale.fields,
+                        csvFields: locale.csvFields,
+                        csvFilename: locale.csvFilename,
+                        detail: locale.detail,
+                    }}
+                    detailView={this.state.detail}
+                    // onURLQueryChange={this.urlHandler.onURLQueryChange}
+                    // onDetailClose={this.urlHandler.onDetailClose}
+                    // getLinkTarget={this.urlHandler.getLinkTarget}
+                    detailFields={detailFields.fields}
+                    detailHeader={detailFields.header}
+                    detailFooter={detailFields.footer}
+                    onDetailRequest={handleDetailRequest(core)}
+                    //onDetailPatch={this.props.permissions.hasPermission('codeholders.update')
+                    //    && handleDetailPatch(core)}
+                    //onDetailDelete={this.props.permissions.hasPermission('codeholders.delete')
+                    //    && (id => core.createTask('codeholders/delete', { id }).runOnceAndDrop())}
+                    //onFetchFieldHistory={
+                    //    this.props.permissions.hasPermission('codeholders_hist.read')
+                    //        && handleFieldHistory(core)
+                    //}
+                    onChangePage={this.scrollToTop}
+                    csvExportOptions={{
+                        countryLocale: {
+                            name: locale.csvOptions.countryLocale,
+                            type: 'select',
+                            options: Object.entries(locale.csvOptions.countryLocales),
+                            default: 'eo',
+                        },
+                    }}
+                    //canSaveFilters={this.props.permissions.hasPermission('queries.create')}
+                    savedFilterCategory={'codeholders'}
+                    onStateChange={state => {
+                        if (state.jsonFilter.enabled !== this.state.lvJSONFilterEnabled) {
+                            this.setState({ lvJSONFilterEnabled: state.jsonFilter.enabled });
+                        }
+                        if (state.list.submitted !== this.state.lvSubmitted) {
+                            this.setState({ lvSubmitted: state.list.submitted });
+                        }
+                        if (state.results.stats.cursed !== this.state.lvIsCursed) {
+                            this.setState({ lvIsCursed: state.results.stats.cursed });
+                        }
+                        // deliberately not a state field to avoid frequent updates
+                        this.reduxState = state;
+                    }}
+                    userData={{ permissions: this.props.permissions }} />
+
+                <AddMemberDialog
+                    open={this.state.addMemberOpen}
+                    onClose={() => this.setState({ addMemberOpen: false })} />
+                <AddrLabelGen
+                    open={this.state.addrLabelGenOpen}
+                    lvIsCursed={this.state.lvIsCursed}
+                    getRequestData={() => stateToRequestData(this.reduxState)}
+                    onClose={() => this.setState({ addrLabelGenOpen: false })} />
+            </div>
         );
     }
 }
 
+// TODO: fix this
+/*
 const Title = connect(state => ({
     query: state.search.query,
     filters: state.filters.enabled,
@@ -238,6 +271,7 @@ const Title = connect(state => ({
     }
     return <div className="members-search-title">{title}</div>;
 });
+*/
 
 function stateToRequestData (state) {
     const useJSONFilters = state.jsonFilter.enabled;

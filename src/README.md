@@ -4,7 +4,7 @@ The AKSO admin frontend consists of two parts: the core (`core/`) and the web fr
 ## The Core
 The application core communicates with the frontend via IPC (or, in web terminology, “Web Worker API”) and mainly deals with two abstract components: tasks and data views. Tasks represent failable actions that have multiple inputs and one output, and data views simply allow a live view of some data.
 
-Both tasks and data views are identified by a path such as `login/hasPassword` (which might check if a user has a password). Path scopes may be lazy-loaded.
+Both tasks and data views are identified by a path such as `login/hasPassword` (which might check if a user has a password). Path scopes may be lazy-loaded (see `src/core/paths/index.js`).
 
 ### Tasks
 Tasks have a very specific lifecycle:

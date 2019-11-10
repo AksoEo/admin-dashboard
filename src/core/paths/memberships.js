@@ -3,6 +3,7 @@ import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
 
+/// Data store path.
 export const MEMBERSHIPS = 'memberships';
 export const MEMBERSHIP_CATEGORIES = [MEMBERSHIPS, 'categories'];
 
@@ -49,6 +50,8 @@ async function loadAllMembershipCategories () {
 }
 
 export const views = {
+    /// memberships/categories: a view of all membership categories and their (significant)
+    /// properties
     categories: class Categories extends AbstractDataView {
         constructor () {
             super();

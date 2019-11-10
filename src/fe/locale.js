@@ -70,6 +70,8 @@ export const login = {
 
 export const app = {
     logOut: 'Elsaluti',
+    // literally any error that causes the UI to fail to render
+    genericError: '[[something went wrong :shrug:]]',
 };
 
 export const pages = {
@@ -87,6 +89,62 @@ export const pages = {
     lists: 'Listoj',
     reports: 'Raportoj',
     documents: 'Ŝpureblaj dokumentoj',
+};
+
+export const search = {
+    normalFilter: 'Facilaj filtriloj',
+    jsonFilter: 'JSON-filtriloj',
+};
+
+export const codeholders = {
+    search: {
+        fields: {
+            nameOrCode: 'Nomo aŭ UEA-kodo',
+            email: 'Retpoŝtadreso',
+            landlinePhone: 'Hejma telefono',
+            cellphone: 'Poŝtelefono',
+            officePhone: 'Oficeja telefono',
+            searchAddress: 'Adreso',
+            notes: 'Notoj',
+        },
+        placeholders: {
+            nameOrCode: 'Ekz. xxtejo aŭ Zamenhof',
+            email: 'Ekz. zamenhof@co.uea.org',
+            landlinePhone: 'Ekz. +314666…',
+            cellphone: 'Ekz. +314666…',
+            officePhone: 'Ekz. +314666…',
+            searchAddress: 'Ekz. Nieuwe Binnenweg',
+            notes: 'Serĉi en notoj',
+        },
+        filters: {
+            age: 'Aĝo',
+            hasOldCode: 'Kvarlitera UEA-kodo',
+            hasEmail: 'Retpoŝtadreso',
+            codeholderType: 'Membrospeco',
+            enabled: 'Konto ŝaltita',
+            isDead: 'Mortinta',
+            country: 'Lando',
+            birthdate: 'Naskiĝtago',
+            hasPassword: 'Kreis konton',
+            membership: 'Membreckategorioj',
+            isActiveMember: 'Aktiva membro en',
+            deathdate: 'Mortdato',
+        },
+    },
+    csvOptions: {
+        countryLocale: 'Lingvo de landnomoj',
+        countryLocales: {
+            eo: 'Esperanto',
+            en: 'English',
+            fr: 'Français',
+            es: 'Español',
+            nl: 'Nederlands',
+            pt: 'Português',
+            sk: 'Slovenčina',
+            zh: '中文',
+            de: 'Deutsch',
+        },
+    },
 };
 
 // TODO: remove this

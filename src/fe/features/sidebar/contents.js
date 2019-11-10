@@ -14,9 +14,9 @@ import { TEJOIcon, UEAIcon } from './icons';
 
 /** Renders a single item in the sidebar. */
 function NavItem ({ item, currentPage }) {
-    const { id, icon, url } = item;
+    const { id, icon, path } = item;
     return (
-        <Link target={`/${url}`} class="sidebar-link">
+        <Link target={`/${path}`} class="sidebar-link">
             <DrawerItem
                 selected={currentPage === id}
                 icon={icon}>

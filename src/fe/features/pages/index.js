@@ -30,6 +30,11 @@ export function ListsIcon () {
     );
 }
 
+const elazy = inner => lazy(() => inner().catch(err => {
+    console.error('Failed to load app page', err); // eslint-disable-line no-console
+    return { __esModule: true, default: () => 'okazas eraro' };
+}));
+
 // TODO: permissions
 
 /// App routes.
@@ -42,76 +47,110 @@ export default [
             {
                 id: 'home',
                 icon: <HomeIcon />,
-                url: '',
+                path: '',
             },
             {
                 id: 'members',
-                component: lazy(() =>
-                    import(/* webpackChunkName: "members", webpackPrefetch: true */ './members')),
+                component: elazy(() =>
+                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders')),
                 icon: <AssignmentIndIcon />,
-                url: 'membroj',
+                path: 'membroj',
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: () => 'todo',
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: {
+                                    editing: true,
+                                },
+                            },
+                            {
+                                path: 'membrecoj',
+                                component: () => 'todo',
+                                type: 'stack',
+                            }
+                        ],
+                    },
+                    {
+                        path: 'LOCALIZE_mkaddrlabels',
+                        type: 'state',
+                        state: {
+                            addrLabelGen: true,
+                        },
+                    },
+                    {
+                        path: 'aldoni',
+                        type: 'task',
+                        task: 'codeholders/create',
+                    },
+                ],
             },
             {
                 id: 'membership',
                 icon: <CardMembershipIcon />,
-                url: 'membreco',
+                path: 'membreco',
             },
             {
                 id: 'email',
                 icon: <EmailIcon />,
-                url: 'amasmesaghoj',
+                path: 'amasmesaghoj',
             },
             {
                 id: 'magazines',
                 icon: <NewspaperIcon />,
-                url: 'revuoj',
+                path: 'revuoj',
             },
             {
                 id: 'statistics',
                 icon: <AssessmentIcon />,
-                url: 'statistiko',
+                path: 'statistiko',
             },
             {
                 id: 'congresses',
                 icon: <BusinessIcon />,
-                url: 'kongresoj',
+                path: 'kongresoj',
             },
             {
                 id: 'payments',
                 icon: <PaymentIcon />,
-                url: 'pagoj',
+                path: 'pagoj',
             },
             {
                 id: 'elections',
                 icon: <HowToVoteIcon />,
-                url: 'vochdonado',
+                path: 'vochdonado',
             },
             {
                 id: 'newsletters',
                 icon: <MarkunreadMailboxIcon />,
-                url: 'bultenoj',
+                path: 'bultenoj',
             },
             {
                 id: 'administration',
-                component: lazy(() =>
-                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
+                // TODO: temporary; undo this
+                // component: lazy(() =>
+                    // import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
                 icon: <SupervisorAccountIcon />,
-                url: 'administrado',
+                path: 'administrado',
             },
             {
                 id: 'lists',
                 icon: <ListsIcon />,
-                url: 'listoj',
+                path: 'listoj',
             },
             {
                 id: 'reports',
                 icon: <AssignmentIcon />,
-                url: 'raportoj',
+                path: 'raportoj',
             },
             {
                 id: 'documents',
                 icon: <FileIcon />,
-                url: 'dokumentoj',
+                path: 'dokumentoj',
             },
         ],
     },

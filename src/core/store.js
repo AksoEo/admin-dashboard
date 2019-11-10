@@ -18,7 +18,9 @@ const toSubscriberKey = path => path.join('~');
 const batchedUpdates = new Map();
 let updateBatchTimeout;
 
-/// Emits an update at the specified path.
+/// Emits an update to all subscribers at the specified path (and at that exact path *only*).
+///
+/// This does not emit updates synchronously.
 function emitUpdate (path, type = UpdateType.UPDATE) {
     const key = toSubscriberKey(path);
     // override the previous batched update. this is fine because

@@ -5,6 +5,8 @@ import { PureComponent } from 'preact/compat';
 ///
 /// # Props
 /// - target: target EventEmitter
+/// - dom: bool, if true will use addEventListener/removeEventListener instead of on/removeListener
+//    (must be invariant)
 /// - on(.*): binds the given function to (1)
 export default class EventProxy extends PureComponent {
     #previousTarget;
@@ -16,19 +18,25 @@ export default class EventProxy extends PureComponent {
         this.#previousTarget = this.props.target;
     }
 
+    componentWillUnmount () {
+        if (this.#previousTarget) this.#unbindEvents(this.#previousTarget);
+    }
+
     #bindEvents = (target) => {
+        const fnName = this.props.dom ? 'addEventListener' : 'on';
         for (const id in this.props) {
             if (id.startsWith('on')) {
                 const eventName = id.substr(2);
-                target.on(eventName, this.props[id]);
+                target[fnName](eventName, this.props[id]);
                 this.#eventHandlers.set(eventName, this.props[id]);
             }
         }
     };
 
     #unbindEvents = (target) => {
+        const fnName = this.props.dom ? 'removeEventListener' : 'removeListener';
         for (const [event, listener] of this.#eventHandlers) {
-            target.removeListener(event, listener);
+            target[fnName](event, listener);
         }
     };
 
