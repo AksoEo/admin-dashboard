@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 
 /// A page is analogous to a view controller, but there is no controller.
 /// Pages may be app pages, dialog contents, or card views.
@@ -15,7 +16,7 @@ import { h, Component } from 'preact';
 //    This may be used to save the scroll position among other things.
 /// - onDataChange: Sets page data.
 ///   Will cause a (debounced) replaceState.
-export default class Page extends Component {
+export default class Page extends PureComponent {
     render () {
         return null;
     }

@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 import ResizeObserver from 'resize-observer-polyfill';
+import './paper-list.less';
 
 const lerp = (a, b, x) => (b - a) * x + a;
 const clamp = (x, l, h) => Math.max(l, Math.min(x, h));
@@ -100,7 +101,7 @@ export default class PaperList extends PureComponent {
 
         return {
             transform: `translateY(${state.y.value}px) scaleY(${scaleY})`,
-            zIndex: Math.round(lerp(this.props.children[index].zIndex | 0, -1, state.hidden.value)),
+            zIndex: Math.round(lerp(this.props.children[index].zIndex | 0, 0, state.hidden.value)),
             opacity: clamp(1 - state.hidden.value, 0, 1),
             pointerEvents: state.hidden.value > 0.5 ? 'none' : '',
         };

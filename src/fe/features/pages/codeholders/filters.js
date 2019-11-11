@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent, useState } from 'preact/compat';
+import { Fragment, PureComponent, useState } from 'preact/compat';
 import { Checkbox, Slider, TextField, Button } from '@cpsdqs/yamdl';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
@@ -119,22 +119,33 @@ function RangeEditor ({ min, max, value, onChange, tickDistance, disabled }) {
  * @return {Function} a functional switch component
  */
 function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
-    return function TripleSwitch (props) {
-        const { filterHeader, value, onChange, enabled, onEnabledChange } = props;
+    return function TripleSwitch ({ filter, onChange, onEnabledChange }) {
+        const { value, enabled } = filter;
 
-        const selected = decode(value, enabled);
+        const selected = decode(filter.value, filter.enabled);
         isOptionDisabled = isOptionDisabled || (() => false);
 
         return (
-            <div className="left-right-editor">
-                {filterHeader}
+            <div class="left-right-editor">
                 <Segmented selected={selected} onSelect={selected => {
-                    onSelect(selected, { value, onChange, enabled, onEnabledChange });
+                    onSelect(selected, { value, onChange, enabled, onEnabledChange, filter });
                 }}>
                     {[
-                        { id: a, label: labels[a], disabled: isOptionDisabled(a, value) },
-                        { id: b, label: labels[b], disabled: isOptionDisabled(b, value) },
-                        { id: all, label: labels[all], disabled: isOptionDisabled(all, value) },
+                        {
+                            id: a,
+                            label: labels[a],
+                            disabled: isOptionDisabled(a, value, filter),
+                        },
+                        {
+                            id: b,
+                            label: labels[b],
+                            disabled: isOptionDisabled(b, value, filter),
+                        },
+                        {
+                            id: all,
+                            label: labels[all],
+                            disabled: isOptionDisabled(all, value, filter),
+                        },
                     ]}
                 </Segmented>
             </div>
@@ -161,145 +172,94 @@ function tripleSwitchYesNo (labels) {
 }
 
 export default {
-    codeholderType: {
+    type: {
         default () {
-            return { human: true, org: true };
+            return { enabled: false, value: 'human' };
         },
-        isNone (value) {
-            return value.human && value.org;
-        },
-        toRequest (value) {
-            return {
-                codeholderType: value.human && value.org ? null : value.human ? 'human' : 'org',
-            };
-        },
-        serialize (value) {
-            return value.human && value.org ? '*' : value.human ? 'h' : 'o';
+        serialize (filter) {
+            return filter.value.substr(0, 1);
         },
         deserialize (value) {
-            if (value === 'o') return { human: false, org: true };
-            else if (value === 'h') return { human: true, org: false };
-            else return { human: true, org: true };
+            if (value === 'o') return { enabled: true, value: 'org' };
+            else if (value === 'h') return { enabled: true, value: 'human' };
+            return { enabled: false, value: 'human' };
         },
         editor: tripleSwitch(
             'all',
             'human',
             'org',
             locale.members.search.codeholderTypes,
-            value => value.human && value.org ? 'all' : value.human ? 'human' : 'org',
-            (selected, { onChange }) => {
-                const newValue = { human: false, org: false };
-                if (selected === 'all' || selected === 'human') newValue.human = true;
-                if (selected === 'all' || selected === 'org') newValue.org = true;
-                onChange(newValue);
+            (value, enabled) => !enabled ? 'all' : value,
+            (selected, { onChange, onEnabledChange }) => {
+                onEnabledChange(selected !== 'all');
+                if (selected !== 'all') onChange(selected);
             },
-            (id, value) => {
-                if (value._restricted) {
+            (id, value, filter) => {
+                if (filter._constrained) {
                     if (id === 'all') return true;
-                    if (id === 'org' && value.human) return true;
-                    if (id === 'human' && value.org) return true;
+                    if (id === 'org' && value === 'human') return true;
+                    if (id === 'human' && value === 'org') return true;
                 }
                 return false;
             },
         ),
-        applyConstraints (value, filters) {
+        applyConstraints (filter, filters) {
             let humanOnly = false;
             if (filters.age && filters.age.enabled) humanOnly = true;
             if (filters.deathdate && filters.deathdate.enabled) humanOnly = true;
 
-            if (humanOnly && !value._restricted) {
-                return { value: { human: true, org: false, _restricted: true } };
-            } else if (!humanOnly && value._restricted) {
-                return { value: { human: value.human, org: value.org } };
+            if (humanOnly && !filter._constrained) {
+                return { value: 'human', _constrained: true, enabled: filter.enabled };
+            } else if (!humanOnly && filter._constrained) {
+                return { value: 'human', enabled: filter.enabled };
             }
         },
     },
     country: {
         default () {
-            return { countries: [], type: null };
+            return { enabled: false, value: { set: [], type: null } };
         },
-        isNone (value) {
-            return !value.countries.length;
-        },
-        toRequest (value) {
-            const countryGroups = [];
-            const countries = [];
-            for (const item of value.countries) {
-                if (item.startsWith('x')) countryGroups.push(item);
-                else countries.push(item);
-            }
-            const filterItems = [];
-            if (value.type === null || value.type === 'fee') {
-                filterItems.push({ feeCountry: { $in: countries } });
-                filterItems.push({ feeCountryGroups: { $hasAny: countryGroups } });
-            }
-            if (value.type === null || value.type === 'address') {
-                filterItems.push({ 'addressLatin.country': { $in: countries } });
-                filterItems.push({ 'addressCountryGroups': { $hasAny: countryGroups } });
-            }
-            return { $or: filterItems };
-        },
-        serialize (value) {
-            const type = value.type === 'fee' ? 'f' : value.type === 'address' ? 'a' : '*';
-            return type + '$' + value.countries.join(',');
+        serialize (filter) {
+            const type = filter.value.type === 'fee' ? 'f'
+                : filter.value.type === 'address' ? 'a' : '*';
+            return type + '$' + filter.value.set.join(',');
         },
         deserialize (value) {
             const type = value[0] === 'f' ? 'fee' : value[0] === 'a' ? 'address' : null;
-            const countries = value.substr(2).split(',');
-            return { type, countries };
+            const set = value.substr(2).split(',');
+            if (!set.length) return { enabled: false, value: { set: [], type: null } };
+            return { enabled: true, value: { type, set } };
         },
-        editor: function CountryEditor ({ filterHeader, value, onChange }) {
+        editor ({ value, onChange, enabled, onEnabledChange }) {
+            const selectedType = value.type === null ? 'all' : value.type;
+
             return (
-                <WithCountries>
-                    {(dCountries, dCountryGroups) => {
-                        const countryGroups = [];
-                        const countries = [];
-
-                        for (const id in dCountryGroups) {
-                            const group = dCountryGroups[id];
-                            countryGroups.push(
-                                <MenuItem key={id} value={id}>{group.name}</MenuItem>
-                            );
-                        }
-
-                        for (const id in dCountries) {
-                            countries.push(
-                                <MenuItem key={id} value={id}>{dCountries[id]}</MenuItem>
-                            );
-                        }
-
-                        const selectedType = value.type === null ? 'all' : value.type;
-
-                        return (
-                            <div className="country-editor">
-                                <div className="country-editor-top">
-                                    {filterHeader}
-                                    <Segmented selected={selectedType} onSelect={selected => {
-                                        if (selected === 'all') selected = null;
-                                        onChange({ ...value, type: selected });
-                                    }}>
-                                        {[
-                                            { id: 'fee', label: locale.members.search.countries.fee },
-                                            { id: 'address', label: locale.members.search.countries.address },
-                                            { id: 'all', label: locale.members.search.countries.all },
-                                        ]}
-                                    </Segmented>
-                                </div>
-                                <CountryPicker
-                                    onChange={countries => onChange({ ...value, countries })}
-                                    value={value.countries} />
-                            </div>
-                        );
-                    }}
-                </WithCountries>
+                <Fragment>
+                    <div class="country-editor-type-selector">
+                        <Segmented selected={selectedType} onSelect={type => {
+                            if (type === 'all') type = null;
+                            onChange({ ...value, type });
+                        }}>
+                            {[
+                                { id: 'fee', label: locale.members.search.countries.fee },
+                                { id: 'address', label: locale.members.search.countries.address },
+                                { id: 'all', label: locale.members.search.countries.all },
+                            ]}
+                        </Segmented>
+                    </div>
+                    <CountryPicker
+                        onChange={set => {
+                            onChange({ ...value, set });
+                            onEnabledChange(set.length);
+                        }}
+                        value={value.set} />
+                </Fragment>
             );
         },
     },
     enabled: {
-        needsSwitch: true,
-        autoSwitch: true,
         default () {
-            return false;
+            return { enabled: true, value: true };
         },
         editor: tripleSwitch(
             'all',
@@ -318,15 +278,16 @@ export default {
     },
     age: {
         needsSwitch: true,
-        min: 0,
-        max: 150,
         default () {
             return {
-                range: [0, 35],
-                atStartOfYear: true,
+                enabled: false,
+                value: {
+                    range: [0, 35],
+                    atStartOfYear: true,
+                },
             };
         },
-        serialize (value) {
+        serialize ({ value }) {
             return value.range[0] + '-' + value.range[1] + (value.atStartOfYear ? '^' : '');
         },
         deserialize (value) {
@@ -337,21 +298,14 @@ export default {
             const atStartOfYear = match[3] === '^';
 
             return {
-                range: [rangeStart, rangeEnd],
-                atStartOfYear,
+                enabled: true,
+                value: {
+                    range: [rangeStart, rangeEnd],
+                    atStartOfYear,
+                },
             };
         },
-        toRequest (value) {
-            const field = value.atStartOfYear ? 'agePrimo' : 'age';
-            if (value.range[0] === value.range[1]) {
-                return { [field]: { $eq: value.range[0] } };
-            }
-            return {
-                [field]: { $gte: value.range[0], $lte: value.range[1] },
-            };
-        },
-        editor (props) {
-            const { filter, value, onChange, filterHeader, disabled } = props;
+        editor ({ value, onChange, enabled, onEnabledChange }) {
             const topValue = value;
 
             const ageToBirthYearRange = age => {
@@ -381,14 +335,12 @@ export default {
                 : lowerBound + '–' + upperBound;
 
             return (
-                <div className={'age-editor' + (disabled ? ' disabled' : '')}>
-                    <div className="age-editor-top">
-                        {filterHeader}
-                        <span className="age-birth-year">
-                            {/* FIXME: why does this break when I put it in .age-prime-switch? */}
-                            {locale.members.search.ageBirthYear(birthYearRange)}
-                        </span>
-                        <div className="age-prime-switch">
+                <Fragment>
+                    <div class="age-editor-top">
+                        <div class="age-prime-switch">
+                            <span class="age-birth-year">
+                                {locale.members.search.ageBirthYear(birthYearRange)}
+                            </span>
                             <label>{locale.members.search.agePrime}</label>
                             <Checkbox
                                 class="inner-switch"
@@ -400,97 +352,48 @@ export default {
                         </div>
                     </div>
                     <RangeEditor
-                        min={filter.min}
-                        max={filter.max}
+                        min={0}
+                        max={150}
                         value={value.range}
-                        disabled={disabled}
-                        onChange={range => onChange({ ...topValue, range })}
+                        disabled={!enabled}
+                        onChange={range => {
+                            onChange({ ...topValue, range });
+                            onEnabledChange(true);
+                        }}
                         tickDistance={5} />
-                </div>
+                </Fragment>
             );
         },
     },
     hasOldCode: {
-        needsSwitch: true,
-        autoSwitch: true,
         default () {
-            return false;
-        },
-        toRequest (value) {
-            return { oldCode: value ? { $neq: null } : null };
+            return { enabled: false, value: false };
         },
         editor: tripleSwitchYesNo(locale.members.search.existence),
     },
     hasEmail: {
-        needsSwitch: true,
-        autoSwitch: true,
         default () {
-            return false;
-        },
-        toRequest (value) {
-            return { email: value ? { $neq: null } : null };
+            return { enabled: false, value: false };
         },
         editor: tripleSwitchYesNo(locale.members.search.existence),
     },
     hasPassword: {
-        needsSwitch: true,
-        autoSwitch: true,
         default () {
-            return false;
+            return { enabled: false, value: false };
         },
         editor: tripleSwitchYesNo(locale.members.search.boolean),
     },
     isDead: {
-        needsSwitch: true,
-        autoSwitch: true,
         default () {
-            return false;
+            return { enabled: false, value: false };
         },
         editor: tripleSwitchYesNo(locale.members.search.boolean),
     },
     membership: {
         default () {
-            return [];
+            return { enabled: false, value: [] };
         },
-        isNone (value) {
-            return !value.length;
-        },
-        toRequest (value) {
-            const items = value.map(({
-                invert, lifetime, givesMembership, useRange, range, categories,
-            }) => {
-                const filter = {};
-                if (givesMembership !== null) {
-                    filter.givesMembership = invert ? !givesMembership : givesMembership;
-                }
-                if (lifetime !== null) {
-                    filter.lifetime = invert ? !lifetime : lifetime;
-                }
-                if (useRange) {
-                    if (range[0] === range[1]) {
-                        filter.year = invert ? { $neq: range[0] } : range[0];
-                    } else {
-                        const rangeMin = range[0];
-                        const rangeMax = range[1];
-                        if (invert) {
-                            filter.$or = [
-                                { year: { $gt: rangeMax } },
-                                { year: { $lt: rangeMin } },
-                            ];
-                        } else {
-                            filter.year = { $gte: rangeMin, $lte: rangeMax };
-                        }
-                    }
-                }
-                if (categories.length) {
-                    filter.categoryId = invert ? { $nin: categories } : { $in: categories };
-                }
-                return filter;
-            });
-
-            return { $membership: { $and: items } };
-        },
-        serialize (value) {
+        serialize ({ value }) {
             return JSON.stringify(value.map(({
                 invert, lifetime, givesMembership, useRange, range, categories,
             }) => ({
@@ -504,33 +407,39 @@ export default {
         deserialize (value) {
             const thisYear = new Date().getFullYear();
 
-            return JSON.parse(value).map(({ i, l, g, r, c }) => ({
-                invert: i,
-                lifetime: l,
-                givesMembership: g,
-                useRange: r !== null,
-                range: r ? r : [thisYear, thisYear],
-                categories: c,
-            }));
+            return {
+                enabled: true,
+                value: JSON.parse(value).map(({ i, l, g, r, c }) => ({
+                    invert: i,
+                    lifetime: l,
+                    givesMembership: g,
+                    useRange: r !== null,
+                    range: r ? r : [thisYear, thisYear],
+                    categories: c,
+                })),
+            };
         },
         editor: class Membership extends PureComponent {
             state = {
                 categories: [],
-            }
+            };
 
             componentDidMount () {
                 cache.getMembershipCategories().then(categories => this.setState({ categories }));
             }
 
             render () {
-                const { value, onChange, filterHeader } = this.props;
+                // FIXME: this mess
+                // add support for auto enabled/change
+
+                const { value, onChange } = this.props;
                 const { categories: availableCategories } = this.state;
 
                 const items = value.map(({
                     invert, lifetime, givesMembership, useRange, range, categories,
                 }, index) => (
                     <div
-                        className="membership-item"
+                        class="membership-item"
                         key={index}>
                         <Button icon small class="membership-remove" onClick={() => {
                             const newValue = [...value];
@@ -539,7 +448,7 @@ export default {
                         }}>
                             <RemoveIcon />
                         </Button>
-                        <div className="membership-item-line">
+                        <div class="membership-item-line">
                             <Segmented selected={invert ? 'yes' : 'no'} onSelect={selected => {
                                 const newValue = [...value];
                                 newValue[index] = {
@@ -560,7 +469,7 @@ export default {
                                 ]}
                             </Segmented>
                         </div>
-                        <div className="membership-item-line">
+                        <div class="membership-item-line">
                             <Segmented
                                 selected={lifetime ? 'yes' : lifetime === false ? 'no' : 'all'}
                                 onSelect={selected => {
@@ -588,7 +497,7 @@ export default {
                                 ]}
                             </Segmented>
                         </div>
-                        <div className="membership-item-line">
+                        <div class="membership-item-line">
                             <Segmented
                                 selected={givesMembership
                                     ? 'yes' : givesMembership === false ? 'no' : 'all'}
@@ -617,9 +526,9 @@ export default {
                                 ]}
                             </Segmented>
                         </div>
-                        <div className="membership-item-line">
+                        <div class="membership-item-line">
                             <Select
-                                className="membership-categories"
+                                class="membership-categories"
                                 multiple
                                 value={categories}
                                 onChange={e => {
@@ -638,15 +547,15 @@ export default {
                                     <MenuItem
                                         key={id}
                                         value={id}
-                                        className="members-list-membership-category">
-                                        <div className="membership-category-id">
+                                        class="members-list-membership-category">
+                                        <div class="membership-category-id">
                                             {availableCategories[id].nameAbbrev}
                                         </div>
                                         <span>{'\u00a0'}</span>
-                                        <div className="membership-category-name">
+                                        <div class="membership-category-name">
                                             {availableCategories[id].name}
                                         </div>
-                                        <div className="membership-category-check">
+                                        <div class="membership-category-check">
                                             {categories.includes(id)
                                                 ? <CheckIcon />
                                                 : null}
@@ -655,7 +564,7 @@ export default {
                                 ))}
                             </Select>
                         </div>
-                        <div className="membership-item-line membership-range-line">
+                        <div class="membership-item-line membership-range-line">
                             <Checkbox
                                 class="membership-range-checkbox"
                                 checked={useRange}
@@ -692,7 +601,7 @@ export default {
                 }
 
                 items.push(
-                    <div className="membership-add-container" key={-1}>
+                    <div class="membership-add-container" key={-1}>
                         <Button icon small class="membership-add-button" onClick={() => {
                             const thisYear = new Date().getFullYear();
 
@@ -711,8 +620,7 @@ export default {
                 );
 
                 return (
-                    <div className={'membership-editor' + (!value.length ? ' is-empty' : '')}>
-                        {filterHeader}
+                    <div class={'membership-editor' + (!value.length ? ' is-empty' : '')}>
                         {items}
                     </div>
                 );
@@ -721,13 +629,11 @@ export default {
     },
     isActiveMember: {
         needsSwitch: true,
-        min: 1887,
-        max: new Date().getFullYear() + 4,
         default () {
             const thisYear = new Date().getFullYear();
-            return [thisYear, thisYear];
+            return { enabled: false, value: [thisYear, thisYear] };
         },
-        serialize (value) {
+        serialize ({ value }) {
             return value.start + '-' + value.end;
         },
         deserialize (value) {
@@ -735,46 +641,21 @@ export default {
             if (!match) throw new Error('value does not match pattern');
             const rangeStart = +match[1] | 0;
             const rangeEnd = +match[2] | 0;
-            return [rangeStart, rangeEnd];
+            return { enabled: true, value: [rangeStart, rangeEnd] };
         },
-        toRequest (value) {
-            const range = {};
-            if (value[0] === value[1]) {
-                range.$eq = value[0];
-            } else {
-                range.$gte = value[0];
-                range.$lte = value[1];
-            }
-
-            return {
-                $membership: {
-                    givesMembership: true,
-                    $or: [
-                        {
-                            lifetime: false,
-                            year: range,
-                        },
-                        {
-                            lifetime: true,
-                            year: { $lte: value[0] },
-                        },
-                    ],
-                },
-            };
-        },
-        editor (props) {
-            const { filter, value, onChange, filterHeader, disabled } = props;
-
+        editor ({ value, onChange, enabled, onEnabledChange }) {
             return (
-                <div className="active-member-editor">
-                    {filterHeader}
+                <div class="active-member-editor">
                     <RangeEditor
-                        min={filter.min}
-                        max={filter.max}
+                        min={1887}
+                        max={new Date().getFullYear() + 4}
                         value={value}
-                        disabled={disabled}
+                        disabled={!enabled}
                         tickDistance={10}
-                        onChange={onChange} />
+                        onChange={value => {
+                            onChange(value);
+                            onEnabledChange(true);
+                        }} />
                 </div>
             );
         },
@@ -782,11 +663,9 @@ export default {
     // FIXME: duplicate code
     deathdate: {
         needsSwitch: true,
-        min: 1887,
-        max: new Date().getFullYear(),
         default () {
             const thisYear = new Date().getFullYear();
-            return [thisYear, thisYear];
+            return { enabled: false, value: [thisYear, thisYear] };
         },
         serialize (value) {
             return value.start + '-' + value.end;
@@ -796,27 +675,21 @@ export default {
             if (!match) throw new Error('value does not match pattern');
             const rangeStart = +match[1] | 0;
             const rangeEnd = +match[2] | 0;
-            return [rangeStart, rangeEnd];
+            return { enabled: true, value: [rangeStart, rangeEnd] };
         },
-        toRequest (value) {
-            const lowerYear = value[0];
-            const upperYear = value[1];
-
-            return { deathdate: { $range: [`${lowerYear}-01-01`, `${upperYear}-12-31`] } };
-        },
-        editor (props) {
-            const { filter, value, onChange, filterHeader, disabled } = props;
-
+        editor ({ value, onChange, enabled, onEnabledChange }) {
             return (
-                <div className="death-date-editor">
-                    {filterHeader}
+                <div class="death-date-editor">
                     <RangeEditor
-                        min={filter.min}
-                        max={filter.max}
+                        min={1887}
+                        max={new Date().getFullYear()}
                         value={value}
-                        disabled={disabled}
+                        disabled={!enabled}
                         tickDistance={10}
-                        onChange={onChange} />
+                        onChange={value => {
+                            onChange(value);
+                            onEnabledChange(true);
+                        }} />
                 </div>
             );
         },

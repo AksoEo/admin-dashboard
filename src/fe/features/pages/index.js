@@ -50,7 +50,7 @@ export default [
                 path: '',
             },
             {
-                id: 'members',
+                id: 'codeholders',
                 component: elazy(() =>
                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders')),
                 icon: <AssignmentIndIcon />,
@@ -76,7 +76,7 @@ export default [
                         ],
                     },
                     {
-                        path: 'LOCALIZE_mkaddrlabels',
+                        path: 'etikedoj',
                         type: 'state',
                         state: {
                             addrLabelGen: true,
@@ -131,11 +131,17 @@ export default [
             },
             {
                 id: 'administration',
-                // TODO: temporary; undo this
-                // component: lazy(() =>
-                    // import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
                 icon: <SupervisorAccountIcon />,
                 path: 'administrado',
+                paths: [
+                    {
+                        // TODO: temporary; undo this
+                        // component: lazy(() =>
+                            // import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
+                        type: 'bottom',
+                        path: 'protokolo',
+                    }
+                ],
             },
             {
                 id: 'lists',

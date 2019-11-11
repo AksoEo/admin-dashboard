@@ -437,7 +437,9 @@ function parametersToRequestData (params) {
             if (!(filter in clientFilters)) {
                 throw { code: 'unknown-filter', message: `unknown filter ${filter}` };
             }
-            filters.push(clientFilters[filter].toAPI(params.filters[filter]));
+            if (params.filters[filter].enabled) {
+                filters.push(clientFilters[filter].toAPI(params.filters[filter].value));
+            }
         }
     }
     if (filters.length) {
@@ -512,7 +514,7 @@ export const tasks = {
     /// options: none
     /// parameters:
     ///    - search: { field: string, query: string }
-    ///    - filters: object { [name]: value }
+    ///    - filters: object { [name]: { value, enabled } }
     ///        - if key `_disabled` is set, will be disabled
     ///    - jsonFilter: object (will be &&-ed with filters)
     ///        - if key `_disabled` is set, will be disabled

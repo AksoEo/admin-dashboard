@@ -1,0 +1,30 @@
+.search-filters {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 16px;
+    --paper-list-horiz-padding: 32px;
+
+    .top-padding, .bottom-padding {
+        height: 32px;
+    }
+
+    @media (max-width: 600px) {
+        padding: 0;
+        --paper-list-horiz-padding: 0px;
+
+        .top-padding {
+            height: 0;
+        }
+    }
+
+    .filters-disclosure {
+        padding: 8px 16px;
+        font-size: small;
+        text-transform: uppercase;
+        font-weight: 600;
+
+        .disclosure-arrow {
+            vertical-align: -7px;
+        }
+    }
+}

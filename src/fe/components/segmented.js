@@ -34,7 +34,7 @@ export default class Segmented extends PureComponent {
     }
 
     /** Animates the background rectangle while it’s moving. */
-    backgroundPos = new Spring(0.85, 0.4);
+    backgroundPos = new Spring(1, 0.2);
     node = null;
     /** Child refs used to get rectangle sizes for the background animation. */
     childRefs = [];

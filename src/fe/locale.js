@@ -72,11 +72,12 @@ export const app = {
     logOut: 'Elsaluti',
     // literally any error that causes the UI to fail to render
     genericError: '[[something went wrong :shrug:]]',
+    genericErrorReload: '[[reload page]]',
 };
 
 export const pages = {
     home: 'Hejmo',
-    members: 'Membroj',
+    codeholders: 'Membroj',
     membership: 'Membreco',
     email: 'Amasmesaĝoj',
     magazines: 'Revuoj',
@@ -94,9 +95,12 @@ export const pages = {
 export const search = {
     normalFilter: 'Facilaj filtriloj',
     jsonFilter: 'JSON-filtriloj',
+    loadingJSONEditor: 'Ŝarĝas...',
+    filtersDisclosure: 'Filtriloj',
 };
 
 export const codeholders = {
+    members: 'Membroj',
     search: {
         fields: {
             nameOrCode: 'Nomo aŭ UEA-kodo',
@@ -120,7 +124,7 @@ export const codeholders = {
             age: 'Aĝo',
             hasOldCode: 'Kvarlitera UEA-kodo',
             hasEmail: 'Retpoŝtadreso',
-            codeholderType: 'Membrospeco',
+            type: 'Membrospeco',
             enabled: 'Konto ŝaltita',
             isDead: 'Mortinta',
             country: 'Lando',

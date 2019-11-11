@@ -1,14 +1,12 @@
 import { h } from 'preact';
 import { PureComponent, Suspense } from 'preact/compat';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import EventProxy from '../components/event-proxy';
 import { CardStackProvider, CardStackRenderer } from '../components/card-stack';
 import pages from './pages';
 import { app as locale } from '../locale';
 
 const TRUNCATED_QUERY_NAME = '?T';
-
-let currentURL = document.location.href;
 
 function NotFoundPage () {
     // TODO
@@ -82,7 +80,14 @@ function parseHistoryState (url, state) {
             if (match) {
                 cursor = subpage;
 
-                if (subpage.type === 'stack') {
+                if (subpage.type === 'bottom') {
+                    while (stack.length) stack.pop();
+                    stack.push({
+                        source: subpage,
+                        component: subpage.component,
+                        state: {},
+                    });
+                } else if (subpage.type === 'stack') {
                     stack.push({
                         source: subpage,
                         component: subpage.component,
@@ -103,7 +108,7 @@ function parseHistoryState (url, state) {
 
         if (!match) {
             // oh no there is no such page
-            stack = [];
+            while (stack.length) stack.pop();
             stack.push(cursor = {
                 source: null,
                 component: NotFoundPage,
@@ -157,7 +162,7 @@ export default class Navigation extends PureComponent {
             this.props.onNavigate && this.props.onNavigate(this.currentLocation);
         }
 
-        this.setState({ stack, tasks });
+        this.setState({ stack, tasks, pathname, query });
     }
 
     onPopState = e => this.loadURL(document.location.href, e.state);
@@ -198,17 +203,32 @@ export default class Navigation extends PureComponent {
         clearTimeout(this.#saveStateTimeout);
     }
 
+    componentDidCatch (error, errorInfo) {
+        // is it just me or does this method not actually work at all
+        console.error('[Navigation] render error', error, errorInfo); // eslint-disable-line no-console
+    }
+
     static getDerivedStateFromError (error) {
         return { error };
     }
 
-    componentDidCatch (error, errorInfo) {
-        console.error('[Navigation] render error', error, errorInfo); // eslint-disable-line no-console
-    }
-
     render () {
         if (this.state.error) {
-            return <div class="navigation-view error">{app.error}</div>;
+            // instead i’m just going to log the error here
+            if (this.state.error !== this._prevError) {
+                console.error('[Navigation] render error', this.state.error); // eslint-disable-line no-console
+                this._prevError = this.state.error;
+            }
+            return (
+                <div class="navigation-view error">
+                    {locale.genericError}
+                    <br />
+                    <br />
+                    <Button onClick={() => window.location.reload()}>
+                        {locale.genericErrorReload}
+                    </Button>
+                </div>
+            );
         }
 
         let bottomPage = null;
@@ -217,7 +237,9 @@ export default class Navigation extends PureComponent {
             const PageComponent = this.state.stack[0].component;
             bottomPage = (
                 <Suspense fallback={
-                    <CircularProgress indeterminate class="page-loading-indicator" />
+                    <div class="page-loading-indicator">
+                        <CircularProgress indeterminate class="page-loading-indicator-inner" />
+                    </div>
                 }>
                     <PageComponent
                         query={this.state.query}

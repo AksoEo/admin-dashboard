@@ -145,26 +145,41 @@
         padding-right: env(safe-area-inset-right);
         min-height: 0;
 
-        .page-container {
+        .navigation-view {
             display: flex;
-            position: relative;
+            flex-direction: column;
+            align-items: stretch;
             flex: 1;
+            background: @page-background;
             height: 0;
             min-height: 0;
-            background: @page-background;
 
-            .app-page {
+            &.error {
+                display: block;
+                text-align: center;
+                padding: 16px;
+            }
+
+            .bottom-page-container {
+                display: flex;
+                position: relative;
                 flex: 1;
-                width: 0;
-                overflow: auto;
-                padding-bottom: env(safe-area-inset-bottom);
-                -webkit-overflow-scrolling: touch;
+                height: 0;
+                min-height: 0;
 
-                &.loading {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
+                & > * {
+                    flex: 1;
+                    width: 0;
+                    overflow: auto;
+                    padding-bottom: env(safe-area-inset-bottom);
+                    -webkit-overflow-scrolling: touch;
                 }
+            }
+
+            .page-loading-indicator {
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
         }
     }

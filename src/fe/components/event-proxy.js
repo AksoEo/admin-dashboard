@@ -12,6 +12,10 @@ export default class EventProxy extends PureComponent {
     #previousTarget;
     #eventHandlers = new Map();
 
+    componentDidMount () {
+        this.componentDidUpdate();
+    }
+
     componentDidUpdate () {
         if (this.#previousTarget) this.#unbindEvents(this.#previousTarget);
         this.#bindEvents(this.props.target);

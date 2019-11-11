@@ -105,7 +105,9 @@ export default class App extends Component {
                         onDoAnimateIn={() => this.setState({ animateIn: true })} />
                     <AppBarProvider>
                         <div class="app-contents">
-                            <AppBarConsumer class="app-header" />
+                            <AppBarConsumer
+                                // TODO: use this el for document.title
+                                class="app-header" />
                             <Navigation
                                 ref={view => this.#navigation = view}
                                 onNavigate={this.onNavigate} />

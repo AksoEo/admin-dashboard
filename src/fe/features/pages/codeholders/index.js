@@ -138,19 +138,20 @@ export default class CodeholdersPage extends Page {
 
         return (
             <div class="codeholders-page" ref={node => this.node = node}>
-                <AppBarProxy actions={menu} priority={1} />
+                <AppBarProxy title={locale.title} actions={menu} priority={1} />
                 <SearchFilters
                     value={options}
                     onChange={options => this.setState({ options })}
                     searchFields={SEARCHABLE_FIELDS}
                     // TODO: use core views
                     fields={Object.keys(FIELDS)}
-                    filters={Object.keys(FILTERS)}
+                    filters={FILTERS}
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     locale={{
                         searchFields: locale.search.fields,
                         searchPlaceholders: locale.search.placeholders,
+                        filters: locale.search.filters,
                     }}
                     category="codeholders" />
                 <ListView
@@ -189,7 +190,7 @@ export default class CodeholdersPage extends Page {
                     filters={FILTERS}
                     fields={FIELDS}
                     fieldConfigColumn={'codeholderType'}
-                    onRequest={handleRequest(core)}
+                    // onRequest={handleRequest(core)}
                     isRestrictedByGlobalFilter={!!(
                         // TODO: this
                         // Object.keys(this.props.permissions.memberFilter).length
@@ -211,7 +212,7 @@ export default class CodeholdersPage extends Page {
                     detailFields={detailFields.fields}
                     detailHeader={detailFields.header}
                     detailFooter={detailFields.footer}
-                    onDetailRequest={handleDetailRequest(core)}
+                    // onDetailRequest={handleDetailRequest(core)}
                     //onDetailPatch={this.props.permissions.hasPermission('codeholders.update')
                     //    && handleDetailPatch(core)}
                     //onDetailDelete={this.props.permissions.hasPermission('codeholders.delete')
