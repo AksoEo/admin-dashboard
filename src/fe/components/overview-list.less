@@ -8,6 +8,64 @@
         display: none;
     }
 
+    .list-meta {
+        color: @text-fade-60;
+        font-style: italic;
+        font-size: small;
+        margin-bottom: 1em;
+    }
+
+    .compact-page-button {
+        display: none;
+        width: 100%;
+        --md-button-color: @gray-button-color;
+        font-size: small;
+        line-height: 1;
+        padding-top: 8px;
+        padding-bottom: 8px;
+
+        &.prev-page-button {
+            padding-top: 0;
+        }
+        &.next-page-button {
+            padding-bottom: 0;
+        }
+    }
+
+    .compact-pagination {
+        display: none;
+        text-align: center;
+        font-size: small;
+        margin-top: 1em;
+        color: @text-fade-60;
+    }
+
+    .regular-pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .pagination-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: @text-fade-60;
+
+            .pagination-text {
+                margin: 0 1em;
+            }
+        }
+    }
+
+    @media (max-width: 600px) {
+        .compact-page-button, .compact-pagination {
+            display: block;
+        }
+        .regular-pagination {
+            display: none;
+        }
+    }
+
     .list-contents {
         overflow: hidden;
 

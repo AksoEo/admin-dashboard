@@ -19,8 +19,9 @@ import AddMemberDialog from './add-member';
 import AddrLabelGen from './addr-label-gen';
 import './style';
 
+// TODO: remove this
 function ListView () {
-    return 'todo: remove this behemoth';
+    return '';
 }
 const Sorting = {};
 const Title = () => 'title';
@@ -204,11 +205,13 @@ export default class CodeholdersPage extends Page {
                     onChange={fields => this.setState({ options: { ...options, fields } })}
                     locale={locale.fields} />
                 <OverviewList
+                    // TODO: also note global filter if present (use core view?)
                     task="codeholders/list"
                     parameters={options}
                     expanded={expanded}
                     fields={FIELDS}
-                    onGetItemLink={id => `/membroj/${id}`} />
+                    onGetItemLink={id => `/membroj/${id}`}
+                    onSetOffset={offset => this.setState({ options: { ...options, offset }})} />
                 <ListView
                     ref={view => this.listView = view}
                     defaults={{

@@ -1,9 +1,14 @@
 import { h } from 'preact';
 import { PureComponent, createContext } from 'preact/compat';
-import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Button, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
+import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
+import ArrowRightIcon from '@material-ui/icons/ChevronRight';
 import { coreContext, connect } from '../core/connection';
 import EventProxy from './event-proxy';
 import { Link } from '../router';
+import { search as locale } from '../locale';
 import './overview-list.less';
 
 // TODO: auto-adjust page if empty
@@ -19,6 +24,8 @@ import './overview-list.less';
 /// - expanded: bool, whether search/filters are expanded
 /// - fields: field renderers
 /// - onGetItemLink: should return a link to an item’s detail view
+/// - onSetOffset: callback for changing the current page
+/// - onSetLimit: callback for changing the current items per page
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -37,6 +44,9 @@ export default class OverviewList extends PureComponent {
 
     /// last time expanded was set to false
     #lastCollapseTime = 0;
+
+    /// last time a page change button was pressed
+    #lastPageChangeTime = 0;
 
     load (id) {
         if (this.#currentTask) this.#currentTask.drop();
@@ -76,11 +86,33 @@ export default class OverviewList extends PureComponent {
         this.maybeReload();
     }
 
+    onPrevPageClick = () => {
+        const { parameters } = this.props;
+        this.props.onSetOffset(
+            Math.max(0, Math.floor(parameters.offset / parameters.limit) - 1) * parameters.limit,
+        );
+        this.#lastPageChangeTime = Date.now();
+    };
+
+    onNextPageClick = () => {
+        const { parameters } = this.props;
+        const { result } = this.state;
+        if (!result) return;
+        const maxPage = Math.floor(result.total / parameters.limit);
+        this.props.onSetOffset(Math.min(
+            maxPage,
+            Math.floor(parameters.offset / parameters.limit) + 1
+        ) * parameters.limit);
+        this.#lastPageChangeTime = Date.now();
+    };
+
     render ({ expanded, fields, parameters, onGetItemLink }, { error, result }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
 
-        let contents;
+        let stats, contents, paginationText;
+        let prevDisabled = true;
+        let nextDisabled = true;
         if (error) {
             // TODO
             contents = 'error';
@@ -97,6 +129,22 @@ export default class OverviewList extends PureComponent {
             // finally, push user fields
             for (const field of selectedFields) if (!field.fixed) compiledFields.push(field);
 
+            stats = locale.stats(
+                result.items.length,
+                result.stats.filtered,
+                result.total,
+                result.stats.time,
+            );
+
+            paginationText = locale.paginationItems(
+                parameters.offset + 1,
+                parameters.offset + parameters.limit,
+                result.total,
+            );
+
+            prevDisabled = parameters.offset === 0;
+            nextDisabled = parameters.offset + parameters.limit > result.total;
+
             contents = result.items.map((id, i) => <ListItem
                 key={id}
                 id={id}
@@ -111,24 +159,33 @@ export default class OverviewList extends PureComponent {
         return (
             <div class={className}>
                 <header class="list-meta">
-                    request took bluh seconds
+                    {stats}
                 </header>
-                <button class="compact-prev-page-button">
-                    up arrow
-                    PREV PAGE
-                </button>
-                <DynamicHeightDiv class="list-contents">
+                <Button class="compact-page-button prev-page-button" onClick={this.onPrevPageClick} disabled={prevDisabled}>
+                    <ArrowUpIcon />
+                    <div class="page-button-label">{locale.prevPage}</div>
+                </Button>
+                <DynamicHeightDiv class="list-contents" lastPageChangeTime={this.#lastPageChangeTime}>
                     {contents}
                 </DynamicHeightDiv>
-                <button class="compact-next-page-button">
-                    nEXT PAGE
-                    down arrow
-                </button>
+                <Button class="compact-page-button next-page-button" onClick={this.onNextPageClick} disabled={nextDisabled}>
+                    <div class="page-button-label">{locale.nextPage}</div>
+                    <ArrowDownIcon />
+                </Button>
                 <div class="compact-pagination">
-                    compact pagination goes here
+                    {paginationText}
                 </div>
                 <div class="regular-pagination">
-                    regular pagination goes here
+                    <div />
+                    <div class="pagination-buttons">
+                        <Button class="page-button" icon onClick={this.onPrevPageClick} disabled={prevDisabled}>
+                            <ArrowLeftIcon />
+                        </Button>
+                        <div class="pagination-text">{paginationText}</div>
+                        <Button class="page-button" icon onClick={this.onNextPageClick} disabled={nextDisabled}>
+                            <ArrowRightIcon />
+                        </Button>
+                    </div>
                 </div>
             </div>
         );
@@ -136,6 +193,9 @@ export default class OverviewList extends PureComponent {
 }
 
 const layoutContext = createContext();
+
+// time interval after changing page during which the results list will not change height
+const PAGE_CHANGE_COOLDOWN = 400; // ms
 
 /// Assumes all children will be laid out vertically without overlapping.
 class DynamicHeightDiv extends PureComponent {
@@ -158,7 +218,9 @@ class DynamicHeightDiv extends PureComponent {
     };
 
     update (dt) {
-        this.#height.update(dt);
+        if (this.props.lastPageChangeTime < Date.now() - PAGE_CHANGE_COOLDOWN) {
+            this.#height.update(dt);
+        }
         if (!this.#height.wantsUpdate()) globalAnimator.deregister(this);
         this.forceUpdate();
     }
