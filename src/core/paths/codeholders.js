@@ -446,11 +446,10 @@ function parametersToRequestData (params) {
         options.filter = { $and: filters };
     }
 
-    if (params.jsonFilter && !params.jsonFilter._disabled) {
-        const jsonFilter = { ...params.jsonFilter };
-        delete jsonFilter._disabled;
-        if (options.filter) options.filter.$and.push(jsonFilter);
-        else options.filter = jsonFilter;
+    if (params.jsonFilter && !params.jsonFilter.disabled) {
+        if (params.jsonFilter.error) throw params.jsonFilter.error;
+        if (options.filter) options.filter.$and.push(params.jsonFilter.json);
+        else options.filter = params.jsonFilter;
     }
     const usedFilters = 'filter' in options && !!Object.keys(options.filter).length;
 
@@ -516,8 +515,7 @@ export const tasks = {
     ///    - search: { field: string, query: string }
     ///    - filters: object { [name]: { value, enabled } }
     ///        - if key `_disabled` is set, will be disabled
-    ///    - jsonFilter: object (will be &&-ed with filters)
-    ///        - if key `_disabled` is set, will be disabled
+    ///    - jsonFilter: object { filter: object, error: string?, disabled: bool }
     ///    - fields: [{ id: string, sorting: 'asc' | 'desc' | 'none' }]
     ///    - offset: number
     ///    - limit: number

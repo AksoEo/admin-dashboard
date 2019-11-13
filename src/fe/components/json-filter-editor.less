@@ -1,7 +1,7 @@
-@import '../../prelude';
+@import '../prelude';
 
 .json-filter-editor {
-    --editor-background: #333;
+    --editor-background: @card-background;
     --editor-selection: fade(#fff, 35%);
     --editor-line-number: #aaa;
     --editor-text: #ddd;
@@ -12,7 +12,10 @@
     --editor-syntax-comment: #999;
     --editor-error: @error;
     --editor-error-background: @error-fade-20;
-    --editor-match: #4ce;
+    --editor-match: #9ce;
+
+    --editor-template-background: fade(#75f, 40%);
+    --editor-template-delimiter: #77f;
 
     position: relative;
     max-width: 800px;
@@ -23,8 +26,6 @@
         font-size: 12px;
         background: var(--editor-background);
         color: var(--editor-text);
-        border-radius: 6px;
-        .elevation(3);
 
         .CodeMirror-cursor {
             border-left-color: var(--editor-text);
@@ -60,6 +61,18 @@
         .json-error-message {
             font-family: Roboto, sans-serif; // FIXME: hardcoded font
         }
+
+        .cm-akso-template {
+            background: var(--editor-template-background);
+
+            .cm-invalidchar[title="\\u91"] {
+                display: inline-block;
+                color: transparent;
+                width: 2px;
+                background: var(--editor-template-delimiter);
+                border-radius: 1px;
+            }
+        }
     }
 
     .json-editor-help-button {
@@ -71,7 +84,7 @@
         transition: transform 0.4s @easing;
     }
 
-    &.submitted {
+    &.collapsed {
         .CodeMirror {
             height: 64px;
         }

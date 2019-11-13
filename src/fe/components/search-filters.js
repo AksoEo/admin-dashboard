@@ -6,12 +6,8 @@ import SearchInput from './search-input';
 import Segmented from './segmented';
 import DisclosureArrow from './disclosure-arrow';
 import { search as locale } from '../locale';
+import JSONFilterEditor from './json-filter-editor';
 import './search-filters.less';
-
-function JSONEditor () {
-    // TODO
-    return 'todo: json editor';
-}
 
 /// This component encapsulates search and filters and serves to abstract dealing with field search,
 /// json filters, regular filters, saved filters, etc. for the core APIs.
@@ -97,7 +93,7 @@ export default function SearchFilters ({
             <Suspense fallback={<div class="json-filter-loading">
                 {locale.loadingJSONEditor}
             </div>}>
-                <JSONEditor
+                <JSONFilterEditor
                     value={value.jsonFilter}
                     onChange={jsonFilter => onChange({ ...value, jsonFilter })}
                     expanded={expanded}
@@ -194,7 +190,10 @@ function FiltersBar ({
 
     return (
         <div class="filters-bar">
-            <Segmented selected={filterType} onSelect={onFilterTypeChange}>
+            <Segmented
+                class="json-switch minimal"
+                selected={filterType}
+                onSelect={onFilterTypeChange}>
                 {[
                     {
                         id: 'normal',
@@ -223,15 +222,20 @@ function Filter ({ id, spec, filter, onFilterChange, locale }) {
                     onChange={enabled => onFilterChange({ ...filter, enabled })} />
             </div>
         );
-    } else {
-        filterSwitch = <div class="filter-switch-placeholder" />;
     }
+
+    const onNameClick = e => {
+        if (spec.needsSwitch) {
+            e.preventDefault();
+            onFilterChange({ ...filter, enabled: !filter.enabled });
+        }
+    };
 
     return (
         <div class="filter">
             <div class="filter-header">
                 {filterSwitch}
-                {locale.filters[id]}
+                <div class="filter-name" onClick={onNameClick}>{locale.filters[id]}</div>
             </div>
             <FilterEditor
                 filter={filter}

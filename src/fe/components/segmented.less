@@ -52,4 +52,24 @@
             opacity: 0.5;
         }
     }
+
+    &.minimal {
+        .segmented-control-background {
+            background: @text-fade-40;
+            box-shadow: none;
+        }
+
+        .segmented-control-option {
+            padding: 4px 8px;
+
+            &.selected:not(.hidden-background) {
+                background: @text-fade-40;
+                box-shadow: none;
+
+                &:focus {
+                    background: @text-fade-60;
+                }
+            }
+        }
+    }
 }

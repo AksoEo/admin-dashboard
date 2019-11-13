@@ -48,7 +48,10 @@ export default class CodeholdersPage extends Page {
                 query: '',
             },
             filters: {},
-            jsonFilter: { _disabled: true },
+            jsonFilter: {
+                _disabled: true,
+                filter: {},
+            },
             offset: 0,
             limit: 10,
         },
