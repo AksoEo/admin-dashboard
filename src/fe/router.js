@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { createContext } from 'preact/compat';
+import { createContext, forwardRef } from 'preact/compat';
 
 /// A React context for in-app navigation.
 ///
@@ -14,19 +14,17 @@ export const routerContext = createContext({
 ///
 /// # Props
 /// - `target`: the target href
-export const Link = function Link (props) {
-    return (
-        <routerContext.Consumer>
-            {context => (
-                <a {...props} href={props.target} target={null} onClick={e => {
-                    if (e.ctrlKey || e.metaKey) return;
-                    e.preventDefault();
-                    if (props.onClick) if (props.onClick(e) === false) return;
-                    context.navigate(props.target);
-                }}>
-                    {props.children}
-                </a>
-            )}
-        </routerContext.Consumer>
-    );
-};
+export const Link = forwardRef((props, ref) => (
+    <routerContext.Consumer>
+        {context => (
+            <a {...props} ref={ref} href={props.target} target={null} onClick={e => {
+                if (e.ctrlKey || e.metaKey) return;
+                e.preventDefault();
+                if (props.onClick) if (props.onClick(e) === false) return;
+                context.navigate(props.target);
+            }}>
+                {props.children}
+            </a>
+        )}
+    </routerContext.Consumer>
+));

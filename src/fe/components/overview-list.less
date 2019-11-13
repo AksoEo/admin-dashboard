@@ -8,21 +8,25 @@
         display: none;
     }
 
-    .list-item {
-        display: grid;
-        max-width: 100%;
-        padding: 8px 0;
-        grid-template-rows: 1fr;
-        justify-content: stretch;
-        align-items: stretch;
+    .list-contents {
+        overflow: hidden;
 
-        color: inherit;
-        text-decoration: none;
-        cursor: default;
+        .list-item {
+            display: grid;
+            max-width: 100%;
+            padding: 8px 0;
+            grid-template-rows: 1fr;
+            justify-content: stretch;
+            align-items: stretch;
 
-        .list-item-cell {
-            .cell-label {
-                display: none;
+            color: inherit;
+            text-decoration: none;
+            cursor: default;
+
+            .list-item-cell {
+                .cell-label {
+                    display: none;
+                }
             }
         }
     }
