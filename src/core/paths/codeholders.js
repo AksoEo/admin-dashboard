@@ -40,7 +40,7 @@ import { LOGIN_ID } from './login-keys';
 //!
 //! - country: { fee, address }
 //! - addressCity: identical to addressLatin.city
-//! - addressCityArea: identical to addressLatin.cityArea
+//! - addressCountryArea: identical to addressLatin.countryArea
 
 /// Data store path.
 export const CODEHOLDERS = 'codeholders';

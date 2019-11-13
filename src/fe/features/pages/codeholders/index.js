@@ -8,6 +8,7 @@ import { AppBarProxy, Spring } from '@cpsdqs/yamdl';
 import { routerContext } from '../../../router';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
+import FieldPicker from '../../../components/field-picker';
 import Page from '../../../components/page';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
@@ -55,6 +56,7 @@ export default class CodeholdersPage extends Page {
             fields: [
                 {
                     id: 'type',
+                    sorting: 'none',
                     fixed: true,
                 },
                 {
@@ -63,6 +65,19 @@ export default class CodeholdersPage extends Page {
                 },
                 {
                     id: 'name',
+                    sorting: 'none',
+                },
+                {
+                    id: 'age',
+                    sorting: 'none',
+                },
+                {
+                    id: 'membership',
+                    sorting: 'none',
+                },
+                {
+                    id: 'country',
+                    sorting: 'none',
                 },
             ],
             offset: 0,
@@ -71,6 +86,8 @@ export default class CodeholdersPage extends Page {
 
         // whether the filters list is expanded
         expanded: false,
+
+        fieldPickerOpen: false,
 
         /// If true, the add member dialog is open.
         addMemberOpen: false,
@@ -112,6 +129,13 @@ export default class CodeholdersPage extends Page {
     render () {
         // overflow menu
         const menu = [];
+
+        menu.push({
+            label: '[[pick fields]]',
+            action: () => this.setState({ fieldPickerOpen: true }),
+            overflow: true,
+        });
+
         // TODO
         /*
         menu.push({
@@ -170,6 +194,15 @@ export default class CodeholdersPage extends Page {
                         filters: locale.search.filters,
                     }}
                     category="codeholders" />
+                <FieldPicker
+                    open={this.state.fieldPickerOpen}
+                    onClose={() => this.setState({ fieldPickerOpen: false })}
+                    // TODO: use core views
+                    available={Object.keys(FIELDS)}
+                    sortables={Object.keys(FIELDS).filter(x => FIELDS[x].sortable)}
+                    selected={options.fields}
+                    onChange={fields => this.setState({ options: { ...options, fields } })}
+                    locale={locale.fields} />
                 <OverviewList
                     task="codeholders/list"
                     parameters={options}

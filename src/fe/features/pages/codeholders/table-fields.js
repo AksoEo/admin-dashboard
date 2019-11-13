@@ -90,14 +90,13 @@ export default {
                     - prefixWidth) + 'px';
             });
 
-            render () {
-                const { type, isDead } = this.props.item;
+            render ({ value, item }) {
+                const { type, isDead } = item;
 
                 if (type === 'human') {
-                    const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.item;
-                    const honorific = this.props.item.honorific;
-                    const first = firstName || firstNameLegal;
-                    const last = lastName || lastNameLegal;
+                    const { honorific, first: f, firstLegal, last: l, lastLegal } = value;
+                    const first = f || firstLegal;
+                    const last = l || lastLegal;
                     return (
                         <span
                             class={'name' + (isDead ? ' is-dead' : '')}
@@ -123,12 +122,12 @@ export default {
                         </span>
                     );
                 } else if (type === 'org') {
-                    const { fullName, nameAbbrev } = this.props.item;
+                    const { full, abbrev } = value;
 
                     return (
                         <span
                             class={'name' + (isDead ? ' is-dead' : '')}
-                            title={`${fullName} ${nameAbbrev}`}
+                            title={`${full} ${abbrev}`}
                             ref={node => {
                                 this.node = node;
                                 if (node) this.resizeObserver.observe(node);
@@ -136,12 +135,12 @@ export default {
                             <span
                                 class="org-full-name"
                                 ref={node => this.truncatingName = node}>
-                                {fullName}
+                                {full}
                             </span> <span className="org-abbrev" ref={node => {
                                 this.fixedName = node;
                                 if (node) this.resizeObserver.observe(node);
                             }}>
-                                {nameAbbrev ? `(${nameAbbrev})` : ''}
+                                {abbrev ? `(${abbrev})` : ''}
                             </span>
                         </span>
                     );
@@ -167,12 +166,11 @@ export default {
     },
     age: {
         sortable: true,
-        component ({ value, item }) {
-            if (!value) {
-                return '';
-            }
-            const atStartOfYear = item.agePrimo;
-            const label = locale.members.fields.ageFormat(value, atStartOfYear);
+        component ({ value }) {
+            if (!value) return null;
+            const { now, atStartOfYear } = value;
+            if (!now) return null;
+            const label = locale.members.fields.ageFormat(now, atStartOfYear);
             return <span class="age">{label}</span>;
         },
         stringify (value) {
@@ -281,16 +279,16 @@ export default {
             return value;
         },
     },
-    addressLatin: {
+    address: {
         sortable: true,
         component ({ value, fields: selectedFields }) {
             if (!value) value = {};
 
-            const streetAddress = (value.streetAddress || '').split('\n');
+            const streetAddress = (value.streetAddressLatin || '').split('\n');
             const showCity = !selectedFields.includes('addressCity');
             const showCountryArea = !selectedFields.includes('addressCountryArea');
-            const city = showCity ? value.city : '';
-            const countryArea = showCountryArea ? value.countryArea : '';
+            const city = showCity ? value.cityLatin : '';
+            const countryArea = showCountryArea ? value.countryAreaLatin : '';
             const showCountry = !selectedFields.includes('country');
             const country = showCountry
                 ? (<WithCountries>{countries => countries[value.country]}</WithCountries>)
@@ -299,7 +297,7 @@ export default {
             const addressPseudolines = [
                 ...streetAddress,
                 [
-                    [value.postalCode, value.cityArea].filter(x => x).join(' '),
+                    [value.postalCodeLatin, value.cityAreaLatin].filter(x => x).join(' '),
                     city,
                 ].filter(x => x).join(', '),
                 countryArea,
@@ -314,11 +312,11 @@ export default {
             );
         },
         stringify: async (value = {}, item, fields) => {
-            const streetAddress = (value.streetAddress || '').split('\n');
+            const streetAddress = (value.streetAddressLatin || '').split('\n');
             const showCity = !fields.includes('addressCity');
             const showCountryArea = !fields.includes('addressCountryArea');
-            const city = showCity ? value.city : '';
-            const countryArea = showCountryArea ? value.countryArea : '';
+            const city = showCity ? value.cityLatin : '';
+            const countryArea = showCountryArea ? value.countryAreaLatin : '';
             const showCountry = !fields.includes('country');
             const countries = await cache.getCountries();
             const country = showCountry ? countries[value.country] : '';
@@ -326,7 +324,7 @@ export default {
             const addressPseudolines = [
                 ...streetAddress,
                 [
-                    [value.postalCode, value.cityArea].filter(x => x).join(' '),
+                    [value.postalCodeLatin, value.cityAreaLatin].filter(x => x).join(' '),
                     city,
                 ].filter(x => x).join(', '),
                 countryArea,
@@ -339,19 +337,19 @@ export default {
     addressCity: {
         sortable: true,
         component ({ item }) {
-            return <span class="address-city">{item.addressLatin.city}</span>;
+            return <span class="address-city">{item.address.cityLatin}</span>;
         },
         stringify (value, item) {
-            return item.addressLatin.city;
+            return item.address.cityLatin;
         },
     },
     addressCountryArea: {
         sortable: true,
         component ({ item }) {
-            return <span class="address-country-area">{item.addressLatin.countryArea}</span>;
+            return <span class="address-country-area">{item.address.countryAreaLAtin}</span>;
         },
         stringify (value, item) {
-            return item.addressLatin.countryArea;
+            return item.address.countryAreaLatin;
         },
     },
     officePhone: {

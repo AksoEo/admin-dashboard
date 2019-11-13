@@ -46,8 +46,10 @@ export default class OverviewList extends PureComponent {
 
     /// Might trigger a reload.
     maybeReload () {
-        if (this.#stale && !this.props.expanded) this.load();
-        this.#stale = false;
+        if (this.#stale && !this.props.expanded) {
+            this.load();
+            this.#stale = false;
+        }
     }
 
     componentDidMount () {
@@ -73,11 +75,14 @@ export default class OverviewList extends PureComponent {
             contents = 'error';
         } else if (result) {
             const selectedFields = parameters.fields;
+            const selectedFieldIds = selectedFields.map(x => x.id);
             const compiledFields = [];
             // first, push fixed fields
             for (const field of selectedFields) if (field.fixed) compiledFields.push(field);
             // then transient fields
-            for (const id of result.transientFields) compiledFields.push({ id, transient: true });
+            for (const id of result.transientFields) {
+                if (!selectedFieldIds.includes(id)) compiledFields.push({ id, transient: true });
+            }
             // finally, push user fields
             for (const field of selectedFields) if (!field.fixed) compiledFields.push(field);
 

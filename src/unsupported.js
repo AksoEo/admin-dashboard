@@ -18,7 +18,7 @@ if (msEdgeVersion) {
     isSupported = +msEdgeVersion[2] >= minVersion;
     browserName = 'Microsoft Edge ' + msEdgeVersion[2];
 } else if (chromiumVersion) {
-    minVersion = 18;
+    minVersion = 57;
     isSupported = +chromiumVersion[2] >= minVersion;
     browserName = chromiumVersion[1] + ' ' + chromiumVersion[2];
     updateLink = googleLink;
