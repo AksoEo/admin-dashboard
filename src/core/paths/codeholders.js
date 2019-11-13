@@ -191,9 +191,9 @@ const clientFields = {
             throw new Error('derived fields cannot be serialized');
         },
     },
-    addressCityArea: {
-        apiFields: ['addressLatin.cityArea'],
-        fromAPI: codeholder => codeholder.addressLatin && codeholder.addressLatin.cityArea,
+    addressCountryArea: {
+        apiFields: ['addressLatin.countryArea'],
+        fromAPI: codeholder => codeholder.addressLatin && codeholder.addressLatin.countryArea,
         toAPI: () => {
             throw new Error('derived fields cannot be serialized');
         },

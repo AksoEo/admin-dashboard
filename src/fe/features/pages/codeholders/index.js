@@ -207,7 +207,8 @@ export default class CodeholdersPage extends Page {
                     task="codeholders/list"
                     parameters={options}
                     expanded={expanded}
-                    fields={FIELDS} />
+                    fields={FIELDS}
+                    onGetItemLink={id => `/membroj/${id}`} />
                 <ListView
                     ref={view => this.listView = view}
                     defaults={{

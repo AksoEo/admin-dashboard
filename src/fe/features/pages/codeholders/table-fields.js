@@ -27,6 +27,7 @@ const cache = {
 export default {
     type: {
         sortable: true,
+        weight: 0.5,
         component ({ value, item }) {
             let icon;
             if (!value) return <span class="codeholder-type-placeholder" />;
@@ -75,6 +76,7 @@ export default {
     },
     name: {
         sortable: true,
+        weight: 2,
         component: class Name extends PureComponent {
             node = null;
             prefixName = null;
@@ -179,6 +181,7 @@ export default {
         },
     },
     membership: {
+        weight: 2,
         component ({ value }) {
             if (!value) return null;
             return (
@@ -280,6 +283,7 @@ export default {
         },
     },
     address: {
+        weight: 2,
         sortable: true,
         component ({ value, fields: selectedFields }) {
             if (!value) value = {};

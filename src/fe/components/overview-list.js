@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
+import { globalAnimator } from '@cpsdqs/yamdl';
 import { coreContext, connect } from '../core/connection';
+import { Link } from '../router';
 import './overview-list.less';
 
 // TODO: auto-adjust page if empty
@@ -15,6 +17,7 @@ import './overview-list.less';
 ///     - fields: objects may also have a `fixed` property to indicate fixed fields.
 /// - expanded: bool, whether search/filters are expanded
 /// - fields: field renderers
+/// - onGetItemLink: should return a link to an item’s detail view
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -31,6 +34,9 @@ export default class OverviewList extends PureComponent {
     /// currently loading task
     #currentTask = null;
 
+    /// Animation time since last result
+    #loadTime = 0;
+
     load (id) {
         if (this.#currentTask) this.#currentTask.drop();
         const { task, options, parameters } = this.props;
@@ -41,6 +47,10 @@ export default class OverviewList extends PureComponent {
         }).catch(error => {
             if (this.#currentTask !== t) return;
             this.setState({ result: null, error });
+        }).then(() => {
+            if (this.#currentTask !== t) return;
+            this.#loadTime = 0;
+            globalAnimator.register(this);
         });
     }
 
@@ -65,7 +75,20 @@ export default class OverviewList extends PureComponent {
         this.maybeReload();
     }
 
-    render ({ expanded, fields, parameters }, { error, result }) {
+    componentWillUnmount () {
+        globalAnimator.deregister(this);
+    }
+
+    update (dt) {
+        this.#loadTime += dt;
+        if (this.#loadTime >= 5) {
+            this.#loadTime = 5;
+            globalAnimator.deregister(this);
+        }
+        this.forceUpdate();
+    }
+
+    render ({ expanded, fields, parameters, onGetItemLink }, { error, result }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
 
@@ -74,6 +97,9 @@ export default class OverviewList extends PureComponent {
             // TODO
             contents = 'error';
         } else if (result) {
+            const constOffset = this.#loadTime === 5 ? 0 : 15 * Math.exp(-10 * this.#loadTime);
+            const spreadFactor = this.#loadTime === 5 ? 0 : 4 * Math.exp(-10 * this.#loadTime);
+
             const selectedFields = parameters.fields;
             const selectedFieldIds = selectedFields.map(x => x.id);
             const compiledFields = [];
@@ -86,11 +112,14 @@ export default class OverviewList extends PureComponent {
             // finally, push user fields
             for (const field of selectedFields) if (!field.fixed) compiledFields.push(field);
 
-            contents = result.items.map(id => <ListItem
+            contents = result.items.map((id, y) => <ListItem
                 key={id}
                 id={id}
                 selectedFields={compiledFields}
-                fields={fields} />);
+                fields={fields}
+                onGetItemLink={onGetItemLink}
+                offset={spreadFactor * y / 2 > 1 ? 0 : constOffset + spreadFactor * y}
+                opacity={1 - spreadFactor * y / 2} />);
         }
 
         return (
@@ -124,7 +153,15 @@ const ListItem = connect(props => (['codeholders/codeholder', {
     id: props.id,
     fields: props.selectedFields,
     noFetch: true,
-}]))(data => ({ data }))(function ListItem ({ selectedFields, data, fields }) {
+}]))(data => ({ data }))(function ListItem ({
+    id,
+    selectedFields,
+    data,
+    fields,
+    onGetItemLink,
+    offset,
+    opacity,
+}) {
     if (!data) return null;
 
     const selectedFieldIds = selectedFields.map(x => x.id);
@@ -136,15 +173,29 @@ const ListItem = connect(props => (['codeholders/codeholder', {
 
         return (
             <div key={id} class="list-item-cell">
-                (label {id}):
+                <div class="cell-label">(label {id})</div>
                 <Component value={data[id]} item={data} fields={selectedFieldIds} />
             </div>
         );
     });
 
+    const weightSum = selectedFields.map(x => fields[x.id].weight || 1).reduce((a, b) => a + b);
+    const unit = Math.max(10, 100 / weightSum);
+
+    const style = {
+        gridTemplateColumns: selectedFields
+            .map(x => ((fields[x.id].weight || 1) * unit) + '%')
+            .join(' '),
+        transform: `translateY(${offset * 10}px)`,
+        opacity: Math.max(0, Math.min(opacity, 1)),
+    };
+
+    const itemLink = onGetItemLink ? onGetItemLink(id) : null;
+    const ItemComponent = onGetItemLink ? Link : 'div';
+
     return (
-        <div class="list-item">
+        <ItemComponent target={itemLink} class="list-item" style={style}>
             {cells}
-        </div>
+        </ItemComponent>
     );
 });
