@@ -11,20 +11,39 @@ var updateLink = '';
 var browserName = 'Nekonata retumilo';
 var extraMessage = '';
 
+var minVersion = '';
+
 if (msEdgeVersion) {
-    isSupported = +msEdgeVersion[2] >= 18;
+    minVersion = 18;
+    isSupported = +msEdgeVersion[2] >= minVersion;
     browserName = 'Microsoft Edge ' + msEdgeVersion[2];
 } else if (chromiumVersion) {
-    isSupported = +chromiumVersion[2] >= 49;
+    minVersion = 18;
+    isSupported = +chromiumVersion[2] >= minVersion;
     browserName = chromiumVersion[1] + ' ' + chromiumVersion[2];
     updateLink = googleLink;
 } else if (firefoxVersion) {
-    isSupported = +firefoxVersion[2] >= 63;
+    minVersion = 63;
+    isSupported = +firefoxVersion[2] >= minVersion;
     browserName = firefoxVersion[1] + ' ' + firefoxVersion[2];
     updateLink = firefoxLink;
 } else if (safariVersion) {
-    isSupported = +safariVersion[2] >= 10;
+    minVersion = 10;
+    isSupported = +safariVersion[2] >= minVersion;
     browserName = 'Safari ' + safariVersion[2];
+}
+
+function supportsGrid() {
+    try {
+        var test = document.createElement('div');
+        document.body.appendChild(test);
+        test.style.display = 'grid';
+        var supportsGrid = getComputedStyle(test).display === 'grid';
+        document.body.removeChild(test);
+        return supportsGrid;
+    } catch (err) {
+        return false;
+    }
 }
 
 // minor feature detection so we can show something more than “unknown browser” if that happens
@@ -32,6 +51,7 @@ if (
     !window.fetch // we don’t use a fetch polyfill
     || !window.Worker || !window.Worker.prototype.postMessage // web workers
     || !window.WeakSet // we compile to ES6
+    || !supportsGrid() // we use CSS grid
 ) {
     isSupported = false;
     extraMessage = 'Via retumilo ne subtenas ĉiujn la funkciojn, kiujn AKSO bezonas.';
@@ -52,7 +72,9 @@ if (!isSupported) {
     c.innerHTML += '<p>Ŝajnas, ke vi uzas: ' + browserName + '</p>';
     if (extraMessage) c.innerHTML += '<p>' + extraMessage + '</p>';
     if (updateLink) {
-        c.innerHTML += '<p>Bonvolu ĝisdatigi vian retumilon al pli nova versio aŭ elŝuti de tie ĉi: ' + updateLink + '</p>';
+        var versionSuggestion = '';
+        if (minVersion) versionSuggestion = ' (&geq;' + minVersion + ')';
+        c.innerHTML += '<p>Bonvolu ĝisdatigi vian retumilon al pli nova versio' + versionSuggestion + ' aŭ elŝuti de tie ĉi: ' + updateLink + '</p>';
     } else {
         c.innerHTML += '<p>Bonvolu ĝisdatigi al pli nova retumilo kiel ekz. ' + firefoxLink + ' aŭ ' + googleLink + '.</p>';
     }

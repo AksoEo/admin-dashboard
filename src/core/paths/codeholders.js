@@ -446,9 +446,9 @@ function parametersToRequestData (params) {
         options.filter = { $and: filters };
     }
 
-    if (params.jsonFilter && !params.jsonFilter.disabled) {
+    if (params.jsonFilter && !params.jsonFilter._disabled) {
         if (params.jsonFilter.error) throw params.jsonFilter.error;
-        if (options.filter) options.filter.$and.push(params.jsonFilter.json);
+        if (options.filter) options.filter.$and.push(params.jsonFilter.filter);
         else options.filter = params.jsonFilter;
     }
     const usedFilters = 'filter' in options && !!Object.keys(options.filter).length;
@@ -796,6 +796,7 @@ export const views = {
     /// # Options
     /// - id: codeholder id
     /// - fields: list of field ids to consider the minimal required set (will be fetched)
+    /// - noFetch: if true, will not fetch
     codeholder: class CodeholderView extends AbstractDataView {
         constructor (options) {
             super();
@@ -809,7 +810,9 @@ export const views = {
 
             /// Note that this specifically uses the id argument and not this.id so that we’re
             /// fetching `self` instead of the resolved id if id is set to `self`
-            tasks.codeholder({}, { id, fields }).catch(err => this.emit('error', err));
+            if (!options.noFetch) {
+                tasks.codeholder({}, { id, fields }).catch(err => this.emit('error', err));
+            }
         }
 
         #onUpdate = () => {

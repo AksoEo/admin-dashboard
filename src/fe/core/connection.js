@@ -6,6 +6,9 @@ export const coreContext = createContext();
 // TODO: handle errors?
 
 /// Connects a component to a view.
+///
+/// If viewArgs[0] is a function, it will be passed the component props and must return an array of
+/// arguments.
 export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
     class InnerConnection extends Component {
         static contextType = coreContext;
@@ -13,7 +16,9 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
         state = { data: null };
 
         componentDidMount () {
-            this.view = this.context.createDataView(...viewArgs);
+            if (typeof viewArgs[0] === 'function') {
+                this.view = this.context.createDataView(...(viewArgs[0](this.props)));
+            } else this.view = this.context.createDataView(...viewArgs);
             this.view.on('update', this.#onUpdate);
         }
 

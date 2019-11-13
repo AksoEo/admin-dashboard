@@ -12,13 +12,17 @@ import 'codemirror/addon/edit/closebrackets';
 import { search as locale } from '../locale';
 import './json-filter-editor.less';
 
-const DEFAULT_VALUE = '{\n\ttest: \x91year\x91\n}'; // must be equal to {}
+const DEFAULT_VALUE = '{\n\t\n}'; // must be equal to {}
 // after the tab on the second line
 const DEFAULT_CURSOR_POS = [1, 1]; // FIXME: broken for some reason
 
 const AKSO_REPR = 'org.akso.admin.v1';
 
 const EXPR_DELIM = '\x91';
+
+// TODO: maybe derive this data from the other filters when the user switches for the first time?
+// TODO: some way of adding EXPR_DELIM to json
+// TODO: improve editing of expr/delims (make them atomic?)
 
 // TODO: use custom JSON highlighter instead so templates don’t break the rest of the highlighting
 CodeMirror.defineMode('akso-json-template', () => ({

@@ -13,7 +13,7 @@ const pkg = require('./package.json');
 
 const browserTargets = {
     edge: '18',
-    chrome: '49',
+    chrome: '57',
     firefox: '63',
     safari: '10',
 };

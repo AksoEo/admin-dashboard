@@ -7,6 +7,7 @@ import AddIcon from '@material-ui/icons/Add';
 import { AppBarProxy, Spring } from '@cpsdqs/yamdl';
 import { routerContext } from '../../../router';
 import SearchFilters from '../../../components/search-filters';
+import OverviewList from '../../../components/overview-list';
 import Page from '../../../components/page';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
@@ -42,7 +43,6 @@ const SEARCHABLE_FIELDS = [
 export default class CodeholdersPage extends Page {
     state = {
         options: {
-            // TODO
             search: {
                 field: SEARCHABLE_FIELDS[0],
                 query: '',
@@ -52,6 +52,18 @@ export default class CodeholdersPage extends Page {
                 _disabled: true,
                 filter: {},
             },
+            fields: [
+                {
+                    id: 'type',
+                },
+                {
+                    id: 'code',
+                    sorting: 'asc',
+                },
+                {
+                    id: 'name',
+                },
+            ],
             offset: 0,
             limit: 10,
         },
@@ -157,6 +169,10 @@ export default class CodeholdersPage extends Page {
                         filters: locale.search.filters,
                     }}
                     category="codeholders" />
+                <OverviewList
+                    task="codeholders/list"
+                    parameters={options}
+                    expanded={expanded} />
                 <ListView
                     ref={view => this.listView = view}
                     defaults={{
