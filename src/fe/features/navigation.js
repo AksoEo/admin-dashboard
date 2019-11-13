@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { PureComponent, Suspense } from 'preact/compat';
 import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import EventProxy from '../components/event-proxy';
-import { CardStackProvider, CardStackRenderer } from '../components/card-stack';
+import { CardStackProvider, CardStackRenderer, CardStackItem } from '../components/card-stack';
 import pages from './pages';
 import { app as locale } from '../locale';
 
@@ -231,28 +231,43 @@ export default class Navigation extends PureComponent {
             );
         }
 
-        let bottomPage = null;
+        let bottomPage;
+        const stackItems = [];
 
-        if (this.state.stack[0]) {
-            const PageComponent = this.state.stack[0].component;
-            bottomPage = (
+        for (let i = 0; i < this.state.stack.length; i++) {
+            const stackItem = this.state.stack[i];
+            const isBottom = i === 0;
+            const isTop = i === this.state.stack.length - 1;
+            const PageComponent = stackItem.component;
+            const itemContents = (
                 <Suspense fallback={
                     <div class="page-loading-indicator">
                         <CircularProgress indeterminate class="page-loading-indicator-inner" />
                     </div>
                 }>
                     <PageComponent
-                        query={this.state.query}
+                        query={isTop ? this.state.query : ''}
                         onQueryChange={query => {
+                            if (!isTop) return;
                             this.navigate(this.state.pathname + (query ? '?' + query : ''));
                         }} />
                 </Suspense>
             );
-        }
 
-        const stackItems = [];
-        for (let i = 1; i < this.state.stack.length; i++) {
-            // TODO
+            if (isBottom) {
+                bottomPage = itemContents;
+            } else {
+                const itemIndex = i;
+                const popStackItem = () => {
+                    // TODO
+                };
+
+                stackItems.push(
+                    <CardStackItem open onClose={popStackItem}>
+                        {itemContents}
+                    </CardStackItem>
+                );
+            }
         }
 
         return (

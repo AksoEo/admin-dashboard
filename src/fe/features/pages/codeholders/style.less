@@ -109,11 +109,10 @@
     }
 
     .country-picker {
+        width: 100%;
         display: flex;
         align-items: center;
-        margin: 8px;
-        margin-right: 16px;
-        margin-left: 56px;
+        margin: 8px 0;
         padding: 8px;
         cursor: default;
         border-bottom: 2px solid @control-idle;
@@ -151,7 +150,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-right: 16px;
 
         @media (max-width: 600px) {
             flex-direction: column;
@@ -163,9 +161,9 @@
         }
     }
 
-    .age-editor {
+    .age-editor-top {
         .age-birth-year {
-            // margin-right: 16px;
+            margin-right: 16px;
             opacity: 0.8;
         }
 
@@ -173,27 +171,13 @@
             margin-left: 16px;
         }
 
-        &.disabled .age-prime-switch {
-            opacity: 0.5;
-        }
-
-        .range-editor {
-            width: calc(100% - 40px);
-            margin: 0 20px;
-        }
-
-        @media (max-width: 600px) {
-            .age-birth-year, .age-prime-switch {
-                margin-bottom: 8px;
-            }
-        }
+        margin-bottom: 8px;
     }
 
     .left-right-editor {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-right: 16px;
 
         @media (max-width: 600px) {
             flex-direction: column;
@@ -210,7 +194,9 @@
 
     .active-member-editor, .death-date-editor {
         display: flex;
+        margin-top: 8px;
         padding-right: 16px;
+        width: 100%;
 
         .filter-header {
             flex-shrink: 0;
@@ -233,7 +219,8 @@
     }
 
     .membership-editor {
-        padding: 0 8px;
+        width: 100%;
+        margin-top: 8px;
 
         .filter-header {
             margin-left: -8px;
@@ -339,8 +326,8 @@
         }
 
         .membership-add-container {
-            margin-top: 8px;
             text-align: center;
+            margin-top: 8px;
         }
 
         .filter-header + .membership-add-container {
@@ -348,9 +335,13 @@
         }
 
         &.is-empty {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: block;
+            text-align: right;
+
+            .membership-add-container {
+                text-align: right;
+                margin-top: 0;
+            }
         }
     }
 

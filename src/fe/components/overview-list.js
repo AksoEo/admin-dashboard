@@ -98,7 +98,7 @@ export default class OverviewList extends PureComponent {
         const { parameters } = this.props;
         const { result } = this.state;
         if (!result) return;
-        const maxPage = Math.floor(result.total / parameters.limit);
+        const maxPage = Math.floor((result.total - 1) / parameters.limit);
         this.props.onSetOffset(Math.min(
             maxPage,
             Math.floor(parameters.offset / parameters.limit) + 1
@@ -143,7 +143,7 @@ export default class OverviewList extends PureComponent {
             );
 
             prevDisabled = parameters.offset === 0;
-            nextDisabled = parameters.offset + parameters.limit > result.total;
+            nextDisabled = parameters.offset + parameters.limit >= result.total;
 
             contents = result.items.map((id, i) => <ListItem
                 key={id}

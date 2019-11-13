@@ -144,6 +144,7 @@ export default function SearchFilters ({
                 locale={searchLocale} />,
             paper: true,
             hidden: !filtersEnabled || (!isEnabled && !expanded),
+            staticHeight: true,
         });
     }
 
