@@ -75,7 +75,12 @@ const phoneFormat = field => ({
 /// - sort: API field to sort by. If not given, use apiFields in the given order
 const clientFields = {
     id: 'id',
-    type: 'codeholderType',
+    type: {
+        apiFields: ['codeholderType'],
+        fromAPI: codeholder => codeholder.codeholderType,
+        toAPI: value => ({ codeholderType: value }),
+        requires: ['enabled', 'isDead'],
+    },
     name: {
         apiFields: [
             'firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific',
@@ -407,6 +412,9 @@ function parametersToRequestData (params) {
     for (const field of fields) {
         if (!(field.id in clientFields)) {
             throw { code: 'unknown-field', message: `unknown field ${field.id}` };
+        }
+        for (const required of (clientFields[field.id].requires || [])) {
+            fields.push({ id: required, sorting: 'none' });
         }
     }
 

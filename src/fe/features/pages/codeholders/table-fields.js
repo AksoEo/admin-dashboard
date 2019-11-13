@@ -21,6 +21,7 @@ const cache = {
 };
 
 // TODO: order fields in some sensible order
+// TODO: update these for the new API
 
 /** List of all member fields. */
 export default {
@@ -59,8 +60,9 @@ export default {
     },
     code: {
         sortable: true,
-        component ({ item }) {
-            const { oldCode, newCode } = item;
+        component ({ value }) {
+            if (!value) return null;
+            const { old: oldCode, new: newCode } = value;
             return <data.ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
         },
         stringify (value, item) {
@@ -89,9 +91,9 @@ export default {
             });
 
             render () {
-                const { codeholderType, isDead } = this.props.item;
+                const { type, isDead } = this.props.item;
 
-                if (codeholderType === 'human') {
+                if (type === 'human') {
                     const { firstName, firstNameLegal, lastName, lastNameLegal } = this.props.item;
                     const honorific = this.props.item.honorific;
                     const first = firstName || firstNameLegal;
@@ -120,7 +122,7 @@ export default {
                             </span>
                         </span>
                     );
-                } else if (codeholderType === 'org') {
+                } else if (type === 'org') {
                     const { fullName, nameAbbrev } = this.props.item;
 
                     return (

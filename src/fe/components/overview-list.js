@@ -11,8 +11,10 @@ import './overview-list.less';
 /// # Props
 /// - task: task name. Output should adhere to a specific format (see e.g. codeholders/list)
 /// - options: task options
-/// - parameters: task parameters
+/// - parameters: task parameters. should adhere to a specific format (See e.g. codeholders/list)
+///     - fields: objects may also have a `fixed` property to indicate fixed fields.
 /// - expanded: bool, whether search/filters are expanded
+/// - fields: field renderers
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -61,16 +63,29 @@ export default class OverviewList extends PureComponent {
         this.maybeReload();
     }
 
-    render ({ expanded }) {
+    render ({ expanded, fields, parameters }, { error, result }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
 
         let contents;
-        if (this.state.error) {
+        if (error) {
             // TODO
             contents = 'error';
-        } else if (this.state.result) {
-            contents = this.state.result.items.map(id => <ListItem key={id} id={id} />);
+        } else if (result) {
+            const selectedFields = parameters.fields;
+            const compiledFields = [];
+            // first, push fixed fields
+            for (const field of selectedFields) if (field.fixed) compiledFields.push(field);
+            // then transient fields
+            for (const id of result.transientFields) compiledFields.push({ id, transient: true });
+            // finally, push user fields
+            for (const field of selectedFields) if (!field.fixed) compiledFields.push(field);
+
+            contents = result.items.map(id => <ListItem
+                key={id}
+                id={id}
+                selectedFields={compiledFields}
+                fields={fields} />);
         }
 
         return (
@@ -102,8 +117,29 @@ export default class OverviewList extends PureComponent {
 
 const ListItem = connect(props => (['codeholders/codeholder', {
     id: props.id,
-    fields: props.fields,
+    fields: props.selectedFields,
     noFetch: true,
-}]))(data => ({ data }))(function ListItem ({ data }) {
-    return '' + data;
+}]))(data => ({ data }))(function ListItem ({ selectedFields, data, fields }) {
+    if (!data) return null;
+
+    const selectedFieldIds = selectedFields.map(x => x.id);
+
+    const cells = selectedFields.map(({ id }) => {
+        let Component;
+        if (fields[id]) Component = fields[id].component;
+        else Component = () => `unknown field ${id}`;
+
+        return (
+            <div key={id} class="list-item-cell">
+                (label {id}):
+                <Component value={data[id]} item={data} fields={selectedFieldIds} />
+            </div>
+        );
+    });
+
+    return (
+        <div class="list-item">
+            {cells}
+        </div>
+    );
 });

@@ -55,6 +55,7 @@ export default class CodeholdersPage extends Page {
             fields: [
                 {
                     id: 'type',
+                    fixed: true,
                 },
                 {
                     id: 'code',
@@ -172,7 +173,8 @@ export default class CodeholdersPage extends Page {
                 <OverviewList
                     task="codeholders/list"
                     parameters={options}
-                    expanded={expanded} />
+                    expanded={expanded}
+                    fields={FIELDS} />
                 <ListView
                     ref={view => this.listView = view}
                     defaults={{
