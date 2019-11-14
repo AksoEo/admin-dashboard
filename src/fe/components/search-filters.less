@@ -1,3 +1,5 @@
+@import '../prelude';
+
 .search-filters {
     margin: 0 auto;
     padding: 0 16px;
@@ -8,7 +10,7 @@
         height: 32px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: @regular-min-width) {
         padding: 0;
         --paper-list-horiz-padding: 0px;
 

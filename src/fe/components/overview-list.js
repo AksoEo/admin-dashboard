@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, createContext } from 'preact/compat';
-import { Button, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -12,7 +12,9 @@ import { search as locale } from '../locale';
 import './overview-list.less';
 
 // TODO: auto-adjust page if empty
-// TODO: debounce maybe
+// TODO: list header
+
+const DEBOUNCE_TIME = 400; // ms
 
 /// Renders an overview list over the items given by the specified task.
 ///
@@ -26,10 +28,15 @@ import './overview-list.less';
 /// - onGetItemLink: should return a link to an item’s detail view
 /// - onSetOffset: callback for changing the current page
 /// - onSetLimit: callback for changing the current items per page
+/// - locale: localized field names
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
     state = {
+        /// same as #stale; why is this not one variable? because setState is asynchronous
+        stale: true,
+        /// true if a task is being run
+        loading: false,
         /// current error
         error: null,
         /// current result
@@ -51,20 +58,35 @@ export default class OverviewList extends PureComponent {
     load (id) {
         if (this.#currentTask) this.#currentTask.drop();
         const { task, options, parameters } = this.props;
+        this.setState({ loading: true });
         const t = this.#currentTask = this.context.createTask(task, options || {}, parameters);
         this.#currentTask.runOnceAndDrop().then(result => {
             if (this.#currentTask !== t) return;
-            this.setState({ result, error: null });
+            this.setState({ result, error: null, stale: false, loading: false });
         }).catch(error => {
             if (this.#currentTask !== t) return;
-            this.setState({ result: null, error });
+            this.setState({ result: null, error, stale: false, loading: false });
         });
     }
+
+    #reloadTimeout;
+    #skipNextDebounce;
 
     /// Might trigger a reload.
     maybeReload () {
         if (this.#stale && !this.props.expanded) {
-            this.load();
+            if (this.#skipNextDebounce) {
+                this.#skipNextDebounce = false;
+                clearTimeout(this.#reloadTimeout);
+                this.load();
+            } else {
+                if (!this.#reloadTimeout) {
+                    this.#reloadTimeout = setTimeout(() => {
+                        this.#reloadTimeout = null;
+                        this.load();
+                    }, DEBOUNCE_TIME);
+                }
+            }
             this.#stale = false;
         }
     }
@@ -77,6 +99,7 @@ export default class OverviewList extends PureComponent {
         if (prevProps.options !== this.props.options
             || prevProps.parameters !== this.props.parameters) {
             this.#stale = true;
+            this.setState({ stale: true });
         }
 
         if (prevProps.expanded && !this.props.expanded) {
@@ -86,8 +109,13 @@ export default class OverviewList extends PureComponent {
         this.maybeReload();
     }
 
+    componentWillUnmount () {
+        clearTimeout(this.#reloadTimeout);
+    }
+
     onPrevPageClick = () => {
         const { parameters } = this.props;
+        this.#skipNextDebounce = true;
         this.props.onSetOffset(
             Math.max(0, Math.floor(parameters.offset / parameters.limit) - 1) * parameters.limit,
         );
@@ -99,6 +127,7 @@ export default class OverviewList extends PureComponent {
         const { result } = this.state;
         if (!result) return;
         const maxPage = Math.floor((result.total - 1) / parameters.limit);
+        this.#skipNextDebounce = true;
         this.props.onSetOffset(Math.min(
             maxPage,
             Math.floor(parameters.offset / parameters.limit) + 1
@@ -106,9 +135,16 @@ export default class OverviewList extends PureComponent {
         this.#lastPageChangeTime = Date.now();
     };
 
-    render ({ expanded, fields, parameters, onGetItemLink }, { error, result }) {
+    render ({
+        expanded,
+        fields,
+        parameters,
+        onGetItemLink,
+        locale: localizedFields,
+    }, { error, result, stale, loading }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
+        if (stale) className += ' stale';
 
         let stats, contents, paginationText;
         let prevDisabled = true;
@@ -145,7 +181,15 @@ export default class OverviewList extends PureComponent {
             prevDisabled = parameters.offset === 0;
             nextDisabled = parameters.offset + parameters.limit >= result.total;
 
-            contents = result.items.map((id, i) => <ListItem
+            contents = [
+                <ListHeader
+                    key="header"
+                    selectedFields={compiledFields}
+                    fields={fields}
+                    locale={localizedFields} />,
+            ];
+
+            contents.push(...result.items.map((id, i) => <ListItem
                 key={id}
                 id={id}
                 selectedFields={compiledFields}
@@ -153,13 +197,16 @@ export default class OverviewList extends PureComponent {
                 onGetItemLink={onGetItemLink}
                 index={i}
                 expanded={expanded}
-                lastCollapseTime={this.#lastCollapseTime} />);
+                lastCollapseTime={this.#lastCollapseTime}
+                locale={localizedFields} />
+            ));
         }
 
         return (
             <div class={className}>
                 <header class="list-meta">
-                    {stats}
+                    <span>{stats}</span>
+                    <CircularProgress class="loading-indicator" indeterminate={loading} small />
                 </header>
                 <Button class="compact-page-button prev-page-button" onClick={this.onPrevPageClick} disabled={prevDisabled}>
                     <ArrowUpIcon />
@@ -212,10 +259,16 @@ class DynamicHeightDiv extends PureComponent {
     };
 
     #scheduledUpdate;
+    #ffScheduledUpdate;
     scheduleUpdate = () => {
         clearTimeout(this.#scheduledUpdate);
+        clearTimeout(this.#ffScheduledUpdate);
         this.#scheduledUpdate = setTimeout(this.updateHeight, 1);
+        // also a schedule update further in the future
+        // because sometimes layout may be just a tad off
+        this.#ffScheduledUpdate = setTimeout(this.updateHeight, 1000);
     };
+    // because sometimes layout may be just a tad off
 
     update (dt) {
         if (this.props.lastPageChangeTime < Date.now() - PAGE_CHANGE_COOLDOWN) {
@@ -236,6 +289,7 @@ class DynamicHeightDiv extends PureComponent {
     componentWillUnmount () {
         globalAnimator.deregister(this);
         clearTimeout(this.#scheduledUpdate);
+        clearTimeout(this.#ffScheduledUpdate);
     }
 
     render (props) {
@@ -248,6 +302,26 @@ class DynamicHeightDiv extends PureComponent {
             </div>
         );
     }
+}
+
+function ListHeader ({ fields, selectedFields, locale }) {
+    // FIXME: duplicate code with below
+    const weightSum = selectedFields.map(x => fields[x.id].weight || 1).reduce((a, b) => a + b);
+    const unit = Math.max(10, 100 / weightSum);
+    const style = {
+        gridTemplateColumns: selectedFields
+            .map(x => ((fields[x.id].weight || 1) * unit) + '%')
+            .join(' '),
+    };
+
+    const cells = selectedFields.map(({ id }) => (
+        <div key={id} class="list-header-cell">
+            <div class="cell-label">{locale[id]}</div>
+            {/* sorting? */}
+        </div>
+    ));
+
+    return <div class="list-header" style={style}>{cells}</div>;
 }
 
 const ListItem = connect(props => (['codeholders/codeholder', {
@@ -311,6 +385,7 @@ const ListItem = connect(props => (['codeholders/codeholder', {
         fields,
         onGetItemLink,
         index,
+        locale,
     }) {
         if (!data) return null;
 
@@ -323,7 +398,7 @@ const ListItem = connect(props => (['codeholders/codeholder', {
 
             return (
                 <div key={id} class="list-item-cell">
-                    <div class="cell-label">(label {id})</div>
+                    <div class="cell-label">{locale[id]}</div>
                     <Component value={data[id]} item={data} fields={selectedFieldIds} />
                 </div>
             );

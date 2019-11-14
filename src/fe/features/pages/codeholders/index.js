@@ -211,7 +211,8 @@ export default class CodeholdersPage extends Page {
                     expanded={expanded}
                     fields={FIELDS}
                     onGetItemLink={id => `/membroj/${id}`}
-                    onSetOffset={offset => this.setState({ options: { ...options, offset }})} />
+                    onSetOffset={offset => this.setState({ options: { ...options, offset }})}
+                    locale={locale.fields} />
                 <ListView
                     ref={view => this.listView = view}
                     defaults={{

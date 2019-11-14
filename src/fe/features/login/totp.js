@@ -93,7 +93,11 @@ export default class TotpPage extends Component {
             <Form ref={node => this.form = node} onSubmit={this.#onSubmit}>
                 {totpSetupRequired ? (
                     <Suspense
-                        fallback={<CircularProgress class="totp-setup-loading" indeterminate />}>
+                        fallback={
+                            <div class="totp-setup-loading">
+                                <CircularProgress indeterminate />
+                            </div>
+                        }>
                         <TotpSetup
                             onHeightChange={onHeightChange}
                             onGenerateSecret={secret => this.setState({ secret })}

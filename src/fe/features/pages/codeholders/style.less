@@ -15,6 +15,25 @@
         width: 100%;
         text-align: center;
         vertical-align: middle;
+
+        .codeholder-type-label {
+            display: none;
+        }
+
+        @media (max-width: @compact-max-width) {
+            width: auto;
+
+            .codeholder-type-icon {
+                margin-right: 4px;
+
+                & > * {
+                    vertical-align: middle;
+                }
+            }
+            .codeholder-type-label {
+                display: inline;
+            }
+        }
     }
 
     .codeholder-type.disabled {

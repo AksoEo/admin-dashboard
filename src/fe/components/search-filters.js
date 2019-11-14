@@ -55,12 +55,12 @@ export default function SearchFilters ({
     items.push({
         node: <SearchInput
             value={value.search}
-            onChange={search => onChange({ ...value, search })}
+            onChange={search => onChange({ ...value, search, offset: 0 })}
             searchFields={searchFields}
             expanded={expanded}
             onSubmit={() => {
                 onExpandedChange(false);
-                // TODO: submit
+                onChange({ ...value, offset: 0 });
             }}
             localizedFields={searchLocale.searchFields}
             localizedPlaceholders={searchLocale.searchPlaceholders} />,
@@ -95,7 +95,7 @@ export default function SearchFilters ({
             </div>}>
                 <JSONFilterEditor
                     value={value.jsonFilter}
-                    onChange={jsonFilter => onChange({ ...value, jsonFilter })}
+                    onChange={jsonFilter => onChange({ ...value, jsonFilter, offset: 0 })}
                     expanded={expanded}
                     onCollapse={() => onExpandedChange(false)} />
             </Suspense>
@@ -140,6 +140,7 @@ export default function SearchFilters ({
                         ...value.filters,
                         [filterId]: filter,
                     },
+                    offset: 0,
                 })}
                 locale={searchLocale} />,
             paper: true,

@@ -45,7 +45,8 @@ export default {
                 <span
                     class={'codeholder-type' + (!enabled ? ' disabled' : '')}
                     title={title}>
-                    {icon}
+                    <span class="codeholder-type-icon">{icon}</span>
+                    <span class="codeholder-type-label">{title}</span>
                 </span>
             );
         },
@@ -224,7 +225,7 @@ export default {
                 return (
                     <WithCountries>
                         {countries => {
-                            const name = countries[country];
+                            const name = countries[country].eo;
                             return <span><CountryFlag country={country} /> {name}</span>;
                         }}
                     </WithCountries>
@@ -233,8 +234,8 @@ export default {
                 return (
                     <WithCountries>
                         {countries => {
-                            const feeCountryName = countries[feeCountry];
-                            const countryName = countries[addressCountry];
+                            const feeCountryName = countries[feeCountry].eo;
+                            const countryName = countries[addressCountry].eo;
                             return (
                                 <span>
                                     {locale.members.fields
