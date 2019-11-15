@@ -78,7 +78,7 @@ There are several types of these subpaths:
 #### Query Strings and URL Encoding
 Additionally, views may store state in a query string. If the view is below another in the page stack, then only the topmost view’s query string will be visible in the URL, but *all* views will have their state preserved in the `window.history` API’s state object. Views may also store additional arbitrary data in this state object, such as scroll position.
 
-If a URL exceeds encodable lengths (i.e. 2000 characters) the query string will be replaced with `?T` (“truncated”) and indicate that the page state must be loaded from the history API. If there is no such state, we pretend it never existed.
+If a URL exceeds encodable lengths (i.e. ≈2000 characters) the query string will be replaced with `?T` (“truncated”) and indicate that the page state must be loaded from the history API. If there is no such state, we pretend it never existed.
 
 #### Link Navigation
 In-app links should always use the router context instead of HTML anchors to allow for proper handling of navigation. Router context navigation will cause the current state to be saved, the new page to be loaded, and the linked URL to be decoded, and most importantly, will not cause a page load, thus preserving cached data.

@@ -3,25 +3,14 @@ import { memo, PureComponent, useState } from 'preact/compat';
 import { AppBarProxy, Button, MenuIcon, Dialog, TextField } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import HistoryIcon from '@material-ui/icons/History';
-import locale from '../../../locale';
+import locale from '../../locale';
 import FieldHistory from './history';
-import Form from '../../form';
-import { CardStackProvider, CardStackRenderer, CardStackItem } from '../../card-stack';
+import Form from '../form';
+import { CardStackProvider, CardStackRenderer, CardStackItem } from '../card-stack';
 import './style';
 
-export default class DetailViewContainer extends PureComponent {
-    render () {
-        return (
-            <CardStackProvider>
-                <CardStackRenderer class="detail-view-card-stack" />
-                <DetailView {...this.props} />
-            </CardStackProvider>
-        );
-    }
-}
-
-/// The detail view in a list view, which is shown as a modal overlay and contains details about a
-/// selected item.
+/// The detail view; renders a data view to an item. May be editable.
+///
 /// - open/onClose: open state
 /// - onRequest: (id) => Promise<Object> - detail view request handler
 /// - onUpdateItem: Called when the item is updated *from the database*, meaning the full data was
@@ -39,11 +28,8 @@ export default class DetailViewContainer extends PureComponent {
 /// - headerComponent: component that renders the header; same structure as a field
 /// - footerComponent: component that renders the footer; same structure as a field
 /// - onFetchFieldHistory: callback
-class DetailView extends PureComponent {
+export default class DetailView extends PureComponent {
     state = {
-        // id is in derived state so it can linger while the detail view is closing, because
-        // the id field is also used as the open state in the list view
-        id: null,
         // any kind of error while loading the detail view data
         error: null,
         // a temporary copy of the data that is meant to be mutable and is used in edit mode
@@ -105,30 +91,23 @@ class DetailView extends PureComponent {
         const item = id && items[id] ? items[id] : null;
 
         return (
-            <CardStackItem
-                class="detail-view"
-                depth={0}
-                open={open}
-                onClose={this.onClose}
-                scrollViewRef={node => this.scrollViewNode = node}
-                appBar={
-                    <DetailAppBar
-                        item={item}
-                        open={open}
-                        locale={detailLocale}
-                        onClose={this.onClose}
-                        editing={!!this.state.editingCopy}
-                        canEdit={!!this.props.onPatch}
-                        onEdit={() => this.beginEdit()}
-                        onEditCancel={() => this.endEdit()}
-                        onEditSave={() => {
-                            if (this.formRef.validate()) {
-                                this.setState({ saveOpen: true });
-                            }
-                        }}
-                        canDelete={!!this.props.onDelete}
-                        onDelete={() => this.setState({ confirmDeleteOpen: true })} />
-                }>
+            <div class="detail-view">
+                <DetailAppBar
+                    item={item}
+                    open={open}
+                    locale={detailLocale}
+                    onClose={this.onClose}
+                    editing={!!this.state.editingCopy}
+                    canEdit={!!this.props.onPatch}
+                    onEdit={() => this.beginEdit()}
+                    onEditCancel={() => this.endEdit()}
+                    onEditSave={() => {
+                        if (this.formRef.validate()) {
+                            this.setState({ saveOpen: true });
+                        }
+                    }}
+                    canDelete={!!this.props.onDelete}
+                    onDelete={() => this.setState({ confirmDeleteOpen: true })} />
                 <DetailViewContents
                     original={item}
                     formRef={form => this.formRef = form}
@@ -165,7 +144,7 @@ class DetailView extends PureComponent {
                     value={this.state.editingCopy || item}
                     fields={this.props.fields}
                     detailLocale={detailLocale} />
-            </CardStackItem>
+            </div>
         );
     }
 }

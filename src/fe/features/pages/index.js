@@ -58,7 +58,8 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
-                        component: () => 'todo',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/detail')),
                         type: 'stack',
                         paths: [
                             {

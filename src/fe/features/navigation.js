@@ -7,6 +7,7 @@ import pages from './pages';
 import { app as locale } from '../locale';
 
 const TRUNCATED_QUERY_NAME = '?T';
+const MAX_LOCATION_LEN = 1887; // you think im joking but this is actually a reasonable limit
 
 function NotFoundPage () {
     // TODO
@@ -19,7 +20,7 @@ function TODOPage () {
 
 // Parses a URL and state into a stack and task list. State is nullable.
 function parseHistoryState (url, state) {
-    // TODO: handle state
+    const stackState = state && Array.isArray(state.stack) ? state.stack : [];
 
     url = new URL(url);
 
@@ -53,6 +54,7 @@ function parseHistoryState (url, state) {
             if (page.path === firstPathPart) {
                 cursor = page;
                 stack.push({
+                    path: firstPathPart,
                     source: page,
                     component: page.component || TODOPage,
                     state: {},
@@ -64,6 +66,7 @@ function parseHistoryState (url, state) {
     if (!cursor) {
         // oh no there is no such page
         stack.push(cursor = {
+            path: firstPathPart,
             source: null,
             component: NotFoundPage,
             state: {},
@@ -71,6 +74,7 @@ function parseHistoryState (url, state) {
     }
 
     // traverse the rest of the path
+    let notFoundParts = '';
     for (const part of pathParts) {
         let match;
         for (const subpage of (cursor.paths || [])) {
@@ -83,12 +87,14 @@ function parseHistoryState (url, state) {
                 if (subpage.type === 'bottom') {
                     while (stack.length) stack.pop();
                     stack.push({
+                        path: part,
                         source: subpage,
                         component: subpage.component,
                         state: {},
                     });
                 } else if (subpage.type === 'stack') {
                     stack.push({
+                        path: part,
                         source: subpage,
                         component: subpage.component,
                         state: {},
@@ -105,11 +111,13 @@ function parseHistoryState (url, state) {
                 break;
             }
         }
+        notFoundParts += (notFoundParts ? '/' : '') + part;
 
         if (!match) {
             // oh no there is no such page
-            while (stack.length) stack.pop();
+            stack.splice(0);
             stack.push(cursor = {
+                path: notFoundParts,
                 source: null,
                 component: NotFoundPage,
                 state: {},
@@ -117,12 +125,29 @@ function parseHistoryState (url, state) {
         }
     }
 
+    // load saved state if available
+    for (let i = 0; i < stackState.length; i++) {
+        if (stack[i] && stackState[i]) {
+            stack[i].data = stackState[i].data;
+            stack[i].query = stackState[i].query;
+        }
+    }
+
+    const urlQuery = (url.search || '').substr(1); // no question mark
+    // top stack item gets the query from the URL
+    if (stack.length) stack[stack.length - 1].query = urlQuery;
+
+    const currentLocation = url.pathname + url.search + url.hash;
+
     return {
-        currentLocation: url.pathname + url.search + url.hash,
+        currentLocation,
+        urlLocation: currentLocation.length > MAX_LOCATION_LEN
+            ? url.pathname + TRUNCATED_QUERY_NAME
+            : currentLocation,
         stack,
         tasks,
         pathname: url.pathname,
-        query: (url.search || '').substr(1),
+        query: urlQuery,
     };
 }
 
@@ -134,8 +159,14 @@ const SAVE_STATE_INTERVAL = 1000; // ms
 /// - onNavigate: emitted when the URL changes
 export default class Navigation extends PureComponent {
     state = {
-        // array of objects like
-        // { data: { ... }, component: ..., source, state: { ... } }
+        // array of objects with properties
+        //
+        // - path: the path components of this stack item (may contain /)
+        // - data: arbitrary data managed by the page
+        // - component: component ref
+        // - source: source ref
+        // - state: additional state given by the url
+        // - query: current query string
         stack: [],
         // map from task names to Task objects
         tasks: {},
@@ -145,11 +176,15 @@ export default class Navigation extends PureComponent {
         query: '',
     };
 
+    /// Full current location.
     currentLocation = null;
+    /// Url current location; may be truncated.
+    urlLocation = null;
 
     /// Loads a URL and a history state object.
     loadURL (url, state) {
         const {
+            urlLocation,
             currentLocation,
             stack,
             tasks,
@@ -159,23 +194,68 @@ export default class Navigation extends PureComponent {
 
         if (currentLocation !== this.currentLocation) {
             this.currentLocation = currentLocation;
+            this.urlLocation = urlLocation;
             this.props.onNavigate && this.props.onNavigate(this.currentLocation);
         }
 
-        this.setState({ stack, tasks, pathname, query });
+        // compute the new stack
+        const newStack = this.state.stack.slice(0, stack.length);
+        for (let i = 0; i < stack.length; i++) {
+            // check if the stack item is still the same thing
+            if (newStack[i] && stack[i].source === newStack[i].source) {
+                if (stack[i].data) {
+                    // if data was decoded; load it
+                    // (otherwise just keep current state)
+                    newStack[i].data = stack[i].data;
+                    newStack[i].query = stack[i].query;
+                }
+                newStack[i].state = stack[i].state;
+            } else newStack[i] = stack[i];
+        }
+
+        this.setState({ stack: newStack, tasks, pathname, query });
     }
 
     onPopState = e => this.loadURL(document.location.href, e.state);
 
     /// Navigates with an href.
     navigate (href) {
+        // first, save the current state so it’s up to date when we go back
         this.saveState();
+        // resolve url
+        // note that currentFullURL is not equal to document.location.href since the
+        // document.location may be truncated
+        const currentFullURL = document.location.protocol + '//' + document.location.host
+            + this.currentLocation;
+        const target = new URL(href, currentFullURL);
+        // load & parse url. also, importantly, compute urlLocation
+        this.loadURL(target.href, null);
+        // then actually push it to history with the newly computed urlLocation
+        window.history.pushState(null, '', this.urlLocation);
+        // and finally, save state
+        this.saveState();
+    }
 
-        // instead of trying to replicate browser behavior, just push an empty state and read the
-        // result, then save state again
-        window.history.pushState(null, '', href);
-        this.loadURL(document.location.href, window.history.state);
-        this.saveState();
+    /// Called when a page changes its query.
+    onQueryChange (stackIndex, newQuery) {
+        const stack = this.state.stack.slice();
+        stack[stackIndex].query = newQuery;
+        if (stackIndex === this.state.stack.length - 1) {
+            // save to URL
+            this.navigate(this.state.pathname + (newQuery ? '?' + newQuery : ''));
+        } else {
+            // just save to state
+            this.setState({ stack }, this.saveState);
+        }
+    }
+
+    /// Removes all stack items at and above the given index.
+    popStackAt (stackIndex) {
+        const stack = this.state.stack.slice();
+        stack.splice(stackIndex);
+        const pathname = '/' + stack.map(x => x.path).join('/');
+        const query = stack.length ? stack[stack.length - 1].query : '';
+        this.navigate(pathname + (query ? '?' + query : ''));
     }
 
     // - state saving
@@ -188,7 +268,8 @@ export default class Navigation extends PureComponent {
 
     saveState = () => {
         window.history.replaceState({
-            stack: this.state.stack.map(item => item.data)
+            stack: this.state.stack.map(item => ({ data: item.data, query: item.query })),
+            href: this.currentLocation,
         }, '', this.currentLocation);
 
         this.scheduleSaveState();
@@ -246,11 +327,8 @@ export default class Navigation extends PureComponent {
                     </div>
                 }>
                     <PageComponent
-                        query={isTop ? this.state.query : ''}
-                        onQueryChange={query => {
-                            if (!isTop) return;
-                            this.navigate(this.state.pathname + (query ? '?' + query : ''));
-                        }} />
+                        query={stackItem.query}
+                        onQueryChange={query => this.onQueryChange(i, query)} />
                 </Suspense>
             );
 
@@ -258,12 +336,8 @@ export default class Navigation extends PureComponent {
                 bottomPage = itemContents;
             } else {
                 const itemIndex = i;
-                const popStackItem = () => {
-                    // TODO
-                };
-
                 stackItems.push(
-                    <CardStackItem open onClose={popStackItem}>
+                    <CardStackItem open onClose={() => this.popStackAt(i)}>
                         {itemContents}
                     </CardStackItem>
                 );
