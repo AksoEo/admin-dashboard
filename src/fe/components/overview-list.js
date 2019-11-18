@@ -7,7 +7,7 @@ import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
 import ArrowRightIcon from '@material-ui/icons/ChevronRight';
 import { coreContext, connect } from '../core/connection';
 import EventProxy from './event-proxy';
-import { Link } from '../router';
+import { LinkButton } from '../router';
 import { search as locale } from '../locale';
 import './overview-list.less';
 
@@ -343,14 +343,14 @@ const ListItem = connect(props => (['codeholders/codeholder', {
 
     getSnapshotBeforeUpdate (prevProps) {
         if (prevProps.index !== this.props.index) {
-            return this.#node ? this.#node.getBoundingClientRect() : null;
+            return this.#node ? this.#node.button.getBoundingClientRect() : null;
         }
         return null;
     }
 
     componentDidUpdate (prevProps, _, oldRect) {
         if (prevProps.index !== this.props.index && this.#node && oldRect) {
-            const newRect = this.#node.getBoundingClientRect();
+            const newRect = this.#node.button.getBoundingClientRect();
             this.#yOffset.value = oldRect.top - newRect.top;
             globalAnimator.register(this);
         }
@@ -420,14 +420,18 @@ const ListItem = connect(props => (['codeholders/codeholder', {
         };
 
         const itemLink = onGetItemLink ? onGetItemLink(id) : null;
-        const ItemComponent = onGetItemLink ? Link : 'div';
+        const ItemComponent = onGetItemLink ? LinkButton : 'div';
 
         return (
             <ItemComponent
                 target={itemLink}
                 class="list-item"
                 style={style}
-                ref={node => this.#node = node}>
+                ref={node => this.#node = node}
+                onClick={e => {
+                    // don’t keep focus on what is essentially button
+                    e.currentTarget.blur();
+                }}>
                 {cells}
             </ItemComponent>
         );

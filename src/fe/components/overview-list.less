@@ -71,11 +71,18 @@
             padding: 8px 0;
             grid-template-rows: 1fr;
             justify-content: stretch;
-            align-items: stretch;
+            align-items: center;
 
             color: inherit;
             text-decoration: none;
             cursor: default;
+
+            // reset paper-button styles
+            text-transform: inherit;
+            text-align: inherit;
+            font: inherit;
+            letter-spacing: inherit;
+            min-width: initial;
 
             .list-item-cell, .list-header-cell {
                 .cell-label {

@@ -1,6 +1,3 @@
-import Sorting from './sorting';
-import * as actions from './actions';
-
 // PARENTHESIS ENCODING
 //
 // Simple human-readable url-safe context-free string delimiter that puts as many parentheses on
@@ -124,24 +121,26 @@ export function encodeURLQuery (state, filters) {
         data += maybeEncodeParens(state.search.query, ')');
         data += ')';
     }
-    if (state.jsonFilter.enabled) {
+    if (state.jsonFilter && !state.jsonFilter._disabled) {
         // jsonFilter(data)
         data += 'jsonFilter(';
+        // TODO: proper encoding
         data += encodeParens(state.jsonFilter.filter);
         data += ')';
-    } else if (state.filters.enabled) {
+    }
+    if (state.filters && !state.filters._disabled) {
         // filter(id:serialized, ...)
         data += 'filter(';
         let count = 0;
-        for (const id in state.filters.filters) {
-            if (!state.filters.filters[id].enabled) continue;
+        for (const id in state.filters) {
+            if (!state.filters[id].enabled) continue;
             if (count) data += ',';
             count++;
             data += maybeEncodeParens(id, ':),');
             data += ':';
             const serialized = filters[id].serialize
-                ? filters[id].serialize(state.filters.filters[id].value)
-                : serializeFilterValue(state.filters.filters[id].value);
+                ? filters[id].serialize(state.filters[id])
+                : serializeFilterValue(state.filters[id].value);
             data += maybeEncodeParens(serialized, ':),');
         }
         // undo filter( if no filters are enabled
@@ -152,11 +151,12 @@ export function encodeURLQuery (state, filters) {
         // fields(field:sorting, ...)
         data += 'fields(';
         let count = 0;
-        for (const field of state.fields.user) {
+        for (const field of state.fields) {
+            if (field.fixed && field.sorting === 'none') continue; // don’t need to encode fixed fields
             if (count) data += ',';
             count++;
             data += maybeEncodeParens(field.id, ':),');
-            if (field.sorting !== Sorting.NONE) {
+            if (field.sorting !== 'none') {
                 data += ':';
                 data += maybeEncodeParens(field.sorting, ':),');
             }
@@ -164,15 +164,15 @@ export function encodeURLQuery (state, filters) {
         data += ')';
     }
     {
-        // page(page, itemsPerPage)
-        data += 'page(' + state.list.page + ',' + state.list.itemsPerPage + ')';
+        // pos(offset, limit)
+        data += 'pos(' + state.offset + ',' + state.limit + ')';
     }
     return data;
 }
 
-/// Decodes and returns a series of redux actions.
+/// Decodes and returns a (partial, and possibly invalid) parameters object.
 export function decodeURLQuery (data, filters) {
-    const cmds = [];
+    const parameters = {};
     while (data.length) {
         const section = data.match(/^(\w+)\(/);
         if (!section) throw new Error('invalid section header');
@@ -182,64 +182,62 @@ export function decodeURLQuery (data, filters) {
             data = data.substr(fieldLen + 1); // ,
             const [query, queryLen] = maybeDecodeParens(data, ')');
             data = data.substr(queryLen);
-            cmds.push(actions.setSearchField(field));
-            cmds.push(actions.setSearchQuery(query));
+            parameters.search = { field, query };
         } else if (section[1] === 'jsonFilter') {
             const [filter, len] = decodeParens(data);
             data = data.substr(len);
-            cmds.push(actions.setJSONFilterEnabled(true));
-            cmds.push(actions.setJSONFilter(filter));
+            // TODO: decode this
+            console.error('did not decode json filter because i didnt implement that yet');
         } else if (section[1] === 'filter') {
-            cmds.push(actions.setFiltersEnabled(true));
+            if (!parameters.filters) parameters.filters = {};
             while (data.length) {
                 const [id, idLen] = maybeDecodeParens(data, ':),');
                 data = data.substr(idLen + 1); // :
                 const [serialized, serLen] = maybeDecodeParens(data, ':),');
                 data = data.substr(serLen);
 
-                const value = filters[id]
+                const filter = filters[id] && filters[id].deserialize
                     ? filters[id].deserialize(serialized)
-                    : deserializeFilterValue(serialized);
+                    : { enabled: true, value: deserializeFilterValue(serialized) };
 
-                cmds.push(actions.setFilterEnabled(id));
-                cmds.push(actions.setFilterValue(id, value));
+                parameters.filters[id] = filter;
 
                 if (data[0] !== ',') break;
                 else data = data.substr(1);
             }
         } else if (section[1] === 'fields') {
-            cmds.push(actions.setUserFields([]));
+            if (!parameters.fields) parameters.fields = [];
             let index = 0;
             while (data.length) {
                 const [id, idLen] = maybeDecodeParens(data, ':),');
                 data = data.substr(idLen);
-
-                cmds.push(actions.addField(id));
 
                 if (data[0] === ':') {
                     data = data.substr(1);
                     const [sorting, sortingLen] = maybeDecodeParens(data, ':),');
                     data = data.substr(sortingLen);
 
-                    cmds.push(actions.setFieldSorting(index, sorting));
+                    parameters.fields.push({ id, sorting });
+                } else {
+                    parameters.fields.push({ id, sorting: 'none' });
                 }
 
                 if (data[0] !== ',') break;
                 else data = data.substr(1);
                 index++;
             }
-        } else if (section[1] === 'page') {
+        } else if (section[1] === 'pos') {
             const match = data.match(/^(\d+),(\d+)/);
             if (!match) throw new Error('bad page section');
             data = data.substr(match[0].length);
 
-            cmds.push(actions.setPage(+match[1]));
-            cmds.push(actions.setItemsPerPage(+match[2]));
+            parameters.offset = +match[1];
+            parameters.limit = +match[2];
         } else {
             throw new Error(`unknown section ${section[1]}`);
         }
         if (data[0] !== ')') throw new Error('section did not end with )');
         data = data.substr(1); // )
     }
-    return cmds;
+    return parameters;
 }

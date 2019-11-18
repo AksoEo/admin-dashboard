@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { createContext, forwardRef } from 'preact/compat';
+import { Button } from '@cpsdqs/yamdl';
 
 /// A React context for in-app navigation.
 ///
@@ -18,13 +19,33 @@ export const Link = forwardRef((props, ref) => (
     <routerContext.Consumer>
         {context => (
             <a {...props} ref={ref} href={props.target} target={null} onClick={e => {
-                if (e.ctrlKey || e.metaKey) return;
+                if (e.ctrlKey || e.shiftKey || e.metaKey) return;
                 e.preventDefault();
                 if (props.onClick) if (props.onClick(e) === false) return;
                 context.navigate(props.target);
             }}>
                 {props.children}
             </a>
+        )}
+    </routerContext.Consumer>
+));
+
+export const LinkButton = forwardRef((props, ref) => (
+    <routerContext.Consumer>
+        {context => (
+            <Button
+                {...props}
+                ref={ref}
+                href={props.target}
+                target={null}
+                onClick={e => {
+                    if (e.ctrlKey || e.shiftKey || e.metaKey) return;
+                    e.preventDefault();
+                    if (props.onClick) if (props.onClick(e) === false) return;
+                    context.navigate(props.target);
+                }}>
+                {props.children}
+            </Button>
         )}
     </routerContext.Consumer>
 ));
