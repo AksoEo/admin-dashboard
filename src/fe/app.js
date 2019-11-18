@@ -110,6 +110,8 @@ export default class App extends Component {
                                 class="app-header" />
                             <Navigation
                                 ref={view => this.#navigation = view}
+                                permaSidebar={this.state.permaSidebar}
+                                onOpenMenu={() => this.setState({ sidebarOpen: true })}
                                 onNavigate={this.onNavigate} />
                         </div>
                     </AppBarProvider>

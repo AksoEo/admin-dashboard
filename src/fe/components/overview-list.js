@@ -173,8 +173,8 @@ export default class OverviewList extends PureComponent {
             );
 
             paginationText = locale.paginationItems(
-                parameters.offset + 1,
-                parameters.offset + parameters.limit,
+                Math.min(result.total, parameters.offset + 1),
+                Math.min(result.total, parameters.offset + parameters.limit),
                 result.total,
             );
 

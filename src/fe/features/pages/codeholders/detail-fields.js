@@ -20,13 +20,6 @@ const makeEditable = (Renderer, Editor) => function EditableField ({ value, onCh
 
 const makeDataEditable = data => makeEditable(data.renderer, data.editor);
 
-const mapField = (Component, map, unmap) => function MappedField ({ value, onChange, ...restProps }) {
-    return <Component {...restProps} value={map(value)} onChange={v => onChange(unmap(value, v))} />;
-};
-
-const mapObjectField = (component, key) =>
-    mapField(component, i => i[key], (i, v) => ({ ...i, [key]: v }));
-
 // Lots of text fields
 function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
     const getKeyedValue = (value, key) => {
@@ -103,15 +96,15 @@ const validators = {
     },
 };
 
-function NameEditor ({ value, editing, onChange }) {
+function NameEditor ({ value, item, editing, onChange }) {
     if (!editing) {
         let primaryName;
         let secondaryName;
         let IconType = () => {};
-        if (value.codeholderType === 'human') {
-            const { honorific, firstName, firstNameLegal, lastName, lastNameLegal } = value;
-            const first = firstName || firstNameLegal;
-            const last = lastName || lastNameLegal;
+        if (item.type === 'human') {
+            const { honorific, first: firstName, firstLegal, last: lastName, lastLegal } = value;
+            const first = firstName || firstLegal;
+            const last = lastName || lastLegal;
             primaryName = '';
             primaryName += honorific || '';
             primaryName += (primaryName ? ' ' : '') + (first || '');
@@ -119,34 +112,34 @@ function NameEditor ({ value, editing, onChange }) {
 
             IconType = PersonIcon;
 
-            if (first !== firstNameLegal || last !== lastNameLegal) {
+            if (first !== firstLegal || last !== lastLegal) {
                 secondaryName = (
                     <div class="name-legal">
                         {locale.members.detail.fields.nameLegal}: <span class="name-legal-inner">
-                            {firstNameLegal || ''} {lastNameLegal || ''}
+                            {firstLegal || ''} {lastLegal || ''}
                         </span>
                     </div>
                 );
             }
-        } else if (value.codeholderType === 'org') {
+        } else if (item.type === 'org') {
             IconType = BusinessIcon;
 
-            primaryName = [value.fullName];
-            if (value.nameAbbrev) {
+            primaryName = [value.full];
+            if (value.abbrev) {
                 primaryName.push(' ');
                 primaryName.push(
                     <span class="name-abbrev" key={0}>
-                        ({value.nameAbbrev})
+                        ({value.abbrev})
                     </span>
                 );
             }
 
-            if (value.fullNameLocal) {
+            if (value.local) {
                 secondaryName = (
                     <div class="name-legal">
-                        {locale.members.detail.fields.fullNameLocal}: <span
+                        {locale.members.detail.fields.local}: <span
                             class="name-legal-inner">
-                            {value.fullNameLocal}
+                            {value.local}
                         </span>
                     </div>
                 );
@@ -235,40 +228,52 @@ function NameEditor ({ value, editing, onChange }) {
     }
 }
 
-function CodeEditor ({ value, editing, onChange }) {
-    if (!editing) return <data.ueaCode.renderer value={value.newCode} value2={value.oldCode} />;
+function CodeEditor ({ value, item, editing, onChange }) {
+    if (!editing) return <data.ueaCode.renderer value={value.new} value2={value.old} />;
 
     const suggestions = UEACode.suggestCodes({
-        type: value.codeholderType,
-        firstNames: [value.firstNameLegal, value.firstName].filter(x => x),
-        lastNames: [value.lastNameLegal, value.lastName].filter(x => x),
-        fullName: value.fullName,
-        nameAbbrev: value.nameAbbrev,
+        type: item.type,
+        firstNames: item.name ? [item.name.firstLegal, item.name.first].filter(x => x) : [],
+        lastNames: item.name ? [item.name.lastLegal, item.name.last].filter(x => x) : [],
+        fullName: item.name ? item.name.full : undefined,
+        nameAbbrev: item.name ? item.name.abbrev : undefined,
     });
 
     return <data.ueaCode.editor
-        value={value.newCode}
-        onChange={v => onChange({ ...value, newCode: v })}
-        id={value.id}
+        value={value.new}
+        onChange={v => onChange({ ...value, new: v })}
+        id={item.id}
         suggestions={suggestions} />;
 }
 
-function Header ({ value, editing, onChange, forceReload, userData }) {
+function todoGetPerms () {
+    // TODO
+    return true;
+}
+
+function Header ({ item, editing, onItemChange }) {
     return (
         <div class="member-header">
             <ProfilePictureEditor
-                id={value.id}
-                profilePictureHash={value.profilePictureHash}
-                onSuccess={forceReload}
-                canEdit={userData.permissions.hasPermission('codeholders.update')} />
+                id={item.id}
+                profilePictureHash={item.profilePictureHash}
+                canEdit={todoGetPerms('codeholders.update')} />
             <div class="member-info">
-                <NameEditor value={value} editing={editing} onChange={onChange} />
+                <NameEditor
+                    value={item.name}
+                    item={item}
+                    editing={editing}
+                    onChange={name => onItemChange({ ...item, name })} />
                 <div class="member-code">
-                    <CodeEditor value={value} editing={editing} onChange={onChange} />
+                    <CodeEditor
+                        value={item.code}
+                        item={item}
+                        editing={editing}
+                        onChange={code => onItemChange({ ...item, code })} />
                 </div>
                 <MembershipEditor
-                    id={value.id}
-                    canEdit={userData.permissions.hasPermission('codeholders.update')} />
+                    id={item.id}
+                    canEdit={todoGetPerms('codeholders.update')} />
             </div>
         </div>
     );
@@ -370,15 +375,10 @@ export class CodeholderAddressRenderer extends Component {
     }
 }
 
-function simpleField (key, component) {
+function simpleField (component) {
     return {
-        component: mapObjectField(component, key),
-        hasDiff (original, value) {
-            // '' should still be considered the same as null
-            if (!value[key] && !original[key]) return false;
-            return value[key] !== original[key];
-        },
-        isEmpty: (value) => !value[key],
+        component,
+        isEmpty: value => !value,
     };
 }
 
@@ -386,38 +386,20 @@ const fields = {
     name: {
         // virtual for diffing
         shouldHide: () => true,
-        hasDiff (original, value) {
-            const fields = [
-                'honorific',
-                'fullName',
-                'nameAbbrev',
-                'firstNameLegal',
-                'lastNameLegal',
-                'firstName',
-                'lastName',
-            ];
-            for (const f of fields) if (original[f] !== value[f]) return true;
-        },
     },
     code: {
         // virtual for diffing
         shouldHide: () => true,
-        hasDiff (original, value) {
-            return original.newCode !== value.newCode || original.oldCode !== value.oldCode;
-        },
     },
     enabled: {
         component ({ value, editing, onChange }) {
-            if (!editing && !value.enabled) return '—';
+            if (!editing && !value) return '—';
             return (
                 <Checkbox
                     class={!editing ? 'fixed-checkbox' : ''}
-                    checked={value.enabled}
-                    onChange={enabled => editing && onChange({ ...value, enabled })} />
+                    checked={value}
+                    onChange={enabled => editing && onChange(enabled)} />
             );
-        },
-        hasDiff (original, value) {
-            return original.enabled !== value.enabled;
         },
     },
     isDead: {
@@ -425,24 +407,18 @@ const fields = {
             return (
                 <Checkbox
                     class={!editing ? 'fixed-checkbox' : ''}
-                    checked={value.isDead}
-                    onChange={isDead => editing && onChange({ ...value, isDead })} />
+                    checked={value}
+                    onChange={isDead => editing && onChange(isDead)} />
             );
-        },
-        hasDiff (original, value) {
-            return original.isDead !== value.isDead;
         },
         isEmpty: value => !value.isDead,
     },
     birthdate: {
-        component: mapObjectField(makeDataEditable(data.date), 'birthdate'),
-        hasDiff (original, value) {
-            return original.birthdate !== value.birthdate;
-        },
+        component: makeDataEditable(data.date),
         isEmpty: value => !value.birthdate,
     },
     deathdate: {
-        component: mapObjectField(makeDataEditable(data.date), 'deathdate'),
+        component: makeDataEditable(data.date),
         hasDiff (original, value) {
             return original.deathdate !== value.deathdate;
         },
@@ -469,35 +445,35 @@ const fields = {
         tall: true,
     },
     feeCountry: {
-        component: mapObjectField(makeDataEditable(data.country), 'feeCountry'),
+        component: makeDataEditable(data.country),
         hasDiff (original, value) {
             return original.feeCountry !== value.feeCountry;
         },
         isEmpty: value => !value.feeCountry,
     },
-    email: simpleField('email', makeDataEditable(data.email)),
+    email: simpleField(makeDataEditable(data.email)),
     profession: simpleField('profession', function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value)} maxLength={50} />;
     }),
-    landlinePhone: simpleField('landlinePhone', makeDataEditable(data.phoneNumber)),
-    officePhone: simpleField('officePhone', makeDataEditable(data.phoneNumber)),
-    cellphone: simpleField('cellphone', makeDataEditable(data.phoneNumber)),
+    landlinePhone: simpleField(makeDataEditable(data.phoneNumber)),
+    officePhone: simpleField(makeDataEditable(data.phoneNumber)),
+    cellphone: simpleField(makeDataEditable(data.phoneNumber)),
     notes: {
         component ({ value, editing, onChange }) {
             if (!editing) {
-                if (!value.notes) return null;
+                if (!value) return null;
                 return (
                     <div class="member-notes">
-                        {value.notes}
+                        {value}
                     </div>
                 );
             } else {
                 return (
                     <div class="member-notes">
                         <textarea
-                            value={value.notes}
-                            onChange={e => onChange({ ...value, notes: e.target.value })} />
+                            value={value}
+                            onChange={e => onChange(e.target.value)} />
                     </div>
                 );
             }
@@ -519,8 +495,8 @@ function Footer ({ value, editing }) {
     );
 }
 
-export default {
-    header: Header,
+export {
+    Header,
     fields,
-    footer: Footer,
+    Footer,
 };

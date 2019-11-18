@@ -278,6 +278,7 @@ export default {
         },
     },
     email: {
+        weight: 2,
         component: data.email.inlineRenderer,
         stringify (value) {
             return value;

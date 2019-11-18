@@ -480,6 +480,26 @@ function deepMerge (a, b) {
     } else return b;
 }
 
+function deepEq (a, b) {
+    if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
+        if (Array.isArray(a) && Array.isArray(b)) {
+            if (a.length !== b.length) return false;
+            for (let i = 0; i < a.length; i++) {
+                if (!deepEq(a[i], b[i])) return false;
+            }
+        } else {
+            for (const k in a) {
+                if (!(k in b)) return false;
+            }
+            for (const k in b) {
+                if (!(k in a)) return false;
+                if (!deepEq(a[k], b[k])) return false;
+            }
+        }
+        return true;
+    } else return a === b;
+}
+
 export const tasks = {
     /// codeholders/fields: lists available fields according to permissions (it is recommended that
     /// you use the corresponding view instead)
@@ -637,6 +657,38 @@ export const tasks = {
     delete: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/codeholders/${id}`);
+    },
+    /// codeholders/update: updates a codeholder
+    ///
+    /// # Options
+    /// - id: codeholder id
+    ///
+    /// # Parameters
+    /// - updateComment: modCmt
+    /// - any codeholder fields; will be diffed
+    update: async ({ id }, data) => {
+        const client = await asyncClient;
+        const codeholderData = { ...data };
+        delete codeholderData.updateComment;
+        const options = {};
+        if (data.updateComment) options.modCmt = data.updateComment;
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const existing = store.get([CODEHOLDERS, storeId]);
+        const currentData = clientToAPI(existing);
+        const newData = clientToAPI(codeholderData);
+        const diff = {};
+
+        for (const k in newData) {
+            if (!deepEq(currentData[k], newData[k])) {
+                diff[k] = newData[k];
+            }
+        }
+
+        await client.patch(`/codeholders/${id}`, diff, options);
+
+        // also update data in store
+        store.insert([CODEHOLDERS, storeId], deepMerge(existing, clientFromAPI(diff)));
     },
     /// codeholders/setProfilePicture: sets a codeholder’s profile picture
     ///

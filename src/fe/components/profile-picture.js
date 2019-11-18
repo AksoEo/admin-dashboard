@@ -28,7 +28,7 @@ export default class ProfilePicture extends Component {
 
         if (profilePictureHash) {
             const hash = Buffer.from(profilePictureHash).toString('base64');
-            const urlBase = new URL(`codeholders/${id}/profile_picture/`, config.host).toString();
+            const urlBase = new URL(`codeholders/${id}/profile_picture/`, config.base).toString();
             const imgSrcSet = [32, 64, 128, 256].map(w => `${urlBase}${w}px?noop=${hash} ${w}w`).join(', ');
             this.setState({ imgSrcSet, isIdenticon: false });
         } else {

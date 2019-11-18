@@ -11,7 +11,8 @@ import OverviewList from '../../../components/overview-list';
 import FieldPicker from '../../../components/field-picker';
 import Page from '../../../components/page';
 import { coreContext } from '../../../core/connection';
-import { codeholders as locale } from '../../../locale';
+import { codeholders as locale, search as searchLocale } from '../../../locale';
+import Meta from '../../meta';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
 import detailFields from './detail-fields';
@@ -132,7 +133,7 @@ export default class CodeholdersPage extends Page {
         const menu = [];
 
         menu.push({
-            label: '[[pick fields]]',
+            label: searchLocale.pickFields,
             action: () => this.setState({ fieldPickerOpen: true }),
             overflow: true,
         });
@@ -179,7 +180,7 @@ export default class CodeholdersPage extends Page {
 
         return (
             <div class="codeholders-page" ref={node => this.node = node}>
-                <AppBarProxy title={locale.title} actions={menu} priority={1} />
+                <Meta title={locale.title} actions={menu} />
                 <SearchFilters
                     value={options}
                     onChange={options => this.setState({ options })}
@@ -268,9 +269,9 @@ export default class CodeholdersPage extends Page {
                     // onURLQueryChange={this.urlHandler.onURLQueryChange}
                     // onDetailClose={this.urlHandler.onDetailClose}
                     // getLinkTarget={this.urlHandler.getLinkTarget}
-                    detailFields={detailFields.fields}
-                    detailHeader={detailFields.header}
-                    detailFooter={detailFields.footer}
+                    //detailFields={detailFields.fields}
+                    //detailHeader={detailFields.header}
+                    //detailFooter={detailFields.footer}
                     // onDetailRequest={handleDetailRequest(core)}
                     //onDetailPatch={this.props.permissions.hasPermission('codeholders.update')
                     //    && handleDetailPatch(core)}

@@ -69,6 +69,7 @@ export const login = {
 };
 
 export const app = {
+    title: 'AKSO',
     logOut: 'Elsaluti',
     // literally any error that causes the UI to fail to render
     genericError: '[[something went wrong :shrug:]]',
@@ -117,10 +118,12 @@ export const search = {
     prevPage: '[[prev page]]',
     nextPage: '[[next page]]',
     paginationItems: (from, to, count) => `${from}–${to} el ${count}`,
+    pickFields: '[[pick fields]]',
 };
 
 export const codeholders = {
     title: 'Membroj',
+    detailTitle: 'Membro',
     search: {
         fields: {
             nameOrCode: 'Nomo aŭ UEA-kodo',

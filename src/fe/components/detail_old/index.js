@@ -11,7 +11,6 @@ import './style';
 
 /// The detail view; renders a data view to an item. May be editable.
 ///
-/// - open/onClose: open state
 /// - onRequest: (id) => Promise<Object> - detail view request handler
 /// - onUpdateItem: Called when the item is updated *from the database*, meaning the full data was
 ///   loaded and should be used to patch the potentially only partial data in the redux store.
@@ -39,11 +38,6 @@ export default class DetailView extends PureComponent {
         confirmDeleteOpen: false,
         // if true, the “commit and save” dialog is open
         saveOpen: false,
-    };
-
-    onClose = () => {
-        if (this.state.editingCopy) return;
-        this.props.onClose();
     };
 
     componentDidMount () {
@@ -89,6 +83,8 @@ export default class DetailView extends PureComponent {
         const { id } = this.state;
 
         const item = id && items[id] ? items[id] : null;
+
+        // FIXME: detail view does too much; split it up
 
         return (
             <div class="detail-view">

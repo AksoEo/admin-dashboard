@@ -25,7 +25,7 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
         #onUpdate = data => this.setState({ data });
 
         componentWillUnmount () {
-            this.view.drop();
+            if (this.view) this.view.drop();
         }
 
         render () {

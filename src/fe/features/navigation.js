@@ -1,9 +1,10 @@
 import { h } from 'preact';
 import { PureComponent, Suspense } from 'preact/compat';
-import { Button, CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
 import EventProxy from '../components/event-proxy';
 import { CardStackProvider, CardStackRenderer, CardStackItem } from '../components/card-stack';
 import pages from './pages';
+import { MetaProvider } from './meta';
 import { app as locale } from '../locale';
 
 const TRUNCATED_QUERY_NAME = '?T';
@@ -91,6 +92,7 @@ function parseHistoryState (url, state) {
                         source: subpage,
                         component: subpage.component,
                         state: {},
+                        pathMatch: match,
                     });
                 } else if (subpage.type === 'stack') {
                     stack.push({
@@ -98,8 +100,10 @@ function parseHistoryState (url, state) {
                         source: subpage,
                         component: subpage.component,
                         state: {},
+                        pathMatch: match,
                     });
                 } else if (subpage.type === 'state') {
+                    // FIXME: these break path:part
                     Object.assign(stack[stack.length - 1].state, subpage.state);
                 } else if (subpage.type === 'task') {
                     // TODO: maybe use a map fn for options instead?
@@ -157,6 +161,8 @@ const SAVE_STATE_INTERVAL = 1000; // ms
 ///
 /// # Props
 /// - onNavigate: emitted when the URL changes
+/// - permaSidebar: bool
+/// - onOpenMenu: fires when the menu icon is pressed
 export default class Navigation extends PureComponent {
     state = {
         // array of objects with properties
@@ -167,6 +173,8 @@ export default class Navigation extends PureComponent {
         // - source: source ref
         // - state: additional state given by the url
         // - query: current query string
+        // - meta: optional object { title, actions } for the app bar
+        // - pathMatch: regex match of the path part
         stack: [],
         // map from task names to Task objects
         tasks: {},
@@ -239,13 +247,15 @@ export default class Navigation extends PureComponent {
     /// Called when a page changes its query.
     onQueryChange (stackIndex, newQuery) {
         const stack = this.state.stack.slice();
-        stack[stackIndex].query = newQuery;
-        if (stackIndex === this.state.stack.length - 1) {
-            // save to URL
-            this.navigate(this.state.pathname + (newQuery ? '?' + newQuery : ''));
-        } else {
-            // just save to state
-            this.setState({ stack }, this.saveState);
+        if (stack[stackIndex].query !== newQuery) {
+            stack[stackIndex].query = newQuery;
+            if (stackIndex === this.state.stack.length - 1) {
+                // save to URL
+                this.navigate(this.state.pathname + (newQuery ? '?' + newQuery : ''));
+            } else {
+                // just save to state
+                this.setState({ stack }, this.saveState);
+            }
         }
     }
 
@@ -315,8 +325,17 @@ export default class Navigation extends PureComponent {
         let bottomPage;
         const stackItems = [];
 
+        let currentTitle = locale.title;
+        let currentActions = [];
+
         for (let i = 0; i < this.state.stack.length; i++) {
             const stackItem = this.state.stack[i];
+
+            if (stackItem.meta) {
+                currentTitle = stackItem.meta.title;
+                currentActions = stackItem.meta.actions;
+            }
+
             const isBottom = i === 0;
             const isTop = i === this.state.stack.length - 1;
             const PageComponent = stackItem.component;
@@ -326,9 +345,16 @@ export default class Navigation extends PureComponent {
                         <CircularProgress indeterminate class="page-loading-indicator-inner" />
                     </div>
                 }>
-                    <PageComponent
-                        query={stackItem.query}
-                        onQueryChange={query => this.onQueryChange(i, query)} />
+                    <MetaProvider onUpdate={({ title, actions }) => {
+                        const stack = this.state.stack.slice();
+                        stack[i].meta = { title, actions };
+                        this.setState({ stack });
+                    }}>
+                        <PageComponent
+                            query={stackItem.query}
+                            onQueryChange={query => this.onQueryChange(i, query)}
+                            match={stackItem.pathMatch} />
+                    </MetaProvider>
                 </Suspense>
             );
 
@@ -344,11 +370,40 @@ export default class Navigation extends PureComponent {
             }
         }
 
+        let appBarMenuType = null;
+        if (!stackItems.length) {
+            // bottom page; show menu button if applicable
+            appBarMenuType = this.props.permaSidebar ? null : 'menu';
+        } else {
+            appBarMenuType = 'back';
+        }
+
+        const onAppBarMenuClick = () => {
+            if (stackItems.length) {
+                // note that we’re popping the last item; but since stackItems is one shorter than
+                // the stack length; this *is* the last stack index
+                this.popStackAt(stackItems.length);
+            } else this.props.onOpenMenu();
+        };
+
+        const appBarMenu = appBarMenuType
+            ? (
+                <Button icon small onClick={onAppBarMenuClick}>
+                    <MenuIcon type={appBarMenuType} />
+                </Button>
+            )
+            : null;
+
         return (
             <div class="navigation-view">
                 <EventProxy
                     dom target={window}
                     onpopstate={this.onPopState} />
+                <AppBarProxy
+                    priority={1}
+                    menu={appBarMenu}
+                    title={currentTitle}
+                    actions={currentActions} />
                 <CardStackProvider>
                     <div class="bottom-page-container">
                         {bottomPage}

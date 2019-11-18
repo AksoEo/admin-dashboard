@@ -178,7 +178,7 @@ export class SortingControl extends PureComponent {
                             ? locale.listView.sorting.asc
                             : locale.listView.sorting.desc}
                 </label>}
-                <Button icon class="sorting-icon">
+                <Button icon small class="sorting-icon">
                     {this.props.value === 'none'
                         ? <RemoveIcon className="none-icon" />
                         : <ArrowUpwardIcon className="arrow-icon" />}
