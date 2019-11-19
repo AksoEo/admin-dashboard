@@ -17,6 +17,8 @@ const phoneNumberRenderer = allowInteractive => function PhoneNumber ({ value })
 };
 
 function PhoneNumberEditor ({ value, onChange }) {
+    if (!value || !value.value) return null;
+
     let trailing = '';
     try {
         const num = parsePhoneNumber(value);

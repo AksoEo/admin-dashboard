@@ -121,6 +121,13 @@ export const search = {
     pickFields: '[[pick fields]]',
 };
 
+export const detail = {
+    editing: 'Redakti',
+    edit: 'Redakti',
+    cancel: 'Nuligi',
+    done: 'Konservi',
+};
+
 export const codeholders = {
     title: 'Membroj',
     detailTitle: 'Membro',

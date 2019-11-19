@@ -27,9 +27,10 @@ export const WithCountries = connect('countries/countryGroups')(data => ({
 }));
 
 function CountryRenderer ({ value }) {
+    if (!value) return null;
     return (
         <WithCountries>{countries => (
-            <span class="data country"><CountryFlag country={value} /> {countries[value]}</span>
+            <span class="data country"><CountryFlag country={value} /> {countries[value].eo}</span>
         )}</WithCountries>
     );
 }
@@ -44,9 +45,9 @@ export function CountryEditor ({ value, onChange }) {
                         value={value}
                         onChange={e => onChange(e.target.value)}>
                         <option value={''}>—</option>
-                        {Object.entries(countries).map(([id, name]) => (
+                        {Object.entries(countries).map(([id, names]) => (
                             <option value={id} key={id}>
-                                {name}
+                                {names.eo}
                             </option>
                         ))}
                     </NativeSelect>

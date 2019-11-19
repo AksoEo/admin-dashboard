@@ -704,7 +704,9 @@ export const tasks = {
         }]);
         // need to update profilePictureHash
         // but we don’t await this because when this fails it shouldn’t display an error
-        tasks.codeholder({ id, fields: ['profilePictureHash'] }).catch(() => {});
+        tasks.codeholder({ id, fields: ['profilePictureHash'] }).catch(err => {
+            console.error('failed to fetch new profile picture hash', err); // eslint-disable no-console
+        });
     },
     /// codeholders/listFiles: lists files for a codeholder
     ///

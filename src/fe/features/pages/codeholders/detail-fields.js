@@ -155,7 +155,7 @@ function NameEditor ({ value, item, editing, onChange }) {
                 {secondaryName}
             </div>
         );
-    } else if (value.codeholderType === 'human') {
+    } else if (item.type === 'human') {
         return lotsOfTextFields([
             [
                 {
@@ -170,35 +170,40 @@ function NameEditor ({ value, item, editing, onChange }) {
             ],
             [
                 {
-                    key: 'firstNameLegal',
+                    key: 'firstLegal',
                     label: <Required>{locale.members.detail.fields.firstNameLegal}</Required>,
                     props: { maxLength: 50 },
                     validate: validators.required(),
                 },
                 {
-                    key: 'lastNameLegal',
+                    key: 'lastLegal',
                     label: locale.members.detail.fields.lastNameLegal,
                     props: { maxLength: 50 },
                 },
             ],
             [
                 {
-                    key: 'firstName',
+                    key: 'first',
                     label: locale.members.detail.fields.firstName,
                     props: { maxLength: 50 },
                 },
                 {
-                    key: 'lastName',
+                    key: 'last',
                     label: locale.members.detail.fields.lastName,
                     props: { maxLength: 50 },
                 },
             ],
-        ], { value, onChange, class: 'member-name editing', key: 'human' });
-    } else if (value.codeholderType === 'org') {
+        ], {
+            value,
+            onChange,
+            class: 'member-name editing',
+            key: 'human',
+        });
+    } else if (item.type === 'org') {
         return lotsOfTextFields([
             [
                 {
-                    key: 'fullName',
+                    key: 'full',
                     label: <Required>{locale.members.detail.fields.fullName}</Required>,
                     props: {
                         maxLength: 100,
@@ -209,7 +214,7 @@ function NameEditor ({ value, item, editing, onChange }) {
             ],
             [
                 {
-                    key: 'fullNameLocal',
+                    key: 'local',
                     label: <Required>{locale.members.detail.fields.fullNameLocal}</Required>,
                     props: {
                         maxLength: 100,
@@ -219,12 +224,17 @@ function NameEditor ({ value, item, editing, onChange }) {
             ],
             [
                 {
-                    key: 'nameAbbrev',
+                    key: 'abbrev',
                     label: locale.members.detail.fields.nameAbbrev,
                     props: { maxLength: 12 },
                 },
             ],
-        ], { value, onChange, class: 'member-name editing', key: 'org' });
+        ], {
+            value,
+            onChange,
+            class: 'member-name editing',
+            key: 'org',
+        });
     }
 }
 

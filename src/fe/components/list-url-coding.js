@@ -123,10 +123,10 @@ export function encodeURLQuery (state, filters) {
     }
     if (state.jsonFilter && !state.jsonFilter._disabled) {
         // jsonFilter(data)
-        data += 'jsonFilter(';
         // TODO: proper encoding
-        data += encodeParens(state.jsonFilter.filter);
-        data += ')';
+        // data += 'jsonFilter(';
+        // data += encodeParens(state.jsonFilter.filter);
+        // data += ')';
     }
     if (state.filters && !state.filters._disabled) {
         // filter(id:serialized, ...)

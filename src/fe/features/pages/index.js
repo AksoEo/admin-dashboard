@@ -65,9 +65,7 @@ export default [
                             {
                                 path: 'redakti',
                                 type: 'state',
-                                state: {
-                                    editing: true,
-                                },
+                                state: 'editing',
                             },
                             {
                                 path: 'membrecoj',

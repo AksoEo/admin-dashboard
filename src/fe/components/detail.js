@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
+import DoneIcon from '@material-ui/icons/Done';
+import { detail as locale } from '../locale';
 import { coreContext } from '../core/connection';
 import './detail.less';
 
@@ -24,6 +26,9 @@ export default class DetailView extends PureComponent {
     state = {
         data: null,
         error: null,
+
+        // current editing copy
+        edit: null,
     };
 
     /// current data view
@@ -55,7 +60,7 @@ export default class DetailView extends PureComponent {
         this.#view.drop();
     }
 
-    render () {
+    render ({ editing }) {
         let contents;
         if (this.state.error) {
             contents = (
@@ -64,13 +69,11 @@ export default class DetailView extends PureComponent {
                 </div>
             );
         } else if (this.state.data) {
+            const itemData = this.state.edit || this.state.data;
             const fieldProps = {
-                editing: this.props.editing,
-                item: this.state.data,
-                onItemChange: () => {
-                    // TODO
-                    throw new Error('todo');
-                },
+                editing,
+                item: itemData,
+                onItemChange: item => this.setState({ edit: item }),
             };
 
             let header = null;
@@ -94,10 +97,14 @@ export default class DetailView extends PureComponent {
                     <div class="detail-field-id" key={'i' + fieldId}>{fieldId}</div>,
                     <div class="detail-field-editor" key={'e' + fieldId}>
                         <FieldComponent
-                            value={this.state.data[fieldId]}
-                            onChange={() => {
-                                // TODO
-                                throw new Error('todo');
+                            value={itemData[fieldId]}
+                            onChange={value => {
+                                this.setState({
+                                    edit: {
+                                        ...itemData,
+                                        [fieldId]: value,
+                                    },
+                                });
                             }}
                             {...fieldProps} />
                     </div>,
@@ -106,8 +113,32 @@ export default class DetailView extends PureComponent {
 
             contents = (
                 <Fragment>
+                    <AppBarProxy
+                        class="detail-view-editing-app-bar"
+                        priority={editing ? 2 : -Infinity}
+                        title={locale.editing}
+                        menu={(
+                            <Button icon small onClick={() => {
+                                this.setState({ edit: null });
+                                this.props.onEndEdit();
+                            }} aria-label={locale.cancel}>
+                            <MenuIcon type="close" />
+                        </Button>
+                        )}
+                        actions={[
+                            {
+                                label: locale.done,
+                                icon: <DoneIcon />,
+                                action: () => {
+                                    // TODO: commit first
+                                    this.props.onEndEdit();
+                                },
+                            }
+                        ]} />
                     {header}
+                    <div class="detail-fields">
                     {items}
+                    </div>
                     {footer}
                 </Fragment>
             );

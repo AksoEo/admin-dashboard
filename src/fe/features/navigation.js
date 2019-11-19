@@ -20,7 +20,7 @@ function TODOPage () {
 }
 
 // Parses a URL and state into a stack and task list. State is nullable.
-function parseHistoryState (url, state) {
+function parseHistoryState (url, state, mkPopStack) {
     const stackState = state && Array.isArray(state.stack) ? state.stack : [];
 
     url = new URL(url);
@@ -43,6 +43,8 @@ function parseHistoryState (url, state) {
     // current state for pages where we don’t have the state encoded in the URL
     // stack items also have a state object into which state paths will be written
     const stack = [];
+    // the subset of stack items that are views
+    const viewStack = [];
     // core tasks we should create
     const tasks = {};
     // current page object from the router
@@ -54,24 +56,29 @@ function parseHistoryState (url, state) {
         for (const page of category.contents) {
             if (page.path === firstPathPart) {
                 cursor = page;
-                stack.push({
+                const item = {
                     path: firstPathPart,
                     source: page,
                     component: page.component || TODOPage,
+                    query: '',
                     state: {},
-                });
+                };
+                stack.push(item);
+                viewStack.push(item);
             }
         }
     }
 
     if (!cursor) {
         // oh no there is no such page
-        stack.push(cursor = {
+        const item = cursor = {
             path: firstPathPart,
             source: null,
             component: NotFoundPage,
             state: {},
-        });
+        };
+        stack.push(item);
+        viewStack.push(item);
     }
 
     // traverse the rest of the path
@@ -87,24 +94,36 @@ function parseHistoryState (url, state) {
 
                 if (subpage.type === 'bottom') {
                     while (stack.length) stack.pop();
-                    stack.push({
+                    const item = {
                         path: part,
                         source: subpage,
                         component: subpage.component,
-                        state: {},
                         pathMatch: match,
-                    });
+                        query: '',
+                        state: {},
+                    };
+                    stack.push(item);
+                    viewStack.push(item);
                 } else if (subpage.type === 'stack') {
-                    stack.push({
+                    const item = {
                         path: part,
                         source: subpage,
                         component: subpage.component,
-                        state: {},
                         pathMatch: match,
-                    });
+                        query: '',
+                        state: {},
+                    };
+                    stack.push(item);
+                    viewStack.push(item);
                 } else if (subpage.type === 'state') {
-                    // FIXME: these break path:part
-                    Object.assign(stack[stack.length - 1].state, subpage.state);
+                    const stateKey = subpage.state;
+                    viewStack[viewStack.length - 1].state[stateKey] = {
+                        pop: mkPopStack(stack.length),
+                    };
+                    stack.push({
+                        path: part,
+                        source: subpage,
+                    });
                 } else if (subpage.type === 'task') {
                     // TODO: maybe use a map fn for options instead?
                     tasks[subpage.task] = subpage.options || {};
@@ -120,26 +139,29 @@ function parseHistoryState (url, state) {
         if (!match) {
             // oh no there is no such page
             stack.splice(0);
-            stack.push(cursor = {
+            viewStack.splice(0);
+            const item = cursor = {
                 path: notFoundParts,
                 source: null,
                 component: NotFoundPage,
                 state: {},
-            });
+            };
+            stack.push(item);
+            viewStack.push(item);
         }
     }
 
     // load saved state if available
     for (let i = 0; i < stackState.length; i++) {
-        if (stack[i] && stackState[i]) {
-            stack[i].data = stackState[i].data;
-            stack[i].query = stackState[i].query;
+        if (viewStack[i] && stackState[i]) {
+            viewStack[i].data = stackState[i].data;
+            viewStack[i].query = stackState[i].query;
         }
     }
 
     const urlQuery = (url.search || '').substr(1); // no question mark
     // top stack item gets the query from the URL
-    if (stack.length) stack[stack.length - 1].query = urlQuery;
+    if (viewStack.length) viewStack[viewStack.length - 1].query = urlQuery;
 
     const currentLocation = url.pathname + url.search + url.hash;
 
@@ -149,6 +171,7 @@ function parseHistoryState (url, state) {
             ? url.pathname + TRUNCATED_QUERY_NAME
             : currentLocation,
         stack,
+        viewStack,
         tasks,
         pathname: url.pathname,
         query: urlQuery,
@@ -195,10 +218,11 @@ export default class Navigation extends PureComponent {
             urlLocation,
             currentLocation,
             stack,
+            viewStack,
             tasks,
             pathname,
             query,
-        } = parseHistoryState(url, state);
+        } = parseHistoryState(url, state, index => replace => this.popStackAt(index, replace));
 
         if (currentLocation !== this.currentLocation) {
             this.currentLocation = currentLocation;
@@ -227,7 +251,7 @@ export default class Navigation extends PureComponent {
     onPopState = e => this.loadURL(document.location.href, e.state);
 
     /// Navigates with an href.
-    navigate (href) {
+    navigate (href, replace) {
         // first, save the current state so it’s up to date when we go back
         this.saveState();
         // resolve url
@@ -239,7 +263,8 @@ export default class Navigation extends PureComponent {
         // load & parse url. also, importantly, compute urlLocation
         this.loadURL(target.href, null);
         // then actually push it to history with the newly computed urlLocation
-        window.history.pushState(null, '', this.urlLocation);
+        if (replace) window.history.replaceState(null, '', this.urlLocation);
+        else window.history.pushState(null, '', this.urlLocation);
         // and finally, save state
         this.saveState();
     }
@@ -251,7 +276,7 @@ export default class Navigation extends PureComponent {
             stack[stackIndex].query = newQuery;
             if (stackIndex === this.state.stack.length - 1) {
                 // save to URL
-                this.navigate(this.state.pathname + (newQuery ? '?' + newQuery : ''));
+                this.navigate(this.state.pathname + (newQuery ? '?' + newQuery : ''), true);
             } else {
                 // just save to state
                 this.setState({ stack }, this.saveState);
@@ -260,12 +285,19 @@ export default class Navigation extends PureComponent {
     }
 
     /// Removes all stack items at and above the given index.
-    popStackAt (stackIndex) {
+    popStackAt (stackIndex, replace) {
         const stack = this.state.stack.slice();
         stack.splice(stackIndex);
         const pathname = '/' + stack.map(x => x.path).join('/');
-        const query = stack.length ? stack[stack.length - 1].query : '';
-        this.navigate(pathname + (query ? '?' + query : ''));
+        let query = '';
+        // find topmost view item and use its query
+        for (let i = stack.length - 1; i >= 0; i--) {
+            if (stack[i].component) {
+                query = stack[i].query;
+                break;
+            }
+        }
+        this.navigate(pathname + (query ? '?' + query : ''), replace);
     }
 
     // - state saving
@@ -277,10 +309,16 @@ export default class Navigation extends PureComponent {
     }
 
     saveState = () => {
-        window.history.replaceState({
-            stack: this.state.stack.map(item => ({ data: item.data, query: item.query })),
-            href: this.currentLocation,
-        }, '', this.currentLocation);
+        if (!this.state.error) {
+            // only save while we don’t have an error
+            window.history.replaceState({
+                stack: this.state.stack
+                    // only save for views
+                    .filter(item => item.component)
+                    .map(item => ({ data: item.data, query: item.query })),
+                href: this.currentLocation,
+            }, '', this.currentLocation);
+        }
 
         this.scheduleSaveState();
     };
@@ -330,6 +368,7 @@ export default class Navigation extends PureComponent {
 
         for (let i = 0; i < this.state.stack.length; i++) {
             const stackItem = this.state.stack[i];
+            if (!stackItem.component) continue; // not a view component
 
             if (stackItem.meta) {
                 currentTitle = stackItem.meta.title;
@@ -340,22 +379,23 @@ export default class Navigation extends PureComponent {
             const isTop = i === this.state.stack.length - 1;
             const PageComponent = stackItem.component;
             const itemContents = (
-                <Suspense fallback={
-                    <div class="page-loading-indicator">
-                        <CircularProgress indeterminate class="page-loading-indicator-inner" />
-                    </div>
-                }>
-                    <MetaProvider onUpdate={({ title, actions }) => {
-                        const stack = this.state.stack.slice();
-                        stack[i].meta = { title, actions };
-                        this.setState({ stack });
-                    }}>
+                <MetaProvider onUpdate={({ title, actions }) => {
+                    const stack = this.state.stack.slice();
+                    stack[i].meta = { title, actions };
+                    this.setState({ stack });
+                }}>
+                    <Suspense fallback={
+                        <div class="page-loading-indicator">
+                            <CircularProgress indeterminate class="page-loading-indicator-inner" />
+                        </div>
+                    }>
                         <PageComponent
                             query={stackItem.query}
                             onQueryChange={query => this.onQueryChange(i, query)}
-                            match={stackItem.pathMatch} />
-                    </MetaProvider>
-                </Suspense>
+                            match={stackItem.pathMatch}
+                            {...stackItem.state} />
+                    </Suspense>
+                </MetaProvider>
             );
 
             if (isBottom) {

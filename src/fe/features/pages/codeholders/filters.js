@@ -430,9 +430,7 @@ export default {
 
             render () {
                 // FIXME: this mess
-                // add support for auto enabled/change
-
-                const { value, onChange } = this.props;
+                const { value, onChange, enabled, onEnabledChange } = this.props;
                 const { categories: availableCategories } = this.state;
 
                 const items = value.map(({
@@ -445,6 +443,7 @@ export default {
                             const newValue = [...value];
                             newValue.splice(index, 1);
                             onChange(newValue);
+                            if (!newValue.length) onEnabledChange(false);
                         }}>
                             <RemoveIcon />
                         </Button>
@@ -613,6 +612,7 @@ export default {
                                 range: [thisYear, thisYear],
                                 categories: [],
                             }]));
+                            onEnabledChange(true);
                         }}>
                             <AddIcon />
                         </Button>

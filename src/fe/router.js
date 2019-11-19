@@ -5,10 +5,8 @@ import { Button } from '@cpsdqs/yamdl';
 /// A React context for in-app navigation.
 ///
 /// - `navigate: (string) => void`: function that may be called to navigate in-app
-/// - `replace: (string) => void`: function that may be called to replaceState in-app
 export const routerContext = createContext({
     navigate: null,
-    replace: null,
 });
 
 /// An in-app link.
