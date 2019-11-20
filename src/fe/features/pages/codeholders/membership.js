@@ -158,14 +158,14 @@ const AddMembership = connect('memberships/categories')((categories, core) => ({
     categories,
     core,
 }))(function AddMembership ({ id, onSuccess, categories, core }) {
-    categories = categories || [];
+    categories = categories || {};
     const [category, setCategory] = useState(null);
     const [year, setYear] = useState(new Date().getFullYear());
 
     return (
         <div>
             <select value={category} onChange={e => setCategory(e.target.value)}>
-                {categories.map(({ id, nameAbbrev, name, availableFrom, availableTo }) => <option key={id} value={id}>
+                {Object.values(categories).map(({ id, nameAbbrev, name, availableFrom, availableTo }) => <option key={id} value={id}>
                     ({nameAbbrev}) {name} ({availableFrom}-{availableTo})
                 </option>)}
             </select>

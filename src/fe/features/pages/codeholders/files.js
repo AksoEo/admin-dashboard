@@ -1,10 +1,13 @@
 import { h } from 'preact';
 import { useState, useCallback, Fragment } from 'preact/compat';
 import { Dialog, TextField, Button } from '@cpsdqs/yamdl';
+import FileIcon from '@material-ui/icons/InsertDriveFile';
+import moment from 'moment';
 import config from '../../../../config.val';
 import DataList from '../../../components/data-list';
 import pickFile from '../../../components/pick-file';
-import locale from '../../../locale';
+import { IdUEACode } from '../../../components/data/uea-code';
+import { codeholders as locale, mime as mimeLocale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 
 // TODO: use core API properly
@@ -29,34 +32,49 @@ export default function Files ({ id }) {
     return (
         <div class="member-files">
             <header class="files-header">
-                <h3 class="files-title">{locale.members.detail.filesTitle}</h3>
-                <Button onClick={uploadFile}>{locale.members.detail.uploadFile}</Button>
+                <h3 class="files-title">{locale.filesTitle}</h3>
+                <Button onClick={uploadFile}>{locale.uploadFile}</Button>
             </header>
             <coreContext.Consumer>
                 {core => <Fragment>
                     <DataList
-                        class="member-files"
+                        class="files-list"
                         onLoad={loadFiles(core, id)}
                         renderItem={item => (
                             <div class="member-file" data-id={item.id}>
+                                <FileThumbnail id={item.id} mime={item.mime} />
                                 <div class="file-meta">
-                                    <FileThumbnail id={item.id} mime={item.mime} />
-                                    <div class="file-name">{item.name}</div>
+                                    <div class="file-name">
+                                        <span class="file-id">#{item.id}</span>
+                                        {item.name}
+                                    </div>
                                     <div class="file-desc">{item.description}</div>
-                                    <div class="file-type">{item.mime}</div>
-                                    <div class="file-added-by">{item.addedBy}</div>
-                                    <div class="file-time">{item.time}</div>
-                                    <Button
-                                        href={new URL(`/codeholders/${id}/files/${item.id}`, config.base).toString()}
-                                        target="_blank"
-                                        rel="noopener">
-                                        {locale.members.detail.downloadFile}
-                                    </Button>
+                                    <div class="secondary-info">
+                                        <span class="file-type">
+                                            <Mime mime={item.mime} />
+                                        </span>
+                                        {' · '}
+                                        <span class="file-added-by">
+                                            {locale.fileAddedBy}
+                                            <IdUEACode id={item.addedBy} />
+                                        </span>
+                                        {' · '}
+                                        <span class="file-time">
+                                            {moment(item.time * 1000).format('LLL')}
+                                        </span>
+                                    </div>
                                 </div>
+                                <Button
+                                    class="download-button"
+                                    href={new URL(`/codeholders/${id}/files/${item.id}`, config.base).toString()}
+                                    target="_blank"
+                                    rel="noopener">
+                                    {locale.downloadFile}
+                                </Button>
                             </div>
                         )}
                         onRemove={item => core
-                            .createTask('codeholders/deleteFile', { id }, { id: item.id })
+                            .createTask('codeholders/deleteFile', { id, file: item.id })
                             .runOnceAndDrop()} />
 
                     <UploadDialog
@@ -78,8 +96,8 @@ function UploadDialog ({ id, open, onClose, file, core }) {
     const [error, setError] = useState(null);
 
     useCallback(() => {
-        setName(file.name);
-    }, [file]);
+        if (file) setName(file.name);
+    }, [file])();
 
     const contents = [];
     const actions = [];
@@ -90,13 +108,13 @@ function UploadDialog ({ id, open, onClose, file, core }) {
         contents.push(
             <FileThumbnail file={file} />,
             <TextField
-                label={locale.members.detail.fileName}
+                label={locale.fileName}
                 maxLength={50}
                 value={name}
                 disabled={uploading}
                 onChange={e => setName(e.target.value)} />,
             <TextField
-                label={locale.members.detail.fileDescription}
+                label={locale.fileDescription}
                 maxLength={300}
                 value={description}
                 disabled={uploading}
@@ -105,10 +123,10 @@ function UploadDialog ({ id, open, onClose, file, core }) {
 
         if (!uploading) {
             actions.push({
-                label: locale.members.detail.cancelUploadFile,
+                label: locale.cancelUploadFile,
                 action: onClose,
             }, {
-                label: locale.members.detail.uploadFile,
+                label: locale.uploadFile,
                 action: () => {
                     setUploading(true);
 
@@ -132,7 +150,7 @@ function UploadDialog ({ id, open, onClose, file, core }) {
             <Dialog
                 backdrop
                 open={open && !error}
-                title={locale.members.detail.uploadThisFile}
+                title={locale.uploadThisFile}
                 onClose={canClose && onClose}
                 actions={actions}>
                 {contents}
@@ -142,18 +160,18 @@ function UploadDialog ({ id, open, onClose, file, core }) {
                 open={error}
                 actions={[
                     {
-                        label: locale.members.detail.cancelUploadFile,
+                        label: locale.cancelUploadFile,
                         action: () => {
                             setError(null);
                             onClose();
                         },
                     },
                     {
-                        label: locale.members.detail.retryFileUpload,
+                        label: locale.retryFileUpload,
                         action: () => setError(null),
                     },
                 ]}>
-                {locale.members.detail.failedFileUpload}
+                {locale.failedFileUpload}
             </Dialog>
         </Fragment>
     );
@@ -161,7 +179,20 @@ function UploadDialog ({ id, open, onClose, file, core }) {
 
 function FileThumbnail ({ file, id, mime }) {
     // upload dialog preview
-    if (file) return 'file preview goes here';
+    if (file) return <div class="file-thumbnail">?<FileIcon /></div>;
 
-    return 'file thumbnail goes here';
+    return <div class="file-thumbnail">?<FileIcon /></div>;
+}
+
+function Mime ({ mime }) {
+    const parts = mime.split('/');
+    const type = parts[0];
+    const subtype = parts[1];
+
+    return (
+        <span class="mime-type">
+            <span class="mime-subtype">{subtype}</span>
+            <span class="mime-ty">{mimeLocale.types[type]}</span>
+        </span>
+    );
 }

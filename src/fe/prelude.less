@@ -184,6 +184,19 @@
         ~"@{ambient-z-value} @{ambient-color}";
 }
 
+.log-gradient-mask(@direction: to bottom, @color: black, @least: 0%, @most: 100%) {
+    mask-image: linear-gradient(@direction,
+        fade(@color, @most - (@most - @least) * 0.00) 0%,
+        fade(@color, @most - (@most - @least) * 0.01) 13%,
+        fade(@color, @most - (@most - @least) * 0.05) 25%,
+        fade(@color, @most - (@most - @least) * 0.12) 38%,
+        fade(@color, @most - (@most - @least) * 0.22) 50%,
+        fade(@color, @most - (@most - @least) * 0.36) 63%,
+        fade(@color, @most - (@most - @least) * 0.53) 75%,
+        fade(@color, @most - (@most - @least) * 0.75) 88%,
+        fade(@color, @most - (@most - @least) * 1.00) 100%);
+}
+
 .log-gradient-background(@direction: to bottom, @color: black, @least: 0%, @most: 100%) {
     background-image: linear-gradient(@direction,
         fade(@color, (@most - @least) * 0.00 + @least) 0%,
@@ -195,13 +208,4 @@
         fade(@color, (@most - @least) * 0.53 + @least) 75%,
         fade(@color, (@most - @least) * 0.75 + @least) 88%,
         fade(@color, (@most - @least) * 1.00 + @least) 100%);
-}
-
-// FIXME: kinda hacky
-.log-gradient-background-to-card-background(@direction: to bottom) {
-    .log-gradient-background(@direction, #fff);
-
-    @media (prefers-color-scheme: dark) {
-        .log-gradient-background(@direction, #222);
-    }
 }

@@ -3,7 +3,7 @@ import { CircularProgress } from '@cpsdqs/yamdl';
 import { UEACode as AKSOUEACode } from '@tejo/akso-client';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-import { coreContext } from '../../core/connection';
+import { connect, coreContext } from '../../core/connection';
 import locale from '../../locale';
 import { Validator } from '../form';
 import SuggestionField from '../suggestion-field';
@@ -29,6 +29,17 @@ function BothUEACodes ({ value, value2 }) {
         </span>
     );
 }
+
+/// Renders a UEA code by ID.
+///
+/// # Props
+/// - id: codeholder id
+export const IdUEACode = connect(
+    ({ id }) => ['codeholders/codeholder', { id, fields: ['code'] }],
+    ['id'],
+)()(({ code }) => (
+    code ? <UEACode value={code.new} /> : null
+));
 
 /// Also pass `id` to enable checking if it’s taken.
 /// Also pass an array to `suggestions` to show a list of suggestions.

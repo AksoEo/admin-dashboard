@@ -267,10 +267,12 @@ function todoGetPerms () {
 function Header ({ item, editing, onItemChange }) {
     return (
         <div class="member-header">
-            <ProfilePictureEditor
-                id={item.id}
-                profilePictureHash={item.profilePictureHash}
-                canEdit={todoGetPerms('codeholders.update')} />
+            <div class="member-picture">
+                <ProfilePictureEditor
+                    id={item.id}
+                    profilePictureHash={item.profilePictureHash}
+                    canEdit={todoGetPerms('codeholders.update')} />
+            </div>
             <div class="member-info">
                 <NameEditor
                     value={item.name}
@@ -288,6 +290,7 @@ function Header ({ item, editing, onItemChange }) {
                     id={item.id}
                     canEdit={todoGetPerms('codeholders.update')} />
             </div>
+            <div class="decorative-flourish" />
         </div>
     );
 }
@@ -333,7 +336,7 @@ export class CodeholderAddressRenderer extends Component {
             this.context.createTask('codeholders/address', { id: this.props.id }, {
                 lang,
                 postal: true,
-            }).then(res => {
+            }).runOnceAndDrop().then(res => {
                 if (id !== this.props.id || lang !== this.state.postalLang) return;
                 this.setState({ postalAddress: res });
             }).catch(() => {

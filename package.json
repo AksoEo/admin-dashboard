@@ -11,7 +11,7 @@
     "@cpsdqs/yamdl": "^0.1.0",
     "@material-ui/core": "^4.5.0",
     "@material-ui/icons": "^4.4.3",
-    "@tejo/akso-client": "^0.1.9",
+    "@tejo/akso-client": "^0.1.10",
     "codemirror": "^5.49.2",
     "core-js": "^3.2.1",
     "csv-stringify": "^5.3.3",

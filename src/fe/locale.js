@@ -267,6 +267,29 @@ export const codeholders = {
             no: 'nemembrecdona',
         },
     },
+    filesTitle: 'Dosieroj',
+    uploadFile: 'Alŝuti dosieron',
+    uploadThisFile: 'Alŝuti',
+    downloadFile: 'Elŝuti',
+    fileName: 'Dosiernomo',
+    fileDescription: 'Priskribo',
+    cancelUploadFile: 'Nuligi',
+    retryFileUpload: 'Reprovi',
+    failedFileUpload: 'Ne sukcesis alŝuti la dosieron',
+    fileAddedBy: '[[file added by]] ',
+};
+
+export const mime = {
+    types: {
+        application: '[[file]]',
+        multipart: '[[file]]',
+        audio: '[[audio]]',
+        font: '[[font]]',
+        image: '[[image]]',
+        model: '[[3d model]]',
+        text: '[[text]]',
+        video: '[[video]]',
+    },
 };
 
 // TODO: remove this

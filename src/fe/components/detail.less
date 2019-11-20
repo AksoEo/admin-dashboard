@@ -19,12 +19,16 @@
     .detail-fields {
         display: grid;
         padding: 16px;
-        grid-template-columns: 8em auto;
+        grid-template-columns: 1fr 3fr;
         grid-column-gap: 16px;
-        grid-row-gap: 8px;
+        grid-row-gap: 16px; // we here at material design invest big in white space
 
         .detail-field-id {
             text-align: right;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: small;
+            margin-top: 0.3em;
 
             &.is-empty {
                 opacity: 0.5;
