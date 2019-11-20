@@ -552,6 +552,8 @@
         .member-notes {
             textarea {
                 font: inherit;
+                background: @card-background;
+                color: inherit;
                 border: 1px solid @separator;
                 display: block;
                 width: 100%;
@@ -935,6 +937,45 @@
             left: 50%;
             transform: translate(-50%, -50%);
             --md-progress-color: #fff;
+        }
+    }
+}
+
+.codeholders-task-update {
+    width: 400px;
+    max-width: 90%;
+
+    .changed-fields-title {
+        font-weight: bold;
+    }
+
+    .update-comment {
+        dipslay: block;
+        width: 100%;
+    }
+
+    .error-message {
+        margin: 16px 0;
+        color: @error;
+        font-size: small;
+    }
+
+    .form-footer {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+
+        button .progress-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        button .progress-overlay + span {
+            transition: opacity 0.3s;
+        }
+        button .progress-overlay.indeterminate + span {
+            opacity: 0;
         }
     }
 }

@@ -5,7 +5,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
 import { UEACode } from '@tejo/akso-client';
 import { coreContext } from '../../../core/connection';
-import locale from '../../../locale';
+import { codeholders as locale, data as dataLocale } from '../../../locale';
 import { Validator } from '../../../components/form';
 import data, { Required } from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
@@ -78,7 +78,7 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                                     editor.key,
                                     editor.intoValue
                                         ? editor.intoValue(e.target.value)
-                                        : e.target.value,
+                                        : (e.target.value || null),
                                 )
                             )}
                             {...(editor.props || {})} />
@@ -92,7 +92,7 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
 const validators = {
     required: (prev = (() => {})) => value => {
         prev(value);
-        if (!value) throw { error: locale.data.requiredField };
+        if (!value) throw { error: dataLocale.requiredField };
     },
 };
 
@@ -115,7 +115,7 @@ function NameEditor ({ value, item, editing, onChange }) {
             if (first !== firstLegal || last !== lastLegal) {
                 secondaryName = (
                     <div class="name-legal">
-                        {locale.members.detail.fields.nameLegal}: <span class="name-legal-inner">
+                        {locale.nameSubfields.legal}: <span class="name-legal-inner">
                             {firstLegal || ''} {lastLegal || ''}
                         </span>
                     </div>
@@ -137,7 +137,7 @@ function NameEditor ({ value, item, editing, onChange }) {
             if (value.local) {
                 secondaryName = (
                     <div class="name-legal">
-                        {locale.members.detail.fields.local}: <span
+                        {locale.nameSubfields.local}: <span
                             class="name-legal-inner">
                             {value.local}
                         </span>
@@ -149,7 +149,7 @@ function NameEditor ({ value, item, editing, onChange }) {
         return (
             <div class="member-name">
                 <div class="name-primary">
-                    <IconType class="type-icon" />
+                    <IconType className="type-icon" />
                     {primaryName}
                 </div>
                 {secondaryName}
@@ -163,33 +163,33 @@ function NameEditor ({ value, item, editing, onChange }) {
                     key: 'honorific',
                     props: {
                         maxLength: 15,
-                        suggestions: locale.members.detail.honorificSuggestions,
-                        label: locale.members.detail.fields.honorific,
+                        suggestions: locale.honorificSuggestions,
+                        label: locale.nameSubfields.honorific,
                     },
                 },
             ],
             [
                 {
                     key: 'firstLegal',
-                    label: <Required>{locale.members.detail.fields.firstNameLegal}</Required>,
+                    label: <Required>{locale.nameSubfields.firstLegal}</Required>,
                     props: { maxLength: 50 },
                     validate: validators.required(),
                 },
                 {
                     key: 'lastLegal',
-                    label: locale.members.detail.fields.lastNameLegal,
+                    label: locale.nameSubfields.lastLegal,
                     props: { maxLength: 50 },
                 },
             ],
             [
                 {
                     key: 'first',
-                    label: locale.members.detail.fields.firstName,
+                    label: locale.nameSubfields.first,
                     props: { maxLength: 50 },
                 },
                 {
                     key: 'last',
-                    label: locale.members.detail.fields.lastName,
+                    label: locale.nameSubfields.last,
                     props: { maxLength: 50 },
                 },
             ],
@@ -204,7 +204,7 @@ function NameEditor ({ value, item, editing, onChange }) {
             [
                 {
                     key: 'full',
-                    label: <Required>{locale.members.detail.fields.fullName}</Required>,
+                    label: <Required>{locale.nameSubfields.full}</Required>,
                     props: {
                         maxLength: 100,
                         validatorProps: { class: 'full-name-editor' },
@@ -215,7 +215,7 @@ function NameEditor ({ value, item, editing, onChange }) {
             [
                 {
                     key: 'local',
-                    label: <Required>{locale.members.detail.fields.fullNameLocal}</Required>,
+                    label: <Required>{locale.nameSubfields.local}</Required>,
                     props: {
                         maxLength: 100,
                         validatorProps: { class: 'full-name-editor' },
@@ -225,7 +225,7 @@ function NameEditor ({ value, item, editing, onChange }) {
             [
                 {
                     key: 'abbrev',
-                    label: locale.members.detail.fields.nameAbbrev,
+                    label: locale.nameSubfields.local,
                     props: { maxLength: 12 },
                 },
             ],
@@ -239,7 +239,10 @@ function NameEditor ({ value, item, editing, onChange }) {
 }
 
 function CodeEditor ({ value, item, editing, onChange }) {
-    if (!editing) return <data.ueaCode.renderer value={value.new} value2={value.old} />;
+    if (!value) return null;
+    if (!editing) {
+        return <data.ueaCode.renderer value={value.new} value2={value.old} />;
+    }
 
     const suggestions = UEACode.suggestCodes({
         type: item.type,
@@ -352,7 +355,7 @@ export class CodeholderAddressRenderer extends Component {
                         this.setState({ postalOpen: true });
                         this.loadPostal();
                     }}>
-                    {locale.members.detail.postalAddress}
+                    {locale.postalAddress}
                 </Button>
 
                 <Dialog
@@ -361,14 +364,14 @@ export class CodeholderAddressRenderer extends Component {
                     backdrop
                     open={this.state.postalOpen}
                     onClose={() => this.setState({ postalOpen: false })}
-                    title={locale.members.detail.postalAddress}>
-                    {locale.members.detail.postalLocale}{' '}
+                    title={locale.postalAddress}>
+                    {locale.postalLocale}{' '}
                     <NativeSelect
                         value={this.state.postalLang}
                         onChange={e => {
                             this.setState({ postalLang: e.target.value }, () => this.loadPostal());
                         }}>
-                        {Object.entries(locale.members.csvOptions.countryLocales)
+                        {Object.entries(locale.csvOptions.countryLocales)
                             .map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                     </NativeSelect>
 
@@ -385,22 +388,14 @@ export class CodeholderAddressRenderer extends Component {
     }
 }
 
-function simpleField (component) {
+function simpleField (component, extra) {
     return {
         component,
-        isEmpty: value => !value,
+        ...extra,
     };
 }
 
 const fields = {
-    name: {
-        // virtual for diffing
-        shouldHide: () => true,
-    },
-    code: {
-        // virtual for diffing
-        shouldHide: () => true,
-    },
     enabled: {
         component ({ value, editing, onChange }) {
             if (!editing && !value) return '—';
@@ -421,54 +416,42 @@ const fields = {
                     onChange={isDead => editing && onChange(isDead)} />
             );
         },
-        isEmpty: value => !value.isDead,
     },
     birthdate: {
         component: makeDataEditable(data.date),
-        isEmpty: value => !value.birthdate,
     },
     deathdate: {
         component: makeDataEditable(data.date),
-        hasDiff (original, value) {
-            return original.deathdate !== value.deathdate;
-        },
-        isEmpty: value => !value.isDead,
     },
     address: {
-        component ({ value, editing, onChange }) {
+        component ({ value, item, editing, onChange }) {
             if (!editing) {
-                return <CodeholderAddressRenderer id={value.id} />;
+                return <CodeholderAddressRenderer id={item.id} />;
             } else {
                 return <data.address.editor
-                    value={value.address}
-                    onChange={v => onChange({ ...value, address: v })} />;
+                    value={value}
+                    onChange={onChange} />;
             }
         },
-        hasDiff (original, value) {
-            return !(original.address === value.address
-                || (value.address
-                    && Object.keys(value.address)
-                        .map(a => value.address[a] === original.address[a])
-                        .reduce((a, b) => a && b)));
-        },
-        isEmpty: value => !value.address || !Object.values(value.address).filter(x => x).length,
-        tall: true,
+        isEmpty: value => !value || !Object.values(value).filter(x => x).length,
     },
     feeCountry: {
         component: makeDataEditable(data.country),
-        hasDiff (original, value) {
-            return original.feeCountry !== value.feeCountry;
-        },
-        isEmpty: value => !value.feeCountry,
     },
     email: simpleField(makeDataEditable(data.email)),
-    profession: simpleField('profession', function ({ value, editing, onChange }) {
+    profession: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
-        return <TextField value={value} onChange={e => onChange(e.target.value)} maxLength={50} />;
+        return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }),
-    landlinePhone: simpleField(makeDataEditable(data.phoneNumber)),
-    officePhone: simpleField(makeDataEditable(data.phoneNumber)),
-    cellphone: simpleField(makeDataEditable(data.phoneNumber)),
+    landlinePhone: simpleField(makeDataEditable(data.phoneNumber), {
+        isEmpty: value => !value.value,
+    }),
+    officePhone: simpleField(makeDataEditable(data.phoneNumber), {
+        isEmpty: value => !value.value,
+    }),
+    cellphone: simpleField(makeDataEditable(data.phoneNumber), {
+        isEmpty: value => !value.value,
+    }),
     notes: {
         component ({ value, editing, onChange }) {
             if (!editing) {
@@ -488,19 +471,14 @@ const fields = {
                 );
             }
         },
-        hasDiff (original, value) {
-            return original.notes !== value.notes;
-        },
-        isEmpty: value => !value.notes,
-        tall: true,
     },
 };
 
-function Footer ({ value, editing }) {
+function Footer ({ item, editing }) {
     if (editing) return '';
     return (
         <div class="member-footer">
-            <Files id={value.id} />
+            <Files id={item.id} />
         </div>
     );
 }

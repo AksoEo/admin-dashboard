@@ -6,7 +6,6 @@ import Form, { Validator } from '../../components/form';
 import { login as locale } from '../../locale';
 import './style';
 
-// TODO
 export default {
     initCreatePassword: ({ open, core, task }) => {
         const buttonValidator = useRef(null);

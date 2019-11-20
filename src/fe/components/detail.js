@@ -2,8 +2,11 @@ import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
 import { Button, CircularProgress, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
 import DoneIcon from '@material-ui/icons/Done';
+import TinyProgress from './tiny-progress';
+import Form from './form';
 import { detail as locale } from '../locale';
 import { coreContext } from '../core/connection';
+import { deepEq } from '../../util';
 import './detail.less';
 
 /// Renders a detail view.
@@ -13,6 +16,9 @@ import './detail.less';
 /// # Props
 /// - view: data view name. The data view should expect an `id` option.
 /// - editing/onEndEdit: editing state
+/// - onCommit: should commit and end edit (or not, if the user cancels the task).
+///   will be passed an array of changed field ids
+/// - edit/onEditChange: editing copy. Is not necessarily synchronized with `editing`
 /// - id: detail view id
 /// - options: additional view options; will *not* cause a reload on update
 /// - fields: object { [client field id]: field spec }, with field spec being an object:
@@ -20,19 +26,20 @@ import './detail.less';
 ///    - isEmpty: field value => bool
 /// - header: like a field editor component, but without value, and with onItemChange
 /// - footer: like header
+/// - locale: object { fields: { field names... } }
 export default class DetailView extends PureComponent {
     static contextType = coreContext;
 
     state = {
         data: null,
         error: null,
-
-        // current editing copy
-        edit: null,
     };
 
     /// current data view
     #view;
+
+    /// current form ref
+    #form;
 
     createView () {
         const { view, id, options } = this.props;
@@ -60,7 +67,19 @@ export default class DetailView extends PureComponent {
         this.#view.drop();
     }
 
-    render ({ editing }) {
+    getChangedFields () {
+        if (!this.props.edit || !this.state.data) return [];
+        return Object.keys(this.state.data)
+            .filter(fieldId => !deepEq(this.state.data[fieldId], this.props.edit[fieldId]));
+    }
+
+    beginCommit () {
+        if (!this.#form.validate()) return;
+        const changes = this.getChangedFields();
+        this.props.onCommit(changes);
+    }
+
+    render ({ editing, locale: detailLocale }) {
         let contents;
         if (this.state.error) {
             contents = (
@@ -69,15 +88,16 @@ export default class DetailView extends PureComponent {
                 </div>
             );
         } else if (this.state.data) {
-            const itemData = this.state.edit || this.state.data;
+            const itemData = editing ? this.props.edit || this.state.data : this.state.data;
             const fieldProps = {
                 editing,
                 item: itemData,
-                onItemChange: item => this.setState({ edit: item }),
+                onItemChange: item => this.props.onEditChange(item),
             };
 
             let header = null;
             const items = [];
+            const emptyItems = [];
             let footer = null;
 
             if (this.props.header) {
@@ -93,22 +113,48 @@ export default class DetailView extends PureComponent {
             for (const fieldId in this.props.fields) {
                 const field = this.props.fields[fieldId];
                 const FieldComponent = field.component;
-                items.push(
-                    <div class="detail-field-id" key={'i' + fieldId}>{fieldId}</div>,
+
+                const isNotLoaded = itemData[fieldId] === undefined;
+                const isEmpty = !isNotLoaded && !editing
+                    && (field.isEmpty ? field.isEmpty(itemData[fieldId]) : !itemData[fieldId]);
+                const hasDiff = this.props.edit && this.state.data
+                    && !deepEq(this.state.data[fieldId], this.props.edit[fieldId]);
+
+                let idClass = 'detail-field-id';
+                if (isEmpty) idClass += ' is-empty';
+                if (hasDiff) idClass += ' has-diff';
+
+                const itemId = (
+                    <div class={idClass} key={'i' + fieldId}>
+                        {detailLocale.fields[fieldId]}
+                    </div>
+                );
+                const itemContents = (
                     <div class="detail-field-editor" key={'e' + fieldId}>
-                        <FieldComponent
-                            value={itemData[fieldId]}
-                            onChange={value => {
-                                this.setState({
-                                    edit: {
+                        {isNotLoaded ? (
+                            <TinyProgress class="detail-field-loading" />
+                        ) : isEmpty ? (
+                            <div class="detail-field-empty">—</div>
+                        ) : (
+                            <FieldComponent
+                                value={itemData[fieldId]}
+                                onChange={value => {
+                                    this.props.onEditChange({
                                         ...itemData,
                                         [fieldId]: value,
-                                    },
-                                });
-                            }}
-                            {...fieldProps} />
-                    </div>,
+                                    });
+                                }}
+                                {...fieldProps} />
+                        )}
+                    </div>
                 );
+
+                if (isEmpty) {
+                    // empty fields go below
+                    emptyItems.push(itemId, itemContents);
+                } else {
+                    items.push(itemId, itemContents);
+                }
             }
 
             contents = (
@@ -119,25 +165,23 @@ export default class DetailView extends PureComponent {
                         title={locale.editing}
                         menu={(
                             <Button icon small onClick={() => {
-                                this.setState({ edit: null });
+                                this.props.onEditChange(null);
                                 this.props.onEndEdit();
                             }} aria-label={locale.cancel}>
-                            <MenuIcon type="close" />
-                        </Button>
+                                <MenuIcon type="close" />
+                            </Button>
                         )}
                         actions={[
                             {
                                 label: locale.done,
                                 icon: <DoneIcon />,
-                                action: () => {
-                                    // TODO: commit first
-                                    this.props.onEndEdit();
-                                },
-                            }
+                                action: () => this.beginCommit(),
+                            },
                         ]} />
                     {header}
                     <div class="detail-fields">
-                    {items}
+                        {items}
+                        {emptyItems}
                     </div>
                     {footer}
                 </Fragment>
@@ -150,11 +194,21 @@ export default class DetailView extends PureComponent {
             );
         }
 
-
-        return (
-            <div class="detail-view">
-                {contents}
-            </div>
-        );
+        if (editing) {
+            return (
+                <Form
+                    ref={view => this.#form = view}
+                    class="detail-view"
+                    onSubmit={() => {}}>
+                    {contents}
+                </Form>
+            );
+        } else {
+            return (
+                <div class="detail-view">
+                    {contents}
+                </div>
+            );
+        }
     }
 }

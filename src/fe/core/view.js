@@ -29,6 +29,7 @@ export default class DataView extends EventEmitter {
     }
 
     drop () {
+        this.emit('drop');
         this.worker.deregisterDataView(this);
     }
 }

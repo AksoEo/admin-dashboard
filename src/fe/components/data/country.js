@@ -43,7 +43,7 @@ export function CountryEditor ({ value, onChange }) {
                 {countries => (
                     <NativeSelect
                         value={value}
-                        onChange={e => onChange(e.target.value)}>
+                        onChange={e => onChange(e.target.value || null)}>
                         <option value={''}>—</option>
                         {Object.entries(countries).map(([id, names]) => (
                             <option value={id} key={id}>

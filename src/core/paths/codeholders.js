@@ -3,6 +3,7 @@ import { AbstractDataView } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
 import { LOGIN_ID } from './login-keys';
+import { deepMerge, deepEq } from '../../util';
 
 //! # Client-side codeholder representation
 //! - fields with no value are null or an empty string
@@ -58,9 +59,11 @@ const addressSubfields = [
 // ditto
 const phoneFormat = field => ({
     apiFields: [field, field + 'Formatted'],
-    fromAPI: codeholder => ({ value: codeholder[field], formatted: codeholder[field + 'Formatted'] }),
+    fromAPI: codeholder => codeholder[field] === undefined
+        ? undefined
+        : { value: codeholder[field], formatted: codeholder[field + 'Formatted'] },
     // -Formatted is a derived property so we never serialize it
-    toAPI: ({ value }) => ({ [field]: value }),
+    toAPI: ({ value }) => value !== undefined ? { [field]: value } : {},
 });
 
 /// Codeholder fields in the client-side representation.
@@ -88,30 +91,41 @@ const clientFields = {
         ],
         fromAPI: codeholder => {
             const value = {};
+            let isEmpty = true;
             if (codeholder.codeholderType === 'human') {
                 for (const f of ['firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific']) {
-                    value[f.replace(/Name/, '')] = codeholder[f] || null;
+                    const item = codeholder[f];
+                    if (item !== undefined) {
+                        isEmpty = false;
+                        value[f.replace(/Name/, '')] = item;
+                    }
                 }
             } else if (codeholder.codeholderType === 'org') {
-                value.full = codeholder.fullName || null;
-                value.local = codeholder.fullNameLocal || null;
-                value.abbrev = codeholder.nameAbbrev || null;
+                if (codeholder.fullName !== undefined
+                    || codeholder.fullNameLocal !== undefined
+                    || codeholder.nameAbbrev !== undefined) {
+                    isEmpty = false;
+                }
+                if (codeholder.fullName !== undefined) value.full = codeholder.fullName;
+                if (codeholder.fullNameLocal !== undefined) value.local = codeholder.fullNameLocal;
+                if (codeholder.nameAbbrev !== undefined) value.abbrev = codeholder.nameAbbrev;
             }
+            if (isEmpty) return undefined;
             return value;
         },
         toAPI: value => {
             const codeholder = {};
-            if ('first' in value) {
+            if (value !== undefined && ('first' in value)) {
                 // human
                 for (const f of ['firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific']) {
                     const cf = f.replace(/Name/, '');
-                    if (value[cf]) codeholder[f] = value[cf] || null;
+                    if (value[cf] !== undefined) codeholder[f] = value[cf] || null;
                 }
-            } else {
+            } else if (value !== undefined) {
                 // org
-                if (value.full) codeholder.fullName = value.full || null;
-                if (value.local) codeholder.fullNameLocal = value.local || null;
-                if (value.abbrev) codeholder.nameAbbrev = value.abbrev || null;
+                if (value.full !== undefined) codeholder.fullName = value.full || null;
+                if (value.local !== undefined) codeholder.fullNameLocal = value.local || null;
+                if (value.abbrev !== undefined) codeholder.nameAbbrev = value.abbrev || null;
             }
             return codeholder;
         },
@@ -122,9 +136,11 @@ const clientFields = {
     website: 'website',
     code: {
         apiFields: ['newCode', 'oldCode'],
-        fromAPI: codeholder => ({ new: codeholder.newCode, old: codeholder.oldCode }),
+        fromAPI: codeholder => codeholder.newCode === undefined && codeholder.oldCode === undefined
+            ? undefined
+            : { new: codeholder.newCode, old: codeholder.oldCode },
         // oldCode is read-only, so we only serialize newCode
-        toAPI: value => ({ newCode: value.new }),
+        toAPI: value => value.new !== undefined ? { newCode: value.new } : {},
     },
     creationTime: 'creationTime',
     hasPassword: 'hasPassword',
@@ -132,10 +148,20 @@ const clientFields = {
         apiFields: addressSubfields.flatMap(f => [`address.${f}`, `addressLatin.${f}`]),
         fromAPI: codeholder => {
             const value = {};
+            let isEmpty = true;
             for (const f of addressSubfields) {
-                value[f] = codeholder.address ? (codeholder.address[f] || null) : null;
-                value[f + 'Latin'] = codeholder.addressLatin ? (codeholder.addressLatin[f] || null) : null;
+                const aValue = codeholder.address ? codeholder.address[f] : undefined;
+                if (aValue !== undefined) {
+                    isEmpty = false;
+                    value[f] = aValue;
+                }
+                const lValue = codeholder.addressLatin ? codeholder.addressLatin[f] : undefined;
+                if (lValue !== undefined) {
+                    isEmpty = false;
+                    value[f + 'Latin'] = lValue;
+                }
             }
+            if (isEmpty) return undefined;
             return value;
         },
         toAPI: value => {
@@ -145,9 +171,11 @@ const clientFields = {
             if (sendNormal) codeholder.address = {};
             if (sendLatin) codeholder.addressLatin = {};
             for (const f of addressSubfields) {
-                if (sendNormal) codeholder.address[f] = value[f];
-                if (sendLatin) codeholder.addressLatin[f] = value[f + 'Latin'];
+                if (sendNormal && value[f] !== undefined) codeholder.address[f] = value[f];
+                if (sendLatin && value[f + 'Latin'] !== undefined) codeholder.addressLatin[f] = value[f + 'Latin'];
             }
+            if (!Object.keys(codeholder.address).length) delete codeholder.address;
+            if (!Object.keys(codeholder.addressLatin).length) delete codeholder.addressLatin;
             return codeholder;
         },
         sort: ['addressLatin.country', 'addressLatin.postalCode'],
@@ -164,9 +192,11 @@ const clientFields = {
     birthdate: 'birthdate',
     age: {
         apiFields: ['age', 'agePrimo'],
-        fromAPI: codeholder => ({ now: codeholder.age, atStartOfYear: codeholder.agePrimo }),
+        fromAPI: codeholder => codeholder.age === undefined && codeholder.agePrimo === undefined
+            ? undefined
+            : { now: codeholder.age, atStartOfYear: codeholder.agePrimo },
         // agePrimo is a derived property so we never serialize it
-        toAPI: value => ({ age: value.now }),
+        toAPI: value => value.now !== undefined ? { age: value.now } : {},
         requires: ['isDead'], // to ignore atStartOfYear when they’re dead
     },
     deathdate: 'deathdate',
@@ -176,27 +206,24 @@ const clientFields = {
 
     country: {
         apiFields: ['addressLatin.country', 'feeCountry'],
-        fromAPI: codeholder => ({
-            fee: codeholder.feeCountry,
-            address: codeholder.addressLatin && codeholder.addressLatin.country,
-        }),
-        toAPI: () => {
-            throw new Error('derived fields cannot be serialized');
-        },
+        fromAPI: codeholder => codeholder.feeCountry === undefined
+            && (!codeholder.addressLatin || codeholder.addressLatin.country === undefined)
+            ? undefined
+            : {
+                fee: codeholder.feeCountry,
+                address: codeholder.addressLatin && codeholder.addressLatin.country,
+            },
+        toAPI: () => ({}),
     },
     addressCity: {
         apiFields: ['addressLatin.city'],
         fromAPI: codeholder => codeholder.addressLatin && codeholder.addressLatin.city,
-        toAPI: () => {
-            throw new Error('derived fields cannot be serialized');
-        },
+        toAPI: () => ({}),
     },
     addressCountryArea: {
         apiFields: ['addressLatin.countryArea'],
         fromAPI: codeholder => codeholder.addressLatin && codeholder.addressLatin.countryArea,
-        toAPI: () => {
-            throw new Error('derived fields cannot be serialized');
-        },
+        toAPI: () => ({}),
     },
 };
 
@@ -217,17 +244,17 @@ function coerceToNull (value) {
     return value;
 }
 /// converts from client repr to api repr (see above)
-///
-/// FIXME: this does not handle partial objects correctly
-/// in fact, i should devise some better way of handling partial objects instead of just setting
-/// stuff to undefined
 function clientToAPI (clientRepr) {
     const apiRepr = {};
     for (const field in clientFields) {
         const spec = clientFields[field];
+        if (clientRepr[field] === undefined) {
+            // do not have this field
+            continue;
+        }
         if (typeof spec === 'string') apiRepr[spec] = coerceToNull(clientRepr[field]);
         else if (typeof spec.apiFields === 'string') apiRepr[spec.apiFields] = coerceToNull(clientRepr[field]);
-        else Object.assign(apiRepr, spec.toAPI(clientRepr));
+        else Object.assign(apiRepr, spec.toAPI(clientRepr[field], clientRepr));
     }
     return apiRepr;
 }
@@ -469,37 +496,6 @@ function parametersToRequestData (params) {
     };
 }
 
-/// merges like object.assign, but deep
-/// may or may not mutate a
-function deepMerge (a, b) {
-    if (b === undefined) return a;
-    if (a !== null && b !== null && typeof a === 'object' && typeof b === 'object') {
-        if (Array.isArray(a) || Array.isArray(b)) return b;
-        for (const k in b) a[k] = deepMerge(a[k], b[k]);
-        return a;
-    } else return b;
-}
-
-function deepEq (a, b) {
-    if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
-        if (Array.isArray(a) && Array.isArray(b)) {
-            if (a.length !== b.length) return false;
-            for (let i = 0; i < a.length; i++) {
-                if (!deepEq(a[i], b[i])) return false;
-            }
-        } else {
-            for (const k in a) {
-                if (!(k in b)) return false;
-            }
-            for (const k in b) {
-                if (!(k in a)) return false;
-                if (!deepEq(a[k], b[k])) return false;
-            }
-        }
-        return true;
-    } else return a === b;
-}
-
 export const tasks = {
     /// codeholders/fields: lists available fields according to permissions (it is recommended that
     /// you use the corresponding view instead)
@@ -635,7 +631,7 @@ export const tasks = {
                 : clientFields[id].apiFields)),
         });
 
-        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : '' + id;
 
         const existing = store.get([CODEHOLDERS, storeId]);
         store.insert([CODEHOLDERS, storeId], deepMerge(existing, clientFromAPI(res.body)));
@@ -673,7 +669,7 @@ export const tasks = {
         const options = {};
         if (data.updateComment) options.modCmt = data.updateComment;
 
-        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : '' + id;
         const existing = store.get([CODEHOLDERS, storeId]);
         const currentData = clientToAPI(existing);
         const newData = clientToAPI(codeholderData);
@@ -704,7 +700,7 @@ export const tasks = {
         }]);
         // need to update profilePictureHash
         // but we don’t await this because when this fails it shouldn’t display an error
-        tasks.codeholder({ id, fields: ['profilePictureHash'] }).catch(err => {
+        tasks.codeholder({}, { id, fields: ['profilePictureHash'] }).catch(err => {
             console.error('failed to fetch new profile picture hash', err); // eslint-disable no-console
         });
     },

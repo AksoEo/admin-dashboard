@@ -30,7 +30,7 @@ function AddressEditor ({ value, onChange }) {
                 class="address-editor-line"
                 key="countryArea"
                 value={value.countryArea}
-                onChange={onChangeField('countryArea', e => e.target.value)}>
+                onChange={onChangeField('countryArea', e => e.target.value || null)}>
                 <option value="">—</option>
                 {rules.countryAreaChoices.map(([id, area]) => (
                     <option key={id} value={id}>{area}</option>
@@ -52,7 +52,7 @@ function AddressEditor ({ value, onChange }) {
             label={isRequired
                 ? <Required>{locale.data.addressFields[k]}</Required>
                 : locale.data.addressFields[k]}
-            onChange={onChangeField(k, e => e.target.value)} />);
+            onChange={onChangeField(k, e => e.target.value || null)} />);
     }
 
     return <div class="data address-editor">{items}</div>;

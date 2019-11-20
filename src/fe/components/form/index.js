@@ -1,57 +1,47 @@
 import { h, Component } from 'preact';
 import { createContext } from 'preact/compat';
-import PropTypes from 'prop-types';
 import { Spring } from '@cpsdqs/yamdl';
 import './style';
 
-/**
- * Context that contains an interface to the [Form] component.
- *
- * Every Form will create an instance of this context, allowing form components to register
- * themselves.
- */
+/// Context that contains an interface to the [Form] component.
+///
+/// Every Form will create an instance of this context, allowing form components to register
+/// themselves.
 export const FormContext = createContext({
-    /** Register a form component (should be passed the component instance as the first arg). */
+    /// Register a form component (should be passed the component instance as the first arg).
     register: () => {},
-    /** Deregisters a previously registered component (pass component as first arg). */
+    /// Deregisters a previously registered component (pass component as first arg).
     deregister: () => {},
 });
 
-/**
- * A `<form>` with validation handling.
- *
- * # Examples
- * ```jsx
- * render() {
- *     return (
- *         <Form onSubmit={() => alert('form submitted')}>
- *             <Validator
- *                 component="input"
- *                 validate={value => {
- *                     // thrown props will be added to the enclosed component’s props
- *                     if (value !== 'valid') throw { class: 'error' };
- *                 }}
- *                 value={this.state.value}
- *                 onInput={e => this.setState({ value: e.target.value })} />
- *         </Form>
- *     );
- * }
- * ```
- */
+/// A `<form>` with validation handling.
+///
+/// # Props
+/// - onSubmit: submission handler
+///
+/// # Examples
+/// ```jsx
+/// render() {
+///     return (
+///         <Form onSubmit={() => alert('form submitted')}>
+///             <Validator
+///                 component="input"
+///                 validate={value => {
+///                     // thrown props will be added to the enclosed component’s props
+///                     if (value !== 'valid') throw { class: 'error' };
+///                 }}
+///                 value={this.state.value}
+///                 onInput={e => this.setState({ value: e.target.value })} />
+///         </Form>
+///     );
+/// }
+/// ```
 export default class Form extends Component {
-    static propTypes = {
-        /** Called when the native `submit` event is intercepted. */
-        onSubmit: PropTypes.func.isRequired,
-        children: PropTypes.arrayOf(PropTypes.element),
-    };
-
-    /** Form fields registered using [FormContext]. */
+    /// Form fields registered using [FormContext].
     fields = new Set();
 
-    /**
-     * Validates all form fields.
-     * @return {boolean} true if successful.
-     */
+    /// Validates all form fields.
+    /// @return {boolean} true if successful.
     validate () {
         let valid = true;
         for (const field of this.fields) {
@@ -62,17 +52,17 @@ export default class Form extends Component {
         return valid;
     }
 
-    /** FormContext register handler */
+    /// FormContext register handler
     onRegister = field => {
         this.fields.add(field);
     };
 
-    /** FormContext deregister handler */
+    /// FormContext deregister handler
     onDeregister = field => {
         this.fields.delete(field);
     };
 
-    /** Native `submit` event handler */
+    /// Native `submit` event handler
     onSubmit = e => {
         e.preventDefault();
         this.submit();
@@ -92,6 +82,11 @@ export default class Form extends Component {
             }}>
                 <form
                     {...this.props}
+                    onKeyDown={e => {
+                        // stop pressing enter from triggering buttons
+                        if (e.key === 'Enter') e.preventDefault();
+                        if (this.props.onKeyDown) this.props.onKeyDown(e);
+                    }}
                     onSubmit={this.onSubmit}>
                     {this.props.children}
                 </form>
@@ -100,51 +95,39 @@ export default class Form extends Component {
     }
 }
 
-/**
- * Validation wrapper around any component that uses `value`.
- * Must be used inside a Form component.
- *
- * All props (except the ones listed below) will be passed directly to the wrapped component.
- *
- * # Examples
- * ```jsx
- * <Validator
- *     // this can be any kind of component
- *     component={TextField}
- *     value={state.value}
- *     // this will be called at appropriate times to see if a value is valid
- *     validate={value => {
- *         // if the value is invalid, the thrown object will be appended as props
- *         if (!isValid(value)) throw { error: 'invalid', style: { color: 'red' } };
- *     }} />
- * ```
- *
- * Additionally, there is a `shake` method for shaking the validator manually.
- */
+/// Validation wrapper around any component that uses `value`.
+/// Must be used inside a Form component.
+///
+/// # Props
+/// - validate: validator function `(value) => void`. Should throw partial props on error.
+/// - value: value that will be validated. will be passed to the wrapped component
+/// - component: the component that will be created by this validator
+/// - innerRef: like a ref, but for the inner wrapped component
+///
+/// All other props will be passed directly to the wrapped component.
+///
+/// # Examples
+/// ```jsx
+/// <Validator
+///     // this can be any kind of component
+///     component={TextField}
+///     value={state.value}
+///     // this will be called at appropriate times to see if a value is valid
+///     validate={value => {
+///         // if the value is invalid, the thrown object will be appended as props
+///         if (!isValid(value)) throw { error: 'invalid', style: { color: 'red' } };
+///     }} />
+/// ```
+///
+/// Additionally, there is a `shake` method for shaking the validator manually.
 export class Validator extends Component {
-    static propTypes = {
-        /** Validator function: `(value) => void`. Should throw props on error. */
-        validate: PropTypes.func.isRequired,
-        /** Value that will be validated. Will be passed to the wrapped component. */
-        value: PropTypes.any,
-        /** The component that will be created by this validator. */
-        component: PropTypes.any.isRequired,
-        children: PropTypes.any,
-        /** Like a `ref`, but for the wrapped component. */
-        innerRef: PropTypes.func,
-    };
-
     state = {
         translateX: 0,
-        /**
-         * The set of error props.
-         * @type {Object|null}
-         */
+        /// The set of error props.
+        /// @type {Object|null}
         error: null,
-        /**
-         *If true, will continuously check validity instead of only when validation is triggered
-         * externally (such as by the Form being submitted).
-         */
+        /// If true, will continuously check validity instead of only when validation is triggered
+        /// externally (such as by the Form being submitted).
         continuous: false,
     };
 
@@ -158,7 +141,7 @@ export class Validator extends Component {
         this.translateX.on('update', translateX => this.setState({ translateX }));
     }
 
-    /** Shakes the component to indicate an error. */
+    /// Shakes the component to indicate an error.
     shake () {
         this.translateX.velocity = 500;
         this.translateX.start();
@@ -169,11 +152,9 @@ export class Validator extends Component {
         this.setState({ error, continuous: true });
     }
 
-    /**
-     * Validates the value using the `validate` prop.
-     * @param {boolean} submitting - if true, will shake the component on error. Should be falsy
-     *                               by default because the shaking animation is distracting.
-     */
+    /// Validates the value using the `validate` prop.
+    /// @param {boolean} submitting - if true, will shake the component on error. Should be falsy
+    ///                               by default because the shaking animation is distracting.
     validate (submitting) {
         try {
             this.props.validate(this.props.value);

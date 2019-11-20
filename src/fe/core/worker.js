@@ -53,11 +53,15 @@ export default class WorkerInterface extends EventEmitter {
         });
     }
     updateTask (task, parameters) {
-        this.worker.postMessage({
-            type: 'update-task',
-            id: task.id,
-            parameters,
-        });
+        try {
+            this.worker.postMessage({
+                type: 'update-task',
+                id: task.id,
+                parameters,
+            });
+        } catch (err) {
+            console.error('failed to update task', task.id, parameters);
+        }
     }
     runTask (task) {
         this.worker.postMessage({

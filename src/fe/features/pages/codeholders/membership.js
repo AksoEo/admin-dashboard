@@ -1,11 +1,12 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
 import { Button, Dialog, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
+import AddIcon from '@material-ui/icons/Add';
 import { CardStackItem } from '../../../components/card-stack';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import DataList from '../../../components/data-list';
 import { coreContext, connect } from '../../../core/connection';
-import locale from '../../../locale';
+import { codeholders as locale } from '../../../locale';
 
 // TODO: use core properly
 
@@ -65,7 +66,7 @@ export default class MembershipEditor extends PureComponent {
             noMemberships = true;
             memberships.push(
                 <span key={0} class="membership-empty">
-                    {locale.members.detail.noMembership}
+                    {locale.noMemberships}
                 </span>
             );
         }
@@ -99,10 +100,11 @@ export default class MembershipEditor extends PureComponent {
                             }}>
                                 <MenuIcon type="back" />
                             </Button>}
-                            title={locale.members.detail.membership}
+                            title={locale.memberships}
                             priority={9}
                             actions={[canEdit && {
-                                label: '[[add]]',
+                                label: locale.addMembership,
+                                icon: <AddIcon />,
                                 action: () => this.setState({ addingMembership: true }),
                             }].filter(x => x)} />
                     }>
@@ -111,10 +113,10 @@ export default class MembershipEditor extends PureComponent {
                             this.context.createTask('codeholders/listMemberships', {
                                 id: this.props.id,
                             }, { offset, limit }).runOnceAndDrop().then(res => ({
-                                items: res.body,
-                                totalItems: +res.res.headers.map['x-total-items'],
+                                items: res.items,
+                                totalItems: res.total,
                             }))}
-                        emptyLabel={locale.members.detail.noMembership}
+                        emptyLabel={locale.noMemberships}
                         itemHeight={56}
                         onRemove={canEdit && (item =>
                             this.context.createTask('codeholders/deleteMembership', {
@@ -129,9 +131,9 @@ export default class MembershipEditor extends PureComponent {
                                 <div class="item-desc">
                                     {item.year}
                                     {', '}
-                                    {locale.members.search.membership.lifetime[item.lifetime ? 'yes' : 'no']}
+                                    {locale.membership.lifetime[item.lifetime ? 'yes' : 'no']}
                                     {', '}
-                                    {locale.members.search.membership.givesMembership[item.givesMembership ? 'yes' : 'no']}
+                                    {locale.membership.givesMembership[item.givesMembership ? 'yes' : 'no']}
                                     {/* TODO: more stuff */}
                                 </div>
                             </div>
@@ -143,7 +145,7 @@ export default class MembershipEditor extends PureComponent {
                     class="membership-editor-add-dialog"
                     open={this.state.addingMembership}
                     onClose={() => this.setState({ addingMembership: false })}
-                    title={locale.members.detail.addMembership}>
+                    title={locale.addMembership}>
                     <AddMembership id={this.props.id} onSuccess={() => this.setState({ addingMembership: false, editing: true })} />
                 </Dialog>
             </div>

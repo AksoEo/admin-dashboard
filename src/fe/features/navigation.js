@@ -251,7 +251,7 @@ export default class Navigation extends PureComponent {
     onPopState = e => this.loadURL(document.location.href, e.state);
 
     /// Navigates with an href.
-    navigate (href, replace) {
+    navigate = (href, replace) => {
         // first, save the current state so it’s up to date when we go back
         this.saveState();
         // resolve url
@@ -267,7 +267,7 @@ export default class Navigation extends PureComponent {
         else window.history.pushState(null, '', this.urlLocation);
         // and finally, save state
         this.saveState();
-    }
+    };
 
     /// Called when a page changes its query.
     onQueryChange (stackIndex, newQuery) {
@@ -393,6 +393,7 @@ export default class Navigation extends PureComponent {
                             query={stackItem.query}
                             onQueryChange={query => this.onQueryChange(i, query)}
                             match={stackItem.pathMatch}
+                            onNavigate={this.navigate}
                             {...stackItem.state} />
                     </Suspense>
                 </MetaProvider>

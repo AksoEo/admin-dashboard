@@ -17,7 +17,9 @@ const phoneNumberRenderer = allowInteractive => function PhoneNumber ({ value })
 };
 
 function PhoneNumberEditor ({ value, onChange }) {
-    if (!value || !value.value) return null;
+    if (!value || value.value === undefined) return null;
+    const wholeValue = value;
+    value = value.value;
 
     let trailing = '';
     try {
@@ -35,13 +37,13 @@ function PhoneNumberEditor ({ value, onChange }) {
     return <TextField
         class="data phone-number-editor"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => onChange({ ...wholeValue, value: e.target.value || null })}
         type="tel"
         placeholder="+"
         maxLength="50"
         trailing={trailing}
-        onFocus={() => (!value && onChange('+'))}
-        onBlur={() => (value.trim() === '+' && onChange(''))} />;
+        onFocus={() => (!value && onChange({ ...wholeValue, value: '+' }))}
+        onBlur={() => (value.trim() === '+' && onChange({ ...wholeValue, value: null }))} />;
 }
 
 export default {

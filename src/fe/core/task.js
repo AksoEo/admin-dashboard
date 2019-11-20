@@ -82,6 +82,7 @@ export default class Task extends EventEmitter {
     }
 
     drop () {
+        this.emit('drop');
         this.worker.deregisterTask(this);
     }
 }

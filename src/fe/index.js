@@ -29,6 +29,7 @@ const genericTaskViews = () => import(/* webpackChunkName: "generic-tasks" */ '.
 const taskViews = {
     info: lazyPath(genericTaskViews, res => res.info),
     login: lazyPath(() => import(/* webpackChunkName: "login-tasks" */ './features/login/tasks')),
+    codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
 };
 const loadTaskView = async (taskPath) => {
     const path = taskPath.split('/');

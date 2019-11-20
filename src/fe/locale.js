@@ -17,6 +17,10 @@ export const generic = {
     close: 'Fermi',
 };
 
+export const data = {
+    requiredField: 'Tiu ĉi kampo estas deviga',
+};
+
 export const login = {
     details: 'Ensaluti',
     createPassword: 'Krei pasvorton',
@@ -126,6 +130,10 @@ export const detail = {
     edit: 'Redakti',
     cancel: 'Nuligi',
     done: 'Konservi',
+    saveTitle: 'Konservado',
+    diff: 'Redaktitaj kampoj',
+    updateComment: 'Priskribo de ŝanĝoj farotaj',
+    commit: 'Aktualigi',
 };
 
 export const codeholders = {
@@ -200,6 +208,38 @@ export const codeholders = {
         profession: 'Profesio',
         membership: 'Membreco',
     },
+    nameSubfields: {
+        legal: 'Jura nomo',
+        abbrev: 'Mallongigo',
+        honorific: 'Titolo',
+        firstLegal: 'Jura persona nomo',
+        lastLegal: 'Jura familia nomo',
+        first: 'Persona nomo',
+        last: 'Familia nomo',
+        full: 'Plena nomo',
+        local: 'Plena, loka nomo',
+    },
+    postalAddress: 'Poŝtadreso',
+    postalLocale: 'Lingvo de adreso',
+    honorificSuggestions: [
+        'S-ro',
+        'S-ino',
+        'S-ano',
+        'Prof.',
+        'Prof-ino',
+        'D-ro',
+        'D-ino',
+        'Mag.',
+        'Mag-ino',
+        'Fraŭlo',
+        'F-ino',
+        'Inĝ.',
+        'Inĝ-ino',
+        'Pastro',
+        'Pastrino',
+        'Civitano',
+        'Ges-ro',
+    ],
     csvOptions: {
         countryLocale: 'Lingvo de landnomoj',
         countryLocales: {
@@ -212,6 +252,19 @@ export const codeholders = {
             sk: 'Slovenčina',
             zh: '中文',
             de: 'Deutsch',
+        },
+    },
+    memberships: 'Membrecoj',
+    noMemberships: 'Neniuj membrecoj',
+    addMembership: 'Aldoni membrecon',
+    membership: {
+        lifetime: {
+            yes: 'dumviva',
+            no: 'unujara',
+        },
+        givesMembership: {
+            yes: 'membrecdona',
+            no: 'nemembrecdona',
         },
     },
 };

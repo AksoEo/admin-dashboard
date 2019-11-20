@@ -4,13 +4,42 @@ import Page from '../../../components/page';
 import DetailView from '../../../components/detail';
 import Meta from '../../meta';
 import { codeholders as locale, detail as detailLocale } from '../../../locale';
-import { routerContext } from '../../../router';
+import { coreContext } from '../../../core/connection';
 import { Header, fields, Footer } from './detail-fields';
 
 export default class Detail extends Page {
-    static contextType = routerContext;
+    static contextType = coreContext;
 
-    onEndEdit = () => this.props.editing && this.props.editing.pop(true);
+    state = {
+        edit: null,
+    };
+
+    onEndEdit = () => {
+        this.props.editing && this.props.editing.pop(true);
+        this.setState({ edit: null });
+    };
+
+    #commitTask;
+
+    onCommit = changedFields => {
+        if (!this.props.editing || this.#commitTask) return;
+        if (!changedFields.length) {
+            // nothing changed, so we can just pop the editing state
+            this.props.editing.pop(true);
+            return;
+        }
+
+        this.#commitTask = this.context.createTask('codeholders/update', {
+            id: +this.props.match[1],
+            _changedFields: changedFields,
+        }, this.state.edit);
+        this.#commitTask.on('success', this.onEndEdit);
+        this.#commitTask.on('drop', () => this.#commitTask = null);
+    };
+
+    componentWillUnmount () {
+        if (this.#commitTask) this.#commitTask.drop();
+    }
 
     render ({ editing }) {
         const { match } = this.props;
@@ -21,7 +50,7 @@ export default class Detail extends Page {
             actions.push({
                 label: detailLocale.edit,
                 icon: <EditIcon />,
-                action: () => this.context.navigate(`/membroj/${id}/redakti`, true),
+                action: () => this.props.onNavigate(`/membroj/${id}/redakti`, true),
             });
         }
 
@@ -35,6 +64,9 @@ export default class Detail extends Page {
                     id={id}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
+                    onCommit={this.onCommit}
+                    edit={this.state.edit}
+                    onEditChange={edit => this.setState({ edit })}
                     options={{
                         fields: [
                             'id',
@@ -64,7 +96,9 @@ export default class Detail extends Page {
                         ],
                     }}
                     header={Header}
-                    fields={fields} />
+                    fields={fields}
+                    footer={Footer}
+                    locale={locale} />
             </div>
         );
     }

@@ -16,6 +16,7 @@ import { PureComponent } from 'preact/compat';
 //    This may be used to save the scroll position among other things.
 /// - onDataChange: Sets page data.
 ///   Will cause a (debounced) replaceState.
+/// - onNavigate: convenience function for navigating
 export default class Page extends PureComponent {
     render () {
         return null;
