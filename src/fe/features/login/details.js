@@ -23,6 +23,7 @@ export default class DetailsPage extends Component {
     #passwordValidator;
     #loginField;
     #passwordField;
+    #passwordField2;
 
     #spawnInitCreatePassword = () => {
         this.props.core.createTask('login/initCreatePassword', {
@@ -136,10 +137,18 @@ export default class DetailsPage extends Component {
                     placeholder={this.props.mode === Mode.CREATING_PASSWORD
                         ? locale.createPasswordPlaceholder
                         : null}
+                    onKeyDown={e => {
+                        if (!needsPasswordValidation) {
+                            if (e.key === 'Enter') this.#onSubmit();
+                        } else {
+                            this.#passwordField2.focus();
+                        }
+                    }}
                     onChange={e => this.setState({ password: e.target.value })}
                     validate={() => true} />
                 {needsPasswordValidation ? (
                     <Validator component={TextField}
+                        innerRef={view => this.#passwordField2 = view}
                         class="form-field"
                         outline
                         label={locale.confirmPassword}
@@ -147,6 +156,9 @@ export default class DetailsPage extends Component {
                         type="password"
                         placeholder={locale.confirmPasswordPlaceholder}
                         onChange={e => this.setState({ confirmPassword: e.target.value })}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter') this.#onSubmit();
+                        }}
                         validate={value => {
                             if (value !== this.state.password) {
                                 throw { error: locale.passwordMismatch };

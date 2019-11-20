@@ -213,10 +213,11 @@ export default {
         },
     },
     country: {
+        weight: 1.5,
         sortable: true,
         component ({ item }) {
-            const { feeCountry, addressLatin } = item;
-            const addressCountry = addressLatin ? addressLatin.country : null;
+            const { feeCountry, address } = item;
+            const addressCountry = address ? address.countryLatin : null;
 
             if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
                 const country = addressCountry || feeCountry;

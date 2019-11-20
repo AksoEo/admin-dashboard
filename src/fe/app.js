@@ -20,12 +20,15 @@ export default class App extends Component {
     state = {
         permaSidebar: false,
         sidebarOpen: false,
+        currentPage: null,
     };
 
     onResize = () => this.setState({ permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH });
 
     // close the sidebar when the user navigates, especially when they select a sidebar item
     onNavigate = () => this.setState({ sidebarOpen: false });
+
+    onCurrentPageChange = currentPage => this.setState({ currentPage });
 
     // navigation ref
     #navigation = null;
@@ -91,16 +94,13 @@ export default class App extends Component {
                 navigate: this.onRouterNavigationRequest,
             }}>
                 <div class={className}>
-                    <EventProxy
-                        dom target={window}
-                        onresize={this.onResize} />
+                    <EventProxy dom target={window} onresize={this.onResize} />
                     <Sidebar
                         permanent={this.state.permaSidebar}
                         open={this.state.sidebarOpen || this.state.permaSidebar}
                         onOpen={() => this.setState({ sidebarOpen: true })}
                         onClose={() => this.setState({ sidebarOpen: false })}
-                        // TODO: this
-                        currentPage={'todo'}
+                        currentPage={this.state.currentPage}
                         onDirectTransition={this.props.onDirectTransition}
                         onDoAnimateIn={() => this.setState({ animateIn: true })} />
                     <AppBarProvider>
@@ -112,6 +112,7 @@ export default class App extends Component {
                                 ref={view => this.#navigation = view}
                                 permaSidebar={this.state.permaSidebar}
                                 onOpenMenu={() => this.setState({ sidebarOpen: true })}
+                                onCurrentPageChange={this.onCurrentPageChange}
                                 onNavigate={this.onNavigate} />
                         </div>
                     </AppBarProvider>

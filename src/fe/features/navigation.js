@@ -50,6 +50,9 @@ function parseHistoryState (url, state, mkPopStack) {
     // current page object from the router
     let cursor;
 
+    // id for the sidebar
+    let currentPageId;
+
     // match the first path part separately because it uses a different format
     const firstPathPart = pathParts.shift();
     for (const category of pages) {
@@ -63,6 +66,7 @@ function parseHistoryState (url, state, mkPopStack) {
                     query: '',
                     state: {},
                 };
+                currentPageId = page.id;
                 stack.push(item);
                 viewStack.push(item);
             }
@@ -79,6 +83,7 @@ function parseHistoryState (url, state, mkPopStack) {
         };
         stack.push(item);
         viewStack.push(item);
+        currentPageId = null;
     }
 
     // traverse the rest of the path
@@ -167,6 +172,7 @@ function parseHistoryState (url, state, mkPopStack) {
 
     return {
         currentLocation,
+        currentPageId,
         urlLocation: currentLocation.length > MAX_LOCATION_LEN
             ? url.pathname + TRUNCATED_QUERY_NAME
             : currentLocation,
@@ -186,6 +192,7 @@ const SAVE_STATE_INTERVAL = 1000; // ms
 /// - onNavigate: emitted when the URL changes
 /// - permaSidebar: bool
 /// - onOpenMenu: fires when the menu icon is pressed
+/// - onCurrentPageChange: fired when the current page id changes
 export default class Navigation extends PureComponent {
     state = {
         // array of objects with properties
@@ -217,12 +224,15 @@ export default class Navigation extends PureComponent {
         const {
             urlLocation,
             currentLocation,
+            currentPageId,
             stack,
             viewStack,
             tasks,
             pathname,
             query,
         } = parseHistoryState(url, state, index => replace => this.popStackAt(index, replace));
+
+        this.props.onCurrentPageChange(currentPageId);
 
         if (currentLocation !== this.currentLocation) {
             this.currentLocation = currentLocation;

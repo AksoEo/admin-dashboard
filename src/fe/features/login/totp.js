@@ -73,6 +73,7 @@ export default class TotpPage extends Component {
                         if (!e.key.match(/\d/) && !e.key.match(/^[A-Z]/)) {
                             e.preventDefault();
                         }
+                        if (e.key === 'Enter') this.#onSubmit();
                     }}
                     onChange={e => this.setState({
                         code: e.target.value.replace(/\D/g, '').substr(0, 6),
