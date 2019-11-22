@@ -1,5 +1,5 @@
 import { UEACode, util } from '@tejo/akso-client';
-import { AbstractDataView } from '../view';
+import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
 import { LOGIN_ID } from './login-keys';
@@ -45,6 +45,10 @@ import { deepMerge, deepEq } from '../../util';
 
 /// Data store path.
 export const CODEHOLDERS = 'codeholders';
+
+// signals
+export const SIG_MEMBERSHIPS = '!memberships';
+export const SIG_FILES = '!files';
 
 // used below; this is just here for DRY
 const addressSubfields = [
@@ -631,7 +635,7 @@ export const tasks = {
                 : clientFields[id].apiFields)),
         });
 
-        const storeId = id === 'self' ? store.get(LOGIN_ID) : '' + id;
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
 
         const existing = store.get([CODEHOLDERS, storeId]);
         store.insert([CODEHOLDERS, storeId], deepMerge(existing, clientFromAPI(res.body)));
@@ -645,6 +649,7 @@ export const tasks = {
     create: async (_, data) => {
         const client = await asyncClient;
         await client.post('/codeholders', clientToAPI(data));
+        // can’t insert anything into the store because we don’t know the id
     },
     /// codeholders/delete: deletes a codeholder
     ///
@@ -653,6 +658,9 @@ export const tasks = {
     delete: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/codeholders/${id}`);
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.remove([CODEHOLDERS, storeId]);
     },
     /// codeholders/update: updates a codeholder
     ///
@@ -669,7 +677,7 @@ export const tasks = {
         const options = {};
         if (data.updateComment) options.modCmt = data.updateComment;
 
-        const storeId = id === 'self' ? store.get(LOGIN_ID) : '' + id;
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         const existing = store.get([CODEHOLDERS, storeId]);
         const currentData = clientToAPI(existing);
         const newData = clientToAPI(codeholderData);
@@ -717,7 +725,7 @@ export const tasks = {
             offset,
             limit,
             // all the fields
-            fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime'],
+            fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime', 'size'],
         });
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };
@@ -738,6 +746,9 @@ export const tasks = {
             type: file.type,
             value: file,
         }]);
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.signal([CODEHOLDERS, storeId, SIG_FILES]);
     },
     /// codeholders/deleteFile: deletes a file
     ///
@@ -747,6 +758,8 @@ export const tasks = {
     deleteFile: async ({ id, file }) => {
         const client = await asyncClient;
         await client.delete(`codeholders/${id}/files/${file}`);
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.signal([CODEHOLDERS, storeId, SIG_FILES]);
     },
     /// codeholders/listMemberships: lists memberships for a codeholder
     ///
@@ -787,6 +800,15 @@ export const tasks = {
             categoryId: category,
             year: year,
         });
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.signal([CODEHOLDERS, storeId, SIG_MEMBERSHIPS]);
+
+        // need to update membership
+        // but we don’t await this because when this fails it shouldn’t display an error
+        tasks.codeholder({}, { id, fields: ['membership'] }).catch(err => {
+            console.error('failed to fetch new memberships', err); // eslint-disable no-console
+        });
     },
     /// codeholders/deleteMembership: deletes a membership
     ///
@@ -796,6 +818,15 @@ export const tasks = {
     deleteMembership: async ({ id }, { membership }) => {
         const client = await asyncClient;
         await client.delete(`/codeholders/${id}/membership/${membership}`);
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.signal([CODEHOLDERS, storeId, SIG_MEMBERSHIPS]);
+
+        // need to update membership
+        // but we don’t await this because when this fails it shouldn’t display an error
+        tasks.codeholder({}, { id, fields: ['membership'] }).catch(err => {
+            console.error('failed to fetch new memberships', err); // eslint-disable no-console
+        });
     },
     /// codeholders/makeAddressLabels: spawns a task on the server
     ///
@@ -855,6 +886,7 @@ export const views = {
     /// - id: codeholder id
     /// - fields: list of field ids to consider the minimal required set (will be fetched)
     /// - noFetch: if true, will not fetch
+    /// - lazyFetch: if true, will only fetch if the data is missing
     codeholder: class CodeholderView extends AbstractDataView {
         constructor (options) {
             super();
@@ -866,9 +898,20 @@ export const views = {
             const current = store.get([CODEHOLDERS, this.id]);
             if (current) setImmediate(this.#onUpdate);
 
+            let shouldFetch = !options.noFetch;
+            if (options.lazyFetch) {
+                shouldFetch = false;
+                for (const field of options.fields) {
+                    if (!current[field]) {
+                        shouldFetch = true;
+                        break;
+                    }
+                }
+            }
+
             /// Note that this specifically uses the id argument and not this.id so that we’re
             /// fetching `self` instead of the resolved id if id is set to `self`
-            if (!options.noFetch) {
+            if (shouldFetch) {
                 tasks.codeholder({}, { id, fields }).catch(err => this.emit('error', err));
             }
         }
@@ -881,4 +924,14 @@ export const views = {
             store.unsubscribe([CODEHOLDERS, this.id], this.#onUpdate);
         }
     },
+    /// codeholders/codeholderSigFiles: observes codeholder files for client-side changes
+    ///
+    /// # Options
+    /// - id: codeholder id
+    codeholderSigFiles: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_FILES]),
+    /// codeholders/codeholderSigFiles: observes codeholder files for client-side changes
+    ///
+    /// # Options
+    /// - id: codeholder id
+    codeholderSigMemberships: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_MEMBERSHIPS]),
 };

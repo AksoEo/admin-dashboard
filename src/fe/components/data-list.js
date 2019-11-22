@@ -1,28 +1,33 @@
-import { h, Component } from 'preact';
-import { useState } from 'preact/compat';
+import { h } from 'preact';
+import { PureComponent, useState } from 'preact/compat';
 import { Button, Menu } from '@cpsdqs/yamdl';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import locale from '../locale';
+import { coreContext } from '../core/connection';
+import { deepEq } from '../../util';
 
 const VLIST_CHUNK_SIZE = 100;
 
 /// Virtual list with auto-sorting and remove/load callbacks.
 ///
 /// # Props
-/// - onLoad: async (offset, limit) -> { items: [item], totalItems: number } callback (required)
+/// - onLoad: async (offset, limit) -> { items: [item], total: number } callback (required)
 /// - renderItem: (item) -> VNode callback (required)
 /// - onRemove: async (item) -> void callback
 /// - onItemClick: (item) -> void callback
 /// - itemHeight: fixed item height in pixels
 /// - emptyLabel: label to show when there are no items
-export default class DataList extends Component {
+/// - updateView: argument list to create a data view that emits updates (if available)
+export default class DataList extends PureComponent {
     state = {
         items: [],
-        totalItems: -1,
+        total: -1,
     };
 
+    static contextType = coreContext;
+
     async fetchChunk (chunk) {
-        if (this.state.totalItems > -1 && chunk * VLIST_CHUNK_SIZE > this.state.totalItems) return;
+        if (this.state.total > -1 && chunk * VLIST_CHUNK_SIZE > this.state.total) return;
         const result = await this.props.onLoad(chunk * VLIST_CHUNK_SIZE, VLIST_CHUNK_SIZE);
         if (!this.maySetState) return;
 
@@ -32,7 +37,7 @@ export default class DataList extends Component {
         }
 
         this.setState({
-            totalItems: result.totalItems,
+            total: result.total,
             items,
         });
     }
@@ -45,7 +50,7 @@ export default class DataList extends Component {
         const lowerChunk = Math.floor(lower / VLIST_CHUNK_SIZE);
         const upperChunk = Math.ceil(upper / VLIST_CHUNK_SIZE);
 
-        for (let i = lowerChunk; i < upperChunk; i++) {
+        for (let i = lowerChunk; i <= upperChunk; i++) {
             if (!this.state.items[i * VLIST_CHUNK_SIZE]) {
                 this.fetchChunk(i);
             }
@@ -59,20 +64,49 @@ export default class DataList extends Component {
         this.props.onRemove(item).then(() => {
             const items = this.state.items.slice();
             items.splice(index, 1);
-            this.setState({ items, totalItems: this.state.totalItems - 1 });
+            this.setState({ items, total: this.state.total - 1 });
         }).catch(err => {
             console.error('Failed to delete item', err); // eslint-disable-line no-console
             // TODO: handle error properly
         });
     }
 
+    #updateView;
+
+    bindUpdates () {
+        if (this.#updateView) this.unbindUpdates();
+        if (!this.props.updateView) return;
+        this.#updateView = this.context.createDataView(...this.props.updateView);
+        this.#updateView.on('update', () => {
+            // data updated
+            // re-fetch all chunks (and if we don’t have any right now; fetch at least one)
+            for (let i = 0; i < Math.max(1, this.state.items.length / VLIST_CHUNK_SIZE); i++) {
+                this.fetchChunk(i);
+            }
+        });
+    }
+
+    unbindUpdates () {
+        if (!this.#updateView) return;
+        this.#updateView.drop();
+        this.#updateView = null;
+    }
+
     componentDidMount () {
         this.maySetState = true;
         this.fetchChunk(0);
+        this.bindUpdates();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (!deepEq(prevProps.updateView, this.props.updateView)) {
+            this.bindUpdates();
+        }
     }
 
     componentWillUnmount () {
         this.maySetState = false;
+        this.unbindUpdates();
     }
 
     render () {
@@ -102,9 +136,9 @@ export default class DataList extends Component {
             }
         }
 
-        let totalItems = this.state.totalItems;
-        if (totalItems === 0 && this.props.emptyLabel) {
-            totalItems++;
+        let total = this.state.total;
+        if (total === 0 && this.props.emptyLabel) {
+            total++;
             items.push(<div class="data-list-empty" key={0}>{this.props.emptyLabel}</div>);
         }
 
@@ -115,7 +149,7 @@ export default class DataList extends Component {
                 onScroll={this.onScroll}>
                 <div
                     class="vlist-spacer"
-                    style={{ height: totalItems * this.props.itemHeight }} />
+                    style={{ height: total * this.props.itemHeight }} />
                 {items}
             </div>
         );

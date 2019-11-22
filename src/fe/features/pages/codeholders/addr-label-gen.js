@@ -9,7 +9,7 @@ import { coreContext } from '../../../core/connection';
 import locale from '../../../locale';
 
 export default function AddrLabelGenContainer ({
-    open, lvIsCursed, getRequestData, onClose,
+    open, lvIsCursed, options, onClose,
 }) {
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -33,7 +33,7 @@ export default function AddrLabelGenContainer ({
                         {core => (
                             <AddrLabelGen
                                 lvIsCursed={lvIsCursed}
-                                getRequestData={getRequestData}
+                                options={options}
                                 onSuccess={() => {
                                     onClose();
                                     setShowSuccess(true);
@@ -59,7 +59,7 @@ export default function AddrLabelGenContainer ({
     );
 }
 
-function AddrLabelGen ({ lvIsCursed, onSuccess, getRequestData, core }) {
+function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
     const [settings, setSettings] = useState({
         language: 'eo',
         latin: false,
@@ -84,7 +84,6 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, getRequestData, core }) {
     const [resultOpen, setResultOpen] = useState(false);
 
     const sendRequest = () => {
-        const { options } = getRequestData();
         setLoading(true);
 
         core.createTask('codeholders/makeAddressLabels', options, settings)
@@ -102,13 +101,11 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, getRequestData, core }) {
                 {locale.members.addrLabelGen.cursedNotice}
             </div> : null}
             <div class="addr-label-gen-inner">
-                <GenPreview value={settings} getRequestData={getRequestData} />
+                <GenPreview value={settings} options={options} />
                 <GenSettings value={settings} onChange={setSettings} />
             </div>
             <footer class="addr-label-gen-footer">
-                <div class="extra-desc">
-                    {locale.members.addrLabelGen.extraDesc}
-                </div>
+                <span class="phantom" />
                 <Button raised class="generate-btn" onClick={sendRequest} disabled={isLoading}>
                     {locale.members.addrLabelGen.generate}
                 </Button>
@@ -213,7 +210,7 @@ const PAGE_SIZES = {
     EXECUTIVE: [521.86, 756.00],
 };
 
-function GenPreview ({ value, getRequestData }) {
+function GenPreview ({ value, options }) {
     const [width, height] = PAGE_SIZES[value.paper];
     const viewBox = `0 0 ${width} ${height}`;
 
@@ -254,7 +251,7 @@ function GenPreview ({ value, getRequestData }) {
                     fill="none" />
             );
 
-            const lines = [4, 9, 7, 5];
+            const lines = [4, 9, 7, 4, 5];
             const lineHeight = value.fontSize;
             const lineSpacing = Math.max(-lineHeight, Math.min(
                 lineHeight / 2,
@@ -284,7 +281,7 @@ function GenPreview ({ value, getRequestData }) {
             <svg class="gen-preview-inner" viewBox={viewBox}>
                 {items}
             </svg>
-            <AddrLabelStats value={value} getRequestData={getRequestData} />
+            <AddrLabelStats value={value} options={options} />
         </div>
     );
 }
@@ -301,18 +298,21 @@ class AddrLabelStats extends PureComponent {
         if (this.loadingMembers) return;
         this.loadingMembers = true;
 
-        const { options } = this.props.getRequestData();
+        const options = { ...this.props.options };
         const addressFilter = { 'addressLatin.city': { $neq: null } };
-        options.jsonFilter = options.jsonFilter
-            ? { $and: [options.jsonFilter, addressFilter] }
-            : addressFilter;
+        const jsonFilter = { ...(options.jsonFilter && options.jsonFilter.filter || {}) };
+        options.jsonFilter = {
+            filter: options.jsonFilter && !options.jsonFilter._disabled
+                ? { $and: [jsonFilter, addressFilter] }
+                : addressFilter
+        };
         options.offset = 0;
         options.limit = 1;
 
         this.context.createTask('codeholders/list', {}, options).runOnceAndDrop().then(({ total }) => {
             this.setState({ withAddresses: total });
         }).then(() => {
-            const { options } = this.props.getRequestData();
+            const options = { ...this.props.options };
             options.offset = 0;
             options.limit = 1;
             return this.context.createTask('codeholders/list', {}, options).runOnceAndDrop();
@@ -325,7 +325,9 @@ class AddrLabelStats extends PureComponent {
     }
 
     componentDidMount () {
-        this.updateMembersWithAddresses();
+        // do this a bit later so the url query filter can be decoded first
+        // as we might get incongruent data otherwise
+        setImmediate(() => this.updateMembersWithAddresses());
     }
 
     componentWillUnmount () {

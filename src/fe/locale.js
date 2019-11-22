@@ -19,6 +19,12 @@ export const generic = {
 
 export const data = {
     requiredField: 'Tiu ĉi kampo estas deviga',
+    byteSizes: [
+        ['[[byte]]', '[[bytes]]'],
+        'kB',
+        'MB',
+        'GB',
+    ],
 };
 
 export const login = {
@@ -123,6 +129,8 @@ export const search = {
     nextPage: '[[next page]]',
     paginationItems: (from, to, count) => `${from}–${to} el ${count}`,
     pickFields: '[[pick fields]]',
+    resetFilters: 'Nuligi filtrilojn',
+    csvExport: 'Elporti kiel CSV',
 };
 
 export const detail = {
@@ -254,6 +262,7 @@ export const codeholders = {
             de: 'Deutsch',
         },
     },
+    create: 'Aldoni membron',
     memberships: 'Membrecoj',
     noMemberships: 'Neniuj membrecoj',
     addMembership: 'Aldoni membrecon',
@@ -277,6 +286,9 @@ export const codeholders = {
     retryFileUpload: 'Reprovi',
     failedFileUpload: 'Ne sukcesis alŝuti la dosieron',
     fileAddedBy: '[[file added by]] ',
+    addrLabelGen: {
+        menuItem: 'Krei adresetikedojn',
+    },
 };
 
 export const mime = {

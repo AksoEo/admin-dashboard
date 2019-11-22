@@ -77,9 +77,7 @@ export default [
                     {
                         path: 'etikedoj',
                         type: 'state',
-                        state: {
-                            addrLabelGen: true,
-                        },
+                        state: 'addrLabelGen',
                     },
                     {
                         path: 'aldoni',

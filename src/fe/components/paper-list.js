@@ -90,9 +90,9 @@ export default class PaperList extends PureComponent {
         }
     }
 
-    /** Returns the style object for a child at the given index. */
+    /// Returns the style object for a child at the given index.
     getChildStyle (index) {
-        if (!this.childStates[index]) return;
+        if (!this.childStates[index] || !this.childNodes[index]) return;
         const state = this.childStates[index];
         const childHeight = this.childNodes[index].offsetHeight;
         const scaleY = this.props.children[index].staticHeight

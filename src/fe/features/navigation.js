@@ -264,6 +264,7 @@ export default class Navigation extends PureComponent {
     navigate = (href, replace) => {
         // first, save the current state so it’s up to date when we go back
         this.saveState();
+        const previousURLLocation = this.urlLocation;
         // resolve url
         // note that currentFullURL is not equal to document.location.href since the
         // document.location may be truncated
@@ -273,6 +274,7 @@ export default class Navigation extends PureComponent {
         // load & parse url. also, importantly, compute urlLocation
         this.loadURL(target.href, null);
         // then actually push it to history with the newly computed urlLocation
+        if (previousURLLocation === this.urlLocation) replace = true;
         if (replace) window.history.replaceState(null, '', this.urlLocation);
         else window.history.pushState(null, '', this.urlLocation);
         // and finally, save state
@@ -284,7 +286,16 @@ export default class Navigation extends PureComponent {
         const stack = this.state.stack.slice();
         if (stack[stackIndex].query !== newQuery) {
             stack[stackIndex].query = newQuery;
-            if (stackIndex === this.state.stack.length - 1) {
+
+            // check if this is the top view stack item
+            let isTopView;
+            for (let i = this.state.stack.length - 1; i >= 0; i--) {
+                if (!stack[i].component) continue;
+                isTopView = i === stackIndex;
+                break;
+            }
+
+            if (isTopView) {
                 // save to URL
                 this.navigate(this.state.pathname + (newQuery ? '?' + newQuery : ''), true);
             } else {

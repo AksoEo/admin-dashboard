@@ -35,7 +35,7 @@ function BothUEACodes ({ value, value2 }) {
 /// # Props
 /// - id: codeholder id
 export const IdUEACode = connect(
-    ({ id }) => ['codeholders/codeholder', { id, fields: ['code'] }],
+    ({ id }) => ['codeholders/codeholder', { id, fields: ['code'], lazyFetch: true }],
     ['id'],
 )()(({ code }) => (
     code ? <UEACode value={code.new} /> : null

@@ -76,9 +76,9 @@ export class AbstractDataView extends EventEmitter {
 
 /// Creates a data view that just shows the given data store path verbatim.
 export const createStoreObserver = (path, map = (id => id)) => class StoreObserverDataView extends AbstractDataView {
-    constructor () {
+    constructor (options) {
         super();
-        this.path = path;
+        this.path = typeof path === 'function' ? path(options) : path;
         store.subscribe(this.path, this.#onUpdate);
         setImmediate(() => this.emit('update', map(store.get(this.path))));
     }

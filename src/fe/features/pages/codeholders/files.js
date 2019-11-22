@@ -7,17 +7,14 @@ import config from '../../../../config.val';
 import DataList from '../../../components/data-list';
 import pickFile from '../../../components/pick-file';
 import { IdUEACode } from '../../../components/data/uea-code';
-import { codeholders as locale, mime as mimeLocale } from '../../../locale';
+import { codeholders as locale, mime as mimeLocale, data as dataLocale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 
 // TODO: use core API properly
 
-const loadFiles = (core, id) => async (offset, limit) => {
-    const { items, total } = await core
-        .createTask('codeholders/listFiles', { id }, { offset, limit })
-        .runOnceAndDrop();
-    return { items, totalItems: total };
-};
+const loadFiles = (core, id) => (offset, limit) => core
+    .createTask('codeholders/listFiles', { id }, { offset, limit })
+    .runOnceAndDrop();
 
 export default function Files ({ id }) {
     const [uploading, setUploading] = useState(false);
@@ -40,6 +37,8 @@ export default function Files ({ id }) {
                     <DataList
                         class="files-list"
                         onLoad={loadFiles(core, id)}
+                        updateView={['codeholders/codeholderSigFiles', { id }]}
+                        itemHeight={64}
                         renderItem={item => (
                             <div class="member-file" data-id={item.id}>
                                 <FileThumbnail id={item.id} mime={item.mime} />
@@ -52,6 +51,10 @@ export default function Files ({ id }) {
                                     <div class="secondary-info">
                                         <span class="file-type">
                                             <Mime mime={item.mime} />
+                                        </span>
+                                        {' · '}
+                                        <span class="file-size">
+                                            <FileSize bytes={item.size} />
                                         </span>
                                         {' · '}
                                         <span class="file-added-by">
@@ -195,4 +198,16 @@ function Mime ({ mime }) {
             <span class="mime-ty">{mimeLocale.types[type]}</span>
         </span>
     );
+}
+
+function FileSize ({ bytes }) {
+    let value = bytes;
+    let suffix = '';
+    for (const s of dataLocale.byteSizes) {
+        suffix = Array.isArray(s) ? (value === 1 ? s[0] : s[1]) : s;
+        if (value >= 1000) value = Math.floor(value / 10) / 100;
+        else break;
+    }
+
+    return `${value} ${suffix}`;
 }

@@ -2,6 +2,7 @@
 
 const UpdateType = {
     UPDATE: 'update',
+    SIGNAL: 'signal',
     DELETE: 'delete',
 };
 
@@ -58,6 +59,14 @@ export function insert (path, value) {
 
     for (let i = 1; i <= path.length; i++) {
         emitUpdate(path.slice(0, i));
+    }
+}
+
+/// Emits an update signal at the given path. This is intended for lists that aren’t cached due to
+/// being volatile but need to be watched for updates.
+export function signal (path) {
+    for (let i = 1; i <= path.length; i++) {
+        emitUpdate(path.slice(0, i), UpdateType.SIGNAL);
     }
 }
 

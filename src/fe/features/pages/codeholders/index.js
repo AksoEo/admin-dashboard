@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import { UEACode, util } from '@tejo/akso-client';
 import JSON5 from 'json5';
 import AddIcon from '@material-ui/icons/Add';
+import SortIcon from '@material-ui/icons/Sort';
+import SaveIcon from '@material-ui/icons/Save';
+import ContactMailIcon from '@material-ui/icons/ContactMail';
 import { AppBarProxy, Spring } from '@cpsdqs/yamdl';
 import { routerContext } from '../../../router';
 import SearchFilters from '../../../components/search-filters';
@@ -44,6 +47,7 @@ const SEARCHABLE_FIELDS = [
 ///
 /// # Props
 /// - query/onQueryChange: url query handling
+/// - addrLabelGen: label gen state (see navigation)
 export default class CodeholdersPage extends Page {
     state = {
         options: {
@@ -92,8 +96,8 @@ export default class CodeholdersPage extends Page {
 
         fieldPickerOpen: false,
 
-        /// If true, the add member dialog is open.
-        addMemberOpen: false,
+        /// If true, the create codeholder dialog is open.
+        createOpen: false,
         /// If true, the address label generator dialog is open.
         addrLabelGenOpen: false,
         /// Derived from list view state.
@@ -188,14 +192,24 @@ export default class CodeholdersPage extends Page {
         this.scrollSpring.stop();
     }
 
-    render () {
+    render ({ addrLabelGen }) {
         // overflow menu
         const menu = [];
 
+        // TODO: this one
+        // if (this.props.permissions.hasPermission('codeholders.create')) {
         menu.push({
+            icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+            label: locale.create,
+            // FIXME: this should use a task
+            action: () => this.setState({ createOpen: true }),
+        });
+        // }
+
+        menu.push({
+            icon: <SortIcon style={{ verticalAlign: 'middle' }} />,
             label: searchLocale.pickFields,
             action: () => this.setState({ fieldPickerOpen: true }),
-            overflow: true,
         });
 
         // TODO
@@ -208,31 +222,31 @@ export default class CodeholdersPage extends Page {
             overflow: true,
         });
         */
-        if (this.state.lvSubmitted) {
+        if (!this.state.expanded) {
             menu.push({
-                label: locale.listView.csvExport.menuItem,
+                icon: <SaveIcon style={{ verticalAlign: 'middle' }} />,
+                label: searchLocale.csvExport,
                 action: () => this.listView.openCSVExport(),
                 overflow: true,
             });
-            menu.push({
-                label: locale.members.addrLabelGen.menuItem,
-                action: () => this.setState({ addrLabelGenOpen: true }),
-                overflow: true,
-            });
+            if (!addrLabelGen) {
+                menu.push({
+                    icon: <ContactMailIcon style={{ verticalAlign: 'middle' }} />,
+                    label: locale.addrLabelGen.menuItem,
+                    action: () => this.props.onNavigate(`/membroj/etikedoj?${this.props.query}`),
+                    overflow: true,
+                });
+            }
         }
-        // TODO: this one
-        /*
-        if (this.props.permissions.hasPermission('codeholders.create')) {
-            menu.push({
-                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
-                label: locale.members.addMember.menuItem,
-                action: () => this.setState({ addMemberOpen: true }),
-            });
-        }
-        */
         menu.push({
-            label: locale.search.resetFilters,
-            action: () => this.listView.resetFilters(),
+            label: searchLocale.resetFilters,
+            action: () => this.setState({
+                options: {
+                    ...this.state.options,
+                    filters: {},
+                    jsonFilter: { _disabled: true },
+                },
+            }),
             overflow: true,
         });
 
@@ -368,13 +382,13 @@ export default class CodeholdersPage extends Page {
                     userData={{ permissions: this.props.permissions }} />
 
                 <AddMemberDialog
-                    open={this.state.addMemberOpen}
-                    onClose={() => this.setState({ addMemberOpen: false })} />
+                    open={this.state.createOpen}
+                    onClose={() => this.setState({ createOpen: false })} />
                 <AddrLabelGen
-                    open={this.state.addrLabelGenOpen}
+                    open={addrLabelGen}
                     lvIsCursed={this.state.lvIsCursed}
-                    getRequestData={() => stateToRequestData(this.reduxState)}
-                    onClose={() => this.setState({ addrLabelGenOpen: false })} />
+                    options={this.state.options}
+                    onClose={() => addrLabelGen.pop()} />
             </div>
         );
     }
