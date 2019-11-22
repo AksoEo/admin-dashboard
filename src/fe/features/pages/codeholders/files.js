@@ -38,7 +38,7 @@ export default function Files ({ id }) {
                         class="files-list"
                         onLoad={loadFiles(core, id)}
                         updateView={['codeholders/codeholderSigFiles', { id }]}
-                        itemHeight={64}
+                        itemHeight={76}
                         renderItem={item => (
                             <div class="member-file" data-id={item.id}>
                                 <FileThumbnail id={item.id} mime={item.mime} />
@@ -208,6 +208,8 @@ function FileSize ({ bytes }) {
         if (value >= 1000) value = Math.floor(value / 10) / 100;
         else break;
     }
+    // esperanto uses commas
+    value = value.toString().replace('.', ',');
 
     return `${value} ${suffix}`;
 }

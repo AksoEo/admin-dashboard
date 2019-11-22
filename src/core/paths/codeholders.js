@@ -16,6 +16,7 @@ import { deepMerge, deepEq } from '../../util';
 //!   or object { full, local, abbrev }
 //! - careOf: identical to API
 //! - website: identical to API
+//! - biography: identical to API
 //! - code: object { new, old } where old always has a check letter
 //! - creationTime: identical to API
 //! - hasPassword: identical to API
@@ -119,7 +120,7 @@ const clientFields = {
         },
         toAPI: value => {
             const codeholder = {};
-            if (value !== undefined && ('first' in value)) {
+            if (value !== undefined && ('firstLegal' in value)) {
                 // human
                 for (const f of ['firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific']) {
                     const cf = f.replace(/Name/, '');
@@ -138,6 +139,7 @@ const clientFields = {
     },
     careOf: 'careOf',
     website: 'website',
+    biography: 'biography',
     code: {
         apiFields: ['newCode', 'oldCode'],
         fromAPI: codeholder => codeholder.newCode === undefined && codeholder.oldCode === undefined
@@ -193,7 +195,12 @@ const clientFields = {
     landlinePhone: phoneFormat('landlinePhone'),
     cellphone: phoneFormat('cellphone'),
     isDead: 'isDead',
-    birthdate: 'birthdate',
+    birthdate: {
+        apiFields: ['birthdate'],
+        fromAPI: codeholder => codeholder.birthdate,
+        toAPI: value => value !== undefined ? { birthdate: value } : {},
+        requires: ['age'],
+    },
     age: {
         apiFields: ['age', 'agePrimo'],
         fromAPI: codeholder => codeholder.age === undefined && codeholder.agePrimo === undefined
@@ -407,7 +414,7 @@ function parametersToRequestData (params) {
     // string, if available
     let prependedUeaCodeSearch = null;
 
-    if (params.search.query) {
+    if (params.search && params.search.query) {
         let query = params.search.query;
         let searchField = params.search.field;
 
@@ -438,7 +445,7 @@ function parametersToRequestData (params) {
     }
 
     // list of all fields that have been selected
-    const fields = params.fields.concat(transientFields.map(id => ({ id, sorting: 'none' })));
+    const fields = (params.fields || []).concat(transientFields.map(id => ({ id, sorting: 'none' })));
 
     for (const field of fields) {
         if (!(field.id in clientFields)) {
@@ -488,7 +495,7 @@ function parametersToRequestData (params) {
     if (params.jsonFilter && !params.jsonFilter._disabled) {
         if (params.jsonFilter.error) throw params.jsonFilter.error;
         if (options.filter) options.filter.$and.push(params.jsonFilter.filter);
-        else options.filter = params.jsonFilter;
+        else options.filter = params.jsonFilter.filter;
     }
     const usedFilters = 'filter' in options && !!Object.keys(options.filter).length;
 
@@ -837,7 +844,7 @@ export const tasks = {
     /// see api docs
     makeAddressLabels: async ({ search, filters, jsonFilter, fields }, parameters) => {
         const client = await asyncClient;
-        const options = parametersToRequestData({ search, filters, jsonFilter, fields });
+        const { options } = parametersToRequestData({ search, filters, jsonFilter, fields });
         delete options.fields;
         delete options.offset;
         delete options.limit;
@@ -916,8 +923,12 @@ export const views = {
             }
         }
 
-        #onUpdate = () => {
-            this.emit('update', store.get([CODEHOLDERS, this.id]));
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([CODEHOLDERS, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([CODEHOLDERS, this.id]));
+            }
         };
 
         drop () {

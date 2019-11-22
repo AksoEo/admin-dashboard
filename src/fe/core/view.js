@@ -19,9 +19,9 @@ export default class DataView extends EventEmitter {
         this.worker.registerDataView(this);
     }
 
-    onUpdate (data) {
+    onUpdate (data, extra) {
         this.data = data;
-        this.emit('update', data);
+        this.emit('update', data, extra);
     }
 
     onError ({ code, message }) {

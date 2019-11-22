@@ -2,7 +2,11 @@ import { h } from 'preact';
 import { useRef, useState } from 'preact/compat';
 import { Dialog, TextField, Button, CircularProgress } from '@cpsdqs/yamdl';
 import Form, { Validator } from '../../../components/form';
-import { codeholders as locale, detail as detailLocale } from '../../../locale';
+import {
+    codeholders as locale,
+    detail as detailLocale,
+    generic as genericLocale,
+} from '../../../locale';
 import './style';
 
 export default {
@@ -69,5 +73,32 @@ export default {
                 </Form>
             </Dialog>
         );
-    }
+    },
+    delete ({ open, core, task }) {
+        const buttonValidator = useRef(null);
+
+        return (
+            <Dialog
+                backdrop
+                class="codeholders-task-delete"
+                open={open}
+                onClose={() => task.drop()}
+                actions={[
+                    {
+                        label: genericLocale.cancel,
+                        action: () => task.drop(),
+                    },
+                    {
+                        label: locale.delete,
+                        action: () => task.runOnceAndDrop().catch(err => {
+                            core.createTask('error', {
+                                message: err.toString(),
+                            });
+                        }),
+                    }
+                ]}>
+                {locale.deleteDescription}
+            </Dialog>
+        );
+    },
 };

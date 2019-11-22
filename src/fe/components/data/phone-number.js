@@ -6,13 +6,14 @@ import { CountryFlag } from './country';
 const phoneNumberRenderer = allowInteractive => function PhoneNumber ({ value }) {
     let number;
     try {
-        number = parsePhoneNumber(value).format('INTERNATIONAL');
+        if (value.formatted) number = value.formatted;
+        else number = parsePhoneNumber(value.value).format('INTERNATIONAL');
     } catch (err) {
         number = value; // close enough, probably
     }
 
     return allowInteractive
-        ? <a class="data phone-number" href={`tel:${value}`}>{number}</a>
+        ? <a class="data phone-number" href={`tel:${value.value}`}>{number}</a>
         : <span class="data phone-number not-interactive">{number}</span>;
 };
 

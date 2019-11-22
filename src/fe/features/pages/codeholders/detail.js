@@ -49,8 +49,15 @@ export default class Detail extends Page {
         if (!editing) {
             actions.push({
                 label: detailLocale.edit,
-                icon: <EditIcon />,
+                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 action: () => this.props.onNavigate(`/membroj/${id}/redakti`, true),
+            });
+            actions.push({
+                label: locale.delete,
+                action: () => this.context.createTask('codeholders/delete', {
+                    id
+                }),
+                overflow: true,
             });
         }
 
@@ -67,6 +74,7 @@ export default class Detail extends Page {
                     onCommit={this.onCommit}
                     edit={this.state.edit}
                     onEditChange={edit => this.setState({ edit })}
+                    onDelete={() => this.props.pop()}
                     options={{
                         fields: [
                             'id',
@@ -74,6 +82,7 @@ export default class Detail extends Page {
                             'name',
                             'careOf',
                             'website',
+                            'biography',
                             'code',
                             'creationTime',
                             'hasPassword',

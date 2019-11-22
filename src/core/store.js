@@ -1,6 +1,6 @@
 //! Global data store.
 
-const UpdateType = {
+export const UpdateType = {
     UPDATE: 'update',
     SIGNAL: 'signal',
     DELETE: 'delete',

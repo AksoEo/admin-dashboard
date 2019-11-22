@@ -421,8 +421,30 @@ const fields = {
         },
     },
     birthdate: {
-        component: makeDataEditable(data.date),
+        component ({ value, editing, onChange, item }) {
+            if (editing) return <data.date.editor value={value} onChange={onChange} />;
+
+            const age = item.age
+                ? locale.fields.ageFormat(item.age.now, item.age.atStartOfYear)
+                : null;
+
+            return (
+                <span class="birth-date">
+                    <data.date.renderer value={value} />
+                    {' · '}
+                    {locale.fields.age + ': '}
+                    {age}
+                </span>
+            );
+        },
+        shouldHide: item => item.type !== 'human',
     },
+    careOf: simpleField(function ({ value, editing, onChange }) {
+        if (!editing) return value;
+        return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+    }, {
+        shouldHide: item => item.type !== 'org',
+    }),
     deathdate: {
         component: makeDataEditable(data.date),
     },
@@ -445,15 +467,28 @@ const fields = {
     profession: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+    }, {
+        shouldHide: item => item.type !== 'human',
+    }),
+    website: simpleField(function ({ value, editing, onChange }) {
+        if (!editing) return value;
+        return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+    }),
+    biography: simpleField(function ({ value, editing, onChange }) {
+        if (!editing) return value;
+        return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }),
     landlinePhone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
+        shouldHide: item => item.type !== 'human',
     }),
     officePhone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
+        shouldHide: item => item.type !== 'human',
     }),
     cellphone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
+        shouldHide: item => item.type !== 'human',
     }),
     notes: {
         component ({ value, editing, onChange }) {

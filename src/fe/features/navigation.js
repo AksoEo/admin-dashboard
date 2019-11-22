@@ -415,6 +415,7 @@ export default class Navigation extends PureComponent {
                             onQueryChange={query => this.onQueryChange(i, query)}
                             match={stackItem.pathMatch}
                             onNavigate={this.navigate}
+                            pop={() => this.popStackAt(i)}
                             {...stackItem.state} />
                     </Suspense>
                 </MetaProvider>

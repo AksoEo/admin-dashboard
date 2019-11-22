@@ -25,12 +25,13 @@ export default class DataView {
         });
     }
 
-    #onUpdate = data => {
+    #onUpdate = (data, extra) => {
         if (this.isDropped) return;
         self.postMessage({
             type: 'data-view-update',
             id: this.id,
             data,
+            extra,
         });
         log.debug('updating data view', this.id);
     };

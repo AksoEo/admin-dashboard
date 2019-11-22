@@ -79,7 +79,7 @@ export default class WorkerInterface extends EventEmitter {
         } else if (data.type === 'task-success') {
             this.tasks.get(data.id).onSuccess(data.result);
         } else if (data.type === 'data-view-update') {
-            this.views.get(data.id).onUpdate(data.data);
+            this.views.get(data.id).onUpdate(data.data, data.extra);
         } else if (data.type === 'data-view-error') {
             this.views.get(data.id).onError(data.error);
         }

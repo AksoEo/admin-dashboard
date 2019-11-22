@@ -7,6 +7,14 @@ import { Validator } from '../form';
 import countryField from './country';
 import Required from './required';
 
+const maxLengthMap = {
+    countryArea: 50,
+    city: 50,
+    streetAddress: 100,
+    postalCode: 20,
+    sortingCode: 20,
+};
+
 function AddressEditor ({ value, onChange }) {
     if (!value) return null;
     const country = value.country;
@@ -49,6 +57,7 @@ function AddressEditor ({ value, onChange }) {
             class="address-editor-line"
             key={k}
             value={value[k]}
+            maxLength={maxLengthMap[k]}
             label={isRequired
                 ? <Required>{locale.data.addressFields[k]}</Required>
                 : locale.data.addressFields[k]}

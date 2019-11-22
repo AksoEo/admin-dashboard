@@ -62,8 +62,8 @@ class UEACodeEditor extends Component {
             return;
         }
         this.setState({ takenState: 'loading' });
-        return this.context.createTask('codeholders/list', {
-            jsonFilter: { newCode: this.props.value, id: { $neq: this.props.id } },
+        return this.context.createTask('codeholders/list', {}, {
+            jsonFilter: { filter: { newCode: this.props.value, id: { $neq: this.props.id } } },
             offset: 0,
             limit: 1,
         }).runOnceAndDrop().then(({ items }) => {

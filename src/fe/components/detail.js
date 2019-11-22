@@ -15,6 +15,7 @@ import './detail.less';
 ///
 /// # Props
 /// - view: data view name. The data view should expect an `id` option.
+///   The view may use the `extra` field and pass `'delete'` to trigger onDelete.
 /// - editing/onEndEdit: editing state
 /// - onCommit: should commit and end edit (or not, if the user cancels the task).
 ///   will be passed an array of changed field ids
@@ -27,6 +28,9 @@ import './detail.less';
 /// - header: like a field editor component, but without value, and with onItemChange
 /// - footer: like header
 /// - locale: object { fields: { field names... } }
+/// - makeHistoryLink: if set, should be a callback that returns the url for the given field’s
+///   history
+/// - onDelete: called when the item is deleted
 export default class DetailView extends PureComponent {
     static contextType = coreContext;
 
@@ -50,7 +54,12 @@ export default class DetailView extends PureComponent {
         this.#view.on('error', this.#onViewError);
     }
 
-    #onViewUpdate = data => this.setState({ data, error: null });
+    #onViewUpdate = (data, extra) => {
+        if (extra === 'delete') {
+            this.props.onDelete();
+        }
+        this.setState({ data, error: null });
+    }
     #onViewError = error => this.setState({ error });
 
     componentDidMount () {
@@ -114,6 +123,8 @@ export default class DetailView extends PureComponent {
                 const field = this.props.fields[fieldId];
                 const FieldComponent = field.component;
 
+                if (field.shouldHide && field.shouldHide(itemData)) continue;
+
                 const isNotLoaded = itemData[fieldId] === undefined;
                 const isEmpty = !isNotLoaded && !editing
                     && (field.isEmpty ? field.isEmpty(itemData[fieldId]) : !itemData[fieldId]);
@@ -125,7 +136,7 @@ export default class DetailView extends PureComponent {
                 if (hasDiff) idClass += ' has-diff';
 
                 const itemId = (
-                    <div class={idClass} key={'i' + fieldId}>
+                    <div class={idClass} key={'i' + fieldId} data-id={fieldId}>
                         {detailLocale.fields[fieldId]}
                     </div>
                 );

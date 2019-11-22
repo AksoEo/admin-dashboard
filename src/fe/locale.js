@@ -15,6 +15,7 @@ export const meta = {
 
 export const generic = {
     close: 'Fermi',
+    cancel: 'Nuligi',
 };
 
 export const data = {
@@ -215,6 +216,9 @@ export const codeholders = {
         honorific: 'Titolo',
         profession: 'Profesio',
         membership: 'Membreco',
+        website: '[[website]]',
+        biography: '[[biography]]',
+        careOf: '[[care of]]',
     },
     nameSubfields: {
         legal: 'Jura nomo',
@@ -289,6 +293,8 @@ export const codeholders = {
     addrLabelGen: {
         menuItem: 'Krei adresetikedojn',
     },
+    delete: 'Forigi',
+    deleteDescription: 'Ĉu vi certas, ke vi volas forigi tiun ĉi membron? Ne eblas malfari tion ĉi.',
 };
 
 export const mime = {

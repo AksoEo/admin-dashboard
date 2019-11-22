@@ -48,10 +48,10 @@ class AddMember extends PureComponent {
         type: 'human',
         newCode: '',
         name: '',
-        nameAbbrev: '',
-        lastNameLegal: '',
-        firstName: '',
-        lastName: '',
+        abbrev: '',
+        lastLegal: '',
+        first: '',
+        last: '',
         loading: false,
         error: null,
     };
@@ -59,10 +59,10 @@ class AddMember extends PureComponent {
     codeValidator = null;
 
     render () {
-        const nameField = this.state.type === 'human' ? 'firstNameLegal' : 'fullName';
+        const nameField = this.state.type === 'human' ? 'firstLegal' : 'full';
         const extraNameFields = this.state.type === 'human'
-            ? ['lastNameLegal', 'firstName', 'lastName']
-            : ['nameAbbrev'];
+            ? ['lastLegal', 'first', 'last']
+            : ['abbrev'];
 
         const codeSuggestions = UEACode.suggestCodes({
             type: this.state.type,
@@ -78,25 +78,22 @@ class AddMember extends PureComponent {
 
                     let nameFields = [nameField].concat(extraNameFields);
                     const nameValue = Object.fromEntries(nameFields
-                        .filter(id => this.state[id])
-                        .map(id => [id.replace(/Name/, ''), this.state[id]]));
+                        .filter(id => this.state[id === nameField ? 'name' : id])
+                        .map(id => [id, this.state[id === nameField ? 'name' : id]]));
+                    const code = this.state.newCode;
 
                     core.createTask('codeholders/create', {}, {
                         type: this.state.type,
-                        code: { newCode: this.state.newCode },
+                        code: { new: code },
                         name: nameValue,
                     }).runOnceAndDrop().then(() => {
                         // find codeholder ID and open their page
-                        core.createTask('codeholders/list', {
-                            jsonFilter: { newCode: this.state.newCode },
-                            fields: ['id'],
+                        core.createTask('codeholders/list', {}, {
+                            jsonFilter: { filter: { newCode: code } },
                             offset: 0,
                             limit: 1,
                         }).runOnceAndDrop().then(res => {
-                            if (res.items[0]) {
-                                const id = res.items[0].id;
-                                this.context.navigate('/membroj/' + id);
-                            }
+                            this.context.navigate('/membroj/' + res.items[0]);
                         }).catch(() => {
                             // silently fail
                         }).then(() => {
