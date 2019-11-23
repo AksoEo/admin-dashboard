@@ -21,7 +21,7 @@ export const generic = {
 export const data = {
     requiredField: 'Tiu ĉi kampo estas deviga',
     byteSizes: [
-        ['[[byte]]', '[[bytes]]'],
+        ['bajto', 'bajtoj'],
         'kB',
         'MB',
         'GB',
@@ -83,8 +83,8 @@ export const app = {
     title: 'AKSO',
     logOut: 'Elsaluti',
     // literally any error that causes the UI to fail to render
-    genericError: '[[something went wrong :shrug:]]',
-    genericErrorReload: '[[reload page]]',
+    genericError: 'Okazis neatendita eraro. Bonvolu poste reprovi. Se tiu ĉi eraro okazadas indus kontakti administranton.',
+    genericErrorReload: 'Okazis neatendita eraro. Bonvolu reŝarĝi la paĝon.',
 };
 
 export const pages = {
@@ -126,10 +126,10 @@ export const search = {
             filtered ? `filtrita${plural(count)}n ` : ''}el entute ${
             total} trovita${plural(total)} en ${time}`;
     },
-    prevPage: '[[prev page]]',
-    nextPage: '[[next page]]',
+    prevPage: 'Antaŭa',
+    nextPage: 'Sekva',
     paginationItems: (from, to, count) => `${from}–${to} el ${count}`,
-    pickFields: '[[pick fields]]',
+    pickFields: 'Elekti kampojn',
     resetFilters: 'Nuligi filtrilojn',
     csvExport: 'Elporti kiel CSV',
 };
@@ -216,9 +216,9 @@ export const codeholders = {
         honorific: 'Titolo',
         profession: 'Profesio',
         membership: 'Membreco',
-        website: '[[website]]',
-        biography: '[[biography]]',
-        careOf: '[[care of]]',
+        website: 'Retejo',
+        biography: 'Biografio',
+        careOf: 'P/a',
     },
     nameSubfields: {
         legal: 'Jura nomo',
@@ -289,7 +289,7 @@ export const codeholders = {
     cancelUploadFile: 'Nuligi',
     retryFileUpload: 'Reprovi',
     failedFileUpload: 'Ne sukcesis alŝuti la dosieron',
-    fileAddedBy: '[[file added by]] ',
+    fileAddedBy: 'aldonita de ',
     addrLabelGen: {
         menuItem: 'Krei adresetikedojn',
     },
@@ -299,15 +299,32 @@ export const codeholders = {
 
 export const mime = {
     types: {
-        application: '[[file]]',
-        multipart: '[[file]]',
-        audio: '[[audio]]',
-        font: '[[font]]',
-        image: '[[image]]',
-        model: '[[3d model]]',
-        text: '[[text]]',
-        video: '[[video]]',
+        application: null,
+        multipart: null,
+        audio: 'sono',
+        font: 'tiparo',
+        image: 'bildo',
+        model: '3D-modelo',
+        text: 'teksto',
+        video: 'video',
     },
+    except: {
+        'application/pdf': 'PDF-dokumento',
+        'application/msword': 'Word-dokumento', // .doc, .dot
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word-dokumento', // .docx
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word-ŝablono', // .dotx
+        'application/msexcel': 'Excel-kalkultabelo', // .xls, .xlt
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel-kalkultabelo', // .xlsx
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel-kalkultabelŝablono', // .xltx
+        'application/mspowerpoint': 'PowerPoint-lumbildaro', // .ppt, .pot
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PowerPoint-prezentaĵo', // .pptx
+        'application/vnd.openxmlformats-officedocument.presentationml.template': 'PowerPoint-prezentaĵo', // .potx
+        'application/vnd.openxmlformats-officedocument.presentationml.slideshow': 'PowerPoint-prezentaĵo', // .ppsx
+        'application/vnd.oasis.opendocument.presentation': 'OpenDocument-prezentaĵo', // .odp
+        'application/vnd.oasis.opendocument.spreadsheet': 'OpenDocument-kalkultabelo', // .ods
+        'application/vnd.oasis.opendocument.text': 'OpenDocument-dokumento', // .odt
+        'application/rtf': 'RTF-dokumento',
+    }
 };
 
 // TODO: remove this

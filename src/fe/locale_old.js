@@ -325,8 +325,8 @@ export default {
                 countries: 'Landoj',
                 // types
                 all: 'ne gravas',
-                fee: 'Paglando',
-                address: 'Loĝlando',
+                fee: 'paglando',
+                address: 'loĝlando',
                 dialogTitle: 'Elekti land(ar)ojn',
                 placeholder: 'Elekti land(ar)ojn',
                 search: 'Serĉi land(ar)ojn',
