@@ -316,7 +316,7 @@ export const mime = {
         'application/msexcel': 'Excel-kalkultabelo', // .xls, .xlt
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel-kalkultabelo', // .xlsx
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel-kalkultabelŝablono', // .xltx
-        'application/mspowerpoint': 'PowerPoint-lumbildaro', // .ppt, .pot
+        'application/mspowerpoint': 'PowerPoint-prezentaĵo', // .ppt, .pot
         'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PowerPoint-prezentaĵo', // .pptx
         'application/vnd.openxmlformats-officedocument.presentationml.template': 'PowerPoint-prezentaĵo', // .potx
         'application/vnd.openxmlformats-officedocument.presentationml.slideshow': 'PowerPoint-prezentaĵo', // .ppsx
