@@ -222,6 +222,7 @@ export const codeholders = {
         website: 'Retejo',
         biography: 'Biografio',
         careOf: 'P/a',
+        creationTime: '[[creation time]]',
     },
     nameSubfields: {
         legal: 'Jura nomo',

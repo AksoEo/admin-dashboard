@@ -2,11 +2,11 @@ import { h } from 'preact';
 import { useState, useCallback, Fragment } from 'preact/compat';
 import { Dialog, TextField, Button } from '@cpsdqs/yamdl';
 import FileIcon from '@material-ui/icons/InsertDriveFile';
-import moment from 'moment';
 import config from '../../../../config.val';
 import DataList from '../../../components/data-list';
 import pickFile from '../../../components/pick-file';
 import { IdUEACode } from '../../../components/data/uea-code';
+import data from '../../../components/data';
 import { codeholders as locale, mime as mimeLocale, data as dataLocale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 
@@ -63,7 +63,7 @@ export default function Files ({ id }) {
                                         </span>
                                         {' · '}
                                         <span class="file-time">
-                                            {moment(item.time * 1000).format('LLL')}
+                                            <data.timestamp.inlineRenderer value={item.time * 1000} />
                                         </span>
                                     </div>
                                 </div>

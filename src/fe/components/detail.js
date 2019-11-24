@@ -133,7 +133,7 @@ export default class DetailView extends PureComponent {
                 const field = this.props.fields[fieldId];
                 const FieldComponent = field.component;
 
-                if (field.shouldHide && field.shouldHide(itemData)) continue;
+                if (field.shouldHide && field.shouldHide(itemData, editing)) continue;
 
                 const isNotLoaded = itemData[fieldId] === undefined;
                 const isEmpty = !isNotLoaded && !editing
@@ -146,7 +146,8 @@ export default class DetailView extends PureComponent {
                 if (hasDiff) idClass += ' has-diff';
 
                 let historyLink = null;
-                if (makeHistoryLink) historyLink = createHistoryLink(fieldId);
+                if (makeHistoryLink && field.history) historyLink = createHistoryLink(fieldId);
+                else if (makeHistoryLink) historyLink = <span class="history-link-placeholder" />;
 
                 const itemId = (
                     <div class={idClass} key={'i' + fieldId} data-id={fieldId}>

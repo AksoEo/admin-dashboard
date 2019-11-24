@@ -412,6 +412,7 @@ const fields = {
             return <NameEditor value={value} item={item} noIcon />;
         },
         shouldHide: () => true,
+        history: true,
     },
     code: {
         component ({ value, item }) {
@@ -419,6 +420,7 @@ const fields = {
             return <CodeEditor value={value} item={item} />;
         },
         shouldHide: () => true,
+        history: true,
     },
     enabled: {
         component ({ value, editing, onChange }) {
@@ -441,6 +443,7 @@ const fields = {
                     onChange={isDead => editing && onChange(isDead)} />
             );
         },
+        history: true,
     },
     birthdate: {
         component ({ value, editing, onChange, item }) {
@@ -460,15 +463,25 @@ const fields = {
             );
         },
         shouldHide: item => item.type !== 'human',
+        history: true,
     },
     careOf: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }, {
         shouldHide: item => item.type !== 'org',
+        history: true,
     }),
     deathdate: {
         component: makeDataEditable(data.date),
+        history: true,
+    },
+    creationTime: {
+        component ({ value }) {
+            if (!value) return null;
+            return <data.timestamp.renderer value={value * 1000} />;
+        },
+        shouldHide: (_, editing) => editing,
     },
     address: {
         component ({ value, item, editing, onChange, isHistory }) {
@@ -485,36 +498,48 @@ const fields = {
             }
         },
         isEmpty: value => !value || !Object.values(value).filter(x => x).length,
+        history: true,
     },
     feeCountry: {
         component: makeDataEditable(data.country),
+        history: true,
     },
-    email: simpleField(makeDataEditable(data.email)),
+    email: simpleField(makeDataEditable(data.email), {
+        history: true,
+    }),
     profession: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }, {
         shouldHide: item => item.type !== 'human',
+        history: true,
     }),
     website: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+    }, {
+        history: true,
     }),
     biography: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+    }, {
+        history: true,
     }),
     landlinePhone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
+        history: true,
     }),
     officePhone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
+        history: true,
     }),
     cellphone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
+        history: true,
     }),
     notes: {
         component ({ value, editing, onChange }) {
@@ -535,6 +560,7 @@ const fields = {
                 );
             }
         },
+        history: true,
     },
 };
 

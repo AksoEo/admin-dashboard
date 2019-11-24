@@ -246,6 +246,9 @@ const clientFields = {
 
 const fieldHistoryBlacklist = [
     'oldCode',
+    'landlinePhoneFormatted',
+    'officePhoneFormatted',
+    'cellphoneFormatted',
 ];
 const isFieldHistoryBlacklisted = field => fieldHistoryBlacklist.includes(field);
 
