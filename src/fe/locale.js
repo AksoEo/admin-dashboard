@@ -222,7 +222,7 @@ export const codeholders = {
         website: 'Retejo',
         biography: 'Biografio',
         careOf: 'P/a',
-        creationTime: '[[creation time]]',
+        creationTime: 'Horo de kreiĝo',
     },
     nameSubfields: {
         legal: 'Jura nomo',
@@ -302,7 +302,7 @@ export const codeholders = {
     fieldHistory: {
         title: 'Historio',
         comment: 'Priskribo de ŝanĝoj',
-        changedBy: '[[changed by]]'
+        changedBy: 'Ŝanĝita de'
     },
 };
 
