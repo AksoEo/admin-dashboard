@@ -665,7 +665,9 @@
                         .mime-type {
                             .mime-subtype {
                                 text-transform: uppercase;
-                                margin-right: 4px;
+                            }
+                            .mime-ty:not(:empty)::before {
+                                content: '-';
                             }
                         }
                     }

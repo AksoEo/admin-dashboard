@@ -71,6 +71,12 @@ export default [
                                 path: 'membrecoj',
                                 component: () => 'todo',
                                 type: 'stack',
+                            },
+                            {
+                                path: 'historio',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/history')),
+                                type: 'stack',
                             }
                         ],
                     },

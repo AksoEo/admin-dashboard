@@ -75,6 +75,7 @@ export default class Detail extends Page {
                     edit={this.state.edit}
                     onEditChange={edit => this.setState({ edit })}
                     onDelete={() => this.props.pop()}
+                    makeHistoryLink={field => `/membroj/${id}/historio?${field}`}
                     options={{
                         fields: [
                             'id',

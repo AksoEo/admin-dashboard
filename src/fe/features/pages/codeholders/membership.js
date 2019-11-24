@@ -112,10 +112,7 @@ export default class MembershipEditor extends PureComponent {
                         onLoad={(offset, limit) =>
                             this.context.createTask('codeholders/listMemberships', {
                                 id: this.props.id,
-                            }, { offset, limit }).runOnceAndDrop().then(res => ({
-                                items: res.items,
-                                totalItems: res.total,
-                            }))}
+                            }, { offset, limit }).runOnceAndDrop()}
                         emptyLabel={locale.noMemberships}
                         itemHeight={56}
                         onRemove={canEdit && (item =>

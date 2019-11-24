@@ -308,14 +308,14 @@ export const mime = {
         text: 'teksto',
         video: 'video',
     },
-    except: {
+    exceptions: {
         'application/pdf': 'PDF-dokumento',
         'application/msword': 'Word-dokumento', // .doc, .dot
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word-dokumento', // .docx
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word-ŝablono', // .dotx
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.template': 'Word-ŝablono', // .dotx
         'application/msexcel': 'Excel-kalkultabelo', // .xls, .xlt
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel-kalkultabelo', // .xlsx
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'Excel-kalkultabelŝablono', // .xltx
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.template': 'Excel-kalkultabelŝablono', // .xltx
         'application/mspowerpoint': 'PowerPoint-prezentaĵo', // .ppt, .pot
         'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PowerPoint-prezentaĵo', // .pptx
         'application/vnd.openxmlformats-officedocument.presentationml.template': 'PowerPoint-prezentaĵo', // .potx
@@ -324,7 +324,8 @@ export const mime = {
         'application/vnd.oasis.opendocument.spreadsheet': 'OpenDocument-kalkultabelo', // .ods
         'application/vnd.oasis.opendocument.text': 'OpenDocument-dokumento', // .odt
         'application/rtf': 'RTF-dokumento',
-    }
+        'text/plain': 'Teksto',
+    },
 };
 
 // TODO: remove this

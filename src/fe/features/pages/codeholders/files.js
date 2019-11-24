@@ -188,6 +188,14 @@ function FileThumbnail ({ file, id, mime }) {
 }
 
 function Mime ({ mime }) {
+    if (mimeLocale.exceptions[mime]) {
+        return (
+            <span class="mime-type is-special">
+                {mimeLocale.exceptions[mime]}
+            </span>
+        );
+    }
+
     const parts = mime.split('/');
     const type = parts[0];
     const subtype = parts[1];

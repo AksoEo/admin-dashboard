@@ -2,10 +2,12 @@ import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
 import { Button, CircularProgress, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
 import DoneIcon from '@material-ui/icons/Done';
+import HistoryIcon from '@material-ui/icons/History';
 import TinyProgress from './tiny-progress';
 import Form from './form';
 import { detail as locale } from '../locale';
 import { coreContext } from '../core/connection';
+import { Link } from '../router';
 import { deepEq } from '../../util';
 import './detail.less';
 
@@ -88,7 +90,7 @@ export default class DetailView extends PureComponent {
         this.props.onCommit(changes);
     }
 
-    render ({ editing, locale: detailLocale }) {
+    render ({ editing, locale: detailLocale, makeHistoryLink }) {
         let contents;
         if (this.state.error) {
             contents = (
@@ -135,9 +137,21 @@ export default class DetailView extends PureComponent {
                 if (isEmpty) idClass += ' is-empty';
                 if (hasDiff) idClass += ' has-diff';
 
+                let historyLink = null;
+                if (makeHistoryLink) {
+                    historyLink = (
+                        <Link
+                            class="history-link"
+                            target={makeHistoryLink(fieldId, itemData)}>
+                            <HistoryIcon style={{ verticalAlign: 'middle' }} />
+                        </Link>
+                    );
+                }
+
                 const itemId = (
                     <div class={idClass} key={'i' + fieldId} data-id={fieldId}>
                         {detailLocale.fields[fieldId]}
+                        {historyLink}
                     </div>
                 );
                 const itemContents = (
