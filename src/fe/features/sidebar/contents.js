@@ -127,7 +127,7 @@ const SidebarUser = connect('codeholders/codeholder', {
         ].map(x => x).join(' ');
     } else if (props.type === 'org') {
         compiledName = props.name.full.length > 30
-            ? props.name.short || props.name.full
+            ? props.name.abbrev || props.name.full
             : props.name.full;
     }
 

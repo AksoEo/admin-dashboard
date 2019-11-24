@@ -84,7 +84,7 @@ export const app = {
     logOut: 'Elsaluti',
     // literally any error that causes the UI to fail to render
     genericError: 'Okazis neatendita eraro. Bonvolu poste reprovi. Se tiu ĉi eraro okazadas indus kontakti administranton.',
-    genericErrorReload: 'Okazis neatendita eraro. Bonvolu reŝarĝi la paĝon.',
+    genericErrorReload: 'Reŝarĝi la paĝon',
 };
 
 export const pages = {
@@ -124,7 +124,10 @@ export const search = {
         const plural = n => n === 1 ? '' : 'j';
         return `Montras ${count} rezulto${plural(count)}n ${
             filtered ? `filtrita${plural(count)}n ` : ''}el entute ${
-            total} trovita${plural(total)} en ${time}`;
+            total} trovita${plural(total)} en ${time
+                .replace('.', ',')
+                // put a space before the unit
+                .replace(/ms/, ' ms')}`;
     },
     prevPage: 'Antaŭa',
     nextPage: 'Sekva',
@@ -295,6 +298,11 @@ export const codeholders = {
     },
     delete: 'Forigi',
     deleteDescription: 'Ĉu vi certas, ke vi volas forigi tiun ĉi membron? Ne eblas malfari tion ĉi.',
+    fieldHistory: {
+        title: 'Historio',
+        comment: 'Priskribo de ŝanĝoj',
+        changedBy: '[[changed by]]'
+    },
 };
 
 export const mime = {

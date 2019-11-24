@@ -2,6 +2,7 @@ import { UEACode, util } from '@tejo/akso-client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
+import * as log from '../log';
 import { LOGIN_ID } from './login-keys';
 import { deepMerge, deepEq } from '../../util';
 
@@ -77,6 +78,7 @@ const phoneFormat = field => ({
 ///   this can either be a string (for 1:1 mapping) or an array (for other mappings)
 /// - fromAPI: maps an API codeholder to a value of this field. required fields can be assumed to
 ///   exist in the API codeholder (if apiFields is a string, this is automatic)
+///   except in field history, required fields won’t be loaded there. use heuristics
 /// - toAPI: maps a value of this field to a partial API codeholder
 ///   (if apiFields is a string, this is automatic)
 /// - requires: required client-side fields that must also be requested (for e.g. disambiguation)
@@ -97,7 +99,11 @@ const clientFields = {
         fromAPI: codeholder => {
             const value = {};
             let isEmpty = true;
-            if (codeholder.codeholderType === 'human') {
+
+            // use actual type or heuristics
+            const codeholderType = codeholder.codeholderType || (codeholder.firstNameLegal ? 'human' : 'org');
+
+            if (codeholderType === 'human') {
                 for (const f of ['firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific']) {
                     const item = codeholder[f];
                     if (item !== undefined) {
@@ -105,7 +111,7 @@ const clientFields = {
                         value[f.replace(/Name/, '')] = item;
                     }
                 }
-            } else if (codeholder.codeholderType === 'org') {
+            } else if (codeholderType === 'org') {
                 if (codeholder.fullName !== undefined
                     || codeholder.fullNameLocal !== undefined
                     || codeholder.nameAbbrev !== undefined) {
@@ -237,6 +243,11 @@ const clientFields = {
         toAPI: () => ({}),
     },
 };
+
+const fieldHistoryBlacklist = [
+    'oldCode',
+];
+const isFieldHistoryBlacklisted = field => fieldHistoryBlacklist.includes(field);
 
 /// converts from API repr to client repr (see above)
 function clientFromAPI (apiRepr) {
@@ -863,6 +874,97 @@ export const tasks = {
         });
         return res.body[id];
     },
+    /// codeholders/fieldHistory: gets a codeholder field’s entire history
+    ///
+    /// Unlike the API, here mods contain the *new* value and not the *old* value.
+    ///
+    /// # Props
+    /// - id: codeholder id
+    /// - field: client field name
+    ///
+    /// # Returns
+    /// - items: modifications, sorted by time
+    fieldHistory: async ({ id, field }) => {
+        const client = await asyncClient;
+
+        const apiFields = typeof clientFields[field] === 'string'
+            ? [clientFields[field]]
+            : clientFields[field].apiFields.filter(x => !isFieldHistoryBlacklisted(x));
+        let histFields = apiFields;
+
+        // special history endpoint
+        if (field === 'address') histFields = ['address'];
+
+        const mods = {
+            // the “null” change; initial value at db creation time or something
+            priori: {
+                comment: null,
+                author: null,
+                time: 0,
+                id: null,
+                data: {},
+            },
+        };
+
+        const currentValues = (await client.get(`/codeholders/${id}`, {
+            fields: apiFields,
+        })).body;
+
+        for (const fieldId of histFields) {
+            let offset = 0;
+            let total = null;
+            let prevMod = 'priori';
+            while (total === null || offset < total) {
+                const res = await client.get(`/codeholders/${id}/hist/${fieldId}`, {
+                    fields: ['val', 'modId', 'modTime', 'modBy', 'modCmt'],
+                    offset,
+                    limit: 100,
+                    order: [['modId', 'asc']],
+                });
+                total = res.res.headers.get('x-total-items');
+                if (res.body.length === 0 && offset < total) {
+                    log.error('server returned zero items but we expected nonzero; aborting and returning partial');
+                    total = 0;
+                }
+                offset += 100;
+
+                for (const item of res.body) {
+                    if (!mods[item.modId]) mods[item.modId] = {
+                        comment: item.modCmt,
+                        author: item.modBy,
+                        time: item.modTime,
+                        id: item.modId,
+                        data: {},
+                    };
+                    // mod contains the *old* value; meaning this value goes in prevMod
+                    if (prevMod) mods[prevMod].data[fieldId] = item.val[fieldId];
+                    prevMod = item.modId;
+                }
+            }
+
+            if (prevMod) mods[prevMod].data[fieldId] = currentValues[fieldId];
+        }
+
+        const modsByTime = Object.keys(mods).sort((a, b) => mods[a].time - mods[b].time);
+        let currentData = {};
+        for (const k of modsByTime) {
+            // we’re operating under the assumption that not all fields might change for a given mod
+            // so with multiple api fields, we might only have partial data sometimes
+            // hence, we first assign the new partial data to the current data to update it
+            Object.assign(currentData, mods[k].data);
+            // then assign the merged data to the mod to have a complete snapshot
+            mods[k].data = { ...currentData };
+        }
+
+        // now, decode the data into client-side reprs
+        for (const k in mods) {
+            mods[k].data = clientFromAPI(mods[k].data);
+        }
+
+        return {
+            items: modsByTime.reverse().map(k => mods[k]),
+        };
+    },
 };
 
 export const views = {
@@ -909,7 +1011,7 @@ export const views = {
             if (options.lazyFetch) {
                 shouldFetch = false;
                 for (const field of options.fields) {
-                    if (!current[field]) {
+                    if (!current || !current[field]) {
                         shouldFetch = true;
                         break;
                     }

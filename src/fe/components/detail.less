@@ -16,6 +16,17 @@
         padding: 16px;
     }
 
+    .history-link {
+        margin-left: 8px;
+        color: @gray-button-color;
+        transition: opacity 0.3s;
+
+        &:active {
+            opacity: 0.5;
+            transition: none;
+        }
+    }
+
     .detail-fields {
         display: grid;
         padding: 16px;
@@ -35,17 +46,6 @@
 
             &.has-diff {
                 color: @secondary;
-            }
-
-            .history-link {
-                margin-left: 8px;
-                color: @gray-button-color;
-                transition: opacity 0.3s;
-
-                &:active {
-                    opacity: 0.5;
-                    transition: none;
-                }
             }
         }
 

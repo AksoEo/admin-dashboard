@@ -106,6 +106,14 @@ export default class DetailView extends PureComponent {
                 onItemChange: item => this.props.onEditChange(item),
             };
 
+            const createHistoryLink = field => makeHistoryLink && (
+                <Link
+                    class="history-link"
+                    target={makeHistoryLink(field, itemData)}>
+                    <HistoryIcon style={{ verticalAlign: 'middle' }} />
+                </Link>
+            );
+
             let header = null;
             const items = [];
             const emptyItems = [];
@@ -113,11 +121,11 @@ export default class DetailView extends PureComponent {
 
             if (this.props.header) {
                 const Header = this.props.header;
-                header = <Header {...fieldProps} />;
+                header = <Header {...fieldProps} createHistoryLink={createHistoryLink} />;
             }
             if (this.props.footer) {
                 const Footer = this.props.footer;
-                footer = <Footer {...fieldProps} />;
+                footer = <Footer {...fieldProps} createHistoryLink={createHistoryLink} />;
             }
 
             // TODO: proper field rendering
@@ -138,15 +146,7 @@ export default class DetailView extends PureComponent {
                 if (hasDiff) idClass += ' has-diff';
 
                 let historyLink = null;
-                if (makeHistoryLink) {
-                    historyLink = (
-                        <Link
-                            class="history-link"
-                            target={makeHistoryLink(fieldId, itemData)}>
-                            <HistoryIcon style={{ verticalAlign: 'middle' }} />
-                        </Link>
-                    );
-                }
+                if (makeHistoryLink) historyLink = createHistoryLink(fieldId);
 
                 const itemId = (
                     <div class={idClass} key={'i' + fieldId} data-id={fieldId}>

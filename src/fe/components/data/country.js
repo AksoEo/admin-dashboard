@@ -29,9 +29,9 @@ export const WithCountries = connect('countries/countryGroups')(data => ({
 function CountryRenderer ({ value }) {
     if (!value) return null;
     return (
-        <WithCountries>{countries => (
+        <WithCountries>{countries => countries[value] ? (
             <span class="data country"><CountryFlag country={value} /> {countries[value].eo}</span>
-        )}</WithCountries>
+        ) : null}</WithCountries>
     );
 }
 

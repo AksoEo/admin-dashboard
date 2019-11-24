@@ -96,12 +96,15 @@ const validators = {
     },
 };
 
-function NameEditor ({ value, item, editing, onChange }) {
+function NameEditor ({ value, item, editing, onChange, noIcon, createHistoryLink }) {
+    // use actual type or heuristics otherwise
+    const itemType = item.type || (value && value.firstLegal ? 'human' : 'org');
+
     if (!editing) {
         let primaryName;
         let secondaryName;
         let IconType = () => {};
-        if (item.type === 'human') {
+        if (itemType === 'human') {
             const { honorific, first: firstName, firstLegal, last: lastName, lastLegal } = value;
             const first = firstName || firstLegal;
             const last = lastName || lastLegal;
@@ -121,7 +124,7 @@ function NameEditor ({ value, item, editing, onChange }) {
                     </div>
                 );
             }
-        } else if (item.type === 'org') {
+        } else if (itemType === 'org') {
             IconType = BusinessIcon;
 
             primaryName = [value.full];
@@ -149,13 +152,14 @@ function NameEditor ({ value, item, editing, onChange }) {
         return (
             <div class="member-name">
                 <div class="name-primary">
-                    <IconType className="type-icon" />
+                    {!noIcon && <IconType className="type-icon" />}
                     {primaryName}
+                    {!noIcon && createHistoryLink('name')}
                 </div>
                 {secondaryName}
             </div>
         );
-    } else if (item.type === 'human') {
+    } else if (itemType === 'human') {
         return lotsOfTextFields([
             [
                 {
@@ -199,7 +203,7 @@ function NameEditor ({ value, item, editing, onChange }) {
             class: 'member-name editing',
             key: 'human',
         });
-    } else if (item.type === 'org') {
+    } else if (itemType === 'org') {
         return lotsOfTextFields([
             [
                 {
@@ -225,7 +229,7 @@ function NameEditor ({ value, item, editing, onChange }) {
             [
                 {
                     key: 'abbrev',
-                    label: locale.nameSubfields.local,
+                    label: locale.nameSubfields.abbrev,
                     props: { maxLength: 12 },
                 },
             ],
@@ -264,7 +268,7 @@ function todoGetPerms () {
     return true;
 }
 
-function Header ({ item, editing, onItemChange }) {
+function Header ({ item, editing, onItemChange, createHistoryLink }) {
     return (
         <div class="member-header">
             <div class="member-picture">
@@ -278,13 +282,15 @@ function Header ({ item, editing, onItemChange }) {
                     value={item.name}
                     item={item}
                     editing={editing}
-                    onChange={name => onItemChange({ ...item, name })} />
+                    onChange={name => onItemChange({ ...item, name })}
+                    createHistoryLink={createHistoryLink} />
                 <div class="member-code">
                     <CodeEditor
                         value={item.code}
                         item={item}
                         editing={editing}
                         onChange={code => onItemChange({ ...item, code })} />
+                    {createHistoryLink('code')}
                 </div>
                 <MembershipEditor
                     id={item.id}
@@ -399,6 +405,21 @@ function simpleField (component, extra) {
 }
 
 const fields = {
+    // for field history
+    name: {
+        component ({ value, item }) {
+            if (!value) return null;
+            return <NameEditor value={value} item={item} noIcon />;
+        },
+        shouldHide: () => true,
+    },
+    code: {
+        component ({ value, item }) {
+            if (!value) return null;
+            return <CodeEditor value={value} item={item} />;
+        },
+        shouldHide: () => true,
+    },
     enabled: {
         component ({ value, editing, onChange }) {
             if (!editing && !value) return '—';
@@ -409,6 +430,7 @@ const fields = {
                     onChange={enabled => editing && onChange(enabled)} />
             );
         },
+        history: true,
     },
     isDead: {
         component ({ value, editing, onChange }) {
@@ -449,7 +471,11 @@ const fields = {
         component: makeDataEditable(data.date),
     },
     address: {
-        component ({ value, item, editing, onChange }) {
+        component ({ value, item, editing, onChange, isHistory }) {
+            if (isHistory) {
+                return <data.address.renderer value={value} />;
+            }
+
             if (!editing) {
                 return <CodeholderAddressRenderer id={item.id} />;
             } else {
