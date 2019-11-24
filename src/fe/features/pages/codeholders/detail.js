@@ -54,9 +54,7 @@ export default class Detail extends Page {
             });
             actions.push({
                 label: locale.delete,
-                action: () => this.context.createTask('codeholders/delete', {
-                    id
-                }),
+                action: () => this.context.createTask('codeholders/delete', { id }),
                 overflow: true,
             });
         }

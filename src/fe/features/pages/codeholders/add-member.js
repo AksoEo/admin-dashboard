@@ -76,7 +76,7 @@ class AddMember extends PureComponent {
                 {core => (<Form onSubmit={() => {
                     this.setState({ loading: true, error: null });
 
-                    let nameFields = [nameField].concat(extraNameFields);
+                    const nameFields = [nameField].concat(extraNameFields);
                     const nameValue = Object.fromEntries(nameFields
                         .filter(id => this.state[id === nameField ? 'name' : id])
                         .map(id => [id, this.state[id === nameField ? 'name' : id]]));

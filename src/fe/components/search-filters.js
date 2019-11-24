@@ -15,7 +15,6 @@ import './search-filters.less';
 /// # Props
 /// - value/onChange: core parameters (see e.g. docs for codeholders/list for details)
 /// - searchFields: string[] or null
-/// - fields: array of all available field ids
 /// - filters: object mapping all available filter ids to their editor spec. An editor spec
 ///   contains:
 ///   - `default() -> Filter` where `typedef Filter { enabled: bool, value: any, ...other }`
@@ -38,7 +37,6 @@ export default function SearchFilters ({
     value,
     onChange,
     searchFields,
-    fields,
     filters,
     expanded,
     onExpandedChange,
@@ -174,6 +172,9 @@ function FiltersBar ({
     value,
     onChange,
 }) {
+    // TODO: saved filters
+    void category;
+
     const filterType = value.filters._disabled ? 'json' : 'normal';
     const onFilterTypeChange = type => {
         const json = type === 'json';

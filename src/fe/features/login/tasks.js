@@ -76,7 +76,7 @@ export default {
             </Dialog>
         );
     },
-    logOut ({ open, core, task }) {
+    logOut ({ open, task }) {
         return (
             <Dialog
                 backdrop

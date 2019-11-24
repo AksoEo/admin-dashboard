@@ -226,7 +226,6 @@ export default class Navigation extends PureComponent {
             currentLocation,
             currentPageId,
             stack,
-            viewStack,
             tasks,
             pathname,
             query,
@@ -397,7 +396,6 @@ export default class Navigation extends PureComponent {
             }
 
             const isBottom = i === 0;
-            const isTop = i === this.state.stack.length - 1;
             const PageComponent = stackItem.component;
             const itemContents = (
                 <MetaProvider onUpdate={({ title, actions }) => {
@@ -427,7 +425,7 @@ export default class Navigation extends PureComponent {
             } else {
                 const itemIndex = i;
                 stackItems.push(
-                    <CardStackItem open onClose={() => this.popStackAt(i)}>
+                    <CardStackItem open onClose={() => this.popStackAt(itemIndex)}>
                         {itemContents}
                     </CardStackItem>
                 );

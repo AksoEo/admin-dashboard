@@ -7,7 +7,6 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CheckIcon from '@material-ui/icons/Check';
 import moment from 'moment';
-import { WithCountries } from '../../../components/data/country';
 import Segmented from '../../../components/segmented';
 import locale from '../../../locale';
 import CountryPicker from './country-picker';
@@ -230,7 +229,7 @@ export default {
             if (!set.length) return { enabled: false, value: { set: [], type: null } };
             return { enabled: true, value: { type, set } };
         },
-        editor ({ value, onChange, enabled, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             const selectedType = value.type === null ? 'all' : value.type;
 
             return (
@@ -430,7 +429,7 @@ export default {
 
             render () {
                 // FIXME: this mess
-                const { value, onChange, enabled, onEnabledChange } = this.props;
+                const { value, onChange, onEnabledChange } = this.props;
                 const { categories: availableCategories } = this.state;
 
                 const items = value.map(({

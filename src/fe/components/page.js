@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 
 /// A page is analogous to a view controller, but there is no controller.

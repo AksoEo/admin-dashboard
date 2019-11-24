@@ -29,6 +29,7 @@ export default class History extends Page {
         }).runOnceAndDrop().then(({ items }) => {
             this.setState({ items });
         }).catch(err => {
+            console.error('Failed to fetch field history', err); // eslint-disable-line no-console
             this.#reloadTimeout = setTimeout(() => this.load(), 1000);
         }).then(() => this.#loadTask = null);
     }

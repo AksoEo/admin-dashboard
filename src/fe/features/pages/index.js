@@ -77,7 +77,7 @@ export default [
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/history')),
                                 type: 'stack',
-                            }
+                            },
                         ],
                     },
                     {
@@ -140,10 +140,10 @@ export default [
                     {
                         // TODO: temporary; undo this
                         // component: lazy(() =>
-                            // import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
+                        // import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
                         type: 'bottom',
                         path: 'protokolo',
-                    }
+                    },
                 ],
             },
             {

@@ -1,25 +1,18 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import PropTypes from 'prop-types';
-import { UEACode, util } from '@tejo/akso-client';
-import JSON5 from 'json5';
+import { Spring } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import SortIcon from '@material-ui/icons/Sort';
 import SaveIcon from '@material-ui/icons/Save';
 import ContactMailIcon from '@material-ui/icons/ContactMail';
-import { AppBarProxy, Spring } from '@cpsdqs/yamdl';
-import { routerContext } from '../../../router';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
 import FieldPicker from '../../../components/field-picker';
 import { decodeURLQuery, encodeURLQuery } from '../../../components/list-url-coding';
 import Page from '../../../components/page';
-import { coreContext } from '../../../core/connection';
 import { codeholders as locale, search as searchLocale } from '../../../locale';
 import Meta from '../../meta';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
-import detailFields from './detail-fields';
 import AddMemberDialog from './add-member';
 import AddrLabelGen from './addr-label-gen';
 import './style';
@@ -393,155 +386,3 @@ export default class CodeholdersPage extends Page {
         );
     }
 }
-
-// TODO: fix this
-/*
-const Title = connect(state => ({
-    query: state.search.query,
-    filters: state.filters.enabled,
-}))(function SearchTitle (props) {
-    let title = locale.members.search.titleFilter;
-    if (!props.filters || props.query) {
-        title = locale.members.search.title;
-    }
-    return <div className="members-search-title">{title}</div>;
-});
-*/
-
-function stateToRequestData (state) {
-    const useJSONFilters = state.jsonFilter.enabled;
-
-    const options = {
-        search: state.search,
-        fields: state.fields.fixed.concat(state.fields.user),
-        offset: state.list.page * state.list.itemsPerPage,
-        limit: state.list.itemsPerPage,
-    };
-
-    let usedFilters = false;
-    if (useJSONFilters) {
-        usedFilters = true;
-        try {
-            options.jsonFilter = JSON5.parse(state.jsonFilter.filter);
-        } catch (err) {
-            err.id = 'invalid-json';
-            throw err;
-        }
-    } else if (state.filters.enabled) {
-        const filters = {};
-        for (const id in state.filters.filters) {
-            const filter = state.filters.filters[id];
-            if (filter.enabled) filters[id] = filter.value;
-        }
-
-        if (Object.keys(filters).length) {
-            options.filters = filters;
-            usedFilters = true;
-        }
-    }
-
-    return {
-        options,
-        usedFilters,
-    };
-}
-
-const handleRequest = core => async function handleRequest (state) {
-    const { options } = stateToRequestData(state);
-
-    const res = await core.createTask('codeholders/list', {}, options).runOnceAndDrop();
-
-    return {
-        items: res.items,
-        transientFields: res.transientFields,
-        stats: {
-            time: res.stats.time,
-            total: res.total,
-            filtered: res.stats.filtered,
-            cursed: res.cursed,
-        },
-    };
-};
-
-const additionalDetailFields = [
-    'id',
-    'profilePictureHash',
-    'address.country',
-    'address.countryArea',
-    'address.city',
-    'address.cityArea',
-    'address.streetAddress',
-    'address.postalCode',
-    'address.sortingCode',
-];
-
-const handleDetailRequest = core => function handleDetailRequest (id) {
-    return core.createTask('codeholders/codeholder', {}, {
-        id,
-        fields: ['name', 'code'], // TODO: fix this
-    }).runOnceAndDrop();
-};
-
-function deepEq (a, b) {
-    if (a === b) return true;
-    if (Array.isArray(a) && Array.isArray(b)) {
-        if (a.length !== b.length) return false;
-        for (let i = 0; i < a.length; i++) {
-            if (!deepEq(a[i], b[i])) return false;
-        }
-        return true;
-    }
-    if (typeof a === 'object' && typeof b === 'object') {
-        const aKeys = Object.keys(a);
-        const bKeys = Object.keys(b);
-        for (const k of aKeys) if (!bKeys.includes(k)) return false;
-        for (const k of bKeys) if (!aKeys.includes(k)) return false;
-
-        for (const k of aKeys) {
-            if (!deepEq(a[k], b[k])) return false;
-        }
-        return true;
-    }
-    return false;
-}
-
-const handleDetailPatch = core => function handleDetailPatch (id, original, value, modCmt) {
-    const diff = {};
-    for (const key in value) {
-        if (!deepEq(original[key], value[key])) {
-            diff[key] = value[key] || null;
-        }
-    }
-
-    const options = {};
-    if (modCmt) options.modCmt = modCmt;
-
-    throw new Error('todo');
-    // return client.patch(`/codeholders/${id}`, diff, options);
-};
-
-const handleFieldHistory = core => async function handleFieldHistory (id, field, offset) {
-    throw new Error('todo');
-
-    /*const mappedFields = [field]; // TODO: map
-    const history = new Map();
-
-    for (const field of mappedFields) {
-        const res = await client.get(`/codeholders/${id}/hist/${field}`, {
-            fields: ['val', 'modId', 'modTime', 'modBy', 'modCmt'],
-            limit: 100,
-            offset,
-        });
-        for (const item of res.body) {
-            let value = {};
-            if (history.has(item.modId)) {
-                value = history.get(item.modId).val;
-            }
-            Object.assign(value, item.val);
-            item.val = value;
-            history.set(item.modId, item);
-        }
-    }
-
-    return [...history.values()].sort((a, b) => a.modTime - b.modTime);*/
-};

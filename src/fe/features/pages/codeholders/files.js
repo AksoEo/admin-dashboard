@@ -86,7 +86,7 @@ export default function Files ({ id }) {
                         open={uploading}
                         onClose={() => setUploading(false)}
                         core={core} />
-                    </Fragment>}
+                </Fragment>}
             </coreContext.Consumer>
         </div>
     );
@@ -181,6 +181,9 @@ function UploadDialog ({ id, open, onClose, file, core }) {
 }
 
 function FileThumbnail ({ file, id, mime }) {
+    // TODO: this
+    void id;
+    void mime;
     // upload dialog preview
     if (file) return <div class="file-thumbnail">?<FileIcon /></div>;
 

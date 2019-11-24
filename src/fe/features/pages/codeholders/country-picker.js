@@ -16,10 +16,10 @@ export default function CountryPicker (props) {
     return (
         <WithCountries>
             {(countries, countryGroups) => (
-            <CountryPickerInnerComponent
-                {...props}
-                countries={countries}
-                countryGroups={countryGroups} />
+                <CountryPickerInnerComponent
+                    {...props}
+                    countries={countries}
+                    countryGroups={countryGroups} />
             )}
         </WithCountries>
     );

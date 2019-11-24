@@ -1,6 +1,6 @@
 //! Country utilities.
 
-import { h, Component } from 'preact';
+import { h } from 'preact';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import { connect } from '../../core/connection';
 

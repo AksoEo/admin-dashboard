@@ -10,7 +10,7 @@ import {
 import './style';
 
 export default {
-    update ({ open, core, task }) {
+    update ({ open, task }) {
         const buttonValidator = useRef(null);
         const [error, setError] = useState(null);
 
@@ -75,8 +75,6 @@ export default {
         );
     },
     delete ({ open, core, task }) {
-        const buttonValidator = useRef(null);
-
         return (
             <Dialog
                 backdrop
@@ -95,7 +93,7 @@ export default {
                                 message: err.toString(),
                             });
                         }),
-                    }
+                    },
                 ]}>
                 {locale.deleteDescription}
             </Dialog>

@@ -60,7 +60,7 @@ export default class WorkerInterface extends EventEmitter {
                 parameters,
             });
         } catch (err) {
-            console.error('failed to update task', task.id, parameters);
+            console.error('failed to update task', task.id, parameters); // eslint-disable-line no-console
         }
     }
     runTask (task) {

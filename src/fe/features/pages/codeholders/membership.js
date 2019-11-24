@@ -117,7 +117,7 @@ export default class MembershipEditor extends PureComponent {
                         itemHeight={56}
                         onRemove={canEdit && (item =>
                             this.context.createTask('codeholders/deleteMembership', {
-                                id: this.props.id
+                                id: this.props.id,
                             }, { membership: item.id }).runOnceAndDrop())}
                         renderItem={item => (
                             <div class="membership-item">

@@ -55,7 +55,7 @@ export default class OverviewList extends PureComponent {
     /// last time a page change button was pressed
     #lastPageChangeTime = 0;
 
-    load (id) {
+    load () {
         if (this.#currentTask) this.#currentTask.drop();
         const { task, options, parameters } = this.props;
         this.setState({ loading: true });
@@ -79,13 +79,11 @@ export default class OverviewList extends PureComponent {
                 this.#skipNextDebounce = false;
                 clearTimeout(this.#reloadTimeout);
                 this.load();
-            } else {
-                if (!this.#reloadTimeout) {
-                    this.#reloadTimeout = setTimeout(() => {
-                        this.#reloadTimeout = null;
-                        this.load();
-                    }, DEBOUNCE_TIME);
-                }
+            } else if (!this.#reloadTimeout) {
+                this.#reloadTimeout = setTimeout(() => {
+                    this.#reloadTimeout = null;
+                    this.load();
+                }, DEBOUNCE_TIME);
             }
             this.#stale = false;
         }
@@ -198,8 +196,7 @@ export default class OverviewList extends PureComponent {
                 index={i}
                 expanded={expanded}
                 lastCollapseTime={this.#lastCollapseTime}
-                locale={localizedFields} />
-            ));
+                locale={localizedFields} />));
         }
 
         return (

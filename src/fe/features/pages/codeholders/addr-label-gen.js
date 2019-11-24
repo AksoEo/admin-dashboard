@@ -304,7 +304,7 @@ class AddrLabelStats extends PureComponent {
         options.jsonFilter = {
             filter: options.jsonFilter && !options.jsonFilter._disabled
                 ? { $and: [jsonFilter, addressFilter] }
-                : addressFilter
+                : addressFilter,
         };
         options.offset = 0;
         options.limit = 1;

@@ -27,7 +27,7 @@ function NavItem ({ item, currentPage }) {
 }
 
 /** Renders a sidebar category. */
-function NavCategory ({ item, currentPage, permissions }) {
+function NavCategory ({ item, currentPage }) {
     const { id, contents } = item;
     const label = localePages[id] ? <DrawerLabel>{localePages[id]}</DrawerLabel> : null;
 

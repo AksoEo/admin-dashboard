@@ -187,7 +187,8 @@ export function decodeURLQuery (data, filters) {
             const [filter, len] = decodeParens(data);
             data = data.substr(len);
             // TODO: decode this
-            console.error('did not decode json filter because i didnt implement that yet');
+            void filter;
+            console.error('did not decode json filter because i didnt implement that yet'); // eslint-disable-line no-console
         } else if (section[1] === 'filter') {
             if (!parameters.filters) parameters.filters = {};
             while (data.length) {
@@ -207,7 +208,6 @@ export function decodeURLQuery (data, filters) {
             }
         } else if (section[1] === 'fields') {
             if (!parameters.fields) parameters.fields = [];
-            let index = 0;
             while (data.length) {
                 const [id, idLen] = maybeDecodeParens(data, ':),');
                 data = data.substr(idLen);
@@ -224,7 +224,6 @@ export function decodeURLQuery (data, filters) {
 
                 if (data[0] !== ',') break;
                 else data = data.substr(1);
-                index++;
             }
         } else if (section[1] === 'pos') {
             const match = data.match(/^(\d+),(\d+)/);

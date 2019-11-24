@@ -53,7 +53,10 @@ export const login = {
     totpSetupDescription: 'Bonvolu skani la QR-kodon per via aplikaĵo por agordi dua-faktoran ensaluton.',
     totpAppDescriptionPre: 'Se vi ne havas dua-faktoran aplikaĵon, ni rekomendas ',
     totpAppName: 'Authy',
-    totpAppHref: userAgent => 'https://authy.com/download/',
+    totpAppHref: userAgent => {
+        void userAgent;
+        return 'https://authy.com/download/';
+    },
     totpAppDescriptionPost: '.',
 
     totp: 'Sekurkodo',
@@ -125,9 +128,9 @@ export const search = {
         return `Montras ${count} rezulto${plural(count)}n ${
             filtered ? `filtrita${plural(count)}n ` : ''}el entute ${
             total} trovita${plural(total)} en ${time
-                .replace('.', ',')
-                // put a space before the unit
-                .replace(/ms/, ' ms')}`;
+            .replace('.', ',')
+            // put a space before the unit
+            .replace(/ms/, ' ms')}`;
     },
     prevPage: 'Antaŭa',
     nextPage: 'Sekva',
@@ -302,7 +305,7 @@ export const codeholders = {
     fieldHistory: {
         title: 'Historio',
         comment: 'Priskribo de ŝanĝoj',
-        changedBy: 'Ŝanĝita de'
+        changedBy: 'Ŝanĝita de',
     },
 };
 

@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 
 /// An event proxy---essentially just binds events for the lifetime of the preact node.

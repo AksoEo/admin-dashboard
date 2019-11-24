@@ -730,7 +730,7 @@ export const tasks = {
         // need to update profilePictureHash
         // but we don’t await this because when this fails it shouldn’t display an error
         tasks.codeholder({}, { id, fields: ['profilePictureHash'] }).catch(err => {
-            console.error('failed to fetch new profile picture hash', err); // eslint-disable no-console
+            log.error('failed to fetch new profile picture hash', err);
         });
     },
     /// codeholders/listFiles: lists files for a codeholder
@@ -828,7 +828,7 @@ export const tasks = {
         // need to update membership
         // but we don’t await this because when this fails it shouldn’t display an error
         tasks.codeholder({}, { id, fields: ['membership'] }).catch(err => {
-            console.error('failed to fetch new memberships', err); // eslint-disable no-console
+            log.error('failed to fetch new memberships', err);
         });
     },
     /// codeholders/deleteMembership: deletes a membership
@@ -846,7 +846,7 @@ export const tasks = {
         // need to update membership
         // but we don’t await this because when this fails it shouldn’t display an error
         tasks.codeholder({}, { id, fields: ['membership'] }).catch(err => {
-            console.error('failed to fetch new memberships', err); // eslint-disable no-console
+            log.error('failed to fetch new memberships', err);
         });
     },
     /// codeholders/makeAddressLabels: spawns a task on the server
@@ -949,7 +949,7 @@ export const tasks = {
         }
 
         const modsByTime = Object.keys(mods).sort((a, b) => mods[a].time - mods[b].time);
-        let currentData = {};
+        const currentData = {};
         for (const k of modsByTime) {
             // we’re operating under the assumption that not all fields might change for a given mod
             // so with multiple api fields, we might only have partial data sometimes

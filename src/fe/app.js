@@ -1,6 +1,5 @@
 import { h, Component } from 'preact';
-import { Suspense } from 'preact/compat';
-import { AppBarProvider, AppBarConsumer, CircularProgress } from '@cpsdqs/yamdl';
+import { AppBarProvider, AppBarConsumer } from '@cpsdqs/yamdl';
 import Sidebar from './features/sidebar';
 import { routerContext } from './router';
 import Navigation from './features/navigation';
@@ -64,30 +63,6 @@ export default class App extends Component {
     render () {
         let className = 'akso-app';
         if (this.props.animateIn) className += ' animate-in';
-
-        // TODO: remove this
-        const compatPermissionsDummy = {
-            memberFilter: {},
-            hasPermission: () => true,
-        };
-
-        // TODO: remove this
-        /*
-        const PageComponent = this.getPageComponent();
-        const pageContents = (
-            <Suspense fallback={
-                <div className="app-page loading">
-                    <CircularProgress class="page-loading-indicator" indeterminate />
-                </div>
-            }>
-                <PageComponent
-                    path={this.state.currentPage.path}
-                    match={this.state.currentPage.match}
-                    query={this.state.currentPage.query}
-                    ref={page => this.currentPage = page}
-                    permissions={compatPermissionsDummy} />
-            </Suspense>
-        );*/
 
         return (
             <routerContext.Provider value={{

@@ -330,7 +330,7 @@ class FileCropDialog extends Component {
         canvas.toBlob(blob => {
             // TODO: make this a task view instead of creating the task here
             this.context.createTask('codeholders/setProfilePicture', {
-                id: this.props.id
+                id: this.props.id,
             }, {
                 blob,
             }).runOnceAndDrop().then(this.props.onSuccess).catch(err => {
