@@ -79,6 +79,7 @@ export default class Task extends EventEmitter {
         this.state = TaskState.ENDED;
         this.emit('success', result);
         this.emit('result', 'success', result);
+        this.emit('drop');
     }
 
     drop () {

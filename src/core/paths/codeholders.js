@@ -713,7 +713,7 @@ export const tasks = {
         await client.patch(`/codeholders/${id}`, diff, options);
 
         // also update data in store
-        store.insert([CODEHOLDERS, storeId], deepMerge(existing, clientFromAPI(diff)));
+        store.insert([CODEHOLDERS, storeId], deepMerge(existing, codeholderData));
     },
     /// codeholders/setProfilePicture: sets a codeholder’s profile picture
     ///

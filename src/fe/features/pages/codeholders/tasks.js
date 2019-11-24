@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useRef, useState } from 'preact/compat';
-import { Dialog, TextField, Button, CircularProgress } from '@cpsdqs/yamdl';
+import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
 import Form, { Validator } from '../../../components/form';
 import {
     codeholders as locale,
@@ -89,7 +89,7 @@ export default {
                     {
                         label: locale.delete,
                         action: () => task.runOnceAndDrop().catch(err => {
-                            core.createTask('error', {
+                            core.createTask('info', {
                                 message: err.toString(),
                             });
                         }),

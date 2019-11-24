@@ -290,11 +290,11 @@ function Header ({ item, editing, onItemChange, createHistoryLink }) {
                         item={item}
                         editing={editing}
                         onChange={code => onItemChange({ ...item, code })} />
-                    {createHistoryLink('code')}
+                    {!editing && createHistoryLink('code')}
                 </div>
-                <MembershipEditor
+                {!editing && <MembershipEditor
                     id={item.id}
-                    canEdit={todoGetPerms('codeholders.update')} />
+                    canEdit={todoGetPerms('codeholders.update')} />}
             </div>
             <div class="decorative-flourish" />
         </div>
