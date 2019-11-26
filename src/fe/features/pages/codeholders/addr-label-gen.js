@@ -6,7 +6,7 @@ import {
     CardStackProvider, CardStackRenderer, CardStackItem,
 } from '../../../components/card-stack';
 import { coreContext } from '../../../core/connection';
-import locale from '../../../locale';
+import { codeholders as locale } from '../../../locale';
 
 export default function AddrLabelGenContainer ({
     open, lvIsCursed, options, onClose,
@@ -26,7 +26,7 @@ export default function AddrLabelGenContainer ({
                             menu={<Button icon small onClick={onClose}>
                                 <MenuIcon type="close" />
                             </Button>}
-                            title={locale.members.addrLabelGen.title}
+                            title={locale.addrLabelGen.title}
                             priority={9} />
                     }>
                     <coreContext.Consumer>
@@ -49,11 +49,11 @@ export default function AddrLabelGenContainer ({
                 onClose={() => setShowSuccess(false)}
                 actions={[
                     {
-                        label: locale.members.addrLabelGen.closeDialog,
+                        label: locale.addrLabelGen.closeDialog,
                         action: () => setShowSuccess(false),
                     },
                 ]}>
-                {locale.members.addrLabelGen.success}
+                {locale.addrLabelGen.success}
             </Dialog>
         </Fragment>
     );
@@ -98,7 +98,7 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
     return (
         <div class="addr-label-gen">
             {lvIsCursed ? <div class="cursed-notice">
-                {locale.members.addrLabelGen.cursedNotice}
+                {locale.addrLabelGen.cursedNotice}
             </div> : null}
             <div class="addr-label-gen-inner">
                 <GenPreview value={settings} options={options} />
@@ -107,7 +107,7 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
             <footer class="addr-label-gen-footer">
                 <span class="phantom" />
                 <Button raised class="generate-btn" onClick={sendRequest} disabled={isLoading}>
-                    {locale.members.addrLabelGen.generate}
+                    {locale.addrLabelGen.generate}
                 </Button>
             </footer>
             <Dialog
@@ -116,13 +116,13 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
                 onClose={() => setResultOpen(false)}
                 actions={[
                     {
-                        label: locale.members.addrLabelGen.closeDialog,
+                        label: locale.addrLabelGen.closeDialog,
                         action: () => setResultOpen(false),
                     },
                 ]}>
                 {(error || '').toString().includes('423')
-                    ? locale.members.addrLabelGen.alreadySubmitted
-                    : locale.members.addrLabelGen.genericError}
+                    ? locale.addrLabelGen.alreadySubmitted
+                    : locale.addrLabelGen.genericError}
             </Dialog>
         </div>
     );
@@ -148,7 +148,7 @@ const U16Editor = boundedInteger(0, 65535);
 const SETTINGS = {
     language: ({ value, onChange }) => (
         <NativeSelect value={value} onChange={e => onChange(e.target.value)}>
-            {Object.entries(locale.members.csvOptions.countryLocales)
+            {Object.entries(locale.csvOptions.countryLocales)
                 .map(([id, label]) => <option value={id} key={id}>{label}</option>)}
         </NativeSelect>
     ),
@@ -156,7 +156,7 @@ const SETTINGS = {
     includeCode: ValCheckbox,
     paper: ({ value, onChange }) => (
         <NativeSelect value={value} onChange={e => onChange(e.target.value)}>
-            {Object.entries(locale.members.addrLabelGen.paperSizes)
+            {Object.entries(locale.addrLabelGen.paperSizes)
                 .map(([id, label]) => <option value={id} key={id}>{label}</option>)}
         </NativeSelect>
     ),
@@ -173,7 +173,7 @@ const SETTINGS = {
 function GenSettings ({ value, onChange }) {
     const items = Object.entries(SETTINGS).map(([id, Editor]) => (
         <div class="settings-item" key={id} data-id={id}>
-            <label class="item-label">{locale.members.addrLabelGen.labels[id]}</label>
+            <label class="item-label">{locale.addrLabelGen.labels[id]}</label>
             <Editor value={value[id]} onChange={v => onChange({ ...value, [id]: v })} />
         </div>
     ));
@@ -340,7 +340,7 @@ class AddrLabelStats extends PureComponent {
         const { total, withAddresses } = this.state;
         return (
             <div class="stats">
-                {locale.members.addrLabelGen.stats({
+                {locale.addrLabelGen.stats({
                     total,
                     withAddresses,
                     perPage: value.rows * value.cols,
