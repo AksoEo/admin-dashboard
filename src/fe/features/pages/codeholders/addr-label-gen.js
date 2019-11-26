@@ -80,7 +80,6 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
         drawOutline: false,
     });
     const [isLoading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [resultOpen, setResultOpen] = useState(false);
 
     const sendRequest = () => {
@@ -89,7 +88,6 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
         core.createTask('codeholders/makeAddressLabels', options, settings)
             .runOnceAndDrop()
             .then(onSuccess).catch(err => {
-                setError(err);
                 console.error(err); // eslint-disable-line no-console
                 setResultOpen(true);
             }).then(() => setLoading(false));
@@ -120,9 +118,7 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
                         action: () => setResultOpen(false),
                     },
                 ]}>
-                {(error || '').toString().includes('423')
-                    ? locale.addrLabelGen.alreadySubmitted
-                    : locale.addrLabelGen.genericError}
+                {locale.addrLabelGen.genericError}
             </Dialog>
         </div>
     );
