@@ -449,16 +449,17 @@ const fields = {
         component ({ value, editing, onChange, item }) {
             if (editing) return <data.date.editor value={value} onChange={onChange} />;
 
-            const age = item.age
+            const age = item.age && item.age.now !== null
                 ? locale.fields.ageFormat(item.age.now, item.age.atStartOfYear)
                 : null;
+
+            let additional = null;
+            if (age) additional = ' · ' + locale.fields.age + ': ' + age;
 
             return (
                 <span class="birth-date">
                     <data.date.renderer value={value} />
-                    {' · '}
-                    {locale.fields.age + ': '}
-                    {age}
+                    {additional}
                 </span>
             );
         },
@@ -512,7 +513,6 @@ const fields = {
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }, {
         shouldHide: item => item.type !== 'human',
-        history: true,
     }),
     website: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;

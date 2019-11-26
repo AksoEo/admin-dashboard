@@ -22,7 +22,6 @@ export default class Detail extends Page {
     #commitTask;
 
     onCommit = changedFields => {
-        console.log(this.props.editing, this.#commitTask);
         if (!this.props.editing || this.#commitTask) return;
         if (!changedFields.length) {
             // nothing changed, so we can just pop the editing state

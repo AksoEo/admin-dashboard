@@ -85,10 +85,8 @@ export default class DetailView extends PureComponent {
     }
 
     beginCommit () {
-        console.log('form validation', this.#form.validate());
         if (!this.#form.validate()) return;
         const changes = this.getChangedFields();
-        console.log(changes);
         this.props.onCommit(changes);
     }
 
