@@ -226,7 +226,7 @@ export const codeholders = {
         biography: 'Biografio',
         careOf: 'P/a',
         creationTime: 'Horo de kreiĝo',
-        hasPassword: '[[has password]]',
+        hasPassword: 'Kreis konton',
     },
     nameSubfields: {
         legal: 'Jura nomo',
@@ -337,14 +337,14 @@ export const codeholders = {
             LEGAL: 'Legal',
             EXECUTIVE: 'Executive',
         },
-        cursedNotice: '[[there are items with a golden shine in the search results. they won’t show up in the generated data]]',
+        cursedNotice: 'Rezultoj trovitaj laŭ UEA-kodo markitaj per ora koloro ne aperos en la adresetikedoj.',
         generate: 'Krei etikedojn',
         success: 'Komencis generadon de viaj etikedoj. Vi ricevos sciigon/retmesaĝon kun alkroĉaĵo laŭeble baldaŭ.',
         extraDesc: '[[REMOVE THIS THANKS]]',
-        genericError: '[[failed to send request]]',
-        alreadySubmitted: '[[you already submitted a request, please wait for it to finish]]',
+        genericError: 'Ne sukcesis sendi la adresetikedpeton.',
+        alreadySubmitted: '[[REMOVE THIS THANKS]]',
         closeDialog: 'Fermi',
-        stats: ({ perPage, pages, total, withAddresses }) => `[[Found ${withAddresses} results (of a total ${total}) with postal addresses on record. On ${perPage} address${perPage === 1 ? '' : 'es'} per page that’s ${pages} page${pages === 1 ? '' : 's'}]]`,
+        stats: ({ perPage, pages, total, withAddresses }) => `Trovis ${withAddresses} rezultojn (el entute ${total}) kiuj havas poŝtadreson. Kun po ${perPage} adreso${perPage === 1 ? '' : 'j'} por paĝo, tio estos ${pages} paĝo${pages === 1 ? '' : 'j'}]]`,
     },
 };
 
