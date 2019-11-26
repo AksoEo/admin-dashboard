@@ -1,5 +1,4 @@
 import { h } from 'preact';
-import { Spring } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import SortIcon from '@material-ui/icons/Sort';
 import SaveIcon from '@material-ui/icons/Save';
@@ -10,6 +9,7 @@ import FieldPicker from '../../../components/field-picker';
 import { decodeURLQuery, encodeURLQuery } from '../../../components/list-url-coding';
 import Page from '../../../components/page';
 import { codeholders as locale, search as searchLocale } from '../../../locale';
+import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
@@ -98,21 +98,7 @@ export default class CodeholdersPage extends Page {
         lvSubmitted: false,
     };
 
-    /// Used to animate the scroll position when the page changes.
-    scrollSpring = new Spring(1, 0.4);
-
-    constructor (props) {
-        super(props);
-
-        this.scrollSpring.on('update', value => this.node.scrollTop = value);
-    }
-
-    scrollToTop = () => {
-        if (this.node.scrollTop > 0) {
-            this.scrollSpring.value = this.node.scrollTop;
-            this.scrollSpring.start();
-        }
-    };
+    static contextType = coreContext;
 
     // current url query state
     #currentQuery = '';
@@ -181,10 +167,6 @@ export default class CodeholdersPage extends Page {
         }
     }
 
-    componentWillUnmount () {
-        this.scrollSpring.stop();
-    }
-
     render ({ addrLabelGen }) {
         // overflow menu
         const menu = [];
@@ -194,8 +176,7 @@ export default class CodeholdersPage extends Page {
         menu.push({
             icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
             label: locale.create,
-            // FIXME: this should use a task
-            action: () => this.setState({ createOpen: true }),
+            action: () => this.context.createTask('codeholders/create'), // task view
         });
         // }
 

@@ -131,6 +131,8 @@ export class Validator extends Component {
         continuous: false,
     };
 
+    static contextType = FormContext;
+
     translateX = new Spring(0.4, 0.3);
 
     constructor (props) {
@@ -168,11 +170,11 @@ export class Validator extends Component {
     }
 
     componentDidMount () {
-        this.formContext.register(this);
+        this.context.register(this);
     }
 
     componentWillUnmount () {
-        this.formContext.deregister(this);
+        this.context.deregister(this);
         this.translateX.stop();
     }
 
@@ -195,18 +197,11 @@ export class Validator extends Component {
         }
 
         return (
-            <FormContext.Consumer>
-                {context => {
-                    this.formContext = context;
-                    return (
-                        <span class="form-validator" style={{
-                            transform: `translateX(${this.state.translateX}px)`,
-                        }} {...validatorProps}>
-                            {h(this.props.component, props, this.props.children)}
-                        </span>
-                    );
-                }}
-            </FormContext.Consumer>
+            <span class="form-validator" style={{
+                transform: `translateX(${this.state.translateX}px)`,
+            }} {...validatorProps}>
+                {h(this.props.component, props, this.props.children)}
+            </span>
         );
     }
 }

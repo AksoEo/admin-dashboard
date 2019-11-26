@@ -19,7 +19,7 @@ function TODOPage () {
     return <center>ankoraŭ ne skribis ĉi tiun paĝon</center>;
 }
 
-// Parses a URL and state into a stack and task list. State is nullable.
+// Parses a URL and state into a stack. State is nullable.
 function parseHistoryState (url, state, mkPopStack) {
     const stackState = state && Array.isArray(state.stack) ? state.stack : [];
 
@@ -45,8 +45,6 @@ function parseHistoryState (url, state, mkPopStack) {
     const stack = [];
     // the subset of stack items that are views
     const viewStack = [];
-    // core tasks we should create
-    const tasks = {};
     // current page object from the router
     let cursor;
 
@@ -129,9 +127,6 @@ function parseHistoryState (url, state, mkPopStack) {
                         path: part,
                         source: subpage,
                     });
-                } else if (subpage.type === 'task') {
-                    // TODO: maybe use a map fn for options instead?
-                    tasks[subpage.task] = subpage.options || {};
                 } else {
                     throw new Error(`unknown subpage type ${subpage.type}`);
                 }
@@ -178,7 +173,6 @@ function parseHistoryState (url, state, mkPopStack) {
             : currentLocation,
         stack,
         viewStack,
-        tasks,
         pathname: url.pathname,
         query: urlQuery,
     };
@@ -206,8 +200,6 @@ export default class Navigation extends PureComponent {
         // - meta: optional object { title, actions } for the app bar
         // - pathMatch: regex match of the path part
         stack: [],
-        // map from task names to Task objects
-        tasks: {},
         // current url pathname
         pathname: '',
         // current url query (does not include the question mark)
@@ -226,7 +218,6 @@ export default class Navigation extends PureComponent {
             currentLocation,
             currentPageId,
             stack,
-            tasks,
             pathname,
             query,
         } = parseHistoryState(url, state, index => replace => this.popStackAt(index, replace));
@@ -254,7 +245,7 @@ export default class Navigation extends PureComponent {
             } else newStack[i] = stack[i];
         }
 
-        this.setState({ stack: newStack, tasks, pathname, query });
+        this.setState({ stack: newStack, pathname, query });
     }
 
     onPopState = e => this.loadURL(document.location.href, e.state);

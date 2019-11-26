@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 import { AppBarProvider, AppBarConsumer } from '@cpsdqs/yamdl';
 import Sidebar from './features/sidebar';
-import { routerContext } from './router';
 import Navigation from './features/navigation';
 import EventProxy from './components/event-proxy';
 import './app.less';
@@ -65,34 +64,30 @@ export default class App extends Component {
         if (this.props.animateIn) className += ' animate-in';
 
         return (
-            <routerContext.Provider value={{
-                navigate: this.onRouterNavigationRequest,
-            }}>
-                <div class={className}>
-                    <EventProxy dom target={window} onresize={this.onResize} />
-                    <Sidebar
-                        permanent={this.state.permaSidebar}
-                        open={this.state.sidebarOpen || this.state.permaSidebar}
-                        onOpen={() => this.setState({ sidebarOpen: true })}
-                        onClose={() => this.setState({ sidebarOpen: false })}
-                        currentPage={this.state.currentPage}
-                        onDirectTransition={this.props.onDirectTransition}
-                        onDoAnimateIn={() => this.setState({ animateIn: true })} />
-                    <AppBarProvider>
-                        <div class="app-contents">
-                            <AppBarConsumer
-                                // TODO: use this el for document.title
-                                class="app-header" />
-                            <Navigation
-                                ref={view => this.#navigation = view}
-                                permaSidebar={this.state.permaSidebar}
-                                onOpenMenu={() => this.setState({ sidebarOpen: true })}
-                                onCurrentPageChange={this.onCurrentPageChange}
-                                onNavigate={this.onNavigate} />
-                        </div>
-                    </AppBarProvider>
-                </div>
-            </routerContext.Provider>
+            <div class={className}>
+                <EventProxy dom target={window} onresize={this.onResize} />
+                <Sidebar
+                    permanent={this.state.permaSidebar}
+                    open={this.state.sidebarOpen || this.state.permaSidebar}
+                    onOpen={() => this.setState({ sidebarOpen: true })}
+                    onClose={() => this.setState({ sidebarOpen: false })}
+                    currentPage={this.state.currentPage}
+                    onDirectTransition={this.props.onDirectTransition}
+                    onDoAnimateIn={() => this.setState({ animateIn: true })} />
+                <AppBarProvider>
+                    <div class="app-contents">
+                        <AppBarConsumer
+                            // TODO: use this el for document.title
+                            class="app-header" />
+                        <Navigation
+                            ref={view => this.#navigation = view}
+                            permaSidebar={this.state.permaSidebar}
+                            onOpenMenu={() => this.setState({ sidebarOpen: true })}
+                            onCurrentPageChange={this.onCurrentPageChange}
+                            onNavigate={this.onNavigate} />
+                    </div>
+                </AppBarProvider>
+            </div>
         );
     }
 }

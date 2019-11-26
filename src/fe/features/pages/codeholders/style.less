@@ -564,6 +564,10 @@
             }
         }
 
+        .codeholder-website-link {
+            color: inherit;
+        }
+
         .detail-view-contents.is-editing .member-header .member-picture-container .edit-overlay {
             opacity: 1;
         }
@@ -894,44 +898,6 @@
     }
 }
 
-.members-add-member-dialog {
-    .form-validator {
-        display: flex;
-        justify-content: center;
-
-        .form-field {
-            margin: 0 20px 32px;
-        }
-    }
-
-    .text-field {
-        width: 300px;
-    }
-
-    .form-footer {
-        text-align: center;
-        padding-bottom: 16px;
-    }
-
-    .progress-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-
-        & + span {
-            opacity: 0;
-        }
-    }
-
-    .form-error {
-        text-align: center;
-        padding-bottom: 16px;
-        color: @error;
-        font-size: small;
-    }
-}
-
 .membership-editor-dialog {
     width: 100%;
 
@@ -1049,7 +1015,7 @@
     }
 }
 
-.codeholders-task-update {
+.codeholders-task-create, .codeholders-task-update {
     width: 400px;
     max-width: 90%;
 
@@ -1058,7 +1024,7 @@
     }
 
     .update-comment {
-        dipslay: block;
+        display: block;
         width: 100%;
     }
 
@@ -1085,5 +1051,34 @@
         button .progress-overlay.indeterminate + span {
             opacity: 0;
         }
+    }
+
+    .form-validator {
+        display: flex;
+        justify-content: center;
+
+        .form-field {
+            margin: 0 20px 32px;
+        }
+    }
+
+    .form-error {
+        text-align: center;
+        padding-bottom: 16px;
+        color: @error;
+        font-size: small;
+    }
+}
+
+.codeholders-task-create {
+    .text-field {
+        width: 300px;
+    }
+
+    .form-footer {
+        display: block;
+        text-align: center;
+        padding-bottom: 16px;
+        margin-top: 0;
     }
 }

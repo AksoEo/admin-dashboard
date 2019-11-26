@@ -97,6 +97,8 @@ const validators = {
 };
 
 function NameEditor ({ value, item, editing, onChange, noIcon, createHistoryLink }) {
+    if (!value) return null;
+
     // use actual type or heuristics otherwise
     const itemType = item.type || (value && value.firstLegal ? 'human' : 'org');
 
@@ -513,9 +515,20 @@ const fields = {
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }, {
         shouldHide: item => item.type !== 'human',
+        history: true,
     }),
     website: simpleField(function ({ value, editing, onChange }) {
-        if (!editing) return value;
+        if (!editing) {
+            return (
+                <a
+                    class="codeholder-website-link"
+                    href={value}
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    {value}
+                </a>
+            );
+        }
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }, {
         history: true,
@@ -540,6 +553,12 @@ const fields = {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
         history: true,
+    }),
+    hasPassword: simpleField(function ({ value }) {
+        return <Checkbox class="fixed-checkbox" checked={value} />;
+    }, {
+        isEmpty: value => !value,
+        shouldHide: (_, editing) => editing,
     }),
     notes: {
         component ({ value, editing, onChange }) {

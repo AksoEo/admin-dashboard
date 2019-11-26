@@ -85,11 +85,6 @@ export default [
                         type: 'state',
                         state: 'addrLabelGen',
                     },
-                    {
-                        path: 'aldoni',
-                        type: 'task',
-                        task: 'codeholders/create',
-                    },
                 ],
             },
             {

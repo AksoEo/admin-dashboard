@@ -147,7 +147,7 @@ export default class PaperList extends PureComponent {
                 const bottom = paperSpanEnd;
                 paper.push(
                     <div
-                        key={paperKey++}
+                        key={'p' + (paperKey++)}
                         class="paper"
                         style={{
                             transform: `translateY(${top}px)`,

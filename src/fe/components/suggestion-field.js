@@ -4,6 +4,12 @@ import { TextField, Button, globalAnimator } from '@cpsdqs/yamdl';
 import fuzzaldrin from 'fuzzaldrin';
 import './suggestion-field.less';
 
+// appending directly to document.body causes weird glitches when a suggestion field is inside
+// a dialog
+const suggestionFieldRootContainer = document.createElement('div');
+suggestionFieldRootContainer.id = 'suggestion-field-root-container';
+document.body.appendChild(suggestionFieldRootContainer);
+
 /// A text field with suggestions that behaves like a typical browser address bar.
 ///
 /// # Props
@@ -79,7 +85,7 @@ export default function SuggestionField ({
     const onButtonClick = suggestion => e => {
         e.preventDefault(); // prevent form submit
         if (onSelect(suggestion)) {
-            onChange(suggestion.toString(0));
+            onChange(suggestion.toString());
         }
     };
 
@@ -139,7 +145,7 @@ class SuggestionFieldRender extends Component {
                     onMouseDown={e => e.preventDefault()}>
                     {popoutContents}
                 </div>,
-                document.body,
+                suggestionFieldRootContainer,
             );
         }
 

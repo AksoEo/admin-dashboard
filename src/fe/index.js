@@ -5,6 +5,7 @@ import { LoginAuthStates } from '../protocol';
 import isSpecialPage from './features/login/is-special-page';
 import { Worker } from './core';
 import { coreContext } from './core/connection';
+import { routerContext } from './router';
 import TaskView from './task-view';
 import './style';
 
@@ -140,6 +141,11 @@ class Session extends Component {
         for (const id of toBeRemoved) this.#taskViews.delete(id);
     };
 
+    #appRef = null;
+    #onRouterNavigationRequest = (...args) => {
+        if (this.#appRef) this.#appRef.onRouterNavigationRequest(...args);
+    };
+
     render () {
         const { loggedIn, showLogin, wasLoggedOut, specialPage, login: Login, app: App } = this.state;
 
@@ -149,7 +155,7 @@ class Session extends Component {
             login = <Login />;
         }
         if (loggedIn && App) {
-            app = <App animateIn={wasLoggedOut} />;
+            app = <App animateIn={wasLoggedOut} ref={view => this.#appRef = view} />;
         }
 
         const tasks = [];
@@ -161,12 +167,16 @@ class Session extends Component {
 
         return (
             <coreContext.Provider value={this.core}>
-                <Fragment>
-                    <LoadingIndicator loading={!login && !app} />
-                    {app}
-                    {login}
-                    {tasks}
-                </Fragment>
+                <routerContext.Provider value={{
+                    navigate: this.#onRouterNavigationRequest,
+                }}>
+                    <Fragment>
+                        <LoadingIndicator loading={!login && !app} />
+                        {app}
+                        {login}
+                        {tasks}
+                    </Fragment>
+                </routerContext.Provider>
             </coreContext.Provider>
         );
     }

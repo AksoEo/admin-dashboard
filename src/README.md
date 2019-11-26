@@ -73,7 +73,6 @@ There are several types of these subpaths:
 - `bottom` (stack bottom) will display a view as if it were a top-level page (admittedly the terminology gets a bit confusing here)
 - `stack` views will be added to the stack
 - `state` paths will not create any views but instead modify the state of the item below them in the stack (e.g. edit mode)
-- `task` paths will spawn tasks (preferably task views) instead, and will be *bound* to the task: when the task ends, the path will be removed from the url, and when the user navigates away, the task will be aborted (as best as we can; http requests aren’t exactly cancelable)
 
 #### Query Strings and URL Encoding
 Additionally, views may store state in a query string. If the view is below another in the page stack, then only the topmost view’s query string will be visible in the URL, but *all* views will have their state preserved in the `window.history` API’s state object. Views may also store additional arbitrary data in this state object, such as scroll position.
