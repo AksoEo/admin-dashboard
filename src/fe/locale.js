@@ -185,7 +185,7 @@ export const codeholders = {
             hasPassword: 'Kreis konton',
             membership: 'Membreckategorioj',
             isActiveMember: 'Aktiva membro iam en',
-            deathdate: 'Mortdato',
+            deathdate: 'Mortjaro',
         },
     },
     fields: {
