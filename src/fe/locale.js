@@ -184,7 +184,7 @@ export const codeholders = {
             birthdate: 'Naskiĝtago',
             hasPassword: 'Kreis konton',
             membership: 'Membreckategorioj',
-            isActiveMember: 'Aktiva membro en',
+            isActiveMember: 'Aktiva membro iam en',
             deathdate: 'Mortdato',
         },
     },
