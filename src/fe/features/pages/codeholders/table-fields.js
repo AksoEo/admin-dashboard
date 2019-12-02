@@ -94,6 +94,7 @@ export default {
             });
 
             render ({ value, item }) {
+                if (!value) return null;
                 const { type, isDead } = item;
 
                 if (type === 'human') {

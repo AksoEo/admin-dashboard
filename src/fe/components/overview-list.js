@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { PureComponent, createContext } from 'preact/compat';
 import { Button, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import NativeSelect from '@material-ui/core/NativeSelect';
 import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -222,6 +223,14 @@ export default class OverviewList extends PureComponent {
                 <div class="regular-pagination">
                     <div />
                     <div class="pagination-buttons">
+                        <NativeSelect value={parameters.limit} onChange={e => {
+                            this.props.onSetLimit(e.target.value | 0);
+                        }}>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </NativeSelect>
                         <Button class="page-button" icon onClick={this.onPrevPageClick} disabled={prevDisabled}>
                             <ArrowLeftIcon />
                         </Button>

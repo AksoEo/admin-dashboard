@@ -261,6 +261,7 @@ export default class CodeholdersPage extends Page {
                     fields={FIELDS}
                     onGetItemLink={id => `/membroj/${id}`}
                     onSetOffset={offset => this.setState({ options: { ...options, offset }})}
+                    onSetLimit={limit => this.setState({ options: { ...options, limit }})}
                     locale={locale.fields} />
                 <ListView
                     ref={view => this.listView = view}
