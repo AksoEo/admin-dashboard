@@ -106,6 +106,7 @@ export const tasks = {
                 body: {
                     key: Buffer.from(token, 'hex'),
                     password,
+                    org: 'akso',
                 },
                 _allowLoggedOut: true,
             });
@@ -127,6 +128,9 @@ export const tasks = {
                 method: 'POST',
                 path: `/codeholders/${login}/!${create ? 'create' : 'forgot'}_password`,
                 _allowLoggedOut: true,
+                body: {
+                    org: 'akso',
+                },
             });
         } catch (err) {
             throw { code: err.statusCode, message: err.toString() };
