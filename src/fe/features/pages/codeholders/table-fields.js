@@ -74,7 +74,7 @@ export default {
             const { old: oldCode, new: newCode } = value;
             return <data.ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
         },
-        stringify (value, item) {
+        stringify (value) {
             const { old: oldCode, new: newCode } = value;
             if (oldCode) {
                 const oldCodeCheckLetter = new AKSOUEACode(oldCode).getCheckLetter();
@@ -372,21 +372,21 @@ export default {
     },
     officePhone: {
         component: data.phoneNumber.inlineRenderer,
-        stringify (value, item) {
+        stringify (value) {
             if (!value) return '';
             return value.formatted;
         },
     },
     cellphone: {
         component: data.phoneNumber.inlineRenderer,
-        stringify (value, item) {
+        stringify (value) {
             if (!value) return '';
             return value.formatted;
         },
     },
     landlinePhone: {
         component: data.phoneNumber.inlineRenderer,
-        stringify (value, item) {
+        stringify (value) {
             if (!value) return '';
             return value.formatted;
         },
