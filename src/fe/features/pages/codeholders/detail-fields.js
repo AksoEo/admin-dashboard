@@ -9,6 +9,7 @@ import { codeholders as locale, data as dataLocale } from '../../../locale';
 import { Validator } from '../../../components/form';
 import data, { Required } from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
+import TinyProgress from '../../../components/tiny-progress';
 import ProfilePictureEditor from './profile-picture';
 import MembershipEditor from './membership';
 import Files from './files';
@@ -354,7 +355,7 @@ export class CodeholderAddressRenderer extends Component {
     }
 
     render () {
-        if (!this.state.address) return;
+        if (!this.state.address) return <TinyProgress />;
         return (
             <div class="codeholder-address-rendered">
                 {this.state.address
