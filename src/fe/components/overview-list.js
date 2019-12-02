@@ -12,9 +12,6 @@ import { LinkButton } from '../router';
 import { search as locale } from '../locale';
 import './overview-list.less';
 
-// TODO: auto-adjust page if empty
-// TODO: list header
-
 const DEBOUNCE_TIME = 400; // ms
 
 /// Renders an overview list over the items given by the specified task.
@@ -64,6 +61,12 @@ export default class OverviewList extends PureComponent {
         this.#currentTask.runOnceAndDrop().then(result => {
             if (this.#currentTask !== t) return;
             this.setState({ result, error: null, stale: false, loading: false });
+
+            if (this.props.parameters.offset >= result.total) {
+                // we’re out of bounds; adjust
+                const limit = this.props.parameters.limit;
+                this.props.onSetOffset(Math.floor(result.total / limit) * limit);
+            }
         }).catch(error => {
             if (this.#currentTask !== t) return;
             this.setState({ result: null, error, stale: false, loading: false });
@@ -312,13 +315,16 @@ class DynamicHeightDiv extends PureComponent {
 
 function ListHeader ({ fields, selectedFields, locale }) {
     // FIXME: duplicate code with below
-    const weightSum = selectedFields.map(x => fields[x.id].weight || 1).reduce((a, b) => a + b);
-    const unit = Math.max(10, 100 / weightSum);
+    const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
+    const weightSum = fieldWeights.reduce((a, b) => a + b);
+    const actualUnit = 100 / weightSum;
+    const unit = Math.max(10, actualUnit);
+
     const style = {
-        gridTemplateColumns: selectedFields
-            .map(x => ((fields[x.id].weight || 1) * unit) + '%')
-            .join(' '),
+        gridTemplateColumns: fieldWeights.map(x => (x * actualUnit) + '%').join(' '),
+        width: weightSum * unit > 100 ? `${weightSum / unit * 100}%` : null,
     };
+    style.maxWidth = style.width;
 
     const cells = selectedFields.map(({ id }) => (
         <div key={id} class="list-header-cell">
@@ -410,20 +416,22 @@ const ListItem = connect(props => (['codeholders/codeholder', {
             );
         });
 
-        const weightSum = selectedFields.map(x => fields[x.id].weight || 1).reduce((a, b) => a + b);
-        const unit = Math.max(10, 100 / weightSum);
+        const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
+        const weightSum = fieldWeights.reduce((a, b) => a + b);
+        const actualUnit = 100 / weightSum;
+        const unit = Math.max(10, actualUnit);
 
         const constOffset = this.#inTime === 5 ? 0 : 15 * Math.exp(-10 * this.#inTime);
         const spreadFactor = this.#inTime === 5 ? 0 : 4 * Math.exp(-10 * this.#inTime);
         const yOffset = this.#yOffset.value;
 
         const style = {
-            gridTemplateColumns: selectedFields
-                .map(x => ((fields[x.id].weight || 1) * unit) + '%')
-                .join(' '),
+            gridTemplateColumns: fieldWeights.map(x => (x * actualUnit) + '%').join(' '),
+            width: weightSum * unit > 100 ? `${weightSum / unit * 100}%` : null,
             transform: `translateY(${(constOffset + spreadFactor * index) * 10 + yOffset}px)`,
             opacity: Math.max(0, Math.min(1 - spreadFactor * index / 2, 1)),
         };
+        style.maxWidth = style.width;
 
         const itemLink = onGetItemLink ? onGetItemLink(id) : null;
         const ItemComponent = onGetItemLink ? LinkButton : 'div';

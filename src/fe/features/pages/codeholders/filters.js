@@ -12,7 +12,7 @@ import locale from '../../../locale';
 import CountryPicker from './country-picker';
 import MulticolList from '../../../components/multicol-list';
 
-// TEMP
+// TEMP: replace with actual multi-<select> when available
 const MembershipCategoryPicker = connect('memberships/categories')(data => ({
     availableCategories: data,
 }))(function MembershipCategoryPicker ({ value, onChange, availableCategories }) {
