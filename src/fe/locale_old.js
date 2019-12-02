@@ -359,6 +359,7 @@ export default {
             code: 'UEA-kodo',
             country: 'Lando',
             disjunctCountry: (fee, country) => `Pagas laŭ ${fee}, loĝas en ${country}`,
+            disjunctCountryCSV: (fee, country) => `Pago: ${fee}, Loĝo: ${country}`,
             age: 'Aĝo',
             ageFormat: (age, agep) => `${age} (${agep} jarkomence)`,
             email: 'Retpoŝtadreso',

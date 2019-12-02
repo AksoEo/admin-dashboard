@@ -10,21 +10,12 @@ import { decodeURLQuery, encodeURLQuery } from '../../../components/list-url-cod
 import Page from '../../../components/page';
 import { codeholders as locale, search as searchLocale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
+import CSVExport from '../../../components/csv-export';
 import Meta from '../../meta';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
-import AddMemberDialog from './add-member';
 import AddrLabelGen from './addr-label-gen';
 import './style';
-
-// TODO: remove this
-function ListView () {
-    return '';
-}
-const Sorting = {};
-const Title = () => 'title';
-
-// TODO: use core api properly
 
 const SEARCHABLE_FIELDS = [
     'nameOrCode',
@@ -86,16 +77,8 @@ export default class CodeholdersPage extends Page {
 
         // whether the filters list is expanded
         expanded: false,
-
         fieldPickerOpen: false,
-
-        /// If true, the create codeholder dialog is open.
-        createOpen: false,
-        /// If true, the address label generator dialog is open.
-        addrLabelGenOpen: false,
-        /// Derived from list view state.
-        lvJSONFilterEnabled: false,
-        lvSubmitted: false,
+        csvExportOpen: false,
     };
 
     static contextType = coreContext;
@@ -171,14 +154,11 @@ export default class CodeholdersPage extends Page {
         // overflow menu
         const menu = [];
 
-        // TODO: this one
-        // if (this.props.permissions.hasPermission('codeholders.create')) {
         menu.push({
             icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
             label: locale.create,
             action: () => this.context.createTask('codeholders/create'), // task view
         });
-        // }
 
         menu.push({
             icon: <SortIcon style={{ verticalAlign: 'middle' }} />,
@@ -186,21 +166,11 @@ export default class CodeholdersPage extends Page {
             action: () => this.setState({ fieldPickerOpen: true }),
         });
 
-        // TODO
-        /*
-        menu.push({
-            label: this.state.lvJSONFilterEnabled
-                ? locale.listView.json.disable
-                : locale.listView.json.enable,
-            action: () => this.listView.setJSONFilterEnabled(!this.state.lvJSONFilterEnabled),
-            overflow: true,
-        });
-        */
         if (!this.state.expanded) {
             menu.push({
                 icon: <SaveIcon style={{ verticalAlign: 'middle' }} />,
                 label: searchLocale.csvExport,
-                action: () => this.listView.openCSVExport(),
+                action: () => this.setState({ csvExportOpen: true }),
                 overflow: true,
             });
             if (!addrLabelGen) {
@@ -263,102 +233,26 @@ export default class CodeholdersPage extends Page {
                     onSetOffset={offset => this.setState({ options: { ...options, offset }})}
                     onSetLimit={limit => this.setState({ options: { ...options, limit }})}
                     locale={locale.fields} />
-                <ListView
-                    ref={view => this.listView = view}
-                    defaults={{
-                        searchField: 'nameOrCode',
-                        fixedFields: [{
-                            id: 'type',
-                            sorting: Sorting.NONE,
-                        }],
-                        fields: [
-                            {
-                                id: 'code',
-                                sorting: Sorting.ASC,
-                            },
-                            {
-                                id: 'name',
-                                sorting: Sorting.NONE,
-                            },
-                            {
-                                id: 'age',
-                                sorting: Sorting.NONE,
-                            },
-                            {
-                                id: 'membership',
-                                sorting: Sorting.NONE,
-                            },
-                            {
-                                id: 'country',
-                                sorting: Sorting.NONE,
-                            },
-                        ],
-                    }}
-                    title={<Title />}
-                    searchFields={SEARCHABLE_FIELDS}
-                    filters={FILTERS}
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    task="codeholders/list"
+                    parameters={options}
                     fields={FIELDS}
-                    fieldConfigColumn={'codeholderType'}
-                    // onRequest={handleRequest(core)}
-                    isRestrictedByGlobalFilter={!!(
-                        // TODO: this
-                        // Object.keys(this.props.permissions.memberFilter).length
-                        false
-                    )}
+                    detailView="codeholders/codeholder"
+                    detailViewOptions={id => ({ id, noFetch: true })}
                     locale={{
-                        searchFields: locale.search.fields,
-                        placeholders: locale.search.placeholders,
-                        filters: locale.search.filters,
-                        fields: locale.fields,
-                        csvFields: locale.csvFields,
-                        csvFilename: locale.csvFilename,
-                        detail: locale.detail,
+                        fields: Object.assign({}, locale.fields, locale.csvFields),
                     }}
-                    detailView={this.state.detail}
-                    // onURLQueryChange={this.urlHandler.onURLQueryChange}
-                    // onDetailClose={this.urlHandler.onDetailClose}
-                    // getLinkTarget={this.urlHandler.getLinkTarget}
-                    //detailFields={detailFields.fields}
-                    //detailHeader={detailFields.header}
-                    //detailFooter={detailFields.footer}
-                    // onDetailRequest={handleDetailRequest(core)}
-                    //onDetailPatch={this.props.permissions.hasPermission('codeholders.update')
-                    //    && handleDetailPatch(core)}
-                    //onDetailDelete={this.props.permissions.hasPermission('codeholders.delete')
-                    //    && (id => core.createTask('codeholders/delete', { id }).runOnceAndDrop())}
-                    //onFetchFieldHistory={
-                    //    this.props.permissions.hasPermission('codeholders_hist.read')
-                    //        && handleFieldHistory(core)
-                    //}
-                    onChangePage={this.scrollToTop}
-                    csvExportOptions={{
+                    filenamePrefix={locale.csvFilename}
+                    userOptions={{
                         countryLocale: {
                             name: locale.csvOptions.countryLocale,
                             type: 'select',
                             options: Object.entries(locale.csvOptions.countryLocales),
                             default: 'eo',
                         },
-                    }}
-                    //canSaveFilters={this.props.permissions.hasPermission('queries.create')}
-                    savedFilterCategory={'codeholders'}
-                    onStateChange={state => {
-                        if (state.jsonFilter.enabled !== this.state.lvJSONFilterEnabled) {
-                            this.setState({ lvJSONFilterEnabled: state.jsonFilter.enabled });
-                        }
-                        if (state.list.submitted !== this.state.lvSubmitted) {
-                            this.setState({ lvSubmitted: state.list.submitted });
-                        }
-                        if (state.results.stats.cursed !== this.state.lvIsCursed) {
-                            this.setState({ lvIsCursed: state.results.stats.cursed });
-                        }
-                        // deliberately not a state field to avoid frequent updates
-                        this.reduxState = state;
-                    }}
-                    userData={{ permissions: this.props.permissions }} />
-
-                <AddMemberDialog
-                    open={this.state.createOpen}
-                    onClose={() => this.setState({ createOpen: false })} />
+                    }} />
                 <AddrLabelGen
                     open={addrLabelGen}
                     lvIsCursed={this.state.lvIsCursed}

@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useRef, useState } from 'preact/compat';
+import { useRef, useState, useEffect } from 'preact/compat';
 import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
@@ -27,6 +27,12 @@ export default {
                 'last',
             ];
         } else if (task.parameters.type === 'org') nameFields = ['full', 'local', 'abbrev'];
+
+        useEffect(() => {
+            if (!task.parameters.type) {
+                task.update({ type: 'human' });
+            }
+        });
 
         const onSubmit = routerContext => () => {
             setError(null);

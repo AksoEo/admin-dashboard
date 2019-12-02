@@ -33,6 +33,7 @@ const taskViews = {
     codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
 };
 const loadTaskView = async (taskPath) => {
+    if (!taskPath) return null;
     const path = taskPath.split('/');
     let o = taskViews;
     for (let i = 0; i < path.length; i++) {

@@ -151,6 +151,16 @@ export const detail = {
     commit: 'Aktualigi',
 };
 
+export const csvExport = {
+    title: 'Elporti kiel CSV',
+    beginExport: 'Elporti',
+    tryResumeExport: 'Provi daŭrigi',
+    abortExport: 'Nuligi',
+    download: 'Elŝuti CSV',
+    commaSeparated: 'CSV (komoj)',
+    tabSeparated: 'TSV (taboj)',
+};
+
 export const codeholders = {
     title: 'Membroj',
     detailTitle: 'Membro',
@@ -228,6 +238,10 @@ export const codeholders = {
         creationTime: 'Horo de kreiĝo',
         hasPassword: 'Kreis konton',
     },
+    csvFields: {
+        membership: 'Membreco (resumo)',
+    },
+    csvFilename: 'membroj',
     nameSubfields: {
         legal: 'Jura nomo',
         abbrev: 'Mallongigo',

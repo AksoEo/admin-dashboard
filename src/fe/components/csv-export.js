@@ -1,101 +1,87 @@
 import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
-import PropTypes from 'prop-types';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import { Dialog, Button } from '@cpsdqs/yamdl';
+import { Dialog, Button, LinearProgress } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import stringify from 'csv-stringify';
-import * as actions from './actions';
-import Segmented from '../segmented';
-import locale from '../../locale';
+import { coreContext } from '../core/connection';
+import Segmented from './segmented';
+import { csvExport as locale } from '../locale';
 
-const ITEMS_PER_PAGE = 100;
+const LIMIT = 100;
 
 /// The CSV export dialog.
+///
+/// # Props
+/// - open/onClose: bool
+/// - task: task name
+/// - options: current task options
+/// - parameters: current task parameters. Is expected to confirm
+/// - filenamePrefix: file name prefix for the csv
+/// - locale: object like { fields: { ... } }
+/// - fields: field renderers (mainly, stringify)
+/// - userOptions:
+///   User-defined options for CSV export.
+///   Should be an object of `id => spec`, where spec is an object with a `type` field. Types:
+///   - `select`: will render a select with options given by the `options` field in the spec.
+///     Each option should be an (array) tuple like `[id, label]`.
 export default class CSVExport extends PureComponent {
-    static propTypes = {
-        open: PropTypes.bool,
-        onClose: PropTypes.func,
-        /// For getting a ref to this component (because redux wrapper components, apparently)
-        innerRef: PropTypes.func,
-        /// The entire redux state.
-        state: PropTypes.object.isRequired,
-        onSetPage: PropTypes.func.isRequired,
-        onSetItemsPerPage: PropTypes.func.isRequired,
-        onSubmit: PropTypes.func.isRequired,
-        /// File name prefix.
-        filename: PropTypes.string.isRequired,
-        localizedFields: PropTypes.object.isRequired,
-        localizedCSVFields: PropTypes.object.isRequired,
-        userOptions: PropTypes.object,
-        fieldSpec: PropTypes.object.isRequired,
-    };
-
-    originalPage = 0;
-    originalItemsPerPage = 10;
+    static contextType = coreContext;
 
     state = {
         data: [],
         page: 0,
-        totalItems: 0,
+        total: 0,
         exporting: false,
         error: null,
         objectURL: null,
         mode: 'csv',
         options: {},
+        transientFields: [],
     };
 
     beginExport () {
-        this.originalPage = this.props.state.list.page;
-        this.originalItemsPerPage = this.props.state.list.itemsPerPage;
-
         this.setState({
             data: [],
             page: 0,
-            totalItems: 0,
+            total: 0,
             exporting: true,
             error: null,
             objectURL: null,
         }, () => {
-            this.props.onSetPage(0);
-            this.props.onSetItemsPerPage(ITEMS_PER_PAGE);
-            this.props.onSubmit();
+            this.loadOne();
+        });
+    }
+
+    loadOne () {
+        const { task, options } = this.props;
+        const parameters = { ...this.props.parameters };
+        parameters.offset = this.state.page * LIMIT;
+        parameters.limit = LIMIT;
+        this.context.createTask(task, options || {}, parameters).runOnceAndDrop().then(res => {
+            this.setState({
+                data: this.state.data.concat(res.items),
+                transientFields: res.transientFields,
+                total: res.total,
+                error: null,
+            }, () => {
+                if (this.state.page < Math.floor(res.total / LIMIT)) {
+                    this.setState({ page: this.state.page + 1 }, () => {
+                        this.loadOne();
+                    });
+                } else this.endExport();
+            });
+        }).catch(error => {
+            this.setState({ error: '' + error, exporting: false });
         });
     }
 
     resumeExport = () => {
-        if (this.state.error) this.props.onSubmit();
+        if (this.state.error) this.load();
         else this.beginExport();
     };
 
-    receiveAction (action) {
-        if (!this.state.exporting) return;
-        if (action.type === actions.RECEIVE_SUCCESS) {
-            this.setState({
-                data: this.state.data.concat(action.items),
-                totalItems: action.stats.total,
-                error: null,
-            }, () => {
-                if (this.state.page < Math.floor(action.stats.total / ITEMS_PER_PAGE)) {
-                    this.setState({ page: this.state.page + 1 }, () => {
-                        this.props.onSetPage(this.state.page);
-                        this.props.onSubmit();
-                    });
-                } else this.endExport();
-            });
-        } else if (action.type === actions.RECEIVE_FAILURE) {
-            this.setState({
-                error: action.error,
-            });
-        }
-    }
-
     abortExport = () => {
-        this.setState({ exporting: false, error: null }, () => {
-            this.props.onSetPage(this.originalPage);
-            this.props.onSetItemsPerPage(this.originalItemsPerPage);
-            this.props.onSubmit();
-        });
+        this.setState({ exporting: false, error: null });
     };
 
     async endExport () {
@@ -119,26 +105,30 @@ export default class CSVExport extends PureComponent {
                 const mime = this.state.mode === 'csv' ? 'text/csv' : 'text/tab-separated-values';
                 const blob = new Blob(rows, { type: mime });
                 const objectURL = URL.createObjectURL(blob);
-                const filename = `${this.props.filename}-${new Date().toISOString()}.${ext}`;
+                const filename = `${this.props.filenamePrefix}-${new Date().toISOString()}.${ext}`;
                 this.setState({ objectURL, filename, exporting: false });
             });
 
+            const { parameters } = this.props;
+
             // compile selected fields
-            const fields = [];
-            for (const field of this.props.state.results.transientFields) {
-                if (!fields.includes(field)) fields.push(field);
+            const compiledFields = [];
+            // first, push fixed fields
+            for (const field of parameters.fields) if (field.fixed) compiledFields.push(field.id);
+            // then transient fields
+            for (const id of this.state.transientFields) {
+                if (!compiledFields.includes(id)) compiledFields.push(id);
             }
-            for (const field of this.props.state.fields.fixed) {
-                if (!fields.includes(field.id)) fields.push(field.id);
-            }
-            for (const field of this.props.state.fields.user) {
-                if (!fields.includes(field.id)) fields.push(field.id);
+            // finally, push user fields
+            for (const field of parameters.fields) {
+                if (!field.fixed) {
+                    if (!compiledFields.includes(field.id)) compiledFields.push(field.id);
+                }
             }
 
             // write header
-            stringifier.write(fields.map(id => {
-                const localized = this.props.localizedCSVFields[id]
-                    || this.props.localizedFields[id];
+            stringifier.write(compiledFields.map(id => {
+                const localized = this.props.locale.fields[id];
                 if (!localized) throw new Error(`missing field name for ${id}`);
                 return localized;
             }));
@@ -146,14 +136,38 @@ export default class CSVExport extends PureComponent {
             const options = this.state.options;
 
             // write data
-            for (const item of this.state.data) {
+            for (const itemId of this.state.data) {
                 const data = [];
 
-                for (const id of fields) {
-                    const fieldSpec = this.props.fieldSpec[id];
+                const itemData = await new Promise((resolve, reject) => {
+                    // get data from the appropriate detail data view
+                    const dv = this.context.createDataView(
+                        this.props.detailView,
+                        this.props.detailViewOptions(itemId)
+                    );
+                    dv.on('update', data => {
+                        if (data !== null) {
+                            dv.drop();
+                            resolve(data);
+                        }
+                    });
+                    dv.on('error', () => {
+                        dv.drop();
+                        reject();
+                    });
+                });
+
+                for (const id of compiledFields) {
+                    const fieldSpec = this.props.fields[id];
                     if (!fieldSpec) throw new Error(`missing field spec for ${id}`);
                     if (!fieldSpec.stringify) throw new Error(`missing stringify for ${id}`);
-                    const stringified = fieldSpec.stringify(item[id], item, fields, options);
+                    const stringified = fieldSpec.stringify(
+                        itemData[id],
+                        itemData,
+                        compiledFields,
+                        options,
+                        this.context,
+                    );
                     if (stringified instanceof Promise) data.push(await stringified);
                     else data.push(stringified);
                 }
@@ -168,21 +182,19 @@ export default class CSVExport extends PureComponent {
     }
 
     onClose = () => {
-        if (this.state.exporting) this.abortExport();
+        this.abortExport();
         if (this.state.objectURL) this.setState({ objectURL: null });
         if (this.props.onClose) this.props.onClose();
     };
 
     render () {
-        if (this.props.innerRef) this.props.innerRef(this);
-
         return (
             <Dialog
                 open={this.props.open}
                 backdrop
-                class="list-view-csv-export"
+                class="csv-export-dialog"
                 onClose={this.onClose}
-                title={locale.listView.csvExport.title}>
+                title={locale.title}>
                 {!this.state.exporting ? (
                     this.state.error ? (
                         <Fragment>
@@ -193,7 +205,7 @@ export default class CSVExport extends PureComponent {
                                 key="resume"
                                 class="action-button"
                                 onClick={this.resumeExport}>
-                                {locale.listView.csvExport.tryResumeExport}
+                                {locale.tryResumeExport}
                             </Button>
                         </Fragment>
                     ) : this.state.objectURL ? (
@@ -202,7 +214,7 @@ export default class CSVExport extends PureComponent {
                             class="action-button"
                             href={this.state.objectURL}
                             download={this.state.filename}>
-                            {locale.listView.csvExport.download}
+                            {locale.download}
                         </Button>
                     ) : (
                         <Fragment>
@@ -213,11 +225,11 @@ export default class CSVExport extends PureComponent {
                                 {[
                                     {
                                         id: 'csv',
-                                        label: locale.listView.csvExport.commaSeparated,
+                                        label: locale.commaSeparated,
                                     },
                                     {
                                         id: 'tsv',
-                                        label: locale.listView.csvExport.tabSeparated,
+                                        label: locale.tabSeparated,
                                     },
                                 ]}
                             </Segmented>
@@ -229,21 +241,20 @@ export default class CSVExport extends PureComponent {
                                 key="begin"
                                 class="action-button"
                                 onClick={this.resumeExport}>
-                                {locale.listView.csvExport.beginExport}
+                                {locale.beginExport}
                             </Button>
                         </Fragment>
                     )
                 ) : (
                     <Fragment>
                         <LinearProgress
-                            className="progress-bar"
-                            value={(this.state.data.length / this.state.totalItems * 100) | 0}
-                            variant={'determinate'} />
+                            class="progress-bar"
+                            progress={this.state.data.length / this.state.total} />
                         {!this.state.error && <Button
                             key="abort"
                             class="action-button"
                             onClick={this.abortExport}>
-                            {locale.listView.csvExport.abortExport}
+                            {locale.abortExport}
                         </Button>}
                     </Fragment>
                 )}
@@ -252,14 +263,12 @@ export default class CSVExport extends PureComponent {
     }
 }
 
-/// Renders user-defined options. See list view docs for details.
+/// Renders user-defined options. See CSV Export docs above for details.
+///
+/// # Props
+/// - options
+/// - value/onChange
 class UserOptions extends PureComponent {
-    static propTypes = {
-        options: PropTypes.object.isRequired,
-        value: PropTypes.object.isRequired,
-        onChange: PropTypes.func.isRequired,
-    };
-
     componentDidMount () {
         this.updateValue();
     }

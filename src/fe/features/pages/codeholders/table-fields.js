@@ -11,14 +11,21 @@ import locale from '../../../locale';
 import data from '../../../components/data';
 import { WithCountries, CountryFlag } from '../../../components/data/country';
 
-const cache = {
-    getCountries: () => {
-        throw new Error('todo');
-    },
-    getCountriesLocalized: () => {
-        throw new Error('todo');
-    },
-};
+function getCountries (core) {
+    return new Promise((resolve, reject) => {
+        const dv = core.createDataView('countries/countries');
+        dv.on('update', data => {
+            if (data !== null) {
+                dv.drop();
+                resolve(data);
+            }
+        });
+        dv.on('error', () => {
+            dv.drop();
+            reject();
+        });
+    });
+}
 
 // TODO: order fields in some sensible order
 // TODO: update these for the new API
@@ -68,7 +75,7 @@ export default {
             return <data.ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
         },
         stringify (value, item) {
-            const { oldCode, newCode } = item;
+            const { old: oldCode, new: newCode } = value;
             if (oldCode) {
                 const oldCodeCheckLetter = new AKSOUEACode(oldCode).getCheckLetter();
                 return `${newCode} (${oldCode}-${oldCodeCheckLetter})`;
@@ -154,15 +161,14 @@ export default {
             }
         },
         stringify (value, item) {
-            const { codeholderType } = item;
-            if (codeholderType === 'human') {
-                const { firstName, firstNameLegal, lastName, lastNameLegal } = item;
-                const honorific = item.honorific;
-                const first = firstName || firstNameLegal;
-                const last = lastName || lastNameLegal;
-                return `${(honorific ? (honorific + ' ') : '')}${first} ${last}`;
-            } else if (codeholderType === 'org') {
-                return item.fullName;
+            const { type } = item;
+            if (type === 'human') {
+                const { first, firstLegal, last, lastLegal, honorific } = value;
+                const f = first || firstLegal;
+                const l = last || lastLegal;
+                return `${(honorific ? (honorific + ' ') : '')}${f} ${l}`;
+            } else if (type === 'org') {
+                return value.full + (value.abbrev ? ` (${value.abbrev})` : '');
             } else {
                 throw new Error('unknown codeholder type');
             }
@@ -178,8 +184,10 @@ export default {
             return <span class="age">{label}</span>;
         },
         stringify (value) {
-            if (value === null || value === undefined) return '';
-            return value.toString();
+            if (!value) return '';
+            const { now, atStartOfYear } = value;
+            if (!now) return null;
+            return locale.members.fields.ageFormat(now, atStartOfYear);
         },
     },
     membership: {
@@ -210,7 +218,7 @@ export default {
         },
         stringify (value) {
             if (!value) return '';
-            return value.map(item => `${item.nameAbbrev} ${item.year}`).join(', ');
+            return value.map(item => `${item.nameAbbrev}${item.year}`).join(', ');
         },
     },
     country: {
@@ -249,19 +257,21 @@ export default {
                 );
             }
         },
-        stringify: async (value, item, fields, options) => {
-            const { feeCountry, addressLatin } = item;
-            const addressCountry = addressLatin ? addressLatin.country : null;
-            const countries = await cache.getCountriesLocalized(options.countryLocale || 'eo');
+        stringify: async (value, item, fields, options, core) => {
+            const { feeCountry, address } = item;
+            const addressCountry = address ? address.countryLatin : null;
+            const countries = await getCountries(core);
+
+            const cl = options.countryLocale;
 
             if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
                 const country = addressCountry || feeCountry;
                 if (!country) return '';
-                return country.toUpperCase() + ' ' + countries[country];
+                return country.toUpperCase() + ' ' + countries[country][cl];
             } else {
-                const feeCountryName = feeCountry.toUpperCase() + ' ' + countries[feeCountry];
-                const countryName = addressCountry.toUpperCase() + ' ' + countries[addressCountry];
-                return locale.members.fields.disjunctCountry(feeCountryName, countryName);
+                const feeCountryName = feeCountry.toUpperCase() + ' ' + countries[feeCountry][cl];
+                const countryName = addressCountry.toUpperCase() + ' ' + countries[addressCountry][cl];
+                return locale.members.fields.disjunctCountryCSV(feeCountryName, countryName);
             }
         },
     },
@@ -269,14 +279,14 @@ export default {
         sortable: true,
         component: data.date.inlineRenderer,
         stringify (value) {
-            return value ? moment(value).format('D[-a de] MMMM Y') : '';
+            return value ? moment(value).format('YYYY-MM-DD') : '';
         },
     },
     deathdate: {
         sortable: true,
         component: data.date.inlineRenderer,
         stringify (value) {
-            return value ? moment(value).format('D[-a de] MMMM Y') : '';
+            return value ? moment(value).format('YYYY-MM-DD') : '';
         },
     },
     email: {
@@ -319,14 +329,14 @@ export default {
                 </div>
             );
         },
-        stringify: async (value = {}, item, fields) => {
+        stringify: async (value = {}, item, fields, options, core) => {
             const streetAddress = (value.streetAddressLatin || '').split('\n');
             const showCity = !fields.includes('addressCity');
             const showCountryArea = !fields.includes('addressCountryArea');
             const city = showCity ? value.cityLatin : '';
             const countryArea = showCountryArea ? value.countryAreaLatin : '';
             const showCountry = !fields.includes('country');
-            const countries = await cache.getCountries();
+            const countries = await getCountries(core);
             const country = showCountry ? countries[value.country] : '';
 
             const addressPseudolines = [
@@ -363,19 +373,22 @@ export default {
     officePhone: {
         component: data.phoneNumber.inlineRenderer,
         stringify (value, item) {
-            return item.officePhoneFormatted;
+            if (!value) return '';
+            return value.formatted;
         },
     },
     cellphone: {
         component: data.phoneNumber.inlineRenderer,
         stringify (value, item) {
-            return item.cellphoneFormatted;
+            if (!value) return '';
+            return value.formatted;
         },
     },
     landlinePhone: {
         component: data.phoneNumber.inlineRenderer,
         stringify (value, item) {
-            return item.landlinePhoneFormatted;
+            if (!value) return '';
+            return value.formatted;
         },
     },
     profession: {
