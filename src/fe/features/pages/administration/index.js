@@ -1,15 +1,16 @@
-import { h, Component } from 'preact';
-import { AppBarProxy } from '@cpsdqs/yamdl';
-import APILogListView from './log';
+import { h } from 'preact';
+import Page from '../../../components/page';
+import Meta from '../../meta';
+import { LinkButton } from '../../../router';
 
-export default class Administration extends Component {
+export default class Administration extends Page {
     render () {
         const menu = [];
 
         return (
-            <div class="app-page administration-page" ref={node => this.node = node}>
-                <AppBarProxy actions={menu} priority={1} />
-                <APILogListView path={this.props.path} query={this.props.query} />
+            <div class="administration-page">
+                <Meta title="..." actions={menu} />
+                <LinkButton target="/administrado/protokolo">(→ protokolo)</LinkButton>
             </div>
         );
     }

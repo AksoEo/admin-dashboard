@@ -18,6 +18,7 @@ const DEBOUNCE_TIME = 400; // ms
 ///
 /// # Props
 /// - task: task name. Output should adhere to a specific format (see e.g. codeholders/list)
+/// - view: view name for detail views.
 /// - options: task options
 /// - parameters: task parameters. should adhere to a specific format (See e.g. codeholders/list)
 ///     - fields: objects may also have a `fixed` property to indicate fixed fields.
@@ -143,6 +144,7 @@ export default class OverviewList extends PureComponent {
         parameters,
         onGetItemLink,
         locale: localizedFields,
+        view,
     }, { error, result, stale, loading }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
@@ -192,6 +194,7 @@ export default class OverviewList extends PureComponent {
             ];
 
             contents.push(...result.items.map((id, i) => <ListItem
+                view={view}
                 key={id}
                 id={id}
                 selectedFields={compiledFields}
@@ -336,7 +339,7 @@ function ListHeader ({ fields, selectedFields, locale }) {
     return <div class="list-header" style={style}>{cells}</div>;
 }
 
-const ListItem = connect(props => (['codeholders/codeholder', {
+const ListItem = connect(props => ([props.view, {
     id: props.id,
     fields: props.selectedFields,
     noFetch: true,

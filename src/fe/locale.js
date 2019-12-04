@@ -360,6 +360,42 @@ export const codeholders = {
     },
 };
 
+export const httpLog = {
+    title: 'Protokolo',
+    search: {
+        placeholders: {
+            userAgent: 'Serĉi retumilon',
+            userAgentParsed: 'Serĉi legeblan retumilon',
+        },
+        filters: {
+            codeholders: 'Membroj',
+            time: 'Horo',
+            apiKey: 'API',
+            ip: 'IP-adreso',
+            origin: 'Fonto',
+            method: 'Metodo',
+            path: 'Adreso',
+            resStatus: 'Rezulta stato',
+            resTime: 'Daŭro',
+        },
+    },
+    fields: {
+        time: 'Horo',
+        codeholder: 'Membro',
+        apiKey: 'API',
+        ip: 'IP-adreso',
+        origin: 'Fonto',
+        userAgent: 'Retumilo',
+        userAgentParsed: 'Retumilo (legebla)',
+        method: 'Metodo',
+        path: 'Adreso',
+        query: 'Peto',
+        resStatus: 'Rezulta stato',
+        resTime: 'Daŭro',
+        resLocation: 'Rezulta loko',
+    },
+};
+
 export const mime = {
     types: {
         application: null,

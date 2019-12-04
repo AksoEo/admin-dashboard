@@ -6,7 +6,7 @@ import ContactMailIcon from '@material-ui/icons/ContactMail';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
 import FieldPicker from '../../../components/field-picker';
-import { decodeURLQuery, encodeURLQuery } from '../../../components/list-url-coding';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
 import Page from '../../../components/page';
 import { codeholders as locale, search as searchLocale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
@@ -87,47 +87,10 @@ export default class CodeholdersPage extends Page {
     #currentQuery = '';
 
     decodeURLQuery () {
-        const decoded = decodeURLQuery(this.props.query, FILTERS);
+        this.setState({
+            options: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.options),
+        });
         this.#currentQuery = this.props.query;
-
-        const options = { ...this.state.options };
-        if (decoded.search) options.search = decoded.search;
-        else options.search.query = '';
-        options.filters = { ...options.filters };
-        if (decoded.filters) {
-            options.filters._disabled = false;
-            for (const id in decoded.filters) {
-                options.filters[id] = decoded.filters[id];
-            }
-            for (const id in options.filters) {
-                if (id === '_disabled') continue;
-                if (!(id in decoded.filters)) options.filters[id].enabled = false;
-            }
-        } else {
-            for (const id in options.filters) {
-                if (id === '_disabled') continue;
-                options.filters[id].enabled = false;
-            }
-        }
-        if (decoded.jsonFilter) {
-            // TODO
-        }
-        if (decoded.fields) {
-            options.fields = options.fields.filter(x => x.fixed);
-            const currentFieldIds = options.fields.map(x => x.id);
-            for (const item of decoded.fields) {
-                if (currentFieldIds.includes(item.id)) {
-                    const i = options.fields.findIndex(x => x.id === item.id);
-                    options.fields[i].sorting = item.sorting;
-                    continue;
-                }
-                currentFieldIds.push(item.id);
-                options.fields.push(item);
-            }
-        }
-        if ('offset' in decoded) options.offset = decoded.offset;
-        if ('limit' in decoded) options.limit = decoded.limit;
-        this.setState({ options });
     }
 
     encodeURLQuery () {
@@ -226,6 +189,7 @@ export default class CodeholdersPage extends Page {
                 <OverviewList
                     // TODO: also note global filter if present (use core view?)
                     task="codeholders/list"
+                    view="codeholders/codeholder"
                     parameters={options}
                     expanded={expanded}
                     fields={FIELDS}

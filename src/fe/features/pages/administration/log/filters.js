@@ -5,8 +5,10 @@ import { util } from '@tejo/akso-client';
 import RemoveIcon from '@material-ui/icons/Remove';
 import SuggestionField from '../../../../components/suggestion-field';
 import data from '../../../../components/data';
-import client from '../../../../client';
 import locale from '../../../../locale';
+
+// TODO
+const client = {};
 
 class CodeholderPicker extends PureComponent {
     state = {

@@ -129,13 +129,14 @@ export default [
             },
             {
                 id: 'administration',
+                component: lazy(() =>
+                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
                 icon: <SupervisorAccountIcon />,
                 path: 'administrado',
                 paths: [
                     {
-                        // TODO: temporary; undo this
-                        // component: lazy(() =>
-                        // import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
+                        component: lazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log')),
                         type: 'bottom',
                         path: 'protokolo',
                     },

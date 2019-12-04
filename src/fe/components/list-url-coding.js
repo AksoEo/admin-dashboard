@@ -240,3 +240,45 @@ export function decodeURLQuery (data, filters) {
     }
     return parameters;
 }
+
+/// Applies the decoded partial parameters to a parameters object.
+export function applyDecoded (decoded, parameters) {
+    parameters = { ...parameters };
+    if (decoded.search) parameters.search = decoded.search;
+    else parameters.search.query = '';
+    parameters.filters = { ...parameters.filters };
+    if (decoded.filters) {
+        parameters.filters._disabled = false;
+        for (const id in decoded.filters) {
+            parameters.filters[id] = decoded.filters[id];
+        }
+        for (const id in parameters.filters) {
+            if (id === '_disabled') continue;
+            if (!(id in decoded.filters)) parameters.filters[id].enabled = false;
+        }
+    } else {
+        for (const id in parameters.filters) {
+            if (id === '_disabled') continue;
+            parameters.filters[id].enabled = false;
+        }
+    }
+    if (decoded.jsonFilter) {
+        // TODO
+    }
+    if (decoded.fields) {
+        parameters.fields = parameters.fields.filter(x => x.fixed);
+        const currentFieldIds = parameters.fields.map(x => x.id);
+        for (const item of decoded.fields) {
+            if (currentFieldIds.includes(item.id)) {
+                const i = parameters.fields.findIndex(x => x.id === item.id);
+                parameters.fields[i].sorting = item.sorting;
+                continue;
+            }
+            currentFieldIds.push(item.id);
+            parameters.fields.push(item);
+        }
+    }
+    if ('offset' in decoded) parameters.offset = decoded.offset;
+    if ('limit' in decoded) parameters.limit = decoded.limit;
+    return parameters;
+}
