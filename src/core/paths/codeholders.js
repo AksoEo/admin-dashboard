@@ -876,6 +876,57 @@ export const tasks = {
     },
 };
 
+const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms
+const codeholderBatchIds = new Set();
+const codeholderBatchFields = new Set();
+const codeholderBatchRejects = new Set();
+let flushCodeholdersTimeout;
+
+function flushCodeholders () {
+    flushCodeholdersTimeout = null;
+    const ids = [...codeholderBatchIds];
+    const fields = [...codeholderBatchFields];
+    const rejects = [...codeholderBatchRejects];
+    codeholderBatchIds.clear();
+    codeholderBatchFields.clear();
+    codeholderBatchRejects.clear();
+
+    tasks.list({}, {
+        fields: fields.map(x => ({ id: x, sorting: 'none' })).concat([{ id: 'id', sorting: 'asc' }]),
+        jsonFilter: {
+            filter: {
+                id: {
+                    $in: ids,
+                }
+            },
+        },
+        limit: ids.length,
+    }).catch(err => {
+        for (const reject of rejects) reject(err);
+    });
+}
+
+/// Fetches a codeholder’s details. Batches calls.
+function fetchCodeholderForView (id, fields) {
+    if (id === 'self') {
+        // can’t batch this one
+        return tasks.codeholder({}, { id, fields });
+    }
+    const now = Date.now() / 1000;
+    if (codeholderBatchIds.size >= 100) {
+        // we can only request 100 at once; flush now
+        flushCodeholders();
+    }
+    codeholderBatchIds.add(id);
+    codeholderBatchFields.add(...fields);
+    if (!flushCodeholdersTimeout) {
+        flushCodeholdersTimeout = setTimeout(flushCodeholders, CODEHOLDER_FETCH_BATCH_TIME);
+    }
+    return new Promise((resolve, reject) => {
+        codeholderBatchRejects.add(reject);
+    });
+}
+
 export const views = {
     // FIXME: the following two views assume that permissions are **immutable**
     // however, this is not the case and we need to handle this at some point (maybe)
@@ -930,7 +981,7 @@ export const views = {
             /// Note that this specifically uses the id argument and not this.id so that we’re
             /// fetching `self` instead of the resolved id if id is set to `self`
             if (shouldFetch) {
-                tasks.codeholder({}, { id, fields }).catch(err => this.emit('error', err));
+                fetchCodeholderForView(id, fields).catch(err => this.emit('error', err));
             }
         }
 
