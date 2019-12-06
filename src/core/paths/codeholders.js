@@ -918,7 +918,7 @@ function fetchCodeholderForView (id, fields) {
         flushCodeholders();
     }
     codeholderBatchIds.add(id);
-    codeholderBatchFields.add(...fields);
+    for (const field of fields) codeholderBatchFields.add(field);
     if (!flushCodeholdersTimeout) {
         flushCodeholdersTimeout = setTimeout(flushCodeholders, CODEHOLDER_FETCH_BATCH_TIME);
     }

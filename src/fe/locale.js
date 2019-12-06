@@ -424,6 +424,7 @@ export const mime = {
         'application/vnd.oasis.opendocument.text': 'OpenDocument-dokumento', // .odt
         'application/rtf': 'RTF-dokumento',
         'text/plain': 'Teksto',
+        'application/octet-stream': 'Dosiero',
     },
 };
 

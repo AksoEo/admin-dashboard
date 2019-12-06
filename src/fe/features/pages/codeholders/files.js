@@ -1,7 +1,19 @@
 import { h } from 'preact';
 import { useState, useCallback, Fragment } from 'preact/compat';
 import { Dialog, TextField, Button } from '@cpsdqs/yamdl';
-import FileIcon from '@material-ui/icons/InsertDriveFile';
+import ImageIcon from '@material-ui/icons/Image';
+import {
+    FileIcon,
+    TextIcon,
+    ArchiveIcon,
+    DocumentIcon,
+    VideoIcon,
+    AudioIcon,
+    FontIcon,
+    ModelIcon,
+    MicrosoftOfficeIcon,
+    WinRARIcon,
+} from './icons';
 import config from '../../../../config.val';
 import DataList from '../../../components/data-list';
 import pickFile from '../../../components/pick-file';
@@ -180,14 +192,53 @@ function UploadDialog ({ id, open, onClose, file, core }) {
     );
 }
 
-function FileThumbnail ({ file, id, mime }) {
-    // TODO: this
-    void id;
-    void mime;
-    // upload dialog preview
-    if (file) return <div class="file-thumbnail">?<FileIcon /></div>;
+const mimeIcons = {
+    'image/': function Icon () {
+        return <ImageIcon style={{ verticalAlign: 'middle' }} />;
+    },
+    'text/': TextIcon,
+    'video/': VideoIcon,
+    'audio/': AudioIcon,
+    'model/': ModelIcon,
+    'font/': FontIcon,
+    'application/pdf': DocumentIcon,
+    'application/zip': ArchiveIcon,
+    'application/vnd.rar': WinRARIcon,
+    'application/msword': MicrosoftOfficeIcon,
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': MicrosoftOfficeIcon,
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.template': MicrosoftOfficeIcon,
+    'application/msexcel': MicrosoftOfficeIcon,
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': MicrosoftOfficeIcon,
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.template': MicrosoftOfficeIcon,
+    'application/mspowerpoint': MicrosoftOfficeIcon,
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': MicrosoftOfficeIcon,
+    'application/vnd.openxmlformats-officedocument.presentationml.template': MicrosoftOfficeIcon,
+    'application/vnd.openxmlformats-officedocument.presentationml.slideshow': MicrosoftOfficeIcon,
+    'application/vnd.oasis.opendocument.presentation': DocumentIcon,
+    'application/vnd.oasis.opendocument.spreadsheet': DocumentIcon,
+    'application/vnd.oasis.opendocument.text': DocumentIcon,
+    'application/rtf': DocumentIcon,
+    'application/x-gzip': ArchiveIcon,
+    'application/x-bzip2': ArchiveIcon,
+};
 
-    return <div class="file-thumbnail">?<FileIcon /></div>;
+function FileThumbnail ({ file, id, mime }) {
+    let icon = <FileIcon />;
+
+    mime = mime || file.type;
+
+    for (const k in mimeIcons) {
+        if (mime.includes(k)) {
+            const Icon = mimeIcons[k];
+            icon = <Icon />;
+            break;
+        }
+    }
+
+    // upload dialog preview
+    if (file) return <div class="file-thumbnail">{icon}</div>;
+
+    return <div class="file-thumbnail">{icon}</div>;
 }
 
 function Mime ({ mime }) {
