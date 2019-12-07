@@ -127,10 +127,11 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
 /* eslint-disable react/display-name */
 
 const ValCheckbox = ({ value, onChange }) => <Checkbox checked={value} onChange={onChange} />;
-const boundedInteger = (min, max) => ({ value, onChange }) =>
+const boundedInteger = (min, max, unit) => ({ value, onChange }) =>
     <TextField
         type="number"
         step="1"
+        trailing={unit}
         min={min}
         max={max}
         value={value}
@@ -140,7 +141,7 @@ const boundedInteger = (min, max) => ({ value, onChange }) =>
             if (bounded !== value) onChange(bounded);
         })} />;
 
-const U16Editor = boundedInteger(0, 65535);
+const U16PtEditor = boundedInteger(0, 65535, 'pt');
 const SETTINGS = {
     language: ({ value, onChange }) => (
         <NativeSelect value={value} onChange={e => onChange(e.target.value)}>
@@ -159,10 +160,10 @@ const SETTINGS = {
     margins: MarginsEditor,
     cols: boundedInteger(1, 20),
     rows: boundedInteger(1, 50),
-    colGap: U16Editor,
-    rowGap: U16Editor,
-    cellPadding: U16Editor,
-    fontSize: boundedInteger(8, 30),
+    colGap: U16PtEditor,
+    rowGap: U16PtEditor,
+    cellPadding: U16PtEditor,
+    fontSize: boundedInteger(8, 30, 'pt'),
     drawOutline: ValCheckbox,
 };
 
@@ -181,14 +182,14 @@ function MarginsEditor ({ value, onChange }) {
     return (
         <div class="margins">
             <div class="margins-line">
-                <U16Editor value={value.top} onChange={v => onChange({ ...value, top: v })} />
+                <U16PtEditor value={value.top} onChange={v => onChange({ ...value, top: v })} />
             </div>
             <div class="margins-line is-line-two">
-                <U16Editor value={value.left} onChange={v => onChange({ ...value, left: v })} />
-                <U16Editor value={value.right} onChange={v => onChange({ ...value, right: v })} />
+                <U16PtEditor value={value.left} onChange={v => onChange({ ...value, left: v })} />
+                <U16PtEditor value={value.right} onChange={v => onChange({ ...value, right: v })} />
             </div>
             <div class="margins-line">
-                <U16Editor value={value.bottom} onChange={v => onChange({ ...value, bottom: v })} />
+                <U16PtEditor value={value.bottom} onChange={v => onChange({ ...value, bottom: v })} />
             </div>
         </div>
     );
