@@ -2,11 +2,14 @@ import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
 import { Button, Menu } from '@cpsdqs/yamdl';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import locale from '../locale';
+import { data as locale } from '../locale';
 import { coreContext } from '../core/connection';
 import { deepEq } from '../../util';
+import './data-list.less';
 
 const VLIST_CHUNK_SIZE = 100;
+
+// TODO: this might need a refactor
 
 /// Virtual list with auto-sorting and remove/load callbacks.
 ///
@@ -18,6 +21,7 @@ const VLIST_CHUNK_SIZE = 100;
 /// - itemHeight: fixed item height in pixels
 /// - emptyLabel: label to show when there are no items
 /// - updateView: argument list to create a data view that emits updates (if available)
+/// - useShowMore: if true, will use a “show more” button instead of scrollng magic
 export default class DataList extends PureComponent {
     state = {
         items: [],
@@ -43,7 +47,7 @@ export default class DataList extends PureComponent {
     }
 
     onScroll = () => {
-        if (!this.node) return;
+        if (!this.node || this.props.useShowMore) return;
         const lower = Math.max(0, Math.floor(this.node.scrollTop / this.props.itemHeight));
         const upper = Math.ceil((this.node.scrollTop + this.node.offsetHeight) / this.props.itemHeight);
 
@@ -54,6 +58,17 @@ export default class DataList extends PureComponent {
             if (!this.state.items[i * VLIST_CHUNK_SIZE]) {
                 this.fetchChunk(i);
             }
+        }
+    };
+
+    showMore = () => {
+        let i = 0;
+        while (i <= Math.ceil(this.state.total / VLIST_CHUNK_SIZE)) {
+            if (!this.state.items[i * VLIST_CHUNK_SIZE]) {
+                this.fetchChunk(i);
+                break;
+            }
+            i++;
         }
     };
 
@@ -112,10 +127,12 @@ export default class DataList extends PureComponent {
     render () {
         const items = [];
 
+        const useAbsolutePositioning = !this.props.useShowMore;
+
         for (let i = 0; i < this.state.items.length; i++) {
             const item = this.state.items[i];
             if (item) {
-                const y = i * this.props.itemHeight;
+                const y = useAbsolutePositioning ? i * this.props.itemHeight : 0;
                 const Component = this.props.onItemClick ? Button : 'div';
                 items.push(
                     <Component
@@ -142,15 +159,28 @@ export default class DataList extends PureComponent {
             items.push(<div class="data-list-empty" key={0}>{this.props.emptyLabel}</div>);
         }
 
+        let showMore = null;
+        if (this.props.useShowMore) {
+            const hasMore = this.state.items.length < this.state.total;
+            if (hasMore) {
+                showMore = (
+                    <Button class="show-more-button" onClick={this.showMore}>
+                        {locale.showMore}
+                    </Button>
+                );
+            }
+        }
+
         return (
             <div
-                class={'data-list ' + (this.props.class || '')}
+                class={'data-list ' + (useAbsolutePositioning ? '' : 'is-flat ') + (this.props.class || '')}
                 ref={node => this.node = node}
                 onScroll={this.onScroll}>
                 <div
                     class="vlist-spacer"
                     style={{ height: total * this.props.itemHeight }} />
                 {items}
+                {showMore}
             </div>
         );
     }
@@ -174,7 +204,7 @@ function ListItemDeleteOverflow ({ onDelete }) {
                 position={menuPos}
                 anchor={[1, 0]}
                 items={[{
-                    label: locale.data.delete,
+                    label: locale.delete,
                     action: onDelete,
                 }]} />
         </Button>

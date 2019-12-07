@@ -86,22 +86,6 @@ export default function SearchFilters ({
 
     const jsonFilterEnabled = value.jsonFilter && !value.jsonFilter._disabled;
 
-    items.push({
-        node: jsonFilterEnabled ? (
-            <Suspense fallback={<div class="json-filter-loading">
-                {locale.loadingJSONEditor}
-            </div>}>
-                <JSONFilterEditor
-                    value={value.jsonFilter}
-                    onChange={jsonFilter => onChange({ ...value, jsonFilter, offset: 0 })}
-                    expanded={expanded}
-                    onCollapse={() => onExpandedChange(false)} />
-            </Suspense>
-        ) : null,
-        paper: true,
-        hidden: !jsonFilterEnabled,
-    });
-
     useEffect(() => {
         const newValue = { ...value };
         if (!newValue.filters) newValue.filters = {};
@@ -146,6 +130,22 @@ export default function SearchFilters ({
             staticHeight: true,
         });
     }
+
+    items.push({
+        node: jsonFilterEnabled ? (
+            <Suspense fallback={<div class="json-filter-loading">
+                {locale.loadingJSONEditor}
+            </div>}>
+                <JSONFilterEditor
+                    value={value.jsonFilter}
+                    onChange={jsonFilter => onChange({ ...value, jsonFilter, offset: 0 })}
+                    expanded={expanded}
+                    onCollapse={() => onExpandedChange(false)} />
+            </Suspense>
+        ) : null,
+        paper: true,
+        hidden: !jsonFilterEnabled,
+    });
 
     items.push({
         node: <div class="bottom-padding" />,

@@ -144,6 +144,7 @@
         flex: 1;
         padding-right: env(safe-area-inset-right);
         min-height: 0;
+        z-index: 1;
 
         .navigation-view {
             display: flex;
@@ -199,8 +200,8 @@
             }
         }
 
-        .page-container {
-            animation: app-page-container-in 0.5s 0.1s @easing backwards;
+        .navigation-view {
+            animation: app-page-container-in 0.8s 0.1s @easing backwards;
 
             @keyframes app-page-container-in {
                 from {

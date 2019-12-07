@@ -46,14 +46,14 @@ export default [
         contents: [
             {
                 id: 'home',
-                icon: <HomeIcon />,
+                icon: HomeIcon,
                 path: '',
             },
             {
                 id: 'codeholders',
                 component: elazy(() =>
                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders')),
-                icon: <AssignmentIndIcon />,
+                icon: AssignmentIndIcon,
                 path: 'membroj',
                 paths: [
                     {
@@ -89,49 +89,49 @@ export default [
             },
             {
                 id: 'membership',
-                icon: <CardMembershipIcon />,
+                icon: CardMembershipIcon,
                 path: 'membreco',
             },
             {
                 id: 'email',
-                icon: <EmailIcon />,
+                icon: EmailIcon,
                 path: 'amasmesaghoj',
             },
             {
                 id: 'magazines',
-                icon: <NewspaperIcon />,
+                icon: NewspaperIcon,
                 path: 'revuoj',
             },
             {
                 id: 'statistics',
-                icon: <AssessmentIcon />,
+                icon: AssessmentIcon,
                 path: 'statistiko',
             },
             {
                 id: 'congresses',
-                icon: <BusinessIcon />,
+                icon: BusinessIcon,
                 path: 'kongresoj',
             },
             {
                 id: 'payments',
-                icon: <PaymentIcon />,
+                icon: PaymentIcon,
                 path: 'pagoj',
             },
             {
                 id: 'elections',
-                icon: <HowToVoteIcon />,
+                icon: HowToVoteIcon,
                 path: 'vochdonado',
             },
             {
                 id: 'newsletters',
-                icon: <MarkunreadMailboxIcon />,
+                icon: MarkunreadMailboxIcon,
                 path: 'bultenoj',
             },
             {
                 id: 'administration',
                 component: lazy(() =>
                     import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
-                icon: <SupervisorAccountIcon />,
+                icon: SupervisorAccountIcon,
                 path: 'administrado',
                 paths: [
                     {
@@ -144,17 +144,17 @@ export default [
             },
             {
                 id: 'lists',
-                icon: <ListsIcon />,
+                icon: ListsIcon,
                 path: 'listoj',
             },
             {
                 id: 'reports',
-                icon: <AssignmentIcon />,
+                icon: AssignmentIcon,
                 path: 'raportoj',
             },
             {
                 id: 'documents',
-                icon: <FileIcon />,
+                icon: FileIcon,
                 path: 'dokumentoj',
             },
         ],

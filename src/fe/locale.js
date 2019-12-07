@@ -26,6 +26,8 @@ export const data = {
         'MB',
         'GB',
     ],
+    delete: 'Forigi',
+    showMore: '[[show more]]',
 };
 
 export const login = {
@@ -309,6 +311,7 @@ export const codeholders = {
         },
     },
     filesTitle: 'Dosieroj',
+    noFiles: '[[no files]]',
     uploadFile: 'Alŝuti dosieron',
     uploadThisFile: 'Alŝuti',
     downloadFile: 'Elŝuti',
@@ -324,6 +327,7 @@ export const codeholders = {
         title: 'Historio',
         comment: 'Priskribo de ŝanĝoj',
         changedBy: 'Ŝanĝita de',
+        initial: '[[initial value]]',
     },
     addrLabelGen: {
         menuItem: 'Krei adresetikedojn',

@@ -15,11 +15,12 @@ import { TEJOIcon, UEAIcon } from './icons';
 /** Renders a single item in the sidebar. */
 function NavItem ({ item, currentPage }) {
     const { id, icon, path } = item;
+    const Icon = icon || (() => null);
     return (
         <Link target={`/${path}`} class="sidebar-link">
             <DrawerItem
                 selected={currentPage === id}
-                icon={icon}>
+                icon={<Icon />}>
                 {localePages[id]}
             </DrawerItem>
         </Link>
@@ -66,12 +67,7 @@ export default class SidebarContents extends PureComponent {
         return (
             <div class="app-sidebar-contents">
                 <div class="sidebar-header">
-                    <SidebarLogo
-                        onDirectTransition={this.props.onDirectTransition}
-                        onDoAnimateIn={() => {
-                            this.props.onDoAnimateIn();
-                        }}
-                        onClick={() => this.context.navigate('/')} />
+                    <SidebarLogo onClick={() => this.context.navigate('/')} />
                     <SidebarUser />
                 </div>
                 <div class="sidebar-nav-container">
@@ -145,6 +141,7 @@ const SidebarUser = connect('codeholders/codeholder', {
             </div>
             <Button
                 icon
+                small
                 class="user-options"
                 aria-owns={this.state.userMenuOpen ? 'sidebar-user-popup-menu' : null}
                 aria-haspopup="true"

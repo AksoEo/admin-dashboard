@@ -116,10 +116,6 @@ export default class Sidebar extends PureComponent {
                         currentPage={this.props.currentPage}
                         onLogout={this.props.onLogout}
                         onDirectTransition={this.props.onDirectTransition}
-                        onDoAnimateIn={() => {
-                            this.props.onDoAnimateIn();
-                            this.animateIn(300);
-                        }}
                         permissions={this.props.permissions} />
                 </div>
             </div>

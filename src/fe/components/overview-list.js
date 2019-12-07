@@ -63,7 +63,7 @@ export default class OverviewList extends PureComponent {
             if (this.#currentTask !== t) return;
             this.setState({ result, error: null, stale: false, loading: false });
 
-            if (this.props.parameters.offset >= result.total) {
+            if (this.props.parameters.offset >= result.total && result.total !== 0) {
                 // we’re out of bounds; adjust
                 const limit = this.props.parameters.limit;
                 this.props.onSetOffset(Math.floor(result.total / limit) * limit);

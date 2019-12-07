@@ -50,7 +50,8 @@ export default function Files ({ id }) {
                         class="files-list"
                         onLoad={loadFiles(core, id)}
                         updateView={['codeholders/codeholderSigFiles', { id }]}
-                        itemHeight={76}
+                        useShowMore
+                        emptyLabel={locale.noFiles}
                         renderItem={item => (
                             <div class="member-file" data-id={item.id}>
                                 <FileThumbnail id={item.id} mime={item.mime} />
@@ -203,7 +204,7 @@ const mimeIcons = {
     'font/': FontIcon,
     'application/pdf': DocumentIcon,
     'application/zip': ArchiveIcon,
-    'application/vnd.rar': WinRARIcon,
+    'application/x-rar': WinRARIcon,
     'application/msword': MicrosoftOfficeIcon,
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': MicrosoftOfficeIcon,
     'application/vnd.openxmlformats-officedocument.wordprocessingml.template': MicrosoftOfficeIcon,

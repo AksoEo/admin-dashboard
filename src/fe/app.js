@@ -16,7 +16,7 @@ const PERMA_SIDEBAR_WIDTH = 900;
 
 export default class App extends Component {
     state = {
-        permaSidebar: false,
+        permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH,
         sidebarOpen: false,
         currentPage: null,
     };

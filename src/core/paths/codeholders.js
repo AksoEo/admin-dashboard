@@ -616,6 +616,12 @@ export const tasks = {
             }
         }
 
+        // if the user changes the profile picture while editing; the old hash will still be in
+        // the codeholder data.
+        // here we mitigate this
+        delete diff.profilePictureHash;
+        delete codeholderData.profilePictureHash;
+
         await client.patch(`/codeholders/${id}`, diff, options);
 
         // also update data in store

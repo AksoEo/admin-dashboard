@@ -365,322 +365,6 @@
         }
     }
 
-    .detail-view {
-        .editor-line {
-            margin-bottom: 8px;
-
-            .paper-text-field, .form-validator {
-                margin-right: 8px;
-            }
-
-            .full-name-editor, .full-name-editor .paper-text-field {
-                width: 100%;
-            }
-        }
-
-        .codeholder-address-rendered {
-            .address-postal-button {
-                font-size: small;
-                margin-top: 8px;
-            }
-        }
-
-        .member-code {
-            position: relative;
-            z-index: 1;
-        }
-
-        .membership-editor {
-            padding: 8px 0;
-            display: flex;
-            align-items: flex-start;
-
-            .membership {
-                display: inline-flex;
-                align-items: center;
-                border: 1px solid @text-fade-20;
-                border-radius: 4px;
-                margin-right: 4px;
-                margin-bottom: 4px;
-
-                .membership-name {
-                    display: inline-block;
-                    background: @text-fade-20;
-                    padding: 2px 4px;
-                    border-radius: 3px;
-                    font-size: small;
-                }
-
-                .membership-year {
-                    display: inline-block;
-                    padding: 0 2px;
-                }
-            }
-
-            .memberships {
-                position: relative;
-                overflow: hidden;
-                height: calc(2em + 8px);
-                .log-gradient-mask();
-
-                &::before {
-                    content: '';
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    width: 100%;
-                    height: calc(1em + 4px);
-                }
-
-                &.is-empty {
-                    .membership-empty {
-                        opacity: 0.8;
-                        margin-right: 4px;
-                    }
-                }
-            }
-
-            .membership-edit-button {
-                --md-button-color: @gray-button-color;
-                flex-shrink: 0;
-                margin-top: -0.7em; // eyeballed
-            }
-        }
-
-        .fixed-checkbox {
-            pointer-events: none;
-            --md-checkbox-check: @secondary;
-            --md-checkbox-color: transparent;
-            --md-checkbox-idle: transparent;
-        }
-
-        .member-header {
-            position: relative;
-            display: flex;
-            padding: 24px;
-            padding-bottom: 12px;
-            align-items: center;
-            --header-background: @text-fade-10;
-            background: var(--header-background);
-
-            margin-bottom: 1em;
-            .decorative-flourish {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                height: 2em;
-                background: var(--header-background);
-                clip-path: polygon(0 0, 100% 0, 100% 100%);
-            }
-
-            .member-picture {
-                width: 25%;
-                margin-right: 16px;
-                flex-shrink: 0;
-            }
-
-            .member-picture-container {
-                position: relative;
-                width: 128px;
-                height: 128px;
-                margin-left: auto;
-                border-radius: 50%;
-                border: 2px solid @picture-outline;
-                overflow: hidden;
-                box-sizing: border-box;
-
-                .profile-picture {
-                    max-width: 100%;
-                    max-height: 100%;
-                }
-
-                .edit-overlay {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    line-height: 0;
-                    padding: 0;
-                    transition: opacity 0.1s;
-                    background: fade(#000, 50%);
-                    --md-button-color: #fff;
-                    --md-button-highlight-opacity: 0;
-
-                    .edit-icon {
-                        position: relative;
-                    }
-
-                    &:not(:hover):not(:focus) {
-                        opacity: 0;
-                    }
-                }
-            }
-
-            .member-info {
-                flex: 1;
-
-                .member-name {
-                    .type-icon {
-                        vertical-align: -4px;
-                        margin-right: 8px;
-                    }
-
-                    .name-primary {
-                        font-size: 1.7em;
-                        font-weight: bold;
-                    }
-                    .name-legal {
-                        font-size: small;
-                        margin-top: 8px;
-
-                        .name-legal-inner {
-                            font-weight: 600;
-                        }
-                    }
-
-                    &.editing {
-                        margin-bottom: 32px;
-                    }
-                }
-
-                .member-code {
-                    margin-top: 8px;
-
-                    .uea-code-editor {
-                        margin-bottom: 8px;
-                    }
-                }
-            }
-
-            @media (max-width: 600px) {
-                display: block;
-
-                .member-picture-container {
-                    margin-left: auto;
-                    margin-right: auto;
-                    margin-bottom: 16px;
-                }
-            }
-        }
-
-        .codeholder-website-link {
-            color: inherit;
-        }
-
-        .detail-view-contents.is-editing .member-header .member-picture-container .edit-overlay {
-            opacity: 1;
-        }
-
-        .member-notes {
-            textarea {
-                font: inherit;
-                background: @card-background;
-                color: inherit;
-                border: 1px solid @separator;
-                display: block;
-                width: 100%;
-                resize: vertical;
-                min-height: 128px;
-                border-radius: 4px;
-                padding: 8px 16px;
-                box-sizing: border-box;
-
-                &:focus {
-                    outline: none;
-                    border: 1px solid @secondary;
-                }
-            }
-        }
-
-        .member-files {
-            padding: 16px;
-            padding-top: 0;
-
-            .files-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .files-list {
-                max-height: 400px;
-                overflow-y: auto;
-                position: relative;
-
-                .data-list-item {
-                    position: absolute;
-                    top: 0;
-                    width: 100%;
-                    height: 64px;
-                    display: flex;
-                    align-items: center;
-
-                    .list-item-contents {
-                        flex: 1;
-                    }
-
-                    .list-item-extra {
-                        flex-shrink: 0;
-                        margin-left: 16px;
-                    }
-                }
-
-                .member-file {
-                    display: flex;
-                    align-items: center;
-                    padding: 8px 0;
-
-                    .file-thumbnail {
-                        width: 48px;
-                        height: 48px;
-                        flex-shrink: 0;
-                        background: @text-fade-10;
-                        border-radius: 50%;
-                        text-align: center;
-                        line-height: 48px;
-                        margin-right: 16px;
-                    }
-
-                    .file-meta {
-                        flex: 1;
-
-                        .file-id {
-                            font-size: small;
-                            padding: 1px 4px;
-                            border-radius: 4px;
-                            background: @text-fade-20;
-                            margin-right: 4px;
-                        }
-
-                        .file-desc, .secondary-info {
-                            font-size: small;
-                            opacity: 0.8;
-                        }
-
-                        .file-desc {
-                            font-size: 0.9em;
-                        }
-
-                        .file-desc:not(:empty), .secondary-info {
-                            margin-top: 4px;
-                        }
-
-                        .mime-type {
-                            .mime-subtype {
-                                text-transform: uppercase;
-                            }
-                            .mime-ty:not(:empty)::before {
-                                content: '-';
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     .addr-label-gen-card-stack {
         position: absolute;
         top: 0;
@@ -778,6 +462,304 @@
 
                     .generate-btn {
                         align-self: flex-end;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.codeholders-page .detail-view, .codeholder-field-history {
+    .editor-line {
+        margin-bottom: 8px;
+
+        .paper-text-field, .form-validator {
+            margin-right: 8px;
+        }
+
+        .full-name-editor, .full-name-editor .paper-text-field {
+            width: 100%;
+        }
+    }
+
+    .codeholder-address-rendered {
+        .address-postal-button {
+            font-size: small;
+            margin-top: 8px;
+        }
+    }
+
+    .member-code {
+        position: relative;
+        z-index: 1;
+    }
+
+    .membership-editor {
+        padding: 8px 0;
+        display: flex;
+        align-items: flex-start;
+
+        .membership {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid @text-fade-20;
+            border-radius: 4px;
+            margin-right: 4px;
+            margin-bottom: 4px;
+
+            .membership-name {
+                display: inline-block;
+                background: @text-fade-20;
+                padding: 2px 4px;
+                border-radius: 3px;
+                font-size: small;
+            }
+
+            .membership-year {
+                display: inline-block;
+                padding: 0 2px;
+            }
+        }
+
+        .memberships {
+            position: relative;
+            overflow: hidden;
+            height: calc(2em + 8px);
+            .log-gradient-mask();
+
+            &::before {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: calc(1em + 4px);
+            }
+
+            &.is-empty {
+                .membership-empty {
+                    opacity: 0.8;
+                    margin-right: 4px;
+                }
+            }
+        }
+
+        .membership-edit-button {
+            --md-button-color: @gray-button-color;
+            flex-shrink: 0;
+            margin-top: -0.7em; // eyeballed
+        }
+    }
+
+    .fixed-checkbox {
+        pointer-events: none;
+        --md-checkbox-check: @secondary;
+        --md-checkbox-color: transparent;
+        --md-checkbox-idle: transparent;
+    }
+
+    .member-header {
+        position: relative;
+        display: flex;
+        padding: 24px;
+        padding-bottom: 12px;
+        align-items: center;
+        --header-background: @text-fade-10;
+        background: var(--header-background);
+
+        margin-bottom: 1em;
+        .decorative-flourish {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            height: 2em;
+            background: var(--header-background);
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
+        }
+
+        .member-picture {
+            width: 25%;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .member-picture-container {
+            position: relative;
+            width: 128px;
+            height: 128px;
+            margin-left: auto;
+            border-radius: 50%;
+            border: 2px solid @picture-outline;
+            overflow: hidden;
+            box-sizing: border-box;
+
+            .profile-picture {
+                max-width: 100%;
+                max-height: 100%;
+            }
+
+            .edit-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                line-height: 0;
+                padding: 0;
+                transition: opacity 0.1s;
+                background: fade(#000, 50%);
+                --md-button-color: #fff;
+                --md-button-highlight-opacity: 0;
+
+                .edit-icon {
+                    position: relative;
+                }
+
+                &:not(:hover):not(:focus) {
+                    opacity: 0;
+                }
+            }
+        }
+
+        .member-info {
+            flex: 1;
+
+            .member-name {
+                .type-icon {
+                    vertical-align: -4px;
+                    margin-right: 8px;
+                }
+
+                .name-primary {
+                    font-size: 1.7em;
+                    font-weight: bold;
+                }
+                .name-legal {
+                    font-size: small;
+                    margin-top: 8px;
+
+                    .name-legal-inner {
+                        font-weight: 600;
+                    }
+                }
+
+                &.editing {
+                    margin-bottom: 32px;
+                }
+            }
+
+            .member-code {
+                margin-top: 8px;
+
+                .uea-code-editor {
+                    margin-bottom: 8px;
+                }
+            }
+        }
+
+        @media (max-width: 600px) {
+            display: block;
+
+            .member-picture-container {
+                margin-left: auto;
+                margin-right: auto;
+                margin-bottom: 16px;
+            }
+        }
+    }
+
+    .codeholder-website-link {
+        color: inherit;
+    }
+
+    .detail-view-contents.is-editing .member-header .member-picture-container .edit-overlay {
+        opacity: 1;
+    }
+
+    .member-notes {
+        textarea {
+            font: inherit;
+            background: @card-background;
+            color: inherit;
+            border: 1px solid @separator;
+            display: block;
+            width: 100%;
+            resize: vertical;
+            min-height: 128px;
+            border-radius: 4px;
+            padding: 8px 16px;
+            box-sizing: border-box;
+
+            &:focus {
+                outline: none;
+                border: 1px solid @secondary;
+            }
+        }
+    }
+
+    .member-files {
+        padding: 16px;
+        padding-top: 0;
+
+        .files-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .files-list {
+            .data-list-empty {
+                top: 0;
+            }
+
+            .member-file {
+                display: flex;
+                align-items: center;
+                padding: 8px 0;
+
+                .file-thumbnail {
+                    width: 48px;
+                    height: 48px;
+                    flex-shrink: 0;
+                    background: @text-fade-10;
+                    border-radius: 50%;
+                    text-align: center;
+                    line-height: 48px;
+                    margin-right: 16px;
+                }
+
+                .file-meta {
+                    flex: 1;
+
+                    .file-id {
+                        font-size: small;
+                        padding: 1px 4px;
+                        border-radius: 4px;
+                        background: @text-fade-20;
+                        margin-right: 4px;
+                    }
+
+                    .file-desc, .secondary-info {
+                        font-size: small;
+                        opacity: 0.8;
+                    }
+
+                    .file-desc {
+                        font-size: 0.9em;
+                    }
+
+                    .file-desc:not(:empty), .secondary-info {
+                        margin-top: 4px;
+                    }
+
+                    .mime-type {
+                        .mime-subtype {
+                            text-transform: uppercase;
+                        }
+                        .mime-ty:not(:empty)::before {
+                            content: '-';
+                        }
                     }
                 }
             }

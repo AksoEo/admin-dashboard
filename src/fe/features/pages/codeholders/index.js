@@ -101,7 +101,29 @@ export default class CodeholdersPage extends Page {
     }
 
     componentDidMount () {
+        const originalQuery = this.props.query;
         this.decodeURLQuery();
+
+        if (!originalQuery) {
+            // FIXME: extremely hacky: wait for state update
+            setTimeout(() => {
+                // fresh load; we can add default filters
+                if (this.state.options.filters.enabled) {
+                    this.setState({
+                        options: {
+                            ...this.state.options,
+                            filters: {
+                                ...this.state.options.filters,
+                                enabled: {
+                                    ...this.state.options.filters.enabled,
+                                    enabled: true,
+                                }
+                            }
+                        }
+                    });
+                }
+            }, 10);
+        }
     }
 
     componentDidUpdate (prevProps, prevState) {

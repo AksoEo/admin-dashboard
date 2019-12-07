@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { CircularProgress } from '@cpsdqs/yamdl';
 import Page from '../../../components/page';
 import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';
@@ -15,6 +16,7 @@ export default class History extends Page {
 
     state = {
         items: [],
+        loading: false,
     };
 
     #loadTask = null;
@@ -22,12 +24,13 @@ export default class History extends Page {
 
     load () {
         if (this.#loadTask) return;
+        this.setState({ loading: true });
         this.#loadTask = this.context.createTask('codeholders/fieldHistory', {
             // get codeholder id from the match above
             id: +this.props.matches[this.props.matches.length - 2][1],
             field: this.props.query,
         }).runOnceAndDrop().then(({ items }) => {
-            this.setState({ items });
+            this.setState({ items, loading: false });
         }).catch(err => {
             console.error('Failed to fetch field history', err); // eslint-disable-line no-console
             this.#reloadTimeout = setTimeout(() => this.load(), 1000);
@@ -57,6 +60,11 @@ export default class History extends Page {
         return (
             <div class="codeholder-field-history">
                 <Meta title={locale.fieldHistory.title} />
+                {this.state.loading ? (
+                    <div class="history-loading-container">
+                        <CircularProgress indeterminate />
+                    </div>
+                ) : null}
                 <div class="history-items">
                     {this.state.items.map(item => <FieldHistoryItem
                         key={item.id}
@@ -91,7 +99,11 @@ function FieldHistoryItem ({ item, field, renderer: Renderer }) {
                         <data.timestamp.inlineRenderer value={item.time * 1000} />
                     </div>
                 </div>
-            ) : null}
+            ) : (
+                <div class="item-meta">
+                    {locale.fieldHistory.initial}
+                </div>
+            )}
         </div>
     );
 }
