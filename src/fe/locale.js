@@ -27,7 +27,7 @@ export const data = {
         'GB',
     ],
     delete: 'Forigi',
-    showMore: '[[show more]]',
+    showMore: 'Montri pliajn',
 };
 
 export const login = {
@@ -309,14 +309,14 @@ export const codeholders = {
             yes: 'membrecdona',
             no: 'nemembrecdona',
         },
-        availableFrom: '[[av. from]]',
-        availableTo: '[[av. to]]',
-        year: '[[year]]',
-        notAYear: '[[not a year]]',
+        availableFrom: 'nur de',
+        availableTo: 'nur ĝis',
+        year: 'Jaro',
+        notAYear: 'Bonvolu enmeti validan jaron',
         add: 'Aldoni',
     },
     filesTitle: 'Dosieroj',
-    noFiles: '[[no files]]',
+    noFiles: 'Neniuj dosieroj',
     uploadFile: 'Alŝuti dosieron',
     uploadThisFile: 'Alŝuti',
     downloadFile: 'Elŝuti',
@@ -332,7 +332,7 @@ export const codeholders = {
         title: 'Historio',
         comment: 'Priskribo de ŝanĝoj',
         changedBy: 'Ŝanĝita de',
-        initial: '[[initial value]]',
+        initial: 'Origina datumo',
     },
     addrLabelGen: {
         menuItem: 'Krei adresetikedojn',
