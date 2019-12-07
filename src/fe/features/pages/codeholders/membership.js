@@ -1,8 +1,7 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { Button, Dialog, MenuIcon } from '@cpsdqs/yamdl';
+import { Button, Dialog } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
-import { CardStackItem } from '../../../components/card-stack';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Page from '../../../components/page';
 import DataList from '../../../components/data-list';
@@ -51,8 +50,6 @@ export class MembershipInDetailView extends PureComponent {
     }
 
     render () {
-        const { canEdit } = this.props;
-
         const memberships = this.state.preview.map(item => {
             let className = 'membership';
             if (item.givesMembership) className += ' gives-membership';
@@ -111,7 +108,9 @@ export default class MembershipPage extends Page {
                     actions={[canEdit && {
                         label: locale.addMembership,
                         icon: <AddIcon />,
-                        action: () => this.setState({ addingMembership: true }),
+                        action: () => {
+                            this.context.createTask('codeholders/addMembership', { id, }); // task view
+                        },
                     }].filter(x => x)} />
                 <DataList
                     updateView={['codeholders/codeholderSigMemberships', { id }]}

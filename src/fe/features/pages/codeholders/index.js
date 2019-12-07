@@ -117,9 +117,9 @@ export default class CodeholdersPage extends Page {
                                 enabled: {
                                     ...this.state.options.filters.enabled,
                                     enabled: true,
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     });
                 }
             }, 10);

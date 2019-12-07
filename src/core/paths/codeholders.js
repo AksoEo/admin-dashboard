@@ -730,8 +730,8 @@ export const tasks = {
     addMembership: async ({ id }, { category, year }) => {
         const client = await asyncClient;
         await client.post(`/codeholders/${id}/membership`, {
-            categoryId: category,
-            year: year,
+            categoryId: +category,
+            year: +year,
         });
 
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
@@ -903,7 +903,7 @@ function flushCodeholders () {
             filter: {
                 id: {
                     $in: ids,
-                }
+                },
             },
         },
         limit: ids.length,
@@ -918,7 +918,6 @@ function fetchCodeholderForView (id, fields) {
         // can’t batch this one
         return tasks.codeholder({}, { id, fields });
     }
-    const now = Date.now() / 1000;
     if (codeholderBatchIds.size >= 100) {
         // we can only request 100 at once; flush now
         flushCodeholders();

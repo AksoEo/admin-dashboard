@@ -1,10 +1,12 @@
 import { h } from 'preact';
 import { useRef, useState, useEffect } from 'preact/compat';
 import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
+import NativeSelect from '@material-ui/core/NativeSelect';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
 import Form, { Validator } from '../../../components/form';
 import data from '../../../components/data';
+import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
 import {
     codeholders as locale,
@@ -237,4 +239,97 @@ export default {
             </Dialog>
         );
     },
+    addMembership: connect('memberships/categories')(categories => ({
+        categories
+    }))(function ({ open, core, task, categories }) {
+        const buttonValidator = useRef(null);
+        const [error, setError] = useState(null);
+
+        useEffect(() => {
+            if (!task.parameters.year) {
+                task.update({ year: new Date().getFullYear() });
+            }
+            if (categories && !('category' in task.parameters)) {
+                task.update({ category: Object.values(categories)[0].id });
+            }
+        });
+
+        return (
+            <Dialog
+                backdrop
+                class="codeholders-task-add-membership"
+                open={open}
+                title={locale.addMembership}
+                onClose={() => task.drop()}>
+                <Form class="task-form" onSubmit={() => {
+                    setError(null);
+                    task.runOnce().catch(err => {
+                        setError(err);
+                        buttonValidator.current.shake();
+                    });
+                }}>
+                    <Validator
+                        component={NativeSelect}
+                        validate={() => {}}
+                        className="category-select form-field"
+                        value={task.parameters.category}
+                        onChange={e => {
+                            task.update({ category: e.target.value });
+                        }}>
+                        {categories && Object.values(categories).map(({
+                            id,
+                            nameAbbrev,
+                            name,
+                            availableFrom,
+                            availableTo,
+                        }) => (
+                            <option key={id} value={id}>
+                                {name} ({nameAbbrev})
+                                {availableFrom && availableTo ? (
+                                    ` (${availableFrom}–${availableTo})`
+                                ) : availableFrom ? (
+                                    ` (${locale.membership.availableFrom} ${availableFrom})`
+                                ) : availableTo ? (
+                                    ` (${locale.membership.availableTo} ${availableTo})`
+                                ) : null}
+                            </option>
+                        ))}
+                    </Validator>
+                    <Validator
+                        component={TextField}
+                        class="form-field text-field"
+                        type="number"
+                        label={locale.membership.year}
+                        value={task.parameters.year}
+                        onChange={e => task.update({ year: e.target.value })}
+                        validate={value => {
+                            if (+value != value) throw { error: locale.membership.notAYear };
+                        }} />
+                    {error ? (
+                        <div class="error-message">
+                            {'' + error}
+                        </div>
+                    ) : null}
+                    <footer class="form-footer">
+                        <span class="footer-spacer" />
+                        <Validator
+                            component={Button}
+                            raised
+                            type="submit"
+                            disabled={task.running}
+                            ref={buttonValidator}
+                            validate={() => {}}>
+                            <CircularProgress
+                                class="progress-overlay"
+                                indeterminate={task.running}
+                                small />
+                            <span>
+                                {locale.membership.add}
+                            </span>
+                        </Validator>
+                    </footer>
+                </Form>
+            </Dialog>
+        );
+    }),
 };

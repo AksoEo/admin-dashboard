@@ -224,6 +224,8 @@ const mimeIcons = {
 };
 
 function FileThumbnail ({ file, id, mime }) {
+    void id;
+
     let icon = <FileIcon />;
 
     mime = mime || file.type;
