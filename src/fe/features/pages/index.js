@@ -69,7 +69,8 @@ export default [
                             },
                             {
                                 path: 'membrecoj',
-                                component: () => 'todo',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/membership')),
                                 type: 'stack',
                             },
                             {

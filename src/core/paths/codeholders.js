@@ -1008,7 +1008,7 @@ export const views = {
     /// # Options
     /// - id: codeholder id
     codeholderSigFiles: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_FILES]),
-    /// codeholders/codeholderSigFiles: observes codeholder files for client-side changes
+    /// codeholders/codeholderSigMemberships: observes codeholder files for client-side changes
     ///
     /// # Options
     /// - id: codeholder id

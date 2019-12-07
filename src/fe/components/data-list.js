@@ -56,7 +56,7 @@ export default class DataList extends PureComponent {
 
         for (let i = lowerChunk; i <= upperChunk; i++) {
             if (!this.state.items[i * VLIST_CHUNK_SIZE]) {
-                this.fetchChunk(i);
+                this.fetchChunk(i).catch(this.onFailFetch);
             }
         }
     };
@@ -65,11 +65,16 @@ export default class DataList extends PureComponent {
         let i = 0;
         while (i <= Math.ceil(this.state.total / VLIST_CHUNK_SIZE)) {
             if (!this.state.items[i * VLIST_CHUNK_SIZE]) {
-                this.fetchChunk(i);
+                this.fetchChunk(i).catch(this.onFailFetch);
                 break;
             }
             i++;
         }
+    };
+
+    onFailFetch = err => {
+        // TODO: error handling
+        console.error(err); // eslint-disable-line no-console
     };
 
     deleteItem (index) {
@@ -96,7 +101,7 @@ export default class DataList extends PureComponent {
             // data updated
             // re-fetch all chunks (and if we don’t have any right now; fetch at least one)
             for (let i = 0; i < Math.max(1, this.state.items.length / VLIST_CHUNK_SIZE); i++) {
-                this.fetchChunk(i);
+                this.fetchChunk(i).catch(this.onFailFetch);
             }
         });
     }
@@ -109,7 +114,7 @@ export default class DataList extends PureComponent {
 
     componentDidMount () {
         this.maySetState = true;
-        this.fetchChunk(0);
+        this.fetchChunk(0).catch(this.onFailFetch);
         this.bindUpdates();
     }
 

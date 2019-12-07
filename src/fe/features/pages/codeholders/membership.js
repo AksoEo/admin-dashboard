@@ -1,27 +1,20 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { Button, Dialog, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
+import { Button, Dialog, MenuIcon } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import { CardStackItem } from '../../../components/card-stack';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import Page from '../../../components/page';
 import DataList from '../../../components/data-list';
 import { coreContext, connect } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
+import Meta from '../../meta';
+import { LinkButton } from '../../../router';
+import './membership.less';
 
-// TODO: use core properly
-
-/// Membership editor.
-///
-/// # Props
-/// - `id`: codeholder ID
-/// - `canEdit`: edit permission
-export default class MembershipEditor extends PureComponent {
+export class MembershipInDetailView extends PureComponent {
     state = {
-        // first 100 items (maybe there’s more? We Just Don’t Know)
         preview: [],
-
-        editing: false,
-        addingMembership: false,
     };
 
     static contextType = coreContext;
@@ -29,7 +22,7 @@ export default class MembershipEditor extends PureComponent {
     loadPreview () {
         this.context.createTask('codeholders/listMemberships', { id: this.props.id }, {
             offset: 0,
-            limit: 100,
+            limit: 20,
         }).runOnceAndDrop().then(res => {
             this.setState({ preview: res.items });
         }).catch(err => {
@@ -37,12 +30,23 @@ export default class MembershipEditor extends PureComponent {
         });
     }
 
+    #sigView;
+    bindSigView () {
+        if (this.#sigView) this.#sigView.drop();
+        this.#sigView = this.context.createDataView('codeholders/codeholderSigMemberships', {
+            id: this.props.id,
+        });
+        this.#sigView.on('update', () => this.loadPreview());
+    }
+
     componentDidMount () {
         this.loadPreview();
+        this.bindSigView();
     }
     componentDidUpdate (prevProps) {
         if (prevProps.id !== this.props.id) {
             this.loadPreview();
+            this.bindSigView();
         }
     }
 
@@ -76,66 +80,67 @@ export default class MembershipEditor extends PureComponent {
                 <div class={'memberships' + (noMemberships ? ' is-empty' : '')}>
                     {memberships}
                 </div>
-                <Button
+                <LinkButton
                     icon
                     small
                     class="membership-edit-button"
-                    onClick={() => this.setState({ editing: true })}>
-                    <MoreHorizIcon />
-                </Button>
+                    style={{ lineHeight: '36px' }} // FIXME: weird
+                    target={`/membroj/${this.props.id}/membrecoj`}>
+                    <MoreHorizIcon style={{ verticalAlign: 'middle' }} />
+                </LinkButton>
+            </div>
+        );
+    }
+}
 
-                <CardStackItem
-                    depth={1}
-                    class="membership-editor-dialog"
-                    open={this.state.editing}
-                    onClose={() => {
-                        this.setState({ editing: false });
-                        this.loadPreview();
-                    }}
-                    appBar={
-                        <AppBarProxy
-                            menu={<Button icon small onClick={() => {
-                                this.setState({ editing: false });
-                                this.loadPreview();
-                            }}>
-                                <MenuIcon type="back" />
-                            </Button>}
-                            title={locale.memberships}
-                            priority={9}
-                            actions={[canEdit && {
-                                label: locale.addMembership,
-                                icon: <AddIcon />,
-                                action: () => this.setState({ addingMembership: true }),
-                            }].filter(x => x)} />
-                    }>
-                    <DataList
-                        onLoad={(offset, limit) =>
-                            this.context.createTask('codeholders/listMemberships', {
-                                id: this.props.id,
-                            }, { offset, limit }).runOnceAndDrop()}
-                        emptyLabel={locale.noMemberships}
-                        itemHeight={56}
-                        onRemove={canEdit && (item =>
-                            this.context.createTask('codeholders/deleteMembership', {
-                                id: this.props.id,
-                            }, { membership: item.id }).runOnceAndDrop())}
-                        renderItem={item => (
-                            <div class="membership-item">
-                                <div class="item-name">
-                                    {item.name}
-                                    {item.nameAbbrev ? ` (${item.nameAbbrev})` : null}
-                                </div>
-                                <div class="item-desc">
-                                    {item.year}
-                                    {', '}
-                                    {locale.membership.lifetime[item.lifetime ? 'yes' : 'no']}
-                                    {', '}
-                                    {locale.membership.givesMembership[item.givesMembership ? 'yes' : 'no']}
-                                    {/* TODO: more stuff */}
-                                </div>
+/// Membership editor.
+export default class MembershipPage extends Page {
+    static contextType = coreContext;
+
+    render () {
+        const canEdit = true; // TODO
+
+        // get codeholder id from the match above
+        const id = +this.props.matches[this.props.matches.length - 2][1];
+
+        return (
+            <div class="codeholder-memberships-page">
+                <Meta
+                    title={locale.memberships}
+                    priority={9}
+                    actions={[canEdit && {
+                        label: locale.addMembership,
+                        icon: <AddIcon />,
+                        action: () => this.setState({ addingMembership: true }),
+                    }].filter(x => x)} />
+                <DataList
+                    updateView={['codeholders/codeholderSigMemberships', { id }]}
+                    onLoad={(offset, limit) =>
+                        this.context.createTask('codeholders/listMemberships', {
+                            id,
+                        }, { offset, limit }).runOnceAndDrop()}
+                    emptyLabel={locale.noMemberships}
+                    itemHeight={56}
+                    onRemove={canEdit && (item =>
+                        this.context.createTask('codeholders/deleteMembership', {
+                            id,
+                        }, { membership: item.id }).runOnceAndDrop())}
+                    renderItem={item => (
+                        <div class="membership-item">
+                            <div class="item-name">
+                                {item.name}
+                                {item.nameAbbrev ? ` (${item.nameAbbrev})` : null}
                             </div>
-                        )} />
-                </CardStackItem>
+                            <div class="item-desc">
+                                {item.year}
+                                {', '}
+                                {locale.membership.lifetime[item.lifetime ? 'yes' : 'no']}
+                                {', '}
+                                {locale.membership.givesMembership[item.givesMembership ? 'yes' : 'no']}
+                                {/* TODO: more stuff */}
+                            </div>
+                        </div>
+                    )} />
 
                 <Dialog
                     backdrop
@@ -143,7 +148,7 @@ export default class MembershipEditor extends PureComponent {
                     open={this.state.addingMembership}
                     onClose={() => this.setState({ addingMembership: false })}
                     title={locale.addMembership}>
-                    <AddMembership id={this.props.id} onSuccess={() => this.setState({ addingMembership: false, editing: true })} />
+                    <AddMembership id={id} onSuccess={() => this.setState({ addingMembership: false, editing: true })} />
                 </Dialog>
             </div>
         );
