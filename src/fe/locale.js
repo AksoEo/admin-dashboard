@@ -149,7 +149,7 @@ export const detail = {
     done: 'Konservi',
     saveTitle: 'Konservado',
     diff: 'Redaktitaj kampoj',
-    updateComment: 'Priskribo de ŝanĝoj farotaj',
+    updateComment: 'Fonto aŭ kialo de ŝanĝoj farotaj',
     commit: 'Aktualigi',
 };
 
