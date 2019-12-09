@@ -798,12 +798,12 @@ export const tasks = {
     /// - id: codeholder id
     /// - role: role id
     /// - durationFrom/durationTo: nullable date bounds
-    addRole: async ({ id }, { durationFrom, durationTo, role: roleId }) => {
+    addRole: async ({ id }, { durationFrom, durationTo, role }) => {
         const client = await asyncClient;
         await client.post(`/codeholders/${id}/roles`, {
-            durationFrom: +new Date(durationFrom) / 1000,
-            durationTo: +new Date(durationTo) / 1000,
-            roleId,
+            durationFrom: durationFrom ? +new Date(durationFrom) / 1000 : null,
+            durationTo: durationTo ? +new Date(durationTo) / 1000 : null,
+            roleId: +role,
         });
 
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;

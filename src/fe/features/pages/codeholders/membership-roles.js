@@ -116,7 +116,7 @@ export const RolesInDetailView = makeInDetailView(
     'roloj',
 );
 
-function makePage (createTask, signal, listTask, deleteTask, renderItem, title, add, empty) {
+function makePage (createTask, signal, listTask, deleteTask, deleteKey, renderItem, title, add, empty) {
     return class MRPage extends Page {
         static contextType = coreContext;
 
@@ -149,7 +149,7 @@ function makePage (createTask, signal, listTask, deleteTask, renderItem, title, 
                         onRemove={canEdit && (item =>
                             this.context.createTask(deleteTask, {
                                 id,
-                            }, { membership: item.id }).runOnceAndDrop())}
+                            }, { [deleteKey]: item.id }).runOnceAndDrop())}
                         renderItem={renderItem} />
                 </div>
             );
@@ -162,6 +162,7 @@ export const MembershipPage = makePage(
     'codeholders/codeholderSigMemberships',
     'codeholders/listMemberships',
     'codeholders/deleteMembership',
+    'membership',
     item => (
         <div class="membership-item">
             <div class="item-name">
@@ -188,6 +189,7 @@ export const RolesPage = makePage(
     'codeholders/codeholderSigRoles',
     'codeholders/listRoles',
     'codeholders/deleteRole',
+    'role',
     item => (
         <div class="role-item">
             <div class="item-name">
