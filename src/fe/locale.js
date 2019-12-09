@@ -434,6 +434,8 @@ export const mime = {
         'application/rtf': 'RTF-dokumento',
         'text/plain': 'Teksto',
         'application/octet-stream': 'Dosiero',
+        'application/zip': 'ZIP-dosiero',
+        'application/x-rar': 'RAR-dosiero',
     },
 };
 
