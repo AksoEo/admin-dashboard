@@ -30,7 +30,10 @@ export function ListsIcon () {
     );
 }
 
-const elazy = inner => lazy(() => inner().catch(err => {
+const elazy = (inner, map) => lazy(() => inner().then(e => {
+    if (map) return { default: map(e) };
+    return e;
+}).catch(err => {
     console.error('Failed to load app page', err); // eslint-disable-line no-console
     return { __esModule: true, default: () => 'okazas eraro' };
 }));
@@ -70,7 +73,13 @@ export default [
                             {
                                 path: 'membrecoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/membership')),
+                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.MembershipPage),
+                                type: 'stack',
+                            },
+                            {
+                                path: 'roloj',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.RolesPage),
                                 type: 'stack',
                             },
                             {

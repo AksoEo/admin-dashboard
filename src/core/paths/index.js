@@ -28,6 +28,7 @@ const countries = () => import(/* webpackChunkName: 'core-countries', webpackPre
 const httpLog = () => import(/* webpackChunkName: 'core-http-log', webpackPrefetch: true */ './http-log');
 const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './login');
 const memberships = () => import(/* webpackChunkName: 'core-memberships', webpackPrefetch: true */ './memberships');
+const roles = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './roles');
 const queries = () => import(/* webpackChunkName: 'core-queries', webpackPrefetch: true */ './queries');
 
 /// Task definitions.
@@ -49,6 +50,7 @@ export const views = {
     httpLog: lazyPath(httpLog, mapViews),
     login: lazyPath(login, mapViews),
     memberships: lazyPath(memberships, mapViews),
+    roles: lazyPath(roles, mapViews),
 
     /// #tasks: a map of all current tasks to their paths; used for task views in the FE
     [TASKS]: createStoreObserver([TASKS], tasks => {

@@ -4,6 +4,7 @@ import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
+import RangeEditor from '../../../components/range-editor';
 import Form, { Validator } from '../../../components/form';
 import data from '../../../components/data';
 import { connect } from '../../../core/connection';
@@ -240,10 +241,18 @@ export default {
         );
     },
     addMembership: connect('memberships/categories')(categories => ({
-        categories
-    }))(function ({ open, core, task, categories }) {
+        categories,
+    }))(function ({ open, task, categories }) {
         const buttonValidator = useRef(null);
         const [error, setError] = useState(null);
+
+        let yearMin = 0;
+        let yearMax = 0;
+
+        if (task.parameters.category) {
+            yearMin = categories[task.parameters.category].availableFrom;
+            yearMax = categories[task.parameters.category].availableTo;
+        }
 
         useEffect(() => {
             if (!task.parameters.year) {
@@ -300,6 +309,8 @@ export default {
                         class="form-field text-field"
                         type="number"
                         label={locale.membership.year}
+                        min={yearMin}
+                        max={yearMax}
                         value={task.parameters.year}
                         onChange={e => task.update({ year: e.target.value })}
                         validate={value => {
@@ -325,6 +336,100 @@ export default {
                                 small />
                             <span>
                                 {locale.membership.add}
+                            </span>
+                        </Validator>
+                    </footer>
+                </Form>
+            </Dialog>
+        );
+    }),
+    addRole: connect('roles/roles')(roles => ({ roles }))(function ({ open, task, roles }) {
+        const buttonValidator = useRef(null);
+        const [error, setError] = useState(null);
+
+        useEffect(() => {
+            if (roles && !('role' in task.parameters)) {
+                task.update({ role: Object.values(roles)[0].id });
+            }
+        });
+
+        return (
+            <Dialog
+                backdrop
+                class="codeholders-task-add-role"
+                open={open}
+                title={locale.addRole}
+                onClose={() => task.drop()}>
+                <Form class="task-form" onSubmit={() => {
+                    setError(null);
+                    task.runOnce().catch(err => {
+                        setError(err);
+                        buttonValidator.current.shake();
+                    });
+                }}>
+                    <Validator
+                        component={NativeSelect}
+                        validate={() => {}}
+                        className="category-select form-field"
+                        value={task.parameters.role}
+                        onChange={e => {
+                            task.update({ role: e.target.value });
+                        }}>
+                        {roles && Object.values(roles).map(({
+                            id,
+                            name,
+                        }) => (
+                            <option key={id} value={id}>
+                                {name}
+                            </option>
+                        ))}
+                    </Validator>
+                    <Validator
+                        component={TextField}
+                        class="form-field text-field"
+                        type="date"
+                        label={locale.role.durationFrom}
+                        value={task.parameters.durationFrom}
+                        onChange={e => task.update({ durationFrom: e.target.value })}
+                        validate={value => {
+                            if (!value) return;
+                            if (!Number.isFinite(new Date(value).getDate())) {
+                                throw { error: locale.role.notADate };
+                            }
+                        }} />
+                    <Validator
+                        component={TextField}
+                        class="form-field text-field"
+                        type="date"
+                        label={locale.role.durationTo}
+                        value={task.parameters.durationTo}
+                        onChange={e => task.update({ durationTo: e.target.value })}
+                        validate={value => {
+                            if (!value) return;
+                            if (!Number.isFinite(new Date(value).getDate())) {
+                                throw { error: locale.role.notADate };
+                            }
+                        }} />
+                    {error ? (
+                        <div class="error-message">
+                            {'' + error}
+                        </div>
+                    ) : null}
+                    <footer class="form-footer">
+                        <span class="footer-spacer" />
+                        <Validator
+                            component={Button}
+                            raised
+                            type="submit"
+                            disabled={task.running}
+                            ref={buttonValidator}
+                            validate={() => {}}>
+                            <CircularProgress
+                                class="progress-overlay"
+                                indeterminate={task.running}
+                                small />
+                            <span>
+                                {locale.role.add}
                             </span>
                         </Validator>
                     </footer>

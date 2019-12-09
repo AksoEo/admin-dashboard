@@ -100,34 +100,6 @@
         }
     }
 
-    .range-editor {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        width: 100%;
-
-        .bound-editor {
-            width: auto;
-            font-size: small;
-            flex: 0 0 4em;
-
-            input {
-                padding: 6px 0 6px 8px;
-            }
-        }
-
-        .editor-inner {
-            width: 100%;
-            flex: 1;
-            margin: 0 8px;
-            z-index: 2;
-        }
-
-        &.disabled {
-            filter: saturate(0) brightness(1.4);
-        }
-    }
-
     .country-picker {
         width: 100%;
         display: flex;
@@ -959,7 +931,7 @@
     }
 }
 
-.codeholders-task-create, .codeholders-task-update, .codeholders-task-add-membership {
+.codeholders-task-create, .codeholders-task-update, .codeholders-task-add-membership, .codeholders-task-add-role {
     width: 400px;
     max-width: 90%;
 
@@ -1027,8 +999,8 @@
     }
 }
 
-.codeholders-task-add-membership {
-    .text-field {
+.codeholders-task-add-membership, .codeholders-task-add-role {
+    .text-field, .category-select {
         width: 100%;
     }
 }

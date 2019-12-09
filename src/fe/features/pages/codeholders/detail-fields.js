@@ -11,7 +11,7 @@ import data, { Required } from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
 import TinyProgress from '../../../components/tiny-progress';
 import ProfilePictureEditor from './profile-picture';
-import { MembershipInDetailView } from './membership';
+import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
 import Files from './files';
 
 const makeEditable = (Renderer, Editor) => function EditableField ({ value, onChange, editing }) {
@@ -296,6 +296,9 @@ function Header ({ item, editing, onItemChange, createHistoryLink }) {
                     {!editing && createHistoryLink('code')}
                 </div>
                 {!editing && <MembershipInDetailView
+                    id={item.id}
+                    canEdit={todoGetPerms('codeholders.update')} />}
+                {!editing && <RolesInDetailView
                     id={item.id}
                     canEdit={todoGetPerms('codeholders.update')} />}
             </div>

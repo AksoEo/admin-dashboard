@@ -51,6 +51,7 @@ export const CODEHOLDERS = 'codeholders';
 
 // signals
 export const SIG_MEMBERSHIPS = '!memberships';
+export const SIG_ROLES = '!roles';
 export const SIG_FILES = '!files';
 
 // used below; this is just here for DRY
@@ -761,6 +762,65 @@ export const tasks = {
             log.error('failed to fetch new memberships', err);
         });
     },
+    /// codeholders/listRoles: lists roles for a codeholder
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - offset, limit
+    /// - filter (optional): verbatim filter
+    ///
+    /// Returns { items, total }
+    listRoles: async ({ id }, { offset, limit, filter }) => {
+        const client = await asyncClient;
+        const opts = {};
+        if (filter) opts.filter = filter;
+        const res = await client.get(`/codeholders/${id}/roles`, {
+            offset,
+            limit,
+            // all of the fields
+            fields: [
+                'id',
+                'durationFrom',
+                'durationTo',
+                'isActive',
+                'role.id',
+                'role.name',
+            ],
+            order: [['durationTo', 'desc']],
+            ...opts,
+        });
+
+        return { items: res.body, total: +res.res.headers.get('x-total-items') };
+    },
+    /// codeholders/addRole: adds a role
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - role: role id
+    /// - durationFrom/durationTo: nullable date bounds
+    addRole: async ({ id }, { durationFrom, durationTo, role: roleId }) => {
+        const client = await asyncClient;
+        await client.post(`/codeholders/${id}/roles`, {
+            durationFrom: +new Date(durationFrom) / 1000,
+            durationTo: +new Date(durationTo) / 1000,
+            roleId,
+        });
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.signal([CODEHOLDERS, storeId, SIG_ROLES]);
+    },
+    /// codeholders/deleteMembership: deletes a membership
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - role: role entry id
+    deleteRole: async ({ id }, { role }) => {
+        const client = await asyncClient;
+        await client.delete(`/codeholders/${id}/roles/${role}`);
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.signal([CODEHOLDERS, storeId, SIG_ROLES]);
+    },
     /// codeholders/makeAddressLabels: spawns a task on the server
     ///
     /// # Options
@@ -1007,9 +1067,14 @@ export const views = {
     /// # Options
     /// - id: codeholder id
     codeholderSigFiles: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_FILES]),
-    /// codeholders/codeholderSigMemberships: observes codeholder files for client-side changes
+    /// codeholders/codeholderSigMemberships: observes codeholder memberships for client-side changes
     ///
     /// # Options
     /// - id: codeholder id
     codeholderSigMemberships: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_MEMBERSHIPS]),
+    /// codeholders/codeholderSigRoles: observes codeholder roles for client-side changes
+    ///
+    /// # Options
+    /// - id: codeholder id
+    codeholderSigRoles: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_ROLES]),
 };
