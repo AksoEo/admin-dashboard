@@ -13,6 +13,8 @@ import Meta from '../../meta';
 import { LinkButton } from '../../../router';
 import './membership.less';
 
+// TODO: clean up some naming (currently everything is called membership)
+
 function makeInDetailView (task, signal, render, empty, target) {
     return class MRInDetailView extends PureComponent {
         state = {

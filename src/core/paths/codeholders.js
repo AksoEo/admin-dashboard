@@ -336,28 +336,17 @@ const clientFilters = {
                 invert, lifetime, givesMembership, useRange, range, categories,
             }) => {
                 const filter = {};
-                if (givesMembership !== null) {
-                    filter.givesMembership = invert ? !givesMembership : givesMembership;
-                }
-                if (lifetime !== null) {
-                    filter.lifetime = invert ? !lifetime : lifetime;
-                }
+                if (givesMembership !== null) filter.givesMembership = givesMembership;
+                if (lifetime !== null) filter.lifetime = lifetime;
                 if (useRange) {
-                    if (invert) {
-                        const [lowerYear, upperYear] = range;
-                        filter.$or = [
-                            { year: { $lt: lowerYear } },
-                            { year: { $gt: upperYear } },
-                        ];
-                    } else filter.year = { $range: range };
+                    if (range[0] === range[1]) filter.year = range[0];
+                    else filter.year = { $range: range };
                 }
-                if (categories.length) {
-                    filter.categoryId = invert ? { $nin: categories } : { $in: categories };
-                }
-                return filter;
+                if (categories.length) filter.categoryId = { $in: categories };
+                return invert ? { $not: { $membership: filter } } : { $membership: filter };
             });
 
-            return { $membership: { $and: items } };
+            return items.length === 1 ? items[0] : { $and: items };
         },
         fields: ['membership'],
     },
