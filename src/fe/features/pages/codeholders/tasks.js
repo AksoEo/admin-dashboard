@@ -4,7 +4,6 @@ import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
-import RangeEditor from '../../../components/range-editor';
 import Form, { Validator } from '../../../components/form';
 import data from '../../../components/data';
 import { connect } from '../../../core/connection';

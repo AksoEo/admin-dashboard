@@ -94,7 +94,6 @@ export const makeParametersToRequestData = ({
         items = items.filter(f => Object.keys(f).length);
 
         options.filter = items.length === 1 ? items[0] : { $and: items };
-        console.log(options.filter);
     }
 
     if (params.jsonFilter && !params.jsonFilter._disabled) {

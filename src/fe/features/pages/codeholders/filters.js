@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Fragment, useState } from 'preact/compat';
-import { Checkbox, Slider, Button, Dialog } from '@cpsdqs/yamdl';
+import { Checkbox, Button, Dialog } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CheckIcon from '@material-ui/icons/Check';
@@ -360,29 +360,60 @@ export default {
             return { enabled: false, value: [] };
         },
         serialize ({ value }) {
-            return JSON.stringify(value.map(({
+            return value.map(({
                 invert, lifetime, givesMembership, useRange, range, categories,
-            }) => ({
-                i: invert,
-                l: lifetime,
-                g: givesMembership,
-                r: useRange ? range : null,
-                c: categories,
-            })));
+            }) => {
+                let s = '';
+                if (invert) s += 'i';
+                if (lifetime !== null) s += lifetime ? 'l' : 'u';
+                if (givesMembership !== null) s += givesMembership ? 'm' : 'n';
+                if (useRange) s += 'r' + range[0] + '-' + range[1];
+                if (categories.length) s += 'c' + categories.join(',');
+                return s;
+            }).join('$');
         },
         deserialize (value) {
             const thisYear = new Date().getFullYear();
 
+            const items = [];
+            for (const serialized of value.split('$')) {
+                const item = {
+                    invert: false,
+                    lifetime: null,
+                    givesMembership: null,
+                    useRange: false,
+                    range: [thisYear, thisYear],
+                    categories: [],
+                };
+
+                const c = [...serialized];
+
+                if (c[0] === 'i') {
+                    c.shift();
+                    item.invert = true;
+                }
+                if (c[0] === 'l' || c[0] === 'u') item.lifetime = c.shift() === 'l';
+                if (c[0] === 'm' || c[0] === 'n') item.givesMembership = c.shift() === 'm';
+                if (c[0] === 'r') {
+                    c.shift();
+                    let d = '';
+                    while (c.length && c[0] !== 'c') d += c.shift();
+                    item.range = d.split('-').slice(0, 2).map(x => +x);
+                    item.useRange = true;
+                }
+                if (c[0] === 'c') {
+                    c.shift();
+                    let d = '';
+                    while (c.length) d += c.shift();
+                    item.categories = d.split(',');
+                }
+
+                items.push(item);
+            }
+
             return {
                 enabled: true,
-                value: JSON.parse(value).map(({ i, l, g, r, c }) => ({
-                    invert: i,
-                    lifetime: l,
-                    givesMembership: g,
-                    useRange: r !== null,
-                    range: r ? r : [thisYear, thisYear],
-                    categories: c,
-                })),
+                value: items,
             };
         },
         editor: function MembershipFilter ({
@@ -565,7 +596,7 @@ export default {
             return { enabled: false, value: [thisYear, thisYear] };
         },
         serialize ({ value }) {
-            return value.start + '-' + value.end;
+            return value[0] + '-' + value[1];
         },
         deserialize (value) {
             const match = value.match(/^(\d+)-(\d+)/);
@@ -598,8 +629,8 @@ export default {
             const thisYear = new Date().getFullYear();
             return { enabled: false, value: [thisYear, thisYear] };
         },
-        serialize (value) {
-            return value.start + '-' + value.end;
+        serialize ({ value }) {
+            return value[0] + '-' + value[1];
         },
         deserialize (value) {
             const match = value.match(/^(\d+)-(\d+)/);
