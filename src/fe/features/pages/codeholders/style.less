@@ -466,12 +466,12 @@
         z-index: 1;
     }
 
-    .membership-editor {
+    .membership-editor, .role-editor {
         padding: 8px 0;
         display: flex;
         align-items: flex-start;
 
-        .membership {
+        .membership, .role {
             display: inline-flex;
             align-items: center;
             border: 1px solid @text-fade-20;
@@ -493,7 +493,12 @@
             }
         }
 
-        .memberships {
+        .role {
+            font-size: small;
+            padding: 2px 4px;
+        }
+
+        .memberships, .roles {
             position: relative;
             overflow: hidden;
             height: calc(2em + 8px);

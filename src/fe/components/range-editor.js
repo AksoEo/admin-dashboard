@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
+import { useState, useRef } from 'preact/compat';
 import { TextField, Slider } from '@cpsdqs/yamdl';
 import './range-editor.less';
 
@@ -16,7 +16,7 @@ import './range-editor.less';
 ///   and the value is momentarily less than K, thus clamping the lower bound. Hence, minSoftBound
 ///   should be used on upper bounds to restrict the area in which they will live-update and thus
 ///   prevent modifying the lower bound unnecessarily.
-export function BoundEditor ({ min, max, minSoftBound, value, onChange }) {
+export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef }) {
     const [isFocused, setFocused] = useState(false);
     const [tmpValue, setTmpValue] = useState(value);
 
@@ -58,6 +58,7 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange }) {
             type="number"
             class="bound-editor"
             center
+            ref={innerRef}
             min={min}
             max={max}
             onFocus={onFocus}
@@ -70,9 +71,13 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange }) {
 
 /// Renders a range editor with inputs on either side.
 export default function RangeEditor ({ min, max, value, onChange, tickDistance, disabled }) {
+    const leftBound = useRef(null);
+    const rightBound = useRef(null);
+
     return (
         <div class={'range-editor' + (disabled ? ' disabled' : '')}>
             <BoundEditor
+                innerRef={leftBound}
                 min={min}
                 max={max}
                 minSoftBound={min}
@@ -86,8 +91,14 @@ export default function RangeEditor ({ min, max, value, onChange, tickDistance, 
                 discrete
                 tickDistance={tickDistance}
                 class="editor-inner"
-                onChange={value => onChange(value)} />
+                onChange={value => {
+                    // bound editors aren’t unfocused automatically
+                    leftBound.current.inputNode.blur();
+                    rightBound.current.inputNode.blur();
+                    onChange(value);
+                }} />
             <BoundEditor
+                innerRef={rightBound}
                 min={min}
                 max={max}
                 minSoftBound={value[0]}

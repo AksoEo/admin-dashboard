@@ -468,7 +468,7 @@ export const tasks = {
     ///    - items: [data store id list]
     ///    - transientFields: [string]
     ///    - total: number
-    ///    - cursed: bool
+    ///    - cursed: array of cursed items or null
     ///    - stats
     ///        - filtered: bool
     ///        - time: string
@@ -501,10 +501,10 @@ export const tasks = {
         const result = await client.get('/codeholders', options);
         let list = result.body;
         let totalItems = +result.res.headers.get('x-total-items');
-        let cursed = false;
+        let cursed = null;
 
         if (itemToPrepend) {
-            cursed = true;
+            cursed = [];
             let isDuplicate = false;
             for (const item of list) {
                 if (item.id === itemToPrepend.id) {
@@ -514,7 +514,10 @@ export const tasks = {
             }
             if (!isDuplicate) {
                 // prepend item on the first page if it’s not a duplicate
-                if (parameters.offset === 0) list.unshift(itemToPrepend);
+                if (parameters.offset === 0) {
+                    list.unshift(itemToPrepend);
+                    cursed.push(itemToPrepend.id);
+                }
                 totalItems++;
             }
         }

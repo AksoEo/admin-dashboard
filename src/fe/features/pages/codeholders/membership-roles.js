@@ -15,7 +15,7 @@ import './membership.less';
 
 // TODO: clean up some naming (currently everything is called membership)
 
-function makeInDetailView (task, signal, render, empty, target) {
+function makeInDetailView (task, signal, render, empty, target, className) {
     return class MRInDetailView extends PureComponent {
         state = {
             preview: [],
@@ -68,8 +68,8 @@ function makeInDetailView (task, signal, render, empty, target) {
             }
 
             return (
-                <div class="membership-editor">
-                    <div class={'memberships' + (noMemberships ? ' is-empty' : '')}>
+                <div class={className + '-editor'}>
+                    <div class={className + 's' + (noMemberships ? ' is-empty' : '')}>
                         {memberships}
                     </div>
                     <LinkButton
@@ -102,6 +102,7 @@ export const MembershipInDetailView = makeInDetailView(
     },
     locale.noMemberships,
     'membrecoj',
+    'membership',
 );
 
 export const RolesInDetailView = makeInDetailView(
@@ -116,6 +117,7 @@ export const RolesInDetailView = makeInDetailView(
     },
     locale.noRoles,
     'roloj',
+    'role',
 );
 
 function makePage (createTask, signal, listTask, deleteTask, deleteKey, renderItem, title, add, empty) {

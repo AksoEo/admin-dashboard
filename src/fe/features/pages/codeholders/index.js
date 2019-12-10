@@ -79,6 +79,9 @@ export default class CodeholdersPage extends Page {
         expanded: false,
         fieldPickerOpen: false,
         csvExportOpen: false,
+
+        // for the addr label gen
+        currentResultIsCursed: false,
     };
 
     static contextType = coreContext;
@@ -218,6 +221,7 @@ export default class CodeholdersPage extends Page {
                     onGetItemLink={id => `/membroj/${id}`}
                     onSetOffset={offset => this.setState({ options: { ...options, offset }})}
                     onSetLimit={limit => this.setState({ options: { ...options, limit }})}
+                    onResult={result => this.setState({ currentResultIsCursed: result.cursed })}
                     locale={locale.fields} />
                 <CSVExport
                     open={this.state.csvExportOpen}
@@ -241,7 +245,7 @@ export default class CodeholdersPage extends Page {
                     }} />
                 <AddrLabelGen
                     open={addrLabelGen}
-                    lvIsCursed={this.state.lvIsCursed}
+                    lvIsCursed={this.state.currentResultIsCursed}
                     options={this.state.options}
                     onClose={() => addrLabelGen.pop()} />
             </div>

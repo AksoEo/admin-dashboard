@@ -27,6 +27,7 @@ const DEBOUNCE_TIME = 400; // ms
 /// - onGetItemLink: should return a link to an item’s detail view
 /// - onSetOffset: callback for changing the current page
 /// - onSetLimit: callback for changing the current items per page
+/// - onResult: result callback
 /// - locale: localized field names
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
@@ -62,6 +63,7 @@ export default class OverviewList extends PureComponent {
         this.#currentTask.runOnceAndDrop().then(result => {
             if (this.#currentTask !== t) return;
             this.setState({ result, error: null, stale: false, loading: false });
+            this.props.onResult(result);
 
             if (this.props.parameters.offset >= result.total && result.total !== 0) {
                 // we’re out of bounds; adjust
@@ -195,6 +197,7 @@ export default class OverviewList extends PureComponent {
 
             contents.push(...result.items.map((id, i) => <ListItem
                 view={view}
+                cursed={result.cursed}
                 key={id}
                 id={id}
                 selectedFields={compiledFields}
@@ -401,6 +404,7 @@ const ListItem = connect(props => ([props.view, {
         onGetItemLink,
         index,
         locale,
+        cursed,
     }) {
         if (!data) return null;
 
@@ -442,7 +446,7 @@ const ListItem = connect(props => ([props.view, {
         return (
             <ItemComponent
                 target={itemLink}
-                class="list-item"
+                class={'list-item' + (cursed ? ' is-cursed' : '')}
                 style={style}
                 ref={node => this.#node = node}
                 onClick={e => {

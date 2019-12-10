@@ -250,8 +250,14 @@ export default class Navigation extends PureComponent {
 
     onPopState = e => this.loadURL(document.location.href, e.state);
 
+    #lastNavigateTime;
+    #debouncedNavigateTimeout;
+
     /// Navigates with an href.
     navigate = (href, replace) => {
+        this.#lastNavigateTime = Date.now();
+        this.#debouncedNavigateTimeout = null;
+
         // first, save the current state so it’s up to date when we go back
         this.saveState();
         const previousURLLocation = this.urlLocation;
@@ -265,10 +271,27 @@ export default class Navigation extends PureComponent {
         this.loadURL(target.href, null);
         // then actually push it to history with the newly computed urlLocation
         if (previousURLLocation === this.urlLocation) replace = true;
-        if (replace) window.history.replaceState(null, '', this.urlLocation);
-        else window.history.pushState(null, '', this.urlLocation);
-        // and finally, save state
-        this.saveState();
+        try {
+            if (replace) window.history.replaceState(null, '', this.urlLocation);
+            else window.history.pushState(null, '', this.urlLocation);
+            // and finally, save state
+            this.saveState();
+        } catch {
+            // may fail in browsers that do not allow frequent updates
+            this.debouncedNavigate(href, replace);
+        }
+    };
+
+    debouncedNavigate = (...args) => {
+        if (this.#lastNavigateTime > Date.now() - 400) {
+            if (!this.#debouncedNavigateTimeout) {
+                this.#debouncedNavigateTimeout = setTimeout(() => {
+                    this.navigate(...args);
+                }, 400);
+            }
+            return;
+        }
+        this.navigate(...args);
     };
 
     /// Called when a page changes its query.
@@ -287,7 +310,7 @@ export default class Navigation extends PureComponent {
 
             if (isTopView) {
                 // save to URL
-                this.navigate(this.state.pathname + (newQuery ? '?' + newQuery : ''), true);
+                this.debouncedNavigate(this.state.pathname + (newQuery ? '?' + newQuery : ''), true);
             } else {
                 // just save to state
                 this.setState({ stack }, this.saveState);
@@ -322,13 +345,17 @@ export default class Navigation extends PureComponent {
     saveState = () => {
         if (!this.state.error) {
             // only save while we don’t have an error
-            window.history.replaceState({
-                stack: this.state.stack
-                    // only save for views
-                    .filter(item => item.component)
-                    .map(item => ({ data: item.data, query: item.query })),
-                href: this.currentLocation,
-            }, '', this.currentLocation);
+            try {
+                window.history.replaceState({
+                    stack: this.state.stack
+                        // only save for views
+                        .filter(item => item.component)
+                        .map(item => ({ data: item.data, query: item.query })),
+                    href: this.currentLocation,
+                }, '', this.currentLocation);
+            } catch {
+                // shrug
+            }
         }
 
         this.scheduleSaveState();
@@ -341,6 +368,7 @@ export default class Navigation extends PureComponent {
 
     componentWillUnmount () {
         clearTimeout(this.#saveStateTimeout);
+        clearTimeout(this.#debouncedNavigateTimeout);
     }
 
     componentDidCatch (error, errorInfo) {
