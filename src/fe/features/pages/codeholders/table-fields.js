@@ -400,6 +400,6 @@ export default {
         },
     },
     notes: {
-        hideColumn: true,
+        hide: true,
     },
 };

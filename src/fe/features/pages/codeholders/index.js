@@ -189,7 +189,14 @@ export default class CodeholdersPage extends Page {
                 <Meta title={locale.title} actions={menu} />
                 <SearchFilters
                     value={options}
-                    onChange={options => this.setState({ options })}
+                    onChange={options => {
+                        this.setState({
+                            options: {
+                                ...options,
+                                fields: options.fields.filter(({ id }) => !FIELDS[id].hide),
+                            },
+                        });
+                    }}
                     searchFields={SEARCHABLE_FIELDS}
                     // TODO: use core views
                     fields={Object.keys(FIELDS)}
@@ -206,7 +213,7 @@ export default class CodeholdersPage extends Page {
                     open={this.state.fieldPickerOpen}
                     onClose={() => this.setState({ fieldPickerOpen: false })}
                     // TODO: use core views
-                    available={Object.keys(FIELDS)}
+                    available={Object.keys(FIELDS).filter(x => !FIELDS[x].hide)}
                     sortables={Object.keys(FIELDS).filter(x => FIELDS[x].sortable)}
                     selected={options.fields}
                     onChange={fields => this.setState({ options: { ...options, fields } })}

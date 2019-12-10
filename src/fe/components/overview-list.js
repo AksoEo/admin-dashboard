@@ -161,7 +161,7 @@ export default class OverviewList extends PureComponent {
         } else if (result) {
             const selectedFields = parameters.fields;
             const selectedFieldIds = selectedFields.map(x => x.id);
-            const compiledFields = [];
+            let compiledFields = [];
             // first, push fixed fields
             for (const field of selectedFields) if (field.fixed) compiledFields.push(field);
             // then transient fields
@@ -170,6 +170,8 @@ export default class OverviewList extends PureComponent {
             }
             // finally, push user fields
             for (const field of selectedFields) if (!field.fixed) compiledFields.push(field);
+
+            compiledFields = compiledFields.filter(({ id }) => !fields[id].hide);
 
             stats = locale.stats(
                 result.items.length,
