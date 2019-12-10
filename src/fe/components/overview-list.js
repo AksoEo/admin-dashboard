@@ -63,7 +63,7 @@ export default class OverviewList extends PureComponent {
         this.#currentTask.runOnceAndDrop().then(result => {
             if (this.#currentTask !== t) return;
             this.setState({ result, error: null, stale: false, loading: false });
-            this.props.onResult(result);
+            if (this.props.onResult) this.props.onResult(result);
 
             if (this.props.parameters.offset >= result.total && result.total !== 0) {
                 // we’re out of bounds; adjust
@@ -72,6 +72,7 @@ export default class OverviewList extends PureComponent {
             }
         }).catch(error => {
             if (this.#currentTask !== t) return;
+            console.error(error); // eslint-disable-line no-console
             this.setState({ result: null, error, stale: false, loading: false });
         });
     }
@@ -199,7 +200,7 @@ export default class OverviewList extends PureComponent {
 
             contents.push(...result.items.map((id, i) => <ListItem
                 view={view}
-                cursed={result.cursed}
+                cursed={result.cursed && result.cursed.includes(id)}
                 key={id}
                 id={id}
                 selectedFields={compiledFields}
