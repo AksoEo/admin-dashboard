@@ -7,6 +7,7 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Page from '../../../components/page';
 import DataList from '../../../components/data-list';
 import data from '../../../components/data';
+import TinyProgress from '../../../components/tiny-progress';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
 import Meta from '../../meta';
@@ -18,7 +19,7 @@ import './membership.less';
 function makeInDetailView (task, signal, render, empty, target, className) {
     return class MRInDetailView extends PureComponent {
         state = {
-            preview: [],
+            items: null,
         };
 
         static contextType = coreContext;
@@ -28,7 +29,7 @@ function makeInDetailView (task, signal, render, empty, target, className) {
                 offset: 0,
                 limit: 20,
             }).runOnceAndDrop().then(res => {
-                this.setState({ preview: res.items });
+                this.setState({ items: res.items });
             }).catch(err => {
                 console.error('Failed to fetch membership/roles', err); // eslint-disable-line no-console
             });
@@ -55,7 +56,8 @@ function makeInDetailView (task, signal, render, empty, target, className) {
         }
 
         render () {
-            const memberships = this.state.preview.map(render);
+            const memberships = this.state.items ? this.state.items.map(render) : [];
+            const loading = this.state.items === null;
 
             let noMemberships = false;
             if (!memberships.length) {
@@ -70,7 +72,7 @@ function makeInDetailView (task, signal, render, empty, target, className) {
             return (
                 <div class={className + '-editor'}>
                     <div class={className + 's' + (noMemberships ? ' is-empty' : '')}>
-                        {memberships}
+                        {loading ? <TinyProgress /> : memberships}
                     </div>
                     <LinkButton
                         icon
