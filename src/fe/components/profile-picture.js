@@ -14,6 +14,7 @@ const DECARDINALIFY = id => [
 ///
 /// # Props
 /// - `id`: member ID
+/// - `self`: set to true to indicate that id is self
 /// - `profilePictureHash`: if given, will load the profile picture; will show an identicon
 ///   otherwise
 export default class ProfilePicture extends Component {
@@ -23,12 +24,13 @@ export default class ProfilePicture extends Component {
     };
 
     load () {
-        const { id, profilePictureHash } = this.props;
+        const { id, self: isSelf, profilePictureHash } = this.props;
         if (!id) return;
 
         if (profilePictureHash) {
             const hash = Buffer.from(profilePictureHash).toString('base64');
-            const urlBase = new URL(`codeholders/${id}/profile_picture/`, config.base).toString();
+            const fid = isSelf ? 'self' : id;
+            const urlBase = new URL(`codeholders/${fid}/profile_picture/`, config.base).toString();
             const imgSrcSet = [32, 64, 128, 256].map(w => `${urlBase}${w}px?noop=${hash} ${w}w`).join(', ');
             this.setState({ imgSrcSet, isIdenticon: false });
         } else {

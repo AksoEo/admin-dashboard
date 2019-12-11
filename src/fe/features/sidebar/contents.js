@@ -134,6 +134,7 @@ const SidebarUser = connect('codeholders/codeholder', {
             <div class="user-profile-picture">
                 <ProfilePicture
                     id={props.id}
+                    self={true}
                     profilePictureHash={props.profilePictureHash} />
             </div>
             <div class="user-name">
