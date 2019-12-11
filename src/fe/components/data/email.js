@@ -11,7 +11,7 @@ function EmailEditor ({ value, onChange }) {
     return <TextField
         class="data email-editor"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value || null)}
         type="email" />;
 }
 

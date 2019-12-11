@@ -39,6 +39,7 @@ function PhoneNumberEditor ({ value, onChange }) {
     }
 
     if (value && !value.startsWith('+')) value = '+' + value;
+    if (value) value = value.replace(/^[+]+/g, '+');
     value = new AsYouTypePhoneFmt().input(value);
 
     return <TextField

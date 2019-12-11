@@ -41,7 +41,7 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
             if (!(p in v)) return null;
             v = v[p] = { ...v[p] };
         }
-        v[last] = newValue;
+        v[last] = newValue || null;
         return value;
     };
 
