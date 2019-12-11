@@ -4,16 +4,22 @@ import { parsePhoneNumber, AsYouType as AsYouTypePhoneFmt } from 'libphonenumber
 import { CountryFlag } from './country';
 
 const phoneNumberRenderer = allowInteractive => function PhoneNumber ({ value }) {
-    let number;
+    let number, trailing;
     try {
+        const parsed = parsePhoneNumber(value.value);
+
         if (value.formatted) number = value.formatted;
-        else number = parsePhoneNumber(value.value).format('INTERNATIONAL');
-    } catch (err) {
+        else number = parsed.format('INTERNATIONAL');
+
+        if (parsed.country) {
+            trailing = <CountryFlag country={parsed.country.toLowerCase()} />;
+        }
+    } catch {
         number = value; // close enough, probably
     }
 
     return allowInteractive
-        ? <a class="data phone-number" href={`tel:${value.value}`}>{number}</a>
+        ? <a class="data phone-number" href={`tel:${value.value}`}>{number} {trailing}</a>
         : <span class="data phone-number not-interactive">{number}</span>;
 };
 
