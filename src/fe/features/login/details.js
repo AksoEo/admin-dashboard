@@ -24,6 +24,7 @@ export default class DetailsPage extends Component {
     #loginField;
     #passwordField;
     #passwordField2;
+    #form;
 
     #spawnInitCreatePassword = () => {
         this.props.core.createTask('login/initCreatePassword', {
@@ -47,14 +48,18 @@ export default class DetailsPage extends Component {
     #onSubmit = () => {
         let task;
 
+        const login = this.props.login.includes('@')
+            ? this.props.login
+            : new UEACode(this.props.login).code;
+
         if (this.props.mode === Mode.NORMAL) {
             task = this.props.core.createTask('login/login', {}, {
-                login: this.props.login,
+                login,
                 password: this.state.password,
             });
         } else {
             task = this.props.core.createTask('login/createPassword', {
-                login: this.props.login,
+                login,
                 token: this.props.token,
             }, {
                 password: this.state.password,
@@ -95,7 +100,7 @@ export default class DetailsPage extends Component {
         const isLoading = authState === LoginAuthStates.AUTHENTICATING;
 
         return (
-            <Form onSubmit={this.#onSubmit}>
+            <Form ref={form => this.#form = form} onSubmit={this.#onSubmit}>
                 <Validator component={TextField}
                     class="form-field"
                     innerRef={view => this.#loginField = view}
@@ -121,7 +126,7 @@ export default class DetailsPage extends Component {
                                 e.preventDefault();
                                 this.#passwordField.focus();
                             } else {
-                                this.#onSubmit();
+                                this.#form.submit();
                             }
                         }
                     }}
@@ -143,7 +148,7 @@ export default class DetailsPage extends Component {
                         : null}
                     onKeyDown={e => {
                         if (!needsPasswordValidation) {
-                            if (e.key === 'Enter') this.#onSubmit();
+                            if (e.key === 'Enter') this.#form.submit();
                         } else {
                             this.#passwordField2.focus();
                         }
@@ -161,7 +166,7 @@ export default class DetailsPage extends Component {
                         placeholder={locale.confirmPasswordPlaceholder}
                         onChange={e => this.setState({ confirmPassword: e.target.value })}
                         onKeyDown={e => {
-                            if (e.key === 'Enter') this.#onSubmit();
+                            if (e.key === 'Enter') this.#form.submit();
                         }}
                         validate={value => {
                             if (value !== this.state.password) {
