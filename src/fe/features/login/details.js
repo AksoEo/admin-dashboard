@@ -116,9 +116,13 @@ export default class DetailsPage extends Component {
                     }}
                     onKeyDown={e => {
                         if (e.key === 'Enter') {
-                            // instead of submitting; focus the password field
-                            e.preventDefault();
-                            this.#passwordField.focus();
+                            if (!this.state.password) {
+                                // instead of submitting; focus the password field
+                                e.preventDefault();
+                                this.#passwordField.focus();
+                            } else {
+                                this.#onSubmit();
+                            }
                         }
                     }}
                     validate={value => {
