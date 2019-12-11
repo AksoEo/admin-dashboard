@@ -580,12 +580,6 @@ const fields = {
     }, {
         history: true,
     }),
-    biography: simpleField(function ({ value, editing, onChange }) {
-        if (!editing) return value;
-        return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
-    }, {
-        history: true,
-    }),
     landlinePhone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
@@ -610,13 +604,35 @@ const fields = {
         isEmpty: value => !value,
         shouldHide: (_, editing) => editing,
     }),
+    biography: {
+        component ({ value, editing, onChange }) {
+            if (!editing) {
+                if (!value) return null;
+                return (
+                    <div class="member-biography">
+                        {value.split('\n').map((l, i) => <span key={i}>{l}<br /></span>)}
+                    </div>
+                );
+            } else {
+                return (
+                    <div class="member-biography">
+                        <textarea
+                            value={value}
+                            onKeyDown={e => e.stopPropagation()}
+                            onChange={e => onChange(e.target.value || null)} />
+                    </div>
+                );
+            }
+        },
+        history: true,
+    },
     notes: {
         component ({ value, editing, onChange }) {
             if (!editing) {
                 if (!value) return null;
                 return (
                     <div class="member-notes">
-                        {value}
+                        {value.split('\n').map((l, i) => <span key={i}>{l}<br /></span>)}
                     </div>
                 );
             } else {
@@ -624,7 +640,8 @@ const fields = {
                     <div class="member-notes">
                         <textarea
                             value={value}
-                            onChange={e => onChange(e.target.value)} />
+                            onKeyDown={e => e.stopPropagation()}
+                            onChange={e => onChange(e.target.value || null)} />
                     </div>
                 );
             }
