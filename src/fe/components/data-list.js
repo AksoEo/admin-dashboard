@@ -16,6 +16,7 @@ const VLIST_CHUNK_SIZE = 100;
 /// # Props
 /// - onLoad: async (offset, limit) -> { items: [item], total: number } callback (required)
 /// - renderItem: (item) -> VNode callback (required)
+/// - renderMenu: (item) -> menu items
 /// - onRemove: async (item) -> void callback
 /// - onItemClick: (item) -> void callback
 /// - itemHeight: fixed item height in pixels
@@ -150,7 +151,11 @@ export default class DataList extends PureComponent {
                         </div>
                         {this.props.onRemove && (
                             <div class="list-item-extra">
-                                <ListItemDeleteOverflow onDelete={() => this.deleteItem(i)} />
+                                <ListItemOverflow
+                                    renderMenu={this.props.renderMenu}
+                                    item={item}
+                                    core={this.context}
+                                    onDelete={() => this.deleteItem(i)}/>
                             </div>
                         )}
                     </Component>
@@ -191,9 +196,11 @@ export default class DataList extends PureComponent {
     }
 }
 
-function ListItemDeleteOverflow ({ onDelete }) {
+function ListItemOverflow ({ renderMenu, item, core, onDelete }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuPos, setMenuPos] = useState([0, 0]);
+
+    const additionalMenu = renderMenu ? renderMenu(item, core) : [];
 
     return (
         <Button small icon class="list-item-overflow" onClick={e => {
@@ -208,7 +215,7 @@ function ListItemDeleteOverflow ({ onDelete }) {
                 onClose={() => setMenuOpen(false)}
                 position={menuPos}
                 anchor={[1, 0]}
-                items={[{
+                items={[...additionalMenu, {
                     label: locale.delete,
                     action: onDelete,
                 }]} />

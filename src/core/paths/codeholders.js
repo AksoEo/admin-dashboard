@@ -801,7 +801,25 @@ export const tasks = {
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         store.signal([CODEHOLDERS, storeId, SIG_ROLES]);
     },
-    /// codeholders/deleteMembership: deletes a membership
+    /// codeholders/updateRole: updates a role
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - entry: role id
+    /// - durationFrom/durationTo: nullable date bounds
+    /// - role: role id
+    updateRole: async ({ id, entry }, { durationFrom, durationTo, role }) => {
+        const client = await asyncClient;
+        await client.patch(`/codeholders/${id}/roles/${entry}`, {
+            durationFrom: durationFrom ? +new Date(durationFrom) / 1000 : null,
+            durationTo: durationTo ? +new Date(durationTo) / 1000 : null,
+            roleId: +role,
+        });
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.signal([CODEHOLDERS, storeId, SIG_ROLES]);
+    },
+    /// codeholders/deleteRole: deletes a role
     ///
     /// # Options and Parameters
     /// - id: codeholder id

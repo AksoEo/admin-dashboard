@@ -318,8 +318,11 @@ export const codeholders = {
     roles: '[[Roloj]]',
     noRoles: '[[Neniuj roloj]]',
     addRole: '[[Aldoni rolon]]',
+    updateRole: '[[update role]]',
     role: {
         add: 'Aldoni',
+        edit: 'Redakti',
+        update: '[[update]]',
         durationFrom: '[[duration from]]',
         durationTo: '[[duration to]]',
         notADate: '[[not a date]]',

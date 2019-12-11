@@ -342,7 +342,12 @@ export default {
             </Dialog>
         );
     }),
-    addRole: connect('roles/roles')(roles => ({ roles }))(function ({ open, task, roles }) {
+    addRole: makeRoleEditor('add'),
+    updateRole: makeRoleEditor('update'),
+};
+
+function makeRoleEditor (type) {
+    return connect('roles/roles')(roles => ({ roles }))(function ({ open, task, roles }) {
         const buttonValidator = useRef(null);
         const [error, setError] = useState(null);
 
@@ -357,7 +362,7 @@ export default {
                 backdrop
                 class="codeholders-task-add-role"
                 open={open}
-                title={locale.addRole}
+                title={locale[type + 'Role']}
                 onClose={() => task.drop()}>
                 <Form class="task-form" onSubmit={() => {
                     setError(null);
@@ -428,12 +433,12 @@ export default {
                                 indeterminate={task.running}
                                 small />
                             <span>
-                                {locale.role.add}
+                                {locale.role[type]}
                             </span>
                         </Validator>
                     </footer>
                 </Form>
             </Dialog>
         );
-    }),
-};
+    });
+}

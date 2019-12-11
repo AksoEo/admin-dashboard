@@ -122,7 +122,7 @@ export const RolesInDetailView = makeInDetailView(
     'role',
 );
 
-function makePage (createTask, signal, listTask, deleteTask, deleteKey, renderItem, title, add, empty) {
+function makePage (createTask, signal, listTask, deleteTask, deleteKey, renderItem, renderMenu, title, add, empty) {
     return class MRPage extends Page {
         static contextType = coreContext;
 
@@ -156,7 +156,8 @@ function makePage (createTask, signal, listTask, deleteTask, deleteKey, renderIt
                             this.context.createTask(deleteTask, {
                                 id,
                             }, { [deleteKey]: item.id }).runOnceAndDrop())}
-                        renderItem={renderItem} />
+                        renderItem={renderItem}
+                        renderMenu={renderMenu(id)} />
                 </div>
             );
         }
@@ -185,6 +186,7 @@ export const MembershipPage = makePage(
             </div>
         </div>
     ),
+    () => null,
     locale.memberships,
     locale.addMembership,
     locale.noMemberships,
@@ -208,6 +210,21 @@ export const RolesPage = makePage(
             </div>
         </div>
     ),
+    id => (item, core) => [
+        {
+            label: locale.role.edit,
+            action: () => {
+                core.createTask('codeholders/updateRole', {
+                    id, entry: item.id,
+                }, {
+                    // FIXME: kinda hacky
+                    durationFrom: item.durationFrom ? new Date(item.durationFrom * 1000).toISOString().split('T')[0] : null,
+                    durationTo: item.durationTo ? new Date(item.durationTo * 1000).toISOString().split('T')[0] : null,
+                    role: item.role.id,
+                }); // task view
+            },
+        },
+    ],
     locale.roles,
     locale.addRole,
     locale.noRoles,
