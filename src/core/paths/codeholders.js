@@ -39,6 +39,13 @@ import { deepMerge, deepEq } from '../../util';
 //! - profilePictureHash: identical to API
 //! - isActiveMember: identical to API
 //! - profession: identical to API
+//! - addressPublicity: identical to API
+//! - emailPublicity: identical to API
+//! - officePhonePublicity: identical to API
+//! - profilePicturePublicity: identical to API
+//! - lastNamePublicity: identical to API
+//! - landlinePhonePublicity: identical to API
+//! - cellphonePublicity: identical to API
 //!
 //! Read-only derived fields:
 //!
@@ -244,6 +251,13 @@ const clientFields = {
         fromAPI: codeholder => codeholder.addressLatin && codeholder.addressLatin.countryArea,
         toAPI: () => ({}),
     },
+    addressPublicity: 'addressPublicity',
+    emailPublicity: 'emailPublicity',
+    officePhonePublicity: 'officePhonePublicity',
+    profilePicturePublicity: 'profilePicturePublicity',
+    lastNamePublicity: 'lastNamePublicity',
+    landlinePhonePublicity: 'landlinePhonePublicity',
+    cellphonePublicity: 'cellphonePublicity',
 };
 
 const fieldHistoryBlacklist = [

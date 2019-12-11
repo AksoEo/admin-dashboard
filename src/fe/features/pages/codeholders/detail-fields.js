@@ -9,6 +9,7 @@ import { codeholders as locale, data as dataLocale } from '../../../locale';
 import { Validator } from '../../../components/form';
 import data, { Required } from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
+import Segmented from '../../../components/segmented';
 import TinyProgress from '../../../components/tiny-progress';
 import ProfilePictureEditor from './profile-picture';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
@@ -415,6 +416,39 @@ function simpleField (component, extra) {
     };
 }
 
+function makePublicityField (shouldHide) {
+    return {
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return (
+                    <Segmented
+                        selected={value}
+                        onSelect={selected => onChange(selected)}>
+                        {[
+                            {
+                                id: 'private',
+                                label: locale.publicity.private,
+                            },
+                            {
+                                id: 'members',
+                                label: locale.publicity.members,
+                            },
+                            {
+                                id: 'public',
+                                label: locale.publicity.public,
+                            },
+                        ]}
+                    </Segmented>
+                );
+            }
+            if (!value) return null;
+            return locale.publicity[value];
+        },
+        shouldHide,
+        history: true,
+    };
+}
+
 const fields = {
     // for field history
     name: {
@@ -445,6 +479,8 @@ const fields = {
         },
         history: true,
     },
+    profilePicturePublicity: makePublicityField((item, editing) => !editing && !item.profilePictureHash),
+    lastNamePublicity: makePublicityField((item, editing) => item.type !== 'human' || !editing && (!item.name || (!item.name.lastLegal && !item.name.last))),
     isDead: {
         component ({ value, editing, onChange }) {
             return (
@@ -512,6 +548,7 @@ const fields = {
         isEmpty: value => !value || !Object.values(value).filter(x => x).length,
         history: true,
     },
+    addressPublicity: makePublicityField((item, editing) => !editing && (!item.address || !Object.values(item.address).filter(x => x).length)),
     feeCountry: {
         component: makeDataEditable(data.country),
         history: true,
@@ -519,6 +556,7 @@ const fields = {
     email: simpleField(makeDataEditable(data.email), {
         history: true,
     }),
+    emailPublicity: makePublicityField((item, editing) => !editing && !item.email),
     profession: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
@@ -553,16 +591,19 @@ const fields = {
         shouldHide: item => item.type !== 'human',
         history: true,
     }),
+    landlinePhonePublicity: makePublicityField((item, editing) => item.type !== 'human' || !editing && (!item.landlinePhone || !item.landlinePhone.value)),
     officePhone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
         history: true,
     }),
+    officePhonePublicity: makePublicityField((item, editing) => !editing && (!item.officePhone || !item.officePhone.value)),
     cellphone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
         history: true,
     }),
+    cellphonePublicity: makePublicityField((item, editing) => item.type !== 'human' || !editing && (!item.cellphone || !item.cellphone.value)),
     hasPassword: simpleField(function ({ value }) {
         return <Checkbox class="fixed-checkbox" checked={value} />;
     }, {

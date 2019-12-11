@@ -101,6 +101,13 @@ export default class Detail extends Page {
                             'profilePictureHash',
                             'isActiveMember',
                             'profession',
+                            'addressPublicity',
+                            'emailPublicity',
+                            'officePhonePublicity',
+                            'profilePicturePublicity',
+                            'lastNamePublicity',
+                            'landlinePhonePublicity',
+                            'cellphonePublicity',
                         ],
                     }}
                     header={Header}

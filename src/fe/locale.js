@@ -239,6 +239,13 @@ export const codeholders = {
         careOf: 'P/a',
         creationTime: 'Horo de kreiĝo',
         hasPassword: 'Kreis konton',
+        addressPublicity: '[[addressPub]]',
+        emailPublicity: '[[emailPub]]',
+        officePhonePublicity: '[[officePhonePub]]',
+        profilePicturePublicity: '[[ppPub]]',
+        lastNamePublicity: '[[lastNamePub]]',
+        landlinePhonePublicity: '[[landlinePub]]',
+        cellphonePublicity: '[[cellphonePub]]',
     },
     csvFields: {
         membership: 'Membreco (resumo)',
@@ -378,6 +385,11 @@ export const codeholders = {
         genericError: 'Ne sukcesis sendi la adresetikedpeton.',
         closeDialog: 'Fermi',
         stats: ({ perPage, pages, total, withAddresses }) => `Trovis ${withAddresses} rezultojn (el entute ${total}) kiuj havas poŝtadreson. Kun po ${perPage} adreso${perPage === 1 ? '' : 'j'} por paĝo, tio estos ${pages} paĝo${pages === 1 ? '' : 'j'}`,
+    },
+    publicity: {
+        private: '[[private]]',
+        members: '[[members]]',
+        public: '[[public]]',
     },
 };
 
