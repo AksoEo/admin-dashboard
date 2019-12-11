@@ -16,7 +16,7 @@ import './membership.less';
 
 // TODO: clean up some naming (currently everything is called membership)
 
-function makeInDetailView (task, signal, render, empty, target, className) {
+function makeInDetailView (task, extra, signal, render, empty, target, className) {
     return class MRInDetailView extends PureComponent {
         state = {
             items: null,
@@ -28,6 +28,7 @@ function makeInDetailView (task, signal, render, empty, target, className) {
             this.context.createTask(task, { id: this.props.id }, {
                 offset: 0,
                 limit: 20,
+                ...extra,
             }).runOnceAndDrop().then(res => {
                 this.setState({ items: res.items });
             }).catch(err => {
@@ -90,6 +91,7 @@ function makeInDetailView (task, signal, render, empty, target, className) {
 
 export const MembershipInDetailView = makeInDetailView(
     'codeholders/listMemberships',
+    {},
     'codeholders/codeholderSigMemberships',
     item => {
         let className = 'membership';
@@ -109,6 +111,7 @@ export const MembershipInDetailView = makeInDetailView(
 
 export const RolesInDetailView = makeInDetailView(
     'codeholders/listRoles',
+    { filter: { isActive: true } },
     'codeholders/codeholderSigRoles',
     item => {
         return (
