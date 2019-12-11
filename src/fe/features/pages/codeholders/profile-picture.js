@@ -6,6 +6,8 @@ import ProfilePicture from '../../../components/profile-picture';
 import pickFile from '../../../components/pick-file';
 import locale from '../../../locale';
 
+// TODO: use core task view
+
 const clamp = (x, l, h) => Math.max(l, Math.min(x, h));
 const lerp = (a, b, x) => (b - a) * x + a;
 

@@ -277,8 +277,13 @@ function Header ({ item, editing, onItemChange, createHistoryLink }) {
             <div class="member-picture">
                 <ProfilePictureEditor
                     id={item.id}
+                    editing={editing}
                     profilePictureHash={item.profilePictureHash}
-                    canEdit={todoGetPerms('codeholders.update')} />
+                    canEdit={todoGetPerms('codeholders.update')}
+                    createHistoryLink={createHistoryLink} />
+                {!editing && <div class="picture-history-link">
+                    {createHistoryLink('profilePictureHash')}
+                </div>}
             </div>
             <div class="member-info">
                 <NameEditor

@@ -556,9 +556,31 @@
         }
 
         .member-picture {
-            width: 25%;
+            position: relative;
+            min-width: 25%;
             margin-right: 16px;
             flex-shrink: 0;
+
+            .picture-history-link {
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                width: 40px;
+                height: 40px;
+                text-align: center;
+                line-height: 38px;
+                border-radius: 50%;
+                background: @card-background;
+                .elevation(3);
+
+                .history-link {
+                    margin: auto;
+                }
+
+                @media (max-width: 600px) {
+                    right: calc(50% - 64px);
+                }
+            }
         }
 
         .member-picture-container {
