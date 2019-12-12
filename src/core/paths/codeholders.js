@@ -288,6 +288,7 @@ const clientToAPI = makeClientToAPI(clientFields);
 //!   interval, and categories is an array of membership category ids
 //! - isActiveMember: array [lower bound year, upper bound year]
 //! - deathdate: array [lower bound year, upper bound year]
+//! - roles: object { roles: array of ids, date: date in RFC3339 }
 
 /// Client filter specs.
 ///
@@ -385,6 +386,15 @@ const clientFilters = {
     deathdate: {
         toAPI: range => ({ deathdate: { $range: [`${range[0]}-01-01`, `${range[1]}-12-31`] } }),
         fields: ['deathdate'],
+    },
+    roles: {
+        toAPI: ({ roles, date }) => ({
+            $roles: {
+                roleId: { $in: roles },
+                durationFrom: { $lte: new Date(date) / 1000 },
+                durationTo: { $gte: new Date(date) / 1000 },
+            },
+        }),
     },
 };
 

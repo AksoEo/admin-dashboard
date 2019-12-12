@@ -8,73 +8,87 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import moment from 'moment';
 import Segmented from '../../../components/segmented';
 import { connect } from '../../../core/connection';
-import locale from '../../../locale';
+import { codeholders as locale } from '../../../locale';
 import CountryPicker from './country-picker';
 import MulticolList from '../../../components/multicol-list';
 import RangeEditor from '../../../components/range-editor';
+import data from '../../../components/data';
 
 // TEMP: replace with actual multi-<select> when available
-const MembershipCategoryPicker = connect('memberships/categories')(data => ({
-    availableCategories: data,
-}))(function MembershipCategoryPicker ({ value, onChange, availableCategories }) {
-    if (!availableCategories) return null;
-    const [open, setOpen] = useState(false);
+function makeDialogMultiSelect (view, pickSome, render, render2) {
+    return connect(view)(data => ({
+        available: data,
+    }))(function MembershipCategoryPicker ({ value, onChange, available, style }) {
+        if (!available) return null;
+        const [open, setOpen] = useState(false);
 
-    const items = [];
-    for (const id in availableCategories) {
-        const column = value.includes(id) ? 0 : 1;
-        items.push({
-            key: id,
-            column,
-            node: (
-                <div style={{
-                    display: 'flex',
-                    height: '48px',
-                    alignItems: 'center',
-                    userSelect: 'none',
-                }} onClick={() => {
-                    const newValue = [...value];
-                    if (newValue.includes(id)) newValue.splice(newValue.indexOf(id), 1);
-                    else newValue.push(id);
-                    onChange(newValue);
-                }}>
-                    <div style={{ marginLeft: '16px' }}>
-                        {availableCategories[id].nameAbbrev}
+        const items = [];
+        for (const id in available) {
+            const column = value.includes(id) ? 0 : 1;
+            items.push({
+                key: id,
+                column,
+                node: (
+                    <div style={{
+                        display: 'flex',
+                        height: '48px',
+                        alignItems: 'center',
+                        userSelect: 'none',
+                    }} onClick={() => {
+                        const newValue = [...value];
+                        if (newValue.includes(id)) newValue.splice(newValue.indexOf(id), 1);
+                        else newValue.push(id);
+                        onChange(newValue);
+                    }}>
+                        {render(available[id])}
+                        <div style={{ marginRight: '16px' }}>
+                            {value.includes(id)
+                                ? <CheckIcon />
+                                : null}
+                        </div>
                     </div>
-                    <span>{'\u00a0'}</span>
-                    <div style={{ flex: '1' }}>
-                        {availableCategories[id].name}
-                    </div>
-                    <div style={{ marginRight: '16px' }}>
-                        {value.includes(id)
-                            ? <CheckIcon />
-                            : null}
-                    </div>
+                ),
+            });
+        }
+
+        return (
+            <div class="country-picker" style={{ width: 'auto', textAlign: 'left', ...(style || {}) }}>
+                <div class="picked-countries" onClick={() => setOpen(true)}>
+                    {value.map(id => render2(available[id])).join(', ') || pickSome}
                 </div>
-            ),
-        });
-    }
+                <ExpandMoreIcon className="expand-icon" />
 
-    return (
-        <div class="country-picker" style={{ width: 'auto', textAlign: 'left' }}>
-            <div class="picked-countries" onClick={() => setOpen(true)}>
-                {value.map(id => availableCategories[id].nameAbbrev).join(', ') || 'Elekti kategoriojn'}
+                <Dialog
+                    class="country-picker-dialog"
+                    backdrop
+                    open={open}
+                    onClose={() => setOpen(false)}
+                    title={pickSome}>
+                    <MulticolList columns={2} itemHeight={48}>
+                        {items}
+                    </MulticolList>
+                </Dialog>
             </div>
-            <ExpandMoreIcon className="expand-icon" />
+        );
+    });
+}
 
-            <Dialog
-                class="country-picker-dialog"
-                backdrop
-                open={open}
-                onClose={() => setOpen(false)}
-                title="Elekti kategoriojn">
-                <MulticolList columns={2} itemHeight={48}>
-                    {items}
-                </MulticolList>
-            </Dialog>
+const MembershipCategoryPicker = makeDialogMultiSelect('memberships/categories', locale.search.membership.pickSome, item => (
+    <Fragment>
+        <div style={{ marginLeft: '16px' }}>
+            {item.nameAbbrev}
         </div>
-    );
-});
+        <span>{'\u00a0'}</span>
+        <div style={{ flex: '1' }}>
+            {item.name}
+        </div>
+    </Fragment>
+), item => item.nameAbbrev);
+const RolePicker = makeDialogMultiSelect('roles/roles', locale.search.role.pickSome, item => (
+    <div style={{ flex: '1' }}>
+        {item.name}
+    </div>
+), item => item.name);
 
 /**
  * Renders a segmented control with three options, [a] [b] [all].
@@ -154,7 +168,7 @@ export default {
             'all',
             'human',
             'org',
-            locale.members.search.codeholderTypes,
+            locale.search.types,
             (value, enabled) => !enabled ? 'all' : value,
             (selected, { onChange, onEnabledChange }) => {
                 onEnabledChange(selected !== 'all');
@@ -207,9 +221,9 @@ export default {
                             onChange({ ...value, type });
                         }}>
                             {[
-                                { id: 'fee', label: locale.members.search.countries.fee },
-                                { id: 'address', label: locale.members.search.countries.address },
-                                { id: 'all', label: locale.members.search.countries.all },
+                                { id: 'fee', label: locale.search.countryFilter.fee },
+                                { id: 'address', label: locale.search.countryFilter.address },
+                                { id: 'all', label: locale.search.countryFilter.all },
                             ]}
                         </Segmented>
                     </div>
@@ -231,7 +245,7 @@ export default {
             'all',
             'enabled',
             'disabled',
-            locale.members.search.enabledStates,
+            locale.search.enabledStates,
             (value, enabled) => !enabled ? 'all' : value ? 'enabled' : 'disabled',
             (selected, { enabled, onEnabledChange, onChange }) => {
                 if (selected === 'all') onEnabledChange(false);
@@ -305,9 +319,9 @@ export default {
                     <div class="age-editor-top">
                         <div class="age-prime-switch">
                             <span class="age-birth-year">
-                                {locale.members.search.ageBirthYear(birthYearRange)}
+                                {locale.search.ageBirthYear(birthYearRange)}
                             </span>
-                            <label>{locale.members.search.agePrime}</label>
+                            <label>{locale.search.agePrime}</label>
                             <Checkbox
                                 class="inner-switch"
                                 switch
@@ -335,25 +349,25 @@ export default {
         default () {
             return { enabled: false, value: false };
         },
-        editor: tripleSwitchYesNo(locale.members.search.existence),
+        editor: tripleSwitchYesNo(locale.search.existence),
     },
     hasEmail: {
         default () {
             return { enabled: false, value: false };
         },
-        editor: tripleSwitchYesNo(locale.members.search.existence),
+        editor: tripleSwitchYesNo(locale.search.existence),
     },
     hasPassword: {
         default () {
             return { enabled: false, value: false };
         },
-        editor: tripleSwitchYesNo(locale.members.search.boolean),
+        editor: tripleSwitchYesNo(locale.search.boolean),
     },
     isDead: {
         default () {
             return { enabled: false, value: false };
         },
-        editor: tripleSwitchYesNo(locale.members.search.boolean),
+        editor: tripleSwitchYesNo(locale.search.boolean),
     },
     membership: {
         default () {
@@ -448,11 +462,11 @@ export default {
                             {[
                                 {
                                     id: 'yes',
-                                    label: locale.members.search.membership.invert.yes,
+                                    label: locale.search.membership.invert.yes,
                                 },
                                 {
                                     id: 'no',
-                                    label: locale.members.search.membership.invert.no,
+                                    label: locale.search.membership.invert.no,
                                 },
                             ]}
                         </Segmented>
@@ -472,15 +486,15 @@ export default {
                             {[
                                 {
                                     id: 'yes',
-                                    label: locale.members.search.membership.lifetime.yes,
+                                    label: locale.search.membership.lifetime.yes,
                                 },
                                 {
                                     id: 'no',
-                                    label: locale.members.search.membership.lifetime.no,
+                                    label: locale.search.membership.lifetime.no,
                                 },
                                 {
                                     id: 'all',
-                                    label: locale.members.search.membership.lifetime.all,
+                                    label: locale.search.membership.lifetime.all,
                                 },
                             ]}
                         </Segmented>
@@ -501,15 +515,15 @@ export default {
                             {[
                                 {
                                     id: 'yes',
-                                    label: locale.members.search.membership.givesMembership.yes,
+                                    label: locale.search.membership.givesMembership.yes,
                                 },
                                 {
                                     id: 'no',
-                                    label: locale.members.search.membership.givesMembership.no,
+                                    label: locale.search.membership.givesMembership.no,
                                 },
                                 {
                                     id: 'all',
-                                    label: locale.members.search.membership.givesMembership.all,
+                                    label: locale.search.membership.givesMembership.all,
                                 },
                             ]}
                         </Segmented>
@@ -557,7 +571,7 @@ export default {
             for (let i = items.length - 1; i > 0; i--) {
                 items.splice(i, 0, (
                     <div class="membership-conjunction-separator" key={`conj-${i}`}>
-                        {locale.members.search.membership.conjunction}
+                        {locale.search.membership.conjunction}
                     </div>
                 ));
             }
@@ -586,6 +600,38 @@ export default {
                 <div class={'membership-editor' + (!value.length ? ' is-empty' : '')}>
                     {items}
                 </div>
+            );
+        },
+    },
+    roles: {
+        default () {
+            return {
+                enabled: false,
+                value: {
+                    roles: [],
+                    date: moment().format('YYYY-MM-DD'),
+                },
+            };
+        },
+        serialize ({ value }) {
+            return value.roles.join(',') + '$' + value.date;
+        },
+        deserialize (value) {
+            const parts = value.split('$');
+            return { enabled: true, value: { roles: parts[0].split(','), date: parts[1] } };
+        },
+        editor ({ value, onChange, enabled, onEnabledChange }) {
+            return (
+                <Fragment>
+                    <data.date.editor value={value.date} onChange={date => onChange({ ...value, date })} />
+                    <RolePicker
+                        style={{ width: '100%' }}
+                        value={value.roles}
+                        onChange={roles => {
+                            onChange({ ...value, roles });
+                            onEnabledChange(!!roles.length);
+                        }} />
+                </Fragment>
             );
         },
     },

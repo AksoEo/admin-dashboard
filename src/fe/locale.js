@@ -196,8 +196,57 @@ export const codeholders = {
             birthdate: 'Naskiĝtago',
             hasPassword: 'Kreis konton',
             membership: 'Membreckategorioj',
+            roles: '[[Roloj]]',
             isActiveMember: 'Aktiva membro iam en',
             deathdate: 'Mortjaro',
+        },
+        countryFilter: {
+            all: 'ne gravas',
+            fee: 'paglando',
+            address: 'loĝlando',
+        },
+        enabledStates: {
+            all: 'ne gravas',
+            enabled: 'ŝaltita',
+            disabled: 'malŝaltita',
+        },
+        agePrime: 'jarkomence',
+        ageBirthYear: range => `naskiĝintoj en ${range}`,
+        boolean: {
+            all: 'ne gravas',
+            yes: 'jes',
+            no: 'ne',
+        },
+        existence: {
+            all: 'ne gravas',
+            yes: 'ekzistas',
+            no: 'ne ekzistas',
+        },
+        membership: {
+            invert: {
+                yes: 'ne havas',
+                no: 'havas',
+            },
+            lifetime: {
+                yes: 'dumviva',
+                no: 'unujara',
+                all: 'ne gravas',
+            },
+            givesMembership: {
+                yes: 'membrecdona',
+                no: 'nemembrecdona',
+                all: 'ne gravas',
+            },
+            conjunction: 'kaj',
+            pickSome: 'Elekti kategoriojn',
+        },
+        role: {
+            pickSome: '[[Elekti rolojn]]',
+        },
+        types: {
+            all: 'ne gravas',
+            human: 'homo',
+            org: 'organizo',
         },
     },
     fields: {
