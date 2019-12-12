@@ -588,7 +588,6 @@ const fields = {
     landlinePhonePublicity: makePublicityField((item, editing) => item.type !== 'human' || !editing && (!item.landlinePhone || !item.landlinePhone.value)),
     officePhone: simpleField(makeDataEditable(data.phoneNumber), {
         isEmpty: value => !value.value,
-        shouldHide: item => item.type !== 'human',
         history: true,
     }),
     officePhonePublicity: makePublicityField((item, editing) => !editing && (!item.officePhone || !item.officePhone.value)),
