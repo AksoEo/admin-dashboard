@@ -391,8 +391,20 @@ const clientFilters = {
         toAPI: ({ roles, date }) => ({
             $roles: {
                 roleId: { $in: roles },
-                durationFrom: { $lte: new Date(date) / 1000 },
-                durationTo: { $gte: new Date(date) / 1000 },
+                $and: [
+                    {
+                        $or: [
+                            { durationFrom: { $lte: new Date(date) / 1000 } },
+                            { durationFrom: null },
+                        ],
+                    },
+                    {
+                        $or: [
+                            { durationTo: { $gte: new Date(date) / 1000 } },
+                            { durationTo: null },
+                        ],
+                    },
+                ],
             },
         }),
     },
