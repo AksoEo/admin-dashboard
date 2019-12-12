@@ -974,6 +974,35 @@ export const tasks = {
             items: modsByTime.reverse().map(k => mods[k]),
         };
     },
+    /// codeholders/listLogins: lists login history
+    ///
+    /// # Options and Parameters
+    /// - id: codeholder id
+    /// - offset, limit
+    listLogins: async ({ id }, { offset, limit }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/codeholders/${id}/logins`, {
+            offset,
+            limit,
+            // all of the fields
+            fields: [
+                'id',
+                'time',
+                'timezone',
+                'ip',
+                'userAgent',
+                'userAgentParsed',
+                'll',
+                'area',
+                'country',
+                'region',
+                'city',
+            ],
+            order: [['time', 'desc']],
+        });
+
+        return { items: res.body, total: +res.res.headers.get('x-total-items') };
+    },
 };
 
 const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms

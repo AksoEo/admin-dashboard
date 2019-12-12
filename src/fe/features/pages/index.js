@@ -88,6 +88,12 @@ export default [
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/history')),
                                 type: 'stack',
                             },
+                            {
+                                path: '[[logins]]',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/logins')),
+                                type: 'stack',
+                            },
                         ],
                     },
                     {

@@ -53,6 +53,11 @@ export default class Detail extends Page {
                 action: () => this.props.onNavigate(`/membroj/${id}/redakti`, true),
             });
             actions.push({
+                label: locale.logins.title,
+                action: () => this.props.onNavigate(`/membroj/${id}/[[logins]]`),
+                overflow: true,
+            });
+            actions.push({
                 label: locale.delete,
                 action: () => this.context.createTask('codeholders/delete', { id }),
                 overflow: true,

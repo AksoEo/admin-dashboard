@@ -440,6 +440,10 @@ export const codeholders = {
         members: '[[members]]',
         public: '[[public]]',
     },
+    logins: {
+        title: '[[logins log]]',
+        empty: '[[no logins]]',
+    },
 };
 
 export const httpLog = {
