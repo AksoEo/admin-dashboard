@@ -89,7 +89,7 @@ export default [
                                 type: 'stack',
                             },
                             {
-                                path: '[[logins]]',
+                                path: 'ensalutoj',
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/logins')),
                                 type: 'stack',

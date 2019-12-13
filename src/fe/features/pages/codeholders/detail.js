@@ -54,7 +54,7 @@ export default class Detail extends Page {
             });
             actions.push({
                 label: locale.logins.title,
-                action: () => this.props.onNavigate(`/membroj/${id}/[[logins]]`),
+                action: () => this.props.onNavigate(`/membroj/${id}/ensalutoj`),
                 overflow: true,
             });
             actions.push({

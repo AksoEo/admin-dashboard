@@ -637,7 +637,7 @@ export default {
             const parts = value.split('$');
             return { enabled: true, value: { roles: parts[0].split(','), date: parts[1] } };
         },
-        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <Fragment>
                     <data.date.editor

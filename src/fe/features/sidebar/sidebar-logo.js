@@ -28,8 +28,8 @@ export default class SidebarLogo extends PureComponent {
         this.logo.spin();
     };
 
-    onFocus = e => this.logo.focus();
-    onBlur = e => this.logo.blur();
+    onFocus = () => this.logo.focus();
+    onBlur = () => this.logo.blur();
 
     render () {
         return (
