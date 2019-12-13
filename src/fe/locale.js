@@ -136,7 +136,7 @@ export const search = {
     },
     prevPage: 'Antaŭa',
     nextPage: 'Sekva',
-    paginationItems: (from, to, count) => `${from}–${to} el ${count}`,
+    paginationItems: (from, to, count) => `${from}–${to} el ${count.toLocaleString('de-DE')}`,
     pickFields: 'Elekti kampojn',
     resetFilters: 'Nuligi filtrilojn',
     csvExport: 'Elporti kiel CSV',
@@ -296,6 +296,8 @@ export const codeholders = {
         landlinePhonePublicity: 'Publikeco de hejma telefono',
         cellphonePublicity: 'Publikeco de poŝtelefono',
     },
+    profilePictureHashLabel: '[[hash of pp]]',
+    profilePictureHashNone: '[[neniu bildo]]',
     csvFields: {
         membership: 'Membreco (resumo)',
     },

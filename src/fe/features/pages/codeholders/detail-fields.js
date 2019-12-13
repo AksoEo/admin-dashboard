@@ -467,6 +467,25 @@ const fields = {
         shouldHide: () => true,
         history: true,
     },
+    profilePictureHash: {
+        component ({ value }) {
+            let formattedValue;
+            if (value === null) {
+                formattedValue = locale.profilePictureHashNone;
+            } else {
+                formattedValue = Buffer.from(value).toString('hex');
+            }
+
+            return (
+                <div class="profile-picture-hash">
+                    {locale.profilePictureHashLabel}: {formattedValue}
+                </div>
+            );
+        },
+        shouldHide: () => true,
+        history: true,
+    },
+    // --
     enabled: {
         component ({ value, editing, onChange }) {
             if (!editing && !value) return '—';

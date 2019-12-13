@@ -388,10 +388,10 @@ const clientFilters = {
         fields: ['deathdate'],
     },
     roles: {
-        toAPI: ({ roles, date }) => ({
-            $roles: {
-                roleId: { $in: roles },
-                $and: [
+        toAPI: ({ roles, date }) => {
+            const dateFilter = {};
+            if (date) {
+                dateFilter.$and = [
                     {
                         $or: [
                             { durationFrom: { $lte: new Date(date) / 1000 } },
@@ -404,9 +404,16 @@ const clientFilters = {
                             { durationTo: null },
                         ],
                     },
-                ],
-            },
-        }),
+                ];
+            }
+
+            return {
+                $roles: {
+                    roleId: { $in: roles },
+                    ...dateFilter,
+                },
+            };
+        },
     },
 };
 

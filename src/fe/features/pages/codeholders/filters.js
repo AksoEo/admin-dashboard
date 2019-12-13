@@ -22,8 +22,14 @@ function makeDialogMultiSelect (view, pickSome, render, render2) {
         if (!available) return null;
         const [open, setOpen] = useState(false);
 
+        const sortedAvailable = Object.keys(available).sort((a, b) => {
+            const an = available[a].name;
+            const bn = available[b].name;
+            return an > bn ? 1 : an < bn ? -1 : 0;
+        });
+
         const items = [];
-        for (const id in available) {
+        for (const id of sortedAvailable) {
             const column = value.includes(id) ? 0 : 1;
             items.push({
                 key: id,
