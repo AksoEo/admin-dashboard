@@ -27,6 +27,7 @@ const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpac
 const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
 const httpLog = () => import(/* webpackChunkName: 'core-http-log', webpackPrefetch: true */ './http-log');
 const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './login');
+const perms = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './perms');
 const memberships = () => import(/* webpackChunkName: 'core-memberships', webpackPrefetch: true */ './memberships');
 const roles = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './roles');
 const queries = () => import(/* webpackChunkName: 'core-queries', webpackPrefetch: true */ './queries');
@@ -41,6 +42,7 @@ export const tasks = {
     httpLog: lazyPath(httpLog, mapTasks),
     login: lazyPath(login, mapTasks),
     queries: lazyPath(queries, mapTasks),
+    perms: lazyPath(perms, mapTasks),
 };
 
 /// View definitions.
@@ -51,6 +53,7 @@ export const views = {
     login: lazyPath(login, mapViews),
     memberships: lazyPath(memberships, mapViews),
     roles: lazyPath(roles, mapViews),
+    perms: lazyPath(perms, mapViews),
 
     /// #tasks: a map of all current tasks to their paths; used for task views in the FE
     [TASKS]: createStoreObserver([TASKS], tasks => {

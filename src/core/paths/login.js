@@ -4,6 +4,8 @@ import { LOGIN, AUTH_STATE, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED, UEA_CO
 import { LoginAuthStates } from '../../protocol';
 import { createStoreObserver } from '../view';
 
+const IS_ACTUALLY_ADMIN = [LOGIN, 'isActuallyAdmin'];
+
 export const tasks = {
     /// login/login: performs login
     login: async (_, { login, password, allowNonAdmin }) => {
@@ -26,6 +28,7 @@ export const tasks = {
 
         store.insert(AUTH_STATE, (!client.totpRequired || result.totpUsed) ? LoginAuthStates.LOGGED_IN : LoginAuthStates.AUTHENTICATED);
         store.insert(IS_ADMIN, result.isAdmin || allowNonAdmin);
+        store.insert(IS_ACTUALLY_ADMIN, result.isAdmin);
         store.insert(UEA_CODE, result.newCode);
         store.insert(LOGIN_ID, result.id);
         if (client.totpRequired) {
@@ -34,6 +37,10 @@ export const tasks = {
         }
 
         return result;
+    },
+    /// login/overrideIsAdmin: for testing purposes; allow overriding isAdmin
+    overrideIsAdmin: async ({ override }) => {
+        store.insert(IS_ADMIN, override ? true : store.get(IS_ACTUALLY_ADMIN));
     },
     /// login/totp: verifies the totp code
     ///

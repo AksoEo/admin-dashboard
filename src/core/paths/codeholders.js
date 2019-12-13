@@ -414,6 +414,7 @@ const clientFilters = {
                 },
             };
         },
+        fields: [],
     },
 };
 
@@ -491,7 +492,7 @@ export const tasks = {
         const client = await asyncClient;
         const filters = [];
         for (const filter in clientFilters) {
-            if (client.hasCodeholderFields('r', ...clientFilters[filter].fields)) {
+            if (await client.hasCodeholderFields('r', ...clientFilters[filter].fields)) {
                 filters.push(filter);
             }
         }

@@ -5,6 +5,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
 import { UEACode } from '@tejo/akso-client';
 import { coreContext } from '../../../core/connection';
+import { connectPerms } from '../../../perms';
 import { codeholders as locale, data as dataLocale } from '../../../locale';
 import { Validator } from '../../../components/form';
 import data, { Required } from '../../../components/data';
@@ -267,12 +268,14 @@ function CodeEditor ({ value, item, editing, onChange }) {
         suggestions={suggestions} />;
 }
 
-function todoGetPerms () {
-    // TODO
-    return true;
-}
-
-function Header ({ item, editing, onItemChange, createHistoryLink }) {
+const Header = connectPerms(function Header ({
+    item,
+    editing,
+    onItemChange,
+    createHistoryLink,
+    canReadHistory,
+    perms,
+}) {
     return (
         <div class="member-header">
             <div class="member-picture">
@@ -280,9 +283,9 @@ function Header ({ item, editing, onItemChange, createHistoryLink }) {
                     id={item.id}
                     editing={editing}
                     profilePictureHash={item.profilePictureHash}
-                    canEdit={todoGetPerms('codeholders.update')}
+                    canEdit={perms.hasPerm('codeholders.update')}
                     createHistoryLink={createHistoryLink} />
-                {!editing && <div class="picture-history-link">
+                {!editing && canReadHistory && <div class="picture-history-link">
                     {createHistoryLink('profilePictureHash')}
                 </div>}
             </div>
@@ -303,15 +306,15 @@ function Header ({ item, editing, onItemChange, createHistoryLink }) {
                 </div>
                 {!editing && <MembershipInDetailView
                     id={item.id}
-                    canEdit={todoGetPerms('codeholders.update')} />}
+                    canEdit={perms.hasPerm('codeholders.update')} />}
                 {!editing && <RolesInDetailView
                     id={item.id}
-                    canEdit={todoGetPerms('codeholders.update')} />}
+                    canEdit={perms.hasPerm('codeholders.update')} />}
             </div>
             <div class="decorative-flourish" />
         </div>
     );
-}
+});
 
 export class CodeholderAddressRenderer extends Component {
     state = {

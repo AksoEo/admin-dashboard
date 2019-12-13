@@ -4,6 +4,7 @@ import { Button, Menu, DrawerItem, DrawerLabel } from '@cpsdqs/yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ProfilePicture from '../../components/profile-picture';
 import { Link, routerContext } from '../../router';
+import permsContext from '../../perms';
 import SidebarLogo from './sidebar-logo';
 import pages from '../pages';
 import { app as locale, pages as localePages, meta as localeMeta } from '../../locale';
@@ -47,13 +48,11 @@ function NavItem ({ item, currentPage }) {
 }
 
 /// Renders a sidebar category.
-function NavCategory ({ item, currentPage }) {
+function NavCategory ({ item, currentPage, perms }) {
     const { id, contents } = item;
     const label = localePages[id] ? <DrawerLabel>{localePages[id]}</DrawerLabel> : null;
 
-    // TODO: permissions
-    // const filteredContents = contents.filter(item => item.hasPermission(permissions));
-    const filteredContents = contents;
+    const filteredContents = contents.filter(item => item.hasPerm(perms));
 
     return (
         <Fragment>
@@ -95,15 +94,17 @@ export default class SidebarContents extends PureComponent {
                 </div>
                 <div class="sidebar-nav-container">
                     <div class="sidebar-nav">
-                        <nav class="sidebar-nav-list" role="navigation">
-                            {pages.map(item => (
-                                <NavCategory
-                                    key={item.id}
-                                    item={item}
-                                    currentPage={this.props.currentPage}
-                                    permissions={this.props.permissions} />
-                            ))}
-                        </nav>
+                        <permsContext.Consumer>
+                            {perms => (<nav class="sidebar-nav-list" role="navigation">
+                                {pages.map(item => (
+                                    <NavCategory
+                                        key={item.id}
+                                        item={item}
+                                        currentPage={this.props.currentPage}
+                                        perms={perms} />
+                                ))}
+                            </nav>)}
+                        </permsContext.Consumer>
                     </div>
                     <div class="sidebar-meta-info">
                         <div class="info-logos">

@@ -256,6 +256,7 @@ export const codeholders = {
             org: 'organizo',
         },
     },
+    globalFilterNotice: 'Ĉiuj viaj serĉoj estas limigitaj laŭ membrofiltrilo. Okaze de demandoj, kontaktu vian administranton.',
     fields: {
         type: 'Membrospeco',
         types: {

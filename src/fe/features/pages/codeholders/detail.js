@@ -4,10 +4,13 @@ import Page from '../../../components/page';
 import DetailView from '../../../components/detail';
 import Meta from '../../meta';
 import { codeholders as locale, detail as detailLocale } from '../../../locale';
-import { coreContext } from '../../../core/connection';
+import { coreContext, connect } from '../../../core/connection';
+import { connectPerms } from '../../../perms';
 import { Header, fields, Footer } from './detail-fields';
 
-export default class Detail extends Page {
+export default connectPerms(connect('codeholders/fields')(fields => ({
+    availableFields: fields,
+}))(class Detail extends Page {
     static contextType = coreContext;
 
     state = {
@@ -41,28 +44,34 @@ export default class Detail extends Page {
         if (this.#commitTask) this.#commitTask.drop();
     }
 
-    render ({ editing }) {
-        const { match } = this.props;
+    render ({ availableFields, editing, match, perms }) {
+        if (!availableFields) return;
         const id = match[1];
 
         const actions = [];
         if (!editing) {
-            actions.push({
-                label: detailLocale.edit,
-                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-                action: () => this.props.onNavigate(`/membroj/${id}/redakti`, true),
-            });
+            if (perms.hasPerm('codeholders.update')) {
+                actions.push({
+                    label: detailLocale.edit,
+                    icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                    action: () => this.props.onNavigate(`/membroj/${id}/redakti`, true),
+                });
+            }
             actions.push({
                 label: locale.logins.title,
                 action: () => this.props.onNavigate(`/membroj/${id}/ensalutoj`),
                 overflow: true,
             });
-            actions.push({
-                label: locale.delete,
-                action: () => this.context.createTask('codeholders/delete', { id }),
-                overflow: true,
-            });
+            if (perms.hasPerm('codeholders.delete')) {
+                actions.push({
+                    label: locale.delete,
+                    action: () => this.context.createTask('codeholders/delete', { id }),
+                    overflow: true,
+                });
+            }
         }
+
+        const canReadHistory = perms.hasPerm('codeholders.hist.read');
 
         return (
             <div class="codeholder-detail-page">
@@ -78,43 +87,10 @@ export default class Detail extends Page {
                     edit={this.state.edit}
                     onEditChange={edit => this.setState({ edit })}
                     onDelete={() => this.props.pop()}
-                    makeHistoryLink={field => `/membroj/${id}/historio?${field}`}
-                    options={{
-                        fields: [
-                            'id',
-                            'type',
-                            'name',
-                            'careOf',
-                            'website',
-                            'biography',
-                            'code',
-                            'creationTime',
-                            'hasPassword',
-                            'address',
-                            'feeCountry',
-                            'membership',
-                            'email',
-                            'enabled',
-                            'notes',
-                            'officePhone',
-                            'landlinePhone',
-                            'cellphone',
-                            'isDead',
-                            'birthdate',
-                            'age',
-                            'deathdate',
-                            'profilePictureHash',
-                            'isActiveMember',
-                            'profession',
-                            'addressPublicity',
-                            'emailPublicity',
-                            'officePhonePublicity',
-                            'profilePicturePublicity',
-                            'lastNamePublicity',
-                            'landlinePhonePublicity',
-                            'cellphonePublicity',
-                        ],
-                    }}
+                    makeHistoryLink={canReadHistory
+                        ? field => `/membroj/${id}/historio?${field}`
+                        : null}
+                    options={{ fields: availableFields }}
                     header={Header}
                     fields={fields}
                     footer={Footer}
@@ -122,4 +98,4 @@ export default class Detail extends Page {
             </div>
         );
     }
-}
+}));

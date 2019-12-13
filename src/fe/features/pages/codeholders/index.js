@@ -9,7 +9,8 @@ import FieldPicker from '../../../components/field-picker';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
 import Page from '../../../components/page';
 import { codeholders as locale, search as searchLocale } from '../../../locale';
-import { coreContext } from '../../../core/connection';
+import { connect, coreContext } from '../../../core/connection';
+import { connectPerms } from '../../../perms';
 import CSVExport from '../../../components/csv-export';
 import Meta from '../../meta';
 import FILTERS from './filters';
@@ -27,12 +28,18 @@ const SEARCHABLE_FIELDS = [
     'notes',
 ];
 
+const connectToEverything = a => connect('codeholders/fields')(fields => ({
+    fields,
+}))(connect('codeholders/filters')(filters => ({
+    filters,
+}))(connectPerms(a)));
+
 /// The codeholders list page.
 ///
 /// # Props
 /// - query/onQueryChange: url query handling
 /// - addrLabelGen: label gen state (see navigation)
-export default class CodeholdersPage extends Page {
+export default connectToEverything(class CodeholdersPage extends Page {
     state = {
         options: {
             search: {
@@ -142,15 +149,27 @@ export default class CodeholdersPage extends Page {
         }
     }
 
-    render ({ addrLabelGen }) {
+    render ({ addrLabelGen, perms, fields: availableFields, filters: availableFilters }) {
+        const canRead = perms.hasPerm('codeholders.read');
+        const canCreate = perms.hasPerm('codeholders.create');
+
+        availableFields = availableFields || Object.keys(FIELDS);
+        availableFilters = availableFilters || Object.keys(FILTERS);
+
+        const hasGlobalFilter = perms.perms
+            ? !!Object.keys(perms.perms.memberFilter).length
+            : false;
+
         // overflow menu
         const menu = [];
 
-        menu.push({
-            icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
-            label: locale.create,
-            action: () => this.context.createTask('codeholders/create'), // task view
-        });
+        if (canCreate) {
+            menu.push({
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.create,
+                action: () => this.context.createTask('codeholders/create'), // task view
+            });
+        }
 
         menu.push({
             icon: <SortIcon style={{ verticalAlign: 'middle' }} />,
@@ -186,6 +205,11 @@ export default class CodeholdersPage extends Page {
             overflow: true,
         });
 
+        const filteredFilters = { ...FILTERS };
+        for (const k in filteredFilters) {
+            if (!availableFilters.includes(k)) delete filteredFilters[k];
+        }
+
         const { options, expanded } = this.state;
 
         return (
@@ -202,9 +226,8 @@ export default class CodeholdersPage extends Page {
                         });
                     }}
                     searchFields={SEARCHABLE_FIELDS}
-                    // TODO: use core views
-                    fields={Object.keys(FIELDS)}
-                    filters={FILTERS}
+                    fields={availableFields}
+                    filters={filteredFilters}
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     locale={{
@@ -218,13 +241,13 @@ export default class CodeholdersPage extends Page {
                     open={this.state.fieldPickerOpen}
                     onClose={() => this.setState({ fieldPickerOpen: false })}
                     // TODO: use core views
-                    available={Object.keys(FIELDS).filter(x => !FIELDS[x].hide)}
+                    available={availableFields.filter(x => FIELDS[x] && !FIELDS[x].hide)}
                     sortables={Object.keys(FIELDS).filter(x => FIELDS[x].sortable)}
                     selected={options.fields}
                     onChange={fields => this.setState({ options: { ...options, fields } })}
                     locale={locale.fields} />
                 <OverviewList
-                    // TODO: also note global filter if present (use core view?)
+                    notice={hasGlobalFilter ? locale.globalFilterNotice : null}
                     task="codeholders/list"
                     view="codeholders/codeholder"
                     parameters={options}
@@ -263,4 +286,4 @@ export default class CodeholdersPage extends Page {
             </div>
         );
     }
-}
+});

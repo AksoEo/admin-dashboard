@@ -40,7 +40,13 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
         if (this.#konamiDSeq.length === KONAMI_CODE.length
             && this.#konamiDSeq.map((x, i) => x === KONAMI_CODE[i]).reduce((a, b) => a && b)) {
             // match
-            this.setState({ allowsNonAdmin: !this.state.allowsNonAdmin });
+            const allowsNonAdmin = !this.state.allowsNonAdmin;
+            this.setState({ allowsNonAdmin });
+            if (this.props.authState === LoginAuthStates.LOGGED_IN) {
+                this.props.core.createTask('login/overrideIsAdmin', {
+                    override: allowsNonAdmin,
+                }).runOnceAndDrop();
+            }
         }
     };
 

@@ -113,6 +113,7 @@ export default class DetailView extends PureComponent {
                     <HistoryIcon style={{ verticalAlign: 'middle' }} />
                 </Link>
             );
+            const canReadHistory = !!makeHistoryLink;
 
             let header = null;
             const items = [];
@@ -121,11 +122,11 @@ export default class DetailView extends PureComponent {
 
             if (this.props.header) {
                 const Header = this.props.header;
-                header = <Header {...fieldProps} createHistoryLink={createHistoryLink} />;
+                header = <Header {...fieldProps} createHistoryLink={createHistoryLink} canReadHistory={canReadHistory} />;
             }
             if (this.props.footer) {
                 const Footer = this.props.footer;
-                footer = <Footer {...fieldProps} createHistoryLink={createHistoryLink} />;
+                footer = <Footer {...fieldProps} createHistoryLink={createHistoryLink} canReadHistory={canReadHistory} />;
             }
 
             // TODO: proper field rendering

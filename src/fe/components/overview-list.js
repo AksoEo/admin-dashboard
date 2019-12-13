@@ -29,6 +29,7 @@ const DEBOUNCE_TIME = 400; // ms
 /// - onSetLimit: callback for changing the current items per page
 /// - onResult: result callback
 /// - locale: localized field names
+/// - notice: optional string to show below stats
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -148,6 +149,7 @@ export default class OverviewList extends PureComponent {
         onGetItemLink,
         locale: localizedFields,
         view,
+        notice,
     }, { error, result, stale, loading }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
@@ -218,6 +220,7 @@ export default class OverviewList extends PureComponent {
                     <span>{stats}</span>
                     <CircularProgress class="loading-indicator" indeterminate={loading} small />
                 </header>
+                {notice ? <div class="list-notice">{notice}</div> : null}
                 <Button class="compact-page-button prev-page-button" onClick={this.onPrevPageClick} disabled={prevDisabled}>
                     <ArrowUpIcon />
                     <div class="page-button-label">{locale.prevPage}</div>
