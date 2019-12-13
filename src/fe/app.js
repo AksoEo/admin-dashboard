@@ -77,6 +77,7 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
             // the two perms objects must not be identical
             this.perms = new Perms();
             this.perms.load(this.props.perms);
+            this.forceUpdate();
         }
     }
 

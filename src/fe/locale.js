@@ -97,6 +97,8 @@ export const app = {
     // literally any error that causes the UI to fail to render
     genericError: 'Okazis neatendita eraro. Bonvolu poste reprovi. Se tiu ĉi eraro okazadas indus kontakti administranton.',
     genericErrorReload: 'Reŝarĝi la paĝon',
+
+    debugPageInfo: '[[this is not the page you’re looking for *waves hand*]]',
 };
 
 export const pages = {

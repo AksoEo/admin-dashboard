@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import Logo from '../../components/logo';
-import { coreContext } from '../../core/connection';
+import { routerContext } from '../../router';
 
 // lazy-loaded particles
 let particlesPromise, triggerParticles;
@@ -20,7 +20,7 @@ function loadParticles () {
 /// # Props
 /// - onClick
 export default class SidebarLogo extends PureComponent {
-    static contextType = coreContext;
+    static contextType = routerContext;
 
     onClick = e => {
         if (this.props.onClick) this.props.onClick(e);

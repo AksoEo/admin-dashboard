@@ -48,6 +48,14 @@ export default [
         id: 'undefined',
         contents: [
             {
+                id: 'debug',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "debug-tools" */ './debug')),
+                icon: () => null,
+                path: 'debug',
+                hasPerm: () => false, // always hide
+            },
+            {
                 id: 'home',
                 icon: HomeIcon,
                 path: '',

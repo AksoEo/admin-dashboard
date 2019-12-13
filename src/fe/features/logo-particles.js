@@ -1,7 +1,6 @@
 //! easter egg for enabling devtools with vfx à la video games
 
 import { globalAnimator } from '@cpsdqs/yamdl';
-import * as locale from '../locale';
 
 const lerp = (a, b, x) => (b - a) * x + a;
 const clamp = (x, l, h) => Math.max(l, Math.min(x, h));
@@ -100,7 +99,7 @@ const easeInCubic = t => t * t * t;
 const easeInOutCubic = t => t < 0.5 ? (4 * t * t * t) : ((t - 1) * (2 * t - 2) * (2 * t - 2) + 1);
 const easeOutExpo = t => 1 - Math.pow(2, -10 * t);
 
-function particleVortex (logo, core) {
+function particleVortex (logo, router) {
     const cornerPositions = [...logo.querySelectorAll('.corner')].map(corner => {
         const rect = corner.getBoundingClientRect();
         return [rect.left + rect.width / 2, rect.top + rect.height / 2];
@@ -129,7 +128,7 @@ function particleVortex (logo, core) {
     root.appendChild(flash);
 
     const message = document.createElement('div');
-    message.textContent = '→ window.akso';
+    message.textContent = 'debug page!';
     Object.assign(message.style, {
         position: 'fixed',
         top: '50%',
@@ -188,7 +187,8 @@ function particleVortex (logo, core) {
 
             if (this.time > 2 && !this.exposed) {
                 this.exposed = true;
-                exposeAKSO(core);
+
+                router.navigate('/debug');
             }
 
             if (this.time >= 4) {
@@ -198,14 +198,6 @@ function particleVortex (logo, core) {
             }
         },
     });
-}
-
-function exposeAKSO (core) {
-    window.akso = {
-        core,
-        globalAnimator,
-        locale,
-    };
 }
 
 export default function trigger (logo, core) {
