@@ -25,7 +25,8 @@ const mapViews = res => res.views;
 
 const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './codeholders');
 const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
-const httpLog = () => import(/* webpackChunkName: 'core-http-log', webpackPrefetch: true */ './http-log');
+const adminGroups = () => import(/* webpackChunkName: 'core-admin', webpackPrefetch: true */ './admin-groups');
+const httpLog = () => import(/* webpackChunkName: 'core-admin', webpackPrefetch: true */ './http-log');
 const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './login');
 const perms = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './perms');
 const memberships = () => import(/* webpackChunkName: 'core-memberships', webpackPrefetch: true */ './memberships');
@@ -40,6 +41,7 @@ export const tasks = {
     info: async () => {},
 
     codeholders: lazyPath(codeholders, mapTasks),
+    adminGroups: lazyPath(adminGroups, mapTasks),
     httpLog: lazyPath(httpLog, mapTasks),
     login: lazyPath(login, mapTasks),
     queries: lazyPath(queries, mapTasks),
@@ -51,6 +53,7 @@ export const tasks = {
 export const views = {
     codeholders: lazyPath(codeholders, mapViews),
     countries: lazyPath(countries, mapViews),
+    adminGroups: lazyPath(adminGroups, mapViews),
     httpLog: lazyPath(httpLog, mapViews),
     login: lazyPath(login, mapViews),
     memberships: lazyPath(memberships, mapViews),

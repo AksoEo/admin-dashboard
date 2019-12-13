@@ -29,6 +29,7 @@ function ObjectViewer ({ value: obj, shallow }) {
     const baseStyle = {
         font: '12px Menlo, monospace',
         background: '#000',
+        color: 'white',
     };
     const disclosure = <button style={{ color: 'inherit', background: '#777', borderColor: 'transparent' }} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</button>;
     if (Array.isArray(obj)) {
