@@ -20,6 +20,11 @@
     }
 
     .filters-disclosure {
+        background: none;
+        color: inherit;
+        font: inherit;
+        border: none;
+        margin: 0;
         padding: 8px 16px;
         font-size: small;
         text-transform: uppercase;
@@ -27,6 +32,13 @@
 
         .disclosure-arrow {
             vertical-align: -7px;
+        }
+
+        &::-moz-focus-inner {
+            border: 0;
+        }
+        &:focus {
+            color: @secondary;
         }
     }
 

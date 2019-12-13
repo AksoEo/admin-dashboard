@@ -295,6 +295,9 @@ export const codeholders = {
         lastNamePublicity: 'Publikeco de familinomo',
         landlinePhonePublicity: 'Publikeco de hejma telefono',
         cellphonePublicity: 'Publikeco de poŝtelefono',
+
+        // used only in field history
+        profilePictureHash: '[[Profilbildo]]',
     },
     profilePictureHashLabel: '[[hash of pp]]',
     profilePictureHashNone: '[[neniu bildo]]',
@@ -399,7 +402,7 @@ export const codeholders = {
     delete: 'Forigi',
     deleteDescription: 'Ĉu vi certas, ke vi volas forigi tiun ĉi membron? Ne eblas malfari tion ĉi.',
     fieldHistory: {
-        title: 'Historio',
+        title: field => `Historio de ${field}`,
         comment: 'Priskribo de ŝanĝoj',
         changedBy: 'Ŝanĝita de',
         initial: 'Origina datumo',

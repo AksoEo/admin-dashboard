@@ -13,16 +13,28 @@ export default class Logo extends Component {
         bounce: new Mass(4, -120, 0.63),
     }));
     rotation = new Spring(1, 1);
+    spread = new Spring(0.3, 0.3);
 
     bounce (velocity) {
         for (const state of this.states) {
             state.bounce.velocity = velocity;
         }
+        if (this.spread.target) this.spread.velocity -= 300;
         globalAnimator.register(this);
     }
 
     spin () {
         this.rotation.target += Math.PI;
+        globalAnimator.register(this);
+    }
+
+    focus () {
+        this.spread.target = 3;
+        globalAnimator.register(this);
+    }
+
+    blur () {
+        this.spread.target = 0;
         globalAnimator.register(this);
     }
 
@@ -34,6 +46,8 @@ export default class Logo extends Component {
         }
         this.rotation.update(dt);
         if (this.rotation.wantsUpdate()) wantsUpdate = true;
+        this.spread.update(dt);
+        if (this.spread.wantsUpdate()) wantsUpdate = true;
         if (!wantsUpdate) globalAnimator.deregister(this);
         this.forceUpdate();
 
@@ -59,6 +73,8 @@ export default class Logo extends Component {
     render () {
         const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
+        const spread = this.spread.value;
+
         return (
             <svg
                 class="logo"
@@ -76,7 +92,7 @@ export default class Logo extends Component {
                         style={{
                             transformOrigin: '32px 32px',
                             transform: `rotate(${state.offset + this.rotation.value}rad) `
-                                + `translate(${state.bounce.value}px, ${-state.bounce.value}px)`,
+                                + `translate(${state.bounce.value + spread}px, ${-state.bounce.value - spread}px)`,
                         }} />
                 ))}
             </svg>

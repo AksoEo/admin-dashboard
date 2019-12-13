@@ -28,9 +28,17 @@ export default class SidebarLogo extends PureComponent {
         this.logo.spin();
     };
 
+    onFocus = e => this.logo.focus();
+    onBlur = e => this.logo.blur();
+
     render () {
         return (
-            <div class="sidebar-logo" onClick={this.onClick} ref={node => this.node = node}>
+            <button
+                class="sidebar-logo"
+                onClick={this.onClick}
+                onFocus={this.onFocus}
+                onBlur={this.onBlur}
+                ref={node => this.node = node}>
                 <Logo
                     ref={view => this.logo = view}
                     onUpdate={logo => {
@@ -53,7 +61,7 @@ export default class SidebarLogo extends PureComponent {
                     draggable="false"
                     aria-label="AKSO"
                     alt="AKSO" />
-            </div>
+            </button>
         );
     }
 }

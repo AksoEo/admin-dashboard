@@ -16,9 +16,10 @@ import './range-editor.less';
 ///   and the value is momentarily less than K, thus clamping the lower bound. Hence, minSoftBound
 ///   should be used on upper bounds to restrict the area in which they will live-update and thus
 ///   prevent modifying the lower bound unnecessarily.
-export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef }) {
+export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef, disabled }) {
     const [isFocused, setFocused] = useState(false);
     const [tmpValue, setTmpValue] = useState(value);
+    const [didChange, setDidChange] = useState(false);
 
     const bindValue = v => Math.max(min, Math.min(v | 0, max));
     const softBindValue = v => {
@@ -35,13 +36,15 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef
 
     const onFocus = () => {
         setTmpValue(value);
+        setDidChange(false);
         setFocused(true);
     };
     const onBlur = () => {
         setFocused(false);
-        commit();
+        if (didChange) commit();
     };
     const onInputChange = e => {
+        setDidChange(true);
         if (isFocused) {
             const softBound = softBindValue(e.target.value);
             setTmpValue(softBound);
@@ -58,6 +61,7 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef
             type="number"
             class="bound-editor"
             center
+            disabled={disabled}
             ref={innerRef}
             min={min}
             max={max}
@@ -70,16 +74,17 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef
 }
 
 /// Renders a range editor with inputs on either side.
-export default function RangeEditor ({ min, max, value, onChange, tickDistance, disabled }) {
+export default function RangeEditor ({ min, max, value, onChange, tickDistance, faded, disabled }) {
     const leftBound = useRef(null);
     const rightBound = useRef(null);
 
     return (
-        <div class={'range-editor' + (disabled ? ' disabled' : '')}>
+        <div class={'range-editor' + (faded ? ' faded' : '')}>
             <BoundEditor
                 innerRef={leftBound}
                 min={min}
                 max={max}
+                disabled={disabled}
                 minSoftBound={min}
                 value={value[0]}
                 onChange={val => onChange([val, Math.max(val, value[1])])}/>
@@ -87,6 +92,7 @@ export default function RangeEditor ({ min, max, value, onChange, tickDistance, 
                 min={min}
                 max={max}
                 value={value}
+                disabled={disabled}
                 popout
                 discrete
                 tickDistance={tickDistance}
@@ -101,6 +107,7 @@ export default function RangeEditor ({ min, max, value, onChange, tickDistance, 
                 innerRef={rightBound}
                 min={min}
                 max={max}
+                disabled={disabled}
                 minSoftBound={value[0]}
                 value={value[1]}
                 onChange={val => onChange([Math.min(val, value[0]), val])}/>

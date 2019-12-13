@@ -57,9 +57,11 @@ export default class History extends Page {
             ? detailFields[this.props.query].component
             : (() => 'eraro');
 
+        const fieldName = locale.fields[this.props.query].toLowerCase();
+
         return (
             <div class="codeholder-field-history">
-                <Meta title={locale.fieldHistory.title} />
+                <Meta title={locale.fieldHistory.title(fieldName)} />
                 {this.state.loading ? (
                     <div class="history-loading-container">
                         <CircularProgress indeterminate />

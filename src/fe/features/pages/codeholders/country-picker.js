@@ -29,6 +29,7 @@ export default function CountryPicker (props) {
 ///
 /// # Props
 /// - value/onChange: array of strings
+/// - hidden: if true, will disable tab focusing
 class CountryPickerInnerComponent extends PureComponent {
     state = {
         dialogOpen: false,
@@ -133,7 +134,7 @@ class CountryPickerInnerComponent extends PureComponent {
         return (
             <div
                 class="country-picker"
-                tabIndex={0}
+                tabIndex={this.props.hidden ? -1 : 0}
                 onKeyDown={e => {
                     if (e.key === ' ' || e.key === 'Enter') this.setState({ dialogOpen: true });
                 }}

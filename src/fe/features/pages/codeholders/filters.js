@@ -18,7 +18,7 @@ import data from '../../../components/data';
 function makeDialogMultiSelect (view, pickSome, render, render2) {
     return connect(view)(data => ({
         available: data,
-    }))(function MembershipCategoryPicker ({ value, onChange, available, style }) {
+    }))(function MembershipCategoryPicker ({ value, onChange, available, style, disabled }) {
         if (!available) return null;
         const [open, setOpen] = useState(false);
 
@@ -58,8 +58,12 @@ function makeDialogMultiSelect (view, pickSome, render, render2) {
         }
 
         return (
-            <div class="country-picker" style={{ width: 'auto', textAlign: 'left', ...(style || {}) }}>
-                <div class="picked-countries" onClick={() => setOpen(true)}>
+            <div
+                class="country-picker"
+                style={{ width: 'auto', textAlign: 'left', ...(style || {}) }}
+                tabIndex={disabled ? -1 : 0}
+                onClick={() => !disabled && setOpen(true)}>
+                <div class="picked-countries">
                     {value.map(id => render2(available[id])).join(', ') || pickSome}
                 </div>
                 <ExpandMoreIcon className="expand-icon" />
@@ -105,7 +109,7 @@ const RolePicker = makeDialogMultiSelect('roles/roles', locale.search.role.pickS
  * @return {Function} a functional switch component
  */
 function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
-    return function TripleSwitch ({ filter, onChange, onEnabledChange }) {
+    return function TripleSwitch ({ filter, onChange, onEnabledChange, hidden }) {
         const { value, enabled } = filter;
 
         const selected = decode(filter.value, filter.enabled);
@@ -115,7 +119,7 @@ function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
             <div class="left-right-editor">
                 <Segmented selected={selected} onSelect={selected => {
                     onSelect(selected, { value, onChange, enabled, onEnabledChange, filter });
-                }}>
+                }} disabled={hidden}>
                     {[
                         {
                             id: a,
@@ -216,7 +220,7 @@ export default {
             if (!set.length) return { enabled: false, value: { set: [], type: null } };
             return { enabled: true, value: { type, set } };
         },
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             const selectedType = value.type === null ? 'all' : value.type;
 
             return (
@@ -225,7 +229,7 @@ export default {
                         <Segmented selected={selectedType} onSelect={type => {
                             if (type === 'all') type = null;
                             onChange({ ...value, type });
-                        }}>
+                        }} disabled={hidden}>
                             {[
                                 { id: 'fee', label: locale.search.countryFilter.fee },
                                 { id: 'address', label: locale.search.countryFilter.address },
@@ -234,6 +238,7 @@ export default {
                         </Segmented>
                     </div>
                     <CountryPicker
+                        hidden={hidden}
                         onChange={set => {
                             onChange({ ...value, set });
                             onEnabledChange(set.length);
@@ -291,7 +296,7 @@ export default {
                 },
             };
         },
-        editor ({ value, onChange, enabled, onEnabledChange }) {
+        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
             const topValue = value;
 
             const ageToBirthYearRange = age => {
@@ -331,6 +336,7 @@ export default {
                             <Checkbox
                                 class="inner-switch"
                                 switch
+                                disabled={hidden}
                                 checked={value.atStartOfYear}
                                 onChange={checked => {
                                     onChange({ ...topValue, atStartOfYear: checked });
@@ -341,7 +347,8 @@ export default {
                         min={0}
                         max={150}
                         value={value.range}
-                        disabled={!enabled}
+                        faded={!enabled}
+                        disabled={hidden}
                         onChange={range => {
                             onChange({ ...topValue, range });
                             onEnabledChange(true);
@@ -440,6 +447,7 @@ export default {
             value,
             onChange,
             onEnabledChange,
+            hidden,
         }) {
             // FIXME: this mess
             const items = value.map(({
@@ -448,7 +456,7 @@ export default {
                 <div
                     class="membership-item"
                     key={index}>
-                    <Button icon small class="membership-remove" onClick={() => {
+                    <Button icon small class="membership-remove" disabled={hidden} onClick={() => {
                         const newValue = [...value];
                         newValue.splice(index, 1);
                         onChange(newValue);
@@ -464,7 +472,7 @@ export default {
                                 invert: selected === 'yes',
                             };
                             onChange(newValue);
-                        }}>
+                        }} disabled={hidden}>
                             {[
                                 {
                                     id: 'yes',
@@ -488,7 +496,7 @@ export default {
                                         ? true : selected === 'no' ? false : null,
                                 };
                                 onChange(newValue);
-                            }}>
+                            }} disabled={hidden}>
                             {[
                                 {
                                     id: 'yes',
@@ -517,7 +525,7 @@ export default {
                                         ? true : selected === 'no' ? false : null,
                                 };
                                 onChange(newValue);
-                            }}>
+                            }} disabled={hidden}>
                             {[
                                 {
                                     id: 'yes',
@@ -537,6 +545,7 @@ export default {
                     <div class="membership-item-line">
                         <MembershipCategoryPicker
                             value={categories}
+                            disabled={hidden}
                             onChange={categories => {
                                 const newValue = [...value];
                                 newValue[index] = {
@@ -549,6 +558,7 @@ export default {
                     <div class="membership-item-line membership-range-line">
                         <Checkbox
                             class="membership-range-checkbox"
+                            disabled={hidden}
                             checked={useRange}
                             onChange={checked => {
                                 const newValue = [...value];
@@ -562,7 +572,8 @@ export default {
                             min={1887}
                             max={new Date().getFullYear() + 4}
                             value={range}
-                            disabled={!useRange}
+                            faded={!useRange}
+                            disabled={hidden}
                             tickDistance={10}
                             onChange={range => {
                                 const newValue = [...value];
@@ -596,7 +607,7 @@ export default {
                             categories: [],
                         }]));
                         onEnabledChange(true);
-                    }}>
+                    }} disabled={hidden}>
                         <AddIcon />
                     </Button>
                 </div>
@@ -626,12 +637,17 @@ export default {
             const parts = value.split('$');
             return { enabled: true, value: { roles: parts[0].split(','), date: parts[1] } };
         },
-        editor ({ value, onChange, enabled, onEnabledChange }) {
+        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
             return (
                 <Fragment>
-                    <data.date.editor value={value.date} onChange={date => onChange({ ...value, date })} />
+                    <data.date.editor
+                        value={value.date}
+                        onChange={date => onChange({ ...value, date })}
+                        disabled={hidden}
+                        tabIndex={hidden ? -1 : undefined} />
                     <RolePicker
                         style={{ width: '100%' }}
+                        disabled={hidden}
                         value={value.roles}
                         onChange={roles => {
                             onChange({ ...value, roles });
@@ -657,14 +673,15 @@ export default {
             const rangeEnd = +match[2] | 0;
             return { enabled: true, value: [rangeStart, rangeEnd] };
         },
-        editor ({ value, onChange, enabled, onEnabledChange }) {
+        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
             return (
                 <div class="active-member-editor">
                     <RangeEditor
                         min={1887}
                         max={new Date().getFullYear() + 4}
                         value={value}
-                        disabled={!enabled}
+                        faded={!enabled}
+                        disabled={hidden}
                         tickDistance={10}
                         onChange={value => {
                             onChange(value);
@@ -691,14 +708,15 @@ export default {
             const rangeEnd = +match[2] | 0;
             return { enabled: true, value: [rangeStart, rangeEnd] };
         },
-        editor ({ value, onChange, enabled, onEnabledChange }) {
+        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
             return (
                 <div class="death-date-editor">
                     <RangeEditor
                         min={1887}
                         max={new Date().getFullYear()}
                         value={value}
-                        disabled={!enabled}
+                        faded={!enabled}
+                        disabled={hidden}
                         tickDistance={10}
                         onChange={value => {
                             onChange(value);

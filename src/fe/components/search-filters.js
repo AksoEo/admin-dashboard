@@ -81,7 +81,8 @@ export default function SearchFilters ({
         node: <FiltersBar
             category={category}
             value={value}
-            onChange={onChange} />,
+            onChange={onChange}
+            hidden={!expanded} />,
         hidden: !expanded,
         paper: true,
     });
@@ -113,6 +114,7 @@ export default function SearchFilters ({
         // TODO: filter constaints
         if (!value.filters[filterId]) continue; // handled above
         const isEnabled = value.filters[filterId].enabled;
+        const filterIsHidden = !filtersEnabled || (!isEnabled && !expanded);
         items.push({
             node: <Filter
                 id={filterId}
@@ -126,9 +128,10 @@ export default function SearchFilters ({
                     },
                     offset: 0,
                 })}
+                hidden={filterIsHidden}
                 locale={searchLocale} />,
             paper: true,
-            hidden: !filtersEnabled || (!isEnabled && !expanded),
+            hidden: filterIsHidden,
             staticHeight: true,
         });
     }
@@ -160,11 +163,11 @@ export default function SearchFilters ({
 
 function FiltersDisclosure ({ expanded, onExpandedChange }) {
     return (
-        <div class="filters-disclosure" onClick={() => onExpandedChange(!expanded)}>
+        <button class="filters-disclosure" onClick={() => onExpandedChange(!expanded)}>
             {locale.filtersDisclosure}
 
             <DisclosureArrow dir={expanded ? 'up' : 'down'} />
-        </div>
+        </button>
     );
 }
 
@@ -173,6 +176,7 @@ function FiltersBar ({
     category,
     value,
     onChange,
+    hidden,
 }) {
     // TODO: saved filters
     void category;
@@ -198,6 +202,7 @@ function FiltersBar ({
             <Segmented
                 class="json-switch minimal"
                 selected={filterType}
+                disabled={hidden}
                 onSelect={onFilterTypeChange}>
                 {[
                     {
@@ -215,7 +220,7 @@ function FiltersBar ({
     );
 }
 
-function Filter ({ id, spec, filter, onFilterChange, locale }) {
+function Filter ({ id, spec, filter, onFilterChange, hidden, locale }) {
     const FilterEditor = spec.editor;
 
     let filterSwitch;
@@ -224,6 +229,7 @@ function Filter ({ id, spec, filter, onFilterChange, locale }) {
             <div class="filter-switch-container">
                 <Checkbox
                     checked={filter.enabled}
+                    disabled={hidden}
                     onChange={enabled => onFilterChange({ ...filter, enabled })} />
             </div>
         );
@@ -250,6 +256,7 @@ function Filter ({ id, spec, filter, onFilterChange, locale }) {
                 // to the filter prop
                 onChange={value => onFilterChange(filter = { ...filter, value })}
                 enabled={filter.enabled}
+                hidden={hidden}
                 onEnabledChange={enabled => onFilterChange(filter = { ...filter, enabled })} />
         </div>
     );

@@ -12,7 +12,7 @@ import { TEJOIcon, UEAIcon } from './icons';
 
 // also see src/pages/index.js
 
-/** Renders a single item in the sidebar. */
+/// Renders a single item in the sidebar.
 function NavItem ({ item, currentPage }) {
     const { id, icon, path } = item;
     const Icon = icon || (() => null);
@@ -20,14 +20,33 @@ function NavItem ({ item, currentPage }) {
         <Link target={`/${path}`} class="sidebar-link">
             <DrawerItem
                 selected={currentPage === id}
-                icon={<Icon />}>
+                icon={<Icon />}
+                onKeyDown={e => {
+                    if (e.key === 'ArrowDown') {
+                        const parent = e.currentTarget.parentNode;
+                        const next = parent.nextElementSibling;
+                        if (next) {
+                            const drawerItem = next.children[0];
+                            e.preventDefault();
+                            drawerItem.focus();
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        const parent = e.currentTarget.parentNode;
+                        const prev = parent.previousElementSibling;
+                        if (prev) {
+                            const drawerItem = prev.children[0];
+                            e.preventDefault();
+                            drawerItem.focus();
+                        }
+                    }
+                }}>
                 {localePages[id]}
             </DrawerItem>
         </Link>
     );
 }
 
-/** Renders a sidebar category. */
+/// Renders a sidebar category.
 function NavCategory ({ item, currentPage }) {
     const { id, contents } = item;
     const label = localePages[id] ? <DrawerLabel>{localePages[id]}</DrawerLabel> : null;
@@ -62,6 +81,10 @@ export default class SidebarContents extends PureComponent {
         id: null,
         profilePictureHash: null,
     };
+
+    focus () {
+
+    }
 
     render () {
         return (

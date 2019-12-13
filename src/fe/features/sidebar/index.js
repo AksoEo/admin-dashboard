@@ -89,6 +89,8 @@ export default class Sidebar extends PureComponent {
         this.sidebarDragHandler.unbind();
     }
 
+    #contents;
+
     render () {
         let className = 'app-sidebar-container';
         if (this.props.permanent) className += ' permanent';
@@ -111,8 +113,18 @@ export default class Sidebar extends PureComponent {
                             this.spring.locked = false;
                             this.props.onClose();
                         }
+                    }}
+                    // don’t focus the scroll view
+                    tabIndex={-1}
+                    onFocus={e => {
+                        if (e.target === e.currentTarget) {
+                            e.preventDefault();
+                            e.target.blur();
+                            this.#contents.focus();
+                        }
                     }}>
                     <SidebarContents
+                        ref={contents => this.#contents = contents}
                         currentPage={this.props.currentPage}
                         onLogout={this.props.onLogout}
                         onDirectTransition={this.props.onDirectTransition}

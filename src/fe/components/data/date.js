@@ -6,9 +6,13 @@ function DateFormatter ({ value }) {
     return value ? moment(value).format('D[-a de] MMMM Y') : '';
 }
 
-function RudimentaryDateEditor ({ value, onChange }) {
+function RudimentaryDateEditor ({ value, onChange, ...props }) {
     return (
-        <input type="date" value={value} onChange={e => onChange(e.target.value)} />
+        <input
+            type="date"
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            {...props} />
     );
 }
 
