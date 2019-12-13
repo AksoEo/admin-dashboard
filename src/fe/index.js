@@ -90,8 +90,8 @@ class Session extends Component {
 
     #hideLoginTimeout = null;
     #onLoginUpdate = data => {
-        this.setState({ loggedIn: data.authState === LoginAuthStates.LOGGED_IN });
-        if (data.authState && data.authState !== LoginAuthStates.LOGGED_IN) {
+        this.setState({ loggedIn: data.authState === LoginAuthStates.LOGGED_IN && data.isAdmin });
+        if (data.authState && (data.authState !== LoginAuthStates.LOGGED_IN || !data.isAdmin)) {
             clearTimeout(this.#hideLoginTimeout);
             this.setState({ showLogin: true, wasLoggedOut: true });
             this.loadLogin();

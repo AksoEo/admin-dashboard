@@ -6,7 +6,7 @@ import { createStoreObserver } from '../view';
 
 export const tasks = {
     /// login/login: performs login
-    login: async (_, { login, password }) => {
+    login: async (_, { login, password, allowNonAdmin }) => {
         const client = await asyncClient;
         if (client.loggedIn) {
             throw { code: 'already-logged-in', message: 'already logged in' };
@@ -25,7 +25,7 @@ export const tasks = {
         }
 
         store.insert(AUTH_STATE, (!client.totpRequired || result.totpUsed) ? LoginAuthStates.LOGGED_IN : LoginAuthStates.AUTHENTICATED);
-        store.insert(IS_ADMIN, result.isAdmin);
+        store.insert(IS_ADMIN, result.isAdmin || allowNonAdmin);
         store.insert(UEA_CODE, result.newCode);
         store.insert(LOGIN_ID, result.id);
         if (client.totpRequired) {
@@ -93,7 +93,7 @@ export const tasks = {
         }
     },
     /// login/createPassword: creates a password
-    createPassword: async ({ login, token }, { password }) => {
+    createPassword: async ({ login, token }, { password, allowNonAdmin }) => {
         const client = await asyncClient;
 
         store.insert(AUTH_STATE, LoginAuthStates.AUTHENTICATING);
@@ -110,7 +110,7 @@ export const tasks = {
                 },
                 _allowLoggedOut: true,
             });
-            await tasks.login({}, { login, password });
+            await tasks.login({}, { login, password, allowNonAdmin });
         } catch (err) {
             store.insert(AUTH_STATE, LoginAuthStates.LOGGED_OUT);
             throw { code: err.statusCode, message: err.toString() };

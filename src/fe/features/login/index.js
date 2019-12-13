@@ -49,10 +49,10 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
     };
 
     #getSelectedPageIndex = () => {
-        const { authState } = this.props;
-        if (authState === LoginAuthStates.AUTHENTICATED
-            || authState === LoginAuthStates.VERIFYING_TOTP) return 1;
-        if (authState === LoginAuthStates.LOGGED_IN) return 2;
+        const { authState, isAdmin } = this.props;
+        if ((authState === LoginAuthStates.AUTHENTICATED
+            || authState === LoginAuthStates.VERIFYING_TOTP) && isAdmin) return 1;
+        if (authState === LoginAuthStates.LOGGED_IN && isAdmin) return 2;
         return 0;
     }
 
@@ -77,7 +77,7 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
         }, 200);
     }
 
-    render ({ core, authState, totpSetupRequired, ueaCode }, { mode, login, token, allowsNonAdmin }) {
+    render ({ core, authState, isAdmin, totpSetupRequired, ueaCode }, { mode, login, token, allowsNonAdmin }) {
         const selectedPageIndex = this.#getSelectedPageIndex();
 
         let className = 'login';
@@ -101,8 +101,12 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
                             ref={view => this.#detailsPage = view}
                             core={core}
                             authState={authState}
+                            isAdmin={isAdmin}
+                            ueaCode={ueaCode}
                             login={login}
                             onLoginChange={login => this.setState({ login })}
+                            allowsNonAdmin={allowsNonAdmin}
+                            onHeightChange={this.#onHeightChange}
                             token={token}
                             mode={mode} />
                         <TotpPage

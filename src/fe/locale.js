@@ -52,6 +52,13 @@ export const login = {
         email: 'Nevalida retpoŝtadreso aŭ pasvorto',
     },
 
+    loggedInAs: code => `[[you are logged in as ${code}.]]`,
+    notAdminShort: '[[ne estas administranto]]',
+    notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon.',
+    notAdminPWR: '[[however, your password was successfully reset.]]',
+    notAdminLogout: 'Bonvolu elsaluti kaj reensaluti per konto de administranto se vi volas uzi la administran sistemon.',
+    logOut: 'Elsaluti',
+
     totpSetupDescription: 'Bonvolu skani la QR-kodon per via aplikaĵo por agordi dua-faktoran ensaluton.',
     totpAppDescriptionPre: 'Se vi ne havas dua-faktoran aplikaĵon, ni rekomendas ',
     totpAppName: 'Authy',

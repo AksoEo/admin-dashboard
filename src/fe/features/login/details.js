@@ -11,6 +11,7 @@ import { Mode } from './is-special-page';
 /// # Props
 /// - core: core ref
 /// - authState: core auth state
+/// - isAdmin: core isAdmin state
 /// - mode: login mode
 /// - token: password creation token (if given)
 /// - login/onLoginChange: login name
@@ -18,6 +19,7 @@ export default class DetailsPage extends Component {
     state = {
         password: '',
         confirmPassword: '',
+        notAdminButPasswordSuccess: false,
     };
 
     #passwordValidator;
@@ -56,6 +58,7 @@ export default class DetailsPage extends Component {
             task = this.props.core.createTask('login/login', {}, {
                 login,
                 password: this.state.password,
+                allowNonAdmin: this.props.allowsNonAdmin,
             });
         } else {
             task = this.props.core.createTask('login/createPassword', {
@@ -63,13 +66,24 @@ export default class DetailsPage extends Component {
                 token: this.props.token,
             }, {
                 password: this.state.password,
+                allowNonAdmin: this.props.allowsNonAdmin,
             });
         }
 
-        task.runOnceAndDrop().then(() => {
+        task.runOnceAndDrop().then(res => {
+            const nope = !res.isAdmin && !this.props.allowsNonAdmin;
             if (this.props.mode !== Mode.NORMAL) {
                 // special page; need to reset URL
                 window.history.pushState(null, null, '/');
+
+                if (nope) {
+                    // TODO: info dialog
+                    this.setState({ notAdminButPasswordSuccess: true });
+                }
+            } else if (nope) {
+                const error = new Error('is not admin');
+                error.code = 'is-not-admin';
+                throw error;
             }
         }).catch(err => {
             let error = locale.genericError;
@@ -82,6 +96,8 @@ export default class DetailsPage extends Component {
                     : locale.invalidLogin.ueaCode;
             } else if (err.code === 409) {
                 this.#spawnInitCreatePassword();
+            } else if (err.code === 'is-not-admin') {
+                error = locale.notAdminShort;
             }
 
             this.#passwordValidator.shake();
@@ -90,14 +106,48 @@ export default class DetailsPage extends Component {
     };
 
     focus () {
-        this.#loginField.focus();
+        if (this.#loginField) this.#loginField.focus();
     }
 
-    render ({ mode, authState }) {
+    componentDidUpdate (prevProps) {
+        if (prevProps.authState !== this.props.authState
+            || prevProps.isAdmin !== this.props.isAdmin) {
+            this.props.onHeightChange();
+        }
+    }
+
+    render ({ mode, authState, ueaCode, isAdmin }) {
         const needsPasswordValidation = mode !== Mode.NORMAL;
         const shouldShowHelpLinks = mode === Mode.NORMAL;
 
-        const isLoading = authState === LoginAuthStates.AUTHENTICATING;
+        const isLoading = authState === LoginAuthStates.AUTHENTICATING
+            || authState === LoginAuthStates.LOGGING_OUT;
+
+        if (authState >= LoginAuthStates.AUTHENTICATED && !isAdmin) {
+            return (
+                <div class="login-not-admin">
+                    <p>{locale.loggedInAs(ueaCode)}</p>
+                    <p>{locale.notAdmin}</p>
+                    {this.state.notAdminButPasswordSuccess ? <p>{locale.notAdminPWR}</p> : null}
+                    <p>{locale.notAdminLogout}</p>
+                    <footer class="form-footer">
+                        <span class="phantom" style={{ flex: 1 }} />
+                        <Button
+                            raised
+                            disabled={isLoading}
+                            onClick={() => {
+                                this.props.core.createTask('login/logOut').runOnceAndDrop();
+                            }}>
+                            <CircularProgress
+                                class="progress-overlay"
+                                indeterminate={isLoading}
+                                small />
+                            <span>{locale.logOut}</span>
+                        </Button>
+                    </footer>
+                </div>
+            );
+        }
 
         return (
             <Form ref={form => this.#form = form} onSubmit={this.#onSubmit}>
