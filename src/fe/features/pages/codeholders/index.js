@@ -86,6 +86,8 @@ export default class CodeholdersPage extends Page {
 
     static contextType = coreContext;
 
+    #searchInput;
+
     // current url query state
     #currentQuery = '';
 
@@ -127,6 +129,8 @@ export default class CodeholdersPage extends Page {
                 }
             }, 10);
         }
+
+        this.#searchInput.focus(500);
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -208,7 +212,8 @@ export default class CodeholdersPage extends Page {
                         searchPlaceholders: locale.search.placeholders,
                         filters: locale.search.filters,
                     }}
-                    category="codeholders" />
+                    category="codeholders"
+                    inputRef={view => this.#searchInput = view} />
                 <FieldPicker
                     open={this.state.fieldPickerOpen}
                     onClose={() => this.setState({ fieldPickerOpen: false })}

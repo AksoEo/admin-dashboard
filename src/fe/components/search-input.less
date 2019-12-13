@@ -54,4 +54,21 @@
             margin-right: 16px;
         }
     }
+
+    &.focus-animation {
+        animation: search-input-focus 0.8s;
+
+        @keyframes search-input-focus {
+            0% {
+                box-shadow: 0 0 0 30px transparent;
+            }
+            43% {
+                box-shadow: 0 0 0 4px @secondary-fade-50;
+                animation-timing-function: @easing;
+            }
+            100% {
+                box-shadow: 0 0 0 4px transparent;
+            }
+        }
+    }
 }

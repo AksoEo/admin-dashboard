@@ -42,6 +42,7 @@ export default function SearchFilters ({
     onExpandedChange,
     locale: searchLocale,
     category,
+    inputRef,
 }) {
     const items = [];
 
@@ -52,6 +53,7 @@ export default function SearchFilters ({
 
     items.push({
         node: <SearchInput
+            ref={inputRef}
             value={value.search}
             onChange={search => onChange({ ...value, search, offset: 0 })}
             searchFields={searchFields}

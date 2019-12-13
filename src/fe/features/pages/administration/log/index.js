@@ -62,6 +62,8 @@ export default class APILogListView extends Page {
 
     static contextType = coreContext;
 
+    #searchInput;
+
     // current url query state
     #currentQuery = '';
 
@@ -81,6 +83,8 @@ export default class APILogListView extends Page {
 
     componentDidMount () {
         this.decodeURLQuery();
+
+        this.#searchInput.focus(500);
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -117,7 +121,8 @@ export default class APILogListView extends Page {
                         searchPlaceholders: locale.search.placeholders,
                         filters: locale.search.filters,
                     }}
-                    category="http_log" />
+                    category="http_log"
+                    inputRef={view => this.#searchInput = view} />
                 <FieldPicker
                     open={this.state.fieldPickerOpen}
                     onClose={() => this.setState({ fieldPickerOpen: false })}
