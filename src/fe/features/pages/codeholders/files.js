@@ -28,7 +28,7 @@ const loadFiles = (core, id) => (offset, limit) => core
     .createTask('codeholders/listFiles', { id }, { offset, limit })
     .runOnceAndDrop();
 
-export default function Files ({ id }) {
+export default function Files ({ id, canUpload }) {
     const [uploading, setUploading] = useState(false);
     const [file, setFile] = useState(null);
 
@@ -42,7 +42,7 @@ export default function Files ({ id }) {
         <div class="member-files">
             <header class="files-header">
                 <h3 class="files-title">{locale.filesTitle}</h3>
-                <Button onClick={uploadFile}>{locale.uploadFile}</Button>
+                {canUpload ? <Button onClick={uploadFile}>{locale.uploadFile}</Button> : null}
             </header>
             <coreContext.Consumer>
                 {core => <Fragment>

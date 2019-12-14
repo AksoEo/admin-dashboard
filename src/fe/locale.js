@@ -316,7 +316,7 @@ export const codeholders = {
         // used only in field history
         profilePictureHash: '[[Profilbildo]]',
     },
-    profilePictureHashLabel: '[[hash of pp]]',
+    profilePictureHashSome: '[[iu bildo]]',
     profilePictureHashNone: '[[neniu bildo]]',
     csvFields: {
         membership: 'Membreco (resumo)',

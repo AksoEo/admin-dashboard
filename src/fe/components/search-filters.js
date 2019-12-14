@@ -281,8 +281,9 @@ function FiltersBar ({
                                 }
 
                                 // create a task view
+                                let task;
                                 if (value._savedFilter) {
-                                    core.createTask('queries/update', {
+                                    task = core.createTask('queries/update', {
                                         id: value._savedFilter.id,
                                     }, {
                                         name: value._savedFilter.name,
@@ -290,7 +291,7 @@ function FiltersBar ({
                                         query: filter,
                                     });
                                 } else {
-                                    core.createTask('queries/add', {
+                                    task = core.createTask('queries/add', {
                                         category,
                                     }, {
                                         name: '',
@@ -298,6 +299,10 @@ function FiltersBar ({
                                         query: filter,
                                     });
                                 }
+                                task.on('success', result => {
+                                    // TODO: add or update saved filter state
+                                    void result;
+                                });
                             }}>
                                 {locale.saveFilter}
                             </button>

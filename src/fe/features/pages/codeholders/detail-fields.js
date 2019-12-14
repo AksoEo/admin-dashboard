@@ -473,15 +473,18 @@ const fields = {
     profilePictureHash: {
         component ({ value }) {
             let formattedValue;
+            let hash;
             if (value === null) {
                 formattedValue = locale.profilePictureHashNone;
+                hash = '';
             } else {
-                formattedValue = Buffer.from(value).toString('hex');
+                formattedValue = locale.profilePictureHashSome;
+                hash = Buffer.from(value).toString('hex');
             }
 
             return (
-                <div class="profile-picture-hash">
-                    {locale.profilePictureHashLabel}: {formattedValue}
+                <div class="profile-picture-hash" title={hash}>
+                    {formattedValue}
                 </div>
             );
         },
@@ -671,14 +674,18 @@ const fields = {
     },
 };
 
-function Footer ({ item, editing }) {
+const Footer = connectPerms(function Footer ({ item, editing, perms }) {
     if (editing) return '';
+    const canReadFiles = perms.hasCodeholderField('files', 'r');
+    const canWriteFiles = perms.hasCodeholderField('files', 'w');
     return (
         <div class="member-footer">
-            <Files id={item.id} />
+            {canReadFiles ? <Files
+                id={item.id}
+                canUpload={canWriteFiles} /> : null}
         </div>
     );
-}
+});
 
 export {
     Header,
