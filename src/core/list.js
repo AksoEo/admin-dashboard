@@ -1,3 +1,41 @@
+export function filtersToAPI (clientFilters, pfilters) {
+    const filters = [];
+    if (pfilters && !pfilters._disabled) {
+        for (const filter in pfilters) {
+            if (filter === '_disabled') continue;
+            if (!(filter in clientFilters)) {
+                throw { code: 'unknown-filter', message: `unknown filter ${filter}` };
+            }
+            if (pfilters[filter].enabled) {
+                filters.push(clientFilters[filter].toAPI(pfilters[filter].value));
+            }
+        }
+    }
+    if (filters.length) {
+        // merge filters with no common keys
+        let accum = {};
+        let items = [accum];
+        const split = () => items.push(accum = {});
+        const queue = [...filters];
+        while (queue.length) {
+            const filter = queue.pop();
+            for (const k in filter) {
+                if (k === '$and') {
+                    // also spill $and into the parent scope
+                    queue.push(...filter[k]);
+                } else {
+                    if (accum[k]) split();
+                    accum[k] = filter[k];
+                }
+            }
+        }
+        items = items.filter(f => Object.keys(f).length);
+
+        return items.length === 1 ? items[0] : { $and: items };
+    }
+    return null;
+}
+
 /// Converts params to request options. See e.g. task codeholders/list for details.
 export const makeParametersToRequestData = ({
     searchFieldToTransientFields,
@@ -61,40 +99,8 @@ export const makeParametersToRequestData = ({
     options.offset = params.offset | 0;
     options.limit = params.limit | 0;
 
-    const filters = [];
-    if (params.filters && !params.filters._disabled) {
-        for (const filter in params.filters) {
-            if (filter === '_disabled') continue;
-            if (!(filter in clientFilters)) {
-                throw { code: 'unknown-filter', message: `unknown filter ${filter}` };
-            }
-            if (params.filters[filter].enabled) {
-                filters.push(clientFilters[filter].toAPI(params.filters[filter].value));
-            }
-        }
-    }
-    if (filters.length) {
-        // merge filters with no common keys
-        let accum = {};
-        let items = [accum];
-        const split = () => items.push(accum = {});
-        const queue = [...filters];
-        while (queue.length) {
-            const filter = queue.pop();
-            for (const k in filter) {
-                if (k === '$and') {
-                    // also spill $and into the parent scope
-                    queue.push(...filter[k]);
-                } else {
-                    if (accum[k]) split();
-                    accum[k] = filter[k];
-                }
-            }
-        }
-        items = items.filter(f => Object.keys(f).length);
-
-        options.filter = items.length === 1 ? items[0] : { $and: items };
-    }
+    const apiFilter = filtersToAPI(clientFilters, params.filters);
+    if (apiFilter) options.filter = apiFilter;
 
     if (params.jsonFilter && !params.jsonFilter._disabled) {
         if (params.jsonFilter.error) throw params.jsonFilter.error;

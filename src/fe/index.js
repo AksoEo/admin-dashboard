@@ -31,6 +31,7 @@ const taskViews = {
     info: lazyPath(genericTaskViews, res => res.info),
     login: lazyPath(() => import(/* webpackChunkName: "login-tasks" */ './features/login/tasks')),
     codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
+    queries: lazyPath(() => import(/* webpackChunkName: "queries-tasks" */ './features/queries')),
 };
 const loadTaskView = async (taskPath) => {
     if (!taskPath) return null;

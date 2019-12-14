@@ -1,11 +1,14 @@
 import { h } from 'preact';
-import { Suspense, useEffect } from 'preact/compat';
-import { Checkbox } from '@cpsdqs/yamdl';
+import { Suspense, useEffect, useState, Fragment } from 'preact/compat';
+import { Checkbox, Dialog } from '@cpsdqs/yamdl';
+import RemoveIcon from '@material-ui/icons/Remove';
 import PaperList from './paper-list';
+import DataList from './data-list';
 import SearchInput from './search-input';
 import Segmented from './segmented';
 import DisclosureArrow from './disclosure-arrow';
 import { search as locale } from '../locale';
+import { coreContext } from '../core/connection';
 import JSONFilterEditor from './json-filter-editor';
 import './search-filters.less';
 
@@ -14,6 +17,8 @@ import './search-filters.less';
 ///
 /// # Props
 /// - value/onChange: core parameters (see e.g. docs for codeholders/list for details)
+///   additional fields:
+///   _savedFilter: null or object { id, name, description } if loaded
 /// - searchFields: string[] or null
 /// - filters: object mapping all available filter ids to their editor spec. An editor spec
 ///   contains:
@@ -33,6 +38,7 @@ import './search-filters.less';
 /// - expanded/onExpandedChange: bool
 /// - locale: object with `{ searchFields, searchPlaceholders, filters }`
 /// - category: category id for saved filters
+/// - filtersToAPI: name of a task that will convert client filters to an api filter
 export default function SearchFilters ({
     value,
     onChange,
@@ -43,6 +49,7 @@ export default function SearchFilters ({
     locale: searchLocale,
     category,
     inputRef,
+    filtersToAPI,
 }) {
     const items = [];
 
@@ -82,7 +89,8 @@ export default function SearchFilters ({
             category={category}
             value={value}
             onChange={onChange}
-            hidden={!expanded} />,
+            hidden={!expanded}
+            filtersToAPITask={filtersToAPI} />,
         hidden: !expanded,
         paper: true,
     });
@@ -174,12 +182,12 @@ function FiltersDisclosure ({ expanded, onExpandedChange }) {
 /// Renders the json/normal switch and saved filters stuff
 function FiltersBar ({
     category,
+    filtersToAPITask,
     value,
     onChange,
     hidden,
 }) {
-    // TODO: saved filters
-    void category;
+    const [pickerOpen, setPickerOpen] = useState(false);
 
     const filterType = value.filters._disabled ? 'json' : 'normal';
     const onFilterTypeChange = type => {
@@ -196,6 +204,21 @@ function FiltersBar ({
             },
         });
     };
+
+    let loadedFilter;
+    if (value._savedFilter) {
+        loadedFilter = (
+            <span class="loaded-filter">
+                <button class="tiny-remove-button" onClick={() => {
+                    // remove savedFilter link
+                    onChange({ ...value, _savedFilter: null });
+                }}>
+                    <RemoveIcon />
+                </button>
+                {value._savedFilter.name}
+            </span>
+        );
+    }
 
     return (
         <div class="filters-bar">
@@ -215,8 +238,101 @@ function FiltersBar ({
                     },
                 ]}
             </Segmented>
-            todo: saved filters
+
+            {loadedFilter}
+
+            <coreContext.Consumer>
+                {core => (
+                    <Fragment>
+                        <button class="tiny-button" onClick={() => setPickerOpen(true)}>
+                            {locale.loadFilter}
+                        </button>
+                        <FilterPicker
+                            open={pickerOpen}
+                            onClose={() => setPickerOpen(false)}
+                            category={category}
+                            core={core}
+                            onLoad={item => {
+                                onChange({
+                                    ...value,
+                                    filters: {
+                                        ...(value.filters || {}),
+                                        _disabled: true,
+                                    },
+                                    jsonFilter: {
+                                        filter: item.query,
+                                        _disabled: false,
+                                    },
+                                    _savedFilter: item,
+                                });
+                                setPickerOpen(false);
+                            }} />
+
+                        {filterType === 'json' || filtersToAPITask ? (
+                            <button class="tiny-button" onClick={async () => {
+                                let filter;
+                                if (filterType === 'normal' && filtersToAPITask) {
+                                    // we need to save the api representation
+                                    filter = await core.createTask(filtersToAPITask, {
+                                        filters: value.filters,
+                                    }).runOnceAndDrop();
+                                } else {
+                                    filter = value.jsonFilter.filter;
+                                }
+
+                                // create a task view
+                                if (value._savedFilter) {
+                                    core.createTask('queries/update', {
+                                        id: value._savedFilter.id,
+                                    }, {
+                                        name: value._savedFilter.name,
+                                        description: value._savedFilter.description,
+                                        query: filter,
+                                    });
+                                } else {
+                                    core.createTask('queries/add', {
+                                        category,
+                                    }, {
+                                        name: '',
+                                        description: null,
+                                        query: filter,
+                                    });
+                                }
+                            }}>
+                                {locale.saveFilter}
+                            </button>
+                        ) : null}
+                    </Fragment>
+                )}
+            </coreContext.Consumer>
         </div>
+    );
+}
+
+function FilterPicker ({ category, open, onClose, core, onLoad }) {
+    return (
+        <Dialog
+            backdrop
+            open={open}
+            onClose={onClose}
+            title={locale.pickFilter}
+            class="search-filter-picker">
+            <DataList
+                onLoad={(offset, limit) => core.createTask('queries/list', { category }, {
+                    offset,
+                    limit,
+                }).runOnceAndDrop()}
+                itemHeight={56}
+                renderItem={item => (
+                    <div>
+                        <div>{item.name}</div>
+                        <div>{item.description}</div>
+                    </div>
+                )}
+                onItemClick={item => onLoad(item)}
+                onRemove={item => core.createTask('queries/delete', { id: item.id }).runOnceAndDrop()}
+                emptyLabel={locale.noFilters} />
+        </Dialog>
     );
 }
 

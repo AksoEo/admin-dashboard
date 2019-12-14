@@ -3,7 +3,7 @@ import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
 import * as log from '../log';
-import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
+import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
 import { LOGIN_ID } from './login-keys';
 import { deepMerge, deepEq } from '../../util';
 
@@ -497,6 +497,10 @@ export const tasks = {
             }
         }
         return filters;
+    },
+    /// codeholders/filtersToAPI: converts filters to api repr
+    filtersToAPI: async ({ filters }) => {
+        return filtersToAPI(clientFilters, filters);
     },
     /// codeholders/list: fetches codeholders
     /// options: none

@@ -3,14 +3,14 @@ import asyncClient from '../client';
 export const tasks = {
     /// queries/list: lists available queries
     ///
-    /// # Parameters
+    /// # Options and Parameters
     /// - limit, offset
     /// - category: category id
     ///
     /// # Returns
     /// - items: list of queries
     /// - total: total item count
-    list: async (_, { limit, offset, category }) => {
+    list: async ({ category }, { limit, offset }) => {
         const client = await asyncClient;
         const res = await client.get('/queries', {
             offset,
@@ -35,8 +35,25 @@ export const tasks = {
     /// - query
     add: async ({ category }, { name, description, query }) => {
         const client = await asyncClient;
-        await client.post('/queries', {
+        const res = await client.post('/queries', {
             category,
+            name,
+            description: description || null,
+            query,
+        });
+    },
+
+    /// queries/update: updates a query
+    ///
+    /// # Options and Parameters
+    /// - id
+    /// - category
+    /// - name
+    /// - description
+    /// - query
+    update: async ({ id }, { name, description, query }) => {
+        const client = await asyncClient;
+        await client.patch(`/queries/${id}`, {
             name,
             description: description || null,
             query,

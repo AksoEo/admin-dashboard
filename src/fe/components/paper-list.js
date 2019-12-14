@@ -9,6 +9,7 @@ const clamp = (x, l, h) => Math.max(l, Math.min(x, h));
 
 const DAMPING = 1;
 const RESPONSE = 0.4;
+const USE_SCALE = true;
 
 /// Renders a vertical array of animatable material paper.
 ///
@@ -98,9 +99,13 @@ export default class PaperList extends PureComponent {
         const scaleY = this.props.children[index].staticHeight
             ? 1
             : state.height.value / childHeight;
+        const clipY = state.height.value < childHeight
+            ? `inset(0 0 ${childHeight - state.height.value} 0)`
+            : null;
 
         return {
-            transform: `translateY(${state.y.value}px) scaleY(${scaleY})`,
+            transform: `translateY(${state.y.value}px)` + (USE_SCALE ? ` scaleY(${scaleY})` : ''),
+            clipPath: USE_SCALE ? null : clipY,
             zIndex: Math.round(lerp(this.props.children[index].zIndex | 0, 0, state.hidden.value)),
             opacity: clamp(1 - state.hidden.value, 0, 1),
             pointerEvents: state.hidden.value > 0.5 ? 'none' : '',

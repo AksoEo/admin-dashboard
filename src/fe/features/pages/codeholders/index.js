@@ -236,6 +236,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                         filters: locale.search.filters,
                     }}
                     category="codeholders"
+                    filtersToAPI="codeholders/filtersToAPI"
                     inputRef={view => this.#searchInput = view} />
                 <FieldPicker
                     open={this.state.fieldPickerOpen}

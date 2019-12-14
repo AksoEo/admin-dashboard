@@ -1,0 +1,29 @@
+.queries-task-update {
+    width: 300px;
+
+    .form-validator {
+        display: flex;
+
+        .form-field {
+            margin-bottom: 24px;
+            flex: 1;
+        }
+    }
+
+    button .progress-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    button .progress-overlay + span {
+        transition: opacity 0.3s;
+    }
+    button .progress-overlay.indeterminate + span {
+        opacity: 0;
+    }
+
+    .form-footer {
+        text-align: right;
+    }
+}

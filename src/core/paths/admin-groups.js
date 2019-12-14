@@ -5,7 +5,7 @@ export const ADMIN_GROUPS = 'adminGroups';
 
 export const tasks = {
     /// adminGroups/list: lists admin groups
-    list: async ({}, { search, offset, limit }) => {
+    list: async (_, { search, offset, limit }) => {
         const client = await asyncClient;
 
         const opts = { offset, limit };
@@ -27,7 +27,7 @@ export const tasks = {
             total: res.res.header.get('x-total-items'),
         };
     },
-    create: async ({}, { name, description, memberRestrictions }) => {
+    create: async (_, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
 
         await client.post('/admin_groups', {
@@ -35,24 +35,22 @@ export const tasks = {
             description,
             memberRestrictions,
         });
-
-        store.insert([ADMIN_GROUPS, item.id], item);
     },
-    update: async ({}, { name, description, memberRestrictions }) => {
+    update: async ({ id }, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
 
-        await client.patch('/admin_groups', {
+        await client.patch(`/admin_groups/${id}`, {
             name,
             description,
             memberRestrictions,
         });
 
-        store.insert([ADMIN_GROUPS, item.id], item);
+        store.insert([ADMIN_GROUPS, id], { name, description, memberRestrictions });
     },
-    delete: async ({}, { id }) => {
+    delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${id}`);
-        store.signal(ADMIN_GROUPS);
+        store.remove([ADMIN_GROUPS, id]);
     },
 };
 

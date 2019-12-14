@@ -148,6 +148,13 @@ export const search = {
     paginationItems: (from, to, count) => `${from}–${to} el ${count.toLocaleString('de-DE')}`,
     pickFields: 'Elekti kampojn',
     resetFilters: 'Nuligi filtrilojn',
+    loadFilter: 'Ŝargi',
+    saveFilter: 'Konservi',
+    pickFilter: 'Ŝargi filtrilon',
+    saveFilterTitle: 'Konservi filtrilon',
+    noFilters: 'Neniuj konservitaj filtriloj',
+    savedFilterName: 'Nomo',
+    savedFilterDesc: 'Priskribo',
     csvExport: 'Elporti kiel CSV',
 };
 
