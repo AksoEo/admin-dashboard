@@ -23,7 +23,7 @@
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
     "msgpack-lite": "^0.1.26",
-    "preact": "^10.0.5",
+    "preact": "^10.1.0",
     "react-codemirror2": "^6.0.0",
     "resize-observer-polyfill": "^1.5.1",
     "uuid": "^3.3.3"
