@@ -1,6 +1,6 @@
-// for some reason, Chrome focuses elements when you tap on them and causes their focus
-// styles to activate for no good reason, so here’s a few blacklisted elements for which
-// we can be sure that it makes no sense
+//! For some reason, Chrome focuses elements when you tap on them and causes their focus
+//! styles to activate for no good reason, so here’s a few blacklisted elements for which
+//! we can be sure that it makes no sense.
 
 if (navigator.userAgent.includes('Chrome/')) {
     const isBlacklisted = element => {

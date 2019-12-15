@@ -10,6 +10,8 @@ export Required from './required';
 
 import './style';
 
+let didDisplayDeprecationWarning = false;
+
 /// Data types.
 ///
 /// # Items
@@ -24,7 +26,25 @@ import './style';
 /// Renderers must have a `value` prop, and editors must have both `value` and `onChange`.
 ///
 /// Multi-field renderers may also accept `valuek` for k ∈ ℕ \ {0, 1}.
-export default {
+export default new Proxy({
+    address,
+    country,
+    date,
+    email,
+    phoneNumber,
+    ueaCode,
+    timestamp,
+}, {
+    get (target, prop, receiver) {
+        if (!didDisplayDeprecationWarning) {
+            console.warn('Deprecated usage of default components/data export; use named exports instead'); // eslint-disable-line no-console
+            didDisplayDeprecationWarning = true;
+        }
+        return Reflect.get(target, prop, receiver);
+    },
+});
+
+export {
     address,
     country,
     date,

@@ -6,8 +6,9 @@ import Form, { Validator } from '../components/form';
 import { search as locale } from '../locale';
 import './queries.less';
 
-function makeQuerySaveDialog(type) {
-    return ({ task, open, core }) => {
+function makeQuerySaveDialog (type) {
+    void type; // TODO
+    return ({ task, open }) => {
         const buttonValidator = useRef(null);
         const [error, setError] = useState(null);
 

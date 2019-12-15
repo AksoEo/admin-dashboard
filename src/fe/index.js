@@ -48,13 +48,21 @@ const loadTaskView = async (taskPath) => {
     }
 };
 
+/// AKSO session manager.
 class Session extends Component {
     state = {
+        /// the Login component
         login: null,
+        /// the App component
         app: null,
+        /// whether or not we’re logged in
         loggedIn: false,
+        /// whether or not we should show the login page
+        /// this exists to allow for animation buffer time between login and when the app displays
         showLogin: false,
+        /// if true, the app will play the you-just-logged-in animation
         wasLoggedOut: false,
+        /// if true, this is a special page (e.g. password reset) and must show the login screen
         specialPage: false,
     };
 

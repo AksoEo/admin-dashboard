@@ -153,7 +153,6 @@ export default connectToEverything(class CodeholdersPage extends Page {
     }
 
     render ({ addrLabelGen, perms, fields: availableFields, filters: availableFilters }) {
-        const canRead = perms.hasPerm('codeholders.read');
         const canCreate = perms.hasPerm('codeholders.create');
 
         availableFields = availableFields || Object.keys(FIELDS);

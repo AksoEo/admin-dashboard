@@ -6,13 +6,27 @@ import { CardStackProvider, CardStackRenderer, CardStackItem } from '../componen
 import pages from './pages';
 import { MetaProvider } from './meta';
 import { app as locale } from '../locale';
+import { LinkButton } from '../router';
 
 const TRUNCATED_QUERY_NAME = '?T';
 const MAX_LOCATION_LEN = 1887; // you think im joking but this is actually a reasonable limit
 
+function ForbiddenPage () {
+    return (
+        <div class="forbidden-page">
+            <div class="error-title">{locale.forbidden}</div>
+            <LinkButton class="error-go-home" target="/">{locale.goHome}</LinkButton>
+        </div>
+    );
+}
+
 function NotFoundPage () {
-    // TODO
-    return 'not found (todo: fancy 404 page)';
+    return (
+        <div class="not-found-page">
+            <div class="error-title">{locale.notFound}</div>
+            <LinkButton class="error-go-home" target="/">{locale.goHome}</LinkButton>
+        </div>
+    );
 }
 
 function TODOPage () {
@@ -20,7 +34,7 @@ function TODOPage () {
 }
 
 // Parses a URL and state into a stack. State is nullable.
-function parseHistoryState (url, state, mkPopStack) {
+function parseHistoryState (url, state, mkPopStack, perms) {
     const stackState = state && Array.isArray(state.stack) ? state.stack : [];
 
     url = new URL(url);
@@ -48,6 +62,9 @@ function parseHistoryState (url, state, mkPopStack) {
     // current page object from the router
     let cursor;
 
+    // if true, the user doesn’t have permission to access the page
+    let forbidden = false;
+
     // id for the sidebar
     let currentPageId;
 
@@ -64,6 +81,7 @@ function parseHistoryState (url, state, mkPopStack) {
                     query: '',
                     state: {},
                 };
+                if (!page.hasPerm(perms)) forbidden = true;
                 currentPageId = page.id;
                 stack.push(item);
                 viewStack.push(item);
@@ -77,6 +95,21 @@ function parseHistoryState (url, state, mkPopStack) {
             path: firstPathPart,
             source: null,
             component: NotFoundPage,
+            state: {},
+        };
+        stack.push(item);
+        viewStack.push(item);
+        currentPageId = null;
+    }
+
+    if (forbidden) {
+        stack.splice(0);
+        viewStack.splice(0);
+        pathParts.splice(0); // no need to parse the rest
+        const item = cursor = {
+            path: firstPathPart,
+            source: null,
+            component: ForbiddenPage,
             state: {},
         };
         stack.push(item);
@@ -187,6 +220,7 @@ const SAVE_STATE_INTERVAL = 1000; // ms
 /// - permaSidebar: bool
 /// - onOpenMenu: fires when the menu icon is pressed
 /// - onCurrentPageChange: fired when the current page id changes
+/// - perms: permissions
 export default class Navigation extends PureComponent {
     state = {
         // array of objects with properties
@@ -220,7 +254,12 @@ export default class Navigation extends PureComponent {
             stack,
             pathname,
             query,
-        } = parseHistoryState(url, state, index => replace => this.popStackAt(index, replace));
+        } = parseHistoryState(
+            url,
+            state,
+            index => replace => this.popStackAt(index, replace),
+            this.props.perms,
+        );
 
         this.props.onCurrentPageChange(currentPageId);
 

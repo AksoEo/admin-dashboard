@@ -1,3 +1,5 @@
+//! Constants used in the Core-FE protocol.
+
 export const LoginAuthStates = {
     UNKNOWN: 0,
     LOGGED_OUT: 1,

@@ -7,6 +7,11 @@ import { coreContext } from '../core/connection';
 import { deepEq } from '../../util';
 import './data-list.less';
 
+// nested portals cause bugs when they end up in the same container
+const menuContainer = document.createElement('div');
+menuContainer.id = 'data-list-nested-menu-container';
+document.body.appendChild(menuContainer);
+
 const VLIST_CHUNK_SIZE = 100;
 
 // TODO: this might need a refactor
@@ -215,6 +220,7 @@ function ListItemOverflow ({ renderMenu, item, core, onDelete }) {
                 onClose={() => setMenuOpen(false)}
                 position={menuPos}
                 anchor={[1, 0]}
+                container={menuContainer}
                 items={[...additionalMenu, {
                     label: locale.delete,
                     action: onDelete,

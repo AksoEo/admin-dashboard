@@ -95,9 +95,14 @@ export const login = {
 export const app = {
     title: 'AKSO',
     logOut: 'Elsaluti',
+
     // literally any error that causes the UI to fail to render
     genericError: 'Okazis neatendita eraro. Bonvolu poste reprovi. Se tiu ĉi eraro okazadas indus kontakti administranton.',
     genericErrorReload: 'Reŝarĝi la paĝon',
+
+    notFound: '[[kato manĝas ĉi tiun paĝon, pardonu min]]',
+    forbidden: '[[vi ne rajtas vidi ĉi tiun paĝon]]',
+    goHome: '[[fermi]]',
 
     debugPageInfo: '[[this is not the page you’re looking for *waves hand*]]',
 };

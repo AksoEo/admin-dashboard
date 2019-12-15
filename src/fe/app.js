@@ -17,6 +17,8 @@ moment.tz.setDefault('UTC');
 
 const PERMA_SIDEBAR_WIDTH = 900;
 
+/// The application component.
+/// This contains everything pertaining to a logged-in session.
 export default connect('perms/perms')(perms => ({ perms }))(class App extends Component {
     state = {
         permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH,
@@ -107,7 +109,8 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
                                 permaSidebar={this.state.permaSidebar}
                                 onOpenMenu={() => this.setState({ sidebarOpen: true })}
                                 onCurrentPageChange={this.onCurrentPageChange}
-                                onNavigate={this.onNavigate} />
+                                onNavigate={this.onNavigate}
+                                perms={this.perms} />
                         </div>
                     </AppBarProvider>
                 </div>

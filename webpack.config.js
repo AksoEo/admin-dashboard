@@ -12,9 +12,13 @@ const webpack = require('webpack');
 const pkg = require('./package.json');
 
 const browserTargets = {
+    // because Web Worker API
     edge: '18',
+    // because CSS grid
     chrome: '57',
+    // ?
     firefox: '63',
+    // because CSS grid
     safari: '10',
 };
 

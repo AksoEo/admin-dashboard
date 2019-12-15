@@ -1,3 +1,6 @@
+//! This file contains handling of unsupported browsers.
+//! Do NOT use modern Javascript features in this file
+
 var msEdgeVersion = navigator.userAgent.match(/(Edge)\/(\d+)(?:\.(\d+))?/);
 var chromiumVersion = navigator.userAgent.match(/(Chromium|Chrome)\/(\d+)\.(\d+)(?:\.(\d+))?/);
 var firefoxVersion = navigator.userAgent.match(/(Firefox)\/(\d+)\.(\d+)/);
