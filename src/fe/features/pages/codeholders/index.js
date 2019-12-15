@@ -320,7 +320,8 @@ function GlobalFilterViewer ({ open, onClose, filter }) {
             backdrop
             open={open}
             onClose={onClose}
-            title={locale.globalFilterTitle}>
+            title={locale.globalFilterTitle}
+            fullScreen={width => width < 600}>
             <ObjectViewer value={filter} />
         </Dialog>
     );
