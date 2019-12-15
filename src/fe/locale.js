@@ -28,6 +28,7 @@ export const data = {
     ],
     delete: 'Forigi',
     showMore: 'Montri pliajn',
+    objViewerArrayItems: items => `[[${items} item${items === 1 ? '' : 's'}]]`,
 };
 
 export const login = {
@@ -265,7 +266,8 @@ export const codeholders = {
             org: 'organizo',
         },
     },
-    globalFilterNotice: 'Ĉiuj viaj serĉoj estas limigitaj laŭ membrofiltrilo. Okaze de demandoj, kontaktu vian administranton.',
+    globalFilterTitle: '[[Membrofiltrilo]]',
+    globalFilterNotice: ['Ĉiuj viaj serĉoj estas limigitaj laŭ ', 'membrofiltrilo', '. Okaze de demandoj, kontaktu vian administranton.'],
     fields: {
         type: 'Membrospeco',
         types: {

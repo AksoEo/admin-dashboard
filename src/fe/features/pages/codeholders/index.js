@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { Dialog } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import SortIcon from '@material-ui/icons/Sort';
 import SaveIcon from '@material-ui/icons/Save';
@@ -6,6 +7,7 @@ import ContactMailIcon from '@material-ui/icons/ContactMail';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
 import FieldPicker from '../../../components/field-picker';
+import ObjectViewer from '../../../components/object-viewer';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
 import Page from '../../../components/page';
 import { codeholders as locale, search as searchLocale } from '../../../locale';
@@ -86,6 +88,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
         expanded: false,
         fieldPickerOpen: false,
         csvExportOpen: false,
+        globalFilterOpen: false,
 
         // for the addr label gen
         currentResultIsCursed: false,
@@ -159,6 +162,22 @@ export default connectToEverything(class CodeholdersPage extends Page {
         const hasGlobalFilter = perms.perms
             ? !!Object.keys(perms.perms.memberFilter).length
             : false;
+
+        let globalFilterNotice = null;
+        if (hasGlobalFilter) {
+            globalFilterNotice = (
+                <span class="global-filter-notice">
+                    {locale.globalFilterNotice[0]}
+                    <a href="#" onClick={e => {
+                        e.preventDefault();
+                        this.setState({ globalFilterOpen: true });
+                    }}>
+                        {locale.globalFilterNotice[1]}
+                    </a>
+                    {locale.globalFilterNotice[2]}
+                </span>
+            );
+        }
 
         // overflow menu
         const menu = [];
@@ -248,7 +267,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     onChange={fields => this.setState({ options: { ...options, fields } })}
                     locale={locale.fields} />
                 <OverviewList
-                    notice={hasGlobalFilter ? locale.globalFilterNotice : null}
+                    notice={globalFilterNotice}
                     task="codeholders/list"
                     view="codeholders/codeholder"
                     parameters={options}
@@ -284,7 +303,25 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     lvIsCursed={this.state.currentResultIsCursed}
                     options={this.state.options}
                     onClose={() => addrLabelGen.pop()} />
+
+                <GlobalFilterViewer
+                    open={this.state.globalFilterOpen}
+                    onClose={() => this.setState({ globalFilterOpen: false })}
+                    filter={perms.perms ? perms.perms.memberFilter : null} />
             </div>
         );
     }
 });
+
+function GlobalFilterViewer ({ open, onClose, filter }) {
+    return (
+        <Dialog
+            class="codeholders-global-filter-viewer"
+            backdrop
+            open={open}
+            onClose={onClose}
+            title={locale.globalFilterTitle}>
+            <ObjectViewer value={filter} />
+        </Dialog>
+    );
+}

@@ -3,6 +3,7 @@ import JSON5 from 'json5';
 import { useState, Fragment } from 'preact/compat';
 import { Dialog } from '@cpsdqs/yamdl';
 import Page from '../../../components/page';
+import ObjectViewer from '../../../components/object-viewer';
 import { app as locale } from '../../../locale';
 import permsContext from '../../../perms';
 import { connect, coreContext } from '../../../core/connection';
@@ -21,71 +22,6 @@ export default class DebugPage extends Page {
                 <RequestRunner />
             </div>
         );
-    }
-}
-
-function ObjectViewer ({ value: obj, shallow }) {
-    const [open, setOpen] = useState(false);
-    const baseStyle = {
-        font: '12px Menlo, monospace',
-        background: '#000',
-        color: 'white',
-    };
-    const disclosure = <button style={{ color: 'inherit', background: '#777', borderColor: 'transparent' }} onClick={() => setOpen(!open)}>{open ? 'v' : '>'}</button>;
-    if (Array.isArray(obj)) {
-        if (shallow) return '[…]';
-        return open ? (
-            <div style={baseStyle}>
-                {disclosure}[
-                {obj.map((x, i) => (<div style={{ paddingLeft: '2em' }} key={i}>{i}: <ObjectViewer value={x} /></div>))}
-                ]
-            </div>
-        ) : (
-            <span style={{ ...baseStyle, display: 'inline-block' }}>
-                {disclosure}
-                [
-                {obj.slice(0, 5).flatMap((x, i) => [
-                    <ObjectViewer key={i} value={x} shallow />,
-                    ', ',
-                ])}
-                {obj.length > 5 ? '…' : ''}
-                ] ({obj.length} item{obj.length === 1 ? '' : 's'})
-            </span>
-        );
-    } else if (typeof obj === 'object' && obj !== null) {
-        if (shallow) return '{…}';
-        const keys = Object.keys(obj);
-        return open ? (
-            <div style={baseStyle}>
-                {disclosure}
-                {'{'}
-                {keys.map(x => (
-                    <div style={{ paddingLeft: '2em' }} key={x}>
-                        <span style={{ color: '#f54784' }}>{x}</span>: <ObjectViewer value={obj[x]} />
-                    </div>))}
-                {'}'}
-            </div>
-        ) : (
-            <span style={{ ...baseStyle, display: 'inline-block' }}>
-                {disclosure}
-                {'{'}
-                {keys.slice(0, 5).flatMap(x => [
-                    <span key={x}><span style={{ color: '#f54784' }}>{x}</span>: <ObjectViewer value={obj[x]} shallow /></span>,
-                    ', ',
-                ])}
-                {keys.length > 5 ? '…' : ''}
-                {'}'}
-            </span>
-        );
-    } else {
-        let color = 'white';
-        let os = '' + obj;
-        if (typeof obj === 'number') color = '#ed9b50';
-        else if (typeof obj === 'string') {
-            color = '#4ebc6b';
-            os = JSON.stringify(obj);
-        } else if (typeof obj === 'boolean') color = '#ed9b50';
-        return <span style={{ ...baseStyle, color }}>{os}</span>;
     }
 }
 
