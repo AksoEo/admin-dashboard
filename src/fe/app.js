@@ -17,6 +17,12 @@ moment.tz.setDefault('UTC');
 
 const PERMA_SIDEBAR_WIDTH = 900;
 
+function createDummyPerms () {
+    const perms = new Perms();
+    perms._isDummy = true;
+    return perms;
+}
+
 /// The application component.
 /// This contains everything pertaining to a logged-in session.
 export default connect('perms/perms')(perms => ({ perms }))(class App extends Component {
@@ -60,7 +66,7 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
         };
     }
 
-    perms = new Perms();
+    perms = createDummyPerms();
 
     componentDidMount () {
         this.onResize();

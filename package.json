@@ -8,6 +8,7 @@
   ],
   "dependencies": {
     "@babel/polyfill": "^7.7.0",
+    "@cpsdqs/google-i18n-address": "^1.0.2",
     "@cpsdqs/yamdl": "^0.1.1",
     "@material-ui/core": "^4.5.0",
     "@material-ui/icons": "^4.4.3",
@@ -16,14 +17,13 @@
     "core-js": "^3.2.1",
     "csv-stringify": "^5.3.3",
     "fuzzaldrin": "^2.1.0",
-    "google-i18n-address": "git+https://github.com/cpsdqs/google-i18n-address.git",
     "jdenticon": "^2.2.0",
     "json5": "^2.1.1",
     "libphonenumber-js": "^1.7.25",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.26",
     "msgpack-lite": "^0.1.26",
-    "preact": "^10.1.0",
+    "preact": "^10.1.1",
     "react-codemirror2": "^6.0.0",
     "resize-observer-polyfill": "^1.5.1",
     "uuid": "^3.3.3"

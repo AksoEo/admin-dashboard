@@ -1,6 +1,6 @@
-import { h } from 'preact';
+import { h, Component } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
-import i18naddress from 'google-i18n-address';
+import { getValidationRules } from '@cpsdqs/google-i18n-address';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import locale from '../../locale';
 import { Validator } from '../form';
@@ -43,56 +43,89 @@ function BasicAddressRenderer ({ value }) {
     );
 }
 
-function AddressEditor ({ value, onChange }) {
-    if (!value) return null;
-    const country = value.country;
+class AddressEditor extends Component {
+    state = {
+        validationRules: null,
+    };
 
-    const onChangeField = (key, map = (x => x)) => v => onChange({ ...value, [key]: map(v) });
+    #reloadTimeout;
 
-    const items = [
-        <countryField.editor key="country" value={country} onChange={onChangeField('country')} />,
-    ];
+    loadValidationRules () {
+        if (!this.props.value) return;
+        this.setState({ validationRules: null });
+        getValidationRules({ countryCode: this.props.value.country }).then(rules => {
+            this.setState({ validationRules: rules });
+        }).catch(err => {
+            console.error(err); // eslint-disable-line no-console
+            // this.#reloadTimeout = setTimeout(() => this.loadValidationRules(), 1000);
+        });
+    }
 
-    const rules = i18naddress.getValidationRules({ countryCode: country });
-    const requiredFields = rules.requiredFields || [];
+    componentDidMount () {
+        this.loadValidationRules();
+    }
 
-    if (requiredFields.includes('countryArea')) {
-        items.push(
-            <Validator
-                component={NativeSelect}
+    componentDidUpdate (prevProps) {
+        if (!prevProps.value || prevProps.value.country !== this.props.value.country) {
+            this.loadValidationRules();
+        }
+    }
+
+    componentWillUnmount () {
+        clearTimeout(this.#reloadTimeout);
+    }
+
+    render ({ value, onChange }) {
+        if (!value) return null;
+        const country = value.country;
+
+        const onChangeField = (key, map = (x => x)) => v => onChange({ ...value, [key]: map(v) });
+
+        const items = [
+            <countryField.editor key="country" value={country} onChange={onChangeField('country')} />,
+        ];
+
+        const rules = this.state.validationRules || {};
+        const requiredFields = rules.requiredFields || [];
+
+        if (requiredFields.includes('countryArea')) {
+            items.push(
+                <Validator
+                    component={NativeSelect}
+                    validate={value => {
+                        if (country && !value) throw { error: locale.data.requiredField };
+                    }}
+                    class="address-editor-line"
+                    key="countryArea"
+                    value={value.countryArea}
+                    onChange={onChangeField('countryArea', e => e.target.value || null)}>
+                    <option value="">—</option>
+                    {rules.countryAreaChoices.map(([id, area]) => (
+                        <option key={id} value={id}>{area}</option>
+                    ))}
+                </Validator>
+            );
+        }
+
+        for (const k of ['city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode']) {
+            const isRequired = requiredFields.includes(k);
+            items.push(<Validator
+                component={TextField}
                 validate={value => {
-                    if (country && !value) throw { error: locale.data.requiredField };
+                    if (country && !value && isRequired) throw { error: locale.data.requiredField };
                 }}
                 class="address-editor-line"
-                key="countryArea"
-                value={value.countryArea}
-                onChange={onChangeField('countryArea', e => e.target.value || null)}>
-                <option value="">—</option>
-                {rules.countryAreaChoices.map(([id, area]) => (
-                    <option key={id} value={id}>{area}</option>
-                ))}
-            </Validator>
-        );
-    }
+                key={k}
+                value={value[k]}
+                maxLength={maxLengthMap[k]}
+                label={isRequired
+                    ? <Required>{locale.data.addressFields[k]}</Required>
+                    : locale.data.addressFields[k]}
+                onChange={onChangeField(k, e => e.target.value || null)} />);
+        }
 
-    for (const k of ['city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode']) {
-        const isRequired = requiredFields.includes(k);
-        items.push(<Validator
-            component={TextField}
-            validate={value => {
-                if (country && !value && isRequired) throw { error: locale.data.requiredField };
-            }}
-            class="address-editor-line"
-            key={k}
-            value={value[k]}
-            maxLength={maxLengthMap[k]}
-            label={isRequired
-                ? <Required>{locale.data.addressFields[k]}</Required>
-                : locale.data.addressFields[k]}
-            onChange={onChangeField(k, e => e.target.value || null)} />);
+        return <div class="data address-editor">{items}</div>;
     }
-
-    return <div class="data address-editor">{items}</div>;
 }
 
 export default {

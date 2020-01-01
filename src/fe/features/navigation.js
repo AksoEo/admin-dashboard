@@ -81,7 +81,7 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                     query: '',
                     state: {},
                 };
-                if (!page.hasPerm(perms)) forbidden = true;
+                if (!perms._isDummy && !page.hasPerm(perms)) forbidden = true;
                 currentPageId = page.id;
                 stack.push(item);
                 viewStack.push(item);
@@ -403,6 +403,12 @@ export default class Navigation extends PureComponent {
     componentDidMount () {
         this.loadURL(document.location.href, window.history.state);
         this.scheduleSaveState();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.perms !== this.props.perms) {
+            this.loadURL(document.location.href, window.history.state);
+        }
     }
 
     componentWillUnmount () {
