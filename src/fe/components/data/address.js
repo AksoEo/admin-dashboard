@@ -57,7 +57,7 @@ class AddressEditor extends Component {
             this.setState({ validationRules: rules });
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
-            // this.#reloadTimeout = setTimeout(() => this.loadValidationRules(), 1000);
+            this.#reloadTimeout = setTimeout(() => this.loadValidationRules(), 1000);
         });
     }
 
