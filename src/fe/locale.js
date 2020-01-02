@@ -2,7 +2,7 @@ import config from '../config.val';
 
 const startYear = 2019;
 const thisYear = new Date(config.buildTime).getUTCFullYear();
-const copyrightYear = thisYear === startYear ? thisYear : `${startYear}–${thisYear}`;
+const copyrightYear = `${startYear}–${thisYear}`;
 
 export const meta = {
     copyright: `© ${copyrightYear}`,
