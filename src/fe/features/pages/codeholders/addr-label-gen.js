@@ -15,34 +15,31 @@ export default function AddrLabelGenContainer ({
 
     return (
         <Fragment>
-            <CardStackProvider>
-                <CardStackRenderer class="addr-label-gen-card-stack" />
-                <CardStackItem
-                    open={open}
-                    onClose={onClose}
-                    depth={0}
-                    appBar={
-                        <AppBarProxy
-                            menu={<Button icon small onClick={onClose}>
-                                <MenuIcon type="close" />
-                            </Button>}
-                            title={locale.addrLabelGen.title}
-                            priority={9} />
-                    }>
-                    <coreContext.Consumer>
-                        {core => (
-                            <AddrLabelGen
-                                lvIsCursed={lvIsCursed}
-                                options={options}
-                                onSuccess={() => {
-                                    onClose();
-                                    setShowSuccess(true);
-                                }}
-                                core={core} />
-                        )}
-                    </coreContext.Consumer>
-                </CardStackItem>
-            </CardStackProvider>
+            <CardStackItem
+                open={open}
+                onClose={onClose}
+                depth={0}
+                appBar={
+                    <AppBarProxy
+                        menu={<Button icon small onClick={onClose}>
+                            <MenuIcon type="close" />
+                        </Button>}
+                        title={locale.addrLabelGen.title}
+                        priority={9} />
+                }>
+                <coreContext.Consumer>
+                    {core => (
+                        <AddrLabelGen
+                            lvIsCursed={lvIsCursed}
+                            options={options}
+                            onSuccess={() => {
+                                onClose();
+                                setShowSuccess(true);
+                            }}
+                            core={core} />
+                    )}
+                </coreContext.Consumer>
+            </CardStackItem>
             <Dialog
                 backdrop
                 open={showSuccess}
@@ -94,7 +91,7 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
     };
 
     return (
-        <div class="addr-label-gen">
+        <div class="codeholders-addr-label-gen">
             {lvIsCursed ? <div class="cursed-notice">
                 {locale.addrLabelGen.cursedNotice}
             </div> : null}
