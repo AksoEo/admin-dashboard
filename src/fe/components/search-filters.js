@@ -299,9 +299,15 @@ function FiltersBar ({
                                         query: filter,
                                     });
                                 }
-                                task.on('success', result => {
-                                    // TODO: add or update saved filter state
-                                    void result;
+                                task.on('success', id => {
+                                    onChange({
+                                        ...value,
+                                        _savedFilter: {
+                                            id,
+                                            name: task.parameters.name,
+                                            description: task.parameters.description,
+                                        },
+                                    });
                                 });
                             }}>
                                 {locale.saveFilter}

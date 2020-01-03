@@ -33,6 +33,8 @@ export const tasks = {
     /// - name
     /// - description
     /// - query
+    ///
+    /// Returns the id of the new query.
     add: async ({ category }, { name, description, query }) => {
         const client = await asyncClient;
         const res = await client.post('/queries', {
@@ -41,6 +43,7 @@ export const tasks = {
             description: description || null,
             query,
         });
+        return +res.res.headers.get('x-identifier');
     },
 
     /// queries/update: updates a query
