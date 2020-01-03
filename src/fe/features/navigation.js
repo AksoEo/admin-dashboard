@@ -129,9 +129,14 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                 cursor = subpage;
 
                 if (subpage.type === 'bottom') {
-                    while (stack.length) stack.pop();
+                    const pathParts = [];
+                    while (stack.length) {
+                        const item = stack.pop();
+                        pathParts.unshift(item.path);
+                    }
+                    pathParts.push(part);
                     const item = {
-                        path: part,
+                        path: pathParts.join('/'),
                         source: subpage,
                         component: subpage.component,
                         pathMatch: match,
@@ -535,7 +540,7 @@ export default class Navigation extends PureComponent {
                         {bottomPage}
                     </div>
                     {stackItems}
-                    <CardStackRenderer />
+                    <CardStackRenderer class="navigation-card-stack" />
                 </CardStackProvider>
             </div>
         );

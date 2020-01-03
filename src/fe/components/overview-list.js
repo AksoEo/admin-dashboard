@@ -168,20 +168,24 @@ export default class OverviewList extends PureComponent {
             // first, push fixed fields
             for (const field of selectedFields) if (field.fixed) compiledFields.push(field);
             // then transient fields
-            for (const id of result.transientFields) {
-                if (!selectedFieldIds.includes(id)) compiledFields.push({ id, transient: true });
+            if (result.transientFields) {
+                for (const id of result.transientFields) {
+                    if (!selectedFieldIds.includes(id)) compiledFields.push({ id, transient: true });
+                }
             }
             // finally, push user fields
             for (const field of selectedFields) if (!field.fixed) compiledFields.push(field);
 
             compiledFields = compiledFields.filter(({ id }) => !fields[id].hide);
 
-            stats = locale.stats(
-                result.items.length,
-                result.stats.filtered,
-                result.total,
-                result.stats.time,
-            );
+            if (result.stats) {
+                stats = locale.stats(
+                    result.items.length,
+                    result.stats.filtered,
+                    result.total,
+                    result.stats.time,
+                );
+            }
 
             paginationText = locale.paginationItems(
                 Math.min(result.total, parameters.offset + 1),

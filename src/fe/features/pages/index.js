@@ -162,13 +162,27 @@ export default [
             },
             {
                 id: 'administration',
-                component: lazy(() =>
+                component: elazy(() =>
                     import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
                 icon: SupervisorAccountIcon,
                 path: 'administrado',
                 paths: [
                     {
-                        component: lazy(() =>
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups')),
+                        type: 'bottom',
+                        path: 'grupoj',
+                        paths: [
+                            {
+                                match: /^(\d+)$/,
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/detail')),
+                                type: 'stack',
+                            },
+                        ],
+                    },
+                    {
+                        component: elazy(() =>
                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log')),
                         type: 'bottom',
                         path: 'protokolo',

@@ -1,4 +1,5 @@
 import asyncClient from '../client';
+import { AbstractDataView } from '../view';
 import * as store from '../store';
 
 export const ADMIN_GROUPS = 'adminGroups';
@@ -24,8 +25,18 @@ export const tasks = {
 
         return {
             items: res.body.map(item => item.id),
-            total: res.res.header.get('x-total-items'),
+            total: res.res.headers.get('x-total-items'),
         };
+    },
+    /// adminGroups/group: returns an admin group
+    group: async ({ id }) => {
+        const client = await asyncClient;
+
+        const res = await client.get(`/admin_groups/${id}`, {
+            fields: ['id', 'name', 'description', 'memberRestrictions.filter', 'memberRestrictions.fields'],
+        });
+        store.insert([ADMIN_GROUPS, id], res.body);
+        return res.body;
     },
     create: async (_, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
@@ -55,5 +66,37 @@ export const tasks = {
 };
 
 export const views = {
+    /// adminGroups/group: observes an admin group
+    ///
+    /// # Parameters
+    /// - id: admin group id
+    /// - noFetch: if true, will not fetch
+    group: class AdminGroupView extends AbstractDataView {
+        constructor ({ id, noFetch }) {
+            super();
+            this.id = id;
 
+            store.subscribe([ADMIN_GROUPS, this.id], this.#onUpdate);
+            const current = store.get([ADMIN_GROUPS, this.id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!noFetch) {
+                tasks.group({ id }, {})
+                    .then(res => this.emit('update', res))
+                    .catch(err => this.emit('error', err));
+            }
+        }
+
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([ADMIN_GROUPS, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([ADMIN_GROUPS, this.id]));
+            }
+        };
+
+        drop () {
+            store.unsubscribe([ADMIN_GROUPS, this.id], this.#onUpdate);
+        }
+    },
 };

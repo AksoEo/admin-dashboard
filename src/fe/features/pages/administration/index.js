@@ -10,6 +10,8 @@ export default class Administration extends Page {
         return (
             <div class="administration-page">
                 <Meta title="..." actions={menu} />
+                temp index page
+                <LinkButton target="/administrado/grupoj">(→ grupoj)</LinkButton>
                 <LinkButton target="/administrado/protokolo">(→ protokolo)</LinkButton>
             </div>
         );

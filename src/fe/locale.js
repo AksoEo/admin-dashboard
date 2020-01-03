@@ -475,6 +475,15 @@ export const codeholders = {
     },
 };
 
+export const adminGroups = {
+    title: '[[Grupoj]]',
+    detailTitle: '[[Grupo]]',
+    fields: {
+        name: 'Nomo',
+        description: 'Priskribo',
+    },
+};
+
 export const httpLog = {
     title: 'Protokolo',
     search: {
