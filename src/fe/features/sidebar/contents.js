@@ -52,7 +52,7 @@ function NavCategory ({ item, currentPage, perms }) {
     const { id, contents } = item;
     const label = localePages[id] ? <DrawerLabel>{localePages[id]}</DrawerLabel> : null;
 
-    const filteredContents = contents.filter(item => item.hasPerm(perms));
+    const filteredContents = contents.filter(item => !item.hidden && item.hasPerm(perms));
 
     return (
         <Fragment>

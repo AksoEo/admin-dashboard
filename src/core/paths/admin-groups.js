@@ -1,5 +1,12 @@
+import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import { AbstractDataView } from '../view';
+import {
+    CODEHOLDERS,
+    parametersToRequestData as codeholdersPTRD,
+    clientFromAPI as codeholderFromAPI,
+} from './codeholders';
+import { deepMerge } from '../../util';
 import * as store from '../store';
 
 export const ADMIN_GROUPS = 'adminGroups';
@@ -11,7 +18,11 @@ export const tasks = {
 
         const opts = { offset, limit };
         if (search && search.query) {
-            opts.search = { cols: [search.field], str: search.query };
+            const transformedQuery = util.transformSearch(search.query);
+            if (!util.isValidSearch(transformedQuery)) {
+                throw { code: 'invalid-search-query', message: 'invalid search query' };
+            }
+            opts.search = { cols: [search.field], str: transformedQuery };
         }
 
         const res = await client.get('/admin_groups', {
@@ -62,6 +73,32 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${id}`);
         store.remove([ADMIN_GROUPS, id]);
+    },
+
+    listCodeholders: async ({ group }, { offset, limit }) => {
+        const client = await asyncClient;
+        const { options } = codeholdersPTRD({
+            fields: [{ id: 'code', sorting: 'asc' }, { id: 'name', sorting: 'asc' }],
+            offset,
+            limit,
+        });
+        const res = await client.get(`/admin_groups/${group}/codeholders`, options);
+
+        for (const item of res.body) {
+            const existing = store.get([CODEHOLDERS, item.id]);
+            store.insert([CODEHOLDERS, item.id], deepMerge(existing, codeholderFromAPI(item)));
+        }
+
+        const list = res.body.map(item => item.id);
+
+        return {
+            items: list,
+            total: +res.res.headers.get('x-total-items'),
+            stats: {
+                time: res.resTime,
+                filtered: false,
+            },
+        };
     },
 };
 

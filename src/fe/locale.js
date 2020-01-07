@@ -478,6 +478,9 @@ export const codeholders = {
 export const adminGroups = {
     title: '[[Grupoj]]',
     detailTitle: '[[Grupo]]',
+    search: {
+        placeholders: '[[serĉi nomojn]]',
+    },
     fields: {
         name: 'Nomo',
         description: 'Priskribo',

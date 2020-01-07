@@ -52,7 +52,8 @@ export default [
                     import(/* webpackChunkName: "debug-tools" */ './debug')),
                 icon: () => null,
                 path: 'debug',
-                hasPerm: () => false, // always hide
+                hasPerm: () => true,
+                hidden: true,
             },
             {
                 id: 'home',

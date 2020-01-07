@@ -10,6 +10,7 @@ import { coreContext, connect } from '../core/connection';
 import EventProxy from './event-proxy';
 import { LinkButton } from '../router';
 import { search as locale } from '../locale';
+import { deepEq } from '../../util';
 import './overview-list.less';
 
 const DEBOUNCE_TIME = 400; // ms
@@ -103,8 +104,11 @@ export default class OverviewList extends PureComponent {
     }
 
     componentDidUpdate (prevProps) {
-        if (prevProps.options !== this.props.options
-            || prevProps.parameters !== this.props.parameters) {
+        const paramsDidChange = this.props.useDeepCmp
+            ? !deepEq(prevProps.options, this.props.options) || !deepEq(prevProps.parameters, this.props.parameters)
+            : prevProps.options !== this.props.options || prevProps.parameters !== this.props.parameters;
+
+        if (paramsDidChange) {
             this.#stale = true;
             this.setState({ stale: true });
         }
@@ -332,7 +336,7 @@ class DynamicHeightDiv extends PureComponent {
 function ListHeader ({ fields, selectedFields, locale }) {
     // FIXME: duplicate code with below
     const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
-    const weightSum = fieldWeights.reduce((a, b) => a + b);
+    const weightSum = fieldWeights.reduce((a, b) => a + b, 0);
     const actualUnit = 100 / weightSum;
     const unit = Math.max(10, actualUnit);
 
@@ -434,7 +438,7 @@ const ListItem = connect(props => ([props.view, {
         });
 
         const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
-        const weightSum = fieldWeights.reduce((a, b) => a + b);
+        const weightSum = fieldWeights.reduce((a, b) => a + b, 0);
         const actualUnit = 100 / weightSum;
         const unit = Math.max(10, actualUnit);
 

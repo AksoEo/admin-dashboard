@@ -269,7 +269,7 @@ const fieldHistoryBlacklist = [
 const isFieldHistoryBlacklisted = field => fieldHistoryBlacklist.includes(field);
 
 /// converts from API repr to client repr (see above)
-const clientFromAPI = makeClientFromAPI(clientFields);
+export const clientFromAPI = makeClientFromAPI(clientFields);
 const clientToAPI = makeClientToAPI(clientFields);
 
 //! # Client-side filter representation
@@ -427,7 +427,7 @@ const searchFieldToTransientFields = {
 };
 
 /// Converts params to request options. See task codeholders/list for details.
-const parametersToRequestData = makeParametersToRequestData({
+export const parametersToRequestData = makeParametersToRequestData({
     searchFieldToTransientFields,
     handleSearchFields: ({ query, field }) => {
         let prependedUeaCodeSearch;

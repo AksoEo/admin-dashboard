@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import Page from '../../../../components/page';
+import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import Meta from '../../../meta';
 import { adminGroups as locale } from '../../../../locale';
@@ -21,7 +22,7 @@ export default class AdminGroups extends Page {
     state = {
         parameters: {
             search: {
-                field: null,
+                field: 'name',
                 query: '',
             },
             fields: [
@@ -37,6 +38,12 @@ export default class AdminGroups extends Page {
         return (
             <div class="admin-groups-page">
                 <Meta title={locale.title} />
+                <SearchFilters
+                    value={parameters}
+                    onChange={parameters => this.setState({ parameters })}
+                    locale={{
+                        searchPlaceholders: locale.search.placeholders,
+                    }} />
                 <OverviewList
                     task="adminGroups/list"
                     view="adminGroups/group"

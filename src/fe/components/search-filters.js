@@ -66,7 +66,7 @@ export default function SearchFilters ({
             searchFields={searchFields}
             expanded={expanded}
             onSubmit={() => {
-                onExpandedChange(false);
+                if (onExpandedChange) onExpandedChange(false);
                 onChange({ ...value, offset: 0 });
             }}
             localizedFields={searchLocale.searchFields}
@@ -76,28 +76,33 @@ export default function SearchFilters ({
         staticHeight: true,
     });
 
-    items.push({
-        node: <FiltersDisclosure
-            expanded={expanded}
-            onExpandedChange={onExpandedChange} />,
-        paper: true,
-        staticHeight: true,
-    });
+    const hasFilters = filters && Object.keys(filters).length;
 
-    items.push({
-        node: <FiltersBar
-            category={category}
-            value={value}
-            onChange={onChange}
-            hidden={!expanded}
-            filtersToAPITask={filtersToAPI} />,
-        hidden: !expanded,
-        paper: true,
-    });
+    if (hasFilters) {
+        items.push({
+            node: <FiltersDisclosure
+                expanded={expanded}
+                onExpandedChange={onExpandedChange} />,
+            paper: true,
+            staticHeight: true,
+        });
+
+        items.push({
+            node: <FiltersBar
+                category={category}
+                value={value}
+                onChange={onChange}
+                hidden={!expanded}
+                filtersToAPITask={filtersToAPI} />,
+            hidden: !expanded,
+            paper: true,
+        });
+    }
 
     const jsonFilterEnabled = value.jsonFilter && !value.jsonFilter._disabled;
 
     useEffect(() => {
+        if (!hasFilters) return;
         const newValue = { ...value };
         if (!newValue.filters) newValue.filters = {};
         let didChange = false;

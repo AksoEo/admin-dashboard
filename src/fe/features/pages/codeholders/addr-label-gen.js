@@ -2,9 +2,7 @@ import { h } from 'preact';
 import { useState, Fragment, PureComponent } from 'preact/compat';
 import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
-import {
-    CardStackProvider, CardStackRenderer, CardStackItem,
-} from '../../../components/card-stack';
+import { CardStackItem } from '../../../components/card-stack';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
 
