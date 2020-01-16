@@ -1,0 +1,70 @@
+@import '../../../../prelude';
+
+.perms-editor {
+    position: relative;
+
+    .perms-category, .perms-group {
+        .group-title {
+            font-weight: bold;
+        }
+        &.perms-category > .group-title {
+            font-size: 1.1em;
+        }
+    }
+
+    .perm-checkbox {
+        margin-right: 8px;
+
+        &.is-implied-active {
+            --md-checkbox-color: @text-fade-40;
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 4px solid @secondary-fade-50;
+            box-sizing: border-box;
+            border-radius: 10px;
+            transform: scale(0.9);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.3s @easing, opacity 0.3s @easing;
+        }
+
+        &.is-implier::before {
+            transform: none;
+            opacity: 1;
+            animation: admin-perms-editor-checkbox-implier-in 0.3s @easing;
+
+            @keyframes admin-perms-editor-checkbox-implier-in {
+                0% {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+                100% {
+                    transform: none;
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .perms-switch {
+        display: flex;
+        justify-content: space-between;
+
+        .switch-name {
+            margin-right: 8px;
+        }
+
+        .switch-options {
+            .switch-option {
+                margin: 8px;
+            }
+        }
+    }
+}

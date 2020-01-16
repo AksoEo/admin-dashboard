@@ -9,6 +9,7 @@ import Meta from '../../../meta';
 import { connect } from '../../../../core/connection';
 import { adminGroups as locale, codeholders as codeholdersLocale } from '../../../../locale';
 import { connectPerms } from '../../../../perms';
+import PermsEditor from '../perms-editor';
 import './detail.less';
 
 export default connect(props => ['adminGroups/group', {
@@ -22,6 +23,14 @@ export default connect(props => ['adminGroups/group', {
         parameters: {
             limit: 10,
         },
+
+        TEMP: [
+            'codeholders.read',
+            'codeholders.update',
+            'codeholders.delete',
+            'admin_groups.*',
+            'cats',
+        ],
     };
 
     render ({ item, match, perms }, { tab, parameters }) {
@@ -59,6 +68,9 @@ export default connect(props => ['adminGroups/group', {
                     <div class="group-title">{item.name}</div>
                     <div class="group-description">{item.description}</div>
                 </div>
+                <PermsEditor
+                    permissions={this.state.TEMP}
+                    onChange={permissions => this.setState({ TEMP: permissions })} />
                 <Segmented selected={tab} onSelect={tab => this.setState({ tab })}>
                     {[
                         { id: 'codeholders', label: '[TMP CH]' },
