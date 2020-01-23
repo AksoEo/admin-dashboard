@@ -55,10 +55,10 @@ export const login = {
         email: 'Nevalida retpoŝtadreso aŭ pasvorto',
     },
 
-    loggedInAs: code => `[[you are logged in as ${code}.]]`,
-    notAdminShort: '[[ne estas administranto]]',
+    loggedInAs: code => `Vi estas ensalutinta kiel ${code}.`,
+    notAdminShort: 'Vi ne estas administranto',
     notAdmin: 'Nur administrantoj povas uzi tiun ĉi retejon.',
-    notAdminPWR: '[[however, your password was successfully reset.]]',
+    notAdminPWR: 'Sed via pasvorto estis sukcese nuligita.',
     notAdminLogout: 'Bonvolu elsaluti kaj reensaluti per konto de administranto se vi volas uzi la administran sistemon.',
     logOut: 'Elsaluti',
 
@@ -102,11 +102,11 @@ export const app = {
     genericError: 'Okazis neatendita eraro. Bonvolu poste reprovi. Se tiu ĉi eraro okazadas indus kontakti administranton.',
     genericErrorReload: 'Reŝarĝi la paĝon',
 
-    notFound: '[[kato manĝas ĉi tiun paĝon, pardonu min]]',
-    forbidden: '[[vi ne rajtas vidi ĉi tiun paĝon]]',
-    goHome: '[[fermi]]',
+    notFound: 'Ni ne sukcesis trovi tiun ĉi paĝon. Eventaule kontrolu ĉu vi mistajpis adreson.',
+    forbidden: 'Vi ne rajtas aliri tiun ĉi paĝon.',
+    goHome: 'Hejmen',
 
-    debugPageInfo: '[[this is not the page you’re looking for *waves hand*]]',
+    debugPageInfo: 'Se vi ne scias kio estas tio ĉi, ne zorgu kaj alklaku sur \'Hejmo\' en la menuo.',
 };
 
 export const pages = {
@@ -273,7 +273,7 @@ export const codeholders = {
             org: 'organizo',
         },
     },
-    globalFilterTitle: '[[Membrofiltrilo]]',
+    globalFilterTitle: 'La rezultoj estas filtritaj',
     globalFilterNotice: ['Ĉiuj viaj serĉoj estas limigitaj laŭ ', 'membrofiltrilo', '. Okaze de demandoj, kontaktu vian administranton.'],
     fields: {
         type: 'Membrospeco',
@@ -323,10 +323,10 @@ export const codeholders = {
         cellphonePublicity: 'Publikeco de poŝtelefono',
 
         // used only in field history
-        profilePictureHash: '[[Profilbildo]]',
+        profilePictureHash: 'Profilbildo',
     },
-    profilePictureHashSome: '[[iu bildo]]',
-    profilePictureHashNone: '[[neniu bildo]]',
+    profilePictureHashSome: 'Havas bildon',
+    profilePictureHashNone: 'Havas neniun bildon',
     csvFields: {
         membership: 'Membreco (resumo)',
     },
@@ -478,10 +478,10 @@ export const codeholders = {
 };
 
 export const adminGroups = {
-    title: '[[Grupoj]]',
-    detailTitle: '[[Grupo]]',
+    title: 'Administraj grupoj',
+    detailTitle: 'Administra grupo',
     search: {
-        placeholders: '[[serĉi nomojn]]',
+        placeholders: 'Serĉi nomojn de grupoj',
     },
     fields: {
         name: 'Nomo',
