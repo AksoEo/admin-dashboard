@@ -30,7 +30,7 @@ export const data = {
     ],
     delete: 'Forigi',
     showMore: 'Montri pliajn',
-    objViewerArrayItems: items => `[[${items} item${items === 1 ? '' : 's'}]]`,
+    objViewerArrayItems: items => `[[${items} ero${items === 1 ? '' : 'j'}]]`,
 };
 
 export const login = {
