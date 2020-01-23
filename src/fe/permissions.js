@@ -67,9 +67,34 @@ export const spec = [
                     },
                 ],
             },
+            {
+                type: 'group',
+                name: 'Membrecoj',
+                requires: ['codeholders.read'],
+                children: [
+                    {
+                        type: 'perm',
+                        name: 'fjkdsfda',
+                        id: 'memberships.read',
+                        impliesFields: {
+                            profilePicture: 'r',
+                        },
+                    },
+                ],
+            },
         ],
     },
 ];
+
+export const memberFieldsAll = 'Ĉiuj kampoj';
+export const memberFieldsRead = 'Vidi';
+export const memberFieldsWrite = 'Redakti';
+
+export const memberFields = {
+    birthdate: { name: 'Naskiĝtago', fields: ['birthdate'] },
+    code: { name: 'Kodo', fields: ['newCode', 'oldCode'] },
+    profilePicture: { name: 'Profilbildo', fields: ['profilePicture', 'profilePictureHash'] },
+};
 
 function buildReverseMap (spec, mapping, path = []) {
     if (spec.type === 'category' || spec.type === 'group') {

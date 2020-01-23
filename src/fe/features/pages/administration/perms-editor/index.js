@@ -1,8 +1,13 @@
 import { h, Component } from 'preact';
-import { useRef } from 'preact/compat';
 import { Checkbox } from '@cpsdqs/yamdl';
-import { spec } from '../../../../permissions';
-import { read, add, remove } from './solver';
+import {
+    spec,
+    memberFields as fieldsSpec,
+    memberFieldsAll,
+    memberFieldsRead,
+    memberFieldsWrite,
+} from '../../../../permissions';
+import { read, add, remove, hasField, addField, removeField } from './solver';
 import './style';
 
 // TODO: member fields stuff
@@ -16,28 +21,46 @@ import './style';
 /// - memberFields: member fields (may be none)
 export default class PermsEditor extends Component {
     state = {
-        showImplied: new Set(),
+        showImplied: null,
     };
 
     #node = null;
 
-    render ({ permissions, onChange }) {
+    render ({ permissions, memberFields, onChange, onFieldsChange }) {
         const [permStates, unknown] = read(permissions);
 
         const ctx = {
             states: permStates,
-            showImplied: this.state.showImplied,
-            setShowImplied: (implied, targetRect) => {
-                this.setState({
-                    showImplied: implied || new Set(),
-                });
-            },
+            showImplied: this.state.showImplied && permStates.has(this.state.showImplied)
+                ? permStates.get(this.state.showImplied).impliedBy
+                : new Set(),
+            setShowImplied: implied => this.setState({ showImplied: implied }),
             togglePerm: perm => {
                 if (permStates.get(perm).active) {
-                    onChange(remove(permissions, perm));
+                    const [p, m] = remove(permissions, memberFields, perm);
+                    onChange(p);
+                    onFieldsChange(m);
                 } else {
-                    onChange(add(permissions, perm));
+                    const [p, m] = add(permissions, memberFields, perm);
+                    onChange(p);
+                    onFieldsChange(m);
                 }
+            },
+            memberFields,
+            toggleField: (field, perm) => {
+                if (hasField(memberFields, field, perm)) {
+                    const [p, m] = removeField(permissions, memberFields, field, perm);
+                    onChange(p);
+                    onFieldsChange(m);
+                } else {
+                    const [p, m] = addField(permissions, memberFields, field, perm);
+                    onChange(p);
+                    onFieldsChange(m);
+                }
+            },
+            toggleAllFields: () => {
+                if (memberFields === null) onFieldsChange({});
+                else onFieldsChange(null);
             },
         };
 
@@ -86,7 +109,7 @@ function PermsItem ({ item, ctx }) {
                                 <Checkbox
                                     class={className}
                                     checked={state.active}
-                                    onMouseOver={e => ctx.setShowImplied(state.impliedBy)}
+                                    onMouseOver={() => ctx.setShowImplied(opt.id)}
                                     onMouseOut={() => ctx.setShowImplied(null)}
                                     onClick={() => ctx.togglePerm(opt.id)} />
                                 <span class="switch-option-label">{opt.name}</span>
@@ -109,16 +132,67 @@ function PermsItem ({ item, ctx }) {
                 <Checkbox
                     class={className}
                     checked={state.active}
-                    onMouseOver={e => ctx.setShowImplied(state.impliedBy)}
+                    onMouseOver={() => ctx.setShowImplied(state.impliedBy)}
                     onMouseOut={() => ctx.setShowImplied(null)}
                     onClick={() => ctx.togglePerm(item.id)} />
                 {item.name}
             </div>
         );
     } else if (item === '!memberFieldsEditor') {
-        return 'member fields editor goes here';
+        return (
+            <MemberFieldsEditor
+                fields={ctx.memberFields}
+                toggleField={ctx.toggleField}
+                toggleAll={ctx.toggleAllFields} />
+        );
     } else if (item === '!memberFilterEditor') {
         return 'member filter editor goes here';
     }
     return 'unknown perms spec type ' + item.type;
+}
+
+function MemberFieldsEditor ({ fields, toggleField, toggleAll }) {
+    const items = [];
+    if (fields !== null) {
+        for (const field in fieldsSpec) {
+            const item = fieldsSpec[field];
+            let canRead = true;
+            let canWrite = true;
+            for (const f of item.fields) {
+                if (!fields[f] || !fields[f].includes('r')) canRead = false;
+                if (!fields[f] || !fields[f].includes('w')) canWrite = false;
+            }
+
+            items.push(
+                <div class="member-field">
+                    <span class="field-name">{item.name}</span>
+                    <span class="field-perms">
+                        <Checkbox
+                            class={'perm-checkbox' + (canRead && canWrite ? ' is-implied-active' : '')}
+                            checked={canRead}
+                            onClick={() => toggleField(field, 'r')} />
+                        {memberFieldsRead}
+                        <Checkbox
+                            class="perm-checkbox"
+                            checked={canWrite}
+                            onClick={() => toggleField(field, 'w')} />
+                        {memberFieldsWrite}
+                    </span>
+                </div>
+            );
+        }
+    }
+
+    return (
+        <div class="member-fields">
+            <div class="member-fields-all">
+                <Checkbox
+                    class="perm-checkbox"
+                    checked={fields === null}
+                    onClick={toggleAll} />
+                {memberFieldsAll}
+            </div>
+            {items}
+        </div>
+    );
 }

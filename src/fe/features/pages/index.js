@@ -184,6 +184,20 @@ export default [
                     },
                     {
                         component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients')),
+                        type: 'bottom',
+                        path: 'klientoj',
+                        paths: [
+                            {
+                                match: /^([\da-fA-F]+)$/,
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/detail')),
+                                type: 'stack',
+                            },
+                        ],
+                    },
+                    {
+                        component: elazy(() =>
                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log')),
                         type: 'bottom',
                         path: 'protokolo',

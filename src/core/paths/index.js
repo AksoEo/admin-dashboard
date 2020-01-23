@@ -23,6 +23,7 @@ const lazyPath = (f, map) => {
 const mapTasks = res => res.tasks;
 const mapViews = res => res.views;
 
+const clients = () => import(/* webpackChunkName: 'core-clients', webpackPrefetch: true */ './clients');
 const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './codeholders');
 const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
 const adminGroups = () => import(/* webpackChunkName: 'core-admin', webpackPrefetch: true */ './admin-groups');
@@ -40,6 +41,7 @@ export const tasks = {
     /// info: takes title and message options (strings probably)
     info: async () => {},
 
+    clients: lazyPath(clients, mapTasks),
     codeholders: lazyPath(codeholders, mapTasks),
     adminGroups: lazyPath(adminGroups, mapTasks),
     httpLog: lazyPath(httpLog, mapTasks),
@@ -51,6 +53,7 @@ export const tasks = {
 
 /// View definitions.
 export const views = {
+    clients: lazyPath(clients, mapViews),
     codeholders: lazyPath(codeholders, mapViews),
     countries: lazyPath(countries, mapViews),
     adminGroups: lazyPath(adminGroups, mapViews),

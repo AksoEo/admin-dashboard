@@ -489,6 +489,24 @@ export const adminGroups = {
     },
 };
 
+export const clients = {
+    title: '[[Klientoj]]',
+    detailTitle: '[[Kliento]]',
+    search: {
+        placeholders: {
+            name: '[[serĉi nomojn]]',
+            ownerName: '[[ownername]]',
+            ownerEmail: '[[owneremail]]',
+        },
+    },
+    fields: {
+        name: 'Nomo',
+        apiKey: '[[apikey]]',
+        ownerName: '[[ownername]]',
+        ownerEmail: '[[superlonglabel4email]]',
+    },
+};
+
 export const httpLog = {
     title: 'Protokolo',
     search: {

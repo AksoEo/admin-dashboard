@@ -1,7 +1,8 @@
-import { spec, reverseMap } from '../../../../permissions';
+import { memberFields as fieldsSpec, reverseMap } from '../../../../permissions';
 
 // implication graph for the spec
 const reverseImplicationGraph = new Map();
+const reverseFieldsImplicationGraph = new Map();
 {
     for (const perm in reverseMap) {
         const { node } = reverseMap[perm];
@@ -19,6 +20,17 @@ const reverseImplicationGraph = new Map();
         for (const perm of implied) {
             if (!reverseImplicationGraph.has(perm)) reverseImplicationGraph.set(perm, new Set());
             reverseImplicationGraph.get(perm).add(node.id);
+        }
+
+        for (const field in (node.impliesFields || {})) {
+            if (!reverseFieldsImplicationGraph.has(field)) reverseFieldsImplicationGraph.set(field, new Map());
+            const fieldMap = reverseFieldsImplicationGraph.get(field);
+
+            const flags = node.impliesFields[field].split('');
+            for (const flag of flags) {
+                if (!fieldMap.has(flag)) fieldMap.set(flag, new Set());
+                fieldMap.get(flag).add(node.id);
+            }
         }
     }
 }
@@ -43,10 +55,8 @@ export function read (permissions) {
     }
 
     for (const perm in reverseMap) {
-        const { node } = reverseMap[perm];
-
         // permission state--is it active? implied?
-        let state = {
+        const state = {
             // whether this permission is active server-side
             active: false,
             // whether this permission *should* be active server-side (e.g. because it’s implied)
@@ -112,17 +122,22 @@ export function read (permissions) {
     return [permStates, unknown];
 }
 
-export function add (permissions, perm) {
+export function add (permissions, memberFields, perm) {
     permissions = permissions.slice();
-    const [permStates,] = read(permissions);
+    memberFields = memberFields ? { ...memberFields } : null;
 
-    // collect all implied perms
+    const [permStates] = read(permissions);
+
+    // collect all implied perms and fields
     const implications = new Set();
+    const impliedFields = new Map(); // map from perm to flags
     const queue = [perm];
     while (queue.length) {
         const cursor = queue.shift();
-        let implies = [];
+        // contains all implied perms for the cursor item
+        const implies = [];
         if (cursor.endsWith('.*')) {
+            // wildcard implies all sub-perms
             const prefix = perm.substr(0, perm.length - 1);
             for (const p of Object.keys(reverseMap).filter(x => x.startsWith(prefix))) {
                 if (p === perm) continue; // don’t imply self
@@ -132,6 +147,15 @@ export function add (permissions, perm) {
         if (reverseMap[cursor]) {
             const { node } = reverseMap[cursor];
             if (node.implies) implies.push(...node.implies);
+
+            // also add implied fields
+            for (const impliedField in (node.impliesFields || {})) {
+                const currentFlags = impliedFields.get(impliedField) || new Set();
+                for (const flag of node.impliesFields[impliedField]) {
+                    currentFlags.add(flag);
+                }
+                impliedFields.set(impliedField, currentFlags);
+            }
         }
         if (!implies.length) continue;
 
@@ -153,11 +177,20 @@ export function add (permissions, perm) {
 
     permissions.push(perm);
 
-    return permissions;
+    if (memberFields !== null) {
+        for (const [f, flags] of impliedFields) {
+            const flagsString = [...flags].join('');
+            [permissions, memberFields] = addField(permissions, memberFields, f, flagsString);
+        }
+    }
+
+    return [permissions, memberFields];
 }
 
-export function remove (permissions, perm) {
+export function remove (permissions, memberFields, perm) {
     permissions = permissions.slice();
+    memberFields = memberFields ? { ...memberFields } : null;
+
     // remove the permission itself if it exists
     if (permissions.includes(perm)) permissions.splice(permissions.indexOf(perm), 1);
     // remove any relevant wildcards
@@ -166,11 +199,86 @@ export function remove (permissions, perm) {
     for (let i = permParts.length - 1; i > 0; i--) {
         const wildcard = permParts.slice(0, i).join('.') + '.*';
         if (wildcard === perm) continue;
-        permissions = remove(permissions, wildcard);
+        [permissions, memberFields] = remove(permissions, memberFields, wildcard);
     }
     // remove impliers
     for (const implier of (reverseImplicationGraph.get(perm) || [])) {
-        permissions = remove(permissions, implier);
+        [permissions, memberFields] = remove(permissions, memberFields, implier);
     }
-    return permissions;
+
+    return [permissions, memberFields];
+}
+
+/// Returns if the given member field permissions are fully fulfilled
+export function hasField (memberFields, field, perm) {
+    if (memberFields === null) return true;
+    const item = fieldsSpec[field] || { fields: [field] };
+
+    const flags = new Set(['r', 'w']);
+    for (const f of item.fields) {
+        const g = memberFields[f] || '';
+        if (!g.includes('r')) flags.delete('r');
+        if (!g.includes('w')) flags.delete('w');
+    }
+
+    return perm.split('').map(f => flags.has(f)).reduce((a, b) => a && b, true);
+}
+
+/// Adds a member field
+export function addField (permissions, memberFields, field, perm) {
+    memberFields = memberFields ? { ...memberFields } : null;
+    if (memberFields) {
+        const item = fieldsSpec[field] || { fields: [field] };
+
+        // get the min common set of flags
+        const flags = new Set(['r', 'w']);
+        for (const f of item.fields) {
+            const g = memberFields[f] || '';
+            if (!g.includes('r')) flags.delete('r');
+            if (!g.includes('w')) flags.delete('w');
+        }
+
+        flags.add(perm);
+        if (perm.includes('w')) flags.add('r');
+
+        for (const f of item.fields) memberFields[f] = [...flags].join('');
+    }
+    return [permissions, memberFields];
+}
+
+/// Removes a member field
+export function removeField (permissions, memberFields, field, perm) {
+    memberFields = memberFields ? { ...memberFields } : null;
+    if (memberFields) {
+        const item = fieldsSpec[field] || { field: [field] };
+
+        // get the max common set of flags
+        const flags = new Set();
+        for (const f of item.fields) {
+            const g = memberFields[f] || '';
+            if (g.includes('r')) flags.add('r');
+            if (g.includes('w')) flags.add('w');
+        }
+
+        flags.delete(perm);
+        if (perm.includes('r')) flags.delete('w');
+
+        for (const f of item.fields) memberFields[f] = [...flags].join('');
+
+        const removedPerms = new Set();
+        if (perm.includes('r')) removedPerms.add('r');
+        if (perm.includes('w')) removedPerms.add('w');
+
+        const revImpls = reverseFieldsImplicationGraph.get(field);
+        if (revImpls) {
+            for (const p of removedPerms) {
+                const perms = revImpls.get(p);
+                if (!perms) continue;
+                for (const perm of perms) {
+                    [permissions, memberFields] = remove(permissions, memberFields, perm);
+                }
+            }
+        }
+    }
+    return [permissions, memberFields];
 }

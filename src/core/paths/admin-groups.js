@@ -1,6 +1,7 @@
 import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import { AbstractDataView } from '../view';
+import { CLIENTS } from './clients';
 import {
     CODEHOLDERS,
     parametersToRequestData as codeholdersPTRD,
@@ -10,6 +11,7 @@ import { deepMerge } from '../../util';
 import * as store from '../store';
 
 export const ADMIN_GROUPS = 'adminGroups';
+export const SIG_LIST = '!list';
 
 export const tasks = {
     /// adminGroups/list: lists admin groups
@@ -36,7 +38,7 @@ export const tasks = {
 
         return {
             items: res.body.map(item => item.id),
-            total: res.res.headers.get('x-total-items'),
+            total: +res.res.headers.get('x-total-items'),
         };
     },
     /// adminGroups/group: returns an admin group
@@ -99,6 +101,55 @@ export const tasks = {
                 filtered: false,
             },
         };
+    },
+
+    listClients: async ({ group }, { offset, limit }) => {
+        const client = await asyncClient;
+
+        const res = await client.get(`/admin_groups/${group}/clients`, {
+            fields: ['apiKey', 'name', 'ownerName', 'ownerEmail'],
+            order: [['apiKey', 'asc']],
+            offset,
+            limit,
+        });
+
+        for (const item of res.body) {
+            const existing = store.get([CLIENTS, item.id]);
+            store.insert([CLIENTS, item.id], deepMerge(existing, item));
+        }
+
+        const list = res.body.map(item => item.id);
+
+        return {
+            items: list,
+            total: +res.res.headers.get('x-total-items'),
+            stats: {
+                time: res.resTime,
+                filtered: false,
+            },
+        };
+    },
+
+    addCodeholder: async ({ group }, { codeholder }) => {
+        const client = await asyncClient;
+        await client.put(`/admin_groups/${group}/codeholders/${codeholder}`);
+        store.signal([CLIENTS, group, SIG_LIST]);
+    },
+    removeCodeholder: async ({ group }, { codeholder }) => {
+        const client = await asyncClient;
+        await client.delete(`/admin_groups/${group}/codeholders/${codeholder}`);
+        store.signal([CLIENTS, group, SIG_LIST]);
+    },
+
+    addClient: async ({ group }, { client: id }) => {
+        const client = await asyncClient;
+        await client.put(`/admin_groups/${group}/clients/${id}`);
+        store.signal([CLIENTS, group, SIG_LIST]);
+    },
+    removeClient: async ({ group }, { client: id }) => {
+        const client = await asyncClient;
+        await client.delete(`/admin_groups/${group}/clients/${id}`);
+        store.signal([CLIENTS, group, SIG_LIST]);
     },
 };
 

@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import Segmented from '../../../../components/segmented';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
@@ -14,7 +14,7 @@ import './detail.less';
 
 export default connect(props => ['adminGroups/group', {
     id: props.match[1],
-}])(item => ({ item }))(connectPerms(class AdminGroupDetailPage extends Page {
+}])((item, core) => ({ item, core }))(connectPerms(class AdminGroupDetailPage extends Page {
     state = {
         tab: 'codeholders',
         // TODO: store these in navigation data because users might move to/from other pages a lot (e.g. codeholders)
@@ -31,9 +31,14 @@ export default connect(props => ['adminGroups/group', {
             'admin_groups.*',
             'cats',
         ],
+        TEMP2: {
+            birthdate: 'r',
+            profilePicture: 'r',
+            profilePictureHash: 'rw',
+        },
     };
 
-    render ({ item, match, perms }, { tab, parameters }) {
+    render ({ item, match, perms, core }, { tab, parameters }) {
         if (!item) return (
             <div class="admin-group-detail-page is-loading">
                 <CircularProgress indeterminate />
@@ -42,7 +47,7 @@ export default connect(props => ['adminGroups/group', {
         const id = match[1];
 
         const itemsTask = tab === 'clients' ? 'adminGroups/listClients' : 'adminGroups/listCodeholders';
-        const itemsView = tab === 'clients' ? 'clients/clients' : 'codeholders/codeholder';
+        const itemsView = tab === 'clients' ? 'clients/client' : 'codeholders/codeholder';
         const offsetKey = tab === 'clients' ? 'clientsOffset' : 'codeholdersOffset';
         const itemsOffset = this.state[offsetKey];
         const itemFields = tab === 'clients'
@@ -61,6 +66,10 @@ export default connect(props => ['adminGroups/group', {
             ? null
             : <GlobalFilterNotice perms={perms} />;
 
+        const addItem = tab === 'clients'
+            ? () => core.createTask('admin-groups/addClient', { group: id })
+            : () => core.createTask('admin-groups/addCodeholder', { group: id });
+
         return (
             <div class="admin-group-detail-page">
                 <Meta title={locale.detailTitle} />
@@ -70,13 +79,18 @@ export default connect(props => ['adminGroups/group', {
                 </div>
                 <PermsEditor
                     permissions={this.state.TEMP}
-                    onChange={permissions => this.setState({ TEMP: permissions })} />
+                    memberFields={this.state.TEMP2}
+                    onChange={permissions => this.setState({ TEMP: permissions })}
+                    onFieldsChange={fields => this.setState({ TEMP2: fields })} />
                 <Segmented selected={tab} onSelect={tab => this.setState({ tab })}>
                     {[
                         { id: 'codeholders', label: '[TMP CH]' },
                         { id: 'clients', label: '[TMP API]' },
                     ]}
                 </Segmented>
+                <Button onClick={addItem}>
+                    [[add one]]
+                </Button>
                 <OverviewList
                     task={itemsTask}
                     notice={itemsNotice}

@@ -1,0 +1,78 @@
+import { h } from 'preact';
+import Page from '../../../../components/page';
+import SearchFilters from '../../../../components/search-filters';
+import OverviewList from '../../../../components/overview-list';
+import { email } from '../../../../components/data';
+import Meta from '../../../meta';
+import { clients as locale } from '../../../../locale';
+
+const FIELDS = {
+    name: {
+        component ({ value }) {
+            return value;
+        },
+    },
+    apiKey: {
+        component ({ value }) {
+            return value;
+        },
+    },
+    ownerName: {
+        component ({ value }) {
+            return value;
+        },
+    },
+    ownerEmail: {
+        component ({ value }) {
+            return <email.renderer valeu={value} />;
+        },
+    },
+};
+
+export default class Clients extends Page {
+    state = {
+        parameters: {
+            search: {
+                field: 'name',
+                query: '',
+            },
+            fields: [
+                { id: 'name', sorting: 'none', fixed: true },
+                { id: 'apiKey', sorting: 'none', fixed: true },
+                { id: 'ownerName', sorting: 'none', fixed: true },
+                { id: 'ownerEmail', sorting: 'none', fixed: true },
+            ],
+            offset: 0,
+            limit: 10,
+        },
+    };
+
+    render (_, { parameters }) {
+        return (
+            <div class="clients-page">
+                <Meta title={locale.title} />
+                <SearchFilters
+                    value={parameters}
+                    searchFields={[
+                        'name',
+                        'ownerName',
+                        'ownerEmail',
+                    ]}
+                    onChange={parameters => this.setState({ parameters })}
+                    locale={{
+                        searchPlaceholders: locale.search.placeholders,
+                        searchFields: locale.fields,
+                    }} />
+                <OverviewList
+                    task="clients/list"
+                    view="clients/client"
+                    parameters={parameters}
+                    fields={FIELDS}
+                    onGetItemLink={id => `/administrado/klientoj/${id}`}
+                    onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
+                    onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
+                    locale={locale.fields} />
+            </div>
+        );
+    }
+}
