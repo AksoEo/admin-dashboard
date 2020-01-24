@@ -1,4 +1,5 @@
 import address from './address';
+import apiKey from './apikey';
 import country from './country';
 import date from './date';
 import email from './email';
@@ -46,6 +47,7 @@ export default new Proxy({
 
 export {
     address,
+    apiKey,
     country,
     date,
     email,

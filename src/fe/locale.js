@@ -498,13 +498,17 @@ export const adminGroups = {
 };
 
 export const clients = {
-    title: '[[Klientoj]]',
-    detailTitle: '[[Kliento]]',
-    add: 'Aldoni klienton',
+    title: 'API-Klientoj',
+    detailTitle: 'API-Kliento',
+    add: 'Aldoni API-klienton',
     addButton: 'Aldoni',
-    delete: 'Forigi klienton',
+    delete: 'Forigi API-klienton',
     deleteButton: 'Forigi',
     deleteAreYouSure: '[[are you sure itll be gone forever]]',
+    secret: {
+        title: '[[api secret]]',
+        description: '[[this is the api secret save it now or it’ll be lost forever]]',
+    },
     search: {
         placeholders: {
             name: '[[serĉi nomojn]]',

@@ -27,6 +27,8 @@ export default class TaskDialog extends Component {
             this.setState({ error });
             console.error(error); // eslint-disable-line no-console
             this.#buttonValidator.shake();
+        }).then(() => {
+            this.setState({ loading: false });
         });
     };
 

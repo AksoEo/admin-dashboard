@@ -7,6 +7,7 @@ import { email } from '../../../../components/data';
 import Meta from '../../../meta';
 import { clients as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
+import { apiKey } from '../../../../components/data';
 
 const FIELDS = {
     name: {
@@ -16,7 +17,7 @@ const FIELDS = {
     },
     apiKey: {
         component ({ value }) {
-            return value;
+            return <apiKey.inlineRenderer value={value} />;
         },
     },
     ownerName: {

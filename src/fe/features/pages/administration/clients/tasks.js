@@ -6,7 +6,7 @@ import { clients as locale } from '../../../../locale';
 import { routerContext } from '../../../../router';
 
 export default {
-    create ({ open, task }) {
+    create ({ open, core, task }) {
         return (
             <routerContext.Consumer>
                 {routerContext => (
@@ -15,8 +15,15 @@ export default {
                         onClose={() => task.drop()}
                         title={locale.add}
                         actionLabel={locale.addButton}
-                        run={() => task.runOnce().then(id => {
+                        run={() => task.runOnce().then(({ id, secret }) => {
                             routerContext.navigate(`/administrado/klientoj/${id}`);
+                            core.createTask('info', {
+                                title: locale.secret.title,
+                                message: [
+                                    locale.secret.description,
+                                    secret,
+                                ].join('\n'),
+                            });
                         })}>
                         <Validator
                             component={TextField}

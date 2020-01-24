@@ -51,7 +51,10 @@ export const tasks = {
     create: async (_, { name, ownerName, ownerEmail }) => {
         const client = await asyncClient;
         const res = await client.post('/clients', { name, ownerName, ownerEmail });
-        return res.res.headers.get('x-identifier');
+        return {
+            id: res.res.headers.get('x-identifier'),
+            secret: Buffer.from(res.body.apiSecret).toString('hex'),
+        };
     },
 
     delete: async (_, { id }) => {
