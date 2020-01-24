@@ -54,11 +54,12 @@ export const tasks = {
     create: async (_, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
 
-        await client.post('/admin_groups', {
+        const res = await client.post('/admin_groups', {
             name,
             description,
             memberRestrictions,
         });
+        return +res.res.headers.get('x-identifier');
     },
     update: async ({ id }, { name, description, memberRestrictions }) => {
         const client = await asyncClient;

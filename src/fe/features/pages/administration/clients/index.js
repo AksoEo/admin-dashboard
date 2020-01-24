@@ -1,10 +1,12 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import { email } from '../../../../components/data';
 import Meta from '../../../meta';
 import { clients as locale } from '../../../../locale';
+import { coreContext } from '../../../../core/connection';
 
 const FIELDS = {
     name: {
@@ -24,7 +26,7 @@ const FIELDS = {
     },
     ownerEmail: {
         component ({ value }) {
-            return <email.renderer valeu={value} />;
+            return <email.inlineRenderer value={value} />;
         },
     },
 };
@@ -47,10 +49,21 @@ export default class Clients extends Page {
         },
     };
 
+    static contextType = coreContext;
+
     render (_, { parameters }) {
+        const actions = [];
+        actions.push({
+            icon: <AddIcon />,
+            label: locale.add,
+            action: () => this.context.createTask('clients/create'),
+        });
+
         return (
             <div class="clients-page">
-                <Meta title={locale.title} />
+                <Meta
+                    title={locale.title}
+                    actions={actions} />
                 <SearchFilters
                     value={parameters}
                     searchFields={[

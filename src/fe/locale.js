@@ -482,7 +482,10 @@ export const adminGroups = {
     detailTitle: 'Administra grupo',
     permsTitle: '[[Permesiloj]]',
     add: 'Aldoni grupon',
+    addButton: 'Aldoni',
     delete: 'Forigi grupon',
+    deleteButton: 'Forigi',
+    deleteAreYouSure: '[[are you sure itll be gone forever]]',
     search: {
         placeholders: 'Serĉi nomojn de grupoj',
     },
@@ -490,11 +493,18 @@ export const adminGroups = {
         name: 'Nomo',
         description: 'Priskribo',
     },
+
+    nameRequired: '[[name is required]]',
 };
 
 export const clients = {
     title: '[[Klientoj]]',
     detailTitle: '[[Kliento]]',
+    add: 'Aldoni klienton',
+    addButton: 'Aldoni',
+    delete: 'Forigi klienton',
+    deleteButton: 'Forigi',
+    deleteAreYouSure: '[[are you sure itll be gone forever]]',
     search: {
         placeholders: {
             name: '[[serĉi nomojn]]',
@@ -508,6 +518,10 @@ export const clients = {
         ownerName: '[[ownername]]',
         ownerEmail: '[[superlonglabel4email]]',
     },
+
+    nameRequired: '[[name is required]]',
+    ownerNameRequired: '[[name is required]]',
+    ownerEmailRequired: '[[email is required]]',
 };
 
 export const httpLog = {

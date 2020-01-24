@@ -47,6 +47,17 @@ export const tasks = {
 
         return item;
     },
+
+    create: async (_, { name, ownerName, ownerEmail }) => {
+        const client = await asyncClient;
+        const res = await client.post('/clients', { name, ownerName, ownerEmail });
+        return res.res.headers.get('x-identifier');
+    },
+
+    delete: async (_, { id }) => {
+        const client = await asyncClient;
+        await client.delete(`/clients/${id}`);
+    },
 };
 
 export const views = {

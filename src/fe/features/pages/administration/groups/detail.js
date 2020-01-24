@@ -10,7 +10,6 @@ import { connect } from '../../../../core/connection';
 import { LinkButton } from '../../../../router';
 import { adminGroups as locale, codeholders as codeholdersLocale } from '../../../../locale';
 import { connectPerms } from '../../../../perms';
-import PermsEditor from '../perms-editor';
 import './detail.less';
 
 export default connect(props => ['adminGroups/group', {

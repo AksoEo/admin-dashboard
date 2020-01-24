@@ -1,8 +1,8 @@
 import { h } from 'preact';
-import { Dialog, TextField } from '@cpsdqs/yamdl';
-import { adminGroups as locale } from '../../../../locale';
-import { Validator } from '../../../../components/form';
+import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../../components/task-dialog';
+import { Validator } from '../../../../components/form';
+import { clients as locale } from '../../../../locale';
 import { routerContext } from '../../../../router';
 
 export default {
@@ -16,7 +16,7 @@ export default {
                         title={locale.add}
                         actionLabel={locale.addButton}
                         run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/administrado/grupoj/${id}`);
+                            routerContext.navigate(`/administrado/klientoj/${id}`);
                         })}>
                         <Validator
                             component={TextField}
@@ -28,15 +28,26 @@ export default {
                             }} />
                         <Validator
                             component={TextField}
-                            label={locale.fields.description}
-                            value={task.parameters.description || ''}
-                            onChange={e => task.update({ description: e.target.value })}
-                            validate={() => {}} />
+                            label={locale.fields.ownerName}
+                            value={task.parameters.ownerName || ''}
+                            onChange={e => task.update({ ownerName: e.target.value })}
+                            validate={name => {
+                                if (!name) throw { error: locale.ownerNameRequired };
+                            }} />
+                        <Validator
+                            component={TextField}
+                            label={locale.fields.ownerEmail}
+                            value={task.parameters.ownerEmail || ''}
+                            onChange={e => task.update({ ownerEmail: e.target.value })}
+                            validate={email => {
+                                if (!email) throw { error: locale.ownerEmailRequired };
+                            }} />
                     </TaskDialog>
                 )}
             </routerContext.Consumer>
         );
     },
+
     delete ({ open, task }) {
         return (
             <routerContext.Consumer>
@@ -47,50 +58,12 @@ export default {
                         title={locale.delete}
                         actionLabel={locale.deleteButton}
                         run={() => task.runOnce().then(() => {
-                            routerContext.navigate('/administrado/grupoj');
+                            routerContext.navigate('/administrado/klientoj');
                         })}>
                         {locale.deleteAreYouSure}
                     </TaskDialog>
                 )}
             </routerContext.Consumer>
-        );
-    },
-    addCodeholder ({ open, task }) {
-        return (
-            <Dialog
-                open={open}
-                onClose={() => task.drop()}
-                backdrop
-                title="[[add codeholder]]"
-                actions={[
-                    {
-                        label: '[[add]]',
-                        action: () => {
-                            // TODO
-                        },
-                    },
-                ]}>
-                codeholder picker goes here
-            </Dialog>
-        );
-    },
-    addClient ({ open, task }) {
-        return (
-            <Dialog
-                open={open}
-                onClose={() => task.drop()}
-                backdrop
-                title="[[add client]]"
-                actions={[
-                    {
-                        label: '[[add]]',
-                        action: () => {
-                            // TODO
-                        },
-                    },
-                ]}>
-                client picker goes here
-            </Dialog>
         );
     },
 };
