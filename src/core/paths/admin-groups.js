@@ -11,6 +11,7 @@ import { deepMerge } from '../../util';
 import * as store from '../store';
 
 export const ADMIN_GROUPS = 'adminGroups';
+export const PERMISSIONS = 'permissions';
 export const SIG_LIST = '!list';
 
 export const tasks = {
@@ -48,7 +49,8 @@ export const tasks = {
         const res = await client.get(`/admin_groups/${id}`, {
             fields: ['id', 'name', 'description', 'memberRestrictions.filter', 'memberRestrictions.fields'],
         });
-        store.insert([ADMIN_GROUPS, id], res.body);
+        const existing = store.get([ADMIN_GROUPS, id]);
+        store.insert([ADMIN_GROUPS, id], deepMerge(existing, res.body));
         return res.body;
     },
     create: async (_, { name, description, memberRestrictions }) => {
@@ -59,7 +61,9 @@ export const tasks = {
             description,
             memberRestrictions,
         });
-        return +res.res.headers.get('x-identifier');
+        const id = +res.res.headers.get('x-identifier');
+        store.insert([ADMIN_GROUPS, id], { name, description, memberRestrictions });
+        return id;
     },
     update: async ({ id }, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
@@ -70,12 +74,26 @@ export const tasks = {
             memberRestrictions,
         });
 
-        store.insert([ADMIN_GROUPS, id], { name, description, memberRestrictions });
+        const existing = store.get([ADMIN_GROUPS, id]);
+        store.insert([ADMIN_GROUPS, id], deepMerge(existing, { name, description, memberRestrictions }));
     },
     delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${id}`);
         store.remove([ADMIN_GROUPS, id]);
+    },
+
+    permissions: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/admin_groups/${id}/permissions`);
+
+        const perms = res.body.map(x => x.permission);
+
+        const existing = store.get([ADMIN_GROUPS, id]);
+        store.insert([ADMIN_GROUPS, id], deepMerge(existing, {
+            permissions: perms,
+        }));
+        return perms;
     },
 
     listCodeholders: async ({ group }, { offset, limit }) => {
@@ -160,8 +178,9 @@ export const views = {
     /// # Parameters
     /// - id: admin group id
     /// - noFetch: if true, will not fetch
+    /// - fetchPerms: if true, will fetch perms
     group: class AdminGroupView extends AbstractDataView {
-        constructor ({ id, noFetch }) {
+        constructor ({ id, noFetch, fetchPerms }) {
             super();
             this.id = id;
 
@@ -172,6 +191,12 @@ export const views = {
             if (!noFetch) {
                 tasks.group({ id }, {})
                     .then(res => this.emit('update', res))
+                    .catch(err => this.emit('error', err));
+            }
+
+            if (fetchPerms) {
+                tasks.permissions({ id }, {})
+                    .then(() => this.#onUpdate())
                     .catch(err => this.emit('error', err));
             }
         }

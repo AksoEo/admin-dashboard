@@ -1,37 +1,71 @@
 import { h } from 'preact';
+import { AppBarProxy, Button, MenuIcon, CircularProgress } from '@cpsdqs/yamdl';
+import DoneIcon from '@material-ui/icons/Done';
 import Meta from '../../../meta';
 import Page from '../../../../components/page';
 import PermsEditor from '../perms-editor';
 import { adminGroups as locale } from '../../../../locale';
+import { connect } from '../../../../core/connection';
+import './detail.less';
 
-export default class AdminGroupPermsEditor extends Page {
+export default connect(({ matches }) => {
+    return ['adminGroups/group', {
+        id: +matches[matches.length - 2][1],
+        fetchPerms: true,
+    }];
+})((data, core) => ({ group: data, core }))(class AdminGroupPermsEditor extends Page {
     state = {
-        TEMP: [
-            'codeholders.read',
-            'codeholders.update',
-            'codeholders.delete',
-            'admin_groups.*',
-            'cats',
-        ],
-        TEMP2: {
-            birthdate: 'r',
-            profilePicture: 'r',
-            profilePictureHash: 'rw',
-        },
+        permissions: null,
+        memberFields: undefined,
     };
 
-    render ({ matches }) {
-        const groupId = +matches[matches.length - 1][1];
+    #save = () => {
+        const { core } = this.props;
+        const task = core.createTask('info', {
+            title: 'TODO',
+            message: 'todo: save',
+        });
+        task.on('success', () => this.props.pop());
+    };
+
+    render ({ group, matches }) {
+        const edited = this.state.permissions || this.state.memberFields !== undefined;
+
+        let permsEditor;
+        if (group && group.permissions && group.memberRestrictions) {
+            permsEditor = (
+                <PermsEditor
+                    permissions={this.state.permissions || group.permissions}
+                    memberFields={this.state.memberFields === undefined
+                        ? group.memberRestrictions.fields
+                        : this.state.memberFields}
+                    onChange={permissions => this.setState({ permissions })}
+                    onFieldsChange={fields => this.setState({ memberFields: fields })} />
+            );
+        } else {
+            permsEditor = <CircularProgress indeterminate />;
+        }
 
         return (
             <div class="admin-group-perms-editor">
                 <Meta title={locale.permsTitle} />
-                <PermsEditor
-                    permissions={this.state.TEMP}
-                    memberFields={this.state.TEMP2}
-                    onChange={permissions => this.setState({ TEMP: permissions })}
-                    onFieldsChange={fields => this.setState({ TEMP2: fields })} />
+                <AppBarProxy
+                    class="admin-groups-perms-editor-app-bar"
+                    priority={edited ? 9 : -Infinity}
+                    menu={(
+                        <Button small icon onClick={() => this.props.pop()}>
+                            <MenuIcon type="close" />
+                        </Button>
+                    )}
+                    title={locale.permsTitle}
+                    actions={[
+                        {
+                            icon: <DoneIcon />,
+                            action: this.#save,
+                        },
+                    ]} />
+                {permsEditor}
             </div>
         );
     }
-}
+});
