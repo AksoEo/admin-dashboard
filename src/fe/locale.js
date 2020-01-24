@@ -512,6 +512,7 @@ export const clients = {
     search: {
         placeholders: {
             name: '[[serĉi nomojn]]',
+            apiKey: '[[search exact api key]]',
             ownerName: '[[ownername]]',
             ownerEmail: '[[owneremail]]',
         },

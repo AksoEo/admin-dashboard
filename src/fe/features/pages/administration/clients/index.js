@@ -69,6 +69,7 @@ export default class Clients extends Page {
                     value={parameters}
                     searchFields={[
                         'name',
+                        'apiKey',
                         'ownerName',
                         'ownerEmail',
                     ]}

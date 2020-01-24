@@ -11,11 +11,15 @@ export const tasks = {
 
         const opts = { offset, limit };
         if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
+            if (search.field === 'apiKey') {
+                opts.filter = { apiKey: Buffer.from(search.query, 'hex') };
+            } else {
+                const transformedQuery = util.transformSearch(search.query);
+                if (!util.isValidSearch(transformedQuery)) {
+                    throw { code: 'invalid-search-query', message: 'invalid search query' };
+                }
+                opts.search = { cols: [search.field], str: transformedQuery };
             }
-            opts.search = { cols: [search.field], str: transformedQuery };
         }
 
         const res = await client.get('/clients', {
