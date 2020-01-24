@@ -7,6 +7,7 @@ import OverviewList from '../../../../components/overview-list';
 import GlobalFilterNotice from '../../codeholders/global-filter-notice';
 import Meta from '../../../meta';
 import { connect } from '../../../../core/connection';
+import { LinkButton } from '../../../../router';
 import { adminGroups as locale, codeholders as codeholdersLocale } from '../../../../locale';
 import { connectPerms } from '../../../../perms';
 import PermsEditor from '../perms-editor';
@@ -22,19 +23,6 @@ export default connect(props => ['adminGroups/group', {
         clientsOffset: 0,
         parameters: {
             limit: 10,
-        },
-
-        TEMP: [
-            'codeholders.read',
-            'codeholders.update',
-            'codeholders.delete',
-            'admin_groups.*',
-            'cats',
-        ],
-        TEMP2: {
-            birthdate: 'r',
-            profilePicture: 'r',
-            profilePictureHash: 'rw',
         },
     };
 
@@ -67,27 +55,36 @@ export default connect(props => ['adminGroups/group', {
             : <GlobalFilterNotice perms={perms} />;
 
         const addItem = tab === 'clients'
-            ? () => core.createTask('admin-groups/addClient', { group: id })
-            : () => core.createTask('admin-groups/addCodeholder', { group: id });
+            ? () => core.createTask('adminGroups/addClient', { group: id })
+            : () => core.createTask('adminGroups/addCodeholder', { group: id });
+
+        const actions = [];
+        actions.push({
+            overflow: true,
+            label: locale.delete,
+            action: () => core.createTask('adminGroups/delete', {}, { id }),
+        });
+
+        const permsTarget = `/administrado/grupoj/${id}/permesiloj`;
 
         return (
             <div class="admin-group-detail-page">
-                <Meta title={locale.detailTitle} />
+                <Meta
+                    title={locale.detailTitle}
+                    actions={actions} />
                 <div class="group-header">
                     <div class="group-title">{item.name}</div>
                     <div class="group-description">{item.description}</div>
                 </div>
-                <PermsEditor
-                    permissions={this.state.TEMP}
-                    memberFields={this.state.TEMP2}
-                    onChange={permissions => this.setState({ TEMP: permissions })}
-                    onFieldsChange={fields => this.setState({ TEMP2: fields })} />
                 <Segmented selected={tab} onSelect={tab => this.setState({ tab })}>
                     {[
                         { id: 'codeholders', label: '[TMP CH]' },
                         { id: 'clients', label: '[TMP API]' },
                     ]}
                 </Segmented>
+                <LinkButton target={permsTarget}>
+                    [[edit perms]]
+                </LinkButton>
                 <Button onClick={addItem}>
                     [[add one]]
                 </Button>

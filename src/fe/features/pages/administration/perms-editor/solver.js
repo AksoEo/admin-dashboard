@@ -169,7 +169,7 @@ export function add (permissions, memberFields, perm) {
         if (!permStates.has(p) || !permStates.get(p).active) permissions.push(p);
     }
 
-    if (perm.endsWith('.*')) {
+    if (perm.endsWith('.*') || perm === '*') {
         // get rid of all the other ones that are now included in the wildcard
         const prefix = perm.substr(0, perm.length - 1);
         permissions = permissions.filter(x => !x.startsWith(prefix));

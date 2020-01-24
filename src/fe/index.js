@@ -31,7 +31,7 @@ const taskViews = {
     info: lazyPath(genericTaskViews, res => res.info),
     login: lazyPath(() => import(/* webpackChunkName: "login-tasks" */ './features/login/tasks')),
     codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
-    'admin-groups': lazyPath(() => import(/* webpackChunkName: "admin-groups-tasks" */ './features/pages/administration/groups/tasks')),
+    adminGroups: lazyPath(() => import(/* webpackChunkName: "admin-groups-tasks" */ './features/pages/administration/groups/tasks')),
     queries: lazyPath(() => import(/* webpackChunkName: "queries-tasks" */ './features/queries')),
 };
 const loadTaskView = async (taskPath) => {

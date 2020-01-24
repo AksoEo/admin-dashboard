@@ -1,6 +1,11 @@
 /// Global permissions config
 export const spec = [
     {
+        type: 'perm',
+        name: 'Ĉiuj',
+        id: '*',
+    },
+    {
         type: 'category',
         name: 'Membroj',
         children: [

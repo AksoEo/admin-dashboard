@@ -1,9 +1,11 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import Meta from '../../../meta';
 import { adminGroups as locale } from '../../../../locale';
+import { coreContext } from '../../../../core/connection';
 
 const FIELDS = {
     name: {
@@ -34,10 +36,21 @@ export default class AdminGroups extends Page {
         },
     };
 
+    static contextType = coreContext;
+
     render (_, { parameters }) {
+        const actions = [];
+        actions.push({
+            icon: <AddIcon />,
+            label: locale.add,
+            action: () => this.context.createTask('adminGroups/create'),
+        });
+
         return (
             <div class="admin-groups-page">
-                <Meta title={locale.title} />
+                <Meta
+                    title={locale.title}
+                    actions={actions} />
                 <SearchFilters
                     value={parameters}
                     onChange={parameters => this.setState({ parameters })}

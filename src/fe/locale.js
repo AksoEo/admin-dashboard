@@ -480,6 +480,9 @@ export const codeholders = {
 export const adminGroups = {
     title: 'Administraj grupoj',
     detailTitle: 'Administra grupo',
+    permsTitle: '[[Permesiloj]]',
+    add: 'Aldoni grupon',
+    delete: 'Forigi grupon',
     search: {
         placeholders: 'Serĉi nomojn de grupoj',
     },
