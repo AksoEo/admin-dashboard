@@ -12,6 +12,7 @@ import './task-dialog.less';
 /// - actionLabel: label string for the action button
 /// - mapError: function to map an error to a (human-readable?) string (optional)
 /// - run: run closure; must return a promise. success will not be handled
+/// - running: if true, will consider the task to be running
 export default class TaskDialog extends Component {
     state = {
         loading: false,
@@ -32,8 +33,10 @@ export default class TaskDialog extends Component {
         });
     };
 
-    render ({ title, open, onClose, actionLabel, mapError }, { loading, error }) {
+    render ({ title, open, onClose, actionLabel, mapError, running }, { loading: loadingState, error }) {
         const className = 'task-dialog ' + (this.props.class || '');
+
+        const loading = loadingState || running;
 
         return (
             <Dialog

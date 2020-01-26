@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, createContext } from 'preact/compat';
-import { Button, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Checkbox, Button, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -31,6 +31,9 @@ const DEBOUNCE_TIME = 400; // ms
 /// - onResult: result callback
 /// - locale: localized field names
 /// - notice: optional string to show below stats
+/// - selection: if given will show checkboxes for selection. should have the Set interface, i.e.
+///   add, delete, has
+/// - updateView: argument list to create a data view that emits updates (if available)
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -99,8 +102,27 @@ export default class OverviewList extends PureComponent {
         }
     }
 
+    #updateView;
+
+    bindUpdates () {
+        if (this.#updateView) this.unbindUpdates();
+        if (!this.props.updateView) return;
+        this.#updateView = this.context.createDataView(...this.props.updateView);
+        this.#updateView.on('update', () => {
+            this.#stale = true;
+            this.setState({ stale: true });
+        });
+    }
+
+    unbindUpdates () {
+        if (!this.#updateView) return;
+        this.#updateView.drop();
+        this.#updateView = null;
+    }
+
     componentDidMount () {
         this.maybeReload();
+        this.bindUpdates();
     }
 
     componentDidUpdate (prevProps) {
@@ -117,11 +139,16 @@ export default class OverviewList extends PureComponent {
             this.#lastCollapseTime = Date.now();
         }
 
+        if (!deepEq(prevProps.updateView, this.props.updateView)) {
+            this.bindUpdates();
+        }
+
         this.maybeReload();
     }
 
     componentWillUnmount () {
         clearTimeout(this.#reloadTimeout);
+        this.unbindUpdates();
     }
 
     onPrevPageClick = () => {
@@ -154,9 +181,11 @@ export default class OverviewList extends PureComponent {
         locale: localizedFields,
         view,
         notice,
+        selection,
     }, { error, result, stale, loading }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
+        if (selection) className += ' is-selectable';
         if (stale) className += ' stale';
 
         let stats, contents, paginationText;
@@ -204,6 +233,7 @@ export default class OverviewList extends PureComponent {
                 <ListHeader
                     key="header"
                     selectedFields={compiledFields}
+                    selection={selection}
                     fields={fields}
                     locale={localizedFields} />,
             ];
@@ -217,6 +247,7 @@ export default class OverviewList extends PureComponent {
                 fields={fields}
                 onGetItemLink={onGetItemLink}
                 index={i}
+                selection={selection}
                 expanded={expanded}
                 lastCollapseTime={this.#lastCollapseTime}
                 locale={localizedFields} />));
@@ -333,10 +364,11 @@ class DynamicHeightDiv extends PureComponent {
     }
 }
 
-function ListHeader ({ fields, selectedFields, locale }) {
+function ListHeader ({ fields, selectedFields, locale, selection }) {
     // FIXME: duplicate code with below
     const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
-    const weightSum = fieldWeights.reduce((a, b) => a + b, 0);
+    let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
+    if (selection) weightSum += 1;
     const actualUnit = 100 / weightSum;
     const unit = Math.max(10, actualUnit);
 
@@ -344,6 +376,7 @@ function ListHeader ({ fields, selectedFields, locale }) {
         gridTemplateColumns: fieldWeights.map(x => (x * actualUnit) + '%').join(' '),
         width: weightSum * unit > 100 ? `${weightSum / unit * 100}%` : null,
     };
+    if (selection) style.gridTemplateColumns = actualUnit + '% ' + style.gridTemplateColumns;
     style.maxWidth = style.width;
 
     const cells = selectedFields.map(({ id }) => (
@@ -352,6 +385,10 @@ function ListHeader ({ fields, selectedFields, locale }) {
             {/* sorting? */}
         </div>
     ));
+
+    if (selection) {
+        cells.unshift(<div key="selection" class="list-header-cell selection-cell"></div>);
+    }
 
     return <div class="list-header" style={style}>{cells}</div>;
 }
@@ -419,6 +456,7 @@ const ListItem = connect(props => ([props.view, {
         index,
         locale,
         cursed,
+        selection,
     }) {
         if (!data) return null;
 
@@ -437,8 +475,24 @@ const ListItem = connect(props => ([props.view, {
             );
         });
 
+        if (selection) {
+            cells.unshift(
+                <div key="selection" class="list-item-cell selection-cell" onClick={e => {
+                    // FIXME: hacky because we need to prevent the link from doing stuff
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (selection.has(id)) selection.delete(id);
+                    else selection.add(id);
+                }}>
+                    <Checkbox
+                        checked={selection.has(id)} />
+                </div>
+            );
+        }
+
         const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
-        const weightSum = fieldWeights.reduce((a, b) => a + b, 0);
+        let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
+        if (selection) weightSum += 1;
         const actualUnit = 100 / weightSum;
         const unit = Math.max(10, actualUnit);
 
@@ -452,6 +506,7 @@ const ListItem = connect(props => ([props.view, {
             transform: `translateY(${(constOffset + spreadFactor * index) * 10 + yOffset}px)`,
             opacity: Math.max(0, Math.min(1 - spreadFactor * index / 2, 1)),
         };
+        if (selection) style.gridTemplateColumns = actualUnit + '% ' + style.gridTemplateColumns;
         style.maxWidth = style.width;
 
         const itemLink = onGetItemLink ? onGetItemLink(id) : null;

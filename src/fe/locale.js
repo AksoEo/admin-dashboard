@@ -494,6 +494,14 @@ export const adminGroups = {
         description: 'Priskribo',
     },
 
+    addCodeholders: '[[add codeholders]]',
+    addCodeholdersCount: n => `[[${n} codeholder${n === 1 ? '' : 's'} selected]]`,
+    removeCodeholders: '[[remove codeholders]]',
+    removeButton: '[[remove]]',
+    removeCodeholdersAreYouSure: n => `[[are you sure you want to remove ${n} codeholder${n === 1 ? '' : 's'}?]]`,
+    addCodeholdersDone: '[[add selected]]',
+    addClients: '[[add clients]]',
+
     nameRequired: '[[name is required]]',
 };
 

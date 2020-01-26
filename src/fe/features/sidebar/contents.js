@@ -14,13 +14,14 @@ import { TEJOIcon, UEAIcon } from './icons';
 // also see src/pages/index.js
 
 /// Renders a single item in the sidebar.
-function NavItem ({ item, currentPage }) {
+function NavItem ({ item, currentPage, locked }) {
     const { id, icon, path } = item;
     const Icon = icon || (() => null);
     return (
         <Link target={`/${path}`} class="sidebar-link">
             <DrawerItem
                 selected={currentPage === id}
+                disabled={locked}
                 icon={<Icon />}
                 onKeyDown={e => {
                     if (e.key === 'ArrowDown') {
@@ -48,7 +49,7 @@ function NavItem ({ item, currentPage }) {
 }
 
 /// Renders a sidebar category.
-function NavCategory ({ item, currentPage, perms }) {
+function NavCategory ({ item, currentPage, perms, locked }) {
     const { id, contents } = item;
     const label = localePages[id] ? <DrawerLabel>{localePages[id]}</DrawerLabel> : null;
 
@@ -61,7 +62,8 @@ function NavCategory ({ item, currentPage, perms }) {
                 <NavItem
                     key={item.id}
                     item={item}
-                    currentPage={currentPage} />
+                    currentPage={currentPage}
+                    locked={locked} />
             ))}
         </Fragment>
     );
@@ -71,6 +73,7 @@ function NavCategory ({ item, currentPage, perms }) {
 ///
 /// # Props
 /// - currentPage: current page ID, use to highlight the corresponding sidebar item
+/// - locked
 export default class SidebarContents extends PureComponent {
     static contextType = routerContext;
 
@@ -81,9 +84,7 @@ export default class SidebarContents extends PureComponent {
         profilePictureHash: null,
     };
 
-    focus () {
-
-    }
+    focus () {}
 
     render () {
         return (
@@ -101,7 +102,8 @@ export default class SidebarContents extends PureComponent {
                                         key={item.id}
                                         item={item}
                                         currentPage={this.props.currentPage}
-                                        perms={perms} />
+                                        perms={perms}
+                                        locked={this.props.locked} />
                                 ))}
                             </nav>)}
                         </permsContext.Consumer>

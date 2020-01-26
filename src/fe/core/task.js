@@ -30,6 +30,7 @@ export default class Task extends EventEmitter {
         this.parameters = {};
 
         this.state = TaskState.IDLE;
+        this.dropped = false;
 
         this.worker.registerTask(this);
         this.update(parameters);
@@ -80,10 +81,12 @@ export default class Task extends EventEmitter {
         this.emit('success', result);
         this.emit('result', 'success', result);
         this.emit('drop');
+        this.dropped = true;
     }
 
     drop () {
         this.emit('drop');
         this.worker.deregisterTask(this);
+        this.dropped = true;
     }
 }

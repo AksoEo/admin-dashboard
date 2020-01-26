@@ -14,6 +14,7 @@ const EDGE_DRAG_WIDTH = 50;
 ///   If this is true, `open` will be ignored.
 /// - open/onOpen/onClose: open state
 /// - currentPage: Current page identifier passed to the SidebarContents
+/// - locked: if true, will lock the sidebar to user interactions
 export default class Sidebar extends PureComponent {
     node = null;
     backdropNode = null;
@@ -125,6 +126,7 @@ export default class Sidebar extends PureComponent {
                     }}>
                     <SidebarContents
                         ref={contents => this.#contents = contents}
+                        locked={this.props.locked}
                         currentPage={this.props.currentPage}
                         onLogout={this.props.onLogout}
                         onDirectTransition={this.props.onDirectTransition}

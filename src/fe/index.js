@@ -166,15 +166,19 @@ class Session extends Component {
         if (Login && (showLogin || specialPage)) {
             login = <Login />;
         }
-        if (loggedIn && App) {
-            app = <App animateIn={wasLoggedOut} ref={view => this.#appRef = view} />;
-        }
 
         const tasks = [];
+        let renderTasksHere = true;
         for (const [id, [view, deathTime]] of this.#taskViews.entries()) {
             tasks.push(
                 <TaskView id={id} core={this.core} view={view} isDead={!!deathTime} />
             );
+        }
+
+        if (loggedIn && App) {
+            // also pass tasks because those need some contexts only available in the app
+            app = <App animateIn={wasLoggedOut} ref={view => this.#appRef = view} tasks={tasks} />;
+            renderTasksHere = false;
         }
 
         return (
@@ -186,7 +190,7 @@ class Session extends Component {
                         <LoadingIndicator loading={!login && !app} />
                         {app}
                         {login}
-                        {tasks}
+                        {renderTasksHere ? tasks : null}
                     </Fragment>
                 </routerContext.Provider>
             </coreContext.Provider>

@@ -149,26 +149,30 @@ export const tasks = {
         };
     },
 
+    // dummies for task views
+    addCodeholdersBatchTask: async () => {},
+    removeCodeholdersBatchTask: async () => {},
+
     addCodeholder: async ({ group }, { codeholder }) => {
         const client = await asyncClient;
         await client.put(`/admin_groups/${group}/codeholders/${codeholder}`);
-        store.signal([CLIENTS, group, SIG_LIST]);
+        store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
     removeCodeholder: async ({ group }, { codeholder }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${group}/codeholders/${codeholder}`);
-        store.signal([CLIENTS, group, SIG_LIST]);
+        store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
 
     addClient: async ({ group }, { client: id }) => {
         const client = await asyncClient;
         await client.put(`/admin_groups/${group}/clients/${id}`);
-        store.signal([CLIENTS, group, SIG_LIST]);
+        store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
     removeClient: async ({ group }, { client: id }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${group}/clients/${id}`);
-        store.signal([CLIENTS, group, SIG_LIST]);
+        store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
 };
 

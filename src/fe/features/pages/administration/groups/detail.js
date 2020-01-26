@@ -23,6 +23,8 @@ export default connect(props => ['adminGroups/group', {
         parameters: {
             limit: 10,
         },
+        codeholdersSelection: new Set(),
+        clientsSelection: new Set(),
     };
 
     render ({ item, match, perms, core }, { tab, parameters }) {
@@ -55,7 +57,46 @@ export default connect(props => ['adminGroups/group', {
 
         const addItem = tab === 'clients'
             ? () => core.createTask('adminGroups/addClient', { group: id })
-            : () => core.createTask('adminGroups/addCodeholder', { group: id });
+            : () => core.createTask('adminGroups/addCodeholdersBatchTask', { group: id });
+
+        const updateView = ['adminGroups/group', { id }];
+
+        const removeItemsTask = tab === 'clients'
+            ? 'adminGroups/removeClient'
+            : 'adminGroups/removeCodeholdersBatchTask';
+
+        const selectionSet = tab === 'clients'
+            ? this.state.clientsSelection
+            : this.state.codeholdersSelection;
+        const selection = {
+            add: item => {
+                selectionSet.add(item);
+                this.forceUpdate();
+            },
+            delete: item => {
+                selectionSet.delete(item);
+                this.forceUpdate();
+            },
+            has: item => selectionSet.has(item),
+        };
+
+        let deleteButton;
+        if (selectionSet.size) {
+            deleteButton = (
+                <Button onClick={() => {
+                    const task = core.createTask(removeItemsTask, { group: id }, { items: [...selectionSet] });
+                    task.on('success', () => {
+                        // reset selection
+                        this.setState({
+                            clientsSelection: new Set(),
+                            codeholdersSelection: new Set(),
+                        });
+                    });
+                }}>
+                    [[tmp button to delete selection]]
+                </Button>
+            );
+        }
 
         const actions = [];
         actions.push({
@@ -87,10 +128,12 @@ export default connect(props => ['adminGroups/group', {
                 <Button onClick={addItem}>
                     [[add one]]
                 </Button>
+                {deleteButton}
                 <OverviewList
                     task={itemsTask}
                     notice={itemsNotice}
                     view={itemsView}
+                    selection={selection}
                     options={{
                         group: id,
                     }}
@@ -106,6 +149,7 @@ export default connect(props => ['adminGroups/group', {
                     onSetLimit={limit => this.setState({
                         parameters: { ...this.state.parameters, limit },
                     })}
+                    updateView={updateView}
                     locale={itemsLocale} />
             </div>
         );
