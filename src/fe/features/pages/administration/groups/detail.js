@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import EditIcon from '@material-ui/icons/Edit';
 import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import Segmented from '../../../../components/segmented';
 import Page from '../../../../components/page';
@@ -104,6 +105,12 @@ export default connect(props => ['adminGroups/group', {
             overflow: true,
             label: locale.delete,
             action: () => core.createTask('adminGroups/delete', {}, { id }),
+        });
+
+        actions.push({
+            icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+            label: locale.edit,
+            action: () => core.createTask('adminGroups/update', { id }, { ...item }),
         });
 
         const permsTarget = `/administrado/grupoj/${id}/permesiloj`;

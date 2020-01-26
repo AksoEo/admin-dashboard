@@ -2,6 +2,7 @@ import { util } from '@tejo/akso-client';
 import { AbstractDataView } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
+import { deepMerge } from '../../util';
 
 export const CLIENTS = 'clients';
 
@@ -61,9 +62,20 @@ export const tasks = {
         };
     },
 
+    update: async ({ id }, { name, ownerName, ownerEmail }) => {
+        const client = await asyncClient;
+        const res = await client.patch(`/clients/${id}`, { name, ownerName, ownerEmail });
+
+        const existing = store.get([CLIENTS, id]);
+        store.insert([CLIENTS, id], deepMerge(existing, { name, ownerName, ownerEmail }));
+
+        store.signal([CLIENTS, id]);
+    },
+
     delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/clients/${id}`);
+        store.remove([CLIENTS, id]);
     },
 };
 

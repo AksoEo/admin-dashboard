@@ -39,6 +39,31 @@ export default {
             </routerContext.Consumer>
         );
     },
+    update ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.editGroup}
+                actionLabel={locale.editUpdate}
+                run={() => task.runOnce()}>
+                <Validator
+                    component={TextField}
+                    label={locale.fields.name}
+                    value={task.parameters.name || ''}
+                    onChange={e => task.update({ name: e.target.value })}
+                    validate={name => {
+                        if (!name) throw { error: locale.nameRequired };
+                    }} />
+                <Validator
+                    component={TextField}
+                    label={locale.fields.description}
+                    value={task.parameters.description || ''}
+                    onChange={e => task.update({ description: e.target.value })}
+                    validate={() => {}} />
+            </TaskDialog>
+        );
+    },
     delete ({ open, task }) {
         return (
             <routerContext.Consumer>

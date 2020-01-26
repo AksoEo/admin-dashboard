@@ -68,11 +68,10 @@ export const tasks = {
     update: async ({ id }, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
 
-        await client.patch(`/admin_groups/${id}`, {
-            name,
-            description,
-            memberRestrictions,
-        });
+        const options = { name, description };
+        if (memberRestrictions) options.memberRestrictions = memberRestrictions;
+
+        await client.patch(`/admin_groups/${id}`, options);
 
         const existing = store.get([ADMIN_GROUPS, id]);
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, { name, description, memberRestrictions }));
