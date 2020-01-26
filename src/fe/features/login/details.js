@@ -38,6 +38,7 @@ export default class DetailsPage extends Component {
 
     #nopwCheckTimeout;
     #checkHasPassword = () => {
+        if (this.props.mode !== Mode.Normal) return;
         if (!this.props.login) return;
         clearTimeout(this.#nopwCheckTimeout);
         this.props.core.createTask('login/hasPassword', {}, {
@@ -77,7 +78,6 @@ export default class DetailsPage extends Component {
                 window.history.pushState(null, null, '/');
 
                 if (nope) {
-                    // TODO: info dialog
                     this.setState({ notAdminButPasswordSuccess: true });
                 }
             } else if (nope) {
@@ -99,6 +99,8 @@ export default class DetailsPage extends Component {
             } else if (err.code === 'is-not-admin') {
                 error = locale.notAdminShort;
             }
+
+            console.error(err); // eslint-disable-line no-console
 
             this.#passwordValidator.shake();
             this.#passwordValidator.setError({ error });
@@ -197,10 +199,9 @@ export default class DetailsPage extends Component {
                         ? locale.createPasswordPlaceholder
                         : null}
                     onKeyDown={e => {
-                        if (!needsPasswordValidation) {
-                            if (e.key === 'Enter') this.#form.submit();
-                        } else {
-                            this.#passwordField2.focus();
+                        if (e.key === 'Enter') {
+                            if (!needsPasswordValidation) this.#form.submit();
+                            else this.#passwordField2.focus();
                         }
                     }}
                     onChange={e => this.setState({ password: e.target.value })}

@@ -113,11 +113,10 @@ export const tasks = {
                 body: {
                     key: Buffer.from(token, 'hex'),
                     password,
-                    org: 'akso',
                 },
                 _allowLoggedOut: true,
             });
-            await tasks.login({}, { login, password, allowNonAdmin });
+            return await tasks.login({}, { login, password, allowNonAdmin });
         } catch (err) {
             store.insert(AUTH_STATE, LoginAuthStates.LOGGED_OUT);
             throw { code: err.statusCode, message: err.toString() };
