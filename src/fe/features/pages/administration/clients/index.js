@@ -9,7 +9,7 @@ import { clients as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { apiKey } from '../../../../components/data';
 
-const FIELDS = {
+export const FIELDS = {
     name: {
         component ({ value }) {
             return value;

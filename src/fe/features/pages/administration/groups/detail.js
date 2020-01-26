@@ -3,12 +3,13 @@ import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import Segmented from '../../../../components/segmented';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
+import { FIELDS as CLIENT_FIELDS } from '../clients/index';
 import OverviewList from '../../../../components/overview-list';
 import GlobalFilterNotice from '../../codeholders/global-filter-notice';
 import Meta from '../../../meta';
 import { connect } from '../../../../core/connection';
 import { LinkButton } from '../../../../router';
-import { adminGroups as locale, codeholders as codeholdersLocale } from '../../../../locale';
+import { adminGroups as locale, clients as clientsLocale, codeholders as codeholdersLocale } from '../../../../locale';
 import { connectPerms } from '../../../../perms';
 import './detail.less';
 
@@ -40,16 +41,16 @@ export default connect(props => ['adminGroups/group', {
         const offsetKey = tab === 'clients' ? 'clientsOffset' : 'codeholdersOffset';
         const itemsOffset = this.state[offsetKey];
         const itemFields = tab === 'clients'
-            ? [] // TODO
+            ? [{ id: 'name', sorting: 'none' }, { id: 'apiKey', sorting: 'asc' }, { id: 'ownerName', sorting: 'none' }]
             : [{ id: 'code', sorting: 'asc' }, { id: 'name', sorting: 'asc' }];
         const itemFieldSpecs = tab === 'clients'
-            ? {} // TODO
+            ? CLIENT_FIELDS
             : CODEHOLDER_FIELDS;
         const itemsLocale = tab === 'clients'
-            ? {} // TODO
+            ? clientsLocale.fields
             : codeholdersLocale.fields;
         const onGetItemLink = tab === 'clients'
-            ? null // TODO
+            ? id => `/administrado/klientoj/${id}`
             : id => `/membroj/${id}`;
         const itemsNotice = tab === 'clients'
             ? null
