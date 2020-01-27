@@ -1,8 +1,11 @@
 @import '../prelude';
 
 .overview-list {
-    margin: 1em auto;
-    padding: 0 16px;
+    background: @card-background;
+    border-radius: 8px;
+    .elevation(4);
+    margin: 16px;
+    padding: 16px 0;
 
     &.search-expanded {
         display: none;
@@ -17,6 +20,7 @@
         font-style: italic;
         font-size: small;
         margin-bottom: 1em;
+        padding: 0 16px;
     }
 
     .list-notice {
@@ -25,6 +29,7 @@
         font-size: small;
         margin-top: -1em; // undo margin bottom from list-meta
         margin-bottom: 1em;
+        padding: 0 16px;
     }
 
     .compact-page-button {
@@ -50,9 +55,12 @@
         font-size: small;
         margin-top: 1em;
         color: @text-fade-60;
+        padding: 0 16px;
     }
 
     .regular-pagination {
+        padding: 0 16px;
+        margin-top: 8px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -77,11 +85,14 @@
         .list-item, .list-header {
             display: grid;
             grid-column-gap: 8px;
+            border-radius: 0;
             max-width: 100%;
-            padding: 8px;
+            padding: 8px 16px;
             grid-template-rows: 1fr;
             justify-content: stretch;
             align-items: center;
+
+            --md-button-color: @gray-button-color;
 
             color: inherit;
             text-decoration: none;

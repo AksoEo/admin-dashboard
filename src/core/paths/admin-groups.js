@@ -34,12 +34,17 @@ export const tasks = {
         });
 
         for (const item of res.body) {
-            store.insert([ADMIN_GROUPS, item.id], item);
+            const existing = store.get([ADMIN_GROUPS, item.id]);
+            store.insert([ADMIN_GROUPS, item.id], deepMerge(existing, item));
         }
 
         return {
             items: res.body.map(item => item.id),
             total: +res.res.headers.get('x-total-items'),
+            stats: {
+                filtered: false,
+                time: res.resTime,
+            },
         };
     },
     /// adminGroups/group: returns an admin group
@@ -58,28 +63,31 @@ export const tasks = {
 
         const res = await client.post('/admin_groups', {
             name,
-            description,
+            description: description || null,
             memberRestrictions,
         });
         const id = +res.res.headers.get('x-identifier');
         store.insert([ADMIN_GROUPS, id], { name, description, memberRestrictions });
+        store.signal([ADMIN_GROUPS, SIG_LIST]);
         return id;
     },
     update: async ({ id }, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
 
-        const options = { name, description };
+        const options = { name, description: description || null };
         if (memberRestrictions) options.memberRestrictions = memberRestrictions;
 
         await client.patch(`/admin_groups/${id}`, options);
 
         const existing = store.get([ADMIN_GROUPS, id]);
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, { name, description, memberRestrictions }));
+        store.signal([ADMIN_GROUPS, SIG_LIST]);
     },
     delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${id}`);
         store.remove([ADMIN_GROUPS, id]);
+        store.signal([ADMIN_GROUPS, SIG_LIST]);
     },
 
     permissions: async ({ id }) => {
@@ -216,4 +224,18 @@ export const views = {
             store.unsubscribe([ADMIN_GROUPS, this.id], this.#onUpdate);
         }
     },
+
+    /// emits a signal when the list changes
+    sigList: class AdminGroupListSignal extends AbstractDataView {
+        constructor () {
+            super();
+            store.subscribe([ADMIN_GROUPS, SIG_LIST], this.#onUpdate);
+        }
+        #onUpdate = () => {
+            this.emit('update', null);
+        };
+        drop () {
+            store.unsubscribe([ADMIN_GROUPS, SIG_LIST], this.#onUpdate);
+        }
+    }
 };

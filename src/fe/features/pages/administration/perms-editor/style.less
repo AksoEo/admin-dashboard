@@ -2,14 +2,29 @@
 
 .perms-editor {
     position: relative;
+    padding: 24px;
 
     .perms-category, .perms-group {
+        margin-bottom: 16px;
+
         .group-title {
             font-weight: bold;
+            margin-bottom: 8px;
         }
-        &.perms-category > .group-title {
-            font-size: 1.1em;
+        &.perms-category {
+            & > .group-title {
+                font-size: 1.2em;
+                border-bottom: 1px solid @text-fade-40;
+            }
         }
+    }
+
+    .perms-item {
+        background: @card1-background;
+        padding: 16px;
+        border-radius: 8px;
+        .elevation(4);
+        margin-bottom: 16px;
     }
 
     .perm-checkbox {
@@ -53,17 +68,41 @@
         }
     }
 
-    .perms-switch {
-        display: flex;
-        justify-content: space-between;
+    .member-fields-container {
+        background: @card1-background;
+        .elevation(4);
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
 
+        .member-fields {
+            border-spacing: 0;
+
+            th, tr {
+                padding: 0;
+            }
+
+            thead th {
+                padding-bottom: 8px;
+                font-weight: inherit;
+            }
+        }
+    }
+
+    .perms-switch {
         .switch-name {
+            display: inline-block;
             margin-right: 8px;
+            margin-bottom: 8px;
         }
 
         .switch-options {
             .switch-option {
                 margin: 8px;
+
+                &:first-child {
+                    margin-left: 0;
+                }
             }
         }
     }

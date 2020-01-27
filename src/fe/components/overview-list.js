@@ -368,7 +368,7 @@ function ListHeader ({ fields, selectedFields, locale, selection }) {
     // FIXME: duplicate code with below
     const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
     let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
-    if (selection) weightSum += 1;
+    if (selection) weightSum += 0.5;
     const actualUnit = 100 / weightSum;
     const unit = Math.max(10, actualUnit);
 
@@ -376,7 +376,7 @@ function ListHeader ({ fields, selectedFields, locale, selection }) {
         gridTemplateColumns: fieldWeights.map(x => (x * actualUnit) + '%').join(' '),
         width: weightSum * unit > 100 ? `${weightSum / unit * 100}%` : null,
     };
-    if (selection) style.gridTemplateColumns = actualUnit + '% ' + style.gridTemplateColumns;
+    if (selection) style.gridTemplateColumns = (actualUnit / 2) + '% ' + style.gridTemplateColumns;
     style.maxWidth = style.width;
 
     const cells = selectedFields.map(({ id }) => (
@@ -492,7 +492,7 @@ const ListItem = connect(props => ([props.view, {
 
         const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
         let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
-        if (selection) weightSum += 1;
+        if (selection) weightSum += 0.5;
         const actualUnit = 100 / weightSum;
         const unit = Math.max(10, actualUnit);
 
@@ -506,7 +506,7 @@ const ListItem = connect(props => ([props.view, {
             transform: `translateY(${(constOffset + spreadFactor * index) * 10 + yOffset}px)`,
             opacity: Math.max(0, Math.min(1 - spreadFactor * index / 2, 1)),
         };
-        if (selection) style.gridTemplateColumns = actualUnit + '% ' + style.gridTemplateColumns;
+        if (selection) style.gridTemplateColumns = (actualUnit / 2) + '% ' + style.gridTemplateColumns;
         style.maxWidth = style.width;
 
         const itemLink = onGetItemLink ? onGetItemLink(id) : null;

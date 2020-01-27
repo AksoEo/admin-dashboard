@@ -65,7 +65,8 @@ export default class AdminGroups extends Page {
                     onGetItemLink={id => `/administrado/grupoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
-                    locale={locale.fields} />
+                    locale={locale.fields}
+                    updateView={['adminGroups/sigList']} />
             </div>
         );
     }

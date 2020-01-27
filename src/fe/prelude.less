@@ -30,9 +30,12 @@
 
     --page-background: #eee;
     --card-background: #fff;
+    --card1-background: #fff;
     --sidebar-background: #f9f9f9;
     --sidebar-border: #ddd;
     --golden-background: fade(#fee12a, 20%);
+
+    --gray-button-color: var(--text-fade-40);
 
     --membership-gives-membership-background: #4ebc6b;
     --membership-is-lifetime-background: #ed9b50;
@@ -47,8 +50,11 @@
 
         --page-background: #1a1a1a;
         --card-background: #222;
+        --card1-background: #2a2a2a;
         --sidebar-background: #222;
         --sidebar-border: #333;
+
+        --gray-button-color: var(--text-fade-60);
     }
 
     --editor-background: #222;
@@ -85,7 +91,7 @@
 @text-fade-50: var(--text-fade-50);
 @text-fade-60: var(--text-fade-60);
 @text-fade-80: var(--text-fade-80);
-@gray-button-color: @text-fade-60;
+@gray-button-color: var(--gray-button-color);
 @picture-outline: @text-fade-20;
 @text-on-primary: var(--text-on-primary);
 @text-on-primary-fade-60: var(--text-on-primary-fade-60);
@@ -95,6 +101,7 @@
 @subtle-separator: @text-fade-10;
 @page-background: var(--page-background);
 @card-background: var(--card-background);
+@card1-background: var(--card1-background);
 @sidebar-background: var(--sidebar-background);
 @sidebar-border: var(--sidebar-border);
 @sidebar-text: inherit;

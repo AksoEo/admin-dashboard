@@ -93,7 +93,7 @@ function PermsItem ({ item, ctx }) {
         );
     } else if (item.type === 'switch') {
         return (
-            <div class="perms-switch">
+            <div class="perms-item perms-switch">
                 {item.name ? <span class="switch-name">{item.name}</span> : <span class="spacer" />}
                 <div class="switch-options">
                     {item.options.map((opt, i) => {
@@ -128,7 +128,7 @@ function PermsItem ({ item, ctx }) {
         }
 
         return (
-            <div class="perms-perm">
+            <div class="perms-item perms-perm">
                 <Checkbox
                     class={className}
                     checked={state.active}
@@ -164,35 +164,44 @@ function MemberFieldsEditor ({ fields, toggleField, toggleAll }) {
             }
 
             items.push(
-                <div class="member-field">
-                    <span class="field-name">{item.name}</span>
-                    <span class="field-perms">
+                <tr class="member-field">
+                    <td class="field-name">{item.name}</td>
+                    <td class="field-perms">
                         <Checkbox
                             class={'perm-checkbox' + (canRead && canWrite ? ' is-implied-active' : '')}
                             checked={canRead}
                             onClick={() => toggleField(field, 'r')} />
                         {memberFieldsRead}
+                        {' \u00a0 \u00a0'}
                         <Checkbox
                             class="perm-checkbox"
                             checked={canWrite}
                             onClick={() => toggleField(field, 'w')} />
                         {memberFieldsWrite}
-                    </span>
-                </div>
+                    </td>
+                </tr>
             );
         }
     }
 
     return (
-        <div class="member-fields">
-            <div class="member-fields-all">
-                <Checkbox
-                    class="perm-checkbox"
-                    checked={fields === null}
-                    onClick={toggleAll} />
-                {memberFieldsAll}
-            </div>
-            {items}
+        <div class="member-fields-container">
+            <table class="member-fields">
+                <thead class="member-fields-all">
+                    <tr>
+                        <th>
+                            <Checkbox
+                                class="perm-checkbox"
+                                checked={fields === null}
+                                onClick={toggleAll} />
+                            {memberFieldsAll}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {items}
+                </tbody>
+            </table>
         </div>
     );
 }
