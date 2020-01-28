@@ -209,6 +209,14 @@ export default [
                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log')),
                         type: 'bottom',
                         path: 'protokolo',
+                        paths: [
+                            {
+                                match: /^(\d+)$/,
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log/detail')),
+                                type: 'stack',
+                            },
+                        ],
                     },
                 ],
                 hasPerm: () => true,

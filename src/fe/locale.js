@@ -544,6 +544,7 @@ export const clients = {
 
 export const httpLog = {
     title: 'Protokolo',
+    detailTitle: '[[http request]]',
     search: {
         placeholders: {
             userAgent: 'Serĉi retumilon',
@@ -552,7 +553,7 @@ export const httpLog = {
         filters: {
             codeholders: 'Membroj',
             time: 'Horo',
-            apiKey: 'API',
+            apiKey: '[[API key]]',
             ip: 'IP-adreso',
             origin: 'Fonto',
             method: 'Metodo',

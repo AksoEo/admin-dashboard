@@ -237,5 +237,5 @@ export const views = {
         drop () {
             store.unsubscribe([ADMIN_GROUPS, SIG_LIST], this.#onUpdate);
         }
-    }
+    },
 };

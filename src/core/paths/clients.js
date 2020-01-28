@@ -64,7 +64,7 @@ export const tasks = {
 
     update: async ({ id }, { name, ownerName, ownerEmail }) => {
         const client = await asyncClient;
-        const res = await client.patch(`/clients/${id}`, { name, ownerName, ownerEmail });
+        await client.patch(`/clients/${id}`, { name, ownerName, ownerEmail });
 
         const existing = store.get([CLIENTS, id]);
         store.insert([CLIENTS, id], deepMerge(existing, { name, ownerName, ownerEmail }));

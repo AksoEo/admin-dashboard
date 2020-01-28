@@ -5,7 +5,6 @@ import Page from '../../../../components/page';
 import Meta from '../../../meta';
 import { connect } from '../../../../core/connection';
 import { clients as locale } from '../../../../locale';
-import { coreContext } from '../../../../core/connection';
 
 export default connect(props => ['clients/client', {
     id: props.match[1],

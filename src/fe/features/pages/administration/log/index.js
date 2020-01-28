@@ -113,7 +113,7 @@ export default class APILogListView extends Page {
                     onChange={parameters => this.setState({ parameters })}
                     searchFields={searchableFields}
                     fields={Object.keys(FIELDS)}
-                    // filters={FILTERS}
+                    filters={FILTERS}
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     locale={{

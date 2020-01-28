@@ -1,15 +1,7 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import { Button, TextField } from '@cpsdqs/yamdl';
-import { util } from '@tejo/akso-client';
-import RemoveIcon from '@material-ui/icons/Remove';
-import SuggestionField from '../../../../components/suggestion-field';
-import data from '../../../../components/data';
-import locale from '../../../../locale';
+import { TextField } from '@cpsdqs/yamdl';
 
-// TODO
-const client = {};
-
+/*
 class CodeholderPicker extends PureComponent {
     state = {
         search: '',
@@ -127,10 +119,9 @@ class CodeholderPicker extends PureComponent {
         });
     };
 
-    render ({ value, onChange, filterHeader }) {
+    render ({ value, onChange }) {
         return (
             <div class="codeholder-filter">
-                {filterHeader}
                 <div
                     class="selected-codeholders"
                     onClick={() => this.setState({ dialogOpen: true })}>
@@ -173,6 +164,11 @@ class CodeholderPicker extends PureComponent {
             </div>
         );
     }
+}*/
+
+function CodeholderPicker () {
+    // TODO: this
+    return 'todo: codeholder picker';
 }
 
 const MIN_TIME = new Date('2019-05-21T18:00:00Z');
@@ -200,27 +196,19 @@ function DateTimeEditor ({ value, onChange }) {
 
 export default {
     codeholders: {
-        default: () => [],
-        isNone: value => !value.length,
-        toRequest: value => ({
-            codeholderId: { $in: value },
-        }),
+        default: () => ({ enabled: false, value: [] }),
         serialize: value => value.join(','),
         deserialize: value => value.split(','),
         editor: CodeholderPicker,
     },
     time: {
         needsSwitch: true,
-        default: () => [MIN_TIME, new Date()],
-        toRequest: value => ({
-            time: { $gte: (+value[0] / 1e3) | 0, $lte: (+value[1] / 1e3) | 0 },
-        }),
+        default: () => ({ enabled: false, value: [MIN_TIME, new Date()] }),
         serialize: value => `${value[0].toISOString()}$${value[1].toISOString()}`,
         deserialize: value => value.split('$').map(date => new Date(date)),
-        editor ({ value, onChange, filterHeader }) {
+        editor ({ value, onChange }) {
             return (
                 <div class="time-filter">
-                    {filterHeader}
                     <DateTimeEditor value={value[0]} onChange={v => onChange([v, value[1]])} />
                     <DateTimeEditor value={value[1]} onChange={v => onChange([value[0], v])} />
                 </div>
@@ -228,105 +216,84 @@ export default {
         },
     },
     apiKey: {
-        default: () => '',
-        isNone: value => !value,
-        toRequest: value => ({ apiKey: value }),
+        default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange, filterHeader }) {
+        editor ({ value, onChange }) {
             return (
                 <div class="api-key-filter">
-                    {filterHeader}
                     <TextField value={value} onChange={e => onChange(e.target.value)} />
                 </div>
             );
         },
     },
     ip: {
-        default: () => '',
-        isNone: value => !value,
-        toRequest: value => ({ ip: value }),
+        default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange, filterHeader }) {
+        editor ({ value, onChange }) {
             return (
                 <div class="ip-filter">
-                    {filterHeader}
                     <TextField value={value} onChange={e => onChange(e.target.value)} />
                 </div>
             );
         },
     },
     origin: {
-        default: () => '',
-        isNone: value => !value,
-        toRequest: value => ({ origin: value }),
+        default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange, filterHeader }) {
+        editor ({ value, onChange }) {
             return (
                 <div class="origin-filter">
-                    {filterHeader}
                     <TextField value={value} onChange={e => onChange(e.target.value)} />
                 </div>
             );
         },
     },
     method: {
-        default: () => '',
-        isNone: value => !value,
-        toRequest: value => ({ method: value }),
+        default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange, filterHeader }) {
+        editor ({ value, onChange }) {
             return (
                 <div class="method-filter">
-                    {filterHeader}
                     <TextField value={value} onChange={e => onChange(e.target.value)} />
                 </div>
             );
         },
     },
     path: {
-        default: () => '',
-        isNone: value => !value,
-        toRequest: value => ({ path: value }),
+        default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange, filterHeader }) {
+        editor ({ value, onChange }) {
             return (
                 <div class="path-filter">
-                    {filterHeader}
                     <TextField value={value} onChange={e => onChange(e.target.value)} />
                 </div>
             );
         },
     },
     resStatus: {
-        default: () => '',
-        isNone: value => !value,
-        toRequest: value => ({ resStatus: value }),
+        default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange, filterHeader }) {
+        editor ({ value, onChange }) {
             return (
                 <div class="res-status-filter">
-                    {filterHeader}
                     <TextField value={value} onChange={e => onChange(e.target.value)} />
                 </div>
             );
         },
     },
     resTime: {
-        default: () => '',
-        isNone: value => !value,
-        toRequest: value => ({ resTime: value }),
+        default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange, filterHeader }) {
+        editor ({ value, onChange }) {
             return (
                 <div class="res-time-filter">
-                    {filterHeader}
                     <TextField value={value} onChange={e => onChange(e.target.value)} />
                 </div>
             );

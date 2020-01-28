@@ -28,7 +28,7 @@ export default connect(({ matches }) => {
         task.on('success', () => this.props.pop());
     };
 
-    render ({ group, matches }) {
+    render ({ group }) {
         const edited = this.state.permissions || this.state.memberFields !== undefined;
 
         let permsEditor;

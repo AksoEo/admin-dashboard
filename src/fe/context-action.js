@@ -1,7 +1,5 @@
 import { h, Component } from 'preact';
 import { forwardRef, createContext } from 'preact/compat';
-import { routerContext } from './router';
-import { deepEq } from '../util';
 
 /// The contextual action context (confusingly worded)
 ///

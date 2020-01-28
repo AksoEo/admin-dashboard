@@ -24,7 +24,23 @@ const clientFields = {
 };
 
 const clientFilters = {
-
+    codeholders: {
+        toAPI: value => ({
+            codeholderId: { $in: value },
+        }),
+    },
+    time: {
+        toAPI: ([a, b]) => ({
+            time: { $gte: (+a / 1e3) | 0, $lte: (+b / 1e3) | 0 },
+        }),
+    },
+    apiKey: { toAPI: value => ({ apiKey: value }) },
+    ip: { toAPI: value => ({ ip: value }) },
+    origin: { toAPI: value => ({ origin: value }) },
+    method: { toAPI: value => ({ method: value }) },
+    path: { toAPI: value => ({ path: value }) },
+    resStatus: { toAPI: value => ({ resStatus: value }) },
+    resTime: { toAPI: value => ({ resTime: value }) },
 };
 
 const parametersToRequestData = makeParametersToRequestData({
