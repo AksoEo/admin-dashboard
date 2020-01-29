@@ -2,8 +2,18 @@
 export const spec = [
     {
         type: 'perm',
-        name: 'Ĉiuj',
+        name: 'Ĉio',
         id: '*',
+    },
+    {
+        type: 'perm',
+        name: 'Aliro al admin.akso.org',
+        id: 'admin',
+    },
+    {
+        type: 'perm',
+        name: 'Malŝalti uzadlimon',
+        id: 'ratelimit.disable',
     },
     {
         type: 'category',
@@ -52,19 +62,19 @@ export const spec = [
                 children: [
                     {
                         type: 'perm',
-                        name: '[[codeholders.hist.read]]',
+                        name: 'Legi datumhistorion',
                         id: 'codeholders.hist.read',
                     },
                     {
                         type: 'switch',
-                        name: '[[codeholders.perms]]',
+                        name: 'Membropermesoj',
                         options: [
                             {
                                 name: 'Legi',
                                 id: 'codeholders.perms.read',
                             },
                             {
-                                name: 'Redakti',
+                                name: 'Ŝanĝi',
                                 id: 'codeholders.perms.update',
                                 implies: ['codeholders.perms.read'],
                             },
@@ -72,6 +82,14 @@ export const spec = [
                     },
                 ],
             },
+            {
+                type: 'perm',
+                name: 'Malŝalti duan faktoron',
+                id: 'codeholders.disable_totp',
+            },
+
+
+
             {
                 type: 'group',
                 name: 'Membrecoj',
@@ -84,6 +102,47 @@ export const spec = [
                         impliesFields: {
                             profilePicture: 'r',
                         },
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Administrado',
+        children: [
+            {
+                type: 'perm',
+                name: 'Legi la HTTP-protokolon',
+                id: 'log.read',
+            },
+            {
+                type: 'perm',
+                name: 'Ĝisdatigi landojn',
+                id: 'countries.update',
+            },
+            {
+                type: 'group',
+                name: 'Landaroj',
+                children: [
+                    {
+                        type: 'switch',
+                        options: [
+                            {
+                                name: 'Redakti',
+                                id: 'country_groups.update',
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'country_groups.create',
+                                implies: ['country_groups.update'],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'country_groups.delete',
+                                implies: ['country_groups.create'],
+                            },
+                        ],
                     },
                 ],
             },
