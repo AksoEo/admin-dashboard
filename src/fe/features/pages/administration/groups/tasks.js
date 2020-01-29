@@ -260,4 +260,17 @@ export default {
             </Dialog>
         );
     },
+
+    setPermissions ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.setPermissions}
+                actionLabel={locale.setPermsButton}
+                run={() => task.runOnce()}>
+                todo: summary of changes
+            </TaskDialog>
+        );
+    },
 };

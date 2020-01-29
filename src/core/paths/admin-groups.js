@@ -102,6 +102,14 @@ export const tasks = {
         }));
         return perms;
     },
+    setPermissions: async ({ id }, { permissions }) => {
+        const client = await asyncClient;
+        await client.put(`/admin_groups/${id}/permissions`, permissions);
+        const existing = store.get([ADMIN_GROUPS, id]);
+        store.insert([ADMIN_GROUPS, id], deepMerge(existing, {
+            permissions,
+        }));
+    },
 
     listCodeholders: async ({ group }, { offset, limit }) => {
         const client = await asyncClient;

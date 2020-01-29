@@ -21,9 +21,10 @@ export default connect(({ matches }) => {
 
     #save = () => {
         const { core } = this.props;
-        const task = core.createTask('info', {
-            title: 'TODO',
-            message: 'todo: save',
+        const task = core.createTask('adminGroups/setPermissions', {
+            id: +this.props.matches[this.props.matches.length - 2][1],
+        }, {
+            permissions: this.state.permissions,
         });
         task.on('success', () => this.props.pop());
     };
@@ -32,12 +33,12 @@ export default connect(({ matches }) => {
         const edited = this.state.permissions || this.state.memberFields !== undefined;
 
         let permsEditor;
-        if (group && group.permissions && group.memberRestrictions) {
+        if (group && group.permissions && group.id) {
             permsEditor = (
                 <PermsEditor
                     permissions={this.state.permissions || group.permissions}
                     memberFields={this.state.memberFields === undefined
-                        ? group.memberRestrictions.fields
+                        ? (group.memberRestrictions && group.memberRestrictions.fields)
                         : this.state.memberFields}
                     onChange={permissions => this.setState({ permissions })}
                     onFieldsChange={fields => this.setState({ memberFields: fields })} />

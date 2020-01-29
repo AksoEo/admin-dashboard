@@ -4,6 +4,10 @@ import DisclosureArrow from './disclosure-arrow';
 import { data as locale } from '../locale';
 import './object-viewer.less';
 
+/// Renders a JSON object with collapsibles and stuff à la dev tools.
+///
+/// # Props
+/// - value: the JSON object
 export default function ObjectViewer ({ value }) {
     return <div class="object-viewer"><InnerObjectViewer value={value} /></div>;
 }

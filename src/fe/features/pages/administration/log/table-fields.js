@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import moment from 'moment';
 import locale from '../../../../locale';
-import data from '../../../../components/data';
+import { IdUEACode } from '../../../../components/data/uea-code';
 
 const identityComponent = {
     component: ({ value }) => value ? '' + value : '',
@@ -20,8 +20,8 @@ export default {
     },
     codeholder: {
         sortable: true,
-        component ({ item }) {
-            return <data.ueaCode.inlineRenderer value={item.newCode} />;
+        component ({ value }) {
+            return <IdUEACode id={value} />;
         },
         stringify (value, item) {
             return item.newCode;

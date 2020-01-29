@@ -506,6 +506,9 @@ export const adminGroups = {
     addClients: '[[add clients]]',
 
     nameRequired: '[[name is required]]',
+
+    setPermissions: '[[set permissions]]',
+    setPermsButton: '[[upd8]]',
 };
 
 export const clients = {

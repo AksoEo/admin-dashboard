@@ -1,25 +1,24 @@
 import { h } from 'preact';
 import { Button } from '@cpsdqs/yamdl';
 import FIELDS from './table-fields';
-import data from '../../../../components/data';
+import { IdUEACode } from '../../../../components/data/uea-code';
+import ObjectViewer from '../../../../components/object-viewer';
 import { Link } from '../../../../router';
 import locale from '../../../../locale';
 
 const DETAIL_FIELDS = Object.fromEntries(Object.entries(FIELDS)
-    .map(([id, { component, stringify }]) => ([id, {
-        component ({ value }) {
-            return h(component, { value: value[id], item: value });
-        },
-        hasDiff: () => false,
-        isEmpty: value => !stringify(value[id], value),
+    .map(([id, { component, isEmpty = (x => !x) }]) => ([id, {
+        component,
+        isEmpty,
     }])));
 
-DETAIL_FIELDS.codeholder.component = function Codeholder ({ value }) {
+DETAIL_FIELDS.codeholder.component = function Codeholder ({ item }) {
+    if (!item) return;
     return (
         <div class="request-codeholder">
-            <data.ueaCode.renderer value={value.newCode} />
+            <IdUEACode id={item.codeholder} />
             {' '}
-            <Link target={`/membroj/${value.codeholderId}`}>
+            <Link target={`/membroj/${item.codeholder}`}>
                 <Button>
                     {locale.administration.log.viewCodeholder}
                 </Button>
@@ -29,9 +28,10 @@ DETAIL_FIELDS.codeholder.component = function Codeholder ({ value }) {
 };
 
 DETAIL_FIELDS.query.component = function Query ({ value }) {
+    if (!value) return;
     return (
         <pre class="request-query">
-            {JSON.stringify(value.query, null, 4)}
+            <ObjectViewer value={value} />
         </pre>
     );
 };
