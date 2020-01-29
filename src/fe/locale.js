@@ -30,7 +30,7 @@ export const data = {
     ],
     delete: 'Forigi',
     showMore: 'Montri pliajn',
-    objViewerArrayItems: items => `[[${items} ero${items === 1 ? '' : 'j'}]]`,
+    objViewerArrayItems: items => `${items} ero${items === 1 ? '' : 'j'}`,
 };
 
 export const login = {
@@ -480,15 +480,15 @@ export const codeholders = {
 export const adminGroups = {
     title: 'Administraj grupoj',
     detailTitle: 'Administra grupo',
-    permsTitle: '[[Permesiloj]]',
+    permsTitle: 'Permesoj',
     add: 'Aldoni grupon',
     addButton: 'Aldoni',
     edit: 'Redakti',
     editGroup: 'Redakti grupon',
-    editUpdate: '[[submit]]',
+    editUpdate: 'Konservi',
     delete: 'Forigi grupon',
     deleteButton: 'Forigi',
-    deleteAreYouSure: '[[are you sure itll be gone forever]]',
+    deleteAreYouSure: 'Ĉu vi certas, ke vi volas forigi tiun ĉi administran grupon? Ne eblas malfari tiun ĉi agon.',
     search: {
         placeholders: 'Serĉi nomojn de grupoj',
     },
@@ -497,18 +497,18 @@ export const adminGroups = {
         description: 'Priskribo',
     },
 
-    addCodeholders: '[[add codeholders]]',
-    addCodeholdersCount: n => `[[${n} codeholder${n === 1 ? '' : 's'} selected]]`,
-    removeCodeholders: '[[remove codeholders]]',
-    removeButton: '[[remove]]',
-    removeCodeholdersAreYouSure: n => `[[are you sure you want to remove ${n} codeholder${n === 1 ? '' : 's'}?]]`,
-    addCodeholdersDone: '[[add selected]]',
-    addClients: '[[add clients]]',
+    addCodeholders: 'Aldoni membron',
+    addCodeholdersCount: n => `${n} membro${n === 1 ? '' : 'j'} elektitaj`,
+    removeCodeholders: 'Elpreni membrojn el grupo',
+    removeButton: 'Elpreni',
+    removeCodeholdersAreYouSure: n => `Ĉu vi certas, ke vi volas elpreni ${n} membro${n === 1 ? '' : 'j'}n?`,
+    addCodeholdersDone: 'Aldoni elektitojn',
+    addClients: 'Aldoni API-klientojn',
 
-    nameRequired: '[[name is required]]',
+    nameRequired: 'Necesas nomo',
 
-    setPermissions: '[[set permissions]]',
-    setPermsButton: '[[upd8]]',
+    setPermissions: 'Agordi permesojn',
+    setPermsButton: 'Agordi permesojn',
 };
 
 export const clients = {
@@ -516,38 +516,38 @@ export const clients = {
     detailTitle: 'API-Kliento',
     add: 'Aldoni API-klienton',
     addButton: 'Aldoni',
-    update: '[[upd8 api client]]',
-    updateButton: '[[upd8]]',
+    update: 'Konservi',
+    updateButton: 'Konservi',
     delete: 'Forigi API-klienton',
     deleteButton: 'Forigi',
-    deleteAreYouSure: '[[are you sure itll be gone forever]]',
+    deleteAreYouSure: 'Ĉu vi certas, ke vi volas forigi tiun ĉi API-klienton? Ne eblas malfari tiun ĉi agon.',
     secret: {
-        title: '[[api secret]]',
-        description: '[[this is the api secret save it now or it’ll be lost forever]]',
+        title: 'Sekreta API-ŝlosilo',
+        description: 'Tio ĉi estas la sekreta API-ŝlosilo. Konservu ĝin aŭ ĝi estos perdita.',
     },
     search: {
         placeholders: {
-            name: '[[serĉi nomojn]]',
-            apiKey: '[[search exact api key]]',
-            ownerName: '[[ownername]]',
-            ownerEmail: '[[owneremail]]',
+            name: 'Serĉi laŭ nomo',
+            apiKey: 'Serĉi ekzaktan API-ŝlosilon',
+            ownerName: 'Serĉi laŭ nomo de posedanto',
+            ownerEmail: 'Serĉi laŭ retpoŝtadreso',
         },
     },
     fields: {
         name: 'Nomo',
-        apiKey: '[[apikey]]',
-        ownerName: '[[ownername]]',
-        ownerEmail: '[[superlonglabel4email]]',
+        apiKey: 'API-ŝlosilo',
+        ownerName: 'Nomo de posedanto',
+        ownerEmail: 'Retpoŝtadreso',
     },
 
-    nameRequired: '[[name is required]]',
-    ownerNameRequired: '[[name is required]]',
-    ownerEmailRequired: '[[email is required]]',
+    nameRequired: 'Necesas nomo',
+    ownerNameRequired: 'Necesas nomo de posedanto',
+    ownerEmailRequired: 'Necesas retpoŝtadreso',
 };
 
 export const httpLog = {
     title: 'Protokolo',
-    detailTitle: '[[http request]]',
+    detailTitle: 'HTTP-peto',
     search: {
         placeholders: {
             userAgent: 'Serĉi retumilon',
@@ -556,7 +556,7 @@ export const httpLog = {
         filters: {
             codeholders: 'Membroj',
             time: 'Horo',
-            apiKey: '[[API key]]',
+            apiKey: 'API-ŝlosilo',
             ip: 'IP-adreso',
             origin: 'Fonto',
             method: 'Metodo',
