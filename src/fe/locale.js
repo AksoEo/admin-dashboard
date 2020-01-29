@@ -512,8 +512,8 @@ export const adminGroups = {
 };
 
 export const clients = {
-    title: 'API-Klientoj',
-    detailTitle: 'API-Kliento',
+    title: 'API-klientoj',
+    detailTitle: 'API-kliento',
     add: 'Aldoni API-klienton',
     addButton: 'Aldoni',
     update: 'Konservi',
