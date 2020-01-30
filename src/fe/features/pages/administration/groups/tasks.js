@@ -1,9 +1,11 @@
 import { h, Component } from 'preact';
-import { Dialog, TextField, AppBarProxy, Button, MenuIcon } from '@cpsdqs/yamdl';
+import { TextField, AppBarProxy, Button, MenuIcon } from '@cpsdqs/yamdl';
 import DoneIcon from '@material-ui/icons/Done';
 import { adminGroups as locale } from '../../../../locale';
 import { Validator } from '../../../../components/form';
 import TaskDialog from '../../../../components/task-dialog';
+import { IdUEACode } from '../../../../components/data/uea-code';
+import { apiKey } from '../../../../components/data';
 import { routerContext } from '../../../../router';
 import { ContextualAction } from '../../../../context-action';
 
@@ -148,7 +150,6 @@ export default {
                                 label: locale.addCodeholdersDone,
                                 action: () => {
                                     const groupId = task.options.group;
-                                    task.drop();
 
                                     const queue = [...this.selected];
 
@@ -156,6 +157,7 @@ export default {
                                         if (!queue.length) {
                                             // done
                                             this.context.navigate(`/administrado/grupoj/${groupId}`);
+                                            task.run();
                                             return;
                                         }
                                         const codeholder = queue.shift();
@@ -167,6 +169,103 @@ export default {
                                         }).runOnceAndDrop().catch(err => {
                                             console.error(err); // eslint-disable-line no-console
                                             queue.push(codeholder);
+                                        }).then(() => {
+                                            popQueue();
+                                        });
+                                    };
+                                    popQueue();
+                                },
+                            },
+                        ]} />
+                </div>
+            );
+        }
+    },
+    addClientsBatchTask: class AddClientTask extends Component {
+        static contextType = routerContext;
+
+        selected = new Set();
+
+        constructor (props) {
+            super(props);
+
+            this.contextTask = {
+                lockSidebar: true,
+                action: 'select-clients',
+                selected: {
+                    add: this.#add,
+                    delete: this.#delete,
+                    has: this.#has,
+                },
+            };
+        }
+
+        #add = (item) => {
+            this.selected.add(item);
+            this.contextTask = { ...this.contextTask };
+            this.forceUpdate();
+        };
+        #has = (item) => this.selected.has(item);
+        #delete = (item) => {
+            this.selected.delete(item);
+            this.contextTask = { ...this.contextTask };
+            this.forceUpdate();
+        };
+
+        componentDidMount () {
+            setTimeout(() => {
+                if (this.props.task.dropped) return;
+                this.context.navigate(`/administrado/klientoj`);
+            }, 50);
+        }
+
+        render ({ open, core, task }) {
+            if (!open) return null;
+
+            return (
+                <div class="add-client-task">
+                    <ContextualAction
+                        task={this.contextTask}
+                        onClose={() => task.drop()} />
+                    <AppBarProxy
+                        class="context-action-app-bar"
+                        priority={20}
+                        menu={<Button small icon onClick={() => task.drop()}>
+                            <MenuIcon type="close" />
+                        </Button>}
+                        title={locale.addClients}
+                        actions={[
+                            {
+                                node: (
+                                    <span style={{ verticalAlign: 'middle' }}>
+                                        {locale.addClientsCount(this.selected.size)}
+                                    </span>
+                                ),
+                            },
+                            {
+                                icon: <DoneIcon style={{ verticalAlign: 'middle' }} />,
+                                label: locale.addClientsDone,
+                                action: () => {
+                                    const groupId = task.options.group;
+
+                                    const queue = [...this.selected];
+
+                                    const popQueue = () => {
+                                        if (!queue.length) {
+                                            // done
+                                            this.context.navigate(`/administrado/grupoj/${groupId}`);
+                                            task.run();
+                                            return;
+                                        }
+                                        const client = queue.shift();
+
+                                        core.createTask(`adminGroups/addClient`, {
+                                            group: groupId,
+                                        }, {
+                                            client,
+                                        }).runOnceAndDrop().catch(err => {
+                                            console.error(err); // eslint-disable-line no-console
+                                            queue.push(client);
                                         }).then(() => {
                                             popQueue();
                                         });
@@ -221,6 +320,7 @@ export default {
             </TaskDialog>
         );
     },
+    // TODO: improve these two
     addCodeholder ({ open, task }) {
         return (
             <TaskDialog
@@ -230,34 +330,21 @@ export default {
                 actionLabel={locale.addButton}
                 running={task.running}
                 run={() => task.runOnce()}>
-                <Validator
-                    component={TextField}
-                    label="[[codeholder id]]"
-                    value={task.parameters.codeholder || ''}
-                    onChange={e => task.update({ codeholder: e.target.value })}
-                    validate={id => {
-                        if (!id) throw { error: '[[codeholder id is required]]' };
-                    }} />
+                {task.parameters.codeholder ? <IdUEACode value={task.parameters.codeholder} /> : ''}
             </TaskDialog>
         );
     },
     addClient ({ open, task }) {
         return (
-            <Dialog
+            <TaskDialog
                 open={open}
                 onClose={() => task.drop()}
-                backdrop
-                title="[[add client]]"
-                actions={[
-                    {
-                        label: '[[add]]',
-                        action: () => {
-                            // TODO
-                        },
-                    },
-                ]}>
-                client picker goes here
-            </Dialog>
+                title={locale.addClients}
+                actionLabel={locale.addButton}
+                running={task.running}
+                run={() => task.runOnce()}>
+                {task.parameters.client ? <apiKey.renderer value={task.parameters.client} /> : ''}
+            </TaskDialog>
         );
     },
 

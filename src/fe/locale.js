@@ -504,6 +504,8 @@ export const adminGroups = {
     removeCodeholdersAreYouSure: n => `Ĉu vi certas, ke vi volas elpreni ${n} membro${n === 1 ? '' : 'j'}n?`,
     addCodeholdersDone: 'Aldoni elektitojn',
     addClients: 'Aldoni API-klientojn',
+    addClientsCount: n => `${n} API-kliento${n === 1 ? '' : 'j'} elektitaj`,
+    addClientsDone: 'Aldoni elektitojn',
 
     nameRequired: 'Necesas nomo',
 

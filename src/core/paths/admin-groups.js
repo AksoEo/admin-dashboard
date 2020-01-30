@@ -167,6 +167,8 @@ export const tasks = {
     // dummies for task views
     addCodeholdersBatchTask: async () => {},
     removeCodeholdersBatchTask: async () => {},
+    addClientsBatchTask: async () => {},
+    removeClientsBatchTask: async () => {},
 
     addCodeholder: async ({ group }, { codeholder }) => {
         const client = await asyncClient;

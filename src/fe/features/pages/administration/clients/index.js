@@ -7,6 +7,7 @@ import { email } from '../../../../components/data';
 import Meta from '../../../meta';
 import { clients as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
+import { connectContextualActions } from '../../../../context-action';
 import { apiKey } from '../../../../components/data';
 
 export const FIELDS = {
@@ -32,7 +33,7 @@ export const FIELDS = {
     },
 };
 
-export default class Clients extends Page {
+export default connectContextualActions(class Clients extends Page {
     state = {
         parameters: {
             search: {
@@ -52,13 +53,18 @@ export default class Clients extends Page {
 
     static contextType = coreContext;
 
-    render (_, { parameters }) {
+    render ({ contextualAction }, { parameters }) {
         const actions = [];
         actions.push({
             icon: <AddIcon />,
             label: locale.add,
             action: () => this.context.createTask('clients/create'),
         });
+
+        let selection = null;
+        if (contextualAction.action === 'select-clients') {
+            selection = contextualAction.selected;
+        }
 
         return (
             <div class="clients-page">
@@ -82,6 +88,7 @@ export default class Clients extends Page {
                     task="clients/list"
                     view="clients/client"
                     parameters={parameters}
+                    selection={selection}
                     fields={FIELDS}
                     onGetItemLink={id => `/administrado/klientoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
@@ -90,4 +97,4 @@ export default class Clients extends Page {
             </div>
         );
     }
-}
+});

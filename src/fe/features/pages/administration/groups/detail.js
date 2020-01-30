@@ -58,7 +58,7 @@ export default connect(props => ['adminGroups/group', {
             : <GlobalFilterNotice perms={perms} />;
 
         const addItem = tab === 'clients'
-            ? () => core.createTask('adminGroups/addClient', { group: id })
+            ? () => core.createTask('adminGroups/addClientsBatchTask', { group: id })
             : () => core.createTask('adminGroups/addCodeholdersBatchTask', { group: id });
 
         const updateView = ['adminGroups/group', { id }];
