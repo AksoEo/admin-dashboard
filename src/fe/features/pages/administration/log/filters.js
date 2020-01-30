@@ -206,11 +206,17 @@ export default {
         default: () => ({ enabled: false, value: [MIN_TIME, new Date()] }),
         serialize: value => `${value[0].toISOString()}$${value[1].toISOString()}`,
         deserialize: value => value.split('$').map(date => new Date(date)),
-        editor ({ value, onChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="time-filter">
-                    <DateTimeEditor value={value[0]} onChange={v => onChange([v, value[1]])} />
-                    <DateTimeEditor value={value[1]} onChange={v => onChange([value[0], v])} />
+                    <DateTimeEditor value={value[0]} onChange={v => {
+                        onChange([v, value[1]]);
+                        onEnabledChange(true);
+                    }} />
+                    <DateTimeEditor value={value[1]} onChange={v => {
+                        onChange([value[0], v]);
+                        onEnabledChange(true);
+                    }} />
                 </div>
             );
         },
@@ -219,10 +225,13 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="api-key-filter">
-                    <TextField value={value} onChange={e => onChange(e.target.value)} />
+                    <TextField value={value} onChange={e => {
+                        onChange(e.target.value);
+                        onEnabledChange(!!e.target.value);
+                    }} />
                 </div>
             );
         },
@@ -231,10 +240,13 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="ip-filter">
-                    <TextField value={value} onChange={e => onChange(e.target.value)} />
+                    <TextField value={value} onChange={e => {
+                        onChange(e.target.value);
+                        onEnabledChange(!!e.target.value);
+                    }} />
                 </div>
             );
         },
@@ -243,10 +255,13 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="origin-filter">
-                    <TextField value={value} onChange={e => onChange(e.target.value)} />
+                    <TextField value={value} onChange={e => {
+                        onChange(e.target.value);
+                        onEnabledChange(!!e.target.value);
+                    }} />
                 </div>
             );
         },
@@ -255,10 +270,13 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="method-filter">
-                    <TextField value={value} onChange={e => onChange(e.target.value)} />
+                    <TextField value={value} onChange={e => {
+                        onChange(e.target.value);
+                        onEnabledChange(!!e.target.value);
+                    }} />
                 </div>
             );
         },
@@ -267,10 +285,13 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="path-filter">
-                    <TextField value={value} onChange={e => onChange(e.target.value)} />
+                    <TextField value={value} onChange={e => {
+                        onChange(e.target.value);
+                        onEnabledChange(!!e.target.value);
+                    }} />
                 </div>
             );
         },
@@ -279,10 +300,13 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="res-status-filter">
-                    <TextField value={value} onChange={e => onChange(e.target.value)} />
+                    <TextField value={value} onChange={e => {
+                        onChange(e.target.value);
+                        onEnabledChange(!!e.target.value);
+                    }} />
                 </div>
             );
         },
@@ -291,10 +315,13 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: value => value,
         deserialize: value => value,
-        editor ({ value, onChange }) {
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="res-time-filter">
-                    <TextField value={value} onChange={e => onChange(e.target.value)} />
+                    <TextField value={value} onChange={e => {
+                        onChange(e.target.value);
+                        onEnabledChange(!!e.target.value);
+                    }} />
                 </div>
             );
         },
