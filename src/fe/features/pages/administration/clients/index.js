@@ -62,7 +62,7 @@ export default connectContextualActions(class Clients extends Page {
         });
 
         let selection = null;
-        if (contextualAction.action === 'select-clients') {
+        if (contextualAction && contextualAction.action === 'select-clients') {
             selection = contextualAction.selected;
         }
 
