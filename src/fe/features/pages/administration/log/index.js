@@ -33,8 +33,7 @@ export default class APILogListView extends Page {
             },
             fields: [
                 { id: 'time', sorting: 'desc'},
-                { id: 'codeholder', sorting: 'none' },
-                { id: 'apiKey', sorting: 'none' },
+                { id: 'identity', sorting: 'none' },
                 { id: 'ip', sorting: 'none' },
                 { id: 'method', sorting: 'none' },
                 { id: 'path', sorting: 'none' },

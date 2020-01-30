@@ -4,12 +4,12 @@ import DetailView from '../../../../components/detail';
 import Meta from '../../../meta';
 import FIELDS from './detail-fields';
 import { httpLog as locale } from '../../../../locale';
+import './style';
 
 const availableFields = [
     'id',
     'time',
-    'codeholder',
-    'apiKey',
+    'identity',
     'ip',
     'origin',
     'userAgent',
@@ -34,8 +34,17 @@ export default class HttpLogDetailPage extends Page {
                     id={id}
                     options={{ fields: availableFields }}
                     fields={FIELDS}
+                    header={Header}
                     locale={locale} />
             </div>
         );
     }
+}
+
+function Header ({ item }) {
+    return (
+        <div class="http-log-request-header">
+            <h1>{item.method} {item.path}</h1>
+        </div>
+    );
 }

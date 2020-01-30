@@ -364,20 +364,27 @@ class DynamicHeightDiv extends PureComponent {
     }
 }
 
-function ListHeader ({ fields, selectedFields, locale, selection }) {
-    // FIXME: duplicate code with below
+function lineLayout (fields, selectedFields, selection) {
     const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
     let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
     if (selection) weightSum += 0.5;
     const actualUnit = 100 / weightSum;
     const unit = Math.max(10, actualUnit);
 
+    const totalWidth = Math.round(weightSum * unit);
+
     const style = {
         gridTemplateColumns: fieldWeights.map(x => (x * actualUnit) + '%').join(' '),
-        width: weightSum * unit > 100 ? `${weightSum / unit * 100}%` : null,
+        width: totalWidth > 100 ? `${totalWidth}%` : null,
     };
     if (selection) style.gridTemplateColumns = (actualUnit / 2) + '% ' + style.gridTemplateColumns;
     style.maxWidth = style.width;
+
+    return style;
+}
+
+function ListHeader ({ fields, selectedFields, locale, selection }) {
+    const style = lineLayout(fields, selectedFields, selection);
 
     const cells = selectedFields.map(({ id }) => (
         <div key={id} class="list-header-cell">
@@ -490,24 +497,16 @@ const ListItem = connect(props => ([props.view, {
             );
         }
 
-        const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
-        let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
-        if (selection) weightSum += 0.5;
-        const actualUnit = 100 / weightSum;
-        const unit = Math.max(10, actualUnit);
+        const style = lineLayout(fields, selectedFields, selection);
 
         const constOffset = this.#inTime === 5 ? 0 : 15 * Math.exp(-10 * this.#inTime);
         const spreadFactor = this.#inTime === 5 ? 0 : 4 * Math.exp(-10 * this.#inTime);
         const yOffset = this.#yOffset.value;
 
-        const style = {
-            gridTemplateColumns: fieldWeights.map(x => (x * actualUnit) + '%').join(' '),
-            width: weightSum * unit > 100 ? `${weightSum / unit * 100}%` : null,
+        Object.assign(style, {
             transform: `translateY(${(constOffset + spreadFactor * index) * 10 + yOffset}px)`,
             opacity: Math.max(0, Math.min(1 - spreadFactor * index / 2, 1)),
-        };
-        if (selection) style.gridTemplateColumns = (actualUnit / 2) + '% ' + style.gridTemplateColumns;
-        style.maxWidth = style.width;
+        });
 
         const itemLink = onGetItemLink ? onGetItemLink(id) : null;
         const ItemComponent = onGetItemLink ? LinkButton : 'div';

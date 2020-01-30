@@ -569,8 +569,7 @@ export const httpLog = {
     },
     fields: {
         time: 'Horo',
-        codeholder: 'Membro',
-        apiKey: 'API',
+        identity: '[[ident]]',
         ip: 'IP-adreso',
         origin: 'Fonto',
         userAgent: 'Retumilo',
@@ -582,6 +581,12 @@ export const httpLog = {
         resTime: 'Daŭro',
         resLocation: 'Rezulta loko',
     },
+    query: {
+        some: 'Havas peton',
+        none: '',
+    },
+    viewCodeholder: 'Vidi membron',
+    viewClient: 'Vidi API-klienton',
 };
 
 export const mime = {

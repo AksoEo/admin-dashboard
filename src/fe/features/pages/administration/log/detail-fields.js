@@ -1,10 +1,9 @@
 import { h } from 'preact';
 import { Button } from '@cpsdqs/yamdl';
 import FIELDS from './table-fields';
-import { IdUEACode } from '../../../../components/data/uea-code';
 import ObjectViewer from '../../../../components/object-viewer';
 import { Link } from '../../../../router';
-import locale from '../../../../locale';
+import { httpLog as locale } from '../../../../locale';
 
 const DETAIL_FIELDS = Object.fromEntries(Object.entries(FIELDS)
     .map(([id, { component, isEmpty = (x => !x) }]) => ([id, {
@@ -12,15 +11,24 @@ const DETAIL_FIELDS = Object.fromEntries(Object.entries(FIELDS)
         isEmpty,
     }])));
 
-DETAIL_FIELDS.codeholder.component = function Codeholder ({ item }) {
-    if (!item) return;
+const IdentityComponent = DETAIL_FIELDS.identity.component;
+DETAIL_FIELDS.identity.component = function Identity ({ value }) {
+    if (!value || value.type === 'none') return;
+
+    const linkTarget = value.type === 'codeholder'
+        ? `/membroj/${value.id}`
+        : `/administrado/klientoj/${value.id}`;
+    const linkLabel = value.type === 'codeholder'
+        ? locale.viewCodeholder
+        : locale.viewClient;
+
     return (
-        <div class="request-codeholder">
-            <IdUEACode id={item.codeholder} />
+        <div class="request-identity">
+            <IdentityComponent value={value} />
             {' '}
-            <Link target={`/membroj/${item.codeholder}`}>
+            <Link target={linkTarget}>
                 <Button>
-                    {locale.administration.log.viewCodeholder}
+                    {linkLabel}
                 </Button>
             </Link>
         </div>

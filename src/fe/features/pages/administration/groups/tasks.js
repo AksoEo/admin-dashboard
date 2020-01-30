@@ -330,7 +330,7 @@ export default {
                 actionLabel={locale.addButton}
                 running={task.running}
                 run={() => task.runOnce()}>
-                {task.parameters.codeholder ? <IdUEACode value={task.parameters.codeholder} /> : ''}
+                {task.parameters.codeholder ? <IdUEACode id={task.parameters.codeholder} /> : ''}
             </TaskDialog>
         );
     },

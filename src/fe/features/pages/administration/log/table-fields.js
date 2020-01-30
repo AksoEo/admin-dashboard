@@ -1,7 +1,8 @@
 import { h } from 'preact';
 import moment from 'moment';
-import locale from '../../../../locale';
+import { timestampFormat, httpLog as locale } from '../../../../locale';
 import { IdUEACode } from '../../../../components/data/uea-code';
+import { apiKey } from '../../../../components/data';
 
 const identityComponent = {
     component: ({ value }) => value ? '' + value : '',
@@ -12,26 +13,30 @@ export default {
     time: {
         sortable: true,
         component ({ value }) {
-            return value ? moment(value * 1000).format('YYYY-MM-DDTHH:mm:ssZ') : '';
+            return value ? moment(value * 1000).format(timestampFormat) : '';
         },
         stringify (value) {
-            return value ? moment(value * 1000).format('YYYY-MM-DDTHH:mm:ssZ') : '';
+            return value ? moment(value * 1000).format(timestampFormat) : '';
         },
     },
-    codeholder: {
+    identity: {
         sortable: true,
         component ({ value }) {
-            return <IdUEACode id={value} />;
+            if (value.type === 'codeholder') {
+                return <IdUEACode id={value.id} />;
+            } else if (value.type === 'apiKey') {
+                return <apiKey.renderer value={value.id} />;
+            } else {
+                return null;
+            }
         },
-        stringify (value, item) {
-            return item.newCode;
+        stringify () {
+            // TODO
+            throw new Error('unimplemented: stringify identity');
         },
-    },
-    apiKey: {
-        sortable: true,
-        ...identityComponent,
     },
     ip: {
+        weight: 2,
         sortable: true,
         ...identityComponent,
     },
@@ -42,6 +47,7 @@ export default {
     userAgent: identityComponent,
     userAgentParsed: identityComponent,
     method: {
+        weight: 0.5,
         sortable: true,
         ...identityComponent,
     },
@@ -52,8 +58,8 @@ export default {
     query: {
         component ({ value }) {
             return value
-                ? locale.administration.log.query.some
-                : locale.administration.log.query.none;
+                ? locale.query.some
+                : locale.query.none;
         },
         stringify (value) {
             return JSON.stringify(value);
@@ -65,7 +71,12 @@ export default {
     },
     resTime: {
         sortable: true,
-        ...identityComponent,
+        component ({ value }) {
+            return (+value).toLocaleString('fr-FR') + ' ms';
+        },
+        stringify (value) {
+            return (+value).toLocaleString('fr-FR') + ' ms';
+        },
     },
     resLocation: identityComponent,
 };

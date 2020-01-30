@@ -9,8 +9,24 @@ export const HTTP_LOG = 'httpLog';
 const clientFields = {
     id: 'id',
     time: 'time',
-    codeholder: 'codeholderId',
-    apiKey: 'apiKey',
+    identity: {
+        apiFields: ['codeholderId', 'apiKey'],
+        fromAPI: request => {
+            if (request.codeholderId !== null) {
+                return { type: 'codeholder', id: request.codeholderId };
+            } else if (request.apiKey !== null) {
+                return { type: 'apiKey', id: request.apiKey };
+            } else {
+                return { type: 'none' };
+            }
+        },
+        toAPI: value => {
+            const request = {};
+            if (value && value.type === 'codeholder') request.codeholderId = value.id;
+            else if (value && value.type === 'apiKey') request.apiKey = value.id;
+            return request;
+        },
+    },
     ip: 'ip',
     origin: 'origin',
     userAgent: 'userAgent',
