@@ -64,7 +64,7 @@ export default connect(props => ['adminGroups/group', {
         const updateView = ['adminGroups/group', { id }];
 
         const removeItemsTask = tab === 'clients'
-            ? 'adminGroups/removeClient'
+            ? 'adminGroups/removeClientsBatchTask'
             : 'adminGroups/removeCodeholdersBatchTask';
 
         const selectionSet = tab === 'clients'

@@ -320,6 +320,48 @@ export default {
             </TaskDialog>
         );
     },
+    removeClientsBatchTask ({ open, core, task }) {
+        const items = task.parameters.items || [];
+
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.removeClients}
+                actionLabel={locale.removeButton}
+                run={() => {
+                    const groupId = task.options.group;
+
+                    const queue = [...items];
+
+                    return new Promise(resolve => {
+                        const popQueue = () => {
+                            if (!queue.length) {
+                                // done
+                                resolve();
+                                task.runOnceAndDrop(); // signal success to task caller
+                                return;
+                            }
+                            const client = queue.shift();
+
+                            core.createTask(`adminGroups/removeClient`, {
+                                group: groupId,
+                            }, {
+                                client,
+                            }).runOnceAndDrop().catch(err => {
+                                console.error(err); // eslint-disable-line no-console
+                                queue.push(client);
+                            }).then(() => {
+                                popQueue();
+                            });
+                        };
+                        popQueue();
+                    });
+                }}>
+                {locale.removeClientsAreYouSure(items.length)}
+            </TaskDialog>
+        );
+    },
     // TODO: improve these two
     addCodeholder ({ open, task }) {
         return (

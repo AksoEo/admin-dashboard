@@ -148,6 +148,7 @@ export const tasks = {
         });
 
         for (const item of res.body) {
+            item.id = Buffer.from(item.apiKey).toString('hex');
             const existing = store.get([CLIENTS, item.id]);
             store.insert([CLIENTS, item.id], deepMerge(existing, item));
         }
