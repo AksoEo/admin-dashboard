@@ -6,9 +6,9 @@ import SearchIcon from '@material-ui/icons/Search';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import LanguageIcon from '@material-ui/icons/Language';
 import fuzzaldrin from 'fuzzaldrin';
-import { WithCountries, CountryFlag } from '../../../components/data/country';
-import MulticolList from '../../../components/multicol-list';
-import locale from '../../../locale';
+import { WithCountries, CountryFlag } from './data/country';
+import MulticolList from './multicol-list';
+import locale from '../locale';
 
 const LI_HEIGHT = 48;
 

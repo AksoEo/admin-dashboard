@@ -9,7 +9,7 @@ import moment from 'moment';
 import Segmented from '../../../components/segmented';
 import { connect } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
-import CountryPicker from './country-picker';
+import CountryPicker from '../../../components/country-picker';
 import MulticolList from '../../../components/multicol-list';
 import RangeEditor from '../../../components/range-editor';
 import data from '../../../components/data';

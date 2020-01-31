@@ -1,9 +1,11 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../components/page';
+import { CountryFlag } from '../../../../components/data/country';
+import MulticolList from '../../../../components/multicol-list';
 import DetailView from '../../../../components/detail';
 import Meta from '../../../meta';
-import { coreContext } from '../../../../core/connection';
+import { connect, coreContext } from '../../../../core/connection';
 import { FIELDS } from './fields';
 import { countryGroups as locale, detail as detailLocale } from '../../../../locale';
 import './style';
@@ -67,6 +69,7 @@ export default class CountryGroupPage extends Page {
                     view="countries/group"
                     id={id}
                     fields={FIELDS}
+                    footer={Footer}
                     locale={locale}
                     edit={edit}
                     onEditChange={edit => this.setState({ edit })}
@@ -76,4 +79,36 @@ export default class CountryGroupPage extends Page {
             </div>
         );
     }
+}
+
+const Footer = connect('countries/countries')(countries => ({
+    countries,
+}))(function Footer ({ countries, item }) {
+    if (!countries) return null;
+
+    const countryItems = [];
+
+    for (const code in countries) {
+        const name = countries[code].name_eo;
+
+        countryItems.push({
+            key: code,
+            column: item.countries.includes(code),
+            node: <CountryItem code={code} name={name} />,
+        });
+    }
+
+    return (
+        <MulticolList columns={2} itemHeight={48}>
+            {countryItems}
+        </MulticolList>
+    );
+});
+
+function CountryItem ({ code, name }) {
+    return (
+        <div class="country-item">
+            <CountryFlag code={code} /> {name}
+        </div>
+    );
 }

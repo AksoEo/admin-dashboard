@@ -211,6 +211,33 @@ export const tasks = {
 
         store.signal(COUNTRY_GROUPS_LIST.concat([SIG_LIST]));
     },
+
+    addGroupCountry: async ({ group }, { country }) => {
+        const client = await asyncClient;
+        await client.put(`/country_groups/${group}/countries/${country}`);
+
+        const groupData = store.get(COUNTRY_GROUPS_LIST.concat([group]));
+        if (groupData) {
+            if (!groupData.countries.includes(country)) {
+                groupData.countries.push(country);
+                groupData.countries.sort();
+            }
+            store.insert(COUNTRY_GROUPS_LIST.concat([group]), groupData);
+        }
+    },
+    removeGroupCountry: async ({ group }, { country }) => {
+        const client = await asyncClient;
+        await client.delete(`/country_groups/${group}/countries/${country}`);
+
+        const groupData = store.get(COUNTRY_GROUPS_LIST.concat([group]));
+        if (groupData) {
+            if (groupData.countries.includes(country)) {
+                groupData.countries.splice(groupData.countries.indexOf(country), 1);
+                groupData.countries.sort();
+            }
+            store.insert(COUNTRY_GROUPS_LIST.concat([group]), groupData);
+        }
+    },
 };
 
 export const views = {

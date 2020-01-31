@@ -49,7 +49,7 @@ export default class CountryGroupsPage extends Page {
                 <OverviewList
                     task="countries/listGroups"
                     view="countries/group"
-                    updateView={["countries/sigCountryGroups"]}
+                    updateView={['countries/sigCountryGroups']}
                     parameters={parameters}
                     fields={FIELDS}
                     onGetItemLink={id => `/administrado/landgrupoj/${id}`}
