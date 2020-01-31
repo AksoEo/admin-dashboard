@@ -5,10 +5,10 @@ import DetailView from '../../../../components/detail';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { FIELDS } from './fields';
-import { countries as locale, detail as detailLocale } from '../../../../locale';
+import { countryGroups as locale, detail as detailLocale } from '../../../../locale';
 import './style';
 
-export default class CountryPage extends Page {
+export default class CountryGroupPage extends Page {
     static contextType = coreContext;
 
     state = {
@@ -29,7 +29,7 @@ export default class CountryPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('countries/update', {
+        this.#commitTask = this.context.createTask('countries/updateGroup', {
             id: this.props.match[1],
             _changedFields: changedFields,
         }, this.state.edit);
@@ -49,16 +49,16 @@ export default class CountryPage extends Page {
         actions.push({
             label: detailLocale.edit,
             icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-            action: () => this.props.onNavigate(`/administrado/landoj/${id}/redakti`, true),
+            action: () => this.props.onNavigate(`/administrado/landgrupoj/${id}/redakti`, true),
         });
 
         return (
-            <div class="country-page">
+            <div class="country-group-page">
                 <Meta
                     title={locale.detailTitle}
                     actions={actions} />
                 <DetailView
-                    view="countries/country"
+                    view="countries/group"
                     id={id}
                     fields={FIELDS}
                     locale={locale}

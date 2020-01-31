@@ -9,6 +9,7 @@ import { deepMerge } from '../../util';
 export const COUNTRIES = 'countries';
 export const COUNTRIES_LIST = [COUNTRIES, 'countries'];
 export const COUNTRY_GROUPS_LIST = [COUNTRIES, 'countryGroups'];
+export const COUNTRY_GROUPS_TOTAL = [COUNTRIES, 'countryGroupsCount'];
 export const CACHED_LOCALES = [COUNTRIES, 'cachedLocales'];
 
 /// available localization languages
@@ -36,7 +37,8 @@ async function loadCountries (locale) {
 }
 
 async function loadAllCountryGroups () {
-    if (store.get(COUNTRY_GROUPS_LIST)) return;
+    // check if we already have all of them
+    if (Object.keys(store.get(COUNTRY_GROUPS_LIST) || {}).length >= store.get(COUNTRY_GROUPS_TOTAL)) return;
 
     const client = await asyncClient;
     let total = Infinity;
@@ -61,12 +63,12 @@ async function loadAllCountryGroups () {
         }
     }
 
-    const groups = {};
     for (const item of items) {
-        groups[item.code] = item;
+        const path = COUNTRY_GROUPS_LIST.concat([item.code]);
+        store.insert(path, deepMerge(store.get(path), item));
     }
 
-    store.insert(COUNTRY_GROUPS_LIST, groups);
+    store.insert(COUNTRY_GROUPS_TOTAL, total);
 }
 
 export const tasks = {
@@ -108,6 +110,40 @@ export const tasks = {
         };
     },
 
+    listGroups: async (_, { search, offset, limit }) => {
+        const client = await asyncClient;
+
+        const options = {
+            offset,
+            limit,
+            fields: ['code', 'name'],
+            order: [['code', 'asc']],
+        };
+        if (search && search.query) {
+            const transformedQuery = util.transformSearch(search.query);
+            if (!util.isValidSearch(transformedQuery)) {
+                throw { code: 'invalid-search-query', message: 'invalid search query' };
+            }
+            options.search = { cols: ['name'], str: transformedQuery };
+        }
+
+        const res = await client.get('/country_groups', options);
+
+        for (const item of res.body) {
+            const path = COUNTRY_GROUPS_LIST.concat([item.code]);
+            store.insert(path, deepMerge(store.get(path), item));
+        }
+
+        return {
+            items: res.body.map(item => item.code),
+            total: +res.res.headers.get('x-total-items'),
+            stats: {
+                time: res.resTime,
+                filtered: false,
+            },
+        };
+    },
+
     country: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/countries/${id}`, {
@@ -119,6 +155,17 @@ export const tasks = {
         });
         const item = res.body;
         const path = COUNTRIES_LIST.concat([item.code]);
+        store.insert(path, deepMerge(store.get(path), item));
+        return item;
+    },
+
+    group: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/country_groups/${id}`, {
+            fields: ['code', 'name', 'countries'],
+        });
+        const item = res.body;
+        const path = COUNTRY_GROUPS_LIST.concat([item.code]);
         store.insert(path, deepMerge(store.get(path), item));
         return item;
     },
@@ -151,6 +198,22 @@ export const views = {
         #onUpdate = () => this.emit('update', store.get(COUNTRIES_LIST.concat([this.id])));
         drop () {
             store.unsubscribe(COUNTRIES_LIST.concat([this.id]));
+        }
+    },
+    group: class Group extends AbstractDataView {
+        constructor ({ id, noFetch }) {
+            super();
+            this.id = id;
+            store.subscribe(COUNTRY_GROUPS_LIST.concat([id]), this.#onUpdate);
+            if (store.get(COUNTRY_GROUPS_LIST.concat([id]))) this.#onUpdate();
+
+            if (!noFetch) {
+                tasks.group({ id }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = () => this.emit('update', store.get(COUNTRY_GROUPS_LIST.concat([this.id])));
+        drop () {
+            store.unsubscribe(COUNTRY_GROUPS_LIST.concat([this.id]));
         }
     },
     /// countries/countries: lists all countries

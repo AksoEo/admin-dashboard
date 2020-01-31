@@ -239,6 +239,27 @@ export default [
                             },
                         ],
                     },
+                    {
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups')),
+                        type: 'bottom',
+                        path: 'landgrupoj',
+                        paths: [
+                            {
+                                match: /^(x[a-z0-9]{2})$/i,
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups/detail')),
+                                type: 'stack',
+                                paths: [
+                                    {
+                                        path: 'redakti',
+                                        type: 'state',
+                                        state: 'editing',
+                                    },
+                                ],
+                            },
+                        ],
+                    },
                 ],
                 hasPerm: () => true,
             },

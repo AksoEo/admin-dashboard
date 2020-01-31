@@ -15,6 +15,7 @@ export default class Administration extends Page {
                 <LinkButton target="/administrado/klientoj">(→ klientoj)</LinkButton>
                 <LinkButton target="/administrado/protokolo">(→ protokolo)</LinkButton>
                 <LinkButton target="/administrado/landoj">(→ landoj)</LinkButton>
+                <LinkButton target="/administrado/landgrupoj">(→ landgrupoj)</LinkButton>
             </div>
         );
     }

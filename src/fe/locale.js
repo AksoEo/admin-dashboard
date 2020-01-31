@@ -615,6 +615,17 @@ export const countries = {
         button: '[[upd8]]',
     },
 };
+export const countryGroups = {
+    title: 'Landgrupoj',
+    detailTitle: 'Landgrupo',
+    search: {
+        placeholders: 'Serĉi landgrupojn',
+    },
+    fields: {
+        code: '[[kodo]]',
+        name: '[[nomo]]',
+    },
+};
 
 export const mime = {
     types: {
