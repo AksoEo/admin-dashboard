@@ -113,7 +113,7 @@ export default connect(props => ['adminGroups/group', {
             action: () => core.createTask('adminGroups/update', { id }, { ...item }),
         });
 
-        const permsTarget = `/administrado/grupoj/${id}/permesiloj`;
+        const permsTarget = `/administrado/grupoj/${id}/permesoj`;
 
         return (
             <div class="admin-group-detail-page">

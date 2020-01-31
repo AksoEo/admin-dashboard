@@ -476,6 +476,9 @@ export const codeholders = {
         title: 'Historio de ensalutoj',
         empty: 'Neniuj ensalutoj',
     },
+    perms: {
+        title: 'Permesoj',
+    },
 };
 
 export const adminGroups = {

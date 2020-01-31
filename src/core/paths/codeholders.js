@@ -55,6 +55,7 @@ import { deepMerge, deepEq } from '../../util';
 
 /// Data store path.
 export const CODEHOLDERS = 'codeholders';
+export const CODEHOLDER_PERMS = 'codeholderPerms';
 
 // signals
 export const SIG_MEMBERSHIPS = '!memberships';
@@ -1027,6 +1028,15 @@ export const tasks = {
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };
     },
+
+    codeholderPerms: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/codeholders/${id}/permissions`);
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const existing = store.get([CODEHOLDER_PERMS, storeId]);
+        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { permissions: res.body }));
+        return res.body;
+    },
 };
 
 const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms
@@ -1149,6 +1159,25 @@ export const views = {
             store.unsubscribe([CODEHOLDERS, this.id], this.#onUpdate);
         }
     },
+
+    codeholderPerms: class CodeholderPerms extends AbstractDataView {
+        constructor ({ id, noFetch }) {
+            super();
+            this.id = id === 'self' ? store.get(LOGIN_ID) : id; // resolve id
+            store.subscribe([CODEHOLDER_PERMS, this.id], this.#onUpdate);
+            const current = store.get([CODEHOLDER_PERMS, this.id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!noFetch) {
+                tasks.codeholderPerms({ id }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = () => this.emit('update', store.get([CODEHOLDER_PERMS, this.id]));
+        drop () {
+            store.unsubscribe([CODEHOLDER_PERMS, this.id]);
+        }
+    },
+
     /// codeholders/codeholderSigFiles: observes codeholder files for client-side changes
     ///
     /// # Options

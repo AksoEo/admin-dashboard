@@ -103,6 +103,12 @@ export default [
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/logins')),
                                 type: 'stack',
                             },
+                            {
+                                path: 'permesoj',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/perms')),
+                                type: 'stack',
+                            },
                         ],
                     },
                     {
@@ -181,7 +187,7 @@ export default [
                                 type: 'stack',
                                 paths: [
                                     {
-                                        path: 'permesiloj',
+                                        path: 'permesoj',
                                         component: elazy(() =>
                                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/perms')),
                                         type: 'stack',

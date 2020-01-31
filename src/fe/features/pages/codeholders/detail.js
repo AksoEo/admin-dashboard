@@ -50,6 +50,14 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
 
         const actions = [];
         if (!editing) {
+            if (perms.hasPerm('codeholders.perms.read')) {
+                actions.push({
+                    label: locale.perms.title,
+                    action: () => this.props.onNavigate(`/membroj/${id}/permesoj`),
+                    overflow: true,
+                });
+            }
+
             if (perms.hasPerm('codeholders.update')) {
                 actions.push({
                     label: detailLocale.edit,
