@@ -169,6 +169,7 @@ export const search = {
 export const detail = {
     editing: 'Redakti',
     edit: 'Redakti',
+    delete: 'Forigi',
     cancel: 'Nuligi',
     done: 'Konservi',
     saveTitle: 'Konservado',
@@ -624,6 +625,20 @@ export const countryGroups = {
     fields: {
         code: '[[kodo]]',
         name: '[[nomo]]',
+    },
+    create: {
+        menuItem: '[[create]]',
+        title: '[[create group]]',
+        button: '[[create]]',
+    },
+    update: {
+        title: '[[upd8 dialog title]]',
+        button: '[[upd8]]',
+    },
+    delete: {
+        title: '[[delete group]]',
+        button: '[[delete]]',
+        description: '[[are you sure]]',
     },
 };
 

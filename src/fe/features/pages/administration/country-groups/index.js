@@ -1,13 +1,17 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import Meta from '../../../meta';
 import { countryGroups as locale } from '../../../../locale';
+import { coreContext } from '../../../../core/connection';
 import { FIELDS } from './fields';
 import './style';
 
 export default class CountryGroupsPage extends Page {
+    static contextType = coreContext;
+
     state = {
         parameters: {
             search: {
@@ -23,10 +27,19 @@ export default class CountryGroupsPage extends Page {
     };
 
     render (_, { parameters }) {
+        const actions = [];
+
+        actions.push({
+            icon: <AddIcon />,
+            label: locale.create.menuItem,
+            action: () => this.context.createTask('countries/createGroup'),
+        });
+
         return (
             <div class="country-groups-page">
                 <Meta
-                    title={locale.title} />
+                    title={locale.title}
+                    actions={actions} />
                 <SearchFilters
                     value={parameters}
                     onChange={parameters => this.setState({ parameters })}
@@ -36,6 +49,7 @@ export default class CountryGroupsPage extends Page {
                 <OverviewList
                     task="countries/listGroups"
                     view="countries/group"
+                    updateView={["countries/sigCountryGroups"]}
                     parameters={parameters}
                     fields={FIELDS}
                     onGetItemLink={id => `/administrado/landgrupoj/${id}`}

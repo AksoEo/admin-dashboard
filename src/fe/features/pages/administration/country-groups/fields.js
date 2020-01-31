@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { TextField } from '@cpsdqs/yamdl';
 
 export const FIELDS = {
     code: {
@@ -8,7 +9,14 @@ export const FIELDS = {
         },
     },
     name: {
-        component ({ value }) {
+        component ({ value, onChange, editing }) {
+            if (editing) {
+                return (
+                    <TextField
+                        value={value}
+                        onChange={e => onChange(e.target.value)} />
+                );
+            }
             return <span class="country-group-name">{value}</span>;
         },
     },

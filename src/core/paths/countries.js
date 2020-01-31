@@ -1,5 +1,5 @@
 import { util } from '@tejo/akso-client';
-import { AbstractDataView } from '../view';
+import { AbstractDataView, createStoreObserver } from '../view';
 import * as store from '../store';
 import * as log from '../log';
 import asyncClient from '../client';
@@ -11,6 +11,8 @@ export const COUNTRIES_LIST = [COUNTRIES, 'countries'];
 export const COUNTRY_GROUPS_LIST = [COUNTRIES, 'countryGroups'];
 export const COUNTRY_GROUPS_TOTAL = [COUNTRIES, 'countryGroupsCount'];
 export const CACHED_LOCALES = [COUNTRIES, 'cachedLocales'];
+
+export const SIG_LIST = '!list';
 
 /// available localization languages
 export const COUNTRY_LANGS = [
@@ -181,6 +183,34 @@ export const tasks = {
         const path = COUNTRIES_LIST.concat([id]);
         store.insert(path, deepMerge(store.get(path), data));
     },
+
+    createGroup: async (_, { code, name }) => {
+        const client = await asyncClient;
+
+        const res = await client.post(`/country_groups`, { code, name });
+
+        const path = COUNTRY_GROUPS_LIST.concat([code]);
+        store.insert(path, { code, name });
+
+        store.signal(COUNTRY_GROUPS_LIST.concat([SIG_LIST]));
+    },
+
+    updateGroup: async ({ id }, { name }) => {
+        const client = await asyncClient;
+
+        await client.patch(`/country_groups/${id}`, { name });
+
+        const path = COUNTRY_GROUPS_LIST.concat([id]);
+        store.insert(path, deepMerge(store.get(path), { name }));
+    },
+
+    deleteGroup: async (_, { id }) => {
+        const client = await asyncClient;
+        await client.delete(`/country_groups/${id}`)
+        store.remove(COUNTRY_GROUPS_LIST.concat([id]));
+
+        store.signal(COUNTRY_GROUPS_LIST.concat([SIG_LIST]));
+    },
 };
 
 export const views = {
@@ -256,4 +286,6 @@ export const views = {
             store.unsubscribe(COUNTRY_GROUPS_LIST, this.#onUpdate);
         }
     },
+
+    sigCountryGroups: createStoreObserver(COUNTRY_GROUPS_LIST.concat([SIG_LIST])),
 };

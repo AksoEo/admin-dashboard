@@ -52,6 +52,12 @@ export default class CountryGroupPage extends Page {
             action: () => this.props.onNavigate(`/administrado/landgrupoj/${id}/redakti`, true),
         });
 
+        actions.push({
+            label: detailLocale.delete,
+            action: () => this.context.createTask('countries/deleteGroup', {}, { id }),
+            overflow: true,
+        });
+
         return (
             <div class="country-group-page">
                 <Meta
