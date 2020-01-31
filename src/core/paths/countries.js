@@ -187,7 +187,7 @@ export const tasks = {
     createGroup: async (_, { code, name }) => {
         const client = await asyncClient;
 
-        const res = await client.post(`/country_groups`, { code, name });
+        await client.post(`/country_groups`, { code, name });
 
         const path = COUNTRY_GROUPS_LIST.concat([code]);
         store.insert(path, { code, name });
@@ -206,7 +206,7 @@ export const tasks = {
 
     deleteGroup: async (_, { id }) => {
         const client = await asyncClient;
-        await client.delete(`/country_groups/${id}`)
+        await client.delete(`/country_groups/${id}`);
         store.remove(COUNTRY_GROUPS_LIST.concat([id]));
 
         store.signal(COUNTRY_GROUPS_LIST.concat([SIG_LIST]));
