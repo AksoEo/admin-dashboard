@@ -1,31 +1,11 @@
 import { h } from 'preact';
-import CheckIcon from '@material-ui/icons/Check';
 import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import Meta from '../../../meta';
 import { countries as locale } from '../../../../locale';
+import { FIELDS } from './fields';
 import './style';
-
-const FIELDS = {
-    code: {
-        weight: 0.5,
-        component ({ value }) {
-            return <span class="country-code">{value}</span>;
-        },
-    },
-    enabled: {
-        weight: 0.5,
-        component ({ value }) {
-            return value ? <CheckIcon /> : null;
-        },
-    },
-    name_eo: {
-        component ({ value }) {
-            return <span class="country-name">{value}</span>;
-        },
-    },
-};
 
 export default class CountriesPage extends Page {
     state = {
@@ -39,7 +19,7 @@ export default class CountriesPage extends Page {
                 { id: 'name_eo', sorting: 'none' },
             ],
             offset: 0,
-            limit: 10,
+            limit: 300,
         },
     };
 
@@ -59,9 +39,11 @@ export default class CountriesPage extends Page {
                     view="countries/country"
                     parameters={parameters}
                     fields={FIELDS}
+                    onGetItemLink={id => `/administrado/landoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
-                    locale={locale.fields} />
+                    locale={locale.fields}
+                    limits={[10, 20, 100, 200, 300]} />
             </div>
         );
     }

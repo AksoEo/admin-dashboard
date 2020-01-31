@@ -27,13 +27,11 @@ async function loadCountries (locale) {
         order: [['name_eo', 'asc']],
     });
 
-    const list = store.get(COUNTRIES_LIST) || {};
-
     for (const item of res.body) {
-        list[item.code] = deepMerge(list[item.code], item);
+        const path = COUNTRIES_LIST.concat([item.code]);
+        store.insert(path, deepMerge(store.get(path), item));
     }
 
-    store.insert(COUNTRIES_LIST, list);
     store.insert(CACHED_LOCALES, store.get(CACHED_LOCALES).concat([locale]));
 }
 
@@ -95,13 +93,10 @@ export const tasks = {
 
         const res = await client.get('/countries', options);
 
-        const list = store.get(COUNTRIES_LIST) || {};
-
         for (const item of res.body) {
-            list[item.code] = deepMerge(list[item.code], item);
+            const path = COUNTRIES_LIST.concat([item.code]);
+            store.insert(path, deepMerge(store.get(path), item));
         }
-
-        store.insert(COUNTRIES_LIST, list);
 
         return {
             items: res.body.map(item => item.code),
@@ -112,15 +107,46 @@ export const tasks = {
             },
         };
     },
+
+    country: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/countries/${id}`, {
+            fields: [
+                'code',
+                'enabled',
+                ...COUNTRY_LANGS.map(code => `name_${code}`),
+            ],
+        });
+        const item = res.body;
+        const path = COUNTRIES_LIST.concat([item.code]);
+        store.insert(path, deepMerge(store.get(path), item));
+        return item;
+    },
+
+    update: async ({ id }, data) => {
+        const client = await asyncClient;
+        data = { ...data };
+
+        delete data.code;
+
+        await client.patch(`/countries/${id}`, data);
+
+        const path = COUNTRIES_LIST.concat([id]);
+        store.insert(path, deepMerge(store.get(path), data));
+    },
 };
 
 export const views = {
     country: class Country extends AbstractDataView {
-        constructor ({ id }) {
+        constructor ({ id, noFetch }) {
             super();
             this.id = id;
             store.subscribe(COUNTRIES_LIST.concat([id]), this.#onUpdate);
             if (store.get(COUNTRIES_LIST.concat([id]))) this.#onUpdate();
+
+            if (!noFetch) {
+                tasks.country({ id }).catch(err => this.emit('error', err));
+            }
         }
         #onUpdate = () => this.emit('update', store.get(COUNTRIES_LIST.concat([this.id])));
         drop () {

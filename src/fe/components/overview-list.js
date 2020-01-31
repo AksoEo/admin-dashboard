@@ -14,6 +14,7 @@ import { deepEq } from '../../util';
 import './overview-list.less';
 
 const DEBOUNCE_TIME = 400; // ms
+const DEFAULT_LIMITS = [10, 20, 50, 100];
 
 /// Renders an overview list over the items given by the specified task.
 ///
@@ -34,6 +35,7 @@ const DEBOUNCE_TIME = 400; // ms
 /// - selection: if given will show checkboxes for selection. should have the Set interface, i.e.
 ///   add, delete, has
 /// - updateView: argument list to create a data view that emits updates (if available)
+/// - limits: available limit options. if not given, will use default
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -280,10 +282,9 @@ export default class OverviewList extends PureComponent {
                         <NativeSelect value={parameters.limit} onChange={e => {
                             this.props.onSetLimit(e.target.value | 0);
                         }}>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
+                            {(this.props.limits || DEFAULT_LIMITS).map(limit => (
+                                <option key={limit} value={limit}>{'' + limit}</option>
+                            ))}
                         </NativeSelect>
                         <Button class="page-button" icon onClick={this.onPrevPageClick} disabled={prevDisabled}>
                             <ArrowLeftIcon />

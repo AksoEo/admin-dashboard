@@ -4,6 +4,7 @@ import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
+import ChangedFields from '../../../components/changed-fields';
 import Form, { Validator } from '../../../components/form';
 import data from '../../../components/data';
 import { connect } from '../../../core/connection';
@@ -170,18 +171,7 @@ export default {
                         buttonValidator.current.shake();
                     });
                 }}>
-                    <div class="commit-info">
-                        <span class="changed-fields-title">
-                            {detailLocale.diff}
-                        </span>
-                        <ul class="changed-fields">
-                            {changedFields.map(field => (
-                                <li key={field}>
-                                    {locale.fields[field]}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    <ChangedFields changedFields={changedFields} locale={locale.fields} />
                     <TextField
                         class="update-comment"
                         label={detailLocale.updateComment}

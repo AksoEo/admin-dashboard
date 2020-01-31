@@ -223,6 +223,21 @@ export default [
                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries')),
                         type: 'bottom',
                         path: 'landoj',
+                        paths: [
+                            {
+                                match: /^([a-z]{2})$/i,
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries/detail')),
+                                type: 'stack',
+                                paths: [
+                                    {
+                                        path: 'redakti',
+                                        type: 'state',
+                                        state: 'editing',
+                                    },
+                                ],
+                            },
+                        ],
                     },
                 ],
                 hasPerm: () => true,

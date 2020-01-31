@@ -31,6 +31,7 @@ const taskViews = {
     info: lazyPath(genericTaskViews, res => res.info),
     login: lazyPath(() => import(/* webpackChunkName: "login-tasks" */ './features/login/tasks')),
     clients: lazyPath(() => import(/* webpackChunkName: "clients-tasks" */ './features/pages/administration/clients/tasks')),
+    countries: lazyPath(() => import(/* webpackChunkName: "countries-tasks" */ './features/pages/administration/countries/tasks')),
     codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
     adminGroups: lazyPath(() => import(/* webpackChunkName: "admin-groups-tasks" */ './features/pages/administration/groups/tasks')),
     queries: lazyPath(() => import(/* webpackChunkName: "queries-tasks" */ './features/queries')),

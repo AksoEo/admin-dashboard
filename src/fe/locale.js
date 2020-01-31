@@ -593,13 +593,26 @@ export const httpLog = {
 
 export const countries = {
     title: 'Landoj',
+    detailTitle: 'Lando',
     search: {
         placeholders: 'Serĉi landojn',
     },
     fields: {
         code: '[[kodo]]',
         enabled: '[[ŝaltita]]',
-        name_eo: '[[nomo]]',
+        name_eo: '[[name_eo]]',
+        name_en: '[[name_en]]',
+        name_fr: '[[name_fr]]',
+        name_es: '[[name_es]]',
+        name_nl: '[[name_nl]]',
+        name_pt: '[[name_pt]]',
+        name_sk: '[[name_sk]]',
+        name_zh: '[[name_zh]]',
+        name_de: '[[name_de]]',
+    },
+    update: {
+        title: '[[upd8 dialog title]]',
+        button: '[[upd8]]',
     },
 };
 
