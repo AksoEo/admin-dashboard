@@ -88,7 +88,7 @@ class CountryPickerInnerComponent extends PureComponent {
                         : <LanguageIcon />}
                 </div>
                 <div class="country-name">
-                    {this.props.countries[id] ? this.props.countries[id].eo
+                    {this.props.countries[id] ? this.props.countries[id].name_eo
                         : this.props.countryGroups[id] && this.props.countryGroups[id].name}
                 </div>
                 <div class="country-check">
@@ -127,7 +127,7 @@ class CountryPickerInnerComponent extends PureComponent {
                     column: 1,
                     node: <div class="country-item" onClick={onItemClick(country)}>
                         <div class="country-icon"><CountryFlag country={country} /></div>
-                        <div class="country-name">{this.props.countries[country].eo}</div>
+                        <div class="country-name">{this.props.countries[country].name_eo}</div>
                     </div>,
                 })));
 

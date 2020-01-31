@@ -22,7 +22,7 @@ function BasicAddressRenderer ({ value }) {
     const city = value.city;
     const countryArea = value.countryArea;
     const country = value.country
-        ? <WithCountries>{countries => countries[value.country].eo}</WithCountries>
+        ? <WithCountries>{countries => countries[value.country].name_eo}</WithCountries>
         : null;
 
     const addressPseudolines = [

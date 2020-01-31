@@ -30,7 +30,7 @@ function CountryRenderer ({ value }) {
     if (!value) return null;
     return (
         <WithCountries>{countries => countries[value] ? (
-            <span class="data country"><CountryFlag country={value} /> {countries[value].eo}</span>
+            <span class="data country"><CountryFlag country={value} /> {countries[value].name_eo}</span>
         ) : null}</WithCountries>
     );
 }
@@ -47,7 +47,7 @@ export function CountryEditor ({ value, onChange }) {
                         <option value={''}>—</option>
                         {Object.entries(countries).map(([id, names]) => (
                             <option value={id} key={id}>
-                                {names.eo}
+                                {names.name_eo}
                             </option>
                         ))}
                     </NativeSelect>

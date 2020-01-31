@@ -235,7 +235,7 @@ export default {
                 return (
                     <WithCountries>
                         {countries => {
-                            const name = countries[country].eo;
+                            const name = countries[country].name_eo;
                             return <span><CountryFlag country={country} /> {name}</span>;
                         }}
                     </WithCountries>
@@ -244,8 +244,8 @@ export default {
                 return (
                     <WithCountries>
                         {countries => {
-                            const feeCountryName = countries[feeCountry].eo;
-                            const countryName = countries[addressCountry].eo;
+                            const feeCountryName = countries[feeCountry].name_eo;
+                            const countryName = countries[addressCountry].name_eo;
                             return (
                                 <span>
                                     {locale.members.fields
