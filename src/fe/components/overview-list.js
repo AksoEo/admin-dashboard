@@ -419,7 +419,7 @@ const ListItem = connect(props => ([props.view, {
 
     getSnapshotBeforeUpdate (prevProps) {
         if (prevProps.index !== this.props.index) {
-            return this.#node ? this.#node.button.getBoundingClientRect() : null;
+            return this.#node && this.#node.button ? this.#node.button.getBoundingClientRect() : null;
         }
         return null;
     }

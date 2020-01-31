@@ -218,6 +218,12 @@ export default [
                             },
                         ],
                     },
+                    {
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries')),
+                        type: 'bottom',
+                        path: 'landoj',
+                    },
                 ],
                 hasPerm: () => true,
             },

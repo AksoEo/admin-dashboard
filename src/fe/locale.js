@@ -591,6 +591,18 @@ export const httpLog = {
     viewClient: 'Vidi API-klienton',
 };
 
+export const countries = {
+    title: 'Landoj',
+    search: {
+        placeholders: 'Serĉi landojn',
+    },
+    fields: {
+        code: '[[kodo]]',
+        enabled: '[[ŝaltita]]',
+        name_eo: '[[nomo]]',
+    },
+};
+
 export const mime = {
     types: {
         application: null,

@@ -43,6 +43,7 @@ export const tasks = {
 
     clients: lazyPath(clients, mapTasks),
     codeholders: lazyPath(codeholders, mapTasks),
+    countries: lazyPath(countries, mapTasks),
     adminGroups: lazyPath(adminGroups, mapTasks),
     httpLog: lazyPath(httpLog, mapTasks),
     login: lazyPath(login, mapTasks),

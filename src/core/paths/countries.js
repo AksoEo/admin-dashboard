@@ -1,13 +1,20 @@
+import { util } from '@tejo/akso-client';
 import { AbstractDataView } from '../view';
 import * as store from '../store';
 import * as log from '../log';
 import asyncClient from '../client';
+import { deepMerge } from '../../util';
 
 /// Data store path.
 export const COUNTRIES = 'countries';
 export const COUNTRIES_LIST = [COUNTRIES, 'countries'];
 export const COUNTRY_GROUPS_LIST = [COUNTRIES, 'countryGroups'];
 export const CACHED_LOCALES = [COUNTRIES, 'cachedLocales'];
+
+/// available localization languages
+export const COUNTRY_LANGS = [
+    'eo', 'en', 'fr', 'es', 'nl', 'pt', 'sk', 'zh', 'de',
+];
 
 async function loadCountries (locale) {
     if (!store.get(CACHED_LOCALES)) store.insert(CACHED_LOCALES, []);
@@ -23,7 +30,7 @@ async function loadCountries (locale) {
     const list = store.get(COUNTRIES_LIST) || {};
 
     for (const item of res.body) {
-        list[item.code] = Object.assign(list[item.code] || {}, { [locale]: item[`name_${locale}`] });
+        list[item.code] = deepMerge(list[item.code], item);
     }
 
     store.insert(COUNTRIES_LIST, list);
@@ -64,7 +71,62 @@ async function loadAllCountryGroups () {
     store.insert(COUNTRY_GROUPS_LIST, groups);
 }
 
+export const tasks = {
+    list: async (_, { search, offset, limit }) => {
+        const client = await asyncClient;
+
+        const options = {
+            offset,
+            limit,
+            fields: [
+                'code',
+                'enabled',
+                ...COUNTRY_LANGS.map(code => `name_${code}`),
+            ],
+            order: [['code', 'asc']],
+        };
+        if (search && search.query) {
+            const transformedQuery = util.transformSearch(search.query);
+            if (!util.isValidSearch(transformedQuery)) {
+                throw { code: 'invalid-search-query', message: 'invalid search query' };
+            }
+            options.search = { cols: ['name_eo'], str: transformedQuery };
+        }
+
+        const res = await client.get('/countries', options);
+
+        const list = store.get(COUNTRIES_LIST) || {};
+
+        for (const item of res.body) {
+            list[item.code] = deepMerge(list[item.code], item);
+        }
+
+        store.insert(COUNTRIES_LIST, list);
+
+        return {
+            items: res.body.map(item => item.code),
+            total: +res.res.headers.get('x-total-items'),
+            stats: {
+                time: res.resTime,
+                filtered: false,
+            },
+        };
+    },
+};
+
 export const views = {
+    country: class Country extends AbstractDataView {
+        constructor ({ id }) {
+            super();
+            this.id = id;
+            store.subscribe(COUNTRIES_LIST.concat([id]), this.#onUpdate);
+            if (store.get(COUNTRIES_LIST.concat([id]))) this.#onUpdate();
+        }
+        #onUpdate = () => this.emit('update', store.get(COUNTRIES_LIST.concat([this.id])));
+        drop () {
+            store.unsubscribe(COUNTRIES_LIST.concat([this.id]));
+        }
+    },
     /// countries/countries: lists all countries
     ///
     /// # Options
