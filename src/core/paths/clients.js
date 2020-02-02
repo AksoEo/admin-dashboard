@@ -5,6 +5,7 @@ import * as store from '../store';
 import { deepMerge } from '../../util';
 
 export const CLIENTS = 'clients';
+export const CLIENT_PERMS = 'clientPerms';
 
 export const tasks = {
     list: async (_, { search, offset, limit }) => {
@@ -81,6 +82,21 @@ export const tasks = {
         await client.delete(`/clients/${id}`);
         store.remove([CLIENTS, id]);
     },
+
+    clientPerms: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/clients/${id}/permissions`);
+        const perms = res.body.map(({ permission }) => permission);
+        const existing = store.get([CLIENT_PERMS, id]);
+        store.insert([CLIENT_PERMS, id], deepMerge(existing, { permissions: perms }));
+        return perms;
+    },
+    setPermissions: async ({ id }, { permissions }) => {
+        const client = await asyncClient;
+        await client.put(`/clients/${id}/permissions`, permissions);
+        const existing = store.get([CLIENT_PERMS, id]);
+        store.insert([CLIENT_PERMS, id], deepMerge(existing, { permissions }));
+    },
 };
 
 export const views = {
@@ -108,6 +124,23 @@ export const views = {
 
         drop () {
             store.unsubscribe([CLIENTS, this.id], this.#onUpdate);
+        }
+    },
+    clientPerms: class ClientPerms extends AbstractDataView {
+        constructor ({ id, noFetch }) {
+            super();
+            this.id = id;
+            store.subscribe([CLIENT_PERMS, this.id], this.#onUpdate);
+            const current = store.get([CLIENT_PERMS, this.id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!noFetch) {
+                tasks.clientPerms({ id }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = () => this.emit('update', store.get([CLIENT_PERMS, this.id]));
+        drop () {
+            store.unsubscribe([CLIENT_PERMS, this.id]);
         }
     },
 };

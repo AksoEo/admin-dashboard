@@ -19,6 +19,13 @@ export default connect(props => ['clients/client', {
         const id = match[1];
 
         const actions = [];
+
+        actions.push({
+            label: locale.perms.title,
+            action: () => this.props.onNavigate(`/administrado/klientoj/${id}/permesoj`),
+            overflow: true,
+        });
+
         actions.push({
             label: locale.delete,
             action: () => core.createTask('clients/delete', {}, { id }),

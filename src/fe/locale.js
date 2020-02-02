@@ -553,6 +553,12 @@ export const clients = {
     nameRequired: 'Necesas nomo',
     ownerNameRequired: 'Necesas nomo de posedanto',
     ownerEmailRequired: 'Necesas retpoŝtadreso',
+
+    perms: {
+        title: 'Permesoj',
+        setTitle: '[[update perms]]',
+        setButton: '[[update]]',
+    },
 };
 
 export const httpLog = {

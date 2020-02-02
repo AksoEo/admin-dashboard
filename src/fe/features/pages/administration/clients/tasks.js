@@ -107,4 +107,17 @@ export default {
             </routerContext.Consumer>
         );
     },
+
+    setPermissions ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.perms.setTitle}
+                actionLabel={locale.perms.setButton}
+                run={() => task.runOnce()}>
+                todo: summary of changes
+            </TaskDialog>
+        );
+    },
 };

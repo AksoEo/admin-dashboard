@@ -207,6 +207,14 @@ export default [
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/detail')),
                                 type: 'stack',
+                                paths: [
+                                    {
+                                        path: 'permesoj',
+                                        component: elazy(() =>
+                                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/perms')),
+                                        type: 'stack',
+                                    },
+                                ],
                             },
                         ],
                     },
