@@ -38,7 +38,7 @@ export default class DetailsPage extends Component {
 
     #nopwCheckTimeout;
     #checkHasPassword = () => {
-        if (this.props.mode !== Mode.Normal) return;
+        if (this.props.mode !== Mode.NORMAL) return;
         if (!this.props.login) return;
         clearTimeout(this.#nopwCheckTimeout);
         this.props.core.createTask('login/hasPassword', {}, {
