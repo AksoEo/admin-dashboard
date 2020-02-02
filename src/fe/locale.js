@@ -478,6 +478,8 @@ export const codeholders = {
     },
     perms: {
         title: 'Permesoj',
+        setTitle: '[[update perms]]',
+        setButton: '[[update]]',
     },
 };
 

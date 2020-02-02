@@ -1032,10 +1032,18 @@ export const tasks = {
     codeholderPerms: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/codeholders/${id}/permissions`);
+        const perms = res.body.map(({ permission }) => permission);
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         const existing = store.get([CODEHOLDER_PERMS, storeId]);
-        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { permissions: res.body }));
-        return res.body;
+        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { permissions: perms }));
+        return perms;
+    },
+    setPermissions: async ({ id }, { permissions }) => {
+        const client = await asyncClient;
+        await client.put(`/codeholders/${id}/permissions`, permissions);
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const existing = store.get([CODEHOLDER_PERMS, storeId]);
+        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { permissions }));
     },
 };
 

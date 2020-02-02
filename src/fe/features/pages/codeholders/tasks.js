@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { useRef, useState, useEffect } from 'preact/compat';
 import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
+import TaskDialog from '../../../components/task-dialog';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
@@ -334,6 +335,19 @@ export default {
     }),
     addRole: makeRoleEditor('add'),
     updateRole: makeRoleEditor('update'),
+
+    setPermissions ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.perms.setTitle}
+                actionLabel={locale.perms.setButton}
+                run={() => task.runOnce()}>
+                todo: summary of changes
+            </TaskDialog>
+        );
+    },
 };
 
 function makeRoleEditor (type) {

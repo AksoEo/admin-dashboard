@@ -1,9 +1,9 @@
 import { h } from 'preact';
 import { AppBarProxy, Button, MenuIcon, CircularProgress } from '@cpsdqs/yamdl';
+import PermsEditor from '../administration/perms-editor';
 import DoneIcon from '@material-ui/icons/Done';
 import Meta from '../../meta';
 import Page from '../../../components/page';
-import PermsEditor from '../administration/perms-editor';
 import { codeholders as locale } from '../../../locale';
 import { connect } from '../../../core/connection';
 
