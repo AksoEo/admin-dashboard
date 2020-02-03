@@ -39,7 +39,7 @@ export default {
                         title={groupsLocale.create.title}
                         actionLabel={groupsLocale.create.button}
                         run={() => task.runOnce().then(() => {
-                            routerContext.navigate(`/administrado/landgrupoj/${task.parameters.code}`);
+                            routerContext.navigate(`/administrado/landaroj/${task.parameters.code}`);
                         })}>
                         <TextField
                             label={groupsLocale.fields.code}
@@ -78,7 +78,7 @@ export default {
                         title={groupsLocale.delete.title}
                         actionLabel={groupsLocale.delete.button}
                         run={() => task.runOnce().then(() => {
-                            routerContext.navigate(`/administrado/landgrupoj`);
+                            routerContext.navigate(`/administrado/landaroj`);
                         })}>
                         {groupsLocale.delete.description}
                     </TaskDialog>

@@ -265,7 +265,7 @@ export default [
                         component: elazy(() =>
                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups')),
                         type: 'bottom',
-                        path: 'landgrupoj',
+                        path: 'landaroj',
                         paths: [
                             {
                                 match: /^(x[a-z0-9]{2})$/i,

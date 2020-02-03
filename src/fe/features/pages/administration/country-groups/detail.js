@@ -54,7 +54,7 @@ export default class CountryGroupPage extends Page {
         actions.push({
             label: detailLocale.edit,
             icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-            action: () => this.props.onNavigate(`/administrado/landgrupoj/${id}/redakti`, true),
+            action: () => this.props.onNavigate(`/administrado/landaroj/${id}/redakti`, true),
         });
 
         actions.push({

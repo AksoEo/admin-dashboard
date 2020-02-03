@@ -52,7 +52,7 @@ export default class CountryGroupsPage extends Page {
                     updateView={['countries/sigCountryGroups']}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/administrado/landgrupoj/${id}`}
+                    onGetItemLink={id => `/administrado/landaroj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />

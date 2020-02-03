@@ -628,10 +628,10 @@ export const countries = {
     },
 };
 export const countryGroups = {
-    title: 'Landgrupoj',
-    detailTitle: 'Landgrupo',
+    title: 'Landaroj',
+    detailTitle: 'Landaro',
     search: {
-        placeholders: 'Serĉi landgrupojn',
+        placeholders: 'Serĉi landarojn',
     },
     fields: {
         code: '[[kodo]]',
