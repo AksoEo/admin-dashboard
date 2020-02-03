@@ -167,6 +167,7 @@ export const tasks = {
             fields: ['code', 'name', 'countries'],
         });
         const item = res.body;
+        if (!item.countries) item.countries = []; // TEMP: adjust for server bug
         const path = COUNTRY_GROUPS_LIST.concat([item.code]);
         store.insert(path, deepMerge(store.get(path), item));
         return item;
@@ -216,6 +217,8 @@ export const tasks = {
         const client = await asyncClient;
         await client.put(`/country_groups/${group}/countries/${country}`);
 
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
         const groupData = store.get(COUNTRY_GROUPS_LIST.concat([group]));
         if (groupData) {
             if (!groupData.countries.includes(country)) {
@@ -228,6 +231,8 @@ export const tasks = {
     removeGroupCountry: async ({ group }, { country }) => {
         const client = await asyncClient;
         await client.delete(`/country_groups/${group}/countries/${country}`);
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         const groupData = store.get(COUNTRY_GROUPS_LIST.concat([group]));
         if (groupData) {

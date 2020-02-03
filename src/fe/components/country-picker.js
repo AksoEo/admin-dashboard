@@ -9,6 +9,7 @@ import fuzzaldrin from 'fuzzaldrin';
 import { WithCountries, CountryFlag } from './data/country';
 import MulticolList from './multicol-list';
 import locale from '../locale';
+import './country-picker.less';
 
 const LI_HEIGHT = 48;
 
@@ -29,6 +30,7 @@ export default function CountryPicker (props) {
 ///
 /// # Props
 /// - value/onChange: array of strings
+/// - hideGroups: if false, will hide country groups
 /// - hidden: if true, will disable tab focusing
 class CountryPickerInnerComponent extends PureComponent {
     state = {
@@ -37,6 +39,10 @@ class CountryPickerInnerComponent extends PureComponent {
     };
 
     selectAll = () => {
+        if (this.props.hideGroups) {
+            this.props.onChange(Object.keys(this.props.countries));
+            return;
+        }
         this.props.onChange(Object.keys(this.props.countryGroups)
             .concat(Object.keys(this.props.countries)));
     };
@@ -109,7 +115,7 @@ class CountryPickerInnerComponent extends PureComponent {
         }
         searchResults = searchResults.map(x => x.id);
 
-        const availableItems = Object.keys(this.props.countryGroups)
+        const availableItems = (this.props.hideGroups ? [] : Object.keys(this.props.countryGroups)
             .filter(group => !this.props.value.includes(group))
             .filter(group => searchResults.includes(group))
             .map(group => ({
@@ -119,17 +125,17 @@ class CountryPickerInnerComponent extends PureComponent {
                     <div class="country-icon"><LanguageIcon /></div>
                     <div class="country-name">{this.props.countryGroups[group].name}</div>
                 </div>,
-            })).concat(Object.keys(this.props.countries)
-                .filter(country => !this.props.value.includes(country))
-                .filter(country => searchResults.includes(country))
-                .map(country => ({
-                    key: country,
-                    column: 1,
-                    node: <div class="country-item" onClick={onItemClick(country)}>
-                        <div class="country-icon"><CountryFlag country={country} /></div>
-                        <div class="country-name">{this.props.countries[country].name_eo}</div>
-                    </div>,
-                })));
+            }))).concat(Object.keys(this.props.countries)
+            .filter(country => !this.props.value.includes(country))
+            .filter(country => searchResults.includes(country))
+            .map(country => ({
+                key: country,
+                column: 1,
+                node: <div class="country-item" onClick={onItemClick(country)}>
+                    <div class="country-icon"><CountryFlag country={country} /></div>
+                    <div class="country-name">{this.props.countries[country].name_eo}</div>
+                </div>,
+            })));
 
         return (
             <div

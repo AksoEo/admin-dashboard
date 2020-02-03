@@ -1,5 +1,8 @@
 import { h } from 'preact';
+import { useState } from 'preact/compat';
+import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
+import CheckIcon from '@material-ui/icons/Check';
 import Page from '../../../../components/page';
 import { CountryFlag } from '../../../../components/data/country';
 import MulticolList from '../../../../components/multicol-list';
@@ -83,32 +86,99 @@ export default class CountryGroupPage extends Page {
 
 const Footer = connect('countries/countries')(countries => ({
     countries,
-}))(function Footer ({ countries, item }) {
+}))(function Footer ({ countries, item, editing }) {
     if (!countries) return null;
+
+    const [tentativeMemberships, setTentativeMemberships] = useState({});
 
     const countryItems = [];
 
     for (const code in countries) {
+        const isMember = item.countries.includes(code);
+        if (!editing && !isMember) continue;
+
         const name = countries[code].name_eo;
+
+        const setTentativeMembership = membership => {
+            const tm = { ...tentativeMemberships };
+            if (membership === true || membership === false) {
+                tm[code] = membership;
+            } else {
+                delete tm[code];
+            }
+            setTentativeMemberships(tm);
+        };
+
+        const tentativeMembership = tentativeMemberships[code] || null;
+        const hasTM = tentativeMembership !== null;
+
+        const isGUIMember = hasTM ? tentativeMembership : isMember;
 
         countryItems.push({
             key: code,
-            column: item.countries.includes(code),
-            node: <CountryItem code={code} name={name} />,
+            column: isGUIMember ? 0 : 1,
+            node: <CountryItem
+                group={item.code}
+                code={code}
+                name={name}
+                isMember={isMember}
+                editing={editing}
+                setTentativeMembership={setTentativeMembership} />,
         });
     }
 
     return (
-        <MulticolList columns={2} itemHeight={48}>
+        <MulticolList columns={editing ? 2 : 1} itemHeight={48}>
             {countryItems}
         </MulticolList>
     );
 });
 
-function CountryItem ({ code, name }) {
+function CountryItem ({ group, code, name, editing, isMember, setTentativeMembership }) {
+    const [currentTask, setCurrentTask] = useState(null);
+
     return (
-        <div class="country-item">
-            <CountryFlag code={code} /> {name}
-        </div>
+        <coreContext.Consumer>
+            {core => {
+                const onClick = () => {
+                    if (!editing || currentTask) return;
+                    let task;
+                    if (!isMember) {
+                        task = core.createTask('countries/addGroupCountry', {
+                            group,
+                        }, {
+                            country: code,
+                        });
+                        setTentativeMembership(true);
+                    } else {
+                        task = core.createTask('countries/removeGroupCountry', {
+                            group,
+                        }, {
+                            country: code,
+                        });
+                        setTentativeMembership(false);
+                    }
+                    setCurrentTask(task);
+                    task.runOnceAndDrop().catch(err => {
+                        console.error(err); // eslint-disable-line no-console
+                    }).then(() => {
+                        setTentativeMembership(null);
+                        setCurrentTask(null);
+                    });
+                };
+
+                return (
+                    <Button
+                        class="country-item"
+                        disabled={!!currentTask}
+                        onClick={onClick}>
+                        <CountryFlag code={code} /> {name}
+                        {currentTask
+                            ? <CircularProgress indeterminate />
+                            : isMember ? <CheckIcon style={{ verticalAlign: 'middle' }} /> : null}
+                    </Button>
+                );
+            }}
+        </coreContext.Consumer>
     );
 }
