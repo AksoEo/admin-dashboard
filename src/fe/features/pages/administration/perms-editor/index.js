@@ -19,6 +19,7 @@ import './style';
 /// - permissions: list of granted permissions
 /// - memberFilter: member filter (may be none)
 /// - memberFields: member fields (may be none)
+/// - editable: if false, will not show as editable
 export default class PermsEditor extends Component {
     state = {
         showImplied: null,
@@ -26,10 +27,11 @@ export default class PermsEditor extends Component {
 
     #node = null;
 
-    render ({ permissions, memberFields, onChange, onFieldsChange }) {
+    render ({ permissions, memberFields, onChange, onFieldsChange, editable }) {
         const [permStates, unknown] = read(permissions);
 
         const ctx = {
+            editable,
             states: permStates,
             showImplied: this.state.showImplied && permStates.has(this.state.showImplied)
                 ? permStates.get(this.state.showImplied).impliedBy
@@ -78,6 +80,7 @@ export default class PermsEditor extends Component {
 }
 
 function PermsItem ({ item, ctx }) {
+    const disabled = !ctx.editable;
     if (item.requires) {
         for (const req of item.requires) {
             if (!ctx.states.get(req).active) return null;
@@ -108,6 +111,7 @@ function PermsItem ({ item, ctx }) {
                             <span class="switch-option" key={i}>
                                 <Checkbox
                                     class={className}
+                                    disabled={disabled}
                                     checked={state.active}
                                     onMouseOver={() => ctx.setShowImplied(opt.id)}
                                     onMouseOut={() => ctx.setShowImplied(null)}
@@ -131,6 +135,7 @@ function PermsItem ({ item, ctx }) {
             <div class="perms-item perms-perm">
                 <Checkbox
                     class={className}
+                    disabled={disabled}
                     checked={state.active}
                     onMouseOver={() => ctx.setShowImplied(state.impliedBy)}
                     onMouseOut={() => ctx.setShowImplied(null)}

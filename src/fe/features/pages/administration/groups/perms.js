@@ -6,6 +6,7 @@ import Page from '../../../../components/page';
 import PermsEditor from '../perms-editor';
 import { adminGroups as locale } from '../../../../locale';
 import { connect } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 import './detail.less';
 
 export default connect(({ matches }) => {
@@ -13,7 +14,7 @@ export default connect(({ matches }) => {
         id: +matches[matches.length - 2][1],
         fetchPerms: true,
     }];
-})((data, core) => ({ group: data, core }))(class AdminGroupPermsEditor extends Page {
+})((data, core) => ({ group: data, core }))(connectPerms(class AdminGroupPermsEditor extends Page {
     state = {
         permissions: null,
         memberFields: undefined,
@@ -29,13 +30,14 @@ export default connect(({ matches }) => {
         task.on('success', () => this.props.pop());
     };
 
-    render ({ group }) {
+    render ({ perms, group }) {
         const edited = this.state.permissions || this.state.memberFields !== undefined;
 
         let permsEditor;
         if (group && group.permissions && group.id) {
             permsEditor = (
                 <PermsEditor
+                    editable={perms.hasPerm('admin_groups.update')}
                     permissions={this.state.permissions || group.permissions}
                     memberFields={this.state.memberFields === undefined
                         ? (group.memberRestrictions && group.memberRestrictions.fields)
@@ -69,4 +71,4 @@ export default connect(({ matches }) => {
             </div>
         );
     }
-});
+}));

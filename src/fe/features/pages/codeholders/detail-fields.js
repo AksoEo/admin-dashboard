@@ -304,12 +304,12 @@ const Header = connectPerms(function Header ({
                         onChange={code => onItemChange({ ...item, code })} />
                     {!editing && createHistoryLink('code')}
                 </div>
-                {!editing && <MembershipInDetailView
+                {!editing && perms.hasCodeholderField('membership', 'r') && <MembershipInDetailView
                     id={item.id}
                     canEdit={perms.hasPerm('codeholders.update')} />}
-                {!editing && <RolesInDetailView
+                {!editing && perms.hasPerm('codeholder_roles.read') && <RolesInDetailView
                     id={item.id}
-                    canEdit={perms.hasPerm('codeholders.update')} />}
+                    canEdit={perms.hasPerm('codeholder_roles.update')} />}
             </div>
             <div class="decorative-flourish" />
         </div>

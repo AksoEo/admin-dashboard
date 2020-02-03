@@ -61,6 +61,10 @@ export default connect(props => ['adminGroups/group', {
             ? () => core.createTask('adminGroups/addClientsBatchTask', { group: id })
             : () => core.createTask('adminGroups/addCodeholdersBatchTask', { group: id });
 
+        const canAddItem = perms.hasPerm('admin_groups.update') && (tab === 'clients'
+            ? perms.hasPerm('clients.read')
+            : perms.hasPerm('codeholders.read'));
+
         const updateView = ['adminGroups/group', { id }];
 
         const removeItemsTask = tab === 'clients'
@@ -70,7 +74,7 @@ export default connect(props => ['adminGroups/group', {
         const selectionSet = tab === 'clients'
             ? this.state.clientsSelection
             : this.state.codeholdersSelection;
-        const selection = {
+        const selection = perms.hasPerm('admin_groups.update') ? {
             add: item => {
                 selectionSet.add(item);
                 this.forceUpdate();
@@ -80,7 +84,7 @@ export default connect(props => ['adminGroups/group', {
                 this.forceUpdate();
             },
             has: item => selectionSet.has(item),
-        };
+        } : null;
 
         let deleteButton;
         if (selectionSet.size) {
@@ -101,17 +105,21 @@ export default connect(props => ['adminGroups/group', {
         }
 
         const actions = [];
-        actions.push({
-            overflow: true,
-            label: locale.delete,
-            action: () => core.createTask('adminGroups/delete', {}, { id }),
-        });
+        if (perms.hasPerm('admin_groups.delete')) {
+            actions.push({
+                overflow: true,
+                label: locale.delete,
+                action: () => core.createTask('adminGroups/delete', {}, { id }),
+            });
+        }
 
-        actions.push({
-            icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-            label: locale.edit,
-            action: () => core.createTask('adminGroups/update', { id }, { ...item }),
-        });
+        if (perms.hasPerm('admin_groups.update')) {
+            actions.push({
+                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.edit,
+                action: () => core.createTask('adminGroups/update', { id }, { ...item }),
+            });
+        }
 
         const permsTarget = `/administrado/grupoj/${id}/permesoj`;
 
@@ -126,16 +134,18 @@ export default connect(props => ['adminGroups/group', {
                 </div>
                 <Segmented selected={tab} onSelect={tab => this.setState({ tab })}>
                     {[
-                        { id: 'codeholders', label: '[TMP CH]' },
-                        { id: 'clients', label: '[TMP API]' },
-                    ]}
+                        perms.hasPerm('codeholders.read') && { id: 'codeholders', label: '[TMP CH]' },
+                        perms.hasPerm('clients.read') && { id: 'clients', label: '[TMP API]' },
+                    ].filter(x => x)}
                 </Segmented>
                 <LinkButton target={permsTarget}>
                     [[edit perms]]
                 </LinkButton>
-                <Button onClick={addItem}>
-                    [[add one]]
-                </Button>
+                {canAddItem ? (
+                    <Button onClick={addItem}>
+                        [[add one]]
+                    </Button>
+                ) : null}
                 {deleteButton}
                 <OverviewList
                     task={itemsTask}

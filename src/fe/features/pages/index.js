@@ -84,30 +84,35 @@ export default [
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.MembershipPage),
                                 type: 'stack',
+                                hasPerm: perms => perms.hasCodeholderField('membership', 'r'),
                             },
                             {
                                 path: 'roloj',
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.RolesPage),
                                 type: 'stack',
+                                hasPerm: perms => perms.hasPerm('codeholder_roles.read'),
                             },
                             {
                                 path: 'historio',
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/history')),
                                 type: 'stack',
+                                hasPerm: perms => perms.hasPerm('codeholders.hist.read'),
                             },
                             {
                                 path: 'ensalutoj',
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/logins')),
                                 type: 'stack',
+                                hasPerm: perms => perms.hasCodeholderField('logins', 'r'),
                             },
                             {
                                 path: 'permesoj',
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/perms')),
                                 type: 'stack',
+                                hasPerm: perms => perms.hasPerm('codeholders.perms.read'),
                             },
                         ],
                     },
@@ -179,6 +184,7 @@ export default [
                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups')),
                         type: 'bottom',
                         path: 'grupoj',
+                        hasPerm: perms => perms.hasPerm('admin_groups.read'),
                         paths: [
                             {
                                 match: /^(\d+)$/,
@@ -201,6 +207,7 @@ export default [
                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients')),
                         type: 'bottom',
                         path: 'klientoj',
+                        hasPerm: perms => perms.hasPerm('clients.read'),
                         paths: [
                             {
                                 match: /^([\da-fA-F]+)$/,
@@ -223,6 +230,7 @@ export default [
                             import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log')),
                         type: 'bottom',
                         path: 'protokolo',
+                        hasPerm: perms => perms.hasPerm('log.read'),
                         paths: [
                             {
                                 match: /^(\d+)$/,

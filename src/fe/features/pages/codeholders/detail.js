@@ -57,7 +57,6 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                     overflow: true,
                 });
             }
-
             if (perms.hasPerm('codeholders.update')) {
                 actions.push({
                     label: detailLocale.edit,
@@ -65,11 +64,13 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                     action: () => this.props.onNavigate(`/membroj/${id}/redakti`, true),
                 });
             }
-            actions.push({
-                label: locale.logins.title,
-                action: () => this.props.onNavigate(`/membroj/${id}/ensalutoj`),
-                overflow: true,
-            });
+            if (perms.hasCodeholderField('logins', 'r')) {
+                actions.push({
+                    label: locale.logins.title,
+                    action: () => this.props.onNavigate(`/membroj/${id}/ensalutoj`),
+                    overflow: true,
+                });
+            }
             if (perms.hasPerm('codeholders.delete')) {
                 actions.push({
                     label: locale.delete,

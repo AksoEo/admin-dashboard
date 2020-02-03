@@ -6,6 +6,7 @@ import OverviewList from '../../../../components/overview-list';
 import Meta from '../../../meta';
 import { adminGroups as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 
 const FIELDS = {
     name: {
@@ -20,7 +21,7 @@ const FIELDS = {
     },
 };
 
-export default class AdminGroups extends Page {
+export default connectPerms(class AdminGroups extends Page {
     state = {
         parameters: {
             search: {
@@ -38,13 +39,16 @@ export default class AdminGroups extends Page {
 
     static contextType = coreContext;
 
-    render (_, { parameters }) {
+    render ({ perms }, { parameters }) {
         const actions = [];
-        actions.push({
-            icon: <AddIcon />,
-            label: locale.add,
-            action: () => this.context.createTask('adminGroups/create'),
-        });
+
+        if (perms.hasPerm('admin_groups.create')) {
+            actions.push({
+                icon: <AddIcon />,
+                label: locale.add,
+                action: () => this.context.createTask('adminGroups/create'),
+            });
+        }
 
         return (
             <div class="admin-groups-page">
@@ -70,4 +74,4 @@ export default class AdminGroups extends Page {
             </div>
         );
     }
-}
+});

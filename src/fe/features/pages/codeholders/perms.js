@@ -6,12 +6,13 @@ import Meta from '../../meta';
 import Page from '../../../components/page';
 import { codeholders as locale } from '../../../locale';
 import { connect } from '../../../core/connection';
+import { connectPerms } from '../../../perms';
 
 export default connect(({ matches }) => {
     return ['codeholders/codeholderPerms', {
         id: +matches[matches.length - 2][1],
     }];
-})((data, core) => ({ perms: data, core }))(class CodeholderPermsEditor extends Page {
+})((data, core) => ({ codeholderPerms: data, core }))(connectPerms(class CodeholderPermsEditor extends Page {
     state = {
         permissions: null,
         memberFields: undefined,
@@ -27,16 +28,18 @@ export default connect(({ matches }) => {
         task.on('success', () => this.props.pop());
     };
 
-    render ({ perms }) {
+    render ({ perms, codeholderPerms }) {
         const edited = this.state.permissions || this.state.memberFields !== undefined;
+        const editable = perms.hasPerm('codeholders.perms.update');
 
         let permsEditor;
-        if (perms && perms.permissions) {
+        if (codeholderPerms && codeholderPerms.permissions) {
             permsEditor = (
                 <PermsEditor
-                    permissions={this.state.permissions || perms.permissions}
+                    editable={editable}
+                    permissions={this.state.permissions || codeholderPerms.permissions}
                     memberFields={this.state.memberFields === undefined
-                        ? (perms.memberRestrictions && perms.memberRestrictions.fields)
+                        ? (codeholderPerms.memberRestrictions && codeholderPerms.memberRestrictions.fields)
                         : this.state.memberFields}
                     onChange={permissions => this.setState({ permissions })}
                     onFieldsChange={fields => this.setState({ memberFields: fields })} />
@@ -67,4 +70,4 @@ export default connect(({ matches }) => {
             </div>
         );
     }
-});
+}));
