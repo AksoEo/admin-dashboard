@@ -1045,6 +1045,42 @@ export const tasks = {
         const existing = store.get([CODEHOLDER_PERMS, storeId]);
         store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { permissions }));
     },
+    memberRestrictions: async ({ id }) => {
+        const client = await asyncClient;
+        let memberRestrictions;
+        try {
+            const res = await client.get(`/codeholders/${id}/member_restrictions`, {
+                fields: ['filter', 'fields'],
+            });
+            memberRestrictions = res.body;
+        } catch (err) {
+            if (err.statusCode === 404) {
+                memberRestrictions = null;
+            } else {
+                throw err;
+            }
+        }
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const existing = store.get([CODEHOLDER_PERMS, storeId]);
+        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions }));
+        return memberRestrictions;
+    },
+    setMemberRestrictions: async ({ id }, { enabled, filter, fields }) => {
+        const client = await asyncClient;
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        if (enabled) {
+            await client.put(`/codeholders/${id}/member_restrictions`, {
+                filter,
+                fields,
+            });
+            const existing = store.get([CODEHOLDER_PERMS, storeId]);
+            store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions: { filter, fields } }));
+        } else {
+            await client.delete(`/codeholders/${id}/member_restrictions`);
+            const existing = store.get([CODEHOLDER_PERMS, storeId]);
+            store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions: null }));
+        }
+    },
 };
 
 const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms
@@ -1178,6 +1214,7 @@ export const views = {
 
             if (!noFetch) {
                 tasks.codeholderPerms({ id }).catch(err => this.emit('error', err));
+                tasks.memberRestrictions({ id }).catch(err => this.emit('error', err));
             }
         }
         #onUpdate = () => this.emit('update', store.get([CODEHOLDER_PERMS, this.id]));

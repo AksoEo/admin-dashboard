@@ -7,6 +7,7 @@ import {
     memberFieldsRead,
     memberFieldsWrite,
 } from '../../../../permissions';
+import JSONFilterEditor from '../../../../components/json-filter-editor';
 import { read, add, remove, hasField, addField, removeField } from './solver';
 import './style';
 
@@ -27,7 +28,17 @@ export default class PermsEditor extends Component {
 
     #node = null;
 
-    render ({ permissions, memberFields, onChange, onFieldsChange, editable }) {
+    render ({
+        permissions,
+        memberFields,
+        memberFilter,
+        memberRestrictionsEnabled,
+        onChange,
+        onFieldsChange,
+        onFilterChange,
+        onMemberRestrictionsEnabledChange,
+        editable,
+    }) {
         const [permStates, unknown] = read(permissions);
 
         const ctx = {
@@ -64,6 +75,10 @@ export default class PermsEditor extends Component {
                 if (memberFields === null) onFieldsChange({});
                 else onFieldsChange(null);
             },
+            memberFilter,
+            setMemberFilter: onFilterChange,
+            memberRestrictionsEnabled,
+            setMemberRestrictionsEnabled: onMemberRestrictionsEnabledChange,
         };
 
         const unknownPerms = unknown.map(perm => (
@@ -143,7 +158,19 @@ function PermsItem ({ item, ctx }) {
                 {item.name}
             </div>
         );
+    } else if (item.type === '!memberRestrictionsSwitch') {
+        return (
+            <div class="perms-item perms-perm">
+                <Checkbox
+                    class="perm-checkbox"
+                    disabled={disabled}
+                    checked={ctx.memberRestrictionsEnabled}
+                    onClick={() => ctx.setMemberRestrictionsEnabled(!ctx.memberRestrictionsEnabled)} />
+                {item.name}
+            </div>
+        );
     } else if (item === '!memberFieldsEditor') {
+        if (!ctx.memberRestrictionsEnabled) return null;
         return (
             <MemberFieldsEditor
                 fields={ctx.memberFields}
@@ -151,7 +178,13 @@ function PermsItem ({ item, ctx }) {
                 toggleAll={ctx.toggleAllFields} />
         );
     } else if (item === '!memberFilterEditor') {
-        return 'member filter editor goes here';
+        if (!ctx.memberRestrictionsEnabled || !ctx.setMemberFilter) return null;
+        const defaultValue = { filter: {} };
+        return (
+            <MemberFilterEditor
+                filter={ctx.memberFilter || defaultValue}
+                onFilterChange={ctx.setMemberFilter} />
+        );
     }
     return 'unknown perms spec type ' + item.type;
 }
@@ -207,6 +240,16 @@ function MemberFieldsEditor ({ fields, toggleField, toggleAll }) {
                     {items}
                 </tbody>
             </table>
+        </div>
+    );
+}
+
+function MemberFilterEditor ({ filter, onFilterChange }) {
+    return (
+        <div class="member-filter-editor">
+            <JSONFilterEditor
+                value={filter}
+                onChange={onFilterChange} />
         </div>
     );
 }

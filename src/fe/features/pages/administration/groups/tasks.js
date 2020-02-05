@@ -48,21 +48,26 @@ export default {
                 onClose={() => task.drop()}
                 title={locale.editGroup}
                 actionLabel={locale.editUpdate}
+                running={task.running}
                 run={() => task.runOnce()}>
-                <Validator
-                    component={TextField}
-                    label={locale.fields.name}
-                    value={task.parameters.name || ''}
-                    onChange={e => task.update({ name: e.target.value })}
-                    validate={name => {
-                        if (!name) throw { error: locale.nameRequired };
-                    }} />
-                <Validator
-                    component={TextField}
-                    label={locale.fields.description}
-                    value={task.parameters.description || ''}
-                    onChange={e => task.update({ description: e.target.value })}
-                    validate={() => {}} />
+                {!task._noEditors ? (
+                    <Validator
+                        component={TextField}
+                        label={locale.fields.name}
+                        value={task.parameters.name || ''}
+                        onChange={e => task.update({ name: e.target.value })}
+                        validate={name => {
+                            if (!name) throw { error: locale.nameRequired };
+                        }} />
+                ) : null}
+                {!task._noEditors ? (
+                    <Validator
+                        component={TextField}
+                        label={locale.fields.description}
+                        value={task.parameters.description || ''}
+                        onChange={e => task.update({ description: e.target.value })}
+                        validate={() => {}} />
+                ) : null}
             </TaskDialog>
         );
     },

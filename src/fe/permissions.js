@@ -54,6 +54,7 @@ export const spec = [
                 type: 'group',
                 requires: ['codeholders.read'],
                 children: [
+                    { type: '!memberRestrictionsSwitch', name: '[[member restrictions]]' },
                     '!memberFieldsEditor',
                     '!memberFilterEditor',
                 ],
@@ -261,7 +262,7 @@ function buildReverseMap (spec, mapping, path = []) {
         }
     } else if (spec.type === 'perm') {
         mapping[spec.id] = { path, type: 'perm-node', node: spec };
-    } else if (typeof spec === 'string') {
+    } else if (typeof spec === 'string' || spec.type.startsWith('!')) {
         // nope
     } else {
         throw new Error('unknown spec type ' + spec.type);

@@ -263,7 +263,11 @@ export function removeField (permissions, memberFields, field, perm) {
         flags.delete(perm);
         if (perm.includes('r')) flags.delete('w');
 
-        for (const f of item.fields) memberFields[f] = [...flags].join('');
+        if (flags.size) {
+            for (const f of item.fields) memberFields[f] = [...flags].join('');
+        } else {
+            for (const f of item.fields) delete memberFields[f];
+        }
 
         const removedPerms = new Set();
         if (perm.includes('r')) removedPerms.add('r');

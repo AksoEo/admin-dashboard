@@ -97,6 +97,40 @@ export const tasks = {
         const existing = store.get([CLIENT_PERMS, id]);
         store.insert([CLIENT_PERMS, id], deepMerge(existing, { permissions }));
     },
+    memberRestrictions: async ({ id }) => {
+        const client = await asyncClient;
+        let memberRestrictions;
+        try {
+            const res = await client.get(`/clients/${id}/member_restrictions`, {
+                fields: ['filter', 'fields'],
+            });
+            memberRestrictions = res.body;
+        } catch (err) {
+            if (err.statusCode === 404) {
+                memberRestrictions = null;
+            } else {
+                throw err;
+            }
+        }
+        const existing = store.get([CLIENT_PERMS, id]);
+        store.insert([CLIENT_PERMS, id], deepMerge(existing, { memberRestrictions }));
+        return memberRestrictions;
+    },
+    setMemberRestrictions: async ({ id }, { enabled, filter, fields }) => {
+        const client = await asyncClient;
+        if (enabled) {
+            await client.put(`/clients/${id}/member_restrictions`, {
+                filter,
+                fields,
+            });
+            const existing = store.get([CLIENT_PERMS, id]);
+            store.insert([CLIENT_PERMS, id], deepMerge(existing, { memberRestrictions: { filter, fields } }));
+        } else {
+            await client.delete(`/clients/${id}/member_restrictions`);
+            const existing = store.get([CLIENT_PERMS, id]);
+            store.insert([CLIENT_PERMS, id], deepMerge(existing, { memberRestrictions: null }));
+        }
+    },
 };
 
 export const views = {
@@ -136,6 +170,7 @@ export const views = {
 
             if (!noFetch) {
                 tasks.clientPerms({ id }).catch(err => this.emit('error', err));
+                tasks.memberRestrictions({ id }).catch(err => this.emit('error', err));
             }
         }
         #onUpdate = () => this.emit('update', store.get([CLIENT_PERMS, this.id]));
