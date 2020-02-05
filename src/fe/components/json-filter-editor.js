@@ -53,6 +53,7 @@ CodeMirror.defineMode('akso-json-template', () => ({
 /// - value/onChange: object value
 /// - expanded: bool
 /// - onCollapse: callback
+/// - disabled: disabled state
 export default class JSONFilterEditor extends PureComponent {
     state = {
         helpOpen: false,
@@ -181,7 +182,7 @@ export default class JSONFilterEditor extends PureComponent {
     };
 
     render () {
-        const { value } = this.props;
+        const { value, disabled } = this.props;
         const cmSource = this.toCMSource(value);
 
         return (
@@ -203,6 +204,7 @@ export default class JSONFilterEditor extends PureComponent {
                         indentWithTabs: true,
                         indentUnit: 4,
                         matchBrackets: true,
+                        readOnly: disabled,
                         // autoCloseBrackets: true, // glitchy for some reason
                     }}
                     editorDidMount={this.onEditorMount}

@@ -24,6 +24,8 @@ import './style';
 export default class PermsEditor extends Component {
     state = {
         showImplied: null,
+        // if true, will show raw perm ids
+        showRaw: false,
     };
 
     #node = null;
@@ -38,10 +40,11 @@ export default class PermsEditor extends Component {
         onFilterChange,
         onMemberRestrictionsEnabledChange,
         editable,
-    }) {
+    }, { showRaw }) {
         const [permStates, unknown] = read(permissions);
 
         const ctx = {
+            showRaw,
             editable,
             states: permStates,
             showImplied: this.state.showImplied && permStates.has(this.state.showImplied)
@@ -87,6 +90,10 @@ export default class PermsEditor extends Component {
 
         return (
             <div class="perms-editor" ref={node => this.#node = node}>
+                <div>
+                    <Checkbox checked={showRaw} onChange={showRaw => this.setState({ showRaw })} />
+                    don’t mind this thing this is temporary for debugging
+                </div>
                 {spec.map((x, i) => <PermsItem item={x} key={i} ctx={ctx} />)}
                 {unknownPerms}
             </div>
@@ -131,7 +138,9 @@ function PermsItem ({ item, ctx }) {
                                     onMouseOver={() => ctx.setShowImplied(opt.id)}
                                     onMouseOut={() => ctx.setShowImplied(null)}
                                     onClick={() => ctx.togglePerm(opt.id)} />
-                                <span class="switch-option-label">{opt.name}</span>
+                                <span class="switch-option-label">
+                                    {ctx.showRaw ? opt.id : opt.name}
+                                </span>
                             </span>
                         );
                     })}
@@ -155,7 +164,7 @@ function PermsItem ({ item, ctx }) {
                     onMouseOver={() => ctx.setShowImplied(state.impliedBy)}
                     onMouseOut={() => ctx.setShowImplied(null)}
                     onClick={() => ctx.togglePerm(item.id)} />
-                {item.name}
+                {ctx.showRaw ? item.id : item.name}
             </div>
         );
     } else if (item.type === '!memberRestrictionsSwitch') {
@@ -173,6 +182,7 @@ function PermsItem ({ item, ctx }) {
         if (!ctx.memberRestrictionsEnabled) return null;
         return (
             <MemberFieldsEditor
+                disabled={disabled}
                 fields={ctx.memberFields}
                 toggleField={ctx.toggleField}
                 toggleAll={ctx.toggleAllFields} />
@@ -182,6 +192,7 @@ function PermsItem ({ item, ctx }) {
         const defaultValue = { filter: {} };
         return (
             <MemberFilterEditor
+                disabled={disabled}
                 filter={ctx.memberFilter || defaultValue}
                 onFilterChange={ctx.setMemberFilter} />
         );
@@ -189,7 +200,7 @@ function PermsItem ({ item, ctx }) {
     return 'unknown perms spec type ' + item.type;
 }
 
-function MemberFieldsEditor ({ fields, toggleField, toggleAll }) {
+function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
     const items = [];
     if (fields !== null) {
         for (const field in fieldsSpec) {
@@ -207,12 +218,14 @@ function MemberFieldsEditor ({ fields, toggleField, toggleAll }) {
                     <td class="field-perms">
                         <Checkbox
                             class={'perm-checkbox' + (canRead && canWrite ? ' is-implied-active' : '')}
+                            disabled={disabled}
                             checked={canRead}
                             onClick={() => toggleField(field, 'r')} />
                         {memberFieldsRead}
                         {' \u00a0 \u00a0'}
                         <Checkbox
                             class="perm-checkbox"
+                            disabled={disabled}
                             checked={canWrite}
                             onClick={() => toggleField(field, 'w')} />
                         {memberFieldsWrite}
@@ -230,6 +243,7 @@ function MemberFieldsEditor ({ fields, toggleField, toggleAll }) {
                         <th>
                             <Checkbox
                                 class="perm-checkbox"
+                                disabled={disabled}
                                 checked={fields === null}
                                 onClick={toggleAll} />
                             {memberFieldsAll}
@@ -244,10 +258,11 @@ function MemberFieldsEditor ({ fields, toggleField, toggleAll }) {
     );
 }
 
-function MemberFilterEditor ({ filter, onFilterChange }) {
+function MemberFilterEditor ({ disabled, filter, onFilterChange }) {
     return (
         <div class="member-filter-editor">
             <JSONFilterEditor
+                disabled={disabled}
                 value={filter}
                 onChange={onFilterChange} />
         </div>

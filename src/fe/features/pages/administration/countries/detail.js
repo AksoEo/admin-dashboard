@@ -6,9 +6,10 @@ import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { FIELDS } from './fields';
 import { countries as locale, detail as detailLocale } from '../../../../locale';
+import { connectPerms } from '../../../../perms';
 import './style';
 
-export default class CountryPage extends Page {
+export default connectPerms(class CountryPage extends Page {
     static contextType = coreContext;
 
     state = {
@@ -41,16 +42,18 @@ export default class CountryPage extends Page {
         if (this.#commitTask) this.#commitTask.drop();
     }
 
-    render ({ match, editing }, { edit }) {
+    render ({ perms, match, editing }, { edit }) {
         const id = match[1];
 
         const actions = [];
 
-        actions.push({
-            label: detailLocale.edit,
-            icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-            action: () => this.props.onNavigate(`/administrado/landoj/${id}/redakti`, true),
-        });
+        if (perms.hasPerm('countries.update')) {
+            actions.push({
+                label: detailLocale.edit,
+                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                action: () => this.props.onNavigate(`/administrado/landoj/${id}/redakti`, true),
+            });
+        }
 
         return (
             <div class="country-page">
@@ -70,4 +73,4 @@ export default class CountryPage extends Page {
             </div>
         );
     }
-}
+});

@@ -31,7 +31,7 @@ export default connect(({ matches }) => {
         }, {
             permissions: this.state.permissions,
         });
-        task.on('success', () => this.#saveMemberRestrictions);
+        task.on('success', this.#saveMemberRestrictions);
     };
     #saveMemberRestrictions = () => {
         const { core } = this.props;

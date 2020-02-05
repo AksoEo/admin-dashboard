@@ -1076,7 +1076,15 @@ export const tasks = {
             const existing = store.get([CODEHOLDER_PERMS, storeId]);
             store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions: { filter, fields } }));
         } else {
-            await client.delete(`/codeholders/${id}/member_restrictions`);
+            try {
+                await client.delete(`/codeholders/${id}/member_restrictions`);
+            } catch (err) {
+                if (err.statusCode === 404) {
+                    // not found; means there weren’t any in the first place
+                } else {
+                    throw err;
+                }
+            }
             const existing = store.get([CODEHOLDER_PERMS, storeId]);
             store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions: null }));
         }
@@ -1123,7 +1131,7 @@ function fetchCodeholderForView (id, fields) {
         // we can only request 100 at once; flush now
         flushCodeholders();
     }
-    codeholderBatchIds.add(id);
+    codeholderBatchIds.add(+id);
     for (const field of fields) codeholderBatchFields.add(field);
     if (!flushCodeholdersTimeout) {
         flushCodeholdersTimeout = setTimeout(flushCodeholders, CODEHOLDER_FETCH_BATCH_TIME);

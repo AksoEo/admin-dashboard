@@ -348,6 +348,19 @@ export default {
             </TaskDialog>
         );
     },
+    setMemberRestrictions ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.perms.setRestrictions}
+                actionLabel={locale.perms.setRestrictionsButton}
+                running={task.running}
+                run={() => task.runOnce()}>
+                todo: some view
+            </TaskDialog>
+        );
+    },
 };
 
 function makeRoleEditor (type) {

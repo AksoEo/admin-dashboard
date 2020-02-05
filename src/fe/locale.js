@@ -480,6 +480,8 @@ export const codeholders = {
         title: 'Permesoj',
         setTitle: '[[update perms]]',
         setButton: '[[update]]',
+        setRestrictions: '[[update restrictions]]',
+        setRestrictionsButton: '[[update]]',
     },
 };
 

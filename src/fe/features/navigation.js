@@ -135,10 +135,11 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                         pathParts.unshift(item.path);
                     }
                     pathParts.push(part);
+                    const isForbidden = !perms._isDummy && subpage.hasPerm && !subpage.hasPerm(perms);
                     const item = {
                         path: pathParts.join('/'),
                         source: subpage,
-                        component: subpage.component,
+                        component: isForbidden ? ForbiddenPage : subpage.component,
                         pathMatch: match,
                         query: '',
                         state: {},
@@ -146,10 +147,11 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                     stack.push(item);
                     viewStack.push(item);
                 } else if (subpage.type === 'stack') {
+                    const isForbidden = !perms._isDummy && subpage.hasPerm && !subpage.hasPerm(perms);
                     const item = {
                         path: part,
                         source: subpage,
-                        component: subpage.component,
+                        component: isForbidden ? ForbiddenPage : subpage.component,
                         pathMatch: match,
                         query: '',
                         state: {},

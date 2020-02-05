@@ -8,6 +8,7 @@ import SearchInput from './search-input';
 import Segmented from './segmented';
 import DisclosureArrow from './disclosure-arrow';
 import { search as locale } from '../locale';
+import { connectPerms } from '../perms';
 import { coreContext } from '../core/connection';
 import JSONFilterEditor from './json-filter-editor';
 import './search-filters.less';
@@ -185,12 +186,13 @@ function FiltersDisclosure ({ expanded, onExpandedChange }) {
 }
 
 /// Renders the json/normal switch and saved filters stuff
-function FiltersBar ({
+const FiltersBar = connectPerms(function FiltersBar ({
     category,
     filtersToAPITask,
     value,
     onChange,
     hidden,
+    perms,
 }) {
     const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -225,6 +227,9 @@ function FiltersBar ({
         );
     }
 
+    const canReadFilters = perms.hasPerm('queries.read');
+    const canSaveFilters = perms.hasPerm('queries.create') && perms.hasPerm('queries.update');
+
     return (
         <div class="filters-bar">
             <Segmented
@@ -249,9 +254,11 @@ function FiltersBar ({
             <coreContext.Consumer>
                 {core => (
                     <Fragment>
-                        <button class="tiny-button" onClick={() => setPickerOpen(true)}>
-                            {locale.loadFilter}
-                        </button>
+                        {canReadFilters ? (
+                            <button class="tiny-button" onClick={() => setPickerOpen(true)}>
+                                {locale.loadFilter}
+                            </button>
+                        ) : null}
                         <FilterPicker
                             open={pickerOpen}
                             onClose={() => setPickerOpen(false)}
@@ -273,7 +280,7 @@ function FiltersBar ({
                                 setPickerOpen(false);
                             }} />
 
-                        {filterType === 'json' || filtersToAPITask ? (
+                        {(filterType === 'json' || filtersToAPITask) && canSaveFilters ? (
                             <button class="tiny-button" onClick={async () => {
                                 let filter;
                                 if (filterType === 'normal' && filtersToAPITask) {
@@ -323,9 +330,11 @@ function FiltersBar ({
             </coreContext.Consumer>
         </div>
     );
-}
+});
 
-function FilterPicker ({ category, open, onClose, core, onLoad }) {
+const FilterPicker = connectPerms(function FilterPicker ({ category, open, onClose, core, onLoad, perms }) {
+    const canRemoveItem = perms.hasPerm('queries.delete');
+
     return (
         <Dialog
             backdrop
@@ -346,11 +355,13 @@ function FilterPicker ({ category, open, onClose, core, onLoad }) {
                     </div>
                 )}
                 onItemClick={item => onLoad(item)}
-                onRemove={item => core.createTask('queries/delete', { id: item.id }).runOnceAndDrop()}
+                onRemove={canRemoveItem
+                    ? (item => core.createTask('queries/delete', { id: item.id }).runOnceAndDrop())
+                    : null}
                 emptyLabel={locale.noFilters} />
         </Dialog>
     );
-}
+});
 
 function Filter ({ id, spec, filter, onFilterChange, hidden, locale }) {
     const FilterEditor = spec.editor;

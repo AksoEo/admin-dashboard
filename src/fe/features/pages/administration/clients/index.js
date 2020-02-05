@@ -7,6 +7,7 @@ import { email } from '../../../../components/data';
 import Meta from '../../../meta';
 import { clients as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 import { connectContextualActions } from '../../../../context-action';
 import { apiKey } from '../../../../components/data';
 
@@ -33,7 +34,7 @@ export const FIELDS = {
     },
 };
 
-export default connectContextualActions(class Clients extends Page {
+export default connectContextualActions(connectPerms(class Clients extends Page {
     state = {
         parameters: {
             search: {
@@ -53,13 +54,15 @@ export default connectContextualActions(class Clients extends Page {
 
     static contextType = coreContext;
 
-    render ({ contextualAction }, { parameters }) {
+    render ({ contextualAction, perms }, { parameters }) {
         const actions = [];
-        actions.push({
-            icon: <AddIcon />,
-            label: locale.add,
-            action: () => this.context.createTask('clients/create'),
-        });
+        if (perms.hasPerm('clients.create')) {
+            actions.push({
+                icon: <AddIcon />,
+                label: locale.add,
+                action: () => this.context.createTask('clients/create'),
+            });
+        }
 
         let selection = null;
         if (contextualAction && contextualAction.action === 'select-clients') {
@@ -97,4 +100,4 @@ export default connectContextualActions(class Clients extends Page {
             </div>
         );
     }
-});
+}));

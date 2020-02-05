@@ -149,7 +149,22 @@ export default connectToEverything(class CodeholdersPage extends Page {
         if (prevState.options !== this.state.options) {
             this.encodeURLQuery();
         }
+
+        if (prevProps.perms !== this.props.perms || prevProps.fields !== this.props.fields) {
+            this.#filterFieldsWithPerms();
+        }
     }
+
+    #filterFieldsWithPerms = () => {
+        if (!this.props.perms._isDummy) {
+            const fields = this.state.options.fields.filter(({ id }) => {
+                return !this.props.fields || this.props.fields.includes(id);
+            });
+            if (fields.length < this.state.options.fields.length) {
+                this.setState({ options: { ...this.state.options, fields } });
+            }
+        }
+    };
 
     render ({
         addrLabelGen,
