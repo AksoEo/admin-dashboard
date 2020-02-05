@@ -1,4 +1,6 @@
 /// Global permissions config
+const base_orgs = ['uea', 'tejo'];
+
 export const spec = [
     {
         type: 'perm',
@@ -86,22 +88,35 @@ export const spec = [
                 type: 'perm',
                 name: 'Malŝalti duan faktoron',
                 id: 'codeholders.disable_totp',
-            },
-
-
-
-            {
-                type: 'group',
-                name: 'Membrecoj',
                 requires: ['codeholders.read'],
-                children: [
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Adresetikedaj ŝablonoj',
+        children: [
+            {
+                type: 'switch',
+                options: [
                     {
-                        type: 'perm',
-                        name: 'fjkdsfda',
-                        id: 'memberships.read',
-                        impliesFields: {
-                            profilePicture: 'r',
-                        },
+                        name: 'Legi',
+                        id: 'address_label_templates.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'address_label_templates.update',
+                        implies: ['address_label_templates.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'address_label_templates.create',
+                        implies: ['address_label_templates.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'address_label_templates.delete',
+                        implies: ['address_label_templates.create'],
                     },
                 ],
             },
@@ -111,6 +126,36 @@ export const spec = [
         type: 'category',
         name: 'Administrado',
         children: [
+            {
+                type: 'group',
+                name: 'API-klientoj',
+                children: [
+                    {
+                        type: 'switch',
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'clients.read',
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'clients.update',
+                                implies: ['clients.read'],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'clients.create',
+                                implies: ['clients.update'],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'clients.delete',
+                                implies: ['clients.create'],
+                            },
+                        ],
+                    },
+                ],
+            },
             {
                 type: 'perm',
                 name: 'Legi la HTTP-protokolon',
@@ -122,33 +167,78 @@ export const spec = [
                 id: 'countries.update',
             },
             {
-                type: 'group',
+                type: 'switch',
                 name: 'Landaroj',
-                children: [
+                options: [
                     {
-                        type: 'switch',
-                        options: [
-                            {
-                                name: 'Redakti',
-                                id: 'country_groups.update',
-                            },
-                            {
-                                name: 'Krei',
-                                id: 'country_groups.create',
-                                implies: ['country_groups.update'],
-                            },
-                            {
-                                name: 'Forigi',
-                                id: 'country_groups.delete',
-                                implies: ['country_groups.create'],
-                            },
-                        ],
+                        name: 'Redakti',
+                        id: 'country_groups.update',
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'country_groups.create',
+                        implies: ['country_groups.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'country_groups.delete',
+                        implies: ['country_groups.create'],
+                    },
+
+                ],
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Membrolistoj',
+        children: [
+            {
+                type: 'switch',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'lists.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'lists.update',
+                        implies: ['lists.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'lists.create',
+                        implies: ['lists.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'lists.delete',
+                        implies: ['lists.create'],
                     },
                 ],
             },
         ],
     },
 ];
+
+
+/*
+{
+    type: 'group',
+    name: 'Membrecoj',
+    requires: ['codeholders.read'],
+    children: [
+        {
+            type: 'perm',
+            name: 'fjkdsfda',
+            id: 'memberships.read',
+            impliesFields: {
+                profilePicture: 'r',
+            },
+        },
+    ],
+},
+ */
 
 export const memberFieldsAll = 'Ĉiuj kampoj';
 export const memberFieldsRead = 'Vidi';
