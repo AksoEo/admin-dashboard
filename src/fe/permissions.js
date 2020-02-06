@@ -1,5 +1,5 @@
 /// Global permissions config
-const base_orgs = ['uea', 'tejo'];
+const baseOrgs = {'uea': 'UEA', 'tejo': 'TEJO'};
 
 export const spec = [
     {
@@ -16,6 +16,36 @@ export const spec = [
         type: 'perm',
         name: 'Malŝalti uzadlimon',
         id: 'ratelimit.disable',
+    },
+    {
+        type: 'category',
+        name: 'Konservitaj filitriloj',
+        children: [
+            {
+                type: 'switch',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'queries.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'queries.update',
+                        implies: ['queries.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'queries.create',
+                        implies: ['queries.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'queries.delete',
+                        implies: ['queries.create'],
+                    },
+                ],
+            },
+        ],
     },
     {
         type: 'category',
@@ -95,6 +125,62 @@ export const spec = [
     },
     {
         type: 'category',
+        name: 'Roloj',
+        children: [
+            {
+                name: 'Legi',
+                id: 'codeholder_roles.read',
+            },
+            {
+                name: 'Redakti',
+                id: 'codeholder_roles.update',
+                implies: ['codeholder_roles.read'],
+            },
+            {
+                name: 'Krei',
+                id: 'codeholder_roles.create',
+                implies: ['codeholder_roles.update'],
+            },
+            {
+                name: 'Forigi',
+                id: 'codeholder_roles.delete',
+                implies: ['codeholder_roles.create'],
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Membrolistoj',
+        requires: ['codeholders.read'],
+        children: [
+            {
+                type: 'switch',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'lists.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'lists.update',
+                        implies: ['lists.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'lists.create',
+                        implies: ['lists.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'lists.delete',
+                        implies: ['lists.create'],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        type: 'category',
         name: 'Adresetikedaj ŝablonoj',
         children: [
             {
@@ -128,6 +214,42 @@ export const spec = [
         name: 'Administrado',
         children: [
             {
+                type: 'perm',
+                name: 'Legi la HTTP-protokolon',
+                id: 'log.read',
+            },
+            {
+                type: 'perm',
+                name: 'Ĝisdatigi landojn',
+                id: 'countries.update',
+            },
+            {
+                type: 'group',
+                name: 'Landaroj',
+                children: [
+                    {
+                        type: 'switch',
+                        options: [
+                            {
+                                name: 'Redakti',
+                                id: 'country_groups.update',
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'country_groups.create',
+                                implies: ['country_groups.update'],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'country_groups.delete',
+                                implies: ['country_groups.create'],
+                            },
+
+                        ],
+                    },
+                ],
+            },
+            {
                 type: 'group',
                 name: 'API-klientoj',
                 children: [
@@ -155,70 +277,86 @@ export const spec = [
                             },
                         ],
                     },
+                    {
+                        type: 'switch',
+                        name: 'Permesoj',
+                        requires: ['clients.read'],
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'clients.perms.read',
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'clients.perms.update',
+                                implies: ['clients.perms.read'],
+                            },
+                        ],
+                    },
                 ],
             },
             {
-                type: 'perm',
-                name: 'Legi la HTTP-protokolon',
-                id: 'log.read',
-            },
-            {
-                type: 'perm',
-                name: 'Ĝisdatigi landojn',
-                id: 'countries.update',
-            },
-            {
-                type: 'switch',
-                name: 'Landaroj',
-                options: [
+                type: 'group',
+                name: 'Administraj grupoj',
+                children: [
                     {
-                        name: 'Redakti',
-                        id: 'country_groups.update',
+                        type: 'switch',
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'admin_groups.read',
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'admin_groups.update',
+                                implies: ['admin_groups.read'],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'admin_groups.create',
+                                implies: ['admin_groups.update'],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'admin_groups.delete',
+                                implies: ['admin_groups.create'],
+                            },
+                        ],
                     },
-                    {
-                        name: 'Krei',
-                        id: 'country_groups.create',
-                        implies: ['country_groups.update'],
-                    },
-                    {
-                        name: 'Forigi',
-                        id: 'country_groups.delete',
-                        implies: ['country_groups.create'],
-                    },
-
                 ],
             },
         ],
     },
     {
         type: 'category',
-        name: 'Membrolistoj',
-        children: [
-            {
+        name: 'Voĉdonoj',
+        children: Object.entries(baseOrgs).map(([org, name]) => {
+            return {
                 type: 'switch',
+                name: 'Voĉdonoj de ' + name,
                 options: [
                     {
                         name: 'Legi',
-                        id: 'lists.read',
+                        id: 'votes.read.' + org,
                     },
                     {
                         name: 'Redakti',
-                        id: 'lists.update',
-                        implies: ['lists.read'],
+                        id: 'votes.update' + org,
+                        implies: ['votes.read' + org],
                     },
                     {
                         name: 'Krei',
-                        id: 'lists.create',
-                        implies: ['lists.update'],
+                        id: 'votes.create' + org,
+                        implies: ['votes.update' + org],
                     },
                     {
                         name: 'Forigi',
-                        id: 'lists.delete',
-                        implies: ['lists.create'],
+                        id: 'votes.delete' + org,
+                        implies: ['votes.create' + org],
                     },
                 ],
-            },
-        ],
+            };
+        }),
     },
 ];
 
