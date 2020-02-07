@@ -603,6 +603,7 @@ export const httpLog = {
     },
     viewCodeholder: 'Vidi membron',
     viewClient: 'Vidi API-klienton',
+    csvFilename: 'protokolo',
 };
 
 export const countries = {

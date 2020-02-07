@@ -262,7 +262,7 @@ export default {
             const addressCountry = address ? address.countryLatin : null;
             const countries = await getCountries(core);
 
-            const cl = options.countryLocale;
+            const cl = 'name_' + options.countryLocale;
 
             if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
                 const country = addressCountry || feeCountry;

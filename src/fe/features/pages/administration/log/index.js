@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import SortIcon from '@material-ui/icons/Sort';
+import SaveIcon from '@material-ui/icons/Save';
 import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
@@ -7,6 +8,7 @@ import FieldPicker from '../../../../components/field-picker';
 import { coreContext } from '../../../../core/connection';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import { httpLog as locale, search as searchLocale } from '../../../../locale';
+import CSVExport from '../../../../components/csv-export';
 import Meta from '../../../meta';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
@@ -42,6 +44,7 @@ export default class APILogListView extends Page {
             limit: 10,
         },
         expanded: false,
+        csvExportOpen: false,
     };
 
     static contextType = coreContext;
@@ -82,6 +85,15 @@ export default class APILogListView extends Page {
 
     render (_, { parameters, expanded }) {
         const menu = [];
+
+        if (!expanded) {
+            menu.push({
+                icon: <SaveIcon style={{ verticalAlign: 'middle' }} />,
+                label: searchLocale.csvExport,
+                action: () => this.setState({ csvExportOpen: true }),
+                overflow: true,
+            });
+        }
 
         menu.push({
             icon: <SortIcon style={{ verticalAlign: 'middle' }} />,
@@ -127,6 +139,18 @@ export default class APILogListView extends Page {
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    task="httpLog/list"
+                    parameters={parameters}
+                    fields={FIELDS}
+                    detailView="httpLog/request"
+                    detailViewOptions={id => ({ id, noFetch: true })}
+                    locale={{
+                        fields: locale.fields,
+                    }}
+                    filenamePrefix={locale.csvFilename} />
             </div>
         );
     }

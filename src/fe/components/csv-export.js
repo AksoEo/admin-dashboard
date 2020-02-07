@@ -32,6 +32,7 @@ export default class CSVExport extends PureComponent {
         page: 0,
         total: 0,
         exporting: false,
+        endingExport: false,
         error: null,
         objectURL: null,
         mode: 'csv',
@@ -45,6 +46,7 @@ export default class CSVExport extends PureComponent {
             page: 0,
             total: 0,
             exporting: true,
+            endingExport: false,
             error: null,
             objectURL: null,
         }, () => {
@@ -87,7 +89,7 @@ export default class CSVExport extends PureComponent {
     async endExport () {
         try {
             this.abortExport();
-            this.setState({ exporting: true });
+            this.setState({ exporting: true, endingExport: true });
 
             const stringifier = stringify({
                 delimiter: this.state.mode === 'csv' ? ',' : '\t',
@@ -249,7 +251,8 @@ export default class CSVExport extends PureComponent {
                     <Fragment>
                         <LinearProgress
                             class="progress-bar"
-                            progress={this.state.data.length / this.state.total} />
+                            progress={this.state.data.length / this.state.total}
+                            indeterminate={this.state.endingExport} />
                         {!this.state.error && <Button
                             key="abort"
                             class="action-button"

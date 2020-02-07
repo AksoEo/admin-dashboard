@@ -30,9 +30,27 @@ export default {
                 return null;
             }
         },
-        stringify () {
-            // TODO
-            throw new Error('unimplemented: stringify identity');
+        stringify: async (value, item, fields, options, core) => {
+            if (value.type === 'codeholder') {
+                return await new Promise((resolve, reject) => {
+                    const view = core.createDataView('codeholders/codeholder', {
+                        id: value.id,
+                        fields: ['code'],
+                        lazyFetch: true,
+                    });
+                    view.on('update', data => {
+                        if (data === null) return;
+                        resolve(data.code.new);
+                        view.drop();
+                    });
+                    view.on('error', err => {
+                        reject(err);
+                        view.drop();
+                    });
+                });
+            } else if (value.type === 'apiKey') {
+                return Buffer.from(value.id || []).toString('hex');
+            }
         },
     },
     ip: {
