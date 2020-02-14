@@ -656,6 +656,23 @@ export const countryGroups = {
     },
 };
 
+export const lists = {
+    title: 'Listoj',
+    detailTitle: 'Listo',
+    search: {
+        placeholders: {
+            name: '[[serĉi en nomoj]]',
+            description: '[[serĉi en priskriboj]]',
+        },
+    },
+    fields: {
+        name: 'Nomo',
+        description: 'Priskribo',
+    },
+    update: 'Redakti',
+    delete: 'Forigi',
+};
+
 export const mime = {
     types: {
         application: null,

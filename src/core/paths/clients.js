@@ -31,7 +31,8 @@ export const tasks = {
 
         for (const item of res.body) {
             item.id = item.apiKey.toString('hex');
-            store.insert([CLIENTS, item.id], item);
+            const existing = store.get([CLIENTS, item.id]);
+            store.insert([CLIENTS, item.id], deepMerge(existing, item));
         }
 
         return {
@@ -53,7 +54,8 @@ export const tasks = {
 
         const item = res.body;
         item.id = item.apiKey.toString('hex');
-        store.insert([CLIENTS, item.id], item);
+        const existing = store.get([CLIENTS, id]);
+        store.insert([CLIENTS, item.id], deepMerge(existing, item));
 
         return item;
     },

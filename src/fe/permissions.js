@@ -128,23 +128,28 @@ export const spec = [
         name: 'Roloj',
         children: [
             {
-                name: 'Legi',
-                id: 'codeholder_roles.read',
-            },
-            {
-                name: 'Redakti',
-                id: 'codeholder_roles.update',
-                implies: ['codeholder_roles.read'],
-            },
-            {
-                name: 'Krei',
-                id: 'codeholder_roles.create',
-                implies: ['codeholder_roles.update'],
-            },
-            {
-                name: 'Forigi',
-                id: 'codeholder_roles.delete',
-                implies: ['codeholder_roles.create'],
+                type: 'switch',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'codeholder_roles.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'codeholder_roles.update',
+                        implies: ['codeholder_roles.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'codeholder_roles.create',
+                        implies: ['codeholder_roles.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'codeholder_roles.delete',
+                        implies: ['codeholder_roles.create'],
+                    },
+                ],
             },
         ],
     },
