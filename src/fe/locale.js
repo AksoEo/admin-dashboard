@@ -478,10 +478,10 @@ export const codeholders = {
     },
     perms: {
         title: 'Permesoj',
-        setTitle: '[[update perms]]',
-        setButton: '[[update]]',
-        setRestrictions: '[[update restrictions]]',
-        setRestrictionsButton: '[[update]]',
+        setTitle: 'Ĝisdatigi permesojn',
+        setButton: 'Ĝisdatigi',
+        setRestrictions: 'Ĝisdatigi restriktojn',
+        setRestrictionsButton: 'Ĝisdatigi',
     },
 };
 
@@ -558,8 +558,8 @@ export const clients = {
 
     perms: {
         title: 'Permesoj',
-        setTitle: '[[update perms]]',
-        setButton: '[[update]]',
+        setTitle: 'Ĝisdatigi permesojn',
+        setButton: 'Ĝisdatigi',
     },
 };
 
@@ -585,7 +585,7 @@ export const httpLog = {
     },
     fields: {
         time: 'Horo',
-        identity: '[[ident]]',
+        identity: 'Uzanto',
         ip: 'IP-adreso',
         origin: 'Fonto',
         userAgent: 'Retumilo',
@@ -613,21 +613,21 @@ export const countries = {
         placeholders: 'Serĉi landojn',
     },
     fields: {
-        code: '[[kodo]]',
-        enabled: '[[ŝaltita]]',
-        name_eo: '[[name_eo]]',
-        name_en: '[[name_en]]',
-        name_fr: '[[name_fr]]',
-        name_es: '[[name_es]]',
-        name_nl: '[[name_nl]]',
-        name_pt: '[[name_pt]]',
-        name_sk: '[[name_sk]]',
-        name_zh: '[[name_zh]]',
-        name_de: '[[name_de]]',
+        code: 'Landokodo',
+        enabled: 'Ŝaltita',
+        name_eo: 'Esperante',
+        name_en: 'Angle',
+        name_fr: 'France',
+        name_es: 'Hispane',
+        name_nl: 'Nederlande',
+        name_pt: 'Portugale',
+        name_sk: 'Slovake',
+        name_zh: 'Ĉine',
+        name_de: 'Germane',
     },
     update: {
-        title: '[[upd8 dialog title]]',
-        button: '[[upd8]]',
+        title: 'Redakti landojn',
+        button: 'Redakti',
     },
 };
 export const countryGroups = {
@@ -637,22 +637,22 @@ export const countryGroups = {
         placeholders: 'Serĉi landarojn',
     },
     fields: {
-        code: '[[kodo]]',
-        name: '[[nomo]]',
+        code: 'Landarokodo',
+        name: 'Nomo',
     },
     create: {
-        menuItem: '[[create]]',
-        title: '[[create group]]',
-        button: '[[create]]',
+        menuItem: 'Krei',
+        title: 'Krei landaron',
+        button: 'Krei',
     },
     update: {
-        title: '[[upd8 dialog title]]',
-        button: '[[upd8]]',
+        title: 'Redakti landaron',
+        button: 'Redakti',
     },
     delete: {
-        title: '[[delete group]]',
-        button: '[[delete]]',
-        description: '[[are you sure]]',
+        title: 'Forigi landaron',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la landaron? Ne eblas malfari tiun ĉi agon.',
     },
 };
 
