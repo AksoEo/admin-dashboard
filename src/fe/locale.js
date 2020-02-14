@@ -661,8 +661,8 @@ export const lists = {
     detailTitle: 'Listo',
     search: {
         placeholders: {
-            name: '[[serĉi en nomoj]]',
-            description: '[[serĉi en priskriboj]]',
+            name: 'Serĉi listonomon',
+            description: 'Serĉi priskribon',
         },
     },
     fields: {
