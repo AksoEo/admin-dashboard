@@ -101,11 +101,14 @@ export default class PermsEditor extends Component {
     }
 }
 
-function PermsItem ({ item, ctx }) {
-    const disabled = !ctx.editable;
+function PermsItem ({ item, ctx, disabled }) {
+    disabled = disabled || !ctx.editable;
     if (item.requires) {
         for (const req of item.requires) {
-            if (!ctx.states.get(req).active) return null;
+            if (!ctx.states.get(req).active) {
+                disabled = true;
+                break;
+            }
         }
     }
     if (item.type === 'category' || item.type === 'group') {
@@ -113,7 +116,7 @@ function PermsItem ({ item, ctx }) {
         return (
             <div class={className}>
                 {item.name ? <div class="group-title">{item.name}</div> : null}
-                {item.children.map((x, i) => <PermsItem key={i} item={x} ctx={ctx} />)}
+                {item.children.map((x, i) => <PermsItem key={i} item={x} ctx={ctx} disabled={disabled} />)}
             </div>
         );
     } else if (item.type === 'switch') {
