@@ -289,7 +289,17 @@ export default [
                 id: 'lists',
                 icon: ListsIcon,
                 path: 'listoj',
-                hasPerm: () => true,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists')),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists/detail')),
+                        type: 'stack',
+                    },
+                ],
+                hasPerm: perms => perms.hasPerm('lists.read'),
             },
             {
                 id: 'reports',
