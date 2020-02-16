@@ -45,7 +45,9 @@ export default connectPerms(class Lists extends Page {
             actions.push({
                 icon: <AddIcon />,
                 label: locale.add,
-                action: () => this.context.createTask('lists/create'),
+                action: () => this.context.createTask('lists/create', {}, {
+                    filters: ['{\n\t\n}'],
+                }),
             });
         }
 
@@ -68,6 +70,7 @@ export default connectPerms(class Lists extends Page {
                 <OverviewList
                     task="lists/list"
                     view="lists/list"
+                    updateView={['lists/sigLists']}
                     parameters={parameters}
                     fields={FIELDS}
                     onGetItemLink={id => `/listoj/${id}`}

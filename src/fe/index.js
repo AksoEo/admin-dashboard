@@ -34,6 +34,7 @@ const taskViews = {
     countries: lazyPath(() => import(/* webpackChunkName: "countries-tasks" */ './features/pages/administration/countries/tasks')),
     codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
     adminGroups: lazyPath(() => import(/* webpackChunkName: "admin-groups-tasks" */ './features/pages/administration/groups/tasks')),
+    lists: lazyPath(() => import(/* webpackChunkName: "lists-tasks" */ './features/pages/lists/tasks')),
     queries: lazyPath(() => import(/* webpackChunkName: "queries-tasks" */ './features/queries')),
 };
 const loadTaskView = async (taskPath) => {

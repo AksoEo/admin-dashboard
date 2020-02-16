@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import DragHandleIcon from '@material-ui/icons/DragHandle';
 import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import './rearranging-list.less';
 
 // constant li height
 const LI_HEIGHT = 56;
@@ -13,6 +14,7 @@ const LI_HEIGHT = 56;
 /// - isItemDraggable: fn(index) -> bool
 /// - canMove: fn(toPos) -> bool
 /// - onMove: fn(fromPos, toPos)
+/// - itemHeight: item height override
 export default class RearrangingList extends PureComponent {
     itemData = new Map();
 
@@ -80,13 +82,17 @@ export default class RearrangingList extends PureComponent {
         dir: 1,
     };
 
+    get itemHeight () {
+        return this.props.itemHeight || LI_HEIGHT;
+    }
+
     onPointerDown (clientX, clientY, key) {
         if (!this.node) return;
         const listRect = this.node.getBoundingClientRect();
         const y = clientY - listRect.top;
         const itemIndex = this.itemData[key].index;
 
-        this.dragOffset = y - itemIndex * LI_HEIGHT;
+        this.dragOffset = y - itemIndex * this.itemHeight;
         this.dragTarget = this.dragEndIndex = itemIndex;
         this.indexPush.dir = 0;
 
@@ -99,7 +105,7 @@ export default class RearrangingList extends PureComponent {
         const y = clientY - listRect.top;
 
         const item = this.itemData[this.state.draggingKey];
-        const newItemIndex = Math.floor(y / LI_HEIGHT);
+        const newItemIndex = Math.floor(y / this.itemHeight);
 
         if (this.props.canMove(newItemIndex)) {
             if (newItemIndex < item.index) {
@@ -115,7 +121,7 @@ export default class RearrangingList extends PureComponent {
             this.dragEndIndex = newItemIndex;
         }
 
-        this.dragTarget = (y - this.dragOffset) / LI_HEIGHT;
+        this.dragTarget = (y - this.dragOffset) / this.itemHeight;
         this.beginAnimating();
     }
 
@@ -181,7 +187,7 @@ export default class RearrangingList extends PureComponent {
 
         for (const key in this.itemData) {
             const item = this.itemData[key];
-            const posY = item.spring.value * LI_HEIGHT;
+            const posY = item.spring.value * this.itemHeight;
             const draggable = this.props.isItemDraggable(item.index);
 
             let className = 'rearranging-list-item';
@@ -219,10 +225,12 @@ export default class RearrangingList extends PureComponent {
         }
 
         return (
-            <div className="rearranging-list" ref={node => this.node = node}>
+            <div
+                className={(this.props.class || '') + ' rearranging-list'}
+                ref={node => this.node = node}>
                 <div
                     className="rearranging-list-scroll-height"
-                    style={{ height: this.props.children.length * LI_HEIGHT }} />
+                    style={{ height: this.props.children.length * this.itemHeight }} />
                 {items}
             </div>
         );

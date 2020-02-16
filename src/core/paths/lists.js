@@ -1,10 +1,11 @@
 import { util } from '@tejo/akso-client';
-import { AbstractDataView } from '../view';
+import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
 
 export const LISTS = 'lists';
+export const SIG_LISTS = '!lists';
 
 export const tasks = {
     list: async (_, { search, offset, limit }) => {
@@ -61,6 +62,7 @@ export const tasks = {
         if (description) options.description = description;
 
         const res = await client.post('/lists', options);
+        store.signal([LISTS, SIG_LISTS]);
         return res.res.headers.get('x-identifier');
     },
 
@@ -83,6 +85,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`/lists/${id}`);
         store.remove([LISTS, id]);
+        store.signal([LISTS, SIG_LISTS]);
     },
 };
 
@@ -113,4 +116,6 @@ export const views = {
             store.unsubscribe([LISTS, this.id], this.#onUpdate);
         }
     },
+
+    sigLists: createStoreObserver([LISTS, SIG_LISTS]),
 };

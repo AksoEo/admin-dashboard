@@ -1,0 +1,47 @@
+@import '../../../prelude';
+
+.list-detail-page {
+    .detail-header {
+        margin: 0 24px;
+
+        .detail-header-field {
+            margin: 16px 0;
+
+            .paper-text-field {
+                width: 100%;
+            }
+        }
+    }
+
+    .detail-filters {
+        .rearranging-list-item {
+            border: 1px solid @separator;
+            background: @card-background;
+        }
+
+        .filter-item {
+            .filter-item-header {
+                padding: 8px 16px;
+
+                .filter-item-remove {
+                    --md-button-color: @gray-button-color;
+                }
+
+                .filter-item-title {
+                    margin-left: 16px;
+                }
+            }
+
+            .json-editor {
+                .CodeMirror {
+                    height: 150px;
+                }
+            }
+        }
+
+        .add-filter-item {
+            text-align: center;
+            margin: 8px 0;
+        }
+    }
+}

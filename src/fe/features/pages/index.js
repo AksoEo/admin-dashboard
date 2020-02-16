@@ -297,6 +297,13 @@ export default [
                         component: elazy(() =>
                             import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists/detail')),
                         type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
                     },
                 ],
                 hasPerm: perms => perms.hasPerm('lists.read'),

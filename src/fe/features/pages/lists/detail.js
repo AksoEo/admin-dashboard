@@ -1,30 +1,55 @@
 import { h } from 'preact';
+import { Button, TextField } from '@cpsdqs/yamdl';
+import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import RemoveIcon from '@material-ui/icons/Remove';
 import Page from '../../../components/page';
+import DetailView from '../../../components/detail';
+import JSONEditor from '../../../components/json-editor';
+import RearrangingList from '../../../components/rearranging-list';
 import Meta from '../../meta';
-import { connect } from '../../../core/connection';
+import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 import { lists as locale } from '../../../locale';
+import './detail.less';
 
-export default connect(props => ['lists/list', {
-    id: props.match[1],
-}])((item, core) => ({ item, core }))(connectPerms(class ListDetailPage extends Page {
-    render ({ item, core, match, perms }) {
-        if (!item) return (
-            <div class="list-detail-page is-loading">
-                <CircularProgress indeterminate />
-            </div>
-        );
+export default connectPerms(class ListDetailPage extends Page {
+    state = {
+        edit: null,
+    };
 
-        const id = match[1];
+    static contextType = coreContext;
+
+    #commitTask = null;
+    onCommit = changedFields => {
+        if (!this.props.editing || this.#commitTask) return;
+        if (!changedFields.length) {
+            // nothing changed, so we can just pop the editing state
+            this.props.editing.pop(true);
+            return;
+        }
+
+        this.#commitTask = this.context.createTask('lists/update', {
+            id: this.props.match[1],
+            _changedFields: changedFields,
+        }, this.state.edit);
+        this.#commitTask.on('success', this.onEndEdit);
+        this.#commitTask.on('drop', () => this.#commitTask = null);
+    };
+    onEndEdit = () => {
+        this.props.editing && this.props.editing.pop(true);
+        this.setState({ edit: null });
+    };
+
+    render ({ match, perms, editing }) {
+        const id = +match[1];
 
         const actions = [];
 
         if (perms.hasPerm('lists.delete')) {
             actions.push({
-                label: locale.delete,
-                action: () => core.createTask('lists/delete', {}, { id }),
+                label: locale.delete.menuItem,
+                action: () => this.context.createTask('lists/delete', {}, { id }),
                 overflow: true,
             });
         }
@@ -32,8 +57,10 @@ export default connect(props => ['lists/list', {
         if (perms.hasPerm('lists.update') && perms.hasPerm('codeholders.read')) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-                label: locale.update,
-                action: () => core.createTask('lists/update', { id }, { ...item }),
+                label: locale.update.menuItem,
+                action: () => {
+                    this.props.onNavigate(`/listoj/${id}/redakti`, true);
+                },
             });
         }
 
@@ -42,11 +69,109 @@ export default connect(props => ['lists/list', {
                 <Meta
                     title={locale.detailTitle}
                     actions={actions} />
-
-                stuff goes here
-
-                {item.name}
+                <DetailView
+                    view="lists/list"
+                    id={id}
+                    editing={editing}
+                    edit={this.state.edit}
+                    onEditChange={edit => this.setState({ edit })}
+                    onEndEdit={this.onEndEdit}
+                    onCommit={this.onCommit}
+                    header={Header}
+                    onDelete={() => this.props.pop()} />
             </div>
         );
     }
-}));
+});
+
+function Header ({ editing, item, onItemChange }) {
+    const filters = [];
+    for (let i = 0; i < (item.filters || []).length; i++) {
+        const index = i;
+        const filter = item.filters[index];
+        filters.push(
+            <div class="filter-item" key={'f' + index}>
+                <div class="filter-item-header">
+                    {editing ? (
+                        <Button icon small class="filter-item-remove" onClick={() => {
+                            const newFilters = [...item.filters];
+                            newFilters.splice(index, 1);
+                            if (!newFilters.length) newFilters.push('{\n\t\n}');
+                            onItemChange({ ...item, filters: newFilters });
+                        }}>
+                            <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                        </Button>
+                    ) : null}
+                    <span class="filter-item-title">{locale.filters.itemTitle(i)}</span>
+                </div>
+                <JSONEditor
+                    value={filter}
+                    disabled={!editing}
+                    onChange={value => {
+                        if (!editing) return;
+                        const newFilters = [...item.filters];
+                        newFilters[index] = value;
+                        onItemChange({ ...item, filters: newFilters });
+                    }} />
+            </div>
+        );
+    }
+
+    if (editing) {
+        filters.push(
+            <div class="add-filter-item" key="add">
+                <Button icon class="add-filter-button" onClick={() => {
+                    const newFilters = [...item.filters];
+                    newFilters.push('{\n\t\n}');
+                    onItemChange({ ...item, filters: newFilters });
+                }}>
+                    <AddIcon />
+                </Button>
+            </div>
+        );
+    }
+
+    if (editing) {
+        return (
+            <div class="detail-header is-editing">
+                <div class="detail-header-field">
+                    <TextField
+                        label={locale.fields.name}
+                        value={item.name}
+                        onChange={e => onItemChange({ ...item, name: e.target.value })} />
+                </div>
+                <div class="detail-header-field">
+                    <TextField
+                        label={locale.fields.description}
+                        value={item.description}
+                        onChange={e => onItemChange({ ...item, description: e.target.value || null })} />
+                </div>
+                <h3>{locale.filters.title}</h3>
+                <RearrangingList
+                    class="detail-filters"
+                    itemHeight={256}
+                    isItemDraggable={(index) => index < filters.length - 1}
+                    canMove={(toPos) => toPos >= 0 && toPos < filters.length - 1}
+                    onMove={(fromPos, toPos) => {
+                        const newFilters = [...item.filters];
+                        const filter = newFilters.splice(fromPos, 1)[0];
+                        newFilters.splice(toPos, 0, filter);
+                        onItemChange({ ...item, filters: newFilters });
+                    }}>
+                    {filters}
+                </RearrangingList>
+            </div>
+        );
+    }
+
+    return (
+        <div class="detail-header">
+            <h1>{item.name}</h1>
+            <p>{item.description}</p>
+            <h3>{locale.filters.title}</h3>
+            <div class="detail-filters">
+                {filters}
+            </div>
+        </div>
+    );
+}
