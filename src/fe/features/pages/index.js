@@ -11,6 +11,10 @@ import CardMembershipIcon from '@material-ui/icons/CardMembership';
 import EmailIcon from '@material-ui/icons/Email';
 import MarkunreadMailboxIcon from '@material-ui/icons/MarkunreadMailbox';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import HttpIcon from '@material-ui/icons/Http';
+import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
+import PublicIcon from '@material-ui/icons/Public';
+import LanguageIcon from '@material-ui/icons/Language';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import FileIcon from '@material-ui/icons/InsertDriveFile';
 
@@ -173,119 +177,6 @@ export default [
                 hasPerm: () => true,
             },
             {
-                id: 'administration',
-                component: elazy(() =>
-                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration')),
-                icon: SupervisorAccountIcon,
-                path: 'administrado',
-                paths: [
-                    {
-                        component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups')),
-                        type: 'bottom',
-                        path: 'grupoj',
-                        hasPerm: perms => perms.hasPerm('admin_groups.read'),
-                        paths: [
-                            {
-                                match: /^(\d+)$/,
-                                component: elazy(() =>
-                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/detail')),
-                                type: 'stack',
-                                paths: [
-                                    {
-                                        path: 'permesoj',
-                                        component: elazy(() =>
-                                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/perms')),
-                                        type: 'stack',
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                    {
-                        component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients')),
-                        type: 'bottom',
-                        path: 'klientoj',
-                        hasPerm: perms => perms.hasPerm('clients.read'),
-                        paths: [
-                            {
-                                match: /^([\da-fA-F]+)$/,
-                                component: elazy(() =>
-                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/detail')),
-                                type: 'stack',
-                                paths: [
-                                    {
-                                        path: 'permesoj',
-                                        component: elazy(() =>
-                                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/perms')),
-                                        type: 'stack',
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                    {
-                        component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log')),
-                        type: 'bottom',
-                        path: 'protokolo',
-                        hasPerm: perms => perms.hasPerm('log.read'),
-                        paths: [
-                            {
-                                match: /^(\d+)$/,
-                                component: elazy(() =>
-                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log/detail')),
-                                type: 'stack',
-                            },
-                        ],
-                    },
-                    {
-                        component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries')),
-                        type: 'bottom',
-                        path: 'landoj',
-                        paths: [
-                            {
-                                match: /^([a-z]{2})$/i,
-                                component: elazy(() =>
-                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries/detail')),
-                                type: 'stack',
-                                paths: [
-                                    {
-                                        path: 'redakti',
-                                        type: 'state',
-                                        state: 'editing',
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                    {
-                        component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups')),
-                        type: 'bottom',
-                        path: 'landaroj',
-                        paths: [
-                            {
-                                match: /^(x[a-z0-9]{2})$/i,
-                                component: elazy(() =>
-                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups/detail')),
-                                type: 'stack',
-                                paths: [
-                                    {
-                                        path: 'redakti',
-                                        type: 'state',
-                                        state: 'editing',
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-                hasPerm: () => true,
-            },
-            {
                 id: 'lists',
                 icon: ListsIcon,
                 path: 'listoj',
@@ -319,6 +210,127 @@ export default [
                 icon: FileIcon,
                 path: 'dokumentoj',
                 hasPerm: () => true,
+            },
+        ],
+    },
+    {
+        id: 'administration',
+        path: 'administrado',
+        contents: [
+            {
+                id: 'administration-groups',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups')),
+                icon: SupervisorAccountIcon,
+                type: 'bottom',
+                path: 'grupoj',
+                hasPerm: perms => perms.hasPerm('admin_groups.read'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'permesoj',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/perms')),
+                                type: 'stack',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'administration-clients',
+                icon: DeveloperModeIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients')),
+                type: 'bottom',
+                path: 'klientoj',
+                hasPerm: perms => perms.hasPerm('clients.read'),
+                paths: [
+                    {
+                        match: /^([\da-fA-F]+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'permesoj',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/perms')),
+                                type: 'stack',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'administration-log',
+                icon: HttpIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log')),
+                type: 'bottom',
+                path: 'protokolo',
+                hasPerm: perms => perms.hasPerm('log.read'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log/detail')),
+                        type: 'stack',
+                    },
+                ],
+            },
+            {
+                id: 'administration-countries',
+                icon: PublicIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries')),
+                type: 'bottom',
+                path: 'landoj',
+                hasPerm: () => true,
+                paths: [
+                    {
+                        match: /^([a-z]{2})$/i,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'administration-country-groups',
+                icon: LanguageIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups')),
+                type: 'bottom',
+                path: 'landaroj',
+                hasPerm: () => true,
+                paths: [
+                    {
+                        match: /^(x[a-z0-9]{2})$/i,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
             },
         ],
     },

@@ -121,6 +121,11 @@ export const pages = {
     elections: 'Voĉdonado',
     newsletters: 'Bultenoj',
     administration: 'Administrado',
+    'administration-groups': 'Administraj grupoj',
+    'administration-clients': 'API-klientoj',
+    'administration-log': 'API-protokolo',
+    'administration-countries': 'Landoj',
+    'administration-country-groups': 'Landaroj',
     lists: 'Listoj',
     reports: 'Raportoj',
     documents: 'Ŝpureblaj dokumentoj',
@@ -564,7 +569,7 @@ export const clients = {
 };
 
 export const httpLog = {
-    title: 'Protokolo',
+    title: 'API-protokolo',
     detailTitle: 'HTTP-peto',
     search: {
         placeholders: {

@@ -71,20 +71,41 @@ function parseHistoryState (url, state, mkPopStack, perms) {
     // match the first path part separately because it uses a different format
     const firstPathPart = pathParts.shift();
     for (const category of pages) {
-        for (const page of category.contents) {
-            if (page.path === firstPathPart) {
-                cursor = page;
+        if (category.path) {
+            // path category
+            if (category.path === firstPathPart) {
+                cursor = { // HACK: quick fix to fit the category in the page format
+                    ...category,
+                    paths: category.contents,
+                };
                 const item = {
                     path: firstPathPart,
-                    source: page,
-                    component: page.component || TODOPage,
+                    source: category,
+                    component: <NotFoundPage />,
                     query: '',
                     state: {},
                 };
-                if (!perms._isDummy && !page.hasPerm(perms)) forbidden = true;
-                currentPageId = page.id;
+                currentPageId = undefined;
                 stack.push(item);
-                viewStack.push(item);
+            }
+        } else {
+            // otherwise, look in the category subpaths
+            for (const page of category.contents) {
+                if (page.path === firstPathPart) {
+                    cursor = page;
+                    const item = {
+                        path: firstPathPart,
+                        source: page,
+                        component: page.component || TODOPage,
+                        query: '',
+                        state: {},
+                    };
+                    if (!perms._isDummy && !page.hasPerm(perms)) forbidden = true;
+                    currentPageId = page.id;
+                    stack.push(item);
+                    viewStack.push(item);
+                    break;
+                }
             }
         }
     }
@@ -127,6 +148,8 @@ function parseHistoryState (url, state, mkPopStack, perms) {
 
             if (match) {
                 cursor = subpage;
+
+                if (currentPageId === undefined) currentPageId = subpage.id;
 
                 if (subpage.type === 'bottom') {
                     const pathParts = [];

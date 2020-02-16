@@ -1,6 +1,6 @@
-import { h } from 'preact';
-import { PureComponent, Fragment, useState } from 'preact/compat';
-import { Button, Menu, DrawerItem, DrawerLabel } from '@cpsdqs/yamdl';
+import { h, Component } from 'preact';
+import { PureComponent, useState } from 'preact/compat';
+import { Button, Menu, DrawerItem, DrawerLabel, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ProfilePicture from '../../components/profile-picture';
 import { Link, routerContext } from '../../router';
@@ -14,59 +14,123 @@ import { TEJOIcon, UEAIcon } from './icons';
 // also see src/pages/index.js
 
 /// Renders a single item in the sidebar.
-function NavItem ({ item, currentPage, locked }) {
-    const { id, icon, path } = item;
-    const Icon = icon || (() => null);
-    return (
-        <Link target={`/${path}`} class="sidebar-link">
-            <DrawerItem
-                selected={currentPage === id}
-                disabled={locked}
-                icon={<Icon />}
-                onKeyDown={e => {
-                    if (e.key === 'ArrowDown') {
-                        const parent = e.currentTarget.parentNode;
-                        const next = parent.nextElementSibling;
-                        if (next) {
-                            const drawerItem = next.children[0];
-                            e.preventDefault();
-                            drawerItem.focus();
+class NavItem extends PureComponent {
+    offsetX = new Spring(1, 0.5);
+    initTime = 0;
+
+    componentDidMount () {
+        globalAnimator.register(this);
+        this.offsetX.value = 1;
+    }
+
+    update (dt) {
+        if (this.initTime < this.props.index / 40) {
+            this.initTime += dt;
+            this.forceUpdate();
+            return;
+        }
+
+        this.offsetX.update(dt);
+
+        if (!this.offsetX.wantsUpdate()) {
+            globalAnimator.deregister(this);
+        }
+
+        this.forceUpdate();
+    }
+
+    render ({ category, item, currentPage, locked }) {
+        const { id, icon, path } = item;
+
+        const targetPath = category.path ? category.path + '/' + path : path;
+
+        const Icon = icon || (() => null);
+        return (
+            <Link target={`/${targetPath}`} class="sidebar-link">
+                <DrawerItem
+                    style={{
+                        transform: `translateX(${this.offsetX.value * 100}%)`,
+                        opacity: 1 - Math.abs(this.offsetX.value),
+                    }}
+                    selected={currentPage === id}
+                    disabled={locked}
+                    icon={<Icon />}
+                    onKeyDown={e => {
+                        if (e.key === 'ArrowDown') {
+                            const parent = e.currentTarget.parentNode;
+                            const next = parent.nextElementSibling;
+                            if (next) {
+                                const drawerItem = next.children[0];
+                                e.preventDefault();
+                                drawerItem.focus();
+                            }
+                        } else if (e.key === 'ArrowUp') {
+                            const parent = e.currentTarget.parentNode;
+                            const prev = parent.previousElementSibling;
+                            if (prev) {
+                                const drawerItem = prev.children[0];
+                                e.preventDefault();
+                                drawerItem.focus();
+                            }
                         }
-                    } else if (e.key === 'ArrowUp') {
-                        const parent = e.currentTarget.parentNode;
-                        const prev = parent.previousElementSibling;
-                        if (prev) {
-                            const drawerItem = prev.children[0];
-                            e.preventDefault();
-                            drawerItem.focus();
-                        }
-                    }
-                }}>
-                {localePages[id]}
-            </DrawerItem>
-        </Link>
-    );
+                    }}>
+                    {localePages[id]}
+                </DrawerItem>
+            </Link>
+        );
+    }
 }
 
-/// Renders a sidebar category.
-function NavCategory ({ item, currentPage, perms, locked }) {
-    const { id, contents } = item;
-    const label = localePages[id] ? <DrawerLabel>{localePages[id]}</DrawerLabel> : null;
+/// Sidebar navigation items.
+class SidebarNav extends Component {
+    static contextType = permsContext;
 
-    const filteredContents = contents.filter(item => !item.hidden && item.hasPerm(perms));
+    render ({ currentPage, locked }) {
+        const perms = this.context;
 
-    return (
-        <Fragment>
-            {label}
-            {filteredContents.map(item => (
-                <NavItem
-                    key={item.id}
-                    item={item}
-                    currentPage={currentPage}
-                    locked={locked} />
-            ))}
-        </Fragment>
-    );
+        const items = [];
+
+        if (!perms._isDummy) {
+            // don’t show sidebar until perms have loaded
+            let i = 0;
+            for (const category of pages) {
+                const categoryItems = category.contents
+                    .filter(item => !item.hidden && item.hasPerm(perms));
+
+                if (!categoryItems.length) continue;
+
+                if (localePages[category.id]) {
+                    items.push(
+                        <DrawerLabel key={category.id + '-label'}>
+                            {localePages[category.id]}
+                        </DrawerLabel>
+                    );
+                }
+
+                for (const item of categoryItems) {
+                    const itemIndex = i;
+                    items.push(
+                        <NavItem
+                            key={item.id}
+                            index={itemIndex}
+                            category={category}
+                            item={item}
+                            currentPage={currentPage}
+                            locked={locked} />
+                    );
+                    i++;
+                }
+            }
+        }
+
+        return (
+            <div class="sidebar-nav">
+                <nav class="sidebar-nav-list" role="navigation">
+                    {items}
+                </nav>
+            </div>
+        );
+    }
 }
 
 /// Renders the sidebar contents.
@@ -94,20 +158,9 @@ export default class SidebarContents extends PureComponent {
                     <SidebarUser />
                 </div>
                 <div class="sidebar-nav-container">
-                    <div class="sidebar-nav">
-                        <permsContext.Consumer>
-                            {perms => (<nav class="sidebar-nav-list" role="navigation">
-                                {pages.map(item => (
-                                    <NavCategory
-                                        key={item.id}
-                                        item={item}
-                                        currentPage={this.props.currentPage}
-                                        perms={perms}
-                                        locked={this.props.locked} />
-                                ))}
-                            </nav>)}
-                        </permsContext.Consumer>
-                    </div>
+                    <SidebarNav
+                        currentPage={this.props.currentPage}
+                        locked={this.props.locked} />
                     <div class="sidebar-meta-info">
                         <div class="info-logos">
                             <UEAIcon />
@@ -133,6 +186,7 @@ export default class SidebarContents extends PureComponent {
     }
 }
 
+/// The user card in the sidebar.
 const SidebarUser = connect('codeholders/codeholder', {
     id: 'self',
     fields: ['name', 'type', 'profilePictureHash'],

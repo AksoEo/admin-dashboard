@@ -67,28 +67,6 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
         endTask: this.#endTask,
     };
 
-    // TODO: remove this
-    getPageComponent () {
-        if (this.state.currentPage.component) {
-            return this.state.currentPage.component;
-        }
-
-        // TODO: remove null fallback
-        return function NullPage () {
-            return (
-                <div style={{
-                    fontSize: '1.5em',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '100%',
-                }}>
-                    ...
-                </div>
-            );
-        };
-    }
-
     perms = createDummyPerms();
 
     componentDidMount () {
