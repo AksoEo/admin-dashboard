@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, Component } from 'preact';
 import { Button, TextField } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
@@ -84,94 +84,107 @@ export default connectPerms(class ListDetailPage extends Page {
     }
 });
 
-function Header ({ editing, item, onItemChange }) {
-    const filters = [];
-    for (let i = 0; i < (item.filters || []).length; i++) {
-        const index = i;
-        const filter = item.filters[index];
-        filters.push(
-            <div class="filter-item" key={'f' + index}>
-                <div class="filter-item-header">
-                    {editing ? (
-                        <Button icon small class="filter-item-remove" onClick={() => {
+class Header extends Component {
+    /// These keys are used to identify filters while editing the list.
+    /// This is necessary to enable rearranging that doesn’t look confusing.
+    editFilterKeys = [];
+
+    render ({ editing, item, onItemChange }) {
+        const filters = [];
+        for (let i = 0; i < (item.filters || []).length; i++) {
+            if (!this.editFilterKeys[i]) {
+                this.editFilterKeys[i] = 'f' + Math.random();
+            }
+
+            const index = i;
+            const filter = item.filters[index];
+            filters.push(
+                <div class="filter-item" key={this.editFilterKeys[index]}>
+                    <div class="filter-item-header">
+                        {editing ? (
+                            <Button icon small class="filter-item-remove" onClick={() => {
+                                const newFilters = [...item.filters];
+                                newFilters.splice(index, 1);
+                                this.editFilterKeys.splice(index, 1);
+                                if (!newFilters.length) newFilters.push('{\n\t\n}');
+                                onItemChange({ ...item, filters: newFilters });
+                            }}>
+                                <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                            </Button>
+                        ) : null}
+                        <span class="filter-item-title">{locale.filters.itemTitle(i)}</span>
+                    </div>
+                    <JSONEditor
+                        value={filter}
+                        disabled={!editing}
+                        onChange={value => {
+                            if (!editing) return;
                             const newFilters = [...item.filters];
-                            newFilters.splice(index, 1);
-                            if (!newFilters.length) newFilters.push('{\n\t\n}');
+                            newFilters[index] = value;
                             onItemChange({ ...item, filters: newFilters });
-                        }}>
-                            <RemoveIcon style={{ verticalAlign: 'middle' }} />
-                        </Button>
-                    ) : null}
-                    <span class="filter-item-title">{locale.filters.itemTitle(i)}</span>
+                        }} />
                 </div>
-                <JSONEditor
-                    value={filter}
-                    disabled={!editing}
-                    onChange={value => {
-                        if (!editing) return;
-                        const newFilters = [...item.filters];
-                        newFilters[index] = value;
-                        onItemChange({ ...item, filters: newFilters });
-                    }} />
-            </div>
-        );
-    }
+            );
+        }
 
-    if (editing) {
-        filters.push(
-            <div class="add-filter-item" key="add">
-                <Button icon class="add-filter-button" onClick={() => {
-                    const newFilters = [...item.filters];
-                    newFilters.push('{\n\t\n}');
-                    onItemChange({ ...item, filters: newFilters });
-                }}>
-                    <AddIcon />
-                </Button>
-            </div>
-        );
-    }
-
-    if (editing) {
-        return (
-            <div class="detail-header is-editing">
-                <div class="detail-header-field">
-                    <TextField
-                        label={locale.fields.name}
-                        value={item.name}
-                        onChange={e => onItemChange({ ...item, name: e.target.value })} />
-                </div>
-                <div class="detail-header-field">
-                    <TextField
-                        label={locale.fields.description}
-                        value={item.description}
-                        onChange={e => onItemChange({ ...item, description: e.target.value || null })} />
-                </div>
-                <h3>{locale.filters.title}</h3>
-                <RearrangingList
-                    class="detail-filters"
-                    itemHeight={256}
-                    isItemDraggable={(index) => index < filters.length - 1}
-                    canMove={(toPos) => toPos >= 0 && toPos < filters.length - 1}
-                    onMove={(fromPos, toPos) => {
+        if (editing) {
+            filters.push(
+                <div class="add-filter-item" key="add">
+                    <Button icon class="add-filter-button" onClick={() => {
                         const newFilters = [...item.filters];
-                        const filter = newFilters.splice(fromPos, 1)[0];
-                        newFilters.splice(toPos, 0, filter);
+                        newFilters.push('{\n\t\n}');
                         onItemChange({ ...item, filters: newFilters });
                     }}>
+                        <AddIcon />
+                    </Button>
+                </div>
+            );
+        }
+
+        if (editing) {
+            return (
+                <div class="detail-header is-editing">
+                    <div class="detail-header-field">
+                        <TextField
+                            label={locale.fields.name}
+                            value={item.name}
+                            onChange={e => onItemChange({ ...item, name: e.target.value })} />
+                    </div>
+                    <div class="detail-header-field">
+                        <TextField
+                            label={locale.fields.description}
+                            value={item.description}
+                            onChange={e => onItemChange({ ...item, description: e.target.value || null })} />
+                    </div>
+                    <h3>{locale.filters.title}</h3>
+                    <RearrangingList
+                        class="detail-filters"
+                        itemHeight={256}
+                        isItemDraggable={(index) => index < filters.length - 1}
+                        canMove={(toPos) => toPos >= 0 && toPos < filters.length - 1}
+                        onMove={(fromPos, toPos) => {
+                            const newFilters = [...item.filters];
+                            const filter = newFilters.splice(fromPos, 1)[0];
+                            newFilters.splice(toPos, 0, filter);
+                            const filterKey = this.editFilterKeys.splice(fromPos, 1)[0];
+                            this.editFilterKeys.splice(toPos, 0, filterKey);
+                            onItemChange({ ...item, filters: newFilters });
+                        }}>
+                        {filters}
+                    </RearrangingList>
+                </div>
+            );
+        }
+
+        return (
+            <div class="detail-header">
+                <h1>{item.name}</h1>
+                <p>{item.description}</p>
+                <h3>{locale.filters.title}</h3>
+                <div class="detail-filters">
                     {filters}
-                </RearrangingList>
+                </div>
             </div>
         );
     }
-
-    return (
-        <div class="detail-header">
-            <h1>{item.name}</h1>
-            <p>{item.description}</p>
-            <h3>{locale.filters.title}</h3>
-            <div class="detail-filters">
-                {filters}
-            </div>
-        </div>
-    );
 }
