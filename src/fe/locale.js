@@ -672,7 +672,7 @@ export const lists = {
     },
     filters: {
         title: 'Filtriloj',
-        itemTitle: i => `Filtrilo #${i + 1}`,
+        itemTitle: i => `Filtrilo n-ro ${i + 1}`,
     },
     fields: {
         name: 'Nomo',

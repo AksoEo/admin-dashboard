@@ -87,7 +87,7 @@ export default class CountryGroupPage extends Page {
 const Footer = connect('countries/countries')(countries => ({
     countries,
 }))(function Footer ({ countries, item, editing }) {
-    if (!countries) return null;
+    if (!countries || !item.countries) return null;
 
     const [tentativeMemberships, setTentativeMemberships] = useState({});
 
