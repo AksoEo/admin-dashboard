@@ -214,13 +214,15 @@ class Header extends Component {
 }
 
 function ListPreview ({ item }) {
+    const listId = item.id;
+
     return (
         <coreContext.Consumer>
             {core => (
                 <div class="detail-preview">
                     <DataList
                         onLoad={(offset, limit) => core.createTask('lists/codeholders', {
-                            id: item.id,
+                            id: listId,
                         }, { offset, limit }).runOnceAndDrop()}
                         renderItem={item => {
                             return (
@@ -228,7 +230,8 @@ function ListPreview ({ item }) {
                                     <div class="codeholder-picture">
                                         <ProfilePicture
                                             id={item.id}
-                                            profilePictureHash={item.profilePictureHash} />
+                                            profilePictureHash={item.profilePictureHash}
+                                            profilePictureURL={id => `/lists/public/${listId}/codeholders/${id}/profile_picture/`} />
                                     </div>
                                     <div class="codeholder-name">
                                         {item.name}

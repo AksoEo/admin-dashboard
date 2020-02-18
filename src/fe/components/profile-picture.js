@@ -17,6 +17,8 @@ const DECARDINALIFY = id => [
 /// - `self`: set to true to indicate that id is self
 /// - `profilePictureHash`: if given, will load the profile picture; will show an identicon
 ///   otherwise
+/// - `profilePictureURL`: optional override function that maps a codeholder id to the appropriate
+///   path
 export default class ProfilePicture extends Component {
     state = {
         srcSet: '',
@@ -30,7 +32,10 @@ export default class ProfilePicture extends Component {
         if (profilePictureHash) {
             const hash = Buffer.from(profilePictureHash).toString('base64');
             const fid = isSelf ? 'self' : id;
-            const urlBase = new URL(`codeholders/${fid}/profile_picture/`, config.base).toString();
+            const ppPath = this.props.profilePictureURL
+                ? this.props.profilePictureURL(this.props.id)
+                : `codeholders/${fid}/profile_picture/`;
+            const urlBase = new URL(ppPath, config.base).toString();
             const imgSrcSet = [32, 64, 128, 256].map(w => `${urlBase}${w}px?noop=${hash} ${w}w`).join(', ');
             this.setState({ imgSrcSet, isIdenticon: false });
         } else {
