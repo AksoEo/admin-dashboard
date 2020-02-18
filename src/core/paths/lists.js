@@ -99,6 +99,19 @@ export const tasks = {
         store.remove([LISTS, id]);
         store.signal([LISTS, SIG_LISTS]);
     },
+
+    codeholders: async ({ id }, { offset, limit }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/lists/public/${id}/codeholders`, {
+            fields: ['id', 'name', 'profilePictureHash'],
+            offset,
+            limit,
+        });
+        return {
+            items: res.body,
+            total: +res.res.headers.get('x-total-items'),
+        };
+    },
 };
 
 export const views = {

@@ -7,6 +7,9 @@ import Page from '../../../components/page';
 import DetailView from '../../../components/detail';
 import JSONEditor from '../../../components/json-editor';
 import RearrangingList from '../../../components/rearranging-list';
+import Segmented from '../../../components/segmented';
+import DataList from '../../../components/data-list';
+import ProfilePicture from '../../../components/profile-picture';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
@@ -88,6 +91,10 @@ class Header extends Component {
     /// These keys are used to identify filters while editing the list.
     /// This is necessary to enable rearranging that doesn’t look confusing.
     editFilterKeys = [];
+
+    state = {
+        tab: 'filters',
+    };
 
     render ({ editing, item, onItemChange }) {
         const filters = [];
@@ -180,11 +187,59 @@ class Header extends Component {
             <div class="detail-header">
                 <h1>{item.name}</h1>
                 <p>{item.description}</p>
-                <h3>{locale.filters.title}</h3>
-                <div class="detail-filters">
-                    {filters}
-                </div>
+                <Segmented
+                    selected={this.state.tab}
+                    onSelect={tab => this.setState({ tab })}>
+                    {[
+                        {
+                            id: 'filters',
+                            label: locale.filters.title,
+                        },
+                        {
+                            id: 'preview',
+                            label: locale.preview.title,
+                        },
+                    ]}
+                </Segmented>
+                {this.state.tab === 'filters' ? (
+                    <div class="detail-filters">
+                        {filters}
+                    </div>
+                ) : (
+                    <ListPreview item={item} />
+                )}
             </div>
         );
     }
+}
+
+function ListPreview ({ item }) {
+    return (
+        <coreContext.Consumer>
+            {core => (
+                <div class="detail-preview">
+                    <DataList
+                        onLoad={(offset, limit) => core.createTask('lists/codeholders', {
+                            id: item.id,
+                        }, { offset, limit }).runOnceAndDrop()}
+                        renderItem={item => {
+                            return (
+                                <div class="codeholder-item">
+                                    <div class="codeholder-picture">
+                                        <ProfilePicture
+                                            id={item.id}
+                                            profilePictureHash={item.profilePictureHash} />
+                                    </div>
+                                    <div class="codeholder-name">
+                                        {item.name}
+                                    </div>
+                                </div>
+                            );
+                        }}
+                        emptyLabel={locale.preview.empty}
+                        useShowMore />
+                </div>
+            )}
+        </coreContext.Consumer>
+    );
 }

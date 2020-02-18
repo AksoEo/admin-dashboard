@@ -674,6 +674,10 @@ export const lists = {
         title: 'Filtriloj',
         itemTitle: i => `Filtrilo n-ro ${i + 1}`,
     },
+    preview: {
+        title: '[[preview]]',
+        empty: '[[empty]]',
+    },
     fields: {
         name: 'Nomo',
         description: 'Priskribo',
