@@ -3,6 +3,7 @@ import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
+import JSON5 from 'json5';
 
 export const LISTS = 'lists';
 export const SIG_LISTS = '!lists';
@@ -49,6 +50,14 @@ export const tasks = {
         });
 
         const item = res.body;
+        // try converting filters to JSON5 syntax
+        item.filters = item.filters.map(filter => {
+            try {
+                return JSON5.stringify(JSON.parse(filter), undefined, 4);
+            } catch {
+                return filter;
+            }
+        });
         const existing = store.get([LISTS, item.id]);
         store.insert([LISTS, item.id], deepMerge(existing, item));
 
@@ -72,7 +81,10 @@ export const tasks = {
         const opts = {};
         if ('name' in parameters) opts.name = parameters.name;
         if ('description' in parameters) opts.description = parameters.description;
-        if ('filters' in parameters) opts.filters = parameters.filters;
+        if ('filters' in parameters) {
+            // convert back from JSON5 syntax
+            opts.filters = parameters.filters.map(filter => JSON.stringify(JSON5.parse(filter)));
+        }
 
         await client.patch(`/lists/${id}`, opts);
 
