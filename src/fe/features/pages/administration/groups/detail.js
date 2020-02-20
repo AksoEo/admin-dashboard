@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import Segmented from '../../../../components/segmented';
@@ -86,10 +87,10 @@ export default connect(props => ['adminGroups/group', {
             has: item => selectionSet.has(item),
         } : null;
 
-        let deleteButton;
+        let selectionActionButton;
         if (selectionSet.size) {
-            deleteButton = (
-                <Button onClick={() => {
+            selectionActionButton = (
+                <Button class="selection-action-button" onClick={() => {
                     const task = core.createTask(removeItemsTask, { group: id }, { items: [...selectionSet] });
                     task.on('success', () => {
                         // reset selection
@@ -99,7 +100,13 @@ export default connect(props => ['adminGroups/group', {
                         });
                     });
                 }}>
-                    [[tmp button to delete selection]]
+                    {locale.deleteSelection}
+                </Button>
+            );
+        } else if (canAddItem) {
+            selectionActionButton = (
+                <Button class="selection-action-button" icon small onClick={addItem}>
+                    <AddIcon style={{ verticalAlign: 'middle' }} />
                 </Button>
             );
         }
@@ -131,22 +138,17 @@ export default connect(props => ['adminGroups/group', {
                 <div class="group-header">
                     <div class="group-title">{item.name}</div>
                     <div class="group-description">{item.description}</div>
+                    <LinkButton class="edit-perms-button" target={permsTarget}>
+                        {locale.editPerms}
+                    </LinkButton>
                 </div>
-                <Segmented selected={tab} onSelect={tab => this.setState({ tab })}>
+                <Segmented class="tab-switcher" selected={tab} onSelect={tab => this.setState({ tab })}>
                     {[
-                        perms.hasPerm('codeholders.read') && { id: 'codeholders', label: '[TMP CH]' },
-                        perms.hasPerm('clients.read') && { id: 'clients', label: '[TMP API]' },
+                        perms.hasPerm('codeholders.read') && { id: 'codeholders', label: locale.tabs.codeholders },
+                        perms.hasPerm('clients.read') && { id: 'clients', label: locale.tabs.clients },
                     ].filter(x => x)}
                 </Segmented>
-                <LinkButton target={permsTarget}>
-                    [[edit perms]]
-                </LinkButton>
-                {canAddItem ? (
-                    <Button onClick={addItem}>
-                        [[add one]]
-                    </Button>
-                ) : null}
-                {deleteButton}
+                {selectionActionButton}
                 <OverviewList
                     task={itemsTask}
                     notice={itemsNotice}

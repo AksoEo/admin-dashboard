@@ -509,6 +509,12 @@ export const adminGroups = {
         name: 'Nomo',
         description: 'Priskribo',
     },
+    tabs: {
+        codeholders: 'Membroj',
+        clients: 'API-klientoj',
+    },
+    editPerms: 'Redakti permesojn',
+    deleteSelection: '[[delete selection]]',
 
     addCodeholders: 'Aldoni membron',
     addCodeholdersCount: n => `${n} membro${n === 1 ? '' : 'j'} elektitaj`,
