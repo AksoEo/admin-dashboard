@@ -54,15 +54,18 @@ module.exports = function (env, argv) {
         ],
     };
 
+    const entry = {};
+    entry.entry = './src/fe/index.js';
+    if (prod) {
+        entry.unsupported = './src/unsupported.js';
+    }
+
     return {
         mode: prod ? 'production' : 'development',
-        entry: {
-            entry: './src/fe/index.js',
-            unsupported: './src/unsupported.js',
-        },
+        entry,
         output: {
-            filename: '[name].[chunkhash].js',
-            chunkFilename: '[name].[chunkhash].js',
+            filename: prod ? '[name].[hash].js' : '[name].js',
+            chunkFilename: prod ? '[id].[chunkhash].js' : '[name].js',
             path: path.resolve(__dirname, 'dist'),
             globalObject: 'this',
         },
@@ -75,7 +78,7 @@ module.exports = function (env, argv) {
 
                 'react': 'preact/compat',
                 'react-dom': 'preact/compat',
-            }
+            },
         },
         devtool: prod ? 'source-map' : 'inline-source-map',
         stats: prod ? 'minimal' : undefined,
@@ -92,10 +95,11 @@ module.exports = function (env, argv) {
         },
         plugins: [
             new MiniCssExtractPlugin({
-                filename: '[name].[contenthash].css',
-                chunkFilename: '[name].[contenthash].css'
+                filename: prod ? '[name].[hash].css' : '[name].css',
+                chunkFilename: prod ? '[id].[hash].css' : '[name].css',
+                ignoreOrder: true,
             }),
-            new OptimizeCssAssetsPlugin(),
+            prod && new OptimizeCssAssetsPlugin(),
             new HtmlWebpackPlugin({
                 template: 'src/fe/index.html',
                 inject: 'body',
@@ -120,8 +124,8 @@ module.exports = function (env, argv) {
                     test: /()\.m?js$/,
                     // exclude unsupported.js
                     // exclude all node_modules
-                    // (except akso-client and yamdl which are git dependencies)
-                    exclude: /unsupported\.js|node_modules\/(?!akso-client|@cpsdqs\/yamdl)/,
+                    // (except yamdl because it doesn’t have a compiler setup yet)
+                    exclude: /unsupported\.js|node_modules\/(?!@cpsdqs\/yamdl)/,
                     use: [
                         {
                             loader: 'babel-loader',
@@ -146,7 +150,12 @@ module.exports = function (env, argv) {
                 {
                     test: /\.(c|le)ss$/,
                     use: [
-                        MiniCssExtractPlugin.loader,
+                        {
+                            loader: MiniCssExtractPlugin.loader,
+                            options: {
+                                hmr: !prod,
+                            },
+                        },
                         {
                             loader: 'css-loader',
                             options: {
@@ -175,8 +184,9 @@ module.exports = function (env, argv) {
         devServer: {
             contentBase: path.join(__dirname, 'src'),
             port: 2576,
-            stats: prod ? 'minimal' : undefined,
+            stats: 'minimal',
             historyApiFallback: true,
+            hot: true,
             before (app, server) {
                 app.use('/assets', express.static('assets'));
                 app.use('/apple-touch-icon.png', express.static('assets/apple-touch-icon.png'));
