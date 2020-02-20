@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import { Button } from '@cpsdqs/yamdl';
-import CopyIcon from '@material-ui/icons/FileCopy';
 import FIELDS from './table-fields';
 import ObjectViewer from '../../../../components/object-viewer';
+import CopyIcon from '../../../../components/copy-icon';
 import { Link } from '../../../../router';
 import { httpLog as locale } from '../../../../locale';
 
