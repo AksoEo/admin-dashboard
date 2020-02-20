@@ -1,3 +1,4 @@
+import ipaddr from 'ipaddr.js';
 import asyncClient from '../client';
 import { AbstractDataView } from '../view';
 import * as store from '../store';
@@ -51,7 +52,7 @@ const clientFilters = {
         }),
     },
     apiKey: { toAPI: value => ({ apiKey: value }) },
-    ip: { toAPI: value => ({ ip: value }) },
+    ip: { toAPI: value => ({ ip: Buffer.from(ipaddr.parse(value).toByteArray()) }) },
     origin: { toAPI: value => ({ origin: value }) },
     method: { toAPI: value => ({ method: value }) },
     path: { toAPI: value => ({ path: value }) },

@@ -10,6 +10,7 @@ import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { connectContextualActions } from '../../../../context-action';
 import { apiKey } from '../../../../components/data';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 
 export const FIELDS = {
     name: {
@@ -54,6 +55,38 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
 
     static contextType = coreContext;
 
+    #searchInput;
+    #currentQuery = '';
+
+    decodeURLQuery () {
+        this.setState({
+            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
+        });
+        this.#currentQuery = this.props.query;
+    }
+
+    encodeURLQuery () {
+        const encoded = encodeURLQuery(this.state.parameters, {});
+        if (encoded === this.#currentQuery) return;
+        this.#currentQuery = encoded;
+        this.props.onQueryChange(encoded);
+    }
+
+    componentDidMount () {
+        this.decodeURLQuery();
+
+        this.#searchInput.focus(500);
+    }
+
+    componentDidUpdate (prevProps, prevState) {
+        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
+            this.decodeURLQuery();
+        }
+        if (prevState.parameters !== this.state.parameters) {
+            this.encodeURLQuery();
+        }
+    }
+
     render ({ contextualAction, perms }, { parameters }) {
         const actions = [];
         if (perms.hasPerm('clients.create')) {
@@ -86,7 +119,8 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
                     locale={{
                         searchPlaceholders: locale.search.placeholders,
                         searchFields: locale.fields,
-                    }} />
+                    }}
+                    inputRef={view => this.#searchInput = view} />
                 <OverviewList
                     task="clients/list"
                     view="clients/client"

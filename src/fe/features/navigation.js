@@ -321,6 +321,7 @@ export default class Navigation extends PureComponent {
 
     #lastNavigateTime;
     #debouncedNavigateTimeout;
+    #debouncedNavArgs;
 
     /// Navigates with an href.
     navigate = (href, replace) => {
@@ -353,9 +354,10 @@ export default class Navigation extends PureComponent {
 
     debouncedNavigate = (...args) => {
         if (this.#lastNavigateTime > Date.now() - 400) {
+            this.#debouncedNavArgs = args;
             if (!this.#debouncedNavigateTimeout) {
                 this.#debouncedNavigateTimeout = setTimeout(() => {
-                    this.navigate(...args);
+                    this.navigate(...this.#debouncedNavArgs);
                 }, 400);
             }
             return;

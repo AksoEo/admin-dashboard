@@ -147,7 +147,7 @@ export function encodeURLQuery (state, filters) {
         if (!count) data = data.substr(0, data.length - 'filter('.length);
         else data += ')';
     }
-    {
+    if (state.fields && state.fields.filter(x => !x.fixed || x.sorting !== 'none').length) {
         // fields(field:sorting, ...)
         data += 'fields(';
         let count = 0;
@@ -217,8 +217,8 @@ export function decodeURLQuery (data, filters) {
                     const [sorting, sortingLen] = maybeDecodeParens(data, ':),');
                     data = data.substr(sortingLen);
 
-                    parameters.fields.push({ id, sorting });
-                } else {
+                    if (id) parameters.fields.push({ id, sorting });
+                } else if (id) {
                     parameters.fields.push({ id, sorting: 'none' });
                 }
 

@@ -1,3 +1,5 @@
+import { util } from '@tejo/akso-client';
+
 export function filtersToAPI (clientFilters, pfilters) {
     const filters = [];
     if (pfilters && !pfilters._disabled) {
@@ -63,7 +65,11 @@ export const makeParametersToRequestData = ({
             if (data) Object.assign(additionalData, data);
             options.search = search;
         } else {
-            options.search = { str: params.search.query, cols: [searchField] };
+            const transformedQuery = util.transformSearch(params.search.query);
+            if (!util.isValidSearch(transformedQuery)) {
+                throw { code: 'invalid-search-query', message: 'invalid search query' };
+            }
+            options.search = { str: transformedQuery, cols: [searchField] };
         }
     }
 

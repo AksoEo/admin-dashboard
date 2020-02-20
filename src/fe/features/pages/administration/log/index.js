@@ -62,7 +62,7 @@ export default class APILogListView extends Page {
     }
 
     encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.options, FILTERS);
+        const encoded = encodeURLQuery(this.state.parameters, FILTERS);
         if (encoded === this.#currentQuery) return;
         this.#currentQuery = encoded;
         this.props.onQueryChange(encoded);
@@ -78,7 +78,7 @@ export default class APILogListView extends Page {
         if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
             this.decodeURLQuery();
         }
-        if (prevState.options !== this.state.options) {
+        if (prevState.parameters !== this.state.parameters) {
             this.encodeURLQuery();
         }
     }
