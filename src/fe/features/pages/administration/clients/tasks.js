@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../../components/task-dialog';
+import ChangedFields from '../../../../components/changed-fields';
 import { Validator } from '../../../../components/form';
 import { clients as locale } from '../../../../locale';
 import { routerContext } from '../../../../router';
@@ -62,30 +63,9 @@ export default {
                 title={locale.update}
                 actionLabel={locale.updateButton}
                 run={() => task.runOnce()}>
-                <Validator
-                    component={TextField}
-                    label={locale.fields.name}
-                    value={task.parameters.name || ''}
-                    onChange={e => task.update({ name: e.target.value })}
-                    validate={name => {
-                        if (!name) throw { error: locale.nameRequired };
-                    }} />
-                <Validator
-                    component={TextField}
-                    label={locale.fields.ownerName}
-                    value={task.parameters.ownerName || ''}
-                    onChange={e => task.update({ ownerName: e.target.value })}
-                    validate={name => {
-                        if (!name) throw { error: locale.ownerNameRequired };
-                    }} />
-                <Validator
-                    component={TextField}
-                    label={locale.fields.ownerEmail}
-                    value={task.parameters.ownerEmail || ''}
-                    onChange={e => task.update({ ownerEmail: e.target.value })}
-                    validate={email => {
-                        if (!email) throw { error: locale.ownerEmailRequired };
-                    }} />
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={locale.fields} />
             </TaskDialog>
         );
     },

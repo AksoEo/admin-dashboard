@@ -8,6 +8,7 @@ import './changed-fields.less';
 /// - changedFields: list of changed fields
 /// - locale: localized field names
 export default function ChangedFields ({ changedFields, locale: localizedFields }) {
+    if (!changedFields) return;
     return (
         <div class="changed-fields">
             <span class="changed-fields-title">
