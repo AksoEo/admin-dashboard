@@ -48,6 +48,7 @@ export default class TaskDialog extends Component {
                 <Form class="task-dialog-form" onSubmit={this.#run}>
                     {this.props.children}
                     <footer class="task-dialog-footer">
+                        <span class="task-dialog-footer-phantom" />
                         <Validator
                             component={Button}
                             raised

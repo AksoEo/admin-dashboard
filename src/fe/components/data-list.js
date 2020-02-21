@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { Button, Menu } from '@cpsdqs/yamdl';
+import { Button, Menu, CircularProgress } from '@cpsdqs/yamdl';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { data as locale } from '../locale';
 import { coreContext } from '../core/connection';
@@ -32,12 +32,14 @@ export default class DataList extends PureComponent {
     state = {
         items: [],
         total: -1,
+        loading: false,
     };
 
     static contextType = coreContext;
 
     async fetchChunk (chunk) {
         if (this.state.total > -1 && chunk * VLIST_CHUNK_SIZE > this.state.total) return;
+        this.setState({ loading: true });
         const result = await this.props.onLoad(chunk * VLIST_CHUNK_SIZE, VLIST_CHUNK_SIZE);
         if (!this.maySetState) return;
 
@@ -49,6 +51,7 @@ export default class DataList extends PureComponent {
         this.setState({
             total: result.total,
             items,
+            loading: false,
         });
     }
 
@@ -186,6 +189,15 @@ export default class DataList extends PureComponent {
             }
         }
 
+        let loadingIndicator = null;
+        if (this.state.loading) {
+            loadingIndicator = (
+                <div class="data-list-loading-indicator">
+                    <CircularProgress indeterminate />
+                </div>
+            );
+        }
+
         return (
             <div
                 class={'data-list ' + (useAbsolutePositioning ? '' : 'is-flat ') + (this.props.class || '')}
@@ -195,6 +207,7 @@ export default class DataList extends PureComponent {
                     class="vlist-spacer"
                     style={{ height: total * this.props.itemHeight }} />
                 {items}
+                {loadingIndicator}
                 {showMore}
             </div>
         );
