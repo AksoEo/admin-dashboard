@@ -61,6 +61,7 @@ export const tasks = {
             description: description || null,
             query,
         });
+        return +id;
     },
 
     /// queries/delete: deletes a query

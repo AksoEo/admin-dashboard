@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Suspense, useEffect, useState, Fragment } from 'preact/compat';
-import { Checkbox, Dialog } from '@cpsdqs/yamdl';
+import { Checkbox, Button, Dialog } from '@cpsdqs/yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import PaperList from './paper-list';
 import DataList from './data-list';
@@ -199,8 +199,12 @@ const FiltersBar = connectPerms(function FiltersBar ({
     const filterType = value.filters._disabled ? 'json' : 'normal';
     const onFilterTypeChange = type => {
         const json = type === 'json';
+        const _savedFilter = json
+            ? value._savedFilter
+            : null;
         onChange({
             ...value,
+            _savedFilter,
             jsonFilter: {
                 ...(value.jsonFilter || {}),
                 _disabled: !json,
@@ -216,12 +220,12 @@ const FiltersBar = connectPerms(function FiltersBar ({
     if (value._savedFilter) {
         loadedFilter = (
             <span class="loaded-filter">
-                <button class="tiny-remove-button" onClick={() => {
+                <Button icon small class="filter-remove-button" onClick={() => {
                     // remove savedFilter link
                     onChange({ ...value, _savedFilter: null });
                 }}>
-                    <RemoveIcon />
-                </button>
+                    <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                </Button>
                 {value._savedFilter.name}
             </span>
         );
@@ -249,15 +253,19 @@ const FiltersBar = connectPerms(function FiltersBar ({
                 ]}
             </Segmented>
 
+            <span class="filters-bar-spacer" />
+
             {loadedFilter}
+
+            <span class="filters-bar-spacer" />
 
             <coreContext.Consumer>
                 {core => (
                     <Fragment>
                         {canReadFilters ? (
-                            <button class="tiny-button" onClick={() => setPickerOpen(true)}>
+                            <Button class="tiny-button" onClick={() => setPickerOpen(true)}>
                                 {locale.loadFilter}
-                            </button>
+                            </Button>
                         ) : null}
                         <FilterPicker
                             open={pickerOpen}
@@ -281,7 +289,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                             }} />
 
                         {(filterType === 'json' || filtersToAPITask) && canSaveFilters ? (
-                            <button class="tiny-button" onClick={async () => {
+                            <Button class="tiny-button" onClick={async () => {
                                 let filter;
                                 if (filterType === 'normal' && filtersToAPITask) {
                                     // we need to save the api representation
@@ -323,7 +331,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                                 });
                             }}>
                                 {locale.saveFilter}
-                            </button>
+                            </Button>
                         ) : null}
                     </Fragment>
                 )}
@@ -349,9 +357,9 @@ const FilterPicker = connectPerms(function FilterPicker ({ category, open, onClo
                 }).runOnceAndDrop()}
                 itemHeight={56}
                 renderItem={item => (
-                    <div>
+                    <div class="search-filter-item">
                         <div>{item.name}</div>
-                        <div>{item.description}</div>
+                        <div class="filter-item-description">{item.description}</div>
                     </div>
                 )}
                 onItemClick={item => onLoad(item)}

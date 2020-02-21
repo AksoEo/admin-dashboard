@@ -48,9 +48,39 @@
 
     .filters-bar {
         padding: 0 16px;
+        display: flex;
+        align-items: center;
 
         .json-switch {
             font-size: small;
+            flex-shrink: 0;
+        }
+
+        .filters-bar-spacer {
+            flex: 1;
+        }
+
+        .loaded-filter {
+            margin: 0 4px;
+            flex-shrink: 0;
+
+            .filter-remove-button {
+                margin-right: 4px;
+                --md-button-color: @gray-button-color;
+            }
+        }
+
+        .tiny-button {
+            flex-shrink: 0;
+            padding: 4px 8px;
+            margin: 0;
+            margin-left: 4px;
+            font-size: small;
+            font-weight: inherit;
+            line-height: inherit;
+            letter-spacing: inherit;
+            text-transform: none;
+            --md-button-color: @gray-button-color;
         }
     }
 
@@ -82,4 +112,10 @@
 .search-filter-picker {
     width: 400px;
     height: 600px;
+
+    .search-filter-item {
+        .filter-item-description {
+            font-size: small;
+        }
+    }
 }
