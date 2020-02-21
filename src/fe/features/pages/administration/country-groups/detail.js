@@ -1,12 +1,13 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { Button, CircularProgress } from '@cpsdqs/yamdl';
+import { Checkbox, CircularProgress } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
-import CheckIcon from '@material-ui/icons/Check';
+import SearchIcon from '@material-ui/icons/Search';
+import fuzzaldrin from 'fuzzaldrin';
 import Page from '../../../../components/page';
 import { CountryFlag } from '../../../../components/data/country';
-import MulticolList from '../../../../components/multicol-list';
 import DetailView from '../../../../components/detail';
+import RearrangingList from '../../../../components/rearranging-list';
 import Meta from '../../../meta';
 import { connect, coreContext } from '../../../../core/connection';
 import { FIELDS } from './fields';
@@ -90,10 +91,18 @@ const Footer = connect('countries/countries')(countries => ({
     if (!countries || !item.countries) return null;
 
     const [tentativeMemberships, setTentativeMemberships] = useState({});
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredCountries = searchQuery
+        ? fuzzaldrin.filter(Object.keys(countries).map(code => ({
+            code,
+            name: countries[code].name_eo,
+        })), searchQuery, { key: 'name' }).map(({ code }) => code)
+        : Object.keys(countries);
 
     const countryItems = [];
 
-    for (const code in countries) {
+    for (const code of filteredCountries) {
         const isMember = item.countries.includes(code);
         if (!editing && !isMember) continue;
 
@@ -109,28 +118,37 @@ const Footer = connect('countries/countries')(countries => ({
             setTentativeMemberships(tm);
         };
 
-        const tentativeMembership = tentativeMemberships[code] || null;
-        const hasTM = tentativeMembership !== null;
-
-        const isGUIMember = hasTM ? tentativeMembership : isMember;
-
-        countryItems.push({
-            key: code,
-            column: isGUIMember ? 0 : 1,
-            node: <CountryItem
+        countryItems.push(
+            <CountryItem
+                key={code}
                 group={item.code}
                 code={code}
                 name={name}
                 isMember={isMember}
                 editing={editing}
                 setTentativeMembership={setTentativeMembership} />,
-        });
+        );
     }
 
+    // this is a rearranging list because they have good support for filtering
     return (
-        <MulticolList columns={editing ? 2 : 1} itemHeight={48}>
-            {countryItems}
-        </MulticolList>
+        <div class="countries-list-container">
+            <div class="countries-list-search">
+                <div class="countries-list-search-icon">
+                    <SearchIcon style={{ verticalAlign: 'middle' }} />
+                </div>
+                <input
+                    value={searchQuery}
+                    placeholder={locale.detailSearchPlaceholder}
+                    onChange={e => setSearchQuery(e.target.value)} />
+            </div>
+            <RearrangingList
+                class="countries-list"
+                isItemDraggable={() => false}
+                canMove={() => false}>
+                {countryItems}
+            </RearrangingList>
+        </div>
     );
 });
 
@@ -168,15 +186,21 @@ function CountryItem ({ group, code, name, editing, isMember, setTentativeMember
                 };
 
                 return (
-                    <Button
+                    <div
                         class="country-item"
-                        disabled={!!currentTask}
-                        onClick={onClick}>
-                        <CountryFlag code={code} /> {name}
-                        {currentTask
-                            ? <CircularProgress indeterminate />
-                            : isMember ? <CheckIcon style={{ verticalAlign: 'middle' }} /> : null}
-                    </Button>
+                        disabled={!!currentTask}>
+                        <div class="country-checkbox-container">
+                            {currentTask
+                                ? <CircularProgress indeterminate small />
+                                : editing
+                                    ? <Checkbox
+                                        checked={isMember}
+                                        onClick={onClick} />
+                                    : null}
+                        </div>
+                        <CountryFlag country={code} />
+                        {name}
+                    </div>
                 );
             }}
         </coreContext.Consumer>

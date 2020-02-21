@@ -647,6 +647,7 @@ export const countryGroups = {
     search: {
         placeholders: 'Serĉi landarojn',
     },
+    detailSearchPlaceholder: 'Serĉi landojn',
     fields: {
         code: 'Landarokodo',
         name: 'Nomo',
