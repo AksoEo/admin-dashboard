@@ -389,6 +389,14 @@ export default class Navigation extends PureComponent {
         }
     }
 
+    /// Replaces all stack items above the given index with the given path.
+    pushStackAt (stackIndex, path, replace) {
+        const stack = this.state.stack.slice();
+        stack.splice(stackIndex + 1);
+        const pathname = '/' + stack.map(x => x.path).concat(path.split('/')).join('/');
+        this.navigate(pathname, replace);
+    }
+
     /// Removes all stack items at and above the given index.
     popStackAt (stackIndex, replace) {
         const stack = this.state.stack.slice();
@@ -510,6 +518,7 @@ export default class Navigation extends PureComponent {
                             match={stackItem.pathMatch}
                             matches={this.state.stack.slice(0, i + 1).map(x => x.pathMatch)}
                             onNavigate={this.navigate}
+                            push={(path, replace) => this.pushStackAt(i, path, replace)}
                             pop={() => this.popStackAt(i)}
                             {...stackItem.state} />
                     </Suspense>

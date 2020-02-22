@@ -34,6 +34,7 @@ const perms = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: t
 const memberships = () => import(/* webpackChunkName: 'core-memberships', webpackPrefetch: true */ './memberships');
 const roles = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './roles');
 const queries = () => import(/* webpackChunkName: 'core-queries', webpackPrefetch: true */ './queries');
+const votes = () => import(/* webpackChunkName: 'core-votes', webpackPrefetch: true */ './votes');
 const debug = () => import(/* webpackChunkName: 'core-debug' */ './debug');
 
 /// Task definitions.
@@ -51,6 +52,7 @@ export const tasks = {
     lists: lazyPath(lists, mapTasks),
     queries: lazyPath(queries, mapTasks),
     perms: lazyPath(perms, mapTasks),
+    votes: lazyPath(votes, mapTasks),
     debug: lazyPath(debug, mapTasks),
 };
 
@@ -66,6 +68,7 @@ export const views = {
     memberships: lazyPath(memberships, mapViews),
     roles: lazyPath(roles, mapViews),
     perms: lazyPath(perms, mapViews),
+    votes: lazyPath(votes, mapViews),
     debug: lazyPath(debug, mapViews),
 
     /// #tasks: a map of all current tasks to their paths; used for task views in the FE

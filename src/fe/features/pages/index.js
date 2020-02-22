@@ -165,10 +165,12 @@ export default [
                 hasPerm: () => true,
             },
             {
-                id: 'elections',
+                id: 'votes',
                 icon: HowToVoteIcon,
                 path: 'vochdonado',
-                hasPerm: () => true,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes')),
+                hasPerm: perms => perms.hasPerm('votes.read.uea') || perms.hasPerm('votes.read.tejo'),
             },
             {
                 id: 'newsletters',

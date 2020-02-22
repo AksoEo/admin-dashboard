@@ -130,8 +130,6 @@ export const views = {
                 }
             }
 
-            /// Note that this specifically uses the id argument and not this.id so that we’re
-            /// fetching `self` instead of the resolved id if id is set to `self`
             if (shouldFetch) {
                 tasks.list({}, {
                     jsonFilter: {

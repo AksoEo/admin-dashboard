@@ -90,10 +90,6 @@ export default class PermsEditor extends Component {
 
         return (
             <div class="perms-editor" ref={node => this.#node = node}>
-                <div>
-                    <Checkbox checked={showRaw} onChange={showRaw => this.setState({ showRaw })} />
-                    don’t mind this thing this is temporary for debugging
-                </div>
                 {spec.map((x, i) => <PermsItem item={x} key={i} ctx={ctx} />)}
                 {unknownPerms}
             </div>

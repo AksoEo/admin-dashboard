@@ -118,7 +118,7 @@ export const pages = {
     statistics: 'Statistiko',
     congresses: 'Kongresoj',
     payments: 'Pagoj',
-    elections: 'Voĉdonado',
+    votes: 'Voĉdonado',
     newsletters: 'Bultenoj',
     administration: 'Administrado',
     'administration-groups': 'Administraj grupoj',
@@ -708,6 +708,32 @@ export const lists = {
     },
 
     nameRequired: 'Necesas nomo',
+};
+
+export const votes = {
+    title: 'Voĉdonadoj',
+    templates: {
+        menuItem: 'Ŝablonoj',
+    },
+    search: {
+        placeholders: {
+            name: 'Serĉi nomon',
+            description: 'Serĉi priskribon',
+        },
+    },
+    fields: {
+        org: '[[org]]',
+        name: 'Nomo',
+        state: '[[state]]',
+        description: 'Priskribo',
+        voterCodeholders: '[[voterCodeholders]]',
+        voterCodeholdersMemberFilter: '[[voterCodeholdersMemberFilter]]',
+        viewerCodeholders: '[[viewerCodeholders]]',
+        viewerCodeholdersMemberFilter: '[[viewerCodeholdersMemberFilter]]',
+        timespan: '[[timespan]]',
+        ballotsSecret: '[[ballotsSecret]]',
+        config: '[[config]]',
+    },
 };
 
 export const mime = {

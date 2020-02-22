@@ -3,13 +3,14 @@ import { PureComponent, useState } from 'preact/compat';
 import { Button, Menu, DrawerItem, DrawerLabel, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ProfilePicture from '../../components/profile-picture';
+import TEJOIcon from '../../components/tejo-icon';
+import UEAIcon from '../../components/uea-icon';
 import { Link, routerContext } from '../../router';
 import permsContext from '../../perms';
 import SidebarLogo from './sidebar-logo';
 import pages from '../pages';
 import { app as locale, pages as localePages, meta as localeMeta } from '../../locale';
 import { connect } from '../../core/connection';
-import { TEJOIcon, UEAIcon } from './icons';
 
 // also see src/pages/index.js
 
