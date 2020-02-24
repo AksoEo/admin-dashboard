@@ -13,6 +13,7 @@ const OVERFLOW_HEIGHT = () => window.innerHeight - 120;
 /// - selected: number
 /// - children: array of vnodes
 /// - onPageChange: callback for when the animation finishes
+/// - eager: if true, will check page heights every update
 export default class AutosizingPageView extends Component {
     state = {
         x: 0,
@@ -75,14 +76,26 @@ export default class AutosizingPageView extends Component {
             this.updatePageHeights();
             this.firedPageChange = false;
         }
+
+        if (this.props.eager) {
+            if (this.updatePageHeights()) {
+                this.forceUpdate();
+            }
+        }
     }
 
     /** Updates page heights from the DOM. */
     updatePageHeights () {
+        let changed = false;
         for (const key in this.items) {
             const item = this.items[key];
-            item.height = item.node.offsetHeight;
+            const { offsetHeight } = item.node;
+            if (offsetHeight !== item.height) {
+                changed = true;
+                item.height = offsetHeight;
+            }
         }
+        return changed;
     }
 
     /** Updates page heights and triggers a re-render. */

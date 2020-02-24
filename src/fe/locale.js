@@ -784,9 +784,11 @@ export const votes = {
         title: 'Krei voĉdonadon',
         button: 'Krei',
         pages: {
-            generic: '[[generic info]]',
-            timespan: '[[timespan]]',
-            config: '[[vote config]]',
+            template: '[[template]]',
+            general: '[[general]]',
+            vote: '[[vote]]',
+            voters: '[[voters]]',
+            config: '[[config]]',
         },
         continue: 'Daŭrigi',
 

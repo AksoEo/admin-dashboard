@@ -8,6 +8,7 @@ function gcd(a, b) {
     return gcd(b, a % b);
 }
 function reduceFrac ([n, d]) {
+    if (!Number.isFinite(n) || !Number.isFinite(d)) return [0, 1];
     const sign = Math.sign(n) * Math.sign(d);
     n = Math.abs(n);
     d = Math.abs(d);
@@ -32,17 +33,17 @@ export default class Rational extends Component {
         let switchButton = (
             <button
                 class={'rational-type-switch' + (isFractional ? ' is-fraction' : '')}
-                onClick={() => {
+                onClick={e => {
+                    e.preventDefault();
                     if (isFractional) {
                         onChange(value[0] / value[1]);
                     } else {
                         let numerator = value;
                         let denominator = 1;
-                        while (numerator % 1 !== 0) {
+                        while (Number.isFinite(numerator) && numerator % 1 !== 0) {
                             numerator *= 10;
                             denominator *= 10;
                         }
-
                         onChange(reduceFrac([numerator, denominator]));
                     }
                 }}>

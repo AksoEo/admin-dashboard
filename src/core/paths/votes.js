@@ -3,7 +3,7 @@ import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
 import * as store from '../store';
-import { deepMerge } from '../../util';
+import { deepMerge, deepEq } from '../../util';
 
 const clientFields = {
     id: 'id',
@@ -19,13 +19,7 @@ const clientFields = {
             hasEnded: vote.hasEnded,
             isActive: vote.isActive,
         }),
-        toAPI: value => ({
-            hasResults: value.hasResults,
-            usedTieBreaker: value.usedTieBreaker,
-            hasStarted: value.hasStarted,
-            hasEnded: value.hasEnded,
-            isActive: value.isActive,
-        }),
+        toAPI: () => ({}),
     },
     description: 'description',
     voterCodeholders: {
@@ -207,6 +201,36 @@ export const tasks = {
         store.insert([VOTES, +id], deepMerge(existing, clientFromAPI(res.body)));
 
         return +id;
+    },
+
+    create: async (_, data) => {
+        const client = await asyncClient;
+        const res = await client.post('/votes', clientToAPI(data));
+        const id = +res.headers.get('x-identifier');
+        store.insert([VOTES, +id], data);
+        return id;
+    },
+
+    update: async ({ id }, data) => {
+        const client = await asyncClient;
+        const existing = store.get([VOTES, +id]);
+        const currentData = clientToAPI(existing);
+        const newData = clientToAPI(data);
+        const diff = {};
+
+        for (const k in newData) {
+            if (!deepEq(currentData[k], newData[k])) {
+                diff[k] = newData[k];
+            }
+        }
+        await client.patch(`/votes/${id}`, diff);
+        store.insert([VOTES, +id], deepMerge(existing, data));
+    },
+
+    delete: async ({ id }) => {
+        const client = await asyncClient;
+        await client.delete(`/votes/${id}`);
+        store.remove([VOTES, +id]);
     },
 };
 
