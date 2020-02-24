@@ -189,6 +189,7 @@ export class Validator extends Component {
         delete props.validate;
         delete props.component;
         const { validatorProps } = props;
+        if (validatorProps && ('class' in validatorProps)) validatorProps.class += ' form-validator';
         delete props.validatorProps;
         props.ref = this.props.innerRef;
 

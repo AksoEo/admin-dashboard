@@ -712,6 +712,7 @@ export const lists = {
 
 export const votes = {
     title: 'Voĉdonadoj',
+    detailTitle: 'Voĉdonado',
     templates: {
         menuItem: 'Ŝablonoj',
     },
@@ -723,6 +724,7 @@ export const votes = {
     },
     fields: {
         org: '[[org]]',
+        type: '[[type]]',
         name: 'Nomo',
         state: '[[state]]',
         description: 'Priskribo',
@@ -731,8 +733,75 @@ export const votes = {
         viewerCodeholders: '[[viewerCodeholders]]',
         viewerCodeholdersMemberFilter: '[[viewerCodeholdersMemberFilter]]',
         timespan: '[[timespan]]',
+        timeStart: '[[timeStart]]',
+        timeEnd: '[[timeEnd]]',
         ballotsSecret: '[[ballotsSecret]]',
         config: '[[config]]',
+    },
+    cannotEditActive: '[[cannot edit active vote]]',
+    bool: {
+        yes: '[[yes]]',
+        no: '[[no]]',
+    },
+    rational: {
+        numerator: '[[numerator]]',
+        denominator: '[[denominator]]',
+    },
+    noMaxOptions: '[[infinite options!!!]]',
+    state: {
+        hasNotStarted: '[[has not started]]',
+        isActive: '[[active]]',
+        hasEnded: '[[has ended]]',
+        hasResults: '[[has results]]',
+        hasResultsTiebreaker: '[[has results, used tb]]',
+    },
+    config: {
+        quorum: '[[quorum]]',
+        quorumInclusive: '[[quorumInclusive]]',
+        majorityBallots: '[[majorityBallots]]',
+        majorityBallotsInclusive: '[[majorityBallotsInclusive]]',
+        majorityVoters: '[[majorityVoters]]',
+        majorityVotersInclusive: '[[majorityVotersInclusive]]',
+        majorityMustReachBoth: '[[majorityMustReachBoth]]',
+        numChosenOptions: '[[numChosenOptions]]',
+        mentionThreshold: '[[mentionThreshold]]',
+        mentionThresholdInclusive: '[[mentionThresholdInclusive]]',
+        maxOptionsPerBallot: '[[maxOptionsPerBallot]]',
+        tieBreakerCodeholder: '[[tieBreakerCodeholder]]',
+        publishVoters: '[[publishVoters]]',
+        publishVotersPercentage: '[[publishVotersPercentage]]',
+        options: '[[options]]',
+    },
+    types: {
+        yn: '[[yes/no]]',
+        ynb: '[[yes/no/blank]]',
+        rp: '[[tejo® ranked pairs]]',
+        stv: '[[tejo® single transferable vote]]',
+        tm: '[[uea® threshold majority]]',
+    },
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei voĉdonadon',
+        button: 'Krei',
+        pages: {
+            generic: '[[generic info]]',
+            timespan: '[[timespan]]',
+            config: '[[vote config]]',
+        },
+        continue: 'Daŭrigi',
+
+        requiresSelection: '[[requires selection]]',
+    },
+    update: {
+        menuItem: 'Aktualigi',
+        title: 'Aktualigi voĉdonadon',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi voĉdonadon',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la voĉdonadon? Ne eblas malfari tiun ĉi agon.',
     },
 };
 

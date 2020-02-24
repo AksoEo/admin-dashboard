@@ -1,0 +1,20 @@
+.autosizing-page-view {
+    position: relative;
+    overflow: hidden;
+    padding-top: 20px;
+    flex-shrink: 0;
+    flex-grow: 1;
+
+    &.may-overflow {
+        overflow-y: auto;
+    }
+
+    @media (max-width: 420px) {
+        overflow: visible;
+    }
+
+    .autosizing-page {
+        position: absolute;
+        width: 100%;
+    }
+}

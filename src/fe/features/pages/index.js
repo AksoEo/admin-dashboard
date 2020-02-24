@@ -171,6 +171,21 @@ export default [
                 component: elazy(() =>
                     import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes')),
                 hasPerm: perms => perms.hasPerm('votes.read.uea') || perms.hasPerm('votes.read.tejo'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: 'newsletters',

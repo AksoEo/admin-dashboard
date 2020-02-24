@@ -1,3 +1,4 @@
+import JSON5 from 'json5';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
@@ -8,6 +9,7 @@ const clientFields = {
     id: 'id',
     org: 'org',
     name: 'name',
+    type: 'type',
     state: {
         apiFields: ['hasResults', 'usedTieBreaker', 'hasStarted', 'hasEnded', 'isActive'],
         fromAPI: vote => ({
@@ -26,10 +28,26 @@ const clientFields = {
         }),
     },
     description: 'description',
-    voterCodeholders: 'voterCodeholders',
-    voterCodeholdersMemberFilter: 'voterCodeholdersMemberFilter',
-    viewerCodeholders: 'viewerCodeholders',
-    viewerCodeholdersMemberFilter: 'viewerCodeholdersMemberFilter',
+    voterCodeholders: {
+        apiFields: ['voterCodeholders'],
+        fromAPI: vote => JSON5.stringify(vote.voterCodeholders, undefined, 4),
+        toAPI: value => ({ voterCodeholders: JSON5.parse(value) }),
+    },
+    voterCodeholdersMemberFilter: {
+        apiFields: ['voterCodeholdersMemberFilter'],
+        fromAPI: vote => JSON5.stringify(vote.voterCodeholdersMemberFilter, undefined, 4),
+        toAPI: () => ({}),
+    },
+    viewerCodeholders: {
+        apiFields: ['viewerCodeholders'],
+        fromAPI: vote => JSON5.stringify(vote.viewerCodeholders, undefined, 4),
+        toAPI: value => ({ viewerCodeholders: JSON5.parse(value) }),
+    },
+    viewerCodeholdersMemberFilter: {
+        apiFields: ['viewerCodeholdersMemberFilter'],
+        fromAPI: vote => JSON5.stringify(vote.viewerCodeholdersMemberFilter, undefined, 4),
+        toAPI: () => ({}),
+    },
     timespan: {
         apiFields: ['timeStart', 'timeEnd'],
         fromAPI: vote => ({
@@ -65,7 +83,6 @@ const clientFields = {
         ],
         fromAPI: vote => {
             const value = {
-                type: vote.type,
                 quorum: vote.quorum,
                 quorumInclusive: vote.quorumInclusive,
                 publishVoters: vote.publishVoters,
@@ -102,7 +119,6 @@ const clientFields = {
         },
         toAPI: value => {
             const vote = {
-                type: value.type,
                 quorum: value.quorum,
                 quorumInclusive: value.quorumInclusive,
                 publishVoters: value.publishVoters,
@@ -121,7 +137,7 @@ const clientFields = {
                 vote.blankBallotsLimitInclusive = value.blankBallotsLimitInclusive;
             }
             if (value.type === 'rp' || value.type === 'stv' || value.type === 'tm') {
-                vote.numChosenOptions = value.numChosenOptions;
+                vote.numChosenOptions = +value.numChosenOptions;
                 vote.options = value.options;
             }
             if (value.type === 'rp' || value.type === 'tm') {
@@ -129,7 +145,9 @@ const clientFields = {
                 vote.mentionThresholdInclusive = value.mentionThresholdInclusive;
             }
             if (value.type === 'tm') {
-                vote.maxOptionsPerBallot = value.maxOptionsPerBallot;
+                vote.maxOptionsPerBallot = Number.isFinite(+value.maxOptionsPerBallot)
+                    ? +vote.maxOptionsPerBallot
+                    : vote.maxOptionsPerBallot;
             }
             if (value.type === 'rp' || value.type === 'stv') {
                 vote.tieBreakerCodeholder = value.tieBreakerCodeholder;
@@ -216,10 +234,7 @@ export const views = {
             }
 
             if (shouldFetch) {
-                tasks.vote({}, {
-                    id,
-                    fields: fields.map(field => ({ id: field, sorting: 'none' })),
-                }).catch(err => this.emit('error', err));
+                tasks.vote({}, { id, fields }).catch(err => this.emit('error', err));
             }
         }
 

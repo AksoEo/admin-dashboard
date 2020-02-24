@@ -1,8 +1,8 @@
 import { h, Component } from 'preact';
 import { Spring } from '@cpsdqs/yamdl';
-import { lerp } from '@cpsdqs/yamdl/src/animation'; // FIXME: remove this
+import './dialog-progress-indicator.less';
 
-/// Login progress indicator.
+/// Dialog progress indicator.
 /// Assumes that the children will never change.
 /// If `selected` is `-2`, will render `helpLabel`.
 ///
@@ -10,7 +10,7 @@ import { lerp } from '@cpsdqs/yamdl/src/animation'; // FIXME: remove this
 /// - selected: number
 /// - children: list of vnodes
 /// - helpLabel: vnode
-export default class ProgressIndicator extends Component {
+export default class DialogProgressIndicator extends Component {
     state = { offset: 0, currentNodeWidth: 0 };
     spring = new Spring(1, 0.5);
     nodes = [];
@@ -33,7 +33,7 @@ export default class ProgressIndicator extends Component {
         const left = this.nodes[leftIndex].width;
         const right = this.nodes[rightIndex].width;
         const p = Math.max(0, this.state.offset) - leftIndex;
-        const currentNodeWidth = lerp(left, right, p);
+        const currentNodeWidth = (right - left) * p + left;
         if (currentNodeWidth !== this.state.currentNodeWidth) {
             this.setState({ currentNodeWidth });
         }
@@ -82,7 +82,7 @@ export default class ProgressIndicator extends Component {
             items.push(
                 <div
                     key={i}
-                    class="login-progress-item"
+                    class="dialog-progress-item"
                     ref={node => node && (this.nodes[i] = { node, width: node.offsetWidth })}
                     style={this.itemStyle(i)}>
                     {child}
@@ -91,7 +91,7 @@ export default class ProgressIndicator extends Component {
         }
 
         return (
-            <div class="login-progress">
+            <div class="dialog-progress-indicator">
                 {items}
             </div>
         );

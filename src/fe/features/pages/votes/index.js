@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import SortIcon from '@material-ui/icons/Sort';
 import TuneIcon from '@material-ui/icons/Tune';
 import Page from '../../../components/page';
@@ -28,8 +29,9 @@ export default connectPerms(class Votes extends Page {
             },
             fields: [
                 { id: 'org', sorting: 'none' },
-                { id: 'name', sorting: 'asc' },
-                { id: 'description', sorting: 'none' },
+                { id: 'name', sorting: 'none' },
+                { id: 'timespan', sorting: 'desc' },
+                { id: 'state', sorting: 'none' },
             ],
             offset: 0,
             limit: 10,
@@ -74,6 +76,14 @@ export default connectPerms(class Votes extends Page {
 
     render ({ perms }, { parameters, fieldPickerOpen }) {
         const actions = [];
+
+        if (perms.hasPerm('votes.create.tejo') || perms.hasPerm('votes.create.uea')) {
+            actions.push({
+                label: locale.create.menuItem,
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                action: () => this.context.createTask('votes/create'),
+            });
+        }
 
         actions.push({
             label: searchLocale.pickFields,

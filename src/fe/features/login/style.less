@@ -183,53 +183,6 @@
                     transform: translateX(15px) scale((20 / 24));
                 }
             }
-
-            .login-progress {
-                position: relative;
-                height: 2em;
-                margin-bottom: -1em;
-                overflow: hidden;
-
-                .login-progress-item {
-                    position: absolute;
-                    left: 50%;
-                    transform-origin: 50% 80%;
-                    will-change: transform, opacity;
-                    white-space: nowrap;
-                    cursor: default;
-
-                    span {
-                        display: inline-block;
-                        transition: transform 0.5s, opacity 0.5s;
-
-                        &.is-hidden {
-                            transform: scale(0);
-                            opacity: 0;
-                        }
-                    }
-                }
-            }
-        }
-
-        .autosizing-page-view {
-            position: relative;
-            overflow: hidden;
-            padding-top: 20px;
-            flex-shrink: 0;
-            flex-grow: 1;
-
-            &.may-overflow {
-                overflow-y: auto;
-            }
-
-            @media (max-width: 420px) {
-                overflow: visible;
-            }
-
-            .autosizing-page {
-                position: absolute;
-                width: 100%;
-            }
         }
 
         .form-stuff(20px, 20px);

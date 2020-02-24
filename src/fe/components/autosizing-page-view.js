@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import { Spring } from '@cpsdqs/yamdl';
+import './autosizing-page-view.less';
 const lerp = (a, b, x) => (b - a) * x + a;
 
 /// Returns the height above which pages should be allowed to scroll vertically.
@@ -33,7 +34,7 @@ export default class AutosizingPageView extends Component {
         this.xSpring.on('update', x => {
             if (Math.abs(x - this.props.selected) < 0.1 && !this.firedPageChange) {
                 this.firedPageChange = true;
-                this.props.onPageChange(this.props.selected);
+                this.props.onPageChange && this.props.onPageChange(this.props.selected);
             }
             this.setState({ x });
         });

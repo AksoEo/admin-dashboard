@@ -152,9 +152,6 @@ module.exports = function (env, argv) {
                     use: [
                         {
                             loader: MiniCssExtractPlugin.loader,
-                            options: {
-                                hmr: !prod,
-                            },
                         },
                         {
                             loader: 'css-loader',
@@ -186,7 +183,6 @@ module.exports = function (env, argv) {
             port: 2576,
             stats: 'minimal',
             historyApiFallback: true,
-            hot: true,
             before (app, server) {
                 app.use('/assets', express.static('assets'));
                 app.use('/apple-touch-icon.png', express.static('assets/apple-touch-icon.png'));
