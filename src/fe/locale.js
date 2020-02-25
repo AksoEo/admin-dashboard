@@ -819,6 +819,23 @@ export const votes = {
         stv: '[[tejo® single transferable vote]]',
         tm: '[[uea® threshold majority]]',
     },
+    results: {
+        link: 'Vidi rezultojn',
+        title: 'Rezultoj',
+        resultTypes: {
+            undefined: 'Eraro',
+            NO_QUORUM: '[[no quorum]]',
+            TOO_MANY_BLANK_BALLOTS: '[[too many blank ballots]]',
+            TIE_BREAKER_NEEDED: '[[tie breaker needed]]',
+            TIE: '[[tie]]',
+            CHOSEN: '[[chosen]]',
+            MAJORITY: '[[majority]]',
+            NO_MAJORITY: '[[no majority]]',
+        },
+        voters: '[[voters]]',
+        nonVoters: '[[non-voters]]',
+        votersBlank: '[[blank ballots]]',
+    },
     create: {
         menuItem: 'Krei',
         title: 'Krei voĉdonadon',

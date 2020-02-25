@@ -7,6 +7,7 @@ import UeaIcon from '../../../components/uea-icon';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
+import { LinkButton } from '../../../router';
 import { votes as locale } from '../../../locale';
 import {
     voterCodeholders,
@@ -141,6 +142,11 @@ const makeHeader = (owner) => function Header ({ item, editing }) {
                 </span>
                 {item.name}
             </h1>
+            {item && item.state.hasResults ? (
+                <LinkButton target={`/vochdonado/${item.id}/rezultoj`}>
+                    {locale.results.link}
+                </LinkButton>
+            ) : null}
         </div>
     );
 };

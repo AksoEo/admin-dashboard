@@ -211,6 +211,7 @@ const clientToAPI = makeClientToAPI(clientFields);
 
 export const VOTES = 'votes';
 export const VOTE_TEMPLATES = 'voteTemplates';
+export const VOTE_RESULTS = 'voteResults';
 export const SIG_VOTES = '!votes';
 
 export const tasks = {
@@ -251,6 +252,13 @@ export const tasks = {
         const existing = store.get([VOTES, +id]);
         store.insert([VOTES, +id], deepMerge(existing, clientFromAPI(res.body)));
 
+        return +id;
+    },
+    voteResults: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/votes/${+id}/result`);
+        const existing = store.get([VOTE_RESULTS, +id]);
+        store.insert([VOTE_RESULTS, +id], deepMerge(existing, res.body));
         return +id;
     },
 
@@ -379,6 +387,34 @@ export const views = {
 
         drop () {
             store.unsubscribe([VOTES, this.id], this.#onUpdate);
+        }
+    },
+    voteResults: class VoteResults extends AbstractDataView {
+        constructor (options) {
+            super();
+            const { id, fields } = options;
+            this.id = id;
+            this.fields = fields;
+
+            store.subscribe([VOTE_RESULTS, this.id], this.#onUpdate);
+            const current = store.get([VOTE_RESULTS, this.id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!options.noFetch) {
+                tasks.voteResults({ id }).catch(err => this.emit('error', err));
+            }
+        }
+
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([VOTE_RESULTS, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([VOTE_RESULTS, this.id]));
+            }
+        };
+
+        drop () {
+            store.unsubscribe([VOTE_RESULTS, this.id], this.#onUpdate);
         }
     },
 

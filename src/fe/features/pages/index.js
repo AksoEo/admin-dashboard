@@ -183,6 +183,12 @@ export default [
                                 type: 'state',
                                 state: 'editing',
                             },
+                            {
+                                path: 'rezultoj',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes/results')),
+                                type: 'stack',
+                            },
                         ],
                     },
                     {

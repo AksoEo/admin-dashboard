@@ -1,0 +1,43 @@
+@import '../../../prelude';
+
+.vote-results {
+    padding: 24px;
+
+    &.has-error {
+        text-align: center;
+        font-family: @monospace;
+    }
+    &.is-loading {
+        text-align: center;
+    }
+
+    .result-pie-chart {
+        .pie-chart-layer {
+            path {
+                fill: none;
+                stroke: currentColor;
+
+                &.s-a {
+                    stroke: @secondary;
+                }
+                &.s-a1 {
+                    stroke: @text-fade-50;
+                }
+                &.s-b {
+                    stroke: @primary;
+                }
+            }
+        }
+
+        text {
+            fill: currentColor;
+            dominant-baseline: middle;
+            alignment-baseline: middle;
+        }
+
+        .label-line {
+            fill: none;
+            stroke: currentColor;
+        }
+    }
+}
