@@ -723,6 +723,7 @@ export const lists = {
 
 export const votes = {
     title: 'Voĉdonadoj',
+    templateTitle: '[[tpl]]',
     detailTitle: 'Voĉdonado',
     templates: {
         menuItem: 'Ŝablonoj',

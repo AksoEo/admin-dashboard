@@ -1,4 +1,5 @@
 import JSON5 from 'json5';
+import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
@@ -171,6 +172,11 @@ const clientFields = {
         },
     },
 };
+
+let templateFields = new Set(Object.values(clientFields).flatMap(item => item.apiFields));
+templateFields.delete('org');
+templateFields = [...templateFields];
+
 const clientFilters = {
     // TODO
 };
@@ -180,6 +186,7 @@ const clientFromAPI = makeClientFromAPI(clientFields);
 const clientToAPI = makeClientToAPI(clientFields);
 
 export const VOTES = 'votes';
+export const VOTE_TEMPLATES = 'voteTemplates';
 export const SIG_VOTES = '!votes';
 
 export const tasks = {
@@ -254,6 +261,60 @@ export const tasks = {
         store.remove([VOTES, +id]);
         store.signal([VOTES, SIG_VOTES]);
     },
+
+    listTemplates: async (_, { search, offset, limit }) => {
+        const client = await asyncClient;
+
+        const opts = { offset, limit };
+        if (search && search.query) {
+            const transformedQuery = util.transformSearch(search.query);
+            if (!util.isValidSearch(transformedQuery)) {
+                throw { code: 'invalid-search-query', message: 'invalid search query' };
+            }
+            opts.search = { cols: [search.field], str: transformedQuery };
+        }
+
+        const res = await client.get('/vote_templates', {
+            fields: ['id', 'org', 'name', 'description'],
+            ...opts,
+        });
+
+        let list = res.body;
+        const totalItems = +res.res.headers.get('x-total-items');
+
+        for (const item of list) {
+            const existing = store.get([VOTE_TEMPLATES, item.id]);
+            store.insert([VOTE_TEMPLATES, item.id], deepMerge(existing, item));
+        }
+
+        list = list.map(item => item.id);
+
+        return {
+            items: list,
+            total: totalItems,
+            stats: {
+                time: res.resTime,
+                filtered: false,
+            },
+        };
+    },
+    voteTemplate: async (_, { id, fields }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/vote_templates/${+id}`, {
+            fields: [
+                'id',
+                'org',
+                'name',
+                'description',
+                ...templateFields.map(field => `vote.${field}`),
+            ],
+        });
+
+        const existing = store.get([VOTE_TEMPLATES, +id]);
+        store.insert([VOTE_TEMPLATES, +id], deepMerge(existing, clientFromAPI(res.body)));
+
+        return +id;
+    },
 };
 
 export const views = {
@@ -297,5 +358,35 @@ export const views = {
         }
     },
 
+    voteTemplate: class VoteTemplate extends AbstractDataView {
+        constructor (options) {
+            super();
+            const { id, fields } = options;
+            this.id = id;
+            this.fields = fields;
+
+            store.subscribe([VOTE_TEMPLATES, this.id], this.#onUpdate);
+            const current = store.get([VOTE_TEMPLATES, this.id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!options.noFetch) {
+                tasks.voteTemplate({}, { id, fields }).catch(err => this.emit('error', err));
+            }
+        }
+
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([VOTE_TEMPLATES, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([VOTE_TEMPLATES, this.id]));
+            }
+        };
+
+        drop () {
+            store.unsubscribe([VOTE_TEMPLATES, this.id], this.#onUpdate);
+        }
+    },
+
     sigVotes: createStoreObserver([VOTES, SIG_VOTES]),
+    sigVoteTemplates: createStoreObserver([VOTE_TEMPLATES, SIG_VOTES]),
 };

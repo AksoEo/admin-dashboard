@@ -185,6 +185,12 @@ export default [
                             },
                         ],
                     },
+                    {
+                        path: 'shablonoj',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes/templates')),
+                        type: 'stack',
+                    },
                 ],
             },
             {
