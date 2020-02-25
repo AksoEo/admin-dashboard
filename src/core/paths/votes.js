@@ -5,6 +5,12 @@ import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from 
 import * as store from '../store';
 import { deepMerge, deepEq } from '../../util';
 
+/// Returns the value type-casted to be a float or fraction.
+function enforceRational (value) {
+    if (Array.isArray(value)) return value.map(x => +x);
+    return +value;
+}
+
 const clientFields = {
     id: 'id',
     org: 'org',
@@ -111,39 +117,53 @@ const clientFields = {
 
             return value;
         },
-        toAPI: value => {
+        toAPI: (value, item) => {
             const vote = {
-                quorum: value.quorum,
-                quorumInclusive: value.quorumInclusive,
-                publishVoters: value.publishVoters,
-                publishVotersPercentage: value.publishVotersPercentage,
+                quorum: enforceRational(value.quorum),
+                quorumInclusive: !!value.quorumInclusive,
+                publishVoters: !!value.publishVoters,
+                publishVotersPercentage: !!value.publishVotersPercentage,
             };
 
-            if (value.type === 'yn' || value.type === 'ynb') {
-                vote.majorityBallots = value.majorityBallots;
-                vote.majorityBallotsInclusive = value.majorityBallotsInclusive;
-                vote.majorityVoters = value.majorityVoters;
-                vote.majorityVotersInclusive = value.majorityVotersInclusive;
-                vote.majorityMustReachBoth = value.majorityMustReachBoth;
+            if (item.type === 'yn' || item.type === 'ynb') {
+                vote.majorityBallots = enforceRational(value.majorityBallots);
+                vote.majorityBallotsInclusive = !!value.majorityBallotsInclusive;
+                vote.majorityVoters = enforceRational(value.majorityVoters);
+                vote.majorityVotersInclusive = !!value.majorityVotersInclusive;
+                vote.majorityMustReachBoth = !!value.majorityMustReachBoth;
             }
-            if (value.type === 'ynb' || value.type === 'rp' || value.type === 'stv' || value.type === 'tm') {
-                vote.blankBallotsLimit = value.blankBallotsLimit;
-                vote.blankBallotsLimitInclusive = value.blankBallotsLimitInclusive;
+            if (item.type === 'ynb' || item.type === 'rp' || item.type === 'stv' || item.type === 'tm') {
+                vote.blankBallotsLimit = enforceRational(value.blankBallotsLimit);
+                vote.blankBallotsLimitInclusive = !!value.blankBallotsLimitInclusive;
             }
-            if (value.type === 'rp' || value.type === 'stv' || value.type === 'tm') {
+            if (item.type === 'rp' || item.type === 'stv' || item.type === 'tm') {
                 vote.numChosenOptions = +value.numChosenOptions;
-                vote.options = value.options;
+                vote.options = value.options.map(item => {
+                    if (item.type === 'codeholder') {
+                        return {
+                            type: item.type,
+                            codeholderId: item.codeholderId,
+                            description: item.description || null,
+                        };
+                    } else {
+                        return {
+                            type: item.type,
+                            name: item.name,
+                            description: item.description || null,
+                        };
+                    }
+                });
             }
-            if (value.type === 'rp' || value.type === 'tm') {
-                vote.mentionThreshold = value.mentionThreshold;
-                vote.mentionThresholdInclusive = value.mentionThresholdInclusive;
+            if (item.type === 'rp' || item.type === 'tm') {
+                vote.mentionThreshold = enforceRational(value.mentionThreshold);
+                vote.mentionThresholdInclusive = !!value.mentionThresholdInclusive;
             }
-            if (value.type === 'tm') {
+            if (item.type === 'tm') {
                 vote.maxOptionsPerBallot = Number.isFinite(+value.maxOptionsPerBallot)
                     ? +vote.maxOptionsPerBallot
                     : vote.maxOptionsPerBallot;
             }
-            if (value.type === 'rp' || value.type === 'stv') {
+            if (item.type === 'rp' || item.type === 'stv') {
                 vote.tieBreakerCodeholder = value.tieBreakerCodeholder;
             }
 
@@ -206,8 +226,9 @@ export const tasks = {
     create: async (_, data) => {
         const client = await asyncClient;
         const res = await client.post('/votes', clientToAPI(data));
-        const id = +res.headers.get('x-identifier');
+        const id = +res.res.headers.get('x-identifier');
         store.insert([VOTES, +id], data);
+        store.signal([VOTES, SIG_VOTES]);
         return id;
     },
 
@@ -231,6 +252,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`/votes/${id}`);
         store.remove([VOTES, +id]);
+        store.signal([VOTES, SIG_VOTES]);
     },
 };
 

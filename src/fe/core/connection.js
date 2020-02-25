@@ -14,13 +14,14 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
     class InnerConnection extends Component {
         static contextType = coreContext;
 
-        state = { data: null };
+        state = { data: null, error: null };
 
         componentDidMount () {
             if (typeof viewArgs[0] === 'function') {
                 this.view = this.context.createDataView(...(viewArgs[0](this.props)));
             } else this.view = this.context.createDataView(...viewArgs);
             this.view.on('update', this.#onUpdate);
+            this.view.on('error', this.#onError);
         }
 
         componentDidUpdate (prevProps) {
@@ -40,14 +41,15 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
             }
         }
 
-        #onUpdate = data => this.setState({ data });
+        #onUpdate = data => this.setState({ data, error: null });
+        #onError = error => this.setState({ error });
 
         componentWillUnmount () {
             if (this.view) this.view.drop();
         }
 
         render () {
-            const props = { ...this.props, ...map(this.state.data, this.context) };
+            const props = { ...this.props, ...map(this.state.data, this.context, this.state.error) };
             props.ref = props.coreConnForwardedRef;
             delete props.coreConnForwardedRef;
             return <Comp {...props} />;

@@ -14,6 +14,7 @@ const OVERFLOW_HEIGHT = () => window.innerHeight - 120;
 /// - children: array of vnodes
 /// - onPageChange: callback for when the animation finishes
 /// - eager: if true, will check page heights every update
+/// - alwaysOverflow: if true, will always allow overflow
 export default class AutosizingPageView extends Component {
     state = {
         x: 0,
@@ -144,15 +145,18 @@ export default class AutosizingPageView extends Component {
 
         const currentHeight = this.currentHeight();
         let mayOverflow = false;
+        let height = currentHeight;
 
-        if (currentHeight > OVERFLOW_HEIGHT()) {
+        if (!this.props.alwaysOverflow && currentHeight > OVERFLOW_HEIGHT()) {
             mayOverflow = true;
+            height = OVERFLOW_HEIGHT();
         }
 
         return (
             <div
-                class={'autosizing-page-view' + (mayOverflow ? ' may-overflow' : '')}
-                style={{ height: Math.min(OVERFLOW_HEIGHT(), currentHeight) }}>
+                class={'autosizing-page-view' + (mayOverflow ? ' may-overflow' : '')
+                    + (this.props.alwaysOverflow ? ' always-overflow' : '')}
+                style={{ height }}>
                 {children}
             </div>
         );

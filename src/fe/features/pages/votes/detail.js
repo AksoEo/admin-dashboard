@@ -75,7 +75,7 @@ export default connectPerms(class VoteDetailpage extends Page {
         if (perms.hasPerm(`votes.delete.${org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
-                action: () => this.context.createTask('votes/delete', {}, { id }),
+                action: () => this.context.createTask('votes/delete', { id }),
                 overflow: true,
             });
         }

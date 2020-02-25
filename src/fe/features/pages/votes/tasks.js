@@ -27,7 +27,8 @@ export default {
                 open={open}
                 onClose={() => task.drop()}
                 title={locale.delete.title}
-                actionLabel={locale.delete.button}>
+                actionLabel={locale.delete.button}
+                run={() => task.runOnce()}>
                 {locale.delete.description}
             </TaskDialog>
         );

@@ -1,0 +1,32 @@
+@import '../prelude';
+
+.codeholder-picker {
+    .selected-codeholders {
+        .codeholder-item {
+            display: inline-block;
+            background: @text-fade-10;
+            border-radius: 4px;
+            padding-right: 4px;
+            margin-right: 8px;
+
+            .remove-button {
+                vertical-align: middle;
+                width: 24px;
+                height: 24px;
+                margin-right: 4px;
+                border-radius: 4px;
+                --md-button-color: @gray-button-color;
+            }
+
+            .uea-code {
+                border: none;
+                background: none;
+            }
+        }
+
+        .codeholder-search {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+}

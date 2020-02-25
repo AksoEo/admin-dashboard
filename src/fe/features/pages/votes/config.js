@@ -1,29 +1,51 @@
-import { h } from 'preact';
+import { h, Component } from 'preact';
+import JSON5 from 'json5';
+import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-import { TextField } from '@cpsdqs/yamdl';
+import RemoveIcon from '@material-ui/icons/Remove';
+import { Button, TextField } from '@cpsdqs/yamdl';
 import Segmented from '../../../components/segmented';
 import JSONEditor from '../../../components/json-editor';
+import CodeholderPicker from '../../../components/codeholder-picker';
+import RearrangingList from '../../../components/rearranging-list';
 import { timestamp } from '../../../components/data';
+import { Validator } from '../../../components/form';
+import { IdUEACode } from '../../../components/data/uea-code';
 import { votes as locale } from '../../../locale';
 import Rational from './rational';
+import './config.less';
+
+function validateJSON (value) {
+    try {
+        JSON5.parse(value);
+    } catch {
+        throw { error: true };
+    }
+}
 
 export function voterCodeholders ({ value, onChange, editing, item }) {
     if (editing && item.state.isActive) return locale.cannotEditActive;
     return (
-        <JSONEditor
+        <Validator
+            component={JSONEditor}
+            validatorProps={{ class: 'block-validator' }}
             value={value}
             onChange={onChange}
-            disabled={!editing} />
+            disabled={!editing}
+            validate={validateJSON} />
     );
 }
 
 export function viewerCodeholders ({ value, onChange, editing }) {
     return (
-        <JSONEditor
+        <Validator
+            component={JSONEditor}
+            validatorProps={{ class: 'block-validator' }}
             value={value}
             onChange={onChange}
-            disabled={!editing} />
+            disabled={!editing}
+            validate={validateJSON} />
     );
 }
 
@@ -51,9 +73,15 @@ export function timeStart ({ value, onChange, editing, item }) {
     if (!editing) return <timestamp.renderer value={value * 1000} />;
     if (item.state.isActive) return locale.cannotEditActive;
     return (
-        <timestamp.editor
+        <Validator
+            component={timestamp.editor}
             value={value}
-            onChange={onChange} />
+            onChange={onChange}
+            validate={value => {
+                if (!Number.isFinite(new Date(value * 1000).getDate())) {
+                    throw { error: true };
+                }
+            }} />
     );
 }
 export const timeEnd = timeStart;
@@ -107,14 +135,33 @@ export function type ({ value, onChange, editing, item }) {
     );
 }
 
+function requiredRational ({ value, onChange, editing }) {
+    return (
+        <Validator
+            component={Rational}
+            value={value}
+            onChange={onChange}
+            editing={editing}
+            validate={value => {
+                if (Array.isArray(value)) {
+                    if (!Number.isFinite(+value[0]) || !Number.isFinite(+value[1])) {
+                        throw { error: true };
+                    }
+                } else if (!Number.isFinite(+value)) {
+                    throw { error: true };
+                }
+            }} />
+    );
+}
+
 export const ballotsSecret = inactiveBool;
-export const blankBallotsLimit = Rational;
+export const blankBallotsLimit = requiredRational;
 export const blankBallotsLimitInclusive = bool;
-export const quorum = Rational;
+export const quorum = requiredRational;
 export const quorumInclusive = bool;
-export const majorityBallots = Rational;
+export const majorityBallots = requiredRational;
 export const majorityBallotsInclusive = bool;
-export const majorityVoters = Rational;
+export const majorityVoters = requiredRational;
 export const majorityVotersInclusive = bool;
 export const majorityMustReachBoth = bool;
 
@@ -122,14 +169,20 @@ export function numChosenOptions ({ value, onChange, editing }) {
     if (!editing) return '' + value;
 
     return (
-        <TextField
+        <Validator
+            component={TextField}
             type="number"
             value={value}
-            onChange={e => onChange(e.target.value)} />
+            onChange={e => onChange(e.target.value)}
+            validate={value => {
+                if (!Number.isFinite(+value)) {
+                    throw { error: locale.numberRequired };
+                }
+            }} />
     );
 }
 
-export const mentionThreshold = Rational;
+export const mentionThreshold = requiredRational;
 export const mentionThresholdInclusive = bool;
 
 export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
@@ -138,23 +191,186 @@ export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
     if (item.state.isActive) return locale.cannotEditActive;
 
     return (
-        <TextField
+        <Validator
+            component={TextField}
             type="number"
             value={value || ''}
-            onChange={e => onChange(e.target.value || null)} />
+            placeholder={locale.noMaxOptions}
+            onChange={e => onChange(e.target.value || null)}
+            validate={value => {
+                if (!Number.isFinite(+value)) {
+                    throw { error: locale.numberRequired };
+                }
+            }} />
     );
 }
 
 export function tieBreakerCodeholder ({ value, onChange, editing }) {
-    return 'todo: codeholder picker';
+    if (!editing) return <IdUEACode id={value} />;
+    return (
+        <Validator
+            component={CodeholderPicker}
+            value={[value].filter(x => x !== null)}
+            onChange={value => onChange(value[0] || null)}
+            validate={() => {
+                if (value === null) {
+                    throw { error: true };
+                }
+            }}
+            limit={1} />
+    );
 }
 
 export const publishVoters = inactiveBool;
 export const publishVotersPercentage = bool;
 
-export function options ({ value, onChange, editing }) {
-    return 'oh god why';
-}
+export const options = class OptionsEditor extends Component {
+    /// These keys are used to identify options while editing the list.
+    /// This is necessary to enable rearranging that doesn’t look confusing.
+    optionKeys = [];
+
+    render ({ value, onChange, editing }) {
+        const items = [];
+
+        for (let i = 0; i < value.length; i++) {
+            if (!this.optionKeys[i]) {
+                this.optionKeys[i] = 'o' + Math.random();
+            }
+
+            const item = value[i];
+            const index = i;
+
+            let selector;
+            if (item.type === 'codeholder') {
+                selector = (
+                    <CodeholderPicker
+                        limit={1}
+                        value={[item.codeholderId || null].filter(x => x !== null)}
+                        onChange={items => {
+                            const newValue = [...value];
+                            newValue[index] = { ...item, codeholderId: items[0] || null };
+                            onChange(newValue);
+                        }} />
+                );
+            } else {
+                selector = (
+                    <TextField
+                        outline
+                        label={locale.options.name}
+                        value={item.name}
+                        onChange={e => {
+                            const newValue = [...value];
+                            newValue[index] = { ...item, name: e.target.value };
+                            onChange(newValue);
+                        }} />
+                );
+            }
+
+            if (editing) {
+                items.push(
+                    <div class="options-item" key={this.optionKeys[index]}>
+                        <div class="option-header">
+                            <Button class="option-remove-button" icon small onClick={e => {
+                                e.preventDefault();
+                                const newValue = [...value];
+                                newValue.splice(index, 1);
+                                onChange(newValue);
+                            }}>
+                                <RemoveIcon />
+                            </Button>
+                            <Segmented
+                                class="minimal"
+                                selected={item.type}
+                                onSelect={type => {
+                                    const newValue = [...value];
+                                    newValue[index] = { ...item, type };
+                                    onChange(newValue);
+                                }}>
+                                {[
+                                    {
+                                        id: 'simple',
+                                        label: locale.options.simple,
+                                    },
+                                    {
+                                        id: 'codeholder',
+                                        label: locale.options.codeholder,
+                                    },
+                                ]}
+                            </Segmented>
+                        </div>
+                        {selector}
+                        <textarea
+                            class="option-description-editor"
+                            value={item.description}
+                            placeholder={locale.options.descriptionPlaceholder}
+                            onChange={e => {
+                                const newValue = [...value];
+                                newValue[index] = { ...item, description: e.target.value };
+                                onChange(newValue);
+                            }} />
+                    </div>
+                );
+            } else {
+                items.push(
+                    <div class="options-item" key={index}>
+                        <div class="option-name">
+                            {item.type === 'codeholder' ? (
+                                <IdUEACode id={item.codeholderId} />
+                            ) : item.name}
+                        </div>
+                        <div class="option-description">
+                            {item.description}
+                        </div>
+                    </div>
+                );
+            }
+        }
+
+        if (editing) {
+            items.push(
+                <div class="options-add-item" key="add">
+                    <Button icon onClick={e => {
+                        e.preventDefault();
+                        const newValue = [...value];
+                        newValue.push({
+                            type: 'simple',
+                            name: '',
+                            codeholderId: null,
+                            description: '',
+                        });
+                        onChange(newValue);
+                    }}>
+                        <AddIcon />
+                    </Button>
+                </div>
+            );
+
+            return (
+                <RearrangingList
+                    class="vote-options is-editing"
+                    itemHeight={196}
+                    isItemDraggable={index => index < value.length}
+                    canMove={(toIndex) => toIndex < value.length}
+                    onMove={(fromIndex, toIndex) => {
+                        const newValue = [...value];
+                        const item = newValue.splice(fromIndex, 1)[0];
+                        newValue.splice(toIndex, 0, item);
+                        const itemKey = this.optionKeys.splice(fromIndex, 1)[0];
+                        this.optionKeys.splice(toIndex, 0, itemKey);
+                        onChange(newValue);
+                    }}>
+                    {items}
+                </RearrangingList>
+            );
+        }
+
+        return (
+            <div class="vote-options">
+                {items}
+            </div>
+        );
+    }
+};
 
 const CONFIG_FIELDS = {
     quorum: [quorum],
@@ -164,6 +380,8 @@ const CONFIG_FIELDS = {
     majorityVoters: [majorityVoters, ['yn', 'ynb']],
     majorityVotersInclusive: [majorityVotersInclusive, ['yn', 'ynb']],
     majorityMustReachBoth: [majorityMustReachBoth, ['yn', 'ynb']],
+    blankBallotsLimit: [blankBallotsLimit, ['ynb', 'rp', 'stv', 'tm']],
+    blankBallotsLimitInclusive: [blankBallotsLimitInclusive, ['ynb', 'rp', 'stv', 'tm']],
     numChosenOptions: [numChosenOptions, ['rp', 'stv', 'tm']],
     mentionThreshold: [mentionThreshold, ['rp', 'tm']],
     mentionThresholdInclusive: [mentionThresholdInclusive, ['rp', 'tm']],
@@ -171,7 +389,7 @@ const CONFIG_FIELDS = {
     tieBreakerCodeholder: [tieBreakerCodeholder, ['rp', 'stv']],
     publishVoters: [publishVoters],
     publishVotersPercentage: [publishVotersPercentage],
-    options: [options, ['rp', 'stv', 'tm']],
+    options: [options, ['rp', 'stv', 'tm'], true],
 };
 
 export function config ({ value, onChange, editing, item }) {
@@ -182,8 +400,9 @@ export function config ({ value, onChange, editing, item }) {
         const field = CONFIG_FIELDS[f];
         if (!field[1] || field[1].includes(type)) {
             const Field = field[0];
+            const forceVertical = field[2];
             fields.push(
-                <div class="config-field" key={f}>
+                <div class={'config-field' + (forceVertical ? ' is-vertical' : '')} key={f}>
                     <div class="config-field-label">
                         {locale.config[f]}
                     </div>

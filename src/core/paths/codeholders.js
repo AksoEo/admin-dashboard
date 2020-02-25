@@ -1094,17 +1094,17 @@ export const tasks = {
 const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms
 const codeholderBatchIds = new Set();
 const codeholderBatchFields = new Set();
-const codeholderBatchRejects = new Set();
+const codeholderBatchCallbacks = new Set();
 let flushCodeholdersTimeout;
 
 function flushCodeholders () {
     flushCodeholdersTimeout = null;
     const ids = [...codeholderBatchIds];
     const fields = [...codeholderBatchFields];
-    const rejects = [...codeholderBatchRejects];
+    const callbacks = [...codeholderBatchCallbacks];
     codeholderBatchIds.clear();
     codeholderBatchFields.clear();
-    codeholderBatchRejects.clear();
+    codeholderBatchCallbacks.clear();
 
     tasks.list({}, {
         fields: fields.map(x => ({ id: x, sorting: 'none' })).concat([{ id: 'id', sorting: 'asc' }]),
@@ -1116,8 +1116,10 @@ function flushCodeholders () {
             },
         },
         limit: ids.length,
+    }).then(res => {
+        for (const callback of callbacks) callback(true, res.items);
     }).catch(err => {
-        for (const reject of rejects) reject(err);
+        for (const callback of callbacks) callback(false, err);
     });
 }
 
@@ -1137,7 +1139,18 @@ function fetchCodeholderForView (id, fields) {
         flushCodeholdersTimeout = setTimeout(flushCodeholders, CODEHOLDER_FETCH_BATCH_TIME);
     }
     return new Promise((resolve, reject) => {
-        codeholderBatchRejects.add(reject);
+        codeholderBatchCallbacks.add((loaded, arg) => {
+            if (loaded) {
+                const items = arg;
+                if (!items.includes(+id)) {
+                    // id not found; codeholder doesn’t exist
+                    reject(new Error(`codeholder ${id} does not exist`));
+                }
+            } else {
+                const error = arg;
+                reject(error);
+            }
+        });
     });
 }
 

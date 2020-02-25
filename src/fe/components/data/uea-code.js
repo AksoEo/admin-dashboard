@@ -3,10 +3,12 @@ import { CircularProgress } from '@cpsdqs/yamdl';
 import { UEACode as AKSOUEACode } from '@tejo/akso-client';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
+import ErrorIcon from '@material-ui/icons/Error';
 import { connect, coreContext } from '../../core/connection';
-import locale from '../../locale';
+import { data as locale } from '../../locale';
 import { Validator } from '../form';
 import SuggestionField from '../suggestion-field';
+import TinyProgress from '../tiny-progress';
 
 /// Renders a single UEA code. Props: `value`, `old`.
 export function UEACode ({ value, old, ...extra }) {
@@ -37,8 +39,14 @@ function BothUEACodes ({ value, value2 }) {
 export const IdUEACode = connect(
     ({ id }) => ['codeholders/codeholder', { id, fields: ['code'], lazyFetch: true }],
     ['id'],
-)()(({ code }) => (
-    code ? <UEACode value={code.new} /> : null
+)((data, _, err) => ({ data, err }))(({ data, err, errorLabel }) => (
+    err
+        ? (errorLabel || (
+            <span class="data uea-code-load-error" title={locale.ueaCode.idFailed}>
+                <ErrorIcon style={{ verticalAlign: 'middle' }} />
+            </span>
+        ))
+        : data ? <UEACode value={data.code.new} /> : <TinyProgress />
 ));
 
 /// Also pass `id` to enable checking if it’s taken.
@@ -106,16 +114,16 @@ class UEACodeEditor extends Component {
             onChange={onChange}
             maxLength={6}
             placeholder="xxxxxx"
-            label={locale.data.ueaCode.newCode}
+            label={locale.ueaCode.newCode}
             validate={() => {
                 try {
                     const code = new AKSOUEACode(value);
                     if (code.type !== 'new') throw 0;
                 } catch (_) {
-                    throw { error: locale.data.ueaCode.invalidUEACode };
+                    throw { error: locale.ueaCode.invalidUEACode };
                 }
                 if (this.state.takenState === 'taken') {
-                    throw { error: locale.data.ueaCode.codeTaken };
+                    throw { error: locale.ueaCode.codeTaken };
                 }
             }}
             trailing={trailing}

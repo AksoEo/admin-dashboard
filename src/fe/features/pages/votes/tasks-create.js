@@ -141,9 +141,17 @@ const generalPage = (isTemplate) => ({
         return (
             <WizardPage next={next}>
                 <WizardSection title={locale.fields.name} />
-                <TextField
+                <Validator
+                    class="name-editor"
+                    validatorProps={{ class: 'block-validator' }}
+                    component={TextField}
                     value={value.name}
-                    onChange={e => onChange({ ...value, name: e.target.value })} />
+                    onChange={e => onChange({ ...value, name: e.target.value })}
+                    validate={value => {
+                        if (!value) {
+                            throw { error: locale.create.nameRequired };
+                        }
+                    }} />
                 {isTemplate ? null : (
                     <OrgPicker
                         value={value.org}
@@ -210,8 +218,8 @@ const templatePage = () => ({
 export default function makeCreateTask (isTemplate) {
     const pages = [
         generalPage(isTemplate),
-        votePage(isTemplate),
         votersPage(isTemplate),
+        votePage(isTemplate),
         configPage(isTemplate),
     ];
 
@@ -234,7 +242,25 @@ export default function makeCreateTask (isTemplate) {
                     end: null,
                 },
                 voterCodeholders: '{\n\t\n}',
-                config: {},
+                config: {
+                    quorum: 0,
+                    quorumInclusive: true,
+                    blankBallotsLimit: 0,
+                    blankBallotsLimitInclusive: true,
+                    majorityBallots: 0,
+                    majorityBallotsInclusive: true,
+                    majorityVoters: 0,
+                    majorityVotersInclusive: true,
+                    majorityMustReachBoth: true,
+                    numChosenOptions: 1,
+                    mentionThreshold: 0,
+                    mentionThresholdInclusive: true,
+                    maxOptionsPerBallot: null,
+                    tieBreakerCodeholder: null,
+                    publishVoters: false,
+                    publishVotersPercentage: true,
+                    options: [],
+                },
             },
             error: null,
         };
@@ -263,7 +289,6 @@ export default function makeCreateTask (isTemplate) {
                             this.context.navigate(`/vochdonado/${id}`);
                         }).catch(error => {
                             this.setState({ error });
-                            console.log(this.state.vote);
                             console.error(error); // eslint-disable-line no-console
                         });
                         return;
@@ -301,9 +326,14 @@ export default function makeCreateTask (isTemplate) {
                     <ProgressIndicator selected={page}>
                         {pageTitles}
                     </ProgressIndicator>
-                    <AutosizingPageView eager selected={page}>
+                    <AutosizingPageView eager alwaysOverflow selected={page}>
                         {pageContents}
                     </AutosizingPageView>
+                    {this.state.error ? (
+                        <div class="error-message-container">
+                            {'' + this.state.error}
+                        </div>
+                    ) : null}
                 </Dialog>
             );
         }

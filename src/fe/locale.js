@@ -31,6 +31,12 @@ export const data = {
     delete: 'Forigi',
     showMore: 'Montri pliajn',
     objViewerArrayItems: items => `${items} ero${items === 1 ? '' : 'j'}`,
+    ueaCode: {
+        newCode: 'Seslitera UEA-kodo',
+        invalidUEACode: 'Nevalida seslitera UEA-kodo',
+        codeTaken: 'La UEA-kodo estas jam uzata',
+        idFailed: '[[failed to load uea code]]',
+    },
 };
 
 export const login = {
@@ -488,6 +494,11 @@ export const codeholders = {
         setRestrictions: 'Ĝisdatigi restriktojn',
         setRestrictionsButton: 'Ĝisdatigi',
     },
+
+    picker: {
+        none: '[[none selected]]',
+        search: 'Aldoni laŭ nomo aŭ UEA-kodo',
+    },
 };
 
 export const adminGroups = {
@@ -763,6 +774,8 @@ export const votes = {
         majorityVoters: '[[majorityVoters]]',
         majorityVotersInclusive: '[[majorityVotersInclusive]]',
         majorityMustReachBoth: '[[majorityMustReachBoth]]',
+        blankBallotsLimit: '[[blankBallotsLimit]]',
+        blankBallotsLimitInclusive: '[[blankBallotsLimitInclusive]]',
         numChosenOptions: '[[numChosenOptions]]',
         mentionThreshold: '[[mentionThreshold]]',
         mentionThresholdInclusive: '[[mentionThresholdInclusive]]',
@@ -771,6 +784,12 @@ export const votes = {
         publishVoters: '[[publishVoters]]',
         publishVotersPercentage: '[[publishVotersPercentage]]',
         options: '[[options]]',
+    },
+    options: {
+        simple: '[[simple]]',
+        codeholder: '[[codeholder]]',
+        name: 'Nomo',
+        descriptionPlaceholder: 'Priskribo',
     },
     types: {
         yn: '[[yes/no]]',
@@ -792,8 +811,10 @@ export const votes = {
         },
         continue: 'Daŭrigi',
 
+        nameRequired: '[[name is required]]',
         requiresSelection: '[[requires selection]]',
     },
+    numberRequired: '[[enter a number]]',
     update: {
         menuItem: 'Aktualigi',
         title: 'Aktualigi voĉdonadon',
