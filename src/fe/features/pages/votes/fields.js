@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import moment from 'moment';
+import { TextField } from '@cpsdqs/yamdl';
 import TejoIcon from '../../../components/tejo-icon';
 import UeaIcon from '../../../components/uea-icon';
 import { votes as locale, timestampFormat } from '../../../locale';
@@ -20,20 +21,33 @@ export default {
         stringify (value) {
             return value;
         },
+        shouldHide: () => true,
     },
     name: {
         sortable: true,
-        component ({ value }) {
-            return value;
+        component ({ value, onChange, editing }) {
+            if (!editing) return value;
+            return (
+                <TextField
+                    value={value}
+                    onChange={e => onChange(e.target.value)} />
+            );
         },
         stringify (value) {
             return value;
         },
+        shouldHide: (_, editing) => !editing,
     },
     description: {
         sortable: true,
-        component ({ value }) {
-            return value;
+        component ({ value, onChange, editing }) {
+            if (!editing) return value;
+            return (
+                <textarea
+                    class="vote-description-editor"
+                    value={value}
+                    onChange={e => onChange(e.target.value)} />
+            );
         },
         stringify (value) {
             return value;

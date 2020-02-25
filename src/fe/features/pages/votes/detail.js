@@ -2,6 +2,8 @@ import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailView from '../../../components/detail';
 import Page from '../../../components/page';
+import TejoIcon from '../../../components/tejo-icon';
+import UeaIcon from '../../../components/uea-icon';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
@@ -16,6 +18,7 @@ import {
     config,
 } from './config';
 import FIELDS from './fields';
+import './detail.less';
 
 const DETAIL_FIELDS = {
     ...FIELDS,
@@ -34,6 +37,7 @@ export default connectPerms(class VoteDetailpage extends Page {
     state = {
         edit: null,
         org: null,
+        hasEnded: null,
     };
 
     onEndEdit = () => {
@@ -66,8 +70,12 @@ export default connectPerms(class VoteDetailpage extends Page {
     setOrg (org) {
         if (this.state.org !== org) this.setState({ org });
     }
+    // ditto
+    setEnded (hasEnded) {
+        if (this.state.hasEnded !== hasEnded) this.setState({ hasEnded });
+    }
 
-    render ({ match, perms, editing }, { edit, org }) {
+    render ({ match, perms, editing }, { edit, org, hasEnded }) {
         const id = match[1];
 
         const actions = [];
@@ -80,7 +88,7 @@ export default connectPerms(class VoteDetailpage extends Page {
             });
         }
 
-        if (perms.hasPerm(`votes.update.${org}`)) {
+        if (perms.hasPerm(`votes.update.${org}`) && !hasEnded) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update,
@@ -91,7 +99,7 @@ export default connectPerms(class VoteDetailpage extends Page {
         const headerComponent = makeHeader(this);
 
         return (
-            <div class="client-detail-page">
+            <div class="vote-detail-page">
                 <Meta
                     title={locale.detailTitle}
                     actions={actions} />
@@ -119,10 +127,20 @@ export default connectPerms(class VoteDetailpage extends Page {
 const makeHeader = (owner) => function Header ({ item, editing }) {
     if (editing) return null;
     owner.setOrg(item.org);
+    if (item) owner.setEnded(item.state.hasEnded);
 
     return (
-        <div class="client-header">
-            <h1>{item.name}</h1>
+        <div class="vote-header">
+            <h1>
+                <span class="vote-org-icon">
+                    {item.org === 'tejo'
+                        ? <TejoIcon />
+                        : item.org === 'uea'
+                            ? <UeaIcon />
+                            : null}
+                </span>
+                {item.name}
+            </h1>
         </div>
     );
 };

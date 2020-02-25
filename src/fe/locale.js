@@ -35,7 +35,7 @@ export const data = {
         newCode: 'Seslitera UEA-kodo',
         invalidUEACode: 'Nevalida seslitera UEA-kodo',
         codeTaken: 'La UEA-kodo estas jam uzata',
-        idFailed: '[[failed to load uea code]]',
+        idFailed: '[[failed to load]]',
     },
 };
 
