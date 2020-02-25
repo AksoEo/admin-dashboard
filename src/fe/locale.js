@@ -750,6 +750,26 @@ export const votes = {
         ballotsSecret: '[[ballotsSecret]]',
         config: '[[config]]',
     },
+    filters: {
+        org: '[[org]]',
+        timeStart: '[[start time]]',
+        timeEnd: '[[end time]]',
+        state: '[[state]]',
+        type: '[[type]]',
+        orgTypes: {
+            tejo: 'TEJO',
+            uea: 'UEA',
+            none: 'ne gravas',
+        },
+        stateTypes: {
+            pending: '[[pending]]',
+            started: '[[started]]',
+            active: '[[active]]',
+            ended: '[[ended]]',
+            none: 'ne gravas',
+        },
+        noneType: 'ne gravas',
+    },
     cannotEditActive: '[[cannot edit active vote]]',
     bool: {
         yes: '[[yes]]',

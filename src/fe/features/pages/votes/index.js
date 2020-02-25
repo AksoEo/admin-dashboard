@@ -12,6 +12,7 @@ import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 import { votes as locale, search as searchLocale } from '../../../locale';
 import FIELDS from './fields';
+import FILTERS from './filters';
 
 const SEARCHABLE_FIELDS = ['name', 'description'];
 
@@ -36,7 +37,7 @@ export default connectPerms(class Votes extends Page {
             offset: 0,
             limit: 10,
         },
-
+        expanded: false,
         fieldPickerOpen: false,
     };
 
@@ -47,13 +48,13 @@ export default connectPerms(class Votes extends Page {
 
     decodeURLQuery () {
         this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
+            parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
         });
         this.#currentQuery = this.props.query;
     }
 
     encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, {});
+        const encoded = encodeURLQuery(this.state.parameters, FILTERS);
         if (encoded === this.#currentQuery) return;
         this.#currentQuery = encoded;
         this.props.onQueryChange(encoded);
@@ -74,7 +75,7 @@ export default connectPerms(class Votes extends Page {
         }
     }
 
-    render ({ perms }, { parameters, fieldPickerOpen }) {
+    render ({ perms }, { parameters, fieldPickerOpen, expanded }) {
         const actions = [];
 
         if (perms.hasPerm('votes.create.tejo') || perms.hasPerm('votes.create.uea')) {
@@ -105,13 +106,19 @@ export default connectPerms(class Votes extends Page {
                 <SearchFilters
                     value={parameters}
                     searchFields={SEARCHABLE_FIELDS}
+                    filters={FILTERS}
                     onChange={parameters => this.setState({ parameters })}
                     locale={{
                         searchPlaceholders: locale.search.placeholders,
                         searchFields: locale.fields,
+                        filters: locale.filters,
                     }}
-                    inputRef={view => this.#searchInput = view} />
+                    expanded={expanded}
+                    onExpandedChange={expanded => this.setState({ expanded })}
+                    inputRef={view => this.#searchInput = view}
+                    category="votes" />
                 <OverviewList
+                    expanded={expanded}
                     task="votes/list"
                     view="votes/vote"
                     updateView={['votes/sigVotes']}

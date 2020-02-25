@@ -178,7 +178,31 @@ templateFields.delete('org');
 templateFields = [...templateFields];
 
 const clientFilters = {
-    // TODO
+    org: {
+        toAPI: value => ({ org: value }),
+    },
+    timeStart: {
+        toAPI: value => ({ timeStart: { $range: value } }),
+    },
+    timeEnd: {
+        toAPI: value => ({ timeEnd: { $range: value } }),
+    },
+    state: {
+        toAPI: value => {
+            if (value === 'pending') return {
+                $not: {
+                    $or: [{ hasStarted: true }, { isActive: true }, { hasEnded: true }],
+                },
+            };
+            else if (value === 'started') return { hasStarted: true };
+            else if (value === 'active') return { isActive: true };
+            else if (value === 'ended') return { hasEnded: true };
+            return {};
+        },
+    },
+    type: {
+        toAPI: type => ({ type }),
+    },
 };
 
 const parametersToRequestData = makeParametersToRequestData({ clientFields, clientFilters });

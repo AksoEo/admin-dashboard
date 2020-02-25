@@ -28,15 +28,15 @@ function DateTimeEditor ({ value, onChange }) {
 export default {
     codeholders: {
         default: () => ({ enabled: false, value: [] }),
-        serialize: value => value.join(','),
-        deserialize: value => value.split(','),
+        serialize: ({ value }) => value.join(','),
+        deserialize: value => ({ enabled: true, value: value.split(',') }),
         editor: CodeholderPicker,
     },
     time: {
         needsSwitch: true,
         default: () => ({ enabled: false, value: [MIN_TIME, new Date()] }),
-        serialize: value => `${value[0].toISOString()}$${value[1].toISOString()}`,
-        deserialize: value => value.split('$').map(date => new Date(date)),
+        serialize: ({ value }) => `${value[0].toISOString()}$${value[1].toISOString()}`,
+        deserialize: value => ({ enabled: true, value: value.split('$').map(date => new Date(date)) }),
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="time-filter">
@@ -54,8 +54,8 @@ export default {
     },
     apiKey: {
         default: () => ({ enabled: false, value: '' }),
-        serialize: value => value,
-        deserialize: value => value,
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="api-key-filter">
@@ -69,8 +69,8 @@ export default {
     },
     ip: {
         default: () => ({ enabled: false, value: '' }),
-        serialize: value => value,
-        deserialize: value => value,
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="ip-filter">
@@ -84,8 +84,8 @@ export default {
     },
     origin: {
         default: () => ({ enabled: false, value: '' }),
-        serialize: value => value,
-        deserialize: value => value,
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="origin-filter">
@@ -99,8 +99,8 @@ export default {
     },
     method: {
         default: () => ({ enabled: false, value: '' }),
-        serialize: value => value,
-        deserialize: value => value,
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="method-filter">
@@ -114,8 +114,8 @@ export default {
     },
     path: {
         default: () => ({ enabled: false, value: '' }),
-        serialize: value => value,
-        deserialize: value => value,
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="path-filter">
@@ -129,8 +129,8 @@ export default {
     },
     resStatus: {
         default: () => ({ enabled: false, value: '' }),
-        serialize: value => value,
-        deserialize: value => value,
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="res-status-filter">
@@ -144,8 +144,8 @@ export default {
     },
     resTime: {
         default: () => ({ enabled: false, value: '' }),
-        serialize: value => value,
-        deserialize: value => value,
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="res-time-filter">

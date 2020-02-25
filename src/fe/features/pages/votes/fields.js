@@ -53,6 +53,14 @@ export default {
             return value;
         },
     },
+    type: {
+        component ({ value }) {
+            return locale.types[value];
+        },
+        stringify (value) {
+            return locale.types[value];
+        },
+    },
     state: (() => {
         const stringify = value => {
             if (value.hasResults) {
