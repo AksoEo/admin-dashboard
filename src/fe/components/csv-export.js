@@ -6,6 +6,7 @@ import stringify from 'csv-stringify';
 import { coreContext } from '../core/connection';
 import Segmented from './segmented';
 import { csvExport as locale } from '../locale';
+import './csv-export.less';
 
 const LIMIT = 100;
 
@@ -38,6 +39,7 @@ export default class CSVExport extends PureComponent {
         mode: 'csv',
         options: {},
         transientFields: [],
+        completedRows: 0,
     };
 
     beginExport () {
@@ -49,6 +51,7 @@ export default class CSVExport extends PureComponent {
             endingExport: false,
             error: null,
             objectURL: null,
+            completedRows: 0,
         }, () => {
             this.loadOne();
         });
@@ -94,6 +97,7 @@ export default class CSVExport extends PureComponent {
             const stringifier = stringify({
                 delimiter: this.state.mode === 'csv' ? ',' : '\t',
             });
+            let rowCount = 0;
             const rows = [];
             stringifier.on('readable', () => {
                 let row;
@@ -139,6 +143,8 @@ export default class CSVExport extends PureComponent {
 
             // write data
             for (const itemId of this.state.data) {
+                this.setState({ completedRows: rowCount });
+                rowCount++;
                 const data = [];
 
                 const itemData = await new Promise((resolve, reject) => {
@@ -203,48 +209,64 @@ export default class CSVExport extends PureComponent {
                             <div className="export-error">
                                 {this.state.error.toString()}
                             </div>
-                            <Button
-                                key="resume"
-                                class="action-button"
-                                onClick={this.resumeExport}>
-                                {locale.tryResumeExport}
-                            </Button>
+                            <div class="action-button-container">
+                                <Button
+                                    key="resume"
+                                    class="action-button"
+                                    raised
+                                    onClick={this.resumeExport}>
+                                    {locale.tryResumeExport}
+                                </Button>
+                            </div>
                         </Fragment>
                     ) : this.state.objectURL ? (
-                        <Button
-                            key="download"
-                            class="action-button"
-                            href={this.state.objectURL}
-                            download={this.state.filename}>
-                            {locale.download}
-                        </Button>
+                        <Fragment>
+                            <p>
+                                {locale.summary(this.state.total)}
+                            </p>
+                            <div class="action-button-container">
+                                <Button
+                                    key="download"
+                                    class="action-button"
+                                    raised
+                                    href={this.state.objectURL}
+                                    download={this.state.filename}>
+                                    {locale.download}
+                                </Button>
+                            </div>
+                        </Fragment>
                     ) : (
                         <Fragment>
-                            <Segmented
-                                class="mode-switch"
-                                selected={this.state.mode}
-                                onSelect={mode => this.setState({ mode })}>
-                                {[
-                                    {
-                                        id: 'csv',
-                                        label: locale.commaSeparated,
-                                    },
-                                    {
-                                        id: 'tsv',
-                                        label: locale.tabSeparated,
-                                    },
-                                ]}
-                            </Segmented>
+                            <div class="mode-switch-container">
+                                <Segmented
+                                    class="mode-switch"
+                                    selected={this.state.mode}
+                                    onSelect={mode => this.setState({ mode })}>
+                                    {[
+                                        {
+                                            id: 'csv',
+                                            label: locale.commaSeparated,
+                                        },
+                                        {
+                                            id: 'tsv',
+                                            label: locale.tabSeparated,
+                                        },
+                                    ]}
+                                </Segmented>
+                            </div>
                             <UserOptions
                                 options={this.props.userOptions || {}}
                                 value={this.state.options}
                                 onChange={options => this.setState({ options })} />
-                            <Button
-                                key="begin"
-                                class="action-button"
-                                onClick={this.resumeExport}>
-                                {locale.beginExport}
-                            </Button>
+                            <div class="action-button-container">
+                                <Button
+                                    key="begin"
+                                    raised
+                                    class="action-button"
+                                    onClick={this.resumeExport}>
+                                    {locale.beginExport}
+                                </Button>
+                            </div>
                         </Fragment>
                     )
                 ) : (
@@ -253,12 +275,20 @@ export default class CSVExport extends PureComponent {
                             class="progress-bar"
                             progress={this.state.data.length / this.state.total}
                             indeterminate={this.state.endingExport} />
-                        {!this.state.error && <Button
-                            key="abort"
-                            class="action-button"
-                            onClick={this.abortExport}>
-                            {locale.abortExport}
-                        </Button>}
+                        <p class="export-status">
+                            {this.state.endingExport
+                                ? locale.endingExport(this.state.completedRows, this.state.total)
+                                : locale.status(this.state.data.length, this.state.total)}
+                        </p>
+                        <div class="action-button-container">
+                            {!this.state.error && <Button
+                                key="abort"
+                                raised
+                                class="action-button"
+                                onClick={this.abortExport}>
+                                {locale.abortExport}
+                            </Button>}
+                        </div>
                     </Fragment>
                 )}
             </Dialog>
@@ -329,6 +359,8 @@ class UserOptions extends PureComponent {
                 </tr>
             );
         }
+
+        if (!options.length) return null;
 
         return (
             <table className="user-options">

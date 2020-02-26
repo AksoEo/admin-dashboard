@@ -197,6 +197,9 @@ export const csvExport = {
     download: 'Elŝuti CSV',
     commaSeparated: 'CSV (komoj)',
     tabSeparated: 'TSV (taboj)',
+    status: (n, m) => `[[loaded ${n} of ${m} total item${m === 1 ? '' : 's'}]]`,
+    endingExport: (n, m) => `[[exported ${n} of ${m} total row${m === 1 ? '' : 's'}]]`,
+    summary: rows => `[[created csv with ${rows} row${rows === 1 ? '' : 's'}]]`,
 };
 
 export const codeholders = {
