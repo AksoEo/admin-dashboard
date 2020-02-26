@@ -3,9 +3,10 @@ import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
+import CSVExport from '../../../../components/csv-export';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import Meta from '../../../meta';
-import { countryGroups as locale } from '../../../../locale';
+import { countryGroups as locale, search as searchLocale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { FIELDS } from './fields';
 import './style';
@@ -26,6 +27,7 @@ export default class CountryGroupsPage extends Page {
             offset: 0,
             limit: 10,
         },
+        csvExportOpen: false,
     };
 
     #searchInput;
@@ -64,9 +66,15 @@ export default class CountryGroupsPage extends Page {
         const actions = [];
 
         actions.push({
-            icon: <AddIcon />,
+            icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
             label: locale.create.menuItem,
             action: () => this.context.createTask('countries/createGroup'),
+        });
+
+        actions.push({
+            label: searchLocale.csvExport,
+            action: () => this.setState({ csvExportOpen: true }),
+            overflow: true,
         });
 
         return (
@@ -91,6 +99,17 @@ export default class CountryGroupsPage extends Page {
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />
+
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    task="countries/listGroups"
+                    parameters={parameters}
+                    fields={FIELDS}
+                    detailView="countries/group"
+                    detailViewOptions={id => ({ id, noFetch: true })}
+                    locale={{ fields: locale.fields }}
+                    filenamePrefix={locale.csvFilename} />
             </div>
         );
     }

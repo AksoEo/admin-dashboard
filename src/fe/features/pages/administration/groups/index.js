@@ -4,8 +4,9 @@ import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
+import CSVExport from '../../../../components/csv-export';
 import Meta from '../../../meta';
-import { adminGroups as locale } from '../../../../locale';
+import { adminGroups as locale, search as searchLocale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 
@@ -14,11 +15,13 @@ const FIELDS = {
         component ({ value }) {
             return value;
         },
+        stringify: v => v,
     },
     description: {
         component ({ value }) {
             return value;
         },
+        stringify: v => v,
     },
 };
 
@@ -36,6 +39,7 @@ export default connectPerms(class AdminGroups extends Page {
             offset: 0,
             limit: 10,
         },
+        csvExportOpen: false,
     };
 
     static contextType = coreContext;
@@ -77,11 +81,17 @@ export default connectPerms(class AdminGroups extends Page {
 
         if (perms.hasPerm('admin_groups.create')) {
             actions.push({
-                icon: <AddIcon />,
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.add,
                 action: () => this.context.createTask('adminGroups/create'),
             });
         }
+
+        actions.push({
+            label: searchLocale.csvExport,
+            action: () => this.setState({ csvExportOpen: true }),
+            overflow: true,
+        });
 
         return (
             <div class="admin-groups-page">
@@ -105,6 +115,17 @@ export default connectPerms(class AdminGroups extends Page {
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields}
                     updateView={['adminGroups/sigList']} />
+
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    task="adminGroups/list"
+                    parameters={parameters}
+                    fields={FIELDS}
+                    detailView="adminGroups/group"
+                    detailViewOptions={id => ({ id, noFetch: true })}
+                    locale={{ fields: locale.fields }}
+                    filenamePrefix={locale.csvFilename} />
             </div>
         );
     }

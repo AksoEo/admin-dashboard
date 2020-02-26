@@ -3,9 +3,10 @@ import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../components/page';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
+import CSVExport from '../../../components/csv-export';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
 import Meta from '../../meta';
-import { lists as locale } from '../../../locale';
+import { lists as locale, search as searchLocale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 
@@ -14,11 +15,13 @@ export const FIELDS = {
         component ({ value }) {
             return value;
         },
+        stringify: v => v,
     },
     description: {
         component ({ value }) {
             return value;
         },
+        stringify: v => v,
     },
 };
 
@@ -36,6 +39,7 @@ export default connectPerms(class Lists extends Page {
             offset: 0,
             limit: 10,
         },
+        csvExportOpen: false,
     };
 
     static contextType = coreContext;
@@ -76,13 +80,19 @@ export default connectPerms(class Lists extends Page {
         const actions = [];
         if (perms.hasPerm('lists.create') && perms.hasPerm('codeholders.read')) {
             actions.push({
-                icon: <AddIcon />,
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.add,
                 action: () => this.context.createTask('lists/create', {}, {
                     filters: ['{\n\t\n}'],
                 }),
             });
         }
+
+        actions.push({
+            label: searchLocale.csvExport,
+            action: () => this.setState({ csvExportOpen: true }),
+            overflow: true,
+        });
 
         return (
             <div class="lists-page">
@@ -111,6 +121,17 @@ export default connectPerms(class Lists extends Page {
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />
+
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    task="lists/list"
+                    parameters={parameters}
+                    fields={FIELDS}
+                    detailView="lists/list"
+                    detailViewOptions={id => ({ id, noFetch: true })}
+                    locale={{ fields: locale.fields }}
+                    filenamePrefix={locale.csvFilename} />
             </div>
         );
     }

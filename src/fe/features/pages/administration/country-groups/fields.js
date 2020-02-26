@@ -7,6 +7,7 @@ export const FIELDS = {
         component ({ value }) {
             return <span class="country-group-code">{value}</span>;
         },
+        stringify: v => v,
     },
     name: {
         component ({ value, onChange, editing }) {
@@ -19,5 +20,6 @@ export const FIELDS = {
             }
             return <span class="country-group-name">{value}</span>;
         },
+        stringify: v => v,
     },
 };

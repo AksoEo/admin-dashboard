@@ -62,7 +62,7 @@ export default class CSVExport extends PureComponent {
         this.context.createTask(task, options || {}, parameters).runOnceAndDrop().then(res => {
             this.setState({
                 data: this.state.data.concat(res.items),
-                transientFields: res.transientFields,
+                transientFields: res.transientFields || [],
                 total: res.total,
                 error: null,
             }, () => {

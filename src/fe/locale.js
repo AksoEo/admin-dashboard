@@ -543,6 +543,8 @@ export const adminGroups = {
 
     setPermissions: 'Agordi permesojn',
     setPermsButton: 'Agordi permesojn',
+
+    csvFilename: 'administraj-grupoj',
 };
 
 export const clients = {
@@ -584,6 +586,7 @@ export const clients = {
         setTitle: 'Ĝisdatigi permesojn',
         setButton: 'Ĝisdatigi',
     },
+    csvFilename: 'api-klientoj',
 };
 
 export const httpLog = {
@@ -656,6 +659,11 @@ export const countries = {
         title: 'Redakti landojn',
         button: 'Redakti',
     },
+    csvFilename: 'landoj',
+    enabled: {
+        true: 'ŝaltita',
+        false: 'malŝaltita',
+    },
 };
 export const countryGroups = {
     title: 'Landaroj',
@@ -682,6 +690,7 @@ export const countryGroups = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la landaron? Ne eblas malfari tiun ĉi agon.',
     },
+    csvFilename: 'landaroj',
 };
 
 export const lists = {
@@ -724,6 +733,8 @@ export const lists = {
     },
 
     nameRequired: 'Necesas nomo',
+
+    csvFilename: 'listoj',
 };
 
 export const votes = {
@@ -892,6 +903,7 @@ export const votes = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la voĉdonadon? Ne eblas malfari tiun ĉi agon.',
     },
+    csvFilename: 'vochdonadoj',
 };
 
 export const mime = {

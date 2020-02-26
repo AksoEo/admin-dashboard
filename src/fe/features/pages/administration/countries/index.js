@@ -2,9 +2,10 @@ import { h } from 'preact';
 import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
+import CSVExport from '../../../../components/csv-export';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import Meta from '../../../meta';
-import { countries as locale } from '../../../../locale';
+import { countries as locale, search as searchLocale } from '../../../../locale';
 import { FIELDS } from './fields';
 import './style';
 
@@ -23,6 +24,7 @@ export default class CountriesPage extends Page {
             offset: 0,
             limit: 300,
         },
+        csvExportOpen: false,
     };
 
     #searchInput;
@@ -58,10 +60,19 @@ export default class CountriesPage extends Page {
     }
 
     render (_, { parameters }) {
+        const actions = [
+            {
+                label: searchLocale.csvExport,
+                action: () => this.setState({ csvExportOpen: true }),
+                overflow: true,
+            },
+        ];
+
         return (
             <div class="countries-page">
                 <Meta
-                    title={locale.title} />
+                    title={locale.title}
+                    actions={actions} />
                 <SearchFilters
                     value={parameters}
                     onChange={parameters => this.setState({ parameters })}
@@ -79,6 +90,17 @@ export default class CountriesPage extends Page {
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields}
                     limits={[10, 20, 100, 200, 300]} />
+
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    task="countries/list"
+                    parameters={parameters}
+                    fields={FIELDS}
+                    detailView="countries/country"
+                    detailViewOptions={id => ({ id, noFetch: true })}
+                    locale={{ fields: locale.fields }}
+                    filenamePrefix={locale.csvFilename} />
             </div>
         );
     }

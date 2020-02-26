@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import CheckIcon from '@material-ui/icons/Check';
 import { Checkbox, TextField } from '@cpsdqs/yamdl';
+import { countries as locale } from '../../../../locale';
 
 const nameField = {
     component ({ value, onChange, editing }) {
@@ -14,6 +15,7 @@ const nameField = {
         }
         return <span class="country-name">{value}</span>;
     },
+    stringify: v => v,
 };
 
 export const FIELDS = {
@@ -22,6 +24,7 @@ export const FIELDS = {
         component ({ value }) {
             return <span class="country-code">{value}</span>;
         },
+        stringify: v => v,
     },
     enabled: {
         weight: 0.5,
@@ -35,6 +38,7 @@ export const FIELDS = {
             }
             return value ? <CheckIcon /> : null;
         },
+        stringify: v => locale.enabled[v.toString()],
     },
     name_eo: nameField,
     name_en: nameField,

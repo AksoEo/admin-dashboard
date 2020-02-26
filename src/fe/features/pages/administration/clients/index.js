@@ -4,8 +4,9 @@ import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import { email } from '../../../../components/data';
+import CSVExport from '../../../../components/csv-export';
 import Meta from '../../../meta';
-import { clients as locale } from '../../../../locale';
+import { clients as locale, search as searchLocale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { connectContextualActions } from '../../../../context-action';
@@ -17,21 +18,25 @@ export const FIELDS = {
         component ({ value }) {
             return value;
         },
+        stringify: v => v,
     },
     apiKey: {
         component ({ value }) {
             return <apiKey.inlineRenderer value={value} />;
         },
+        stringify: v => Buffer.from(v).toString('hex'),
     },
     ownerName: {
         component ({ value }) {
             return value;
         },
+        stringify: v => v,
     },
     ownerEmail: {
         component ({ value }) {
             return <email.inlineRenderer value={value} />;
         },
+        stringify: v => v,
     },
 };
 
@@ -51,6 +56,7 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
             offset: 0,
             limit: 10,
         },
+        csvExportOpen: false,
     };
 
     static contextType = coreContext;
@@ -91,11 +97,17 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
         const actions = [];
         if (perms.hasPerm('clients.create')) {
             actions.push({
-                icon: <AddIcon />,
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.add,
                 action: () => this.context.createTask('clients/create'),
             });
         }
+
+        actions.push({
+            label: searchLocale.csvExport,
+            action: () => this.setState({ csvExportOpen: true }),
+            overflow: true,
+        });
 
         let selection = null;
         if (contextualAction && contextualAction.action === 'select-clients') {
@@ -131,6 +143,17 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />
+
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    task="clients/list"
+                    parameters={parameters}
+                    fields={FIELDS}
+                    detailView="clients/client"
+                    detailViewOptions={id => ({ id, noFetch: true })}
+                    locale={{ fields: locale.fields }}
+                    filenamePrefix={locale.csvFilename} />
             </div>
         );
     }

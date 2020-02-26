@@ -6,6 +6,7 @@ import Page from '../../../components/page';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
 import FieldPicker from '../../../components/field-picker';
+import CSVExport from '../../../components/csv-export';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
@@ -39,6 +40,7 @@ export default connectPerms(class Votes extends Page {
         },
         expanded: false,
         fieldPickerOpen: false,
+        csvExportOpen: false,
     };
 
     static contextType = coreContext;
@@ -98,6 +100,12 @@ export default connectPerms(class Votes extends Page {
             action: () => this.props.push('shablonoj'),
         });
 
+        actions.push({
+            label: searchLocale.csvExport,
+            action: () => this.setState({ csvExportOpen: true }),
+            overflow: true,
+        });
+
         return (
             <div class="votes-page">
                 <Meta
@@ -137,6 +145,16 @@ export default connectPerms(class Votes extends Page {
                     open={fieldPickerOpen}
                     onClose={() => this.setState({ fieldPickerOpen: false })}
                     locale={locale.fields} />
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    task="votes/list"
+                    parameters={parameters}
+                    fields={FIELDS}
+                    detailView="votes/vote"
+                    detailViewOptions={id => ({ id, noFetch: true })}
+                    locale={{ fields: locale.fields }}
+                    filenamePrefix={locale.csvFilename} />
             </div>
         );
     }
