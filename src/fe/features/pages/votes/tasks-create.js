@@ -211,7 +211,9 @@ const configPage = () => ({
 const templatePage = () => ({
     id: 'template',
     page: function TemplatePage ({ value, onChange }) {
-
+        void value;
+        void onChange;
+        return 'todo';
     },
 });
 
@@ -267,7 +269,7 @@ export default function makeCreateTask (isTemplate) {
 
         static contextType = routerContext;
 
-        render ({ open, core, task }, { page }) {
+        render ({ open, task }, { page }) {
             const pageTitles = [];
             const pageContents = [];
             let pageIndex = 0;

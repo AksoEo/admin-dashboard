@@ -330,7 +330,7 @@ export const tasks = {
             },
         };
     },
-    voteTemplate: async (_, { id, fields }) => {
+    voteTemplate: async (_, { id }) => {
         const client = await asyncClient;
         const res = await client.get(`/vote_templates/${+id}`, {
             fields: [
