@@ -325,7 +325,9 @@ function Bar ({ ymax, items, showPercentage }) {
     const contents = [];
 
     for (const item of items) {
-        const percentage = item.value !== null ? item.value / ymax : 1;
+        const percentage = item.value !== null
+            ? (ymax !== 0 ? item.value / ymax : 0)
+            : 1;
 
         contents.push(
             <div class={'bar-chart-item ' + (item.chosen ? 'was-chosen' : '')}>
