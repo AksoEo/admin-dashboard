@@ -46,7 +46,7 @@ export const IdUEACode = connect(
                 <ErrorIcon style={{ verticalAlign: 'middle' }} />
             </span>
         ))
-        : data ? <UEACode value={data.code.new} /> : <TinyProgress />
+        : (data && data.code) ? <UEACode value={data.code.new} /> : <TinyProgress />
 ));
 
 /// Also pass `id` to enable checking if it’s taken.

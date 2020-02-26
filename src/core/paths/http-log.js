@@ -57,7 +57,7 @@ const clientFilters = {
     method: { toAPI: value => ({ method: value }) },
     path: { toAPI: value => ({ path: value }) },
     resStatus: { toAPI: value => ({ resStatus: value }) },
-    resTime: { toAPI: value => ({ resTime: value }) },
+    resTime: { toAPI: value => ({ resTime: { $range: value } }) },
 };
 
 const parametersToRequestData = makeParametersToRequestData({

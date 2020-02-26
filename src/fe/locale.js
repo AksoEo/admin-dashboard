@@ -603,7 +603,11 @@ export const httpLog = {
             method: 'Metodo',
             path: 'Adreso',
             resStatus: 'Rezulta stato',
-            resTime: 'Daŭro',
+            resTime: 'Daŭro (ms)',
+
+            originPlaceholder: '[[ekz. https://admin.akso.org]]',
+            pathPlaceholder: '[[ekz. /auth]]',
+            resStatusPlaceholder: '[[ekz. 200]]',
         },
     },
     fields: {

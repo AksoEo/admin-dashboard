@@ -1,6 +1,9 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
+import NativeSelect from '@material-ui/core/NativeSelect';
 import CodeholderPicker from '../../../../components/codeholder-picker';
+import RangeEditor from '../../../../components/range-editor';
+import { httpLog as locale } from '../../../../locale';
 
 const MIN_TIME = new Date('2019-05-21T18:00:00Z');
 
@@ -30,7 +33,12 @@ export default {
         default: () => ({ enabled: false, value: [] }),
         serialize: ({ value }) => value.join(','),
         deserialize: value => ({ enabled: true, value: value.split(',') }),
-        editor: CodeholderPicker,
+        editor ({ value, onChange, onEnabledChange }) {
+            return <CodeholderPicker value={value} onChange={value => {
+                onChange(value);
+                onEnabledChange(!!value.length);
+            }} />;
+        },
     },
     time: {
         needsSwitch: true,
@@ -86,28 +94,45 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: ({ value }) => value,
         deserialize: value => ({ enabled: true, value }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="origin-filter">
-                    <TextField value={value} onChange={e => {
-                        onChange(e.target.value);
-                        onEnabledChange(!!e.target.value);
-                    }} />
+                    <TextField
+                        disabled={hidden}
+                        placeholder={locale.search.filters.originPlaceholder}
+                        value={value}
+                        onChange={e => {
+                            onChange(e.target.value);
+                            onEnabledChange(!!e.target.value);
+                        }} />
                 </div>
             );
         },
     },
     method: {
+        needsSwitch: true,
         default: () => ({ enabled: false, value: '' }),
         serialize: ({ value }) => value,
         deserialize: value => ({ enabled: true, value }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, hidden }) {
             return (
                 <div class="method-filter">
-                    <TextField value={value} onChange={e => {
-                        onChange(e.target.value);
-                        onEnabledChange(!!e.target.value);
-                    }} />
+                    <NativeSelect
+                        value={value}
+                        disabled={hidden}
+                        onChange={e => onChange(e.target.value)}>
+                        {[
+                            'GET',
+                            'POST',
+                            'PUT',
+                            'PATCH',
+                            'DELETE',
+                            'HEAD',
+                            'CONNECT',
+                            'OPTIONS',
+                            'TRACE',
+                        ].map(x => <option key={x} value={x}>{x}</option>)}
+                    </NativeSelect>
                 </div>
             );
         },
@@ -116,13 +141,17 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: ({ value }) => value,
         deserialize: value => ({ enabled: true, value }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="path-filter">
-                    <TextField value={value} onChange={e => {
-                        onChange(e.target.value);
-                        onEnabledChange(!!e.target.value);
-                    }} />
+                    <TextField
+                        value={value}
+                        disabled={hidden}
+                        placeholder={locale.search.filters.pathPlaceholder}
+                        onChange={e => {
+                            onChange(e.target.value);
+                            onEnabledChange(!!e.target.value);
+                        }} />
                 </div>
             );
         },
@@ -131,28 +160,40 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: ({ value }) => value,
         deserialize: value => ({ enabled: true, value }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="res-status-filter">
-                    <TextField value={value} onChange={e => {
-                        onChange(e.target.value);
-                        onEnabledChange(!!e.target.value);
-                    }} />
+                    <TextField
+                        value={value}
+                        disabled={hidden}
+                        placeholder={locale.search.filters.resStatusPlaceholder}
+                        onChange={e => {
+                            onChange(e.target.value);
+                            onEnabledChange(!!e.target.value);
+                        }} />
                 </div>
             );
         },
     },
     resTime: {
-        default: () => ({ enabled: false, value: '' }),
-        serialize: ({ value }) => value,
-        deserialize: value => ({ enabled: true, value }),
-        editor ({ value, onChange, onEnabledChange }) {
+        needsSwitch: true,
+        default: () => ({ enabled: false, value: [0, 1000] }),
+        serialize: ({ value }) => value.join('-'),
+        deserialize: value => ({ enabled: true, value: value.split('-').map(x => +x) }),
+        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
             return (
                 <div class="res-time-filter">
-                    <TextField value={value} onChange={e => {
-                        onChange(e.target.value);
-                        onEnabledChange(!!e.target.value);
-                    }} />
+                    <RangeEditor
+                        min={0}
+                        tickDistance={100}
+                        max={10000}
+                        value={value}
+                        faded={!enabled}
+                        disabled={hidden}
+                        onChange={range => {
+                            onChange(range);
+                            onEnabledChange(true);
+                        }} />
                 </div>
             );
         },
