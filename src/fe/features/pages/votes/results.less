@@ -40,4 +40,131 @@
             stroke: currentColor;
         }
     }
+
+    .result-bar-chart {
+        .bar-chart-item {
+            position: relative;
+            padding: 8px 16px;
+            margin-bottom: 8px;
+
+            .item-bar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                background: @text-fade-20;
+            }
+
+            .item-name, .item-value, .item-description {
+                position: relative;
+                z-index: 1;
+            }
+            .item-value {
+                font-size: small;
+            }
+            .item-description:not(:empty) {
+                margin-top: 8px;
+                font-size: small;
+            }
+
+            &.was-chosen .item-bar {
+                background: @secondary;
+            }
+
+            .item-chosen-check {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 1;
+            }
+        }
+    }
+
+    .result-rounds {
+        .round-picker {
+            display: flex;
+            margin-bottom: 8px;
+
+            .round-picker-label {
+                flex: 1;
+                text-align: center;
+            }
+        }
+    }
+
+    .result-round {
+        .round-chosen {
+            .round-chosen-name {
+                font-weight: bold;
+            }
+        }
+
+        .round-options {
+            .round-option {
+                .round-option-name {
+                    margin-right: 8px;
+                }
+            }
+        }
+    }
+
+    .result-lock-graph-container {
+        text-align: center;
+
+        .ranked-pairs {
+            text-align: left;
+
+            tr td:first-child {
+                font-weight: bold;
+                padding-right: 8px;
+            }
+        }
+    }
+
+    .result-lock-graph {
+        max-width: 100%;
+
+        .lock-graph-edge {
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 3px;
+            opacity: 0.7;
+            pointer-events: none;
+
+            transition: stroke-width 0.2s @easing;
+
+            &.is-selected {
+                stroke-width: 6px;
+                opacity: 1;
+            }
+        }
+
+        .lock-graph-edge-hitbox {
+            stroke-width: 14px;
+            fill: none;
+            stroke: #f00;
+            opacity: 0;
+
+            &:hover + .lock-graph-edge {
+                opacity: 1;
+            }
+        }
+
+        .lock-graph-node-background {
+            fill: @text-fade-20;
+
+            &.is-the-chosen-one {
+                fill: @secondary;
+            }
+        }
+
+        text {
+            fill: currentColor;
+            dominant-baseline: middle;
+            alignment-baseline: middle;
+        }
+    }
 }

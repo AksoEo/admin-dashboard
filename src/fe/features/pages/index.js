@@ -186,7 +186,7 @@ export default [
                             {
                                 path: 'rezultoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes/results')),
+                                    import(/* webpackChunkName: "votes-results", webpackPrefetch: true */ './votes/results')),
                                 type: 'stack',
                             },
                         ],
