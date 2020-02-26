@@ -8,6 +8,7 @@ import { apiKey, email } from '../../../../components/data';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
+import { LinkButton } from '../../../../router';
 import { clients as locale } from '../../../../locale';
 import './detail.less';
 
@@ -154,6 +155,9 @@ function Header ({ item, editing }) {
     return (
         <div class="client-header">
             <h1>{item.name}</h1>
+            <LinkButton target={`/administrado/klientoj/${item.id}/permesoj`}>
+                {locale.perms.linkButton}
+            </LinkButton>
         </div>
     );
 }

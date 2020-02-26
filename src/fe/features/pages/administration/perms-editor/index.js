@@ -11,8 +11,6 @@ import JSONFilterEditor from '../../../../components/json-filter-editor';
 import { read, add, remove, hasField, addField, removeField } from './solver';
 import './style';
 
-// TODO: member fields stuff
-
 /// Permissions editor.
 /// Also edits member filter and member fields.
 ///
@@ -263,7 +261,8 @@ function MemberFilterEditor ({ disabled, filter, onFilterChange }) {
             <JSONFilterEditor
                 disabled={disabled}
                 value={filter}
-                onChange={onFilterChange} />
+                onChange={onFilterChange}
+                suppressInitialRoundTrip />
         </div>
     );
 }

@@ -54,6 +54,7 @@ CodeMirror.defineMode('akso-json-template', () => ({
 /// - expanded: bool
 /// - onCollapse: callback
 /// - disabled: disabled state
+/// - suppressInitialRoundTrip: set to true to prevent onChange when initializing
 export default class JSONFilterEditor extends PureComponent {
     state = {
         helpOpen: false,
@@ -177,8 +178,10 @@ export default class JSONFilterEditor extends PureComponent {
         editor.on('keydown', this.onKeyDown);
         editor.addOverlay('akso-json-template');
 
-        // update template variables and detect errors by doing a round-trip
-        this.onChange(this.toCMSource(this.props.value));
+        if (!this.props.suppressInitialRoundTrip) {
+            // update template variables and detect errors by doing a round-trip
+            this.onChange(this.toCMSource(this.props.value));
+        }
     };
 
     render () {

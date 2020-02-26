@@ -579,6 +579,7 @@ export const clients = {
     ownerEmailRequired: 'Necesas retpoŝtadreso',
 
     perms: {
+        linkButton: 'Redakti permesojn',
         title: 'Permesoj',
         setTitle: 'Ĝisdatigi permesojn',
         setButton: 'Ĝisdatigi',
