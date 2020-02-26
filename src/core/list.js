@@ -1,5 +1,21 @@
 import { util } from '@tejo/akso-client';
 
+export function transformError (err) {
+    if (!err) return { code: '?', message: '??' };
+    let code;
+    if (err.statusCode === 400) code = 'bad-request';
+    else if (err.statusCode === 401) code = 'unauthorized';
+    else if (err.statusCode === 403) code = 'forbidden';
+    else if (err.statusCode === 404) code = 'not-found';
+    else if (err.statusCode === 409) code = 'conflict';
+    else if (err.statusCode === 500) code = 'internal-server-error';
+
+    return {
+        code: code || err.code || '?',
+        message: err.message || err.toString(),
+    };
+}
+
 export function filtersToAPI (clientFilters, pfilters) {
     const filters = [];
     if (pfilters && !pfilters._disabled) {

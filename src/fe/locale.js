@@ -29,6 +29,7 @@ export const data = {
         'GB',
     ],
     delete: 'Forigi',
+    retry: 'Reprovi',
     showMore: 'Montri pliajn',
     objViewerArrayItems: items => `${items} ero${items === 1 ? '' : 'j'}`,
     ueaCode: {
@@ -37,6 +38,29 @@ export const data = {
         codeTaken: 'La UEA-kodo estas jam uzata',
         idFailed: '[[failed to load]]',
     },
+};
+
+export const errors = {
+    unknown: err => `[[unknown error: ${err}]]`,
+    invalidSearchQuery: {
+        pre: [
+            'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj.',
+            'Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon:',
+        ],
+        list: [
+            ['*', ' post vorto por permesi ajnajn sekvantajn signojn post la vorto'],
+            ['+', ' antaŭ vorto por postuli ĝian ekziston'],
+            ['-', ' antaŭ vorto por postuli ĝian malekziston'],
+            ['""', '-citilojn ĉirkaŭ frazo aŭ vorto por postuli la ekzaktan kombinon de la vortoj'],
+        ],
+        post: ['Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.'],
+    },
+    'bad-request': err => `[[bad request: ${err}]]`,
+    'unauthorized': '[[unauthorized]]',
+    'forbidden': '[[forbidden]]',
+    'not-found': '[[not found]]',
+    'conflict': '[[conflict]]',
+    'internal-server-error': '[[internal server error]]',
 };
 
 export const login = {

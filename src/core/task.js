@@ -1,4 +1,5 @@
 import { remove, TASKS } from './store';
+import { transformError } from './list';
 import * as log from './log';
 
 /// Abstract task container.
@@ -58,10 +59,7 @@ export default class Task {
             self.postMessage({
                 type: 'task-error',
                 id: this.id,
-                error: {
-                    code: error.code,
-                    message: error.message || error.toString(),
-                },
+                error: transformError(error),
             });
         } else {
             log.debug(`task ${this.id} succeeded, dropping`);

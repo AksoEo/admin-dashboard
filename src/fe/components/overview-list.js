@@ -11,6 +11,7 @@ import EventProxy from './event-proxy';
 import { LinkButton } from '../router';
 import { search as locale } from '../locale';
 import { deepEq } from '../../util';
+import DisplayError from './error';
 import './overview-list.less';
 
 const DEBOUNCE_TIME = 400; // ms
@@ -194,8 +195,7 @@ export default class OverviewList extends PureComponent {
         let prevDisabled = true;
         let nextDisabled = true;
         if (error) {
-            // TODO
-            contents = 'error';
+            contents = <DisplayError error={error} />;
         } else if (result) {
             const selectedFields = parameters.fields;
             const selectedFieldIds = selectedFields.map(x => x.id);

@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { transformError } from './list';
 import * as store from './store';
 import * as log from './log';
 
@@ -41,10 +42,7 @@ export default class DataView {
         self.postMessage({
             type: 'data-view-error',
             id: this.id,
-            error: {
-                code: error.code,
-                message: error.message || error.toString(),
-            },
+            error: transformError(error),
         });
     };
 

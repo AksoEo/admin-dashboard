@@ -5,6 +5,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { data as locale } from '../locale';
 import { coreContext } from '../core/connection';
 import { deepEq } from '../../util';
+import DisplayError from './error';
 import './data-list.less';
 
 // nested portals cause bugs when they end up in the same container
@@ -33,14 +34,21 @@ export default class DataList extends PureComponent {
         items: [],
         total: -1,
         loading: false,
+        error: null,
     };
 
     static contextType = coreContext;
 
     async fetchChunk (chunk) {
         if (this.state.total > -1 && chunk * VLIST_CHUNK_SIZE > this.state.total) return;
-        this.setState({ loading: true });
-        const result = await this.props.onLoad(chunk * VLIST_CHUNK_SIZE, VLIST_CHUNK_SIZE);
+        this.setState({ loading: true, error: null });
+        let result;
+        try {
+            result = await this.props.onLoad(chunk * VLIST_CHUNK_SIZE, VLIST_CHUNK_SIZE);
+        } catch (error) {
+            this.setState({ error, loading: false });
+            return;
+        }
         if (!this.maySetState) return;
 
         const items = this.state.items.slice();
@@ -177,13 +185,18 @@ export default class DataList extends PureComponent {
             items.push(<div class="data-list-empty" key={0}>{this.props.emptyLabel}</div>);
         }
 
+        let error = null;
+        if (this.state.error) {
+            error = <DisplayError error={this.state.error} />;
+        }
+
         let showMore = null;
-        if (this.props.useShowMore) {
+        if (this.props.useShowMore || error) {
             const hasMore = this.state.items.length < this.state.total;
-            if (hasMore) {
+            if (hasMore || error) {
                 showMore = (
                     <Button class="show-more-button" onClick={this.showMore}>
-                        {locale.showMore}
+                        {error ? locale.retry : locale.showMore}
                     </Button>
                 );
             }
@@ -207,6 +220,7 @@ export default class DataList extends PureComponent {
                     class="vlist-spacer"
                     style={{ height: total * this.props.itemHeight }} />
                 {items}
+                {error}
                 {loadingIndicator}
                 {showMore}
             </div>
