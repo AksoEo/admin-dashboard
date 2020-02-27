@@ -118,6 +118,7 @@ export default class APILogListView extends Page {
                         filters: locale.search.filters,
                     }}
                     category="http_log"
+                    filtersToAPI="httpLog/filtersToAPI"
                     inputRef={view => this.#searchInput = view} />
                 <FieldPicker
                     open={this.state.fieldPickerOpen}

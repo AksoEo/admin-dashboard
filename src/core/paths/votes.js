@@ -2,7 +2,7 @@ import JSON5 from 'json5';
 import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
-import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
+import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
 import * as store from '../store';
 import { deepMerge, deepEq } from '../../util';
 
@@ -346,6 +346,10 @@ export const tasks = {
         store.insert([VOTE_TEMPLATES, +id], deepMerge(existing, clientFromAPI(res.body)));
 
         return +id;
+    },
+
+    filtersToAPI: async ({ filters }) => {
+        return filtersToAPI(clientFilters, filters);
     },
 };
 

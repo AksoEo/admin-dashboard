@@ -2,7 +2,7 @@ import ipaddr from 'ipaddr.js';
 import asyncClient from '../client';
 import { AbstractDataView } from '../view';
 import * as store from '../store';
-import { makeParametersToRequestData, makeClientFromAPI } from '../list';
+import { makeParametersToRequestData, makeClientFromAPI, filtersToAPI } from '../list';
 import { deepMerge } from '../../util';
 
 export const HTTP_LOG = 'httpLog';
@@ -97,6 +97,9 @@ export const tasks = {
                 filtered: usedFilters,
             },
         };
+    },
+    filtersToAPI: async ({ filters }) => {
+        return filtersToAPI(clientFilters, filters);
     },
 };
 

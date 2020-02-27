@@ -124,6 +124,7 @@ export default connectPerms(class Votes extends Page {
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     inputRef={view => this.#searchInput = view}
+                    filtersToAPI="votes/filtersToAPI"
                     category="votes" />
                 <OverviewList
                     expanded={expanded}
