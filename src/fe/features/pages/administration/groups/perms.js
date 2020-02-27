@@ -47,9 +47,12 @@ export default connect(({ matches }) => {
 
         const task = core.createTask('adminGroups/update', {
             id: +this.props.matches[this.props.matches.length - 2][1],
-            _noEditors: true,
+            _changedFields: ['memberRestrictions'],
         }, {
-            memberRestrictions: { filter, fields },
+            memberRestrictions: this.state.memberRestrictionsEnabled ? {
+                filter: filter || {},
+                fields: fields || null,
+            } : null,
         });
         task.runOnce().catch(err => {
             console.error(err); // eslint-disable-line no-console

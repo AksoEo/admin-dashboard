@@ -4,6 +4,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import { adminGroups as locale } from '../../../../locale';
 import { Validator } from '../../../../components/form';
 import TaskDialog from '../../../../components/task-dialog';
+import ChangedFields from '../../../../components/changed-fields';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { apiKey } from '../../../../components/data';
 import { routerContext } from '../../../../router';
@@ -50,24 +51,9 @@ export default {
                 actionLabel={locale.editUpdate}
                 running={task.running}
                 run={() => task.runOnce()}>
-                {!task._noEditors ? (
-                    <Validator
-                        component={TextField}
-                        label={locale.fields.name}
-                        value={task.parameters.name || ''}
-                        onChange={e => task.update({ name: e.target.value })}
-                        validate={name => {
-                            if (!name) throw { error: locale.nameRequired };
-                        }} />
-                ) : null}
-                {!task._noEditors ? (
-                    <Validator
-                        component={TextField}
-                        label={locale.fields.description}
-                        value={task.parameters.description || ''}
-                        onChange={e => task.update({ description: e.target.value })}
-                        validate={() => {}} />
-                ) : null}
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={locale.fields} />
             </TaskDialog>
         );
     },

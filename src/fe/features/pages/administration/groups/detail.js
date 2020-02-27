@@ -1,23 +1,22 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import { Button, CircularProgress } from '@cpsdqs/yamdl';
+import { Button, TextField } from '@cpsdqs/yamdl';
 import Segmented from '../../../../components/segmented';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
 import { FIELDS as CLIENT_FIELDS } from '../clients/index';
+import DetailView from '../../../../components/detail';
 import OverviewList from '../../../../components/overview-list';
 import GlobalFilterNotice from '../../codeholders/global-filter-notice';
 import Meta from '../../../meta';
-import { connect } from '../../../../core/connection';
+import { coreContext } from '../../../../core/connection';
 import { LinkButton } from '../../../../router';
 import { adminGroups as locale, clients as clientsLocale, codeholders as codeholdersLocale } from '../../../../locale';
 import { connectPerms } from '../../../../perms';
 import './detail.less';
 
-export default connect(props => ['adminGroups/group', {
-    id: props.match[1],
-}])((item, core) => ({ item, core }))(connectPerms(class AdminGroupDetailPage extends Page {
+export default connectPerms(class AdminGroupDetailPage extends Page {
     state = {
         tab: 'codeholders',
         // TODO: store these in navigation data because users might move to/from other pages a lot (e.g. codeholders)
@@ -28,14 +27,39 @@ export default connect(props => ['adminGroups/group', {
         },
         codeholdersSelection: new Set(),
         clientsSelection: new Set(),
+
+        edit: null,
     };
 
-    render ({ item, match, perms, core }, { tab, parameters }) {
-        if (!item) return (
-            <div class="admin-group-detail-page is-loading">
-                <CircularProgress indeterminate />
-            </div>
-        );
+    static contextType = coreContext;
+
+    onEndEdit = () => {
+        this.props.editing && this.props.editing.pop(true);
+        this.setState({ edit: null });
+    };
+
+    #commitTask = null;
+    onCommit = changedFields => {
+        if (!this.props.editing || this.#commitTask) return;
+        if (!changedFields.length) {
+            // nothing changed, so we can just pop the editing state
+            this.props.editing.pop(true);
+            return;
+        }
+
+        this.#commitTask = this.context.createTask('adminGroups/update', {
+            id: this.props.match[1],
+            _changedFields: changedFields,
+        }, this.state.edit);
+        this.#commitTask.on('success', this.onEndEdit);
+        this.#commitTask.on('drop', () => this.#commitTask = null);
+    };
+
+    componentWillUnmount () {
+        if (this.#commitTask) this.#commitTask.drop();
+    }
+
+    render ({ match, perms, editing }, { tab, parameters, edit }) {
         const id = match[1];
 
         const itemsTask = tab === 'clients' ? 'adminGroups/listClients' : 'adminGroups/listCodeholders';
@@ -59,8 +83,8 @@ export default connect(props => ['adminGroups/group', {
             : <GlobalFilterNotice perms={perms} />;
 
         const addItem = tab === 'clients'
-            ? () => core.createTask('adminGroups/addClientsBatchTask', { group: id })
-            : () => core.createTask('adminGroups/addCodeholdersBatchTask', { group: id });
+            ? () => this.context.createTask('adminGroups/addClientsBatchTask', { group: id })
+            : () => this.context.createTask('adminGroups/addCodeholdersBatchTask', { group: id });
 
         const canAddItem = perms.hasPerm('admin_groups.update') && (tab === 'clients'
             ? perms.hasPerm('clients.read')
@@ -91,7 +115,7 @@ export default connect(props => ['adminGroups/group', {
         if (selectionSet.size) {
             selectionActionButton = (
                 <Button class="selection-action-button" onClick={() => {
-                    const task = core.createTask(removeItemsTask, { group: id }, { items: [...selectionSet] });
+                    const task = this.context.createTask(removeItemsTask, { group: id }, { items: [...selectionSet] });
                     task.on('success', () => {
                         // reset selection
                         this.setState({
@@ -116,7 +140,7 @@ export default connect(props => ['adminGroups/group', {
             actions.push({
                 overflow: true,
                 label: locale.delete,
-                action: () => core.createTask('adminGroups/delete', {}, { id }),
+                action: () => this.context.createTask('adminGroups/delete', {}, { id }),
             });
         }
 
@@ -124,7 +148,7 @@ export default connect(props => ['adminGroups/group', {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.edit,
-                action: () => core.createTask('adminGroups/update', { id }, { ...item }),
+                action: () => this.props.push('redakti'),
             });
         }
 
@@ -135,43 +159,88 @@ export default connect(props => ['adminGroups/group', {
                 <Meta
                     title={locale.detailTitle}
                     actions={actions} />
-                <div class="group-header">
-                    <div class="group-title">{item.name}</div>
-                    <div class="group-description">{item.description}</div>
-                    <LinkButton class="edit-perms-button" target={permsTarget}>
-                        {locale.editPerms}
-                    </LinkButton>
-                </div>
-                <Segmented class="tab-switcher" selected={tab} onSelect={tab => this.setState({ tab })}>
-                    {[
-                        perms.hasPerm('codeholders.read') && { id: 'codeholders', label: locale.tabs.codeholders },
-                        perms.hasPerm('clients.read') && { id: 'clients', label: locale.tabs.clients },
-                    ].filter(x => x)}
-                </Segmented>
-                {selectionActionButton}
-                <OverviewList
-                    task={itemsTask}
-                    notice={itemsNotice}
-                    view={itemsView}
-                    selection={selection}
-                    options={{
-                        group: id,
-                    }}
-                    fields={itemFieldSpecs}
-                    useDeepCmp
-                    parameters={{
-                        ...parameters,
-                        fields: itemFields,
-                        offset: itemsOffset,
-                    }}
-                    onGetItemLink={onGetItemLink}
-                    onSetOffset={offset => this.setState({ [offsetKey]: offset })}
-                    onSetLimit={limit => this.setState({
-                        parameters: { ...this.state.parameters, limit },
-                    })}
-                    updateView={updateView}
-                    locale={itemsLocale} />
+                <DetailView
+                    view="adminGroups/group"
+                    id={id}
+                    header={Header}
+                    fields={fields}
+                    locale={locale}
+                    userData={{ permsTarget }}
+                    edit={edit}
+                    onEditChange={edit => this.setState({ edit })}
+                    editing={editing}
+                    onEndEdit={this.onEndEdit}
+                    onCommit={this.onCommit} />
+                {!editing && (
+                    <Segmented class="tab-switcher" selected={tab} onSelect={tab => this.setState({ tab })}>
+                        {[
+                            perms.hasPerm('codeholders.read') && { id: 'codeholders', label: locale.tabs.codeholders },
+                            perms.hasPerm('clients.read') && { id: 'clients', label: locale.tabs.clients },
+                        ].filter(x => x)}
+                    </Segmented>
+                )}
+                {!editing && selectionActionButton}
+                {!editing && (
+                    <OverviewList
+                        task={itemsTask}
+                        notice={itemsNotice}
+                        view={itemsView}
+                        selection={selection}
+                        options={{
+                            group: id,
+                        }}
+                        fields={itemFieldSpecs}
+                        useDeepCmp
+                        parameters={{
+                            ...parameters,
+                            fields: itemFields,
+                            offset: itemsOffset,
+                        }}
+                        onGetItemLink={onGetItemLink}
+                        onSetOffset={offset => this.setState({ [offsetKey]: offset })}
+                        onSetLimit={limit => this.setState({
+                            parameters: { ...this.state.parameters, limit },
+                        })}
+                        updateView={updateView}
+                        locale={itemsLocale} />
+                )}
             </div>
         );
     }
-}));
+});
+
+function Header ({ item, userData, editing }) {
+    if (editing) return null;
+    return (
+        <div class="group-header">
+            <div class="group-title">{item.name}</div>
+            <div class="group-description">{item.description}</div>
+            <LinkButton class="edit-perms-button" target={userData.permsTarget}>
+                {locale.editPerms}
+            </LinkButton>
+        </div>
+    );
+}
+
+const fields = {
+    name: {
+        component ({ value, onChange }) {
+            return (
+                <TextField
+                    value={value}
+                    onChange={e => onChange(e.target.value)} />
+            );
+        },
+        shouldHide: (_, editing) => !editing,
+    },
+    description: {
+        component ({ value, onChange }) {
+            return (
+                <TextField
+                    value={value}
+                    onChange={e => onChange(e.target.value)} />
+            );
+        },
+        shouldHide: (_, editing) => !editing,
+    },
+};

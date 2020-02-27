@@ -90,7 +90,7 @@ export default class DetailView extends PureComponent {
         this.props.onCommit(changes);
     }
 
-    render ({ editing, locale: detailLocale, makeHistoryLink }) {
+    render ({ editing, locale: detailLocale, makeHistoryLink, userData }) {
         let contents;
         if (this.state.error) {
             contents = (
@@ -104,6 +104,7 @@ export default class DetailView extends PureComponent {
                 editing,
                 item: itemData,
                 onItemChange: item => this.props.onEditChange(item),
+                userData,
             };
 
             const createHistoryLink = field => makeHistoryLink && (

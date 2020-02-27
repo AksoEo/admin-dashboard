@@ -546,6 +546,7 @@ export const adminGroups = {
     fields: {
         name: 'Nomo',
         description: 'Priskribo',
+        memberRestrictions: '[[memberRestrictions]]',
     },
     tabs: {
         codeholders: 'Membroj',

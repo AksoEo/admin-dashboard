@@ -267,6 +267,11 @@ export default [
                                     import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/perms')),
                                 type: 'stack',
                             },
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
                         ],
                     },
                 ],
