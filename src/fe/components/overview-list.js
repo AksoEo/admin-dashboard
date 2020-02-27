@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent, createContext } from 'preact/compat';
+import { Fragment, PureComponent, createContext } from 'preact/compat';
 import { Checkbox, Button, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
@@ -9,7 +9,7 @@ import ArrowRightIcon from '@material-ui/icons/ChevronRight';
 import { coreContext, connect } from '../core/connection';
 import EventProxy from './event-proxy';
 import { LinkButton } from '../router';
-import { search as locale } from '../locale';
+import { search as locale, data as dataLocale } from '../locale';
 import { deepEq } from '../../util';
 import DisplayError from './error';
 import './overview-list.less';
@@ -195,7 +195,20 @@ export default class OverviewList extends PureComponent {
         let prevDisabled = true;
         let nextDisabled = true;
         if (error) {
-            contents = <DisplayError error={error} />;
+            contents = (
+                <Fragment>
+                    <DisplayError error={error} />
+                    <div class="retry-button-container">
+                        <Button class="retry-button" onClick={() => {
+                            this.#stale = true;
+                            this.#skipNextDebounce = true;
+                            this.maybeReload();
+                        }}>
+                            {dataLocale.retry}
+                        </Button>
+                    </div>
+                </Fragment>
+            );
         } else if (result) {
             const selectedFields = parameters.fields;
             const selectedFieldIds = selectedFields.map(x => x.id);
