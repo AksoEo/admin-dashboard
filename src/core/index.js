@@ -1,9 +1,17 @@
-import { insert, get, remove, TASKS, VIEWS } from './store';
+import { insert, get, remove, TASKS, VIEWS, gc } from './store';
+import { CODEHOLDERS } from './paths/codeholders';
 import { tasks, views } from './paths';
 import Task from './task';
 import DataView from './view';
 import * as log from './log';
 import './client';
+
+// schedule gc every 2 minutes
+setInterval(() => {
+    gc([]);
+    // also GC codeholders individually because there’ll most likely always be a view into that
+    gc([CODEHOLDERS]);
+}, 120000);
 
 /// Handlers for messages from the FE.
 const messageHandlers = {

@@ -12,6 +12,8 @@ export const COUNTRY_GROUPS_LIST = [COUNTRIES, 'countryGroups'];
 export const COUNTRY_GROUPS_TOTAL = [COUNTRIES, 'countryGroupsCount'];
 export const CACHED_LOCALES = [COUNTRIES, 'cachedLocales'];
 
+store.subscribe([COUNTRIES], () => {}); // prevent GC
+
 export const SIG_LIST = '!list';
 
 /// available localization languages

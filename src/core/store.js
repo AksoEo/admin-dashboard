@@ -1,5 +1,7 @@
 //! Global data store.
 
+import { debug } from './log';
+
 export const UpdateType = {
     UPDATE: 'update',
     SIGNAL: 'signal',
@@ -13,6 +15,7 @@ const dataStore = {};
 const subscribers = new Map();
 
 const toSubscriberKey = path => path.join('~');
+const fromSubscriberKey = path => path.split('~');
 
 /// Because multiple objects in the data store are often modified at the same time, updates are
 /// batched to avoid unnecessary IPC.
@@ -121,9 +124,37 @@ export function unsubscribe (path, callback) {
     const key = toSubscriberKey(path);
     if (!subscribers.has(key)) return;
     subscribers.get(key).delete(callback);
+    if (!subscribers.get(key).size) subscribers.delete(key);
 }
 
 /// The data store path for tasks.
 export const TASKS = '#tasks';
 /// The data store path for views.
 export const VIEWS = '#views';
+
+// prevent gc on these two views
+subscribe([TASKS], () => {});
+subscribe([VIEWS], () => {});
+
+/// Garbage-collects all children of the data store paths in the given scope that have no
+/// subscribers.
+export function gc (path) {
+    const obj = path.length ? get(path) : dataStore;
+    if (typeof obj !== 'object') return;
+    const pathPrefix = path.length ? toSubscriberKey(path) + '~' : '';
+
+    const subscribedPaths = new Set();
+    for (const subKey of subscribers.keys()) {
+        if (!subKey.startsWith(pathPrefix)) continue;
+        const relevantSubKey = subKey.substr(pathPrefix.length);
+        subscribedPaths.add(fromSubscriberKey(relevantSubKey)[0]);
+    }
+
+    for (const k of Object.keys(obj)) {
+        if (subscribedPaths.has(k)) {
+            continue;
+        }
+        debug(`GC: deleting ${path.concat(k).join('/')}`);
+        delete obj[k];
+    }
+}
