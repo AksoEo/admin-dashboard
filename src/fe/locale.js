@@ -191,6 +191,7 @@ export const search = {
     paginationItems: (from, to, count) => `${from}–${to} el ${count.toLocaleString('de-DE')}`,
     pickFields: 'Elekti kampojn',
     resetFilters: 'Nuligi filtrilojn',
+    viewJSON: '[[convert 2 json]]',
     loadFilter: 'Ŝargi',
     saveFilter: 'Konservi',
     pickFilter: 'Ŝargi filtrilon',

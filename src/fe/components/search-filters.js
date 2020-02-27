@@ -234,6 +234,18 @@ const FiltersBar = connectPerms(function FiltersBar ({
     const canReadFilters = perms.hasPerm('queries.read');
     const canSaveFilters = perms.hasPerm('queries.create') && perms.hasPerm('queries.update');
 
+    const viewJSON = core => async () => {
+        const filter = await core.createTask(filtersToAPITask, {
+            filters: value.filters,
+        }).runOnceAndDrop();
+
+        onChange({
+            ...value,
+            jsonFilter: { filter, _disabled: false },
+            filters: { ...value.filters, _disabled: true },
+        });
+    };
+
     return (
         <div class="filters-bar">
             <Segmented
@@ -262,6 +274,11 @@ const FiltersBar = connectPerms(function FiltersBar ({
             <coreContext.Consumer>
                 {core => (
                     <Fragment>
+                        {(filterType === 'normal' && filtersToAPITask) ? (
+                            <Button class="tiny-button" onClick={viewJSON(core)}>
+                                {locale.viewJSON}
+                            </Button>
+                        ) : null}
                         {canReadFilters ? (
                             <Button class="tiny-button" onClick={() => setPickerOpen(true)}>
                                 {locale.loadFilter}
@@ -322,6 +339,11 @@ const FiltersBar = connectPerms(function FiltersBar ({
                                 task.on('success', id => {
                                     onChange({
                                         ...value,
+                                        filters: { ...value.filters, _disabled: true },
+                                        jsonFilter: {
+                                            filter,
+                                            _disabled: false,
+                                        },
                                         _savedFilter: {
                                             id,
                                             name: task.parameters.name,
