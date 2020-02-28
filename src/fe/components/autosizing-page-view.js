@@ -146,17 +146,21 @@ export default class AutosizingPageView extends Component {
         const currentHeight = this.currentHeight();
         let mayOverflow = false;
         let height = currentHeight;
+        let minHeight = null;
 
         if (!this.props.alwaysOverflow && currentHeight > OVERFLOW_HEIGHT()) {
             mayOverflow = true;
             height = OVERFLOW_HEIGHT();
+        } else if (this.props.alwaysOverflow) {
+            minHeight = height;
+            height = null;
         }
 
         return (
             <div
                 class={'autosizing-page-view' + (mayOverflow ? ' may-overflow' : '')
                     + (this.props.alwaysOverflow ? ' always-overflow' : '')}
-                style={{ height }}>
+                style={{ height, minHeight }}>
                 {children}
             </div>
         );
