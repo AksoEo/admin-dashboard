@@ -9,7 +9,7 @@ import FieldPicker from '../../../components/field-picker';
 import CSVExport from '../../../components/csv-export';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
 import Meta from '../../meta';
-import { coreContext } from '../../../core/connection';
+import { connect, coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 import { votes as locale, search as searchLocale } from '../../../locale';
 import FIELDS from './fields';
@@ -17,7 +17,9 @@ import FILTERS from './filters';
 
 const SEARCHABLE_FIELDS = ['name', 'description'];
 
-export default connectPerms(class Votes extends Page {
+export default connect('votes/filters')(data => ({
+    availableFilters: data,
+}))(connectPerms(class Votes extends Page {
     state = {
         parameters: {
             search: {
@@ -77,7 +79,7 @@ export default connectPerms(class Votes extends Page {
         }
     }
 
-    render ({ perms }, { parameters, fieldPickerOpen, expanded }) {
+    render ({ perms, availableFilters }, { parameters, fieldPickerOpen, expanded }) {
         const actions = [];
 
         if (perms.hasPerm('votes.create.tejo') || perms.hasPerm('votes.create.uea')) {
@@ -106,6 +108,11 @@ export default connectPerms(class Votes extends Page {
             overflow: true,
         });
 
+        let filteredFilters = FILTERS;
+        if (availableFilters) {
+            filteredFilters = Object.fromEntires(availableFilters.map(filter => [filter, FILTERS]));
+        }
+
         return (
             <div class="votes-page">
                 <Meta
@@ -114,7 +121,7 @@ export default connectPerms(class Votes extends Page {
                 <SearchFilters
                     value={parameters}
                     searchFields={SEARCHABLE_FIELDS}
-                    filters={FILTERS}
+                    filters={filteredFilters}
                     onChange={parameters => this.setState({ parameters })}
                     locale={{
                         searchPlaceholders: locale.search.placeholders,
@@ -159,4 +166,4 @@ export default connectPerms(class Votes extends Page {
             </div>
         );
     }
-});
+}));

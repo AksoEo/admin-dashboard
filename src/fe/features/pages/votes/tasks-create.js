@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { useEffect } from 'preact/compat';
 import { Button, Dialog, TextField } from '@cpsdqs/yamdl';
 import ProgressIndicator from '../../../components/dialog-progress-indicator';
 import AutosizingPageView from '../../../components/autosizing-page-view';
@@ -9,6 +10,7 @@ import { timestamp } from '../../../components/data';
 import { votes as locale } from '../../../locale';
 import { config as Config, voterCodeholders as VoterCodeholders } from './config';
 import { routerContext } from '../../../router';
+import { connectPerms } from '../../../perms';
 
 function WizardPage ({ children, next }) {
     return (
@@ -137,7 +139,17 @@ function TimespanEditor ({ value, onChange }) {
 
 const generalPage = (isTemplate) => ({
     id: 'general',
-    page: function GeneralPage ({ value, onChange, next }) {
+    page: connectPerms(function GeneralPage ({ value, onChange, next, perms }) {
+        const hasTejo = perms.hasPerm('votes.create.tejo');
+        const hasUea = perms.hasPerm('votes.create.uea');
+
+        if (!hasTejo || !hasUea && !value.org) {
+            // set org field to the one the user has permission to create
+            useEffect(() => {
+                onChange({ ...value, org: hasUea ? 'uea' : 'tejo' });
+            });
+        }
+
         return (
             <WizardPage next={next}>
                 <WizardSection title={locale.fields.name} />
@@ -152,14 +164,14 @@ const generalPage = (isTemplate) => ({
                             throw { error: locale.create.nameRequired };
                         }
                     }} />
-                {isTemplate ? null : (
+                {hasTejo && hasUea && !isTemplate ? (
                     <OrgPicker
                         value={value.org}
                         onChange={org => onChange({ ...value, org })} />
-                )}
+                ) : null}
             </WizardPage>
         );
-    },
+    }),
 });
 
 const votePage = () => ({

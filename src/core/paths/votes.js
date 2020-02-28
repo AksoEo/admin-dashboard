@@ -180,6 +180,7 @@ templateFields = [...templateFields];
 const clientFilters = {
     org: {
         toAPI: value => ({ org: value }),
+        hasPerm: client => client.hasPerm('votes.read.tejo') && client.hasPerm('votes.read.uea'),
     },
     timeStart: {
         toAPI: value => ({ timeStart: { $range: value } }),
@@ -215,6 +216,16 @@ export const VOTE_RESULTS = 'voteResults';
 export const SIG_VOTES = '!votes';
 
 export const tasks = {
+    filters: async () => {
+        const client = await asyncClient;
+        const filters = [];
+        for (const filter in clientFilters) {
+            if (clientFilters[filter].hasPerm && (await clientFilters[filter].hasPerm(client))) {
+                filters.push(filter);
+            }
+        }
+        return filters;
+    },
     list: async (_, parameters) => {
         const client = await asyncClient;
 
