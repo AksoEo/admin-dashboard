@@ -165,7 +165,7 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
 
     if (editing) {
         inclusiveCheckbox = (
-            <span class="inclusive-checkbox">
+            <div class="inclusive-checkbox">
                 <Checkbox
                     checked={inclusive}
                     onChange={checked => {
@@ -174,7 +174,7 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
                 <label>
                     {locale.inclusive}
                 </label>
-            </span>
+            </div>
         );
     } else if (relation === '<') {
         prefix = inclusive ? '≤ ' : '< ';
@@ -268,6 +268,17 @@ export function tieBreakerCodeholder ({ value, onChange, editing }) {
 
 export const publishVoters = inactiveBool;
 export const publishVotersPercentage = bool;
+
+function ErrorableDiv ({ error, children, ...props }) {
+    return (
+        <div {...props}>
+            {children}
+            <div class="error-message-container">
+                {error}
+            </div>
+        </div>
+    );
+}
 
 export const options = class OptionsEditor extends Component {
     /// These keys are used to identify options while editing the list.
@@ -391,21 +402,29 @@ export const options = class OptionsEditor extends Component {
             );
 
             return (
-                <RearrangingList
-                    class="vote-options is-editing"
-                    itemHeight={196}
-                    isItemDraggable={index => index < value.length}
-                    canMove={(toIndex) => toIndex < value.length}
-                    onMove={(fromIndex, toIndex) => {
-                        const newValue = [...value];
-                        const item = newValue.splice(fromIndex, 1)[0];
-                        newValue.splice(toIndex, 0, item);
-                        const itemKey = this.optionKeys.splice(fromIndex, 1)[0];
-                        this.optionKeys.splice(toIndex, 0, itemKey);
-                        onChange(newValue);
+                <Validator
+                    component={ErrorableDiv}
+                    validate={() => {
+                        if (!value.length) {
+                            throw { error: locale.optionsRequired };
+                        }
                     }}>
-                    {items}
-                </RearrangingList>
+                    <RearrangingList
+                        class="vote-options is-editing"
+                        itemHeight={196}
+                        isItemDraggable={index => index < value.length}
+                        canMove={(toIndex) => toIndex < value.length}
+                        onMove={(fromIndex, toIndex) => {
+                            const newValue = [...value];
+                            const item = newValue.splice(fromIndex, 1)[0];
+                            newValue.splice(toIndex, 0, item);
+                            const itemKey = this.optionKeys.splice(fromIndex, 1)[0];
+                            this.optionKeys.splice(toIndex, 0, itemKey);
+                            onChange(newValue);
+                        }}>
+                        {items}
+                    </RearrangingList>
+                </Validator>
             );
         }
 

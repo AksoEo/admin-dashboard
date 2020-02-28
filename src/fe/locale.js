@@ -926,6 +926,7 @@ export const votes = {
         requiresSelection: '[[requires selection]]',
     },
     numberRequired: '[[enter a number]]',
+    optionsRequired: '[[options required]]',
     update: {
         menuItem: 'Aktualigi',
         title: 'Aktualigi voĉdonadon',
