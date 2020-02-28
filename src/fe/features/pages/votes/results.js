@@ -373,8 +373,25 @@ function Rounds ({ type, ballots, rounds, options }) {
 
     let roundView = null;
 
-    if (type === 'rp') roundView = <RPRound round={rounds[round]} options={options} />;
-    else roundView = <STVRound ballots={ballots} round={rounds[round]} options={options} />;
+    if (type === 'rp') {
+        const rankedPairs = new Map();
+        for (const round of rounds) {
+            for (const pair of round.rankedPairs) {
+                const key = pair.pair.join('~');
+                if (!rankedPairs.has(key)) {
+                    rankedPairs.set(key, pair);
+                }
+            }
+        }
+        roundView = (
+            <RPRound
+                round={rounds[round]}
+                options={options}
+                rankedPairs={[...rankedPairs.values()]} />
+        );
+    } else if (type === 'stv') {
+        roundView = <STVRound ballots={ballots} round={rounds[round]} options={options} />;
+    }
 
     return (
         <div class="result-rounds">
@@ -422,9 +439,14 @@ function STVRound ({ ballots, round, options }) {
 }
 
 /// Renders a single ranked-pairs round.
-function RPRound ({ round, options }) {
+function RPRound ({ round, options, rankedPairs }) {
     return (
         <div class="result-round">
+            <LockGraph
+                graph={round.graph}
+                rankedPairs={rankedPairs}
+                options={options}
+                chosen={round.optChosen} />
             <div class="round-chosen">
                 {locale.results.roundsChosen}
                 <span class="round-chosen-name">
@@ -446,12 +468,6 @@ function RPRound ({ round, options }) {
                     );
                 })}
             </ul>
-            <h4>{locale.results.lockGraph}</h4>
-            <LockGraph
-                graph={round.graph}
-                rankedPairs={round.rankedPairs}
-                options={options}
-                chosen={round.optChosen} />
         </div>
     );
 }
@@ -611,11 +627,12 @@ class LockGraph extends Component {
 
         return (
             <div class="result-lock-graph-container">
+                <RankedPairs options={options} rankedPairs={rankedPairs} selectedEdge={selectedEdge} />
+                <h4 class="lock-graph-title">{locale.results.lockGraph}</h4>
                 <svg class="result-lock-graph" width={viewW} viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`}>
                     {svgEdges}
                     {svgNodes}
                 </svg>
-                <RankedPairs options={options} rankedPairs={rankedPairs} selectedEdge={selectedEdge} />
             </div>
         );
     }
@@ -625,52 +642,42 @@ function RankedPairs ({ options, rankedPairs, selectedEdge }) {
     if (!rankedPairs) return;
     const edge = (selectedEdge || '').split('-').map(x => +x);
 
-    let pair;
-    for (const p of rankedPairs) {
-        if ((p.pair[0] === edge[0] && p.pair[1] === edge[1])
-            || (p.pair[0] === edge[1] && p.pair[1] === edge[0])) {
-            pair = p;
-            break;
-        }
-    }
+    const tableRows = [];
+    for (const pair of rankedPairs) {
+        const selected = edge[0] === pair.pair[0] && edge[1] === pair.pair[1]
+            || edge[0] === pair.pair[1] && edge[1] === pair.pair[0];
 
-    if (!pair) {
-        return (
-            <div class="ranked-pairs">
-                {locale.results.rankedPairs.none}
-            </div>
-        );
+        tableRows.push({
+            cells: [
+                <span key="a">
+                    <VoteOptionName option={options[pair.pair[0]]} />
+                    {` (${pair.opt0}) `}
+                    {locale.results.rankedPairs.vs}
+                    {' '}
+                    <VoteOptionName option={options[pair.pair[1]]} />
+                    {` (${pair.opt1}) `}
+                </span>,
+                <VoteOptionName key="b" option={options[pair.winner]} />,
+                '' + Math.abs(pair.diff),
+            ],
+            selected,
+        });
     }
-
-    /* eslint-disable react/jsx-key */
-    const tableRows = [
-        [locale.results.rankedPairs.diff, '' + pair.diff],
-        [locale.results.rankedPairs.winner, <VoteOptionName option={options[pair.winner]} />],
-        [locale.results.rankedPairs.loser, <VoteOptionName option={options[pair.loser]} />],
-        [
-            <span>
-                {locale.results.rankedPairs.opt}
-                <VoteOptionName option={options[pair.pair[0]]} />
-            </span>,
-            '' + pair.opt0,
-        ],
-        [
-            <span>
-                {locale.results.rankedPairs.opt}
-                <VoteOptionName option={options[pair.pair[1]]} />
-            </span>,
-            '' + pair.opt1,
-        ],
-    ];
-    /* eslint-enable react/jsx-key */
 
     return (
         <div class="ranked-pairs">
-            <table class="ranked-pairs-lines">
+            <table class="ranked-pairs-table">
+                <thead>
+                    <tr>
+                        <th>{locale.results.rankedPairs.pair}</th>
+                        <th>{locale.results.rankedPairs.winner}</th>
+                        <th>{locale.results.rankedPairs.diff}</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    {tableRows.map((row, i) => (
-                        <tr key={i}>
-                            {row.map((d, i) => <td key={i}>{d}</td>)}
+                    {tableRows.map(({ cells, selected }, i) => (
+                        <tr key={i} class={selected ? 'is-selected' : ''}>
+                            {cells.map((d, i) => <td key={i}>{d}</td>)}
                         </tr>
                     ))}
                 </tbody>

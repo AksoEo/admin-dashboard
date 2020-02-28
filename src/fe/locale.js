@@ -902,11 +902,10 @@ export const votes = {
         roundsOptionStats: (won, lost, mentions) => `[[won ${won}, lost ${lost}, mentioned ${mentions} time(s)]]`,
         lockGraph: '[[lock graph]]',
         rankedPairs: {
-            none: '[[select an edge for rankedpairs stuff]]',
-            diff: '[[rp diff]]',
-            winner: '[[rp winner]]',
-            loser: '[[rp loser]]',
-            opt: '[[rp score of]] ',
+            diff: '[[diff]]',
+            winner: '[[winner]]',
+            pair: '[[pair]]',
+            vs: 'kontraŭ',
         },
     },
     create: {

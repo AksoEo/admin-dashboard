@@ -115,11 +115,27 @@
         .ranked-pairs {
             text-align: left;
 
-            tr td:first-child {
+            table {
+                border-collapse: collapse;
+            }
+
+            th {
                 font-weight: bold;
-                padding-right: 8px;
+            }
+
+            th, td {
+                padding: 4px 8px;
+                border-bottom: 1px solid @separator;
+            }
+
+            tr.is-selected td {
+                background: @text-fade-10;
             }
         }
+    }
+
+    .lock-graph-title {
+        text-align: left;
     }
 
     .result-lock-graph {

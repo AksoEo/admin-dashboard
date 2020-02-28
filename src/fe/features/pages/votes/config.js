@@ -159,7 +159,7 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
     onConfigChange,
     editing,
 }) {
-    let prefix = null;
+    let relationLabel = null;
     let inclusiveCheckbox = null;
     const inclusive = config[field];
 
@@ -177,14 +177,19 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
             </div>
         );
     } else if (relation === '<') {
-        prefix = inclusive ? '≤ ' : '< ';
+        relationLabel = inclusive ? '≤' : '<';
     } else if (relation === '>') {
-        prefix = inclusive ? '≥ ' : '> ';
+        relationLabel = inclusive ? '≥' : '>';
     }
 
     return (
         <div class="vote-config-inclusive-rational">
-            {prefix}
+            {relationLabel && (
+                <span class="inclusive-relation">
+                    {relationLabel}
+                </span>
+            )}
+            {relationLabel && ' '}
             <Validator
                 component={Rational}
                 value={value}
