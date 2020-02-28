@@ -798,6 +798,7 @@ export const votes = {
         config: '[[config]]',
     },
     voterCodeholdersDescription: '[[voter codeholders is a json filter for members etc etc]]',
+    viewerCodeholdersSame: '[[same as votercodeholders]]',
     filters: {
         org: '[[org]]',
         timeStart: '[[start time]]',
@@ -854,6 +855,7 @@ export const votes = {
         publishVotersPercentage: '[[publishVotersPercentage]]',
         options: '[[options]]',
     },
+    inclusive: '[[inclusive]]', // checkbox label
     options: {
         simple: '[[simple]]',
         codeholder: '[[codeholder]]',

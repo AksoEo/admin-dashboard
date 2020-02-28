@@ -29,7 +29,10 @@ const DETAIL_FIELDS = {
     voterCodeholders: { component: voterCodeholders },
     voterCodeholdersMemberFilter: { component: voterCodeholdersMemberFilter, shouldHide: (_, editing) => editing },
     viewerCodeholders: { component: viewerCodeholders },
-    viewerCodeholdersMemberFilter: { component: viewerCodeholdersMemberFilter, shouldHide: (_, editing) => editing },
+    viewerCodeholdersMemberFilter: {
+        component: viewerCodeholdersMemberFilter,
+        shouldHide: (item, editing) => editing || item.viewerCodeholders === 'null',
+    },
 };
 
 export default connectPerms(class VoteDetailpage extends Page {

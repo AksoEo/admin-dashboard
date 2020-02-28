@@ -4,7 +4,7 @@ import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
 import Segmented from '../../../components/segmented';
 import JSONEditor from '../../../components/json-editor';
 import CodeholderPicker from '../../../components/codeholder-picker';
@@ -39,13 +39,30 @@ export function voterCodeholders ({ value, onChange, editing, item }) {
 
 export function viewerCodeholders ({ value, onChange, editing }) {
     return (
-        <Validator
-            component={JSONEditor}
-            validatorProps={{ class: 'block-validator' }}
-            value={value}
-            onChange={onChange}
-            disabled={!editing}
-            validate={validateJSON} />
+        <div class="viewer-codeholders">
+            <div class="viewer-codeholders-switch">
+                {editing ? (
+                    <Checkbox
+                        checked={value === 'null'}
+                        onChange={checked => {
+                            if (checked) onChange('null');
+                            else onChange('{}');
+                        }} />
+                ) : null}
+                <label>
+                    {(editing || value === 'null') ? locale.viewerCodeholdersSame : null}
+                </label>
+            </div>
+            {value !== 'null' ? (
+                <Validator
+                    component={JSONEditor}
+                    validatorProps={{ class: 'block-validator' }}
+                    value={value}
+                    onChange={onChange}
+                    disabled={!editing}
+                    validate={validateJSON} />
+            ) : ''}
+        </div>
     );
 }
 
@@ -135,34 +152,63 @@ export function type ({ value, onChange, editing, item }) {
     );
 }
 
-function requiredRational ({ value, onChange, editing }) {
+const requiredRationalInclusive = (field, relation) => function reqRational ({
+    value,
+    onChange,
+    config,
+    onConfigChange,
+    editing,
+}) {
+    let prefix = null;
+    let inclusiveCheckbox = null;
+    const inclusive = config[field];
+
+    if (editing) {
+        inclusiveCheckbox = (
+            <span class="inclusive-checkbox">
+                <Checkbox
+                    checked={inclusive}
+                    onChange={checked => {
+                        onConfigChange({ ...config, [field]: checked });
+                    }} />
+                <label>
+                    {locale.inclusive}
+                </label>
+            </span>
+        );
+    } else if (relation === '<') {
+        prefix = inclusive ? '≤ ' : '< ';
+    } else if (relation === '>') {
+        prefix = inclusive ? '≥ ' : '> ';
+    }
+
     return (
-        <Validator
-            component={Rational}
-            value={value}
-            onChange={onChange}
-            editing={editing}
-            validate={value => {
-                if (Array.isArray(value)) {
-                    if (!Number.isFinite(+value[0]) || !Number.isFinite(+value[1])) {
+        <div class="vote-config-inclusive-rational">
+            {prefix}
+            <Validator
+                component={Rational}
+                value={value}
+                onChange={onChange}
+                editing={editing}
+                validate={value => {
+                    if (Array.isArray(value)) {
+                        if (!Number.isFinite(+value[0]) || !Number.isFinite(+value[1])) {
+                            throw { error: true };
+                        }
+                    } else if (!Number.isFinite(+value)) {
                         throw { error: true };
                     }
-                } else if (!Number.isFinite(+value)) {
-                    throw { error: true };
-                }
-            }} />
+                }} />
+            {inclusiveCheckbox}
+        </div>
     );
-}
+};
 
 export const ballotsSecret = inactiveBool;
-export const blankBallotsLimit = requiredRational;
-export const blankBallotsLimitInclusive = bool;
-export const quorum = requiredRational;
-export const quorumInclusive = bool;
-export const majorityBallots = requiredRational;
-export const majorityBallotsInclusive = bool;
-export const majorityVoters = requiredRational;
-export const majorityVotersInclusive = bool;
+export const blankBallotsLimit = requiredRationalInclusive('blankBallotsLimitInclusive', '<');
+export const quorum = requiredRationalInclusive('quorumInclusive', '>');
+export const majorityBallots = requiredRationalInclusive('majorityBallotsInclusive', '>');
+export const majorityVoters = requiredRationalInclusive('majorityVotersInclusive', '>');
 export const majorityMustReachBoth = bool;
 
 export function numChosenOptions ({ value, onChange, editing }) {
@@ -182,8 +228,7 @@ export function numChosenOptions ({ value, onChange, editing }) {
     );
 }
 
-export const mentionThreshold = requiredRational;
-export const mentionThresholdInclusive = bool;
+export const mentionThreshold = requiredRationalInclusive('mentionThresholdInclusive', '>');
 
 export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
     if (!editing) return value === null ? locale.noMaxOptions : '' + value;
@@ -374,17 +419,12 @@ export const options = class OptionsEditor extends Component {
 
 const CONFIG_FIELDS = {
     quorum: [quorum],
-    quorumInclusive: [quorumInclusive],
     majorityBallots: [majorityBallots, ['yn', 'ynb']],
-    majorityBallotsInclusive: [majorityBallotsInclusive, ['yn', 'ynb']],
     majorityVoters: [majorityVoters, ['yn', 'ynb']],
-    majorityVotersInclusive: [majorityVotersInclusive, ['yn', 'ynb']],
     majorityMustReachBoth: [majorityMustReachBoth, ['yn', 'ynb']],
     blankBallotsLimit: [blankBallotsLimit, ['ynb', 'rp', 'stv', 'tm']],
-    blankBallotsLimitInclusive: [blankBallotsLimitInclusive, ['ynb', 'rp', 'stv', 'tm']],
     numChosenOptions: [numChosenOptions, ['rp', 'stv', 'tm']],
     mentionThreshold: [mentionThreshold, ['rp', 'tm']],
-    mentionThresholdInclusive: [mentionThresholdInclusive, ['rp', 'tm']],
     maxOptionsPerBallot: [maxOptionsPerBallot, ['tm']],
     tieBreakerCodeholder: [tieBreakerCodeholder, ['rp', 'stv']],
     publishVoters: [publishVoters],
@@ -407,10 +447,16 @@ export function config ({ value, onChange, editing, item }) {
                         {locale.config[f]}
                     </div>
                     <div class="config-field-value">
-                        <Field value={value[f]} onChange={v => onChange({
-                            ...value,
-                            [f]: v,
-                        })} editing={editing} item={item} />
+                        <Field
+                            value={value[f]}
+                            onChange={v => onChange({
+                                ...value,
+                                [f]: v,
+                            })}
+                            editing={editing}
+                            item={item}
+                            config={value}
+                            onConfigChange={onChange} />
                     </div>
                 </div>
             );
