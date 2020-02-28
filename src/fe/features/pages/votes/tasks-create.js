@@ -6,6 +6,7 @@ import AutosizingPageView from '../../../components/autosizing-page-view';
 import Form, { Validator } from '../../../components/form';
 import TejoIcon from '../../../components/tejo-icon';
 import UeaIcon from '../../../components/uea-icon';
+import UeaColorIcon from '../../../components/uea-color-icon';
 import { timestamp } from '../../../components/data';
 import { votes as locale } from '../../../locale';
 import { config as Config, voterCodeholders as VoterCodeholders } from './config';
@@ -90,7 +91,7 @@ function OrgPicker ({ value, onChange }) {
                     {
                         value: 'uea',
                         icon: true,
-                        contents: <UeaIcon />,
+                        contents: value === 'uea' ? <UeaColorIcon /> : <UeaIcon />,
                     },
                 ]} />
         </div>
@@ -195,6 +196,9 @@ const votersPage = () => ({
     page: function VotersPage ({ value, onChange, next }) {
         return (
             <WizardPage next={next}>
+                <p>
+                    {locale.voterCodeholdersDescription}
+                </p>
                 <VoterCodeholders
                     value={value.voterCodeholders}
                     onChange={voterCodeholders => onChange({ ...value, voterCodeholders })}

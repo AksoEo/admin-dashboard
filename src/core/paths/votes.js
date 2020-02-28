@@ -365,6 +365,15 @@ export const tasks = {
 };
 
 export const views = {
+    filters: class Filters extends AbstractDataView {
+        constructor () {
+            super();
+            tasks.filters()
+                .then(fields => this.emit('update', fields))
+                .catch(err => this.emit('error', err));
+        }
+    },
+
     vote: class Vote extends AbstractDataView {
         constructor (options) {
             super();

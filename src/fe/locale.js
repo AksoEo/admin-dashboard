@@ -797,6 +797,7 @@ export const votes = {
         ballotsSecret: '[[ballotsSecret]]',
         config: '[[config]]',
     },
+    voterCodeholdersDescription: '[[voter codeholders is a json filter for members etc etc]]',
     filters: {
         org: '[[org]]',
         timeStart: '[[start time]]',
