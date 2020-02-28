@@ -13,6 +13,7 @@ import './task-dialog.less';
 /// - mapError: function to map an error to a (human-readable?) string (optional)
 /// - run: run closure; must return a promise. success will not be handled
 /// - running: if true, will consider the task to be running
+/// - container: will be passed to Dialog
 export default class TaskDialog extends Component {
     state = {
         loading: false,
@@ -33,7 +34,15 @@ export default class TaskDialog extends Component {
         });
     };
 
-    render ({ title, open, onClose, actionLabel, mapError, running }, { loading: loadingState, error }) {
+    render ({
+        title,
+        open,
+        onClose,
+        actionLabel,
+        mapError,
+        running,
+        container,
+    }, { loading: loadingState, error }) {
         const className = 'task-dialog ' + (this.props.class || '');
 
         const loading = loadingState || running;
@@ -44,7 +53,8 @@ export default class TaskDialog extends Component {
                 backdrop
                 open={open}
                 title={title}
-                onClose={onClose}>
+                onClose={onClose}
+                container={container}>
                 <Form class="task-dialog-form" onSubmit={this.#run}>
                     {this.props.children}
                     <footer class="task-dialog-footer">

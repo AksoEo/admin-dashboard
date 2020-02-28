@@ -5,6 +5,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { data as locale } from '../locale';
 import { coreContext } from '../core/connection';
 import { deepEq } from '../../util';
+import TaskDialog from './task-dialog';
 import DisplayError from './error';
 import './data-list.less';
 
@@ -12,6 +13,11 @@ import './data-list.less';
 const menuContainer = document.createElement('div');
 menuContainer.id = 'data-list-nested-menu-container';
 document.body.appendChild(menuContainer);
+
+function orderMenuContainerToFront () {
+    document.body.removeChild(menuContainer);
+    document.body.appendChild(menuContainer);
+}
 
 const VLIST_CHUNK_SIZE = 100;
 
@@ -94,17 +100,21 @@ export default class DataList extends PureComponent {
         console.error(err); // eslint-disable-line no-console
     };
 
-    deleteItem (index) {
+    initDeleteItem (index) {
         const item = this.state.items[index];
         if (!item) return;
 
-        this.props.onRemove(item).then(() => {
+        this.setState({ deleteItem: item, deleteItemOpen: true });
+        // FIXME: hack: reorder menuContainer to the end of the child list in <body> so it’s
+        // z-ordered above the dialog that might be containing this data list
+        orderMenuContainerToFront();
+    }
+
+    deleteItem (item) {
+        return this.props.onRemove(item).then(() => {
             const items = this.state.items.slice();
-            items.splice(index, 1);
-            this.setState({ items, total: this.state.total - 1 });
-        }).catch(err => {
-            console.error('Failed to delete item', err); // eslint-disable-line no-console
-            // TODO: handle error properly
+            if (items.includes(item)) items.splice(items.indexOf(item), 1);
+            this.setState({ items, total: this.state.total - 1, deleteItemOpen: false });
         });
     }
 
@@ -171,7 +181,7 @@ export default class DataList extends PureComponent {
                                     renderMenu={this.props.renderMenu}
                                     item={item}
                                     core={this.context}
-                                    onDelete={() => this.deleteItem(i)}/>
+                                    onDelete={() => this.initDeleteItem(i)}/>
                             </div>
                         )}
                     </Component>
@@ -223,6 +233,16 @@ export default class DataList extends PureComponent {
                 {error}
                 {loadingIndicator}
                 {showMore}
+
+                <TaskDialog
+                    open={this.state.deleteItemOpen}
+                    onClose={() => this.setState({ deleteItemOpen: false })}
+                    title={locale.deleteTitle}
+                    actionLabel={locale.delete}
+                    run={() => this.deleteItem(this.state.deleteItem)}
+                    container={menuContainer}>
+                    {locale.deleteDescription}
+                </TaskDialog>
             </div>
         );
     }

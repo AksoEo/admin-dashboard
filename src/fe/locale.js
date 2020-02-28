@@ -38,6 +38,8 @@ export const data = {
         codeTaken: 'La UEA-kodo estas jam uzata',
         idFailed: '[[failed to load]]',
     },
+    deleteTitle: 'Forigi',
+    deleteDescription: '[[are you sure you want to delete this item?]]',
 };
 
 export const errors = {
