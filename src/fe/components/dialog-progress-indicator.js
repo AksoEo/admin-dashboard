@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Spring } from '@cpsdqs/yamdl';
+import { Button, Spring } from '@cpsdqs/yamdl';
 import './dialog-progress-indicator.less';
 
 /// Dialog progress indicator.
@@ -10,6 +10,7 @@ import './dialog-progress-indicator.less';
 /// - selected: number
 /// - children: list of vnodes
 /// - helpLabel: vnode
+/// - onBack: if set, will show a back button
 export default class DialogProgressIndicator extends Component {
     state = { offset: 0, currentNodeWidth: 0 };
     spring = new Spring(1, 0.5);
@@ -74,7 +75,7 @@ export default class DialogProgressIndicator extends Component {
         };
     }
 
-    render () {
+    render ({ onBack, selected }) {
         const items = [];
         let index = 0;
         for (const child of this.props.children) {
@@ -92,6 +93,20 @@ export default class DialogProgressIndicator extends Component {
 
         return (
             <div class="dialog-progress-indicator">
+                {onBack && (
+                    <Button
+                        class="dialog-progress-back"
+                        disabled={selected === 0}
+                        icon
+                        small
+                        onClick={onBack}>
+                        <svg width="24" height="24">
+                            <path
+                                d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"
+                                fill="currentColor" />
+                        </svg>
+                    </Button>
+                )}
                 {items}
             </div>
         );

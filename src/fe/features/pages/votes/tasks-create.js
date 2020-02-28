@@ -341,7 +341,9 @@ export default function makeCreateTask (isTemplate) {
                     title={locale.create.title}
                     class="vote-creator-wizard"
                     fullScreen={width => width <= 420}>
-                    <ProgressIndicator selected={page}>
+                    <ProgressIndicator selected={page} onBack={() => {
+                        if (page > 0) this.setState({ page: page - 1 });
+                    }}>
                         {pageTitles}
                     </ProgressIndicator>
                     <AutosizingPageView eager alwaysOverflow selected={page}>

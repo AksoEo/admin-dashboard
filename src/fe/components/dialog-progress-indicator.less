@@ -1,3 +1,5 @@
+@import '../prelude';
+
 .dialog-progress-indicator {
     position: relative;
     height: 2em;
@@ -21,5 +23,13 @@
                 opacity: 0;
             }
         }
+    }
+
+    .dialog-progress-back {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        --md-button-color: @gray-button-color;
     }
 }
