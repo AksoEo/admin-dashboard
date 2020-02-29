@@ -69,7 +69,33 @@ export default class APILogListView extends Page {
     }
 
     componentDidMount () {
+        const originalQuery = this.props.query;
         this.decodeURLQuery();
+
+        if (!originalQuery) {
+            // FIXME: extremely hacky: wait for state update
+            setTimeout(() => {
+                // fresh load; we can add default filters
+                if (!this.state.parameters.filters._disabled) {
+                    this.setState({
+                        parameters: {
+                            ...this.state.parameters,
+                            filters: {
+                                ...this.state.parameters.filters,
+                                path: {
+                                    // filter out http log requests by default
+                                    value: {
+                                        invert: true,
+                                        path: '/http_log',
+                                    },
+                                    enabled: true,
+                                },
+                            },
+                        },
+                    });
+                }
+            }, 10);
+        }
 
         this.#searchInput.focus(500);
     }
