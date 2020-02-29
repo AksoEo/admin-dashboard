@@ -75,7 +75,12 @@ export default {
     },
     query: {
         component ({ value }) {
-            return value
+            let isNonEmptyQuery = !!value;
+            if (typeof value === 'object') {
+                isNonEmptyQuery = !!Object.keys(value).length;
+            }
+
+            return isNonEmptyQuery
                 ? locale.query.some
                 : locale.query.none;
         },

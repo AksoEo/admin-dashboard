@@ -1106,6 +1106,8 @@ function flushCodeholders () {
     codeholderBatchFields.clear();
     codeholderBatchCallbacks.clear();
 
+    if (!ids.length) return;
+
     tasks.list({}, {
         fields: fields.map(x => ({ id: x, sorting: 'none' })).concat([{ id: 'id', sorting: 'asc' }]),
         jsonFilter: {
