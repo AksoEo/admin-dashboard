@@ -15,16 +15,29 @@ import { connect } from '../../core/connection';
 // also see src/pages/index.js
 
 /// Renders a single item in the sidebar.
+///
+/// # Props
+/// - `id`: page id (for the localized name, among other things)
+/// - `icon`: page icon
+/// - `path`: page path
+/// - `category`: containing category to prepend the path of
+/// - `locked`: if true, this item will be disabled
+/// - `index`: item index in the sidebar list. Used for the cascade animation
 class NavItem extends PureComponent {
+    /// normalized x transform (from -1 to 1, sort of) for animating in
     offsetX = new Spring(1, 0.5);
+    /// time since initialization. This is used in conjunction with the index prop to cascade
+    /// the sidebar item animation
     initTime = 0;
 
     componentDidMount () {
         globalAnimator.register(this);
+        // load spring to make this item move in from the right
         this.offsetX.value = 1;
     }
 
     update (dt) {
+        // wait until cascade has arrived at this item
         if (this.initTime < this.props.index / 40) {
             this.initTime += dt;
             this.forceUpdate();
@@ -82,7 +95,11 @@ class NavItem extends PureComponent {
     }
 }
 
-/// Sidebar navigation items.
+/// Contains the sidebar navigation items.
+///
+/// # Props
+/// - currentPage: current page id
+/// - locked: if true, the sidebar is locked and can’t be used
 class SidebarNav extends Component {
     static contextType = permsContext;
 
@@ -92,7 +109,7 @@ class SidebarNav extends Component {
         const items = [];
 
         if (!perms._isDummy) {
-            // don’t show sidebar until perms have loaded
+            // don’t show sidebar until perms have loaded to prevent dis-/appearing items
             let i = 0;
             for (const category of pages) {
                 const categoryItems = category.contents
@@ -138,7 +155,7 @@ class SidebarNav extends Component {
 ///
 /// # Props
 /// - currentPage: current page ID, use to highlight the corresponding sidebar item
-/// - locked
+/// - locked: if true, the sidebar is disabled
 export default class SidebarContents extends PureComponent {
     static contextType = routerContext;
 

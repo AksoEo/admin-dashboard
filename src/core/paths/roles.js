@@ -7,6 +7,7 @@ import * as store from '../store';
 export const ROLES = 'codeholder_roles';
 export const ROLES_P = [ROLES];
 
+/// Loads all roles because there won’t be too many for that to be a problem
 async function loadAllRoles () {
     if (store.get(ROLES_P)) return;
 

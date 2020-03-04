@@ -7,6 +7,7 @@ import { Validator } from '../form';
 import countryField, { WithCountries } from './country';
 import Required from './required';
 
+/// Max char lengths for each of the fields.
 const maxLengthMap = {
     countryArea: 50,
     city: 50,
@@ -15,6 +16,7 @@ const maxLengthMap = {
     sortingCode: 20,
 };
 
+/// Renders an address without regarding a specific locale’s format.
 function BasicAddressRenderer ({ value }) {
     if (!value) return null;
 
@@ -43,6 +45,7 @@ function BasicAddressRenderer ({ value }) {
     );
 }
 
+/// Edits an address. Also handles locale-based validation.
 class AddressEditor extends Component {
     state = {
         validationRules: null,
@@ -50,6 +53,7 @@ class AddressEditor extends Component {
 
     #reloadTimeout;
 
+    /// Loads validation rules for the current locale.
     loadValidationRules () {
         if (!this.props.value) return;
         this.setState({ validationRules: null });

@@ -4,6 +4,8 @@ import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 const PATH = 'M33 5h8.053c6.24 0 8.503.65 10.785 1.87a12.721 12.721 0 0 1 5.292 5.292C58.35 14.444'
     + ' 59 16.707 59 22.947V31H33V5z';
 
+/// The AKSO logo; animatable.
+///
 /// # Props
 /// - onUpdate: called on every animation frame with this object as the first argument
 /// - style: additional style properties

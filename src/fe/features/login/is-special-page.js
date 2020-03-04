@@ -4,7 +4,7 @@ export const Mode = {
     RESETTING_PASSWORD: 2,
 };
 
-/** Returns the mode and possibly additional data for the current page. */
+/// Returns the mode and possibly additional data for the current page.
 export function getPageMode () {
     const pathname = document.location.pathname;
     const match = pathname.match(/^\/(krei_pasvorton|nova_pasvorto)\/([^/]+)\/([\da-fA-f]+)\/?$/);
@@ -18,10 +18,8 @@ export function getPageMode () {
     return { mode: Mode.NORMAL };
 }
 
-/**
- * Returns true if the current page is a special page (such as the “create password” page) and
- * should always show the login screen.
- */
+/// Returns true if the current page is a special page (such as the “create password” page) and
+/// should always show the login screen.
 export default function isSpecialPage () {
     return getPageMode().mode !== Mode.NORMAL;
 }

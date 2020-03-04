@@ -8,6 +8,7 @@ export const CLIENTS = 'clients';
 export const CLIENT_PERMS = 'clientPerms';
 
 export const tasks = {
+    /// clients/list: lists clients
     list: async (_, { search, offset, limit }) => {
         const client = await asyncClient;
 
@@ -45,6 +46,7 @@ export const tasks = {
         };
     },
 
+    /// clients/client: returns a single client
     client: async ({ id }) => {
         const client = await asyncClient;
 
@@ -60,6 +62,7 @@ export const tasks = {
         return item;
     },
 
+    /// clients/create: creates a client
     create: async (_, { name, ownerName, ownerEmail }) => {
         const client = await asyncClient;
         const res = await client.post('/clients', { name, ownerName, ownerEmail });
@@ -69,6 +72,7 @@ export const tasks = {
         };
     },
 
+    /// clients/update: updates a client
     update: async ({ id }, { name, ownerName, ownerEmail }) => {
         const client = await asyncClient;
         await client.patch(`/clients/${id}`, { name, ownerName, ownerEmail });
@@ -79,12 +83,14 @@ export const tasks = {
         store.signal([CLIENTS, id]);
     },
 
+    /// clients/delete: deletes a client
     delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/clients/${id}`);
         store.remove([CLIENTS, id]);
     },
 
+    /// clients/clientPerms: returns permissions of a client
     clientPerms: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/clients/${id}/permissions`);
@@ -93,12 +99,14 @@ export const tasks = {
         store.insert([CLIENT_PERMS, id], deepMerge(existing, { permissions: perms }));
         return perms;
     },
+    /// clients/setPermissions: sets client permissions
     setPermissions: async ({ id }, { permissions }) => {
         const client = await asyncClient;
         await client.put(`/clients/${id}/permissions`, permissions);
         const existing = store.get([CLIENT_PERMS, id]);
         store.insert([CLIENT_PERMS, id], deepMerge(existing, { permissions }));
     },
+    /// clients/memberRestrictions: returns member restrictions of a client
     memberRestrictions: async ({ id }) => {
         const client = await asyncClient;
         let memberRestrictions;
@@ -118,6 +126,7 @@ export const tasks = {
         store.insert([CLIENT_PERMS, id], deepMerge(existing, { memberRestrictions }));
         return memberRestrictions;
     },
+    /// clients/setMemberRestrictions: sets member restrictions of a client
     setMemberRestrictions: async ({ id }, { enabled, filter, fields }) => {
         const client = await asyncClient;
         if (enabled) {
@@ -136,6 +145,11 @@ export const tasks = {
 };
 
 export const views = {
+    /// clients/client: data view of a client.
+    ///
+    /// # Options
+    /// - id: client id
+    /// - noFetch: if true, will not fetch any new data
     client: class ClientView extends AbstractDataView {
         constructor (options) {
             super();
@@ -162,6 +176,11 @@ export const views = {
             store.unsubscribe([CLIENTS, this.id], this.#onUpdate);
         }
     },
+    /// clients/clientPerms: views a client’s permissions
+    ///
+    /// # Options
+    /// - id: client id
+    /// - noFetch: if true, will not fetch any new data
     clientPerms: class ClientPerms extends AbstractDataView {
         constructor ({ id, noFetch }) {
             super();

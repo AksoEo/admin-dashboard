@@ -1,11 +1,12 @@
 import { h, Component } from 'preact';
 import { createContext, forwardRef } from 'preact/compat';
 
+/// This context contains a reference to the core worker interface (see worker.js).
 export const coreContext = createContext();
 
 // TODO: handle errors?
 
-/// Connects a component to a view.
+/// Connects a component to a core view.
 ///
 /// If viewArgs[0] is a function, it will be passed the component props and must return an array of
 /// arguments. Then viewArgs[1] may also be an array of prop names which will be shallow-compared

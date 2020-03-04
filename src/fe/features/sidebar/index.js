@@ -4,7 +4,7 @@ import { Spring } from '@cpsdqs/yamdl';
 import SidebarContents from './contents';
 import './style';
 
-/** Width of the region at the left screen edge from which the sidebar may be dragged out. */
+/// Width of the region at the left screen edge from which the sidebar may be dragged out.
 const EDGE_DRAG_WIDTH = 50;
 
 /// Renders the sidebar.
@@ -137,44 +137,43 @@ export default class Sidebar extends PureComponent {
     }
 }
 
-/** Handles sidebar touch-dragging. */
+/// Handles sidebar touch-dragging.
 class SidebarDragHandler {
-    /** True if a touch drag may turn into a sidebar drag. */
+    /// True if a touch drag may turn into a sidebar drag.
     mayDrag = false;
 
-    /** True if the sidebar is currently being dragged. */
+    /// True if the sidebar is currently being dragged.
     isDragging = false;
 
-    /** Temporarily stores the sidebar width. */
+    /// Temporarily stores the sidebar width.
     sidebarWidth = 0;
 
-    /** Initial touch position X. */
+    /// Initial touch position X.
     startTouchX = 0;
-    /** Initial touch position Y. */
+    /// Initial touch position Y.
     startTouchY = 0;
-    /** Previous touch position. */
+    /// Previous touch position.
     lastTouchX = 0;
-    /** Initial spring value offset. */
+    /// Initial spring value offset.
     startTouchOffset = 0;
-    /** Previous event timestamp. */
+    /// Previous event timestamp.
     lastTouchTime = 0;
 
-    /**
-     * @param {Spring} sidebarSpring - the sidebar spring. Should be 0 when closed and 1 when open.
-     * @param {Function} onEnd - a function `(bool) => void` called when the user ends the drag
-     *                           with whether or not the sidebar should be considered open or not.
-     */
+    /// # Parameters
+    /// - sidebarSpring: Spring - the sidebar spring. Should be 0 when closed and 1 when open.
+    /// - onEnd: `(bool) => void` - called when the user ends the drag with whether or not the
+    ///   sidebar should be considered open or not.
     constructor (sidebarSpring, onEnd) {
         this.spring = sidebarSpring;
         this.onEnd = onEnd;
     }
 
-    /** @param {Node} sidebarNode - the sidebar node. */
+    /// Sets the sidebar node.
     setSidebarNode (sidebarNode) {
         this.sidebarNode = sidebarNode;
     }
 
-    /** Binds global event handlers. */
+    /// Binds global event handlers.
     bind () {
         window.addEventListener('touchstart', this.onTouchStart);
         window.addEventListener('touchmove', this.onTouchMove, { passive: false });
@@ -182,7 +181,7 @@ class SidebarDragHandler {
         window.addEventListener('touchcancel', this.onTouchCancel);
     }
 
-    /** Unbinds global event handlers. */
+    /// Unbinds global event handlers.
     unbind () {
         window.removeEventListener('touchstart', this.onTouchStart);
         window.removeEventListener('touchmove', this.onTouchMove);
@@ -190,11 +189,10 @@ class SidebarDragHandler {
         window.removeEventListener('touchcancel', this.onTouchCancel);
     }
 
-    /**
-     * Returns true if a touch event should be ignored, e.g. because the target is a button.
-     * @param {Node} target
-     * @returns {boolean}
-     */
+    /// Returns true if a touch event should be ignored, e.g. because the target is a button.
+    ///
+    /// # Parameters
+    /// - target: Node
     shouldIgnoreEventFor (target) {
         if (!target) return false;
         if (target.tagName === 'BUTTON') return true;

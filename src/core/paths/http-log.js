@@ -100,6 +100,7 @@ export const tasks = {
             },
         };
     },
+    /// httpLog/filtersToAPI: converts client filters to API filters
     filtersToAPI: async ({ filters }) => {
         return filtersToAPI(clientFilters, filters);
     },

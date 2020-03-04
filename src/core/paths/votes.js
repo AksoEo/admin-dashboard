@@ -216,6 +216,7 @@ export const VOTE_RESULTS = 'voteResults';
 export const SIG_VOTES = '!votes';
 
 export const tasks = {
+    /// votes/filters: lists all filters the user has permission to use
     filters: async () => {
         const client = await asyncClient;
         const filters = [];
@@ -226,6 +227,7 @@ export const tasks = {
         }
         return filters;
     },
+    /// votes/list: lists votes
     list: async (_, parameters) => {
         const client = await asyncClient;
 
@@ -252,6 +254,7 @@ export const tasks = {
             },
         };
     },
+    /// votes/vote: fetches a single vote
     vote: async (_, { id, fields }) => {
         const client = await asyncClient;
         const res = await client.get(`/votes/${+id}`, {
@@ -265,6 +268,7 @@ export const tasks = {
 
         return +id;
     },
+    /// votes/voteResults: fetches the results of a vote
     voteResults: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/votes/${+id}/result`);
@@ -273,6 +277,7 @@ export const tasks = {
         return +id;
     },
 
+    /// votes/create: creates a vote
     create: async (_, data) => {
         const client = await asyncClient;
         const res = await client.post('/votes', clientToAPI(data));
@@ -282,6 +287,7 @@ export const tasks = {
         return id;
     },
 
+    /// votes/update: updates a vote
     update: async ({ id }, data) => {
         const client = await asyncClient;
         const existing = store.get([VOTES, +id]);
@@ -298,6 +304,7 @@ export const tasks = {
         store.insert([VOTES, +id], deepMerge(existing, data));
     },
 
+    /// votes/delete: deletes a vote
     delete: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/votes/${id}`);
@@ -305,6 +312,7 @@ export const tasks = {
         store.signal([VOTES, SIG_VOTES]);
     },
 
+    /// votes/listTemplates: lists vote templates
     listTemplates: async (_, { search, offset, limit }) => {
         const client = await asyncClient;
 
@@ -341,6 +349,7 @@ export const tasks = {
             },
         };
     },
+    /// votes/voteTemplate: fetches a single vote template
     voteTemplate: async (_, { id }) => {
         const client = await asyncClient;
         const res = await client.get(`/vote_templates/${+id}`, {
@@ -359,12 +368,14 @@ export const tasks = {
         return +id;
     },
 
+    /// votes/filtersToAPI: converts client filters to API filters
     filtersToAPI: async ({ filters }) => {
         return filtersToAPI(clientFilters, filters);
     },
 };
 
 export const views = {
+    /// votes/filters: data view of client filters the user has permissions to use
     filters: class Filters extends AbstractDataView {
         constructor () {
             super();
@@ -374,6 +385,7 @@ export const views = {
         }
     },
 
+    /// votes/vote: data view of a single vote
     vote: class Vote extends AbstractDataView {
         constructor (options) {
             super();
@@ -413,6 +425,7 @@ export const views = {
             store.unsubscribe([VOTES, this.id], this.#onUpdate);
         }
     },
+    /// votes/voteResults: data view of a single set of vote results
     voteResults: class VoteResults extends AbstractDataView {
         constructor (options) {
             super();
@@ -442,6 +455,7 @@ export const views = {
         }
     },
 
+    /// votes/voteTemplate: data view of a single vote template
     voteTemplate: class VoteTemplate extends AbstractDataView {
         constructor (options) {
             super();
@@ -471,6 +485,8 @@ export const views = {
         }
     },
 
+    /// votes/sigVotes: emits a signal when the list of votes may have changed
     sigVotes: createStoreObserver([VOTES, SIG_VOTES]),
+    /// votes/sigVoteTemplates: emits a signal when the list of vote templates may have changed
     sigVoteTemplates: createStoreObserver([VOTE_TEMPLATES, SIG_VOTES]),
 };

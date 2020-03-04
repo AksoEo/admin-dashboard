@@ -28,6 +28,11 @@ export const Link = forwardRef((props, ref) => (
     </routerContext.Consumer>
 ));
 
+/// A button that is also a link.
+///
+/// # Props
+/// - `target`: the target href
+/// - ...rest inherited from Button
 export const LinkButton = forwardRef((props, ref) => (
     <routerContext.Consumer>
         {context => (

@@ -14,7 +14,7 @@
 // ```
 // cats -> (cats)
 // cats() -> ((cats()))
-// cats(()) -> (((cats())))
+// cats(()) -> (((cats(()))))
 // (cats) -> ((*(cats)))
 // *cats -> (**cats)
 // cats#% -> (cats%23%25)

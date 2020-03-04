@@ -3,6 +3,12 @@ import { CircularProgress } from '@cpsdqs/yamdl';
 import { generateTotp } from '@tejo/akso-client';
 import { login as locale } from '../../locale';
 
+/// The TOTP setup page.
+///
+/// # Props
+/// - onGenerateSecret: (secret) => void callback that will be called when the TOTP secret is
+///   generated
+/// - onHeightChange
 export default class TotpSetup extends Component {
     state = {
         secrets: null,

@@ -241,7 +241,12 @@ function parseHistoryState (url, state, mkPopStack, perms) {
     };
 }
 
-const SAVE_STATE_INTERVAL = 1000; // ms
+/// these browsers will yell if you replaceState too often
+const SLOW_SAVE_STATE = navigator.userAgent.includes('Safari/');
+
+/// Interval at which state will be saved. This includes writing the query string to the URL and
+/// replacing window.history state.
+const SAVE_STATE_INTERVAL = SLOW_SAVE_STATE ? 2100 : 500; // ms
 
 /// Navigation controller sort of thing.
 ///
@@ -457,7 +462,7 @@ export default class Navigation extends PureComponent {
     }
 
     componentDidCatch (error, errorInfo) {
-        // is it just me or does this method not actually work at all
+        // is it just me or does this method not actually work at all (*)
         console.error('[Navigation] render error', error, errorInfo); // eslint-disable-line no-console
     }
 
@@ -467,7 +472,7 @@ export default class Navigation extends PureComponent {
 
     render () {
         if (this.state.error) {
-            // instead i’m just going to log the error here
+            // instead i’m just going to log the error here (*)
             if (this.state.error !== this._prevError) {
                 console.error('[Navigation] render error', this.state.error); // eslint-disable-line no-console
                 this._prevError = this.state.error;

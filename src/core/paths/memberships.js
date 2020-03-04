@@ -7,6 +7,7 @@ import * as store from '../store';
 export const MEMBERSHIPS = 'memberships';
 export const MEMBERSHIP_CATEGORIES = [MEMBERSHIPS, 'categories'];
 
+/// Loads all membership categories because there won’t be too many for this to become a problem
 async function loadAllMembershipCategories () {
     if (store.get(MEMBERSHIP_CATEGORIES)) return;
 

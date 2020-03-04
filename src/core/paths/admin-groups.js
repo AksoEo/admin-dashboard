@@ -58,6 +58,7 @@ export const tasks = {
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, res.body));
         return res.body;
     },
+    /// adminGroups/create: creates an admin group
     create: async (_, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
 
@@ -71,6 +72,7 @@ export const tasks = {
         store.signal([ADMIN_GROUPS, SIG_LIST]);
         return id;
     },
+    /// adminGroups/update: updates an admin group
     update: async ({ id }, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
 
@@ -87,6 +89,7 @@ export const tasks = {
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, options));
         store.signal([ADMIN_GROUPS, SIG_LIST]);
     },
+    /// adminGroups/delete: deletes an admin group
     delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${id}`);
@@ -94,6 +97,7 @@ export const tasks = {
         store.signal([ADMIN_GROUPS, SIG_LIST]);
     },
 
+    /// adminGroups/permissions: lists admin group permissions
     permissions: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/admin_groups/${id}/permissions`);
@@ -106,6 +110,7 @@ export const tasks = {
         }));
         return perms;
     },
+    /// adminGroups/setPermissions: sets admin groups permissions
     setPermissions: async ({ id }, { permissions }) => {
         const client = await asyncClient;
         await client.put(`/admin_groups/${id}/permissions`, permissions);
@@ -115,6 +120,7 @@ export const tasks = {
         }));
     },
 
+    /// adminGroups/listCodeholders: lists codeholders that are part of an admin group
     listCodeholders: async ({ group }, { offset, limit }) => {
         const client = await asyncClient;
         const { options } = codeholdersPTRD({
@@ -141,6 +147,7 @@ export const tasks = {
         };
     },
 
+    /// adminGroups/listClients: lists clients that are part of an admin group
     listClients: async ({ group }, { offset, limit }) => {
         const client = await asyncClient;
 
@@ -175,22 +182,26 @@ export const tasks = {
     addClientsBatchTask: async () => {},
     removeClientsBatchTask: async () => {},
 
+    /// adminGroups/addCodeholder: adds a single codeholder
     addCodeholder: async ({ group }, { codeholder }) => {
         const client = await asyncClient;
         await client.put(`/admin_groups/${group}/codeholders/${codeholder}`);
         store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
+    /// adminGroups/removeCodeholder: removes a single codeholder
     removeCodeholder: async ({ group }, { codeholder }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${group}/codeholders/${codeholder}`);
         store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
 
+    /// adminGroups/addClient: adds a single client
     addClient: async ({ group }, { client: id }) => {
         const client = await asyncClient;
         await client.put(`/admin_groups/${group}/clients/${id}`);
         store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
+    /// adminGroups/removeClient: removes a single client
     removeClient: async ({ group }, { client: id }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${group}/clients/${id}`);
@@ -240,7 +251,7 @@ export const views = {
         }
     },
 
-    /// emits a signal when the list changes
+    /// adminGroups/sigList: emits a signal when the list changes
     sigList: class AdminGroupListSignal extends AbstractDataView {
         constructor () {
             super();

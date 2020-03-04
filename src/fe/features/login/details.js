@@ -19,6 +19,10 @@ export default class DetailsPage extends Component {
     state = {
         password: '',
         confirmPassword: '',
+
+        // if true, the user is not an admin, but used this interface to
+        // reset/create their password, so the “you can’t enter” text will
+        // also note that their password was reset successfully
         notAdminButPasswordSuccess: false,
     };
 

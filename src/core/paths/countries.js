@@ -21,6 +21,7 @@ export const COUNTRY_LANGS = [
     'eo', 'en', 'fr', 'es', 'nl', 'pt', 'sk', 'zh', 'de',
 ];
 
+/// Loads all countries
 async function loadCountries (locale) {
     if (!store.get(CACHED_LOCALES)) store.insert(CACHED_LOCALES, []);
     if (store.get(CACHED_LOCALES).includes(locale)) return;
@@ -40,6 +41,7 @@ async function loadCountries (locale) {
     store.insert(CACHED_LOCALES, store.get(CACHED_LOCALES).concat([locale]));
 }
 
+/// Loads all country groups
 async function loadAllCountryGroups () {
     // check if we already have all of them
     if (Object.keys(store.get(COUNTRY_GROUPS_LIST) || {}).length >= store.get(COUNTRY_GROUPS_TOTAL)) return;
@@ -76,6 +78,7 @@ async function loadAllCountryGroups () {
 }
 
 export const tasks = {
+    /// countries/list: lists countries
     list: async (_, { search, offset, limit }) => {
         const client = await asyncClient;
 
@@ -114,6 +117,7 @@ export const tasks = {
         };
     },
 
+    /// countries/listGroups: lists country groups
     listGroups: async (_, { search, offset, limit }) => {
         const client = await asyncClient;
 
@@ -148,6 +152,7 @@ export const tasks = {
         };
     },
 
+    /// countries/country: fetches a single country
     country: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/countries/${id}`, {
@@ -163,6 +168,7 @@ export const tasks = {
         return item;
     },
 
+    /// countries/group: fetches a single country group
     group: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/country_groups/${id}`, {
@@ -175,6 +181,7 @@ export const tasks = {
         return item;
     },
 
+    /// countries/update: updates a single country
     update: async ({ id }, data) => {
         const client = await asyncClient;
         data = { ...data };
@@ -187,6 +194,7 @@ export const tasks = {
         store.insert(path, deepMerge(store.get(path), data));
     },
 
+    /// countries/createGroup: creates a single country group
     createGroup: async (_, { code, name }) => {
         const client = await asyncClient;
 
@@ -198,6 +206,7 @@ export const tasks = {
         store.signal(COUNTRY_GROUPS_LIST.concat([SIG_LIST]));
     },
 
+    /// countries/updateGroup: updates a country group
     updateGroup: async ({ id }, { name }) => {
         const client = await asyncClient;
 
@@ -207,6 +216,7 @@ export const tasks = {
         store.insert(path, deepMerge(store.get(path), { name }));
     },
 
+    /// countries/deleteGroup: deletes a country group
     deleteGroup: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/country_groups/${id}`);
@@ -215,6 +225,7 @@ export const tasks = {
         store.signal(COUNTRY_GROUPS_LIST.concat([SIG_LIST]));
     },
 
+    /// countries/addGroupCountry: adds a country to a country group
     addGroupCountry: async ({ group }, { country }) => {
         const client = await asyncClient;
         await client.put(`/country_groups/${group}/countries/${country}`);
@@ -230,6 +241,7 @@ export const tasks = {
             store.insert(COUNTRY_GROUPS_LIST.concat([group]), groupData);
         }
     },
+    /// countries/removeGroupCountry: removes a country from a country group
     removeGroupCountry: async ({ group }, { country }) => {
         const client = await asyncClient;
         await client.delete(`/country_groups/${group}/countries/${country}`);
@@ -248,6 +260,7 @@ export const tasks = {
 };
 
 export const views = {
+    /// countries/country: data view of a single country
     country: class Country extends AbstractDataView {
         constructor ({ id, noFetch }) {
             super();
@@ -264,6 +277,7 @@ export const views = {
             store.unsubscribe(COUNTRIES_LIST.concat([this.id]));
         }
     },
+    /// countries/group: data view of a single country group
     group: class Group extends AbstractDataView {
         constructor ({ id, noFetch }) {
             super();
@@ -321,5 +335,6 @@ export const views = {
         }
     },
 
+    /// countries/sigCountryGroups: emits a signal when the list of country groups may have changed
     sigCountryGroups: createStoreObserver(COUNTRY_GROUPS_LIST.concat([SIG_LIST])),
 };

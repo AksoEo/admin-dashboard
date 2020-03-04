@@ -5,7 +5,7 @@ const thisYear = new Date(config.buildTime).getUTCFullYear();
 const copyrightYear = thisYear === startYear ? thisYear : `${startYear}–${thisYear}`;
 
 /** The default locale (Esperanto). */
-export default {
+const oldLocale = {
     // Information shown in the sidebar
     meta: {
         copyright: `© ${copyrightYear}`,
@@ -534,3 +534,15 @@ export default {
         },
     },
 };
+
+let didDisplayDeprecationWarning = false;
+
+export default new Proxy(oldLocale, {
+    get (target, prop, receiver) {
+        if (!didDisplayDeprecationWarning) {
+            console.warn('Deprecated usage of locale_old; use new locale instead'); // eslint-disable-line no-console
+            didDisplayDeprecationWarning = true;
+        }
+        return Reflect.get(target, prop, receiver);
+    },
+});

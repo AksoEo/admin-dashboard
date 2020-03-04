@@ -8,6 +8,7 @@ function TimestampFormatter ({ value }) {
 }
 
 // FIXME: hacky; should be replaced with a proper datetime editor
+// TODO: use date editor from ./date
 function TimestampEditor ({ value, onChange }) {
     const m = moment(Number.isFinite(value) ? value * 1000 : value).utc();
 

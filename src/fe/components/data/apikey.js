@@ -1,5 +1,6 @@
 import { h } from 'preact';
 
+/// Renders an API key as a hex string.
 function APIKeyRenderer ({ value }) {
     const hex = Buffer.from(value || []).toString('hex');
 

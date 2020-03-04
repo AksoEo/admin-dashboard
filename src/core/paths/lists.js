@@ -9,6 +9,7 @@ export const LISTS = 'lists';
 export const SIG_LISTS = '!lists';
 
 export const tasks = {
+    /// lists/list: lists lists
     list: async (_, { search, offset, limit }) => {
         const client = await asyncClient;
 
@@ -42,6 +43,7 @@ export const tasks = {
         };
     },
 
+    /// lists/item: fetches a single list
     item: async ({ id }) => {
         const client = await asyncClient;
 
@@ -64,6 +66,7 @@ export const tasks = {
         return store.get([LISTS, item.id]);
     },
 
+    /// lists/create: creates a list
     create: async (_, { name, description, filters }) => {
         const client = await asyncClient;
 
@@ -75,6 +78,7 @@ export const tasks = {
         return res.res.headers.get('x-identifier');
     },
 
+    /// lists/update: updates a list
     update: async ({ id }, parameters) => {
         const client = await asyncClient;
 
@@ -93,6 +97,7 @@ export const tasks = {
         store.signal([LISTS, id]);
     },
 
+    /// lists/delete: deletes a list
     delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/lists/${id}`);
@@ -100,6 +105,7 @@ export const tasks = {
         store.signal([LISTS, SIG_LISTS]);
     },
 
+    /// lists/codeholders: lists codeholders that are part of a list
     codeholders: async ({ id }, { offset, limit }) => {
         const client = await asyncClient;
         const res = await client.get(`/lists/public/${id}/codeholders`, {
@@ -115,6 +121,7 @@ export const tasks = {
 };
 
 export const views = {
+    /// lists/list: data view of a single list
     list: class ListView extends AbstractDataView {
         constructor (options) {
             super();
@@ -142,5 +149,6 @@ export const views = {
         }
     },
 
+    /// lists/sigLists: emits a signal when the list of lists may have changed
     sigLists: createStoreObserver([LISTS, SIG_LISTS]),
 };

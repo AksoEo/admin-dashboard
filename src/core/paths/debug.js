@@ -3,6 +3,7 @@ import * as store from '../store';
 import { AbstractDataView } from '../view';
 
 export const tasks = {
+    /// debug/request: performs an arbitrary http request
     request: async ({ method, endpoint, options, body }) => {
         const res = await (await asyncClient)[method](endpoint, options, body);
 
@@ -18,6 +19,7 @@ export const tasks = {
 };
 
 export const views = {
+    /// debug/store: displays an arbitrary data store path
     store: class StoreView extends AbstractDataView {
         constructor ({ path }) {
             super();
