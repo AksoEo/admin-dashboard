@@ -1,9 +1,9 @@
 import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
 import { Dialog, Button, LinearProgress } from '@cpsdqs/yamdl';
-import NativeSelect from '@material-ui/core/NativeSelect';
 import stringify from 'csv-stringify';
 import { coreContext } from '../core/connection';
+import Select from './select';
 import Segmented from './segmented';
 import { csvExport as locale } from '../locale';
 import './csv-export.less';
@@ -335,18 +335,18 @@ class UserOptions extends PureComponent {
 
             if (spec.type === 'select') {
                 control = (
-                    <NativeSelect
+                    <Select
                         value={this.props.value[key]}
-                        onChange={e => {
+                        onChange={value => {
                             this.props.onChange({
                                 ...this.props.value,
-                                [key]: e.target.value,
+                                [key]: value,
                             });
-                        }}>
-                        {spec.options.map(([id, label]) => (
-                            <option key={id} value={id}>{label}</option>
-                        ))}
-                    </NativeSelect>
+                        }}
+                        items={spec.options.map(([id, label]) => ({
+                            value: id,
+                            label,
+                        }))} />
                 );
             } else {
                 throw new Error('unknown option type');

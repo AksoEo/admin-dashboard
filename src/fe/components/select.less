@@ -1,0 +1,53 @@
+@import '../prelude';
+
+.paper-select {
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    border-radius: 4px;
+    white-space: nowrap;
+
+    & > select {
+        background: none;
+        border: none;
+        font: inherit;
+        color: inherit;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding: 0 16px;
+        padding-right: 24px;
+        line-height: 2.5em;
+        box-sizing: border-box;
+        margin: 0;
+        border-radius: 0;
+        vertical-align: middle;
+        max-width: 100%;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &.p-outline {
+        border: 1px solid @gray-button-color;
+        padding: 1px;
+
+        &.is-focused {
+            padding: 0;
+            border-width: 2px;
+            border-color: @secondary;
+        }
+    }
+
+    .p-select-icon {
+        margin-left: -24px;
+        width: 24px;
+        height: 24px;
+        vertical-align: middle;
+        pointer-events: none;
+
+        path {
+            fill: currentColor;
+        }
+    }
+}

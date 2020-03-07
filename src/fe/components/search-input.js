@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
-import NativeSelect from '@material-ui/core/NativeSelect';
 import { Button } from '@cpsdqs/yamdl';
 import SearchIcon from '@material-ui/icons/Search';
+import Select from './select';
 import './search-input.less';
 
 export default class SearchInputFocusable extends Component {
@@ -56,17 +56,15 @@ function SearchInput ({
     return (
         <div class="search-input" ref={innerRef}>
             {!!searchFields && (
-                <NativeSelect
-                    className="search-field"
+                <Select
+                    class="search-field"
                     value={value.field || ''}
                     onClick={e => !expanded && e.stopPropagation()}
-                    onChange={e => onChange({ ...value, field: e.target.value })}>
-                    {searchFields.map(field => (
-                        <option value={field} key={field}>
-                            {localizedFields[field]}
-                        </option>
-                    ))}
-                </NativeSelect>
+                    onChange={field => onChange({ ...value, field })}
+                    items={searchFields.map(field => ({
+                        value: field,
+                        label: localizedFields[field],
+                    }))} />
             )}
             <div class="search-query-container">
                 <input

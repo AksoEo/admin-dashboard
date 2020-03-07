@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
 import { timestamp } from '../../../components/data';
 import { votes as locale } from '../../../locale';
@@ -62,19 +62,16 @@ export default {
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="state-filter">
-                    <NativeSelect
+                    <Select
                         value={value || 'none'}
-                        onChange={e => {
-                            const value = e.target.value;
+                        onChange={value => {
                             onChange(value === 'none' ? null : value);
                             onEnabledChange(value !== 'none');
-                        }}>
-                        {Object.keys(locale.types).concat(['none']).map(type => (
-                            <option value={type} key={type}>
-                                {type === 'none' ? locale.filters.noneType : locale.types[type]}
-                            </option>
-                        ))}
-                    </NativeSelect>
+                        }}
+                        items={Object.keys(locale.types).concat(['none']).map(type => ({
+                            value: type,
+                            label: type === 'none' ? locale.filters.noneType : locale.types[type],
+                        }))} />
                 </div>
             );
         },

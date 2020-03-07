@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import NativeSelect from '@material-ui/core/NativeSelect';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
@@ -10,6 +9,7 @@ import { codeholders as locale, data as dataLocale } from '../../../locale';
 import { Validator } from '../../../components/form';
 import data, { Required } from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
+import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
 import TinyProgress from '../../../components/tiny-progress';
 import ProfilePictureEditor from './profile-picture';
@@ -390,14 +390,13 @@ export class CodeholderAddressRenderer extends Component {
                     onClose={() => this.setState({ postalOpen: false })}
                     title={locale.postalAddress}>
                     {locale.postalLocale}{' '}
-                    <NativeSelect
+                    <Select
                         value={this.state.postalLang}
-                        onChange={e => {
-                            this.setState({ postalLang: e.target.value }, () => this.loadPostal());
-                        }}>
-                        {Object.entries(locale.csvOptions.countryLocales)
-                            .map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                    </NativeSelect>
+                        onChange={postalLang => {
+                            this.setState({ postalLang }, () => this.loadPostal());
+                        }}
+                        items={Object.entries(locale.csvOptions.countryLocales)
+                            .map(([k, v]) => ({ value: k, label: v }))} />
 
                     <textarea
                         class="postal-address"

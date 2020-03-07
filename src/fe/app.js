@@ -20,6 +20,13 @@ const PERMA_SIDEBAR_WIDTH = 900;
 
 function createDummyPerms () {
     const perms = new Perms();
+    perms.load({
+        permissions: [],
+        memberFilter: {},
+        memberFields: null,
+        ownMemberFields: null,
+        isActiveMember: false,
+    });
     perms._isDummy = true;
     return perms;
 }

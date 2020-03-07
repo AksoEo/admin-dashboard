@@ -1,7 +1,7 @@
 //! Country utilities.
 
 import { h } from 'preact';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Select from '../select';
 import { connect } from '../../core/connection';
 
 /// Converts a letter to a regional indicator.
@@ -41,16 +41,14 @@ export function CountryEditor ({ value, onChange }) {
         <div class="data country-editor">
             <WithCountries>
                 {countries => (
-                    <NativeSelect
+                    <Select
                         value={value}
-                        onChange={e => onChange(e.target.value || null)}>
-                        <option value={''}>—</option>
-                        {Object.entries(countries).map(([id, names]) => (
-                            <option value={id} key={id}>
-                                {names.name_eo}
-                            </option>
-                        ))}
-                    </NativeSelect>
+                        onChange={value => onChange(value || null)}
+                        items={[{ value: '', label: '—' }].concat(Object.entries(countries)
+                            .map(([id, names]) => ({
+                                value: id,
+                                label: names.name_eo,
+                            })))} />
                 )}
             </WithCountries>
         </div>

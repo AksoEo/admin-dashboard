@@ -1,12 +1,12 @@
 import { h } from 'preact';
 import { Fragment, PureComponent, createContext } from 'preact/compat';
 import { Checkbox, Button, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
-import NativeSelect from '@material-ui/core/NativeSelect';
 import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
 import ArrowRightIcon from '@material-ui/icons/ChevronRight';
 import { coreContext, connect } from '../core/connection';
+import Select from './select';
 import EventProxy from './event-proxy';
 import { LinkButton } from '../router';
 import { search as locale, data as dataLocale } from '../locale';
@@ -292,13 +292,15 @@ export default class OverviewList extends PureComponent {
                 <div class="regular-pagination">
                     <div />
                     <div class="pagination-buttons">
-                        <NativeSelect value={parameters.limit} onChange={e => {
-                            this.props.onSetLimit(e.target.value | 0);
-                        }}>
-                            {(this.props.limits || DEFAULT_LIMITS).map(limit => (
-                                <option key={limit} value={limit}>{'' + limit}</option>
-                            ))}
-                        </NativeSelect>
+                        <Select
+                            value={parameters.limit}
+                            onChange={value => {
+                                this.props.onSetLimit(value | 0);
+                            }}
+                            items={(this.props.limits || DEFAULT_LIMITS).map(limit => ({
+                                value: limit,
+                                label: '' + limit,
+                            }))} />
                         <Button class="page-button" icon onClick={this.onPrevPageClick} disabled={prevDisabled}>
                             <ArrowLeftIcon />
                         </Button>

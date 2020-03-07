@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Select from '../../../../components/select';
 import CodeholderPicker from '../../../../components/codeholder-picker';
 import RangeEditor from '../../../../components/range-editor';
 import { httpLog as locale } from '../../../../locale';
@@ -117,11 +117,11 @@ export default {
         editor ({ value, onChange, hidden }) {
             return (
                 <div class="method-filter">
-                    <NativeSelect
+                    <Select
                         value={value}
                         disabled={hidden}
-                        onChange={e => onChange(e.target.value)}>
-                        {[
+                        onChange={onChange}
+                        items={[
                             'GET',
                             'POST',
                             'PUT',
@@ -131,8 +131,7 @@ export default {
                             'CONNECT',
                             'OPTIONS',
                             'TRACE',
-                        ].map(x => <option key={x} value={x}>{x}</option>)}
-                    </NativeSelect>
+                        ].map(x => ({ value: x, label: x }))} />
                 </div>
             );
         },
@@ -153,16 +152,24 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="path-filter">
-                    <NativeSelect
-                        className="path-filter-invert"
+                    <Select
+                        class="path-filter-invert"
                         value={value.type}
-                        onChange={e => {
-                            onChange({ ...value, type: e.target.value });
-                        }}>
-                        <option value="eq">{locale.search.filters.pathEq}</option>
-                        <option value="prefix">{locale.search.filters.pathStartsWith}</option>
-                        <option value="invert">{locale.search.filters.pathInverted}</option>
-                    </NativeSelect>
+                        onChange={type => onChange({ ...value, type })}
+                        items={[
+                            {
+                                value: 'eq',
+                                label: locale.search.filters.pathEq,
+                            },
+                            {
+                                value: 'prefix',
+                                label: locale.search.filters.pathStartsWith,
+                            },
+                            {
+                                value: 'invert',
+                                label: locale.search.filters.pathInverted,
+                            },
+                        ]} />
                     <TextField
                         class="path-filter-path"
                         value={value.path}

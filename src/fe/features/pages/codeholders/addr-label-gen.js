@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { useState, Fragment, PureComponent } from 'preact/compat';
 import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from '@cpsdqs/yamdl';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Select from '../../../components/select';
 import { CardStackItem } from '../../../components/card-stack';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
@@ -139,18 +139,20 @@ const boundedInteger = (min, max, unit) => ({ value, onChange }) =>
 const U16PtEditor = boundedInteger(0, 65535, 'pt');
 const SETTINGS = {
     language: ({ value, onChange }) => (
-        <NativeSelect value={value} onChange={e => onChange(e.target.value)}>
-            {Object.entries(locale.csvOptions.countryLocales)
-                .map(([id, label]) => <option value={id} key={id}>{label}</option>)}
-        </NativeSelect>
+        <Select
+            value={value}
+            onChange={onChange}
+            items={Object.entries(locale.csvOptions.countryLocales)
+                .map(([id, label]) => ({ value: id, label }))} />
     ),
     latin: ValCheckbox,
     includeCode: ValCheckbox,
     paper: ({ value, onChange }) => (
-        <NativeSelect value={value} onChange={e => onChange(e.target.value)}>
-            {Object.entries(locale.addrLabelGen.paperSizes)
-                .map(([id, label]) => <option value={id} key={id}>{label}</option>)}
-        </NativeSelect>
+        <Select
+            value={value}
+            onChange={onChange}
+            items={Object.entries(locale.addrLabelGen.paperSizes)
+                .map(([id, label]) => ({ value: id, label }))} />
     ),
     margins: MarginsEditor,
     cols: boundedInteger(1, 20),

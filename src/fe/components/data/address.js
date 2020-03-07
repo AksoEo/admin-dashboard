@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import { getValidationRules } from '@cpsdqs/google-i18n-address';
-import NativeSelect from '@material-ui/core/NativeSelect';
+import Select from '../select';
 import locale from '../../locale';
 import { Validator } from '../form';
 import countryField, { WithCountries } from './country';
@@ -95,19 +95,19 @@ class AddressEditor extends Component {
         if (requiredFields.includes('countryArea')) {
             items.push(
                 <Validator
-                    component={NativeSelect}
+                    component={Select}
                     validate={value => {
                         if (country && !value) throw { error: locale.data.requiredField };
                     }}
                     class="address-editor-line"
                     key="countryArea"
                     value={value.countryArea}
-                    onChange={onChangeField('countryArea', e => e.target.value || null)}>
-                    <option value="">—</option>
-                    {rules.countryAreaChoices.map(([id, area]) => (
-                        <option key={id} value={id}>{area}</option>
-                    ))}
-                </Validator>
+                    onChange={onChangeField('countryArea', value => value || null)}
+                    items={[{ value: '', label: '—' }].concat(rules.countryAreaChoices
+                        .map(([id, area]) => ({
+                            value: id,
+                            label: area,
+                        })))} />
             );
         }
 

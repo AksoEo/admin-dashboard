@@ -2,9 +2,9 @@ import { h } from 'preact';
 import { useRef, useState, useEffect } from 'preact/compat';
 import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
-import NativeSelect from '@material-ui/core/NativeSelect';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
+import Select from '../../../components/select';
 import ChangedFields from '../../../components/changed-fields';
 import Form, { Validator } from '../../../components/form';
 import data from '../../../components/data';
@@ -268,32 +268,29 @@ export default {
                     });
                 }}>
                     <Validator
-                        component={NativeSelect}
+                        component={Select}
                         validate={() => {}}
-                        className="category-select form-field"
+                        class="category-select form-field"
                         value={task.parameters.category}
-                        onChange={e => {
-                            task.update({ category: e.target.value });
-                        }}>
-                        {categories && Object.values(categories).map(({
+                        onChange={category => task.update({ category })}
+                        items={categories ? Object.values(categories).map(({
                             id,
                             nameAbbrev,
                             name,
                             availableFrom,
                             availableTo,
-                        }) => (
-                            <option key={id} value={id}>
-                                {name} ({nameAbbrev})
-                                {availableFrom && availableTo ? (
+                        }) => ({
+                            value: id,
+                            label: `${name} (${nameAbbrev})` + (
+                                availableFrom && availableTo ? (
                                     ` (${availableFrom}–${availableTo})`
                                 ) : availableFrom ? (
                                     ` (${locale.membership.availableFrom} ${availableFrom})`
                                 ) : availableTo ? (
                                     ` (${locale.membership.availableTo} ${availableTo})`
-                                ) : null}
-                            </option>
-                        ))}
-                    </Validator>
+                                ) : ''
+                            ),
+                        })) : []} />
                     <Validator
                         component={TextField}
                         class="form-field text-field"
@@ -389,22 +386,18 @@ function makeRoleEditor (type) {
                     });
                 }}>
                     <Validator
-                        component={NativeSelect}
+                        component={Select}
                         validate={() => {}}
-                        className="category-select form-field"
+                        class="category-select form-field"
                         value={task.parameters.role}
-                        onChange={e => {
-                            task.update({ role: e.target.value });
-                        }}>
-                        {roles && Object.values(roles).map(({
+                        onChange={role => task.update({ role })}
+                        items={roles && Object.values(roles).map(({
                             id,
                             name,
-                        }) => (
-                            <option key={id} value={id}>
-                                {name}
-                            </option>
-                        ))}
-                    </Validator>
+                        }) => ({
+                            value: id,
+                            label: name,
+                        }))} />
                     <Validator
                         component={TextField}
                         class="form-field text-field"
