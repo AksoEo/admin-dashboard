@@ -85,7 +85,7 @@ export default class APILogListView extends Page {
                                 path: {
                                     // filter out http log requests by default
                                     value: {
-                                        invert: true,
+                                        type: 'invert',
                                         path: '/http_log',
                                     },
                                     enabled: true,

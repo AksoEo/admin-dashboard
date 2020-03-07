@@ -139,24 +139,29 @@ export default {
     },
     path: {
         default: () => ({ enabled: false, value: '' }),
-        serialize: ({ value }) => (value.invert ? '^' : '') + value.path,
+        serialize: ({ value }) => (value.type === 'invert'
+            ? '!'
+            : value.type === 'prefix' ? '^' : '') + value.path,
         deserialize: value => ({
             enabled: true,
-            value: value.startsWith('^')
-                ? { invert: true, path: value.substr(1) }
-                : { invert: false, path: value },
+            value: value.startsWith('!')
+                ? { type: 'invert', path: value.substr(1) }
+                : value.startsWith('^')
+                    ? { type: 'prefix', path: value.substr(1) }
+                    : { type: 'eq', path: value },
         }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="path-filter">
                     <NativeSelect
                         className="path-filter-invert"
-                        value={value.invert ? 'inverted' : ''}
+                        value={value.type}
                         onChange={e => {
-                            onChange({ ...value, invert: e.target.value === 'inverted' });
+                            onChange({ ...value, type: e.target.value });
                         }}>
-                        <option value="">{locale.search.filters.pathStartsWith}</option>
-                        <option value="inverted">{locale.search.filters.pathInverted}</option>
+                        <option value="eq">{locale.search.filters.pathEq}</option>
+                        <option value="prefix">{locale.search.filters.pathStartsWith}</option>
+                        <option value="invert">{locale.search.filters.pathInverted}</option>
                     </NativeSelect>
                     <TextField
                         class="path-filter-path"

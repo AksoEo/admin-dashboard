@@ -55,9 +55,13 @@ const clientFilters = {
     ip: { toAPI: value => ({ ip: Buffer.from(ipaddr.parse(value).toByteArray()) }) },
     origin: { toAPI: value => ({ origin: value }) },
     method: { toAPI: value => ({ method: value }) },
-    path: { toAPI: value => value.invert
-        ? { $not: { path: { $pre: value.path } } }
-        : { path: { $pre: value.path } } },
+    path: {
+        toAPI: value => value.type === 'invert'
+            ? { $not: { path: { $pre: value.path } } }
+            : value.type === 'prefix'
+                ? { path: { $pre: value.path } }
+                : { path: value.path },
+    },
     resStatus: { toAPI: value => ({ resStatus: value }) },
     resTime: { toAPI: value => ({ resTime: { $range: value } }) },
 };

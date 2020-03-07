@@ -640,6 +640,7 @@ export const httpLog = {
             resTime: 'Daŭro (ms)',
 
             originPlaceholder: '[[ekz. https://admin.akso.org]]',
+            pathEq: '[[is exactly]]',
             pathStartsWith: '[[starts with]]',
             pathInverted: '[[does not start with]]',
             pathPlaceholder: '[[ekz. /auth]]',
