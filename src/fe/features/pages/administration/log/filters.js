@@ -4,29 +4,9 @@ import Select from '../../../../components/select';
 import CodeholderPicker from '../../../../components/codeholder-picker';
 import RangeEditor from '../../../../components/range-editor';
 import { httpLog as locale } from '../../../../locale';
+import { timestamp } from '../../../../components/data';
 
 const MIN_TIME = new Date('2019-05-21T18:00:00Z');
-
-function DateTimeEditor ({ value, onChange }) {
-    const dateParts = value.toISOString().split('T');
-    const timePart = dateParts[1].match(/^(\d{1,2}:\d{2})/)[1];
-
-    return (
-        <span class="date-time-editor">
-            <input type="date" value={dateParts[0]} onChange={e => {
-                const v = e.target.value;
-                const date = new Date(v + 'T' + dateParts[1]);
-                if (Number.isFinite(+date)) onChange(date);
-            }} />
-            <input type="time" value={timePart} onChange={e => {
-                const v = e.target.value;
-                const timePart = v.match(/^(\d{1,2}:\d{2})/)[1];
-                const date = new Date(dateParts[0] + 'T' + timePart + ':00Z');
-                if (Number.isFinite(+date)) onChange(date);
-            }} />
-        </span>
-    );
-}
 
 export default {
     codeholders: {
@@ -48,12 +28,12 @@ export default {
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="time-filter">
-                    <DateTimeEditor value={value[0]} onChange={v => {
-                        onChange([v, value[1]]);
+                    <timestamp.editor value={+value[0] / 1000} onChange={v => {
+                        onChange([new Date(v * 1000), value[1]]);
                         onEnabledChange(true);
                     }} />
-                    <DateTimeEditor value={value[1]} onChange={v => {
-                        onChange([value[0], v]);
+                    <timestamp.editor value={+value[1] / 1000} onChange={v => {
+                        onChange([value[0], new Date(v * 1000)]);
                         onEnabledChange(true);
                     }} />
                 </div>

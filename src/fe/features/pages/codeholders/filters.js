@@ -12,7 +12,7 @@ import { codeholders as locale } from '../../../locale';
 import CountryPicker from '../../../components/country-picker';
 import MulticolList from '../../../components/multicol-list';
 import RangeEditor from '../../../components/range-editor';
-import data from '../../../components/data';
+import { date } from '../../../components/data';
 
 // TEMP: replace with actual multi-<select> when available
 function makeDialogMultiSelect (view, pickSome, render, render2) {
@@ -626,7 +626,7 @@ export default {
                 enabled: false,
                 value: {
                     roles: [],
-                    date: moment().format('YYYY-MM-DD'),
+                    date: moment().format('YYYY-MM-DD')
                 },
             };
         },
@@ -640,7 +640,7 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <Fragment>
-                    <data.date.editor
+                    <date.editor
                         value={value.date}
                         onChange={date => onChange({ ...value, date })}
                         disabled={hidden}

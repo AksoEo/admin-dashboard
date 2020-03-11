@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import moment from 'moment';
 import { timestampFormat } from '../../locale';
+import date from './date';
 
 /// Renders a formatted timestamp (not editable). Use prop `value`.
 function TimestampFormatter ({ value }) {
@@ -8,7 +9,6 @@ function TimestampFormatter ({ value }) {
 }
 
 // FIXME: hacky; should be replaced with a proper datetime editor
-// TODO: use date editor from ./date
 function TimestampEditor ({ value, onChange }) {
     const m = moment(Number.isFinite(value) ? value * 1000 : value).utc();
 
@@ -17,8 +17,7 @@ function TimestampEditor ({ value, onChange }) {
 
     return (
         <span class="timestamp-editor">
-            <input type="date" value={dateValue} onChange={e => {
-                const v = e.target.value;
+            <date.editor value={dateValue} onChange={v => {
                 const newDate = moment.utc(v + '$' + timeValue, 'YYYY-MM-DD$HH:mm:ss');
                 onChange(newDate.unix());
             }} />

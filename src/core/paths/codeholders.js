@@ -395,13 +395,13 @@ const clientFilters = {
                 dateFilter.$and = [
                     {
                         $or: [
-                            { durationFrom: { $lte: new Date(date) / 1000 } },
+                            { durationFrom: { $lte: date / 1000 } },
                             { durationFrom: null },
                         ],
                     },
                     {
                         $or: [
-                            { durationTo: { $gte: new Date(date) / 1000 } },
+                            { durationTo: { $gte: date / 1000 } },
                             { durationTo: null },
                         ],
                     },

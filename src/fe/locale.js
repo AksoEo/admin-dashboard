@@ -40,6 +40,22 @@ export const data = {
     },
     deleteTitle: 'Forigi',
     deleteDescription: '[[are you sure you want to delete this item?]]',
+    months: [
+        'Januaro',
+        'Februaro',
+        'Marto',
+        'Aprilo',
+        'Majo',
+        'Junio',
+        'Julio',
+        'Aŭgusto',
+        'Septembro',
+        'Oktobro',
+        'Novembro',
+        'Decembro',
+    ],
+    weekdays: 'DLMMJVS',
+    weekStart: 0, // Sunday
 };
 
 export const errors = {

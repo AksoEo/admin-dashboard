@@ -7,7 +7,16 @@ import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 import { codeholders as locale, data as dataLocale } from '../../../locale';
 import { Validator } from '../../../components/form';
-import data, { Required } from '../../../components/data';
+import {
+    ueaCode,
+    date,
+    timestamp,
+    address,
+    country,
+    email,
+    phoneNumber,
+    Required,
+} from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
 import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
@@ -250,7 +259,7 @@ function NameEditor ({ value, item, editing, onChange, noIcon, createHistoryLink
 function CodeEditor ({ value, item, editing, onChange }) {
     if (!value) return null;
     if (!editing) {
-        return <data.ueaCode.renderer value={value.new} value2={value.old} />;
+        return <ueaCode.renderer value={value.new} value2={value.old} />;
     }
 
     const suggestions = UEACode.suggestCodes({
@@ -261,7 +270,7 @@ function CodeEditor ({ value, item, editing, onChange }) {
         nameAbbrev: item.name ? item.name.abbrev : undefined,
     });
 
-    return <data.ueaCode.editor
+    return <ueaCode.editor
         value={value.new}
         onChange={v => onChange({ ...value, new: v })}
         id={item.id}
@@ -518,7 +527,7 @@ const fields = {
     },
     birthdate: {
         component ({ value, editing, onChange, item }) {
-            if (editing) return <data.date.editor value={value} onChange={onChange} />;
+            if (editing) return <date.editor value={value} onChange={onChange} />;
 
             const age = item.age && item.age.now !== null
                 ? locale.fields.ageFormat(item.age.now, item.age.atStartOfYear)
@@ -529,7 +538,7 @@ const fields = {
 
             return (
                 <span class="birth-date">
-                    <data.date.renderer value={value} />
+                    <date.renderer value={value} />
                     {additional}
                 </span>
             );
@@ -545,26 +554,26 @@ const fields = {
         history: true,
     }),
     deathdate: {
-        component: makeDataEditable(data.date),
+        component: makeDataEditable(date),
         history: true,
     },
     creationTime: {
         component ({ value }) {
             if (!value) return null;
-            return <data.timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value * 1000} />;
         },
         shouldHide: (_, editing) => editing,
     },
     address: {
         component ({ value, item, editing, onChange, isHistory }) {
             if (isHistory) {
-                return <data.address.renderer value={value} />;
+                return <address.renderer value={value} />;
             }
 
             if (!editing) {
                 return <CodeholderAddressRenderer id={item.id} />;
             } else {
-                return <data.address.editor
+                return <address.editor
                     value={value}
                     onChange={onChange} />;
             }
@@ -574,10 +583,10 @@ const fields = {
     },
     addressPublicity: makePublicityField((item, editing) => !editing && (!item.address || !Object.values(item.address).filter(x => x).length)),
     feeCountry: {
-        component: makeDataEditable(data.country),
+        component: makeDataEditable(country),
         history: true,
     },
-    email: simpleField(makeDataEditable(data.email), {
+    email: simpleField(makeDataEditable(email), {
         history: true,
     }),
     emailPublicity: makePublicityField((item, editing) => !editing && !item.email),
@@ -604,18 +613,18 @@ const fields = {
     }, {
         history: true,
     }),
-    landlinePhone: simpleField(makeDataEditable(data.phoneNumber), {
+    landlinePhone: simpleField(makeDataEditable(phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
         history: true,
     }),
     landlinePhonePublicity: makePublicityField((item, editing) => item.type !== 'human' || !editing && (!item.landlinePhone || !item.landlinePhone.value)),
-    officePhone: simpleField(makeDataEditable(data.phoneNumber), {
+    officePhone: simpleField(makeDataEditable(phoneNumber), {
         isEmpty: value => !value.value,
         history: true,
     }),
     officePhonePublicity: makePublicityField((item, editing) => !editing && (!item.officePhone || !item.officePhone.value)),
-    cellphone: simpleField(makeDataEditable(data.phoneNumber), {
+    cellphone: simpleField(makeDataEditable(phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
         history: true,
