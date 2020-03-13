@@ -55,7 +55,7 @@ export const data = {
         'Decembro',
     ],
     weekdays: 'DLMMJVS',
-    weekStart: 0, // Sunday
+    weekStart: 1, // Monday
 };
 
 export const errors = {
