@@ -626,7 +626,7 @@ export default {
                 enabled: false,
                 value: {
                     roles: [],
-                    date: moment().format('YYYY-MM-DD')
+                    date: moment().format('YYYY-MM-DD'),
                 },
             };
         },

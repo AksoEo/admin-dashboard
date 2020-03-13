@@ -76,7 +76,7 @@ class DateEditor extends Component {
 
     onInputTextChange = e => {
         this.setState({ inputText: e.target.value });
-        let date = tryParseDate(e.target.value);
+        const date = tryParseDate(e.target.value);
 
         if (date) {
             this.props.onChange(moment(date).format('YYYY-MM-DD'));
@@ -88,7 +88,7 @@ class DateEditor extends Component {
         return value ? moment.utc(value, 'YYYY-MM-DD').toDate() : null;
     }
 
-    update (dt) {
+    update () {
         if (this.textField && this.textField.node) {
             const rect = this.textField.node.getBoundingClientRect();
             if (rect.left !== this.state.popoutX) this.setState({ popoutX: rect.left });
