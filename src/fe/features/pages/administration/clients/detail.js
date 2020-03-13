@@ -144,7 +144,8 @@ export default connectPerms(class ClientDetailPage extends Page {
                     onEditChange={edit => this.setState({ edit })}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
-                    onCommit={this.onCommit} />
+                    onCommit={this.onCommit}
+                    onDelete={() => this.props.pop()} />
             </div>
         );
     }

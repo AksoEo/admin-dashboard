@@ -607,6 +607,7 @@ export const clients = {
     secret: {
         title: 'Sekreta API-ŝlosilo',
         description: 'Tio ĉi estas la sekreta API-ŝlosilo. Konservu ĝin aŭ ĝi estos perdita.',
+        done: 'Fermi',
     },
     search: {
         placeholders: {

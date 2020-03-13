@@ -5,6 +5,7 @@ import ChangedFields from '../../../../components/changed-fields';
 import { Validator } from '../../../../components/form';
 import { clients as locale } from '../../../../locale';
 import { routerContext } from '../../../../router';
+import './tasks.less';
 
 export default {
     create ({ open, core, task }) {
@@ -18,12 +19,8 @@ export default {
                         actionLabel={locale.addButton}
                         run={() => task.runOnce().then(({ id, secret }) => {
                             routerContext.navigate(`/administrado/klientoj/${id}`);
-                            core.createTask('info', {
-                                title: locale.secret.title,
-                                message: [
-                                    locale.secret.description,
-                                    secret,
-                                ].join('\n'),
+                            core.createTask('clients/_createdSecret', {
+                                secret,
                             });
                         })}>
                         <Validator
@@ -55,6 +52,25 @@ export default {
             </routerContext.Consumer>
         );
     },
+    _createdSecret ({ open, task }) {
+        return (
+            <TaskDialog
+                class="admin-client-secret-dialog"
+                open={open}
+                onClose={() => {}} // prevent accidental closing
+                title={locale.secret.title}
+                actionLabel={locale.secret.done}
+                run={() => task.runOnce()}>
+                <p class="secret-api-key-description">
+                    {locale.secret.description}
+                </p>
+                <textarea
+                    readOnly
+                    class="secret-api-key-container"
+                    value={task.options ? task.options.secret : '???'} />
+            </TaskDialog>
+        );
+    },
     update ({ open, task }) {
         return (
             <TaskDialog
@@ -71,20 +87,14 @@ export default {
     },
     delete ({ open, task }) {
         return (
-            <routerContext.Consumer>
-                {routerContext => (
-                    <TaskDialog
-                        open={open}
-                        onClose={() => task.drop()}
-                        title={locale.delete}
-                        actionLabel={locale.deleteButton}
-                        run={() => task.runOnce().then(() => {
-                            routerContext.navigate('/administrado/klientoj');
-                        })}>
-                        {locale.deleteAreYouSure}
-                    </TaskDialog>
-                )}
-            </routerContext.Consumer>
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.delete}
+                actionLabel={locale.deleteButton}
+                run={() => task.runOnce()}>
+                {locale.deleteAreYouSure}
+            </TaskDialog>
         );
     },
 

@@ -20,6 +20,7 @@ export default class DebugPage extends Page {
                 <CodeholderFieldsViewer />
                 <CodeholderFiltersViewer />
                 <RequestRunner />
+                <TaskRunner />
             </div>
         );
     }
@@ -108,4 +109,69 @@ function ReqRunnerInner ({ core }) {
 
 const RequestRunner = makeDialog('run request', () => (
     <coreContext.Consumer>{core => <ReqRunnerInner core={core} />}</coreContext.Consumer>
+));
+
+function TaskRunnerInner ({ core }) {
+    const [task, setTask] = useState('');
+    const [options, setOptions] = useState('{}');
+    const [parameters, setParameters] = useState('{}');
+    const [instance, setInstance] = useState(null);
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState(null);
+
+    const create = () => {
+        setError(null);
+        let ti;
+        try {
+            ti = core.createTask(task, JSON5.parse(options), JSON5.parse(parameters));
+        } catch (err) {
+            setError(err);
+            return;
+        }
+        setInstance(ti);
+        ti.on('drop', () => setInstance(null));
+    };
+    const iRun = () => {
+        instance.runOnce().then(res => {
+            setInstance(null);
+            setError(null);
+            setResult(res);
+        }).catch(err => {
+            setError(err);
+        });
+    };
+    const iDrop = () => instance.drop();
+
+    return (
+        <div>
+            task: <input value={task} onChange={e => setTask(e.target.value)} />
+            <br />
+            options: <textarea value={options} onChange={e => setOptions(e.target.value)} />
+            <br />
+            parameters: <textarea value={parameters} onChange={e => setParameters(e.target.value)} />
+            <br />
+            <button onClick={create}>create</button>
+            <br />
+            {instance ? (
+                <div>
+                    task instance
+                    <br />
+                    options: <ObjectViewer value={instance.options} />
+                    <br />
+                    parameters: <ObjectViewer value={instance.parameters} />
+                    <br />
+                    <button onClick={iRun}>run once</button>
+                    <button onClick={iDrop}>drop</button>
+                </div>
+            ) : null}
+            {result ? 'result' : ''}
+            {result ? <ObjectViewer value={result} /> : null}
+            {error ? 'error' : ''}
+            {error ? <ObjectViewer value={error} /> : null}
+        </div>
+    );
+}
+
+const TaskRunner = makeDialog('create task', () => (
+    <coreContext.Consumer>{core => <TaskRunnerInner core={core} />}</coreContext.Consumer>
 ));

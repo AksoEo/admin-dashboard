@@ -58,7 +58,7 @@ export default class DetailView extends PureComponent {
 
     #onViewUpdate = (data, extra) => {
         if (extra === 'delete') {
-            this.props.onDelete();
+            if (this.props.onDelete) this.props.onDelete();
         }
         this.setState({ data, error: null });
     }

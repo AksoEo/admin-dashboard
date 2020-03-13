@@ -71,6 +71,8 @@ export const tasks = {
             secret: Buffer.from(res.body.apiSecret).toString('hex'),
         };
     },
+    // dummy for UI
+    _createdSecret: async () => {},
 
     /// clients/update: updates a client
     update: async ({ id }, { name, ownerName, ownerEmail }) => {
