@@ -71,6 +71,15 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                     overflow: true,
                 });
             }
+            actions.push({
+                label: locale.resetPassword.create,
+                action: () => this.context.createTask('codeholders/createPassword', { id }, { org: 'akso' }),
+                overflow: true,
+            }, {
+                label: locale.resetPassword.reset,
+                action: () => this.context.createTask('codeholders/resetPassword', { id }, { org: 'akso' }),
+                overflow: true,
+            });
             if (perms.hasPerm('codeholders.delete')) {
                 actions.push({
                     label: locale.delete,

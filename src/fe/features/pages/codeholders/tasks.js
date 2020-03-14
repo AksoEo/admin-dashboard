@@ -358,6 +358,67 @@ export default {
             </TaskDialog>
         );
     },
+
+    createPassword ({ open, core, task }) {
+        return (
+            <TaskDialog
+                class="codeholders-task-reset-password"
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.resetPassword.create}
+                actionLabel={locale.resetPassword.send}
+                running={task.running}
+                run={() => task.runOnce().then(() => {
+                    core.createTask('info', {
+                        message: locale.resetPassword.success,
+                    });
+                })}>
+                <p>
+                    {locale.resetPassword.descriptionCreate}
+                </p>
+                <div class="reset-password-select-org">
+                    <label>
+                        {locale.resetPassword.orgsSelect}
+                    </label>
+                    <Segmented
+                        selected={task.parameters.org}
+                        onSelect={org => task.update({ org })}>
+                        {Object.entries(locale.resetPassword.orgs).map(([k, v]) => ({ id: k, label: v }))}
+                    </Segmented>
+                </div>
+            </TaskDialog>
+        );
+    },
+    resetPassword ({ open, core, task }) {
+        return (
+            <TaskDialog
+                class="codeholders-task-reset-password"
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.resetPassword.reset}
+                actionLabel={locale.resetPassword.send}
+                running={task.running}
+                run={() => task.runOnce().then(() => {
+                    core.createTask('info', {
+                        message: locale.resetPassword.success,
+                    });
+                })}>
+                <p>
+                    {locale.resetPassword.descriptionReset}
+                </p>
+                <div class="reset-password-select-org">
+                    <label>
+                        {locale.resetPassword.orgsSelect}
+                    </label>
+                    <Segmented
+                        selected={task.parameters.org}
+                        onSelect={org => task.update({ org })}>
+                        {Object.entries(locale.resetPassword.orgs).map(([k, v]) => ({ id: k, label: v }))}
+                    </Segmented>
+                </div>
+            </TaskDialog>
+        );
+    },
 };
 
 function makeRoleEditor (type) {

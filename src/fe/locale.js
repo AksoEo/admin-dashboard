@@ -545,6 +545,20 @@ export const codeholders = {
         none: '[[none selected]]',
         search: 'Aldoni laŭ nomo aŭ UEA-kodo',
     },
+    resetPassword: {
+        create: '[[send pw creation email]]',
+        reset: '[[send pw reset email]]',
+        descriptionCreate: '[[this will send an email to this user (if they have an email registered) that will allow them to create their password]]',
+        descriptionReset: '[[this will send an email to this user (if they have an email registered) that will allow them to reset their password]]',
+        orgsSelect: '[[select an org for the email]]',
+        orgs: {
+            uea: 'UEA',
+            tejo: 'TEJO',
+            akso: 'AKSO',
+        },
+        send: '[[send]]',
+        success: '[[email request succeeded with http 2xx. we dont actually know if it sent an email]]',
+    },
 };
 
 export const adminGroups = {

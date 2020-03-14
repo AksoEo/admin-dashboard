@@ -1028,6 +1028,48 @@ export const tasks = {
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };
     },
+    /// codeholders/createPassword: sends a password creation email
+    createPassword: async ({ id }, { org }) => {
+        // first, obtain the user’s uea code
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const existing = store.get([CODEHOLDERS, storeId]);
+
+        let ueaCode;
+        if (existing.code && existing.code.new) ueaCode = existing.code.new;
+        else {
+            // we don’t have it; fetch
+            await tasks.codeholder({}, { id, fields: ['code'] });
+            try {
+                ueaCode = store.get([CODEHOLDERS, storeId]).code.new;
+            } catch {
+                throw new Error('broken invariant: codeholder task must populate data or fail');
+            }
+        }
+
+        const client = await asyncClient;
+        await client.post(`/codeholders/${ueaCode}/!create_password`, { org });
+    },
+    /// codeholders/resetPassword: sends a password reset email
+    resetPassword: async ({ id }, { org }) => {
+        // first, obtain the user’s uea code
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const existing = store.get([CODEHOLDERS, storeId]);
+
+        let ueaCode;
+        if (existing.code && existing.code.new) ueaCode = existing.code.new;
+        else {
+            // we don’t have it; fetch
+            await tasks.codeholder({}, { id, fields: ['code'] });
+            try {
+                ueaCode = store.get([CODEHOLDERS, storeId]).code.new;
+            } catch {
+                throw new Error('broken invariant: codeholder task must populate data or fail');
+            }
+        }
+
+        const client = await asyncClient;
+        await client.post(`/codeholders/${ueaCode}/!forgot_password`, { org });
+    },
 
     codeholderPerms: async ({ id }) => {
         const client = await asyncClient;
