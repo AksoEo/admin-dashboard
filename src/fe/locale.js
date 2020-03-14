@@ -468,6 +468,7 @@ export const codeholders = {
         add: 'Aldoni',
         edit: 'Redakti',
         update: 'Redakti',
+        description: '[[Leave the start or end date blank to make it indefinite.]]',
         durationFrom: 'Valida ekde',
         durationTo: 'Valida ĝis',
         notADate: 'Ne estas valida dato',

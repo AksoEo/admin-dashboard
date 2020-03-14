@@ -35,7 +35,7 @@ export default class Select extends Component {
                     onChange={e => {
                         onChange(e.target.value);
                     }}>
-                    {items.map((item, i) => (
+                    {(items || []).map((item, i) => (
                         <option key={i} value={item.value}>{item.label}</option>
                     ))}
                 </select>
