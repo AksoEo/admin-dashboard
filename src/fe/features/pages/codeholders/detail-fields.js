@@ -680,6 +680,11 @@ const fields = {
         },
         history: true,
     },
+    // for field history only
+    password: {
+        component: () => '••••••••',
+        shouldHide: () => true,
+    },
 };
 
 const Footer = connectPerms(function Footer ({ item, editing, perms }) {

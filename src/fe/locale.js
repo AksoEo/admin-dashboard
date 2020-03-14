@@ -372,6 +372,7 @@ export const codeholders = {
         careOf: 'P/a',
         creationTime: 'Horo de kreiĝo',
         hasPassword: 'Kreis konton',
+        password: 'Pasvorto',
         addressPublicity: 'Publikeco de adreso',
         emailPublicity: 'Publikeco de retpoŝtadreso',
         officePhonePublicity: 'Publikeco de oficeja telefono',

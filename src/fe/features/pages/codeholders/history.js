@@ -57,7 +57,7 @@ export default class History extends Page {
             ? detailFields[this.props.query].component
             : (() => 'eraro');
 
-        const fieldName = locale.fields[this.props.query].toLowerCase();
+        const fieldName = (locale.fields[this.props.query] || '???').toLowerCase();
 
         return (
             <div class="codeholder-field-history">

@@ -72,6 +72,10 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                 });
             }
             actions.push({
+                label: locale.fieldHistory.title(locale.fields.password.toLowerCase()),
+                action: () => this.props.onNavigate(`/membroj/${id}/historio?password`),
+                overflow: true,
+            }, {
                 label: locale.resetPassword.create,
                 action: () => this.context.createTask('codeholders/createPassword', { id }, { org: 'akso' }),
                 overflow: true,

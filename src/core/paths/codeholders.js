@@ -921,9 +921,15 @@ export const tasks = {
     fieldHistory: async ({ id, field }) => {
         const client = await asyncClient;
 
-        const apiFields = typeof clientFields[field] === 'string'
-            ? [clientFields[field]]
-            : clientFields[field].apiFields.filter(x => !isFieldHistoryBlacklisted(x));
+        let apiFields;
+        if (field === 'password') {
+            // special otherwise non-existent field
+            apiFields = ['password'];
+        } else {
+            apiFields = typeof clientFields[field] === 'string'
+                ? [clientFields[field]]
+                : clientFields[field].apiFields.filter(x => !isFieldHistoryBlacklisted(x));
+        }
         let histFields = apiFields;
 
         // special history endpoint
@@ -940,9 +946,14 @@ export const tasks = {
             },
         };
 
-        const currentValues = (await client.get(`/codeholders/${id}`, {
-            fields: apiFields,
-        })).body;
+        let currentValues;
+        if (field === 'password') {
+            currentValues = {};
+        } else {
+            currentValues = (await client.get(`/codeholders/${id}`, {
+                fields: apiFields,
+            })).body;
+        }
 
         for (const fieldId of histFields) {
             let offset = 0;
