@@ -115,9 +115,9 @@ class UEACodeEditor extends Component {
         if (this.state.takenState === 'loading') {
             trailing = <CircularProgress class="taken-state is-loading" small indeterminate />;
         } else if (this.state.takenState === 'available') {
-            trailing = <CheckIcon class="taken-state is-available" />;
+            trailing = <CheckIcon className="taken-state is-available" />;
         } else if (this.state.takenState === 'taken') {
-            trailing = <CloseIcon class="taken-state is-taken" />;
+            trailing = <CloseIcon className="taken-state is-taken" />;
         }
 
         const suggestions = extraProps.suggestionParameters
