@@ -2,7 +2,6 @@ import { h, Component } from 'preact';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
-import { UEACode } from '@tejo/akso-client';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 import { codeholders as locale, data as dataLocale } from '../../../locale';
@@ -256,29 +255,27 @@ function NameEditor ({ value, item, editing, onChange, noIcon, createHistoryLink
     }
 }
 
-function CodeEditor ({ value, item, editing, onChange }) {
+function CodeEditor ({ value, item, originalItem, editing, onChange }) {
     if (!value) return null;
     if (!editing) {
         return <ueaCode.renderer value={value.new} value2={value.old} />;
     }
 
-    const suggestions = UEACode.suggestCodes({
-        type: item.type,
-        firstNames: item.name ? [item.name.firstLegal, item.name.first].filter(x => x) : [],
-        lastNames: item.name ? [item.name.lastLegal, item.name.last].filter(x => x) : [],
-        fullName: item.name ? item.name.full : undefined,
-        nameAbbrev: item.name ? item.name.abbrev : undefined,
-    });
+    // keep own code as a suggestion
+    const keepSuggestions = [];
+    if (originalItem && originalItem.code) keepSuggestions.push(originalItem.code.new);
 
     return <ueaCode.editor
         value={value.new}
         onChange={v => onChange({ ...value, new: v })}
         id={item.id}
-        suggestions={suggestions} />;
+        suggestionParameters={item}
+        keepSuggestions={keepSuggestions} />;
 }
 
 const Header = connectPerms(function Header ({
     item,
+    originalItem,
     editing,
     onItemChange,
     createHistoryLink,
@@ -309,6 +306,7 @@ const Header = connectPerms(function Header ({
                     <CodeEditor
                         value={item.code}
                         item={item}
+                        originalItem={originalItem}
                         editing={editing}
                         onChange={code => onItemChange({ ...item, code })} />
                     {!editing && createHistoryLink('code')}

@@ -51,9 +51,12 @@ export const IdUEACode = connect(
 
 /// Also pass `id` to enable checking if it’s taken.
 /// Also pass an array to `suggestions` to show a list of suggestions.
+/// Alternatively, pass `suggestionParameters` to automatically suggest some codes.
+/// Also pass `keepSuggestions` to keep suggestions from being filtered above in suggestion params.
 class UEACodeEditor extends Component {
     state = {
         takenState: null,
+        suggestions: [],
     };
 
     static contextType = coreContext;
@@ -85,6 +88,20 @@ class UEACodeEditor extends Component {
         });
     }
 
+    updateSuggestions () {
+        if (!this.props.suggestionParameters) return;
+        const task = this.context.createTask('codeholders/codeSuggestions', {
+            keep: this.props.keepSuggestions || [],
+        }, this.props.suggestionParameters);
+        task.runOnceAndDrop().then(items => {
+            this.setState({ suggestions: items });
+        }).catch(console.error); // eslint-disable-line no-console
+    }
+
+    componentDidMount () {
+        this.updateSuggestions();
+    }
+
     componentDidUpdate (prevProps) {
         if (prevProps.value !== this.props.value) this.checkTaken();
     }
@@ -93,7 +110,7 @@ class UEACodeEditor extends Component {
         this.doNotUpdate = true;
     }
 
-    render ({ value, onChange, suggestions, ...extraProps }) {
+    render ({ value, onChange, ...extraProps }) {
         let trailing;
         if (this.state.takenState === 'loading') {
             trailing = <CircularProgress class="taken-state is-loading" small indeterminate />;
@@ -103,6 +120,11 @@ class UEACodeEditor extends Component {
             trailing = <CloseIcon class="taken-state is-taken" />;
         }
 
+        const suggestions = extraProps.suggestionParameters
+            ? this.state.suggestions
+            : extraProps.suggestions;
+        delete extraProps.suggestionParameters;
+        delete extraProps.suggestions;
         const className = 'data uea-code-editor' + (extraProps.class ? ' ' + extraProps.class : '');
         delete extraProps.class;
 
@@ -115,6 +137,7 @@ class UEACodeEditor extends Component {
             maxLength={6}
             placeholder="xxxxxx"
             label={locale.ueaCode.newCode}
+            onFocus={() => this.updateSuggestions()}
             validate={() => {
                 try {
                     const code = new AKSOUEACode(value);

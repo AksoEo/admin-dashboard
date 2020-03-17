@@ -48,13 +48,15 @@ export default function SuggestionField ({
         }
     });
 
-    const onFocus = () => {
+    const onFocus = (e) => {
         setFocused(true);
+        if (extraProps.onFocus) extraProps.onFocus(e);
     };
 
-    const onBlur = () => {
+    const onBlur = (e) => {
         setFocused(false);
         setHighlight(minHighlight);
+        if (extraProps.onBlur) extraProps.onBlur(e);
     };
 
     const onKeyDown = e => {
@@ -90,12 +92,12 @@ export default function SuggestionField ({
     };
 
     return <SuggestionFieldRender textFieldProps={{
+        ...extraProps,
         value,
         onChange: e => onChange(e.target.value),
         onFocus,
         onBlur,
         onKeyDown,
-        ...extraProps,
     }} showPopout={isFocused} popoutContents={suggestions.map((suggestion, index) => (
         <Button
             class={'suggestion' + (index === highlight ? ' is-highlighted' : '')}

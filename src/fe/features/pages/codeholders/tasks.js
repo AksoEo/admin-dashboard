@@ -58,17 +58,6 @@ export default {
             });
         };
 
-        const codeSuggestions = [];
-        if (task.parameters.name) {
-            codeSuggestions.push(...UEACode.suggestCodes({
-                type: task.parameters.type,
-                firstNames: [task.parameters.name.firstLegal, task.parameters.name.first],
-                lastNames: [task.parameters.name.lastLegal, task.parameters.name.last],
-                fullName: task.parameters.name.full,
-                nameAbbrev: task.parameters.name.abbrev,
-            }));
-        }
-
         return (
             <Dialog
                 backdrop
@@ -116,7 +105,7 @@ export default {
                             class="form-field text-field"
                             outline
                             value={(task.parameters.code || {}).new}
-                            suggestions={codeSuggestions}
+                            suggestionParameters={task.parameters}
                             onChange={newCode => task.update({ code: { new: newCode } })}
                             disabled={task.running}
                             id={-1} // pass nonsense id to just check if it’s taken

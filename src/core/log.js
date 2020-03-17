@@ -16,6 +16,9 @@ export function any (f, ...args) {
 export function debug (...args) {
     any('debug', ...args);
 }
+export function warn (...args) {
+    any('warn', ...args);
+}
 export function error (...args) {
     any('error', ...args);
 }

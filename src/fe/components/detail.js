@@ -103,6 +103,7 @@ export default class DetailView extends PureComponent {
             const fieldProps = {
                 editing,
                 item: itemData,
+                originalItem: this.state.data,
                 onItemChange: item => this.props.onEditChange(item),
                 userData,
             };

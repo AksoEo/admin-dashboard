@@ -1142,6 +1142,36 @@ export const tasks = {
             store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions: null }));
         }
     },
+
+    codeSuggestions: async ({ keep }, parameters) => {
+        const client = await asyncClient;
+
+        const codeSuggestions = [];
+        if (parameters.name) {
+            codeSuggestions.push(...UEACode.suggestCodes({
+                type: parameters.type,
+                firstNames: [parameters.name.firstLegal, parameters.name.first],
+                lastNames: [parameters.name.lastLegal, parameters.name.last],
+                fullName: parameters.name.full,
+                nameAbbrev: parameters.name.abbrev,
+            }));
+        }
+
+        if (!codeSuggestions.length) return codeSuggestions;
+
+        try {
+            const res = await client.get('/codeholders/codes_available', {
+                codes: codeSuggestions.join(','),
+            });
+            return codeSuggestions.filter(x => {
+                if (keep && keep.includes(x)) return true;
+                return res.body[x].available;
+            });
+        } catch (err) {
+            log.warn(`Failed to fetch available codes (${err}); returning whole list`);
+            return codeSuggestions;
+        }
+    },
 };
 
 const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms
