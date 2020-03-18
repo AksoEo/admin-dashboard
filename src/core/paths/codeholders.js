@@ -893,7 +893,21 @@ export const tasks = {
         delete options.fields;
         delete options.offset;
         delete options.limit;
-        await client.post('/codeholders/!make_address_labels', parameters, options);
+
+        const roundParams = (p) => {
+            if (Array.isArray(p)) {
+                return p.map(roundParams);
+            } else if (typeof p === 'object') {
+                const newP = {};
+                for (const k in p) {
+                    newP[k] = roundParams(p[k]);
+                }
+                return newP;
+            } else if (typeof p === 'number') return Math.round(p);
+            return p;
+        };
+
+        await client.post('/codeholders/!make_address_labels', roundParams(parameters), options);
     },
     /// codeholders/address: gets a codeholder’s formatted address
     ///

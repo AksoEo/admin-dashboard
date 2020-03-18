@@ -126,8 +126,10 @@ export const makeParametersToRequestData = ({
 
     if (params.jsonFilter && !params.jsonFilter._disabled) {
         if (params.jsonFilter.error) throw params.jsonFilter.error;
-        if (options.filter) options.filter.$and.push(params.jsonFilter.filter);
-        else options.filter = params.jsonFilter.filter;
+        if (options.filter) {
+            if (options.filter.$and) options.filter.$and.push(params.jsonFilter.filter);
+            else options.filter = { $and: [options.filter, params.jsonFilter.filter] };
+        } else options.filter = params.jsonFilter.filter;
     }
     const usedFilters = 'filter' in options && !!Object.keys(options.filter).length;
 

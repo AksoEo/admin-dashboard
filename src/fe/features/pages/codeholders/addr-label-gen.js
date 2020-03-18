@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { useState, Fragment, PureComponent } from 'preact/compat';
 import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from '@cpsdqs/yamdl';
 import Select from '../../../components/select';
+import Segmented from '../../../components/segmented';
 import { CardStackItem } from '../../../components/card-stack';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
@@ -74,6 +75,9 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
         fontSize: 12,
         drawOutline: false,
     });
+    const [view, setView] = useState({
+        unit: 'pt',
+    });
     const [isLoading, setLoading] = useState(false);
     const [resultOpen, setResultOpen] = useState(false);
 
@@ -95,7 +99,11 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
             </div> : null}
             <div class="addr-label-gen-inner">
                 <GenPreview value={settings} options={options} />
-                <GenSettings value={settings} onChange={setSettings} />
+                <GenSettings
+                    value={settings}
+                    onChange={setSettings}
+                    view={view}
+                    onViewChange={setView} />
             </div>
             <footer class="addr-label-gen-footer">
                 <span class="phantom" />
@@ -122,10 +130,11 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
 /* eslint-disable react/display-name */
 
 const ValCheckbox = ({ value, onChange }) => <Checkbox checked={value} onChange={onChange} />;
-const boundedInteger = (min, max, unit) => ({ value, onChange }) =>
+const boundedNumber = (min, max, step, unit) => ({ value, onChange }) =>
     <TextField
         type="number"
-        step="1"
+        class={unit === 'mm' ? 'is-mm' : ''}
+        step={step}
         trailing={unit}
         min={min}
         max={max}
@@ -136,7 +145,38 @@ const boundedInteger = (min, max, unit) => ({ value, onChange }) =>
             if (bounded !== value) onChange(bounded);
         })} />;
 
-const U16PtEditor = boundedInteger(0, 65535, 'pt');
+function UnitSwitch ({ value, onChange }) {
+    return (
+        <div class="unit-switch">
+            <Segmented
+                selected={value.unit}
+                onSelect={unit => onChange({ ...value, unit })}>
+                {[
+                    { id: 'pt', label: 'pt' },
+                    { id: 'mm', label: 'mm' },
+                ]}
+            </Segmented>
+        </div>
+    );
+}
+
+const U16PtEditorRaw = boundedNumber(0, 65535, 1, 'pt');
+const ptToIn = pt => pt / 72;
+const ptFromIn = i => i * 72;
+const ptToMm = pt => ptToIn(pt) * 25.4;
+const ptFromMm = mm => ptFromIn(mm / 25.4);
+const U16MmEditorRaw = boundedNumber(ptToMm(0), ptToMm(65535), 1e-15, 'mm');
+
+function U16PtEditor ({ value, onChange, view }) {
+    if (view.unit === 'pt') return <U16PtEditorRaw value={Math.round(value)} onChange={onChange} />;
+    else if (view.unit === 'mm') {
+        const projectedValue = ptToMm(value);
+        const projectedOnChange = v => onChange(ptFromMm(v));
+        return <U16MmEditorRaw value={projectedValue} onChange={projectedOnChange} />;
+    }
+    return '??';
+}
+
 const SETTINGS = {
     language: ({ value, onChange }) => (
         <Select
@@ -154,39 +194,52 @@ const SETTINGS = {
             items={Object.entries(locale.addrLabelGen.paperSizes)
                 .map(([id, label]) => ({ value: id, label }))} />
     ),
+    _unitSwitch: UnitSwitch,
     margins: MarginsEditor,
-    cols: boundedInteger(1, 20),
-    rows: boundedInteger(1, 50),
+    cols: boundedNumber(1, 20, 1),
+    rows: boundedNumber(1, 50, 1),
     colGap: U16PtEditor,
     rowGap: U16PtEditor,
     cellPadding: U16PtEditor,
-    fontSize: boundedInteger(8, 30, 'pt'),
+    fontSize: boundedNumber(8, 30, 1, 'pt'),
     drawOutline: ValCheckbox,
 };
 
-function GenSettings ({ value, onChange }) {
-    const items = Object.entries(SETTINGS).map(([id, Editor]) => (
-        <div class="settings-item" key={id} data-id={id}>
-            <label class="item-label">{locale.addrLabelGen.labels[id]}</label>
-            <Editor value={value[id]} onChange={v => onChange({ ...value, [id]: v })} />
-        </div>
-    ));
+function GenSettings ({ value, onChange, view, onViewChange }) {
+    const items = Object.entries(SETTINGS).map(([id, Editor]) => {
+        if (id.startsWith('_')) {
+            return (
+                <div class="settings-item" key={id} data-id={id}>
+                    <Editor value={view} onChange={onViewChange} />
+                </div>
+            );
+        }
+        return (
+            <div class="settings-item" key={id} data-id={id}>
+                <label class="item-label">{locale.addrLabelGen.labels[id]}</label>
+                <Editor
+                    value={value[id]}
+                    onChange={v => onChange({ ...value, [id]: v })}
+                    view={view} />
+            </div>
+        );
+    });
 
     return <div class="gen-settings">{items}</div>;
 }
 
-function MarginsEditor ({ value, onChange }) {
+function MarginsEditor ({ value, onChange, view }) {
     return (
         <div class="margins">
             <div class="margins-line">
-                <U16PtEditor value={value.top} onChange={v => onChange({ ...value, top: v })} />
+                <U16PtEditor value={value.top} onChange={v => onChange({ ...value, top: v })} view={view} />
             </div>
             <div class="margins-line is-line-two">
-                <U16PtEditor value={value.left} onChange={v => onChange({ ...value, left: v })} />
-                <U16PtEditor value={value.right} onChange={v => onChange({ ...value, right: v })} />
+                <U16PtEditor value={value.left} onChange={v => onChange({ ...value, left: v })} view={view} />
+                <U16PtEditor value={value.right} onChange={v => onChange({ ...value, right: v })} view={view} />
             </div>
             <div class="margins-line">
-                <U16PtEditor value={value.bottom} onChange={v => onChange({ ...value, bottom: v })} />
+                <U16PtEditor value={value.bottom} onChange={v => onChange({ ...value, bottom: v })} view={view} />
             </div>
         </div>
     );
