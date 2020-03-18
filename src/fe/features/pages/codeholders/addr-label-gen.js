@@ -298,7 +298,12 @@ function GenPreview ({ value, options }) {
                     fill="none" />
             );
 
-            const lines = [4, 9, 7, 4, 5];
+            const lines = [[4, 1], [9, 0], [7, 0], [4, 0], [5, 0]];
+
+            if (!value.includeCode) {
+                lines.shift(); // remove first line
+            }
+
             const lineHeight = value.fontSize;
             const lineSpacing = Math.max(-lineHeight, Math.min(
                 lineHeight / 2,
@@ -307,13 +312,21 @@ function GenPreview ({ value, options }) {
             ));
 
             let dy = 0;
-            for (const lineLength of lines) {
+            for (const [lineLength, lineAlignment] of lines) {
+                let x;
+                const width = Math.min(itemWidth - 2 * value.cellPadding, lineHeight * lineLength);
+                if (lineAlignment === 0) {
+                    x = posX + value.cellPadding;
+                } else {
+                    x = posX + itemWidth - value.cellPadding - width;
+                }
+
                 items.push(
                     <rect
                         key={key + 'rl' + dy}
-                        x={posX + value.cellPadding}
+                        x={x}
                         y={posY + value.cellPadding + dy * (lineSpacing + lineHeight)}
-                        width={Math.min(itemWidth - 2 * value.cellPadding, lineHeight * lineLength)}
+                        width={width}
                         height={lineHeight}
                         fill="#000"
                         rx={lineHeight / 2} />
