@@ -293,8 +293,8 @@ function GenPreview ({ value, options }) {
                     width={itemWidth - 2 * value.cellPadding}
                     height={itemHeight - 2 * value.cellPadding}
                     stroke-width="3" // eslint-disable-line react/no-unknown-property
-                    stroke-dasharray="10" // eslint-disable-line react/no-unknown-property
-                    stroke="#999"
+                    stroke-dasharray={value.drawOutline ? null : '10'} // eslint-disable-line react/no-unknown-property
+                    stroke={value.drawOutline ? '#000' : '#999'}
                     fill="none" />
             );
 
