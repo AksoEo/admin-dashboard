@@ -607,7 +607,16 @@ const fields = {
                 </a>
             );
         }
-        return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+        return <TextField
+            value={value}
+            onChange={e => onChange(e.target.value || null)}
+            maxLength={50}
+            onBlur={() => {
+                // prepend protocol if it’s missing
+                if (value && !value.includes('://')) {
+                    onChange('https://' + value);
+                }
+            }} />;
     }, {
         history: true,
     }),
