@@ -17,6 +17,11 @@ import './overview-list.less';
 const DEBOUNCE_TIME = 400; // ms
 const DEFAULT_LIMITS = [10, 20, 50, 100];
 
+function scrollToNode (node) {
+    if (!node) return;
+    node.scrollIntoView && node.scrollIntoView({ behavior: 'smooth' });
+}
+
 /// Renders an overview list over the items given by the specified task.
 ///
 /// # Props
@@ -49,6 +54,8 @@ export default class OverviewList extends PureComponent {
         error: null,
         /// current result
         result: null,
+        /// if true, will animate in backwards
+        animateBackwards: false,
     };
 
     /// whether the current data is stale (in relation to the options/parameters)
@@ -63,6 +70,16 @@ export default class OverviewList extends PureComponent {
     /// last time a page change button was pressed
     #lastPageChangeTime = 0;
 
+    /// If true, will animate backwards and subsequently set this to false.
+    #nextLoadIsBackwards = false;
+
+    // node to scroll to on next load
+    #scrollToNodeOnLoad = null;
+
+    #listMetaNode = null;
+    #compactPrevPageButton = null;
+    #compactNextPageButton = null;
+
     load () {
         if (this.#currentTask) this.#currentTask.drop();
         const { task, options, parameters } = this.props;
@@ -70,16 +87,30 @@ export default class OverviewList extends PureComponent {
         const t = this.#currentTask = this.context.createTask(task, options || {}, parameters);
         this.#currentTask.runOnceAndDrop().then(result => {
             if (this.#currentTask !== t) return;
-            this.setState({ result, error: null, stale: false, loading: false });
+            this.setState({
+                result,
+                error: null,
+                stale: false,
+                loading: false,
+                animateBackwards: this.#nextLoadIsBackwards,
+            });
             if (this.props.onResult) this.props.onResult(result);
+
+            if (this.#scrollToNodeOnLoad) {
+                scrollToNode(this.#scrollToNodeOnLoad);
+                this.#scrollToNodeOnLoad = null;
+            }
 
             if (this.props.parameters.offset >= result.total && result.total !== 0) {
                 // we’re out of bounds; adjust
                 const limit = this.props.parameters.limit;
                 this.props.onSetOffset(Math.floor(result.total / limit) * limit);
+            } else {
+                this.#nextLoadIsBackwards = false;
             }
         }).catch(error => {
             if (this.#currentTask !== t) return;
+            this.#nextLoadIsBackwards = false;
             console.error(error); // eslint-disable-line no-console
             this.setState({ result: null, error, stale: false, loading: false });
         });
@@ -140,6 +171,8 @@ export default class OverviewList extends PureComponent {
 
         if (prevProps.expanded && !this.props.expanded) {
             this.#lastCollapseTime = Date.now();
+            this.#nextLoadIsBackwards = false;
+            this.setState({ animateBackwards: false });
         }
 
         if (!deepEq(prevProps.updateView, this.props.updateView)) {
@@ -154,16 +187,25 @@ export default class OverviewList extends PureComponent {
         this.unbindUpdates();
     }
 
-    onPrevPageClick = () => {
+    onPrevPageClick = e => {
+        const isCompact = e.currentTarget.classList.contains('compact-page-button');
         const { parameters } = this.props;
         this.#skipNextDebounce = true;
+        this.#nextLoadIsBackwards = true;
         this.props.onSetOffset(
             Math.max(0, Math.floor(parameters.offset / parameters.limit) - 1) * parameters.limit,
         );
         this.#lastPageChangeTime = Date.now();
+
+        if (isCompact) {
+            this.#scrollToNodeOnLoad = this.#compactNextPageButton.button;
+        } else {
+            this.#scrollToNodeOnLoad = this.#listMetaNode;
+        }
     };
 
-    onNextPageClick = () => {
+    onNextPageClick = e => {
+        const isCompact = e.currentTarget.classList.contains('compact-page-button');
         const { parameters } = this.props;
         const { result } = this.state;
         if (!result) return;
@@ -174,6 +216,12 @@ export default class OverviewList extends PureComponent {
             Math.floor(parameters.offset / parameters.limit) + 1
         ) * parameters.limit);
         this.#lastPageChangeTime = Date.now();
+
+        if (isCompact) {
+            this.#scrollToNodeOnLoad = this.#compactPrevPageButton.button;
+        } else {
+            this.#scrollToNodeOnLoad = this.#listMetaNode;
+        }
     };
 
     render ({
@@ -185,7 +233,7 @@ export default class OverviewList extends PureComponent {
         view,
         notice,
         selection,
-    }, { error, result, stale, loading }) {
+    }, { error, result, stale, loading, animateBackwards }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
         if (selection) className += ' is-selectable';
@@ -261,7 +309,9 @@ export default class OverviewList extends PureComponent {
                 selectedFields={compiledFields}
                 fields={fields}
                 onGetItemLink={onGetItemLink}
-                index={i}
+                index={animateBackwards ? result.items.length - i - 1 : i}
+                animateBackwards={animateBackwards}
+                skipAnimation={result.items.length > 100 && i > 30}
                 selection={selection}
                 expanded={expanded}
                 lastCollapseTime={this.#lastCollapseTime}
@@ -270,19 +320,27 @@ export default class OverviewList extends PureComponent {
 
         return (
             <div class={className}>
-                <header class="list-meta">
+                <header class="list-meta" ref={node => this.#listMetaNode = node}>
                     <span>{stats}</span>
                     <CircularProgress class="loading-indicator" indeterminate={loading} small />
                 </header>
                 {notice ? <div class="list-notice">{notice}</div> : null}
-                <Button class="compact-page-button prev-page-button" onClick={this.onPrevPageClick} disabled={prevDisabled}>
+                <Button
+                    class="compact-page-button prev-page-button"
+                    onClick={this.onPrevPageClick}
+                    disabled={prevDisabled}
+                    ref={node => this.#compactPrevPageButton = node}>
                     <ArrowUpIcon />
                     <div class="page-button-label">{locale.prevPage}</div>
                 </Button>
                 <DynamicHeightDiv class="list-contents" lastPageChangeTime={this.#lastPageChangeTime}>
                     {contents}
                 </DynamicHeightDiv>
-                <Button class="compact-page-button next-page-button" onClick={this.onNextPageClick} disabled={nextDisabled}>
+                <Button
+                    class="compact-page-button next-page-button"
+                    onClick={this.onNextPageClick}
+                    disabled={nextDisabled}
+                    ref={node => this.#compactNextPageButton = node}>
                     <div class="page-button-label">{locale.nextPage}</div>
                     <ArrowDownIcon />
                 </Button>
@@ -463,10 +521,16 @@ const ListItem = connect(props => ([props.view, {
         this.#inTime += dt;
         this.#yOffset.update(dt);
 
+        if (this.props.skipAnimation) {
+            this.#yOffset.finish();
+            this.#inTime = 5;
+        }
+
         if (!this.#yOffset.wantsUpdate() && this.#inTime >= 5) {
             this.#inTime = 5;
             globalAnimator.deregister(this);
         }
+
         this.forceUpdate();
     }
 
@@ -480,6 +544,7 @@ const ListItem = connect(props => ([props.view, {
         locale,
         cursed,
         selection,
+        animateBackwards,
     }) {
         if (!data) return null;
 
@@ -515,12 +580,13 @@ const ListItem = connect(props => ([props.view, {
 
         const style = lineLayout(fields, selectedFields, selection);
 
+        const animScale = animateBackwards ? -1 : 1;
         const constOffset = this.#inTime === 5 ? 0 : 15 * Math.exp(-10 * this.#inTime);
         const spreadFactor = this.#inTime === 5 ? 0 : 4 * Math.exp(-10 * this.#inTime);
         const yOffset = this.#yOffset.value;
 
         Object.assign(style, {
-            transform: `translateY(${(constOffset + spreadFactor * index) * 10 + yOffset}px)`,
+            transform: `translateY(${animScale * (constOffset + spreadFactor * index) * 10 + yOffset}px)`,
             opacity: Math.max(0, Math.min(1 - spreadFactor * index / 2, 1)),
         });
 

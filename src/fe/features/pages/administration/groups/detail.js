@@ -213,7 +213,7 @@ function Header ({ item, userData, editing }) {
     if (editing) return null;
     return (
         <div class="group-header">
-            <div class="group-title">{item.name}</div>
+            <h1 class="group-title">{item.name}</h1>
             <div class="group-description">{item.description}</div>
             <LinkButton class="edit-perms-button" target={userData.permsTarget}>
                 {locale.editPerms}
