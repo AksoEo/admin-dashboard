@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { useState } from 'preact/compat';
 import { Checkbox } from '@cpsdqs/yamdl';
 import {
     spec,
@@ -7,7 +8,9 @@ import {
     memberFieldsRead,
     memberFieldsWrite,
 } from '../../../../permissions';
+import { data as locale } from '../../../../locale';
 import JSONFilterEditor from '../../../../components/json-filter-editor';
+import DisclosureArrow from '../../../../components/disclosure-arrow';
 import { read, add, remove, hasField, addField, removeField } from './solver';
 import './style';
 
@@ -88,6 +91,9 @@ export default class PermsEditor extends Component {
 
         return (
             <div class="perms-editor" ref={node => this.#node = node}>
+                <p>
+                    {locale.permsEditorNote}
+                </p>
                 {spec.map((x, i) => <PermsItem item={x} key={i} ctx={ctx} />)}
                 {unknownPerms}
             </div>
@@ -105,10 +111,25 @@ function PermsItem ({ item, ctx, disabled }) {
             }
         }
     }
-    if (item.type === 'category' || item.type === 'group') {
-        const className = item.type === 'category' ? 'perms-category' : 'perms-group';
+    if (item.type === 'category') {
+        const [expanded, setExpanded] = useState(true);
+
         return (
-            <div class={className}>
+            <div class={'perms-category' + (expanded ? ' is-expanded' : '')}>
+                <button class="category-title" onClick={() => setExpanded(!expanded)}>
+                    <DisclosureArrow dir={expanded ? 'up' : 'down'} />
+                    <span class="category-title-inner">{item.name}</span>
+                </button>
+                {expanded ? (
+                    <div class="perms-category-contents">
+                        {item.children.map((x, i) => <PermsItem key={i} item={x} ctx={ctx} disabled={disabled} />)}
+                    </div>
+                ) : null}
+            </div>
+        );
+    } else if (item.type === 'group') {
+        return (
+            <div class="perms-group">
                 {item.name ? <div class="group-title">{item.name}</div> : null}
                 {item.children.map((x, i) => <PermsItem key={i} item={x} ctx={ctx} disabled={disabled} />)}
             </div>

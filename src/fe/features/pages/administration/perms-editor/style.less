@@ -4,27 +4,71 @@
     position: relative;
     padding: 24px;
 
-    .perms-category, .perms-group {
-        margin-bottom: 16px;
-
-        .group-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        &.perms-category {
-            & > .group-title {
-                font-size: 1.2em;
-                border-bottom: 1px solid @text-fade-40;
-            }
-        }
-    }
-
     .perms-item {
         background: @card1-background;
         padding: 16px;
         border-radius: 8px;
         .elevation(4);
         margin-bottom: 16px;
+    }
+
+    .perms-category {
+        margin-bottom: 16px;
+        padding: 16px;
+        background: @card1-background;
+        border-radius: 8px;
+        .elevation(4);
+
+        .category-title {
+            display: block;
+            width: 100%;
+            background: none;
+            text-align: left;
+            padding: 0;
+            margin: 0;
+            border: none;
+            font: inherit;
+            color: inherit;
+            font-size: 1.4em;
+            font-weight: bold;
+
+            &:focus {
+                outline: none;
+                color: @secondary;
+            }
+            &::-moz-focus-inner {
+                border: 0;
+            }
+        }
+
+        .perms-category-contents {
+            animation: admin-perms-category-contents-in 0.3s @easing;
+
+            @keyframes admin-perms-category-contents-in {
+                0% {
+                    transform: translateY(-8px);
+                    opacity: 0;
+                }
+            }
+        }
+
+        &.is-expanded .category-title {
+            margin-bottom: 16px;
+        }
+
+        .perms-item {
+            background: @card2-background;
+            box-shadow: none;
+        }
+    }
+
+    .perms-group {
+        margin-bottom: 16px;
+
+        .group-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
     }
 
     .perm-checkbox {
