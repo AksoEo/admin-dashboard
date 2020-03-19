@@ -8,7 +8,7 @@ import LanguageIcon from '@material-ui/icons/Language';
 import fuzzaldrin from 'fuzzaldrin';
 import { WithCountries, CountryFlag } from './data/country';
 import MulticolList from './multicol-list';
-import locale from '../locale';
+import { data as locale } from '../locale';
 import './country-picker.less';
 
 const LI_HEIGHT = 48;
@@ -150,7 +150,7 @@ class CountryPickerInnerComponent extends PureComponent {
                         ? pickedCountries
                         : (
                             <span class="countries-placeholder">
-                                {locale.members.search.countries.placeholder}
+                                {locale.countryPicker.placeholder}
                             </span>
                         )
                     }
@@ -164,7 +164,7 @@ class CountryPickerInnerComponent extends PureComponent {
                     onClose={() => this.setState({ dialogOpen: false })}
                     class="country-picker-dialog"
                     open={this.state.dialogOpen}
-                    title={locale.members.search.countries.dialogTitle}
+                    title={locale.countryPicker.dialogTitle}
                     appBarProps={{
                         actions: [
                             {
@@ -177,7 +177,7 @@ class CountryPickerInnerComponent extends PureComponent {
                                         value={this.state.search}
                                         onChange={e => this.setState({ search: e.target.value })}
                                         ref={node => this.searchBox = node}
-                                        placeholder={locale.members.search.countries.search} />
+                                        placeholder={locale.countryPicker.search} />
                                 </div>,
                             },
                         ],
@@ -190,10 +190,10 @@ class CountryPickerInnerComponent extends PureComponent {
                     </MulticolList>
                     <div class="selection-controls">
                         <Button onClick={this.selectAll} class="selection-button">
-                            {locale.members.search.countries.selectAll}
+                            {locale.countryPicker.selectAll}
                         </Button>
                         <Button onClick={this.deselectAll} class="selection-button">
-                            {locale.members.search.countries.deselectAll}
+                            {locale.countryPicker.deselectAll}
                         </Button>
                     </div>
                 </Dialog>

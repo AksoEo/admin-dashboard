@@ -6,7 +6,7 @@ import AddIcon from '@material-ui/icons/Add';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Page from '../../../components/page';
 import DataList from '../../../components/data-list';
-import data from '../../../components/data';
+import { date } from '../../../components/data';
 import TinyProgress from '../../../components/tiny-progress';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
@@ -207,9 +207,9 @@ export const RolesPage = makePage(
                 {item.role.name}
             </div>
             <div class="item-desc">
-                <data.date.inlineRenderer value={item.durationFrom * 1000} />
+                <date.inlineRenderer value={item.durationFrom * 1000} />
                 {'–'}
-                <data.date.inlineRenderer value={item.durationTo * 1000} />
+                <date.inlineRenderer value={item.durationTo * 1000} />
             </div>
         </div>
     ),

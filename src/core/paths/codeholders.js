@@ -410,7 +410,7 @@ const clientFilters = {
 
             return {
                 $roles: {
-                    roleId: { $in: roles },
+                    roleId: { $in: roles.map(id => +id) },
                     ...dateFilter,
                 },
             };

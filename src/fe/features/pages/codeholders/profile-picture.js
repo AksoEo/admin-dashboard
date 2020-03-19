@@ -4,7 +4,7 @@ import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { coreContext } from '../../../core/connection';
 import ProfilePicture from '../../../components/profile-picture';
 import pickFile from '../../../components/pick-file';
-import locale from '../../../locale';
+import { codeholders as locale } from '../../../locale';
 
 // TODO: use core task view
 
@@ -47,7 +47,7 @@ export default class ProfilePictureEditor extends Component {
                     backdrop
                     open={this.state.uploading}
                     onClose={() => {}}
-                    title={locale.members.detail.cropProfilePicture}>
+                    title={locale.profilePicture.crop}>
                     <FileCropDialog
                         id={this.props.id}
                         url={this.state.croppingFile}
@@ -369,10 +369,10 @@ class FileCropDialog extends Component {
                 {!this.state.uploading && (
                     <div class="accept-reject-region">
                         <Button onClick={this.props.onCancel}>
-                            {locale.members.detail.cancelProfilePicture}
+                            {locale.profilePicture.cancel}
                         </Button>
                         <Button onClick={this.upload}>
-                            {locale.members.detail.setProfilePicture}
+                            {locale.profilePicture.set}
                         </Button>
                     </div>
                 )}

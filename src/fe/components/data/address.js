@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import { getValidationRules } from '@cpsdqs/google-i18n-address';
 import Select from '../select';
-import locale from '../../locale';
+import { data as locale } from '../../locale';
 import { Validator } from '../form';
 import countryField, { WithCountries } from './country';
 import Required from './required';
@@ -97,7 +97,7 @@ class AddressEditor extends Component {
                 <Validator
                     component={Select}
                     validate={value => {
-                        if (country && !value) throw { error: locale.data.requiredField };
+                        if (country && !value) throw { error: locale.requiredField };
                     }}
                     class="address-editor-line"
                     key="countryArea"
@@ -116,15 +116,15 @@ class AddressEditor extends Component {
             items.push(<Validator
                 component={TextField}
                 validate={value => {
-                    if (country && !value && isRequired) throw { error: locale.data.requiredField };
+                    if (country && !value && isRequired) throw { error: locale.requiredField };
                 }}
                 class="address-editor-line"
                 key={k}
                 value={value[k]}
                 maxLength={maxLengthMap[k]}
                 label={isRequired
-                    ? <Required>{locale.data.addressFields[k]}</Required>
-                    : locale.data.addressFields[k]}
+                    ? <Required>{locale.addressFields[k]}</Required>
+                    : locale.addressFields[k]}
                 onChange={onChangeField(k, e => e.target.value || null)} />);
         }
 

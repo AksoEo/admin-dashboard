@@ -32,6 +32,15 @@ export const data = {
     retry: 'Reprovi',
     showMore: 'Montri pliajn',
     objViewerArrayItems: items => `${items} ero${items === 1 ? '' : 'j'}`,
+    addressFields: {
+        country: 'Lando',
+        countryArea: 'Regiono',
+        city: 'Urbo',
+        cityArea: 'Urboparto',
+        streetAddress: 'Stratadreso',
+        postalCode: 'Poŝtkodo',
+        sortingCode: 'Ordigkodo',
+    },
     ueaCode: {
         newCode: 'Seslitera UEA-kodo',
         invalidUEACode: 'Nevalida seslitera UEA-kodo',
@@ -54,6 +63,20 @@ export const data = {
         'Novembro',
         'Decembro',
     ],
+    countryPicker: {
+        // section labels in <select>
+        countryGroups: 'Landaroj',
+        countries: 'Landoj',
+        // types
+        all: 'ne gravas',
+        fee: 'paglando',
+        address: 'loĝlando',
+        dialogTitle: 'Elekti land(ar)ojn',
+        placeholder: 'Elekti land(ar)ojn',
+        search: 'Serĉi land(ar)ojn',
+        selectAll: 'Elekti ĉiujn',
+        deselectAll: 'Malelekti ĉiujn',
+    },
     weekdays: 'DLMMJVS',
     weekStart: 1, // Monday
 };
@@ -218,6 +241,15 @@ export const search = {
     savedFilterName: 'Nomo',
     savedFilterDesc: 'Priskribo',
     csvExport: 'Elporti kiel CSV',
+    sorting: {
+        none: 'ne ordigata',
+        asc: 'kreskanta',
+        desc: 'malkreskanta',
+    },
+    fieldPicker: {
+        title: 'Montrotaj kampoj',
+        searchPlaceholder: 'Serĉi kampon',
+    },
 };
 
 export const detail = {
@@ -339,10 +371,13 @@ export const codeholders = {
             human: 'Homo',
             org: 'Organizo',
         },
+        disabledTitle: 'malŝaltita',
+        deadTitle: 'mortinta',
         name: 'Nomo',
         code: 'UEA-kodo',
         country: 'Lando',
         disjunctCountry: (fee, country) => `Pagas laŭ ${fee}, loĝas en ${country}`,
+        disjunctCountryCSV: (fee, country) => `Pago: ${fee}, Loĝo: ${country}`,
         age: 'Aĝo',
         ageFormat: (age, agep) => `${age} (${agep} jarkomence)`,
         email: 'Retpoŝtadreso',
@@ -435,6 +470,11 @@ export const codeholders = {
             zh: '中文',
             de: 'Deutsch',
         },
+    },
+    profilePicture: {
+        crop: 'Tondi profilfoton',
+        cancel: 'Nuligi',
+        set: 'Alŝuti',
     },
     create: 'Aldoni membron',
     createNoName: 'Nomo estas deviga',

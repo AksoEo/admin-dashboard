@@ -5,7 +5,7 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
 import RearrangingList from './rearranging-list';
-import locale from '../locale';
+import { search as locale } from '../locale';
 import './field-picker.less';
 
 /// Width below which the field picker will be a full-screen modal.
@@ -121,12 +121,12 @@ export default class FieldPicker extends PureComponent {
                 fullScreen={width => width <= FULLSCREEN_WIDTH}
                 open={this.props.open}
                 onClose={this.props.onClose}
-                title={locale.listView.fieldPicker.title}>
+                title={locale.fieldPicker.title}>
                 <div class="field-search">
                     <input
                         value={this.state.search}
                         onChange={e => this.setState({ search: e.target.value })}
-                        placeholder={locale.listView.fieldPicker.searchPlaceholder} />
+                        placeholder={locale.fieldPicker.searchPlaceholder} />
                 </div>
                 <RearrangingList
                     onMove={(fromIndex, toIndex) => this.onMoveField(fromIndex, toIndex)}
@@ -173,10 +173,10 @@ export class SortingControl extends PureComponent {
             <div class={className} onClick={this.onClick}>
                 {!this.props.hideLabel && <label class="sorting-label">
                     {this.props.value === 'none'
-                        ? locale.listView.sorting.none
+                        ? locale.sorting.none
                         : this.props.value === 'asc'
-                            ? locale.listView.sorting.asc
-                            : locale.listView.sorting.desc}
+                            ? locale.sorting.asc
+                            : locale.sorting.desc}
                 </label>}
                 <Button icon small class="sorting-icon">
                     {this.props.value === 'none'

@@ -7,8 +7,8 @@ import { CodeholderDisabledIcon } from './icons';
 import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
 import { UEACode as AKSOUEACode } from '@tejo/akso-client';
 import moment from 'moment';
-import locale from '../../../locale';
-import data from '../../../components/data';
+import { codeholders as locale } from '../../../locale';
+import { ueaCode, date, email, phoneNumber } from '../../../components/data';
 import { WithCountries, CountryFlag } from '../../../components/data/country';
 
 function getCountries (core) {
@@ -44,9 +44,9 @@ export default {
             else if (value === 'human') icon = <CodeholderDisabledIcon />;
             else icon = <DomainDisabledIcon />;
 
-            let title = locale.members.fields.codeholderTypes[value];
-            if (!enabled && !isDead) title += ` (${locale.members.fields.codeholderDisabledTitle})`;
-            else if (!enabled) title += ` (${locale.members.fields.codeholderDeadTitle})`;
+            let title = locale.fields.types[value];
+            if (!enabled && !isDead) title += ` (${locale.fields.disabledTitle})`;
+            else if (!enabled) title += ` (${locale.fields.deadTitle})`;
 
             return (
                 <span
@@ -60,9 +60,9 @@ export default {
         stringify (value, item) {
             const { enabled, isDead } = item;
 
-            let title = locale.members.fields.codeholderTypes[value];
-            if (!enabled && !isDead) title += ` (${locale.members.fields.codeholderDisabledTitle})`;
-            else if (!enabled) title += ` (${locale.members.fields.codeholderDeadTitle})`;
+            let title = locale.fields.types[value];
+            if (!enabled && !isDead) title += ` (${locale.fields.disabledTitle})`;
+            else if (!enabled) title += ` (${locale.fields.deadTitle})`;
 
             return title;
         },
@@ -72,7 +72,7 @@ export default {
         component ({ value }) {
             if (!value) return null;
             const { old: oldCode, new: newCode } = value;
-            return <data.ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
+            return <ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
         },
         stringify (value) {
             const { old: oldCode, new: newCode } = value;
@@ -180,14 +180,14 @@ export default {
             if (!value) return null;
             const { now, atStartOfYear } = value;
             if (!now) return null;
-            const label = locale.members.fields.ageFormat(now, atStartOfYear);
+            const label = locale.fields.ageFormat(now, atStartOfYear);
             return <span class="age">{label}</span>;
         },
         stringify (value) {
             if (!value) return '';
             const { now, atStartOfYear } = value;
             if (!now) return null;
-            return locale.members.fields.ageFormat(now, atStartOfYear);
+            return locale.fields.ageFormat(now, atStartOfYear);
         },
     },
     membership: {
@@ -248,7 +248,7 @@ export default {
                             const countryName = countries[addressCountry].name_eo;
                             return (
                                 <span>
-                                    {locale.members.fields
+                                    {locale.fields
                                         .disjunctCountry(feeCountryName, countryName)}
                                 </span>
                             );
@@ -271,27 +271,27 @@ export default {
             } else {
                 const feeCountryName = feeCountry.toUpperCase() + ' ' + countries[feeCountry][cl];
                 const countryName = addressCountry.toUpperCase() + ' ' + countries[addressCountry][cl];
-                return locale.members.fields.disjunctCountryCSV(feeCountryName, countryName);
+                return locale.fields.disjunctCountryCSV(feeCountryName, countryName);
             }
         },
     },
     birthdate: {
         sortable: true,
-        component: data.date.inlineRenderer,
+        component: date.inlineRenderer,
         stringify (value) {
             return value ? moment(value).format('YYYY-MM-DD') : '';
         },
     },
     deathdate: {
         sortable: true,
-        component: data.date.inlineRenderer,
+        component: date.inlineRenderer,
         stringify (value) {
             return value ? moment(value).format('YYYY-MM-DD') : '';
         },
     },
     email: {
         weight: 2,
-        component: data.email.inlineRenderer,
+        component: email.inlineRenderer,
         stringify (value) {
             return value;
         },
@@ -371,21 +371,21 @@ export default {
         },
     },
     officePhone: {
-        component: data.phoneNumber.inlineRenderer,
+        component: phoneNumber.inlineRenderer,
         stringify (value) {
             if (!value) return '';
             return value.formatted;
         },
     },
     cellphone: {
-        component: data.phoneNumber.inlineRenderer,
+        component: phoneNumber.inlineRenderer,
         stringify (value) {
             if (!value) return '';
             return value.formatted;
         },
     },
     landlinePhone: {
-        component: data.phoneNumber.inlineRenderer,
+        component: phoneNumber.inlineRenderer,
         stringify (value) {
             if (!value) return '';
             return value.formatted;

@@ -5,7 +5,7 @@ import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';
 import { codeholders as locale } from '../../../locale';
 import { IdUEACode } from '../../../components/data/uea-code';
-import data from '../../../components/data';
+import { timestamp } from '../../../components/data';
 import { fields as detailFields } from './detail-fields';
 import './history.less';
 
@@ -98,7 +98,7 @@ function FieldHistoryItem ({ item, field, renderer: Renderer }) {
                     <div class="item-additional">
                         {locale.fieldHistory.changedBy} <DiffAuthor author={item.author} />
                         {' · '}
-                        <data.timestamp.inlineRenderer value={item.time * 1000} />
+                        <timestamp.inlineRenderer value={item.time * 1000} />
                     </div>
                 </div>
             ) : (

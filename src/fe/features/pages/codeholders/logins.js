@@ -3,7 +3,7 @@ import { codeholders as locale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 import Page from '../../../components/page';
 import DataList from '../../../components/data-list';
-import data from '../../../components/data';
+import { timestamp } from '../../../components/data';
 import Meta from '../../meta';
 import './logins.less';
 
@@ -34,7 +34,7 @@ function LoginItem ({ item }) {
     return (
         <div class="login-item" data-id={item.id}>
             <div class="login-time">
-                <data.timestamp.inlineRenderer value={item.time * 1000} />
+                <timestamp.inlineRenderer value={item.time * 1000} />
                 {' '}
                 {item.timezone}
             </div>
