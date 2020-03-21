@@ -368,18 +368,18 @@ export const spec = [
                     },
                     {
                         name: 'Redakti',
-                        id: 'votes.update' + org,
-                        implies: ['votes.read' + org],
+                        id: 'votes.update.' + org,
+                        implies: ['votes.read.' + org],
                     },
                     {
                         name: 'Krei',
-                        id: 'votes.create' + org,
-                        implies: ['votes.update' + org],
+                        id: 'votes.create.' + org,
+                        implies: ['votes.update.' + org],
                     },
                     {
                         name: 'Forigi',
-                        id: 'votes.delete' + org,
-                        implies: ['votes.create' + org],
+                        id: 'votes.delete.' + org,
+                        implies: ['votes.create.' + org],
                     },
                 ],
             };
