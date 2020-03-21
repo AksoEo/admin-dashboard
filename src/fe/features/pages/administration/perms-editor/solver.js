@@ -1,288 +1,354 @@
-import { memberFields as fieldsSpec, reverseMap } from '../../../../permissions';
+//! The AKSO perms solver.
+//!
+//! Permissions and member fields are treated as one to make the logic easier to write.
+//! Member fields are referred to like `@.name.r` for `name: 'r'`.
+//! Additionally, permissions will be treated like a Set instead of an array internally.
+//! For simplicity, this representation is referred to as `xperms` in the code.
 
-// implication graph for the spec
-const reverseImplicationGraph = new Map();
-const reverseFieldsImplicationGraph = new Map();
-{
-    for (const perm in reverseMap) {
-        const { node } = reverseMap[perm];
-        const implied = [];
+import {
+    memberFields as fieldsSpec,
+    reverseMap,
+    reverseImplicationGraph,
+    reverseFieldsImplicationGraph,
+    reverseRequirementGraph,
+} from '../../../../permissions';
 
-        if (node.implies) implied.push(...node.implies);
-        if (perm.endsWith('.*')) {
-            const prefix = perm.substr(0, perm.length - 1);
-            for (const p of Object.keys(reverseMap).filter(x => x.startsWith(prefix))) {
-                if (p === perm) continue; // don’t imply self
-                implied.push(p);
+/// Pops an item from the permission path.
+function pop (perm) {
+    return perm.substr(0, perm.lastIndexOf('.'));
+}
+
+/// Pushes an item to the permission path.
+function push (perm, part) {
+    if (!perm) return part;
+    return perm + '.' + part;
+}
+
+/// Clones xperms.
+function clone (xperms) {
+    return new Set([...xperms]);
+}
+
+/// Decodes an xperms-encoded field. Returns the field and the read or write flag.
+function xpDecodeField (id) {
+    if (!id.startsWith('@.')) throw new Error('invalid argument to xpDecodeField: should start with @.');
+    const parts = id.split('.');
+    return [parts[1], parts[2]];
+}
+/// Encodes a field in the xperms format.
+function xpEncodeField (field, flag) {
+    return `@.${field}.${flag}`;
+}
+
+/// Converts regular perms and member fields to xperms.
+function toXPerms (perms, fields) {
+    const xperms = new Set();
+    for (const p of perms) xperms.add(p);
+    if (fields === null) {
+        // wildcard
+        xperms.add('@.*');
+    } else {
+        for (const field in fields) {
+            const flag = fields[field];
+            if (flag.includes('r')) xperms.add(xpEncodeField(field, 'r'));
+            if (flag.includes('w')) xperms.add(xpEncodeField(field, 'w'));
+        }
+    }
+    return xperms;
+}
+/// Converts xperms to regular perms and member fields.
+function fromXPerms (xperms) {
+    const perms = [];
+    const fields = xperms.has('@.*') ? null : {};
+    for (const p of xperms) {
+        if (p.startsWith('@.')) {
+            if (fields) {
+                const [field, flag] = xpDecodeField(p);
+                const hadRead = (fields[field] || '').includes('r');
+                const hadWrite = (fields[field] || '').includes('w');
+                const hasRead = flag === 'r' || hadRead;
+                const hasWrite = flag === 'w' || hadWrite;
+                fields[field] = (hasRead ? 'r' : '') + (hasWrite ? 'w' : '');
+            } else if (p !== '@.*') {
+                throw new Error('internal inconsistency: field wildcard present but did not delete field perms');
+            }
+        } else {
+            perms.push(p);
+        }
+    }
+    return [perms, fields];
+}
+
+/// Returns true if the given permission is a wildcard.
+function isWildcard (id) {
+    return id.split('.').pop() === '*';
+}
+
+/// Returns all wildcards that could affect the given perm.
+function wildcardCandidates (id) {
+    const candidates = [];
+    while (id) {
+        id = pop(id);
+        candidates.push(push(id, '*'));
+    }
+    return candidates;
+}
+
+/// Returns true if the given permission is currently active.
+function isActive (xperms, id) {
+    if (xperms.has(id)) return true;
+    if (id.startsWith('@.')) {
+        // this is a field; there are no wildcards here
+        return false;
+    } else if (id !== '*') {
+        // this is a normal permission; might be implied by a wildcard
+        const closestWildcardId = id.endsWith('.*')
+            ? push(pop(pop(id)), '*')
+            : push(pop(id), '*');
+        // we don’t need to check the parents because this is a recursive call
+        return isActive(xperms, closestWildcardId);
+    } else {
+        return false;
+    }
+}
+
+/// Returns a set of permissions that are currently directly implying the given permission.
+function reverseImplications (xperms, id, includeWildcards = true) {
+    const revImplies = new Set();
+    if (id.startsWith('@.')) {
+        // this is a field
+        const [field, flag] = xpDecodeField(id);
+        const fieldMap = reverseFieldsImplicationGraph.get(field);
+        if (fieldMap) {
+            const flagMaps = [];
+            flagMaps.push(fieldMap.get(flag));
+            // write always implies read, so we need to consider that too
+            if (flag === 'r') flagMaps.push(fieldMap.get('w'));
+            for (const flagMap of flagMaps) {
+                if (!flagMap) continue;
+                for (const perm of flagMap) {
+                    if (isActive(xperms, perm)) {
+                        revImplies.add(perm);
+                    }
+                }
             }
         }
-
-        for (const perm of implied) {
-            if (!reverseImplicationGraph.has(perm)) reverseImplicationGraph.set(perm, new Set());
-            reverseImplicationGraph.get(perm).add(node.id);
+    } else {
+        // this is a regular permission
+        const permSet = reverseImplicationGraph.get(id);
+        if (permSet) {
+            for (const perm of permSet) {
+                if (isWildcard(perm) && !includeWildcards) continue;
+                if (isActive(xperms, perm)) revImplies.add(perm);
+            }
         }
+    }
+    return revImplies;
+}
 
-        for (const field in (node.impliesFields || {})) {
-            if (!reverseFieldsImplicationGraph.has(field)) reverseFieldsImplicationGraph.set(field, new Map());
-            const fieldMap = reverseFieldsImplicationGraph.get(field);
+/// Explodes a wildcard into its components, i.e. all permissions that would be granted
+/// automatically by a wildcard are now granted manually. The wildcard is removed.
+/// This action is a no-op if the wildcard permission isn’t present.
+/// Sub-wildcards will remain sub-wildcards.
+function explodeWildcard (xperms, id) {
+    if (!xperms.has(id)) return xperms; // skip everything if the wildcard isn’t present
+    xperms = clone(xperms);
+    xperms.delete(id); // delete wildcard
+    // find all perms that would be matched
+    const idWithoutWildcard = pop(id);
+    const permsToConsider = permsByPrefix(idWithoutWildcard);
+    for (const p of permsToConsider) {
+        // do not match the wildcard itself
+        if (p === id) continue;
+        xperms.add(p);
+    }
+    return xperms;
+}
 
-            const flags = node.impliesFields[field].split('');
+/// Returns all perms in the reverseMap that match the given prefix path.
+///
+/// for a prefix `a.b`, this includes permissions like `a.b.*`, `a.b.c.d`, but not `a.b`.
+function permsByPrefix (prefix) {
+    const perms = [];
+    for (const k in reverseMap) {
+        if (k.startsWith(prefix) && k.substr(prefix.length)[0] === '.') {
+            perms.push(k);
+        }
+    }
+    return perms;
+}
+
+/// Deletes all perms that would match the given prefix. Also see permsByPrefix.
+function deleteByPrefix (xperms, prefix) {
+    xperms = clone(xperms);
+    for (const p of [...xperms]) {
+        if (p.startsWith(prefix) && p.substr(prefix.length)[0] === '.') {
+            xperms.delete(p);
+        }
+    }
+    return xperms;
+}
+
+/// Checks that all requirements for a node are met, and if not, removes it.
+function checkRequirements (xperms, id) {
+    const mapItem = reverseMap[id];
+    let broken = false;
+    if (mapItem && mapItem.requires) {
+        for (const p of mapItem.requires) {
+            if (!isActive(xperms, p)) {
+                broken = true;
+                break;
+            }
+        }
+    }
+    if (broken) return remove(xperms, id);
+    return xperms;
+}
+
+/// Adds a permission.
+function add (xperms, id) {
+    xperms = clone(xperms);
+
+    // only add if it isn’t already active to prevent wildcards from being useless
+    if (!isActive(xperms, id)) xperms.add(id);
+
+    if (isWildcard(id)) {
+        // delete all perms covered by this wildcard
+        xperms = deleteByPrefix(xperms, pop(id));
+        xperms.add(id);
+
+        // propagate implications
+        for (const p of permsByPrefix(pop(id))) {
+            if (p === id) continue;
+            xperms = add(xperms, p);
+        }
+    }
+
+    // propagate manual implications
+    const mapItem = reverseMap[id];
+    if (mapItem && mapItem.node && mapItem.node.implies) {
+        for (const impliedPerm of mapItem.node.implies) {
+            xperms = add(xperms, impliedPerm);
+        }
+    }
+    if (mapItem && mapItem.node && mapItem.node.impliesFields) {
+        for (const field in mapItem.node.impliesFields) {
+            const flags = mapItem.node.impliesFields[field].split('');
             for (const flag of flags) {
-                if (!fieldMap.has(flag)) fieldMap.set(flag, new Set());
-                fieldMap.get(flag).add(node.id);
+                xperms = add(xperms, xpEncodeField(field, flag));
             }
         }
     }
+    if (id.startsWith('@.')) {
+        // this is a field
+        const [field, flag] = xpDecodeField(id);
+        if (flag === 'w') {
+            // also add r
+            xperms = add(xperms, xpEncodeField(field, 'r'));
+        }
+    }
+
+    return xperms;
 }
 
-export function read (permissions) {
-    const permStates = new Map();
+/// Removes a permission.
+function remove (xperms, id) {
+    xperms = clone(xperms);
 
-    // list of unknown permissions
-    const unknown = [];
-    for (const perm of permissions) {
-        if (!reverseMap[perm]) {
-            unknown.push(perm);
+    // do not remove if manually implied
+    const revImplies = reverseImplications(xperms, id, false);
+    for (const p of revImplies) {
+        xperms = remove(xperms, p);
+    }
 
-            permStates.set(perm, {
-                active: true,
-                virtuallyActive: true,
-                isRoot: true,
-                impliedBy: new Set(),
-                isUnknown: true,
-            });
+    // explode the closest wildcard
+    for (const candidate of wildcardCandidates(id)) {
+        if (candidate !== id && xperms.has(candidate)) {
+            xperms = explodeWildcard(xperms, candidate);
+            break;
         }
     }
 
-    for (const perm in reverseMap) {
-        // permission state--is it active? implied?
-        const state = {
-            // whether this permission is active server-side
-            active: false,
-            // whether this permission *should* be active server-side (e.g. because it’s implied)
-            virtuallyActive: false,
-            // whether this permission is a root node in the implication graph
-            isRoot: false,
-            // nodes that imply this permission
-            impliedBy: new Set(),
-            isUnknown: false,
-        };
+    xperms.delete(id);
 
-        if (permissions.includes(perm)) {
-            // is in permissions itself
-            state.active = state.virtuallyActive = state.isRoot = true;
-        }
-
-        // check active permissions for wildcards
-        if (permissions.includes('*') && perm !== '*') {
-            state.active = state.virtuallyActive = true;
-            state.impliedBy.add('*');
-        } else {
-            const permParts = perm.split('.');
-            for (let i = permParts.length - 1; i > 0; i--) {
-                const wildcard = permParts.slice(0, i).join('.') + '.*';
-                if (permissions.includes(wildcard) && wildcard !== perm) {
-                    state.active = state.virtuallyActive = true;
-                    state.impliedBy.add(wildcard);
-                }
-            }
-        }
-
-        permStates.set(perm, state);
-    }
-
-    // now traverse perms again and propagate implications until nothing changes
-    let somethingChanged = true;
-    while (somethingChanged) {
-        somethingChanged = false;
-
-        for (const perm in reverseMap) {
-            const state = permStates.get(perm);
-            for (const implier of (reverseImplicationGraph.get(perm) || [])) {
-                if (state.impliedBy.has(implier)) continue;
-                if (permStates.get(implier).active) {
-                    somethingChanged = true;
-                    state.impliedBy.add(implier);
-                    state.virtuallyActive = true;
-                }
-            }
+    if (id.startsWith('@.')) {
+        // this is a field
+        const [field, flag] = xpDecodeField(id);
+        if (flag === 'r') {
+            // also remove w
+            xperms = remove(xperms, xpEncodeField(field, 'w'));
         }
     }
 
-    // now add impliedBy to unknown permissions
-    // (does not need to loop indefinitely because these are unknown and can hence not imply
-    // anything)
-    for (const perm of unknown) {
-        const state = permStates.get(perm);
-        for (const implier of (reverseImplicationGraph.get(perm) || [])) {
-            if (permStates.get(implier).active) state.impliedBy.add(implier);
+    // also check perms that require this perm
+    const revRequires = reverseRequirementGraph.get(id);
+    if (revRequires) {
+        for (const p of revRequires) {
+            xperms = checkRequirements(xperms, p);
         }
     }
 
-    return [permStates, unknown];
+    return xperms;
 }
 
-export function add (permissions, memberFields, perm) {
-    permissions = permissions.slice();
-    memberFields = memberFields ? { ...memberFields } : null;
-
-    const [permStates] = read(permissions);
-
-    // collect all implied perms and fields
-    const implications = new Set();
-    const impliedFields = new Map(); // map from perm to flags
-    const queue = [perm];
-    while (queue.length) {
-        const cursor = queue.shift();
-        // contains all implied perms for the cursor item
-        const implies = [];
-        if (cursor.endsWith('.*')) {
-            // wildcard implies all sub-perms
-            const prefix = perm.substr(0, perm.length - 1);
-            for (const p of Object.keys(reverseMap).filter(x => x.startsWith(prefix))) {
-                if (p === perm) continue; // don’t imply self
-                implies.push(p);
-            }
-        }
-        if (reverseMap[cursor]) {
-            const { node } = reverseMap[cursor];
-            if (node.implies) implies.push(...node.implies);
-
-            // also add implied fields
-            for (const impliedField in (node.impliesFields || {})) {
-                const currentFlags = impliedFields.get(impliedField) || new Set();
-                for (const flag of node.impliesFields[impliedField]) {
-                    currentFlags.add(flag);
-                }
-                impliedFields.set(impliedField, currentFlags);
-            }
-        }
-        if (!implies.length) continue;
-
-        for (const implied of implies) {
-            if (implications.has(implied)) continue;
-            implications.add(implied);
-            queue.push(implied);
-        }
-    }
-    for (const p of implications) {
-        if (!permStates.has(p) || !permStates.get(p).active) permissions.push(p);
-    }
-
-    if (perm.endsWith('.*') || perm === '*') {
-        // get rid of all the other ones that are now included in the wildcard
-        const prefix = perm.substr(0, perm.length - 1);
-        permissions = permissions.filter(x => !x.startsWith(prefix));
-    }
-
-    permissions.push(perm);
-
-    if (memberFields !== null) {
-        for (const [f, flags] of impliedFields) {
-            const flagsString = [...flags].join('');
-            [permissions, memberFields] = addField(permissions, memberFields, f, flagsString);
-        }
-    }
-
-    return [permissions, memberFields];
+/// Adds a permission.
+export function addPermission (permissions, memberFields, perm) {
+    if (perm.startsWith('@.')) throw new Error('Malformed permission: cannot start with @.');
+    let xperms = toXPerms(permissions, memberFields);
+    xperms = add(xperms, perm);
+    return fromXPerms(xperms);
 }
 
-export function remove (permissions, memberFields, perm) {
-    permissions = permissions.slice();
-    memberFields = memberFields ? { ...memberFields } : null;
-
-    // remove the permission itself if it exists
-    if (permissions.includes(perm)) permissions.splice(permissions.indexOf(perm), 1);
-    // remove any relevant wildcards
-    if (permissions.includes('*')) permissions.splice(permissions.indexOf('*'), 1);
-    const permParts = perm.split('.');
-    for (let i = permParts.length - 1; i > 0; i--) {
-        const wildcard = permParts.slice(0, i).join('.') + '.*';
-        if (wildcard === perm) continue;
-        [permissions, memberFields] = remove(permissions, memberFields, wildcard);
-    }
-    // remove impliers
-    for (const implier of (reverseImplicationGraph.get(perm) || [])) {
-        [permissions, memberFields] = remove(permissions, memberFields, implier);
-    }
-
-    return [permissions, memberFields];
+/// Removes a permission.
+export function removePermission (permissions, memberFields, perm) {
+    if (perm.startsWith('@.')) throw new Error('Malformed permission: cannot start with @.');
+    let xperms = toXPerms(permissions, memberFields);
+    xperms = remove(xperms, perm);
+    return fromXPerms(xperms);
 }
 
-/// Returns if the given member field permissions are fully fulfilled
-export function hasField (memberFields, field, perm) {
-    if (memberFields === null) return true;
-    const item = fieldsSpec[field] || { fields: [field] };
-
-    const flags = new Set(['r', 'w']);
-    for (const f of item.fields) {
-        const g = memberFields[f] || '';
-        if (!g.includes('r')) flags.delete('r');
-        if (!g.includes('w')) flags.delete('w');
-    }
-
-    return perm.split('').map(f => flags.has(f)).reduce((a, b) => a && b, true);
+/// Returns whether or not a permission is active.
+export function hasPermission (permissions, memberFields, perm) {
+    return isActive(toXPerms(permissions, memberFields), perm);
 }
 
-/// Adds a member field
-export function addField (permissions, memberFields, field, perm) {
-    memberFields = memberFields ? { ...memberFields } : null;
-    if (memberFields) {
-        const item = fieldsSpec[field] || { fields: [field] };
-
-        // get the min common set of flags
-        const flags = new Set(['r', 'w']);
-        for (const f of item.fields) {
-            const g = memberFields[f] || '';
-            if (!g.includes('r')) flags.delete('r');
-            if (!g.includes('w')) flags.delete('w');
-        }
-
-        flags.add(perm);
-        if (perm.includes('w')) flags.add('r');
-
-        for (const f of item.fields) memberFields[f] = [...flags].join('');
-    }
-    return [permissions, memberFields];
+/// Returns true if the given permission is not known to the permissions tree.
+export function isPermissionUnknown (perm) {
+    return !reverseMap[perm];
 }
 
-/// Removes a member field
-export function removeField (permissions, memberFields, field, perm) {
-    memberFields = memberFields ? { ...memberFields } : null;
-    if (memberFields) {
-        const item = fieldsSpec[field] || { field: [field] };
-
-        // get the max common set of flags
-        const flags = new Set();
-        for (const f of item.fields) {
-            const g = memberFields[f] || '';
-            if (g.includes('r')) flags.add('r');
-            if (g.includes('w')) flags.add('w');
-        }
-
-        flags.delete(perm);
-        if (perm.includes('r')) flags.delete('w');
-
-        if (flags.size) {
-            for (const f of item.fields) memberFields[f] = [...flags].join('');
-        } else {
-            for (const f of item.fields) delete memberFields[f];
-        }
-
-        const removedPerms = new Set();
-        if (perm.includes('r')) removedPerms.add('r');
-        if (perm.includes('w')) removedPerms.add('w');
-
-        const revImpls = reverseFieldsImplicationGraph.get(field);
-        if (revImpls) {
-            for (const p of removedPerms) {
-                const perms = revImpls.get(p);
-                if (!perms) continue;
-                for (const perm of perms) {
-                    [permissions, memberFields] = remove(permissions, memberFields, perm);
-                }
-            }
+/// Adds a member field.
+export function addMemberField (permissions, memberFields, field, flags) {
+    let xperms = toXPerms(permissions, memberFields);
+    const fieldSpec = fieldsSpec[field];
+    for (const f of fieldSpec.fields) {
+        for (const flag of flags.split('')) {
+            xperms = add(xperms, xpEncodeField(f, flag));
         }
     }
-    return [permissions, memberFields];
+    return fromXPerms(xperms);
+}
+
+/// Removes a member field.
+export function removeMemberField (permissions, memberFields, field, flags) {
+    let xperms = toXPerms(permissions, memberFields);
+    const fieldSpec = fieldsSpec[field];
+    for (const f of fieldSpec.fields) {
+        for (const flag of flags.split('')) {
+            xperms = remove(xperms, xpEncodeField(f, flag));
+        }
+    }
+    return fromXPerms(xperms);
+}
+
+/// Returns whether the given member field permissions are fully fulfilled for the given flag.
+export function hasMemberField (permissions, memberFields, field, flags) {
+    const xperms = toXPerms(permissions, memberFields);
+    const fieldSpec = fieldsSpec[field];
+    for (const f of fieldSpec.fields) {
+        for (const flag of flags.split('')) {
+            if (!isActive(xperms, xpEncodeField(f, flag))) return false;
+        }
+    }
+    return true;
 }

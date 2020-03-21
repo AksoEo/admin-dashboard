@@ -11,7 +11,15 @@ import {
 import { data as locale } from '../../../../locale';
 import JSONFilterEditor from '../../../../components/json-filter-editor';
 import DisclosureArrow from '../../../../components/disclosure-arrow';
-import { read, add, remove, hasField, addField, removeField } from './solver';
+import {
+    addPermission,
+    hasPermission,
+    removePermission,
+    isPermissionUnknown,
+    addMemberField,
+    hasMemberField,
+    removeMemberField,
+} from './solver';
 import './style';
 
 /// Permissions editor.
@@ -42,35 +50,34 @@ export default class PermsEditor extends Component {
         onMemberRestrictionsEnabledChange,
         editable,
     }, { showRaw }) {
-        const [permStates, unknown] = read(permissions);
-
         const ctx = {
             showRaw,
             editable,
-            states: permStates,
-            showImplied: this.state.showImplied && permStates.has(this.state.showImplied)
-                ? permStates.get(this.state.showImplied).impliedBy
-                : new Set(),
+            permissions,
+            memberFields,
+            showImplied: new Set(), // TODO
+            // showImplied: this.state.showImplied && permStates.has(this.state.showImplied)
+            //     ? permStates.get(this.state.showImplied).impliedBy
+            //     : new Set(),
             setShowImplied: implied => this.setState({ showImplied: implied }),
             togglePerm: perm => {
-                if (permStates.get(perm).active) {
-                    const [p, m] = remove(permissions, memberFields, perm);
+                if (hasPermission(permissions, memberFields, perm)) {
+                    const [p, m] = removePermission(permissions, memberFields, perm);
                     onChange(p);
                     onFieldsChange(m);
                 } else {
-                    const [p, m] = add(permissions, memberFields, perm);
+                    const [p, m] = addPermission(permissions, memberFields, perm);
                     onChange(p);
                     onFieldsChange(m);
                 }
             },
-            memberFields,
-            toggleField: (field, perm) => {
-                if (hasField(memberFields, field, perm)) {
-                    const [p, m] = removeField(permissions, memberFields, field, perm);
+            toggleField: (field, flags) => {
+                if (hasMemberField(permissions, memberFields, field, flags)) {
+                    const [p, m] = removeMemberField(permissions, memberFields, field, flags);
                     onChange(p);
                     onFieldsChange(m);
                 } else {
-                    const [p, m] = addField(permissions, memberFields, field, perm);
+                    const [p, m] = addMemberField(permissions, memberFields, field, flags);
                     onChange(p);
                     onFieldsChange(m);
                 }
@@ -85,6 +92,7 @@ export default class PermsEditor extends Component {
             setMemberRestrictionsEnabled: onMemberRestrictionsEnabledChange,
         };
 
+        const unknown = permissions.filter(isPermissionUnknown);
         const unknownPerms = unknown.map(perm => (
             <PermsItem key={perm} item={{ type: 'perm', name: perm, id: perm }} ctx={ctx} />
         ));
@@ -105,7 +113,7 @@ function PermsItem ({ item, ctx, disabled }) {
     disabled = disabled || !ctx.editable;
     if (item.requires) {
         for (const req of item.requires) {
-            if (!ctx.states.get(req).active) {
+            if (!hasPermission(ctx.permissions, ctx.memberFields, req)) {
                 disabled = true;
                 break;
             }
@@ -140,9 +148,9 @@ function PermsItem ({ item, ctx, disabled }) {
                 {item.name ? <span class="switch-name">{item.name}</span> : <span class="spacer" />}
                 <div class="switch-options">
                     {item.options.map((opt, i) => {
-                        const state = ctx.states.get(opt.id);
+                        const isActive = hasPermission(ctx.permissions, ctx.memberFields, opt.id);
                         let className = 'perm-checkbox';
-                        if (state.active && state.impliedBy.size) className += ' is-implied-active';
+                        // if (state.active && state.impliedBy.size) className += ' is-implied-active';
                         if (ctx.showImplied.has(opt.id)) {
                             className += ' is-implier';
                         }
@@ -152,7 +160,7 @@ function PermsItem ({ item, ctx, disabled }) {
                                 <Checkbox
                                     class={className}
                                     disabled={disabled}
-                                    checked={state.active}
+                                    checked={isActive}
                                     onMouseOver={() => ctx.setShowImplied(opt.id)}
                                     onMouseOut={() => ctx.setShowImplied(null)}
                                     onClick={() => ctx.togglePerm(opt.id)} />
@@ -166,9 +174,9 @@ function PermsItem ({ item, ctx, disabled }) {
             </div>
         );
     } else if (item.type === 'perm') {
-        const state = ctx.states.get(item.id);
+        const isActive = hasPermission(ctx.permissions, ctx.memberFields, item.id);
         let className = 'perm-checkbox';
-        if (state.active && state.impliedBy.size) className += ' is-implied-active';
+        // if (state.active && state.impliedBy.size) className += ' is-implied-active';
         if (ctx.showImplied.has(item.id)) {
             className += ' is-implier';
         }
@@ -178,8 +186,8 @@ function PermsItem ({ item, ctx, disabled }) {
                 <Checkbox
                     class={className}
                     disabled={disabled}
-                    checked={state.active}
-                    onMouseOver={() => ctx.setShowImplied(state.impliedBy)}
+                    checked={isActive}
+                    onMouseOver={() => ctx.setShowImplied(item.id)}
                     onMouseOut={() => ctx.setShowImplied(null)}
                     onClick={() => ctx.togglePerm(item.id)} />
                 {ctx.showRaw ? item.id : item.name}

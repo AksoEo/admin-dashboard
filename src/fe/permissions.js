@@ -468,17 +468,21 @@ export const memberFields = {
 };
 
 /// Builds a map from permission id to node.
-function buildReverseMap (spec, mapping, path = []) {
+/// Also sifts down requirements.
+function buildReverseMap (spec, mapping, path = [], reqs = []) {
     if (spec.type === 'category' || spec.type === 'group') {
+        reqs = reqs.concat(spec.requires || []);
         for (let i = 0; i < spec.children.length; i++) {
-            buildReverseMap(spec.children[i], mapping, path.concat([i]));
+            buildReverseMap(spec.children[i], mapping, path.concat([i]), reqs);
         }
     } else if (spec.type === 'switch') {
+        reqs = reqs.concat(spec.requires || []);
         for (const opt of spec.options) {
-            mapping[opt.id] = { path, type: 'option', node: opt };
+            mapping[opt.id] = { path, type: 'option', node: opt, requires: reqs };
         }
     } else if (spec.type === 'perm') {
-        mapping[spec.id] = { path, type: 'perm-node', node: spec };
+        reqs = reqs.concat(spec.requires || []);
+        mapping[spec.id] = { path, type: 'perm-node', node: spec, requires: reqs };
     } else if (typeof spec === 'string' || spec.type.startsWith('!')) {
         // nope
     } else {
@@ -489,3 +493,41 @@ function buildReverseMap (spec, mapping, path = []) {
 }
 
 export const reverseMap = buildReverseMap({ type: 'category', children: spec }, {});
+
+export const reverseImplicationGraph = new Map();
+export const reverseFieldsImplicationGraph = new Map();
+export const reverseRequirementGraph = new Map();
+for (const perm in reverseMap) {
+    const { node, requires } = reverseMap[perm];
+    const implied = [];
+
+    if (node.implies) implied.push(...node.implies);
+    if (perm.endsWith('.*')) {
+        const prefix = perm.substr(0, perm.length - 1);
+        for (const p of Object.keys(reverseMap).filter(x => x.startsWith(prefix))) {
+            if (p === perm) continue; // don’t imply self
+            implied.push(p);
+        }
+    }
+
+    for (const perm of implied) {
+        if (!reverseImplicationGraph.has(perm)) reverseImplicationGraph.set(perm, new Set());
+        reverseImplicationGraph.get(perm).add(node.id);
+    }
+
+    for (const field in (node.impliesFields || {})) {
+        if (!reverseFieldsImplicationGraph.has(field)) reverseFieldsImplicationGraph.set(field, new Map());
+        const fieldMap = reverseFieldsImplicationGraph.get(field);
+
+        const flags = node.impliesFields[field].split('');
+        for (const flag of flags) {
+            if (!fieldMap.has(flag)) fieldMap.set(flag, new Set());
+            fieldMap.get(flag).add(node.id);
+        }
+    }
+
+    for (const perm of requires) {
+        if (!reverseRequirementGraph.has(perm)) reverseRequirementGraph.set(perm, new Set());
+        reverseRequirementGraph.get(perm).add(node.id);
+    }
+}
