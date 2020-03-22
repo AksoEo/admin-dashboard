@@ -578,6 +578,15 @@ export const codeholders = {
     logins: {
         title: 'Historio de ensalutoj',
         empty: 'Neniuj ensalutoj',
+        inTimezone: '[[in timezone]]',
+        viewInOSM: '[[view approximate area in osm]]',
+        osmLink: (area, lat, lon) => {
+            // FIXME: bad zoom approximation
+            let zoom = 6;
+            if (area <= 1000) zoom = 7;
+            if (area <= 100) zoom = 8;
+            return `https://www.openstreetmap.org/#map=${zoom}/${lat}/${lon}`;
+        },
     },
     perms: {
         title: 'Permesoj',

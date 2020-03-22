@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { Button } from '@cpsdqs/yamdl';
 import { codeholders as locale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 import Page from '../../../components/page';
@@ -23,7 +24,7 @@ export default class LoginsPage extends Page {
                             id,
                         }, { offset, limit }).runOnceAndDrop()}
                     emptyLabel={locale.logins.empty}
-                    itemHeight={72}
+                    itemHeight={84}
                     renderItem={item => <LoginItem item={item} />} />
             </div>
         );
@@ -31,10 +32,14 @@ export default class LoginsPage extends Page {
 }
 
 function LoginItem ({ item }) {
+    const osmLink = locale.logins.osmLink(item.area, item.ll[0], item.ll[1]);
+
     return (
         <div class="login-item" data-id={item.id}>
             <div class="login-time">
                 <timestamp.inlineRenderer value={item.time * 1000} />
+                {' '}
+                {locale.logins.inTimezone}
                 {' '}
                 {item.timezone}
             </div>
@@ -49,6 +54,9 @@ function LoginItem ({ item }) {
                 {item.region}
                 {' '}
                 {item.city}
+                <Button class="login-loc-map-link" target="_blank" rel="noopener noreferrer" href={osmLink}>
+                    {locale.logins.viewInOSM}
+                </Button>
             </div>
         </div>
     );

@@ -460,7 +460,7 @@ export const memberFields = {
     landlinePhone: { name: 'Hejma telefono', fields: ['landlinePhone', 'landlinePhoneFormatted'] },
     landlinePhonePublicity: { name: 'Publikeco de hejma telefono', fields: ['landlinePhonePublicity'] },
     cellphone: { name: 'Poŝtelefono', fields: ['cellphone', 'cellphoneFormatted'] },
-    cellphonePublicity: { name: 'Poŝtelefono', fields: ['cellphonePublicity'] },
+    cellphonePublicity: { name: 'Publikeco de poŝtelefono', fields: ['cellphonePublicity'] },
 
     files: { name: 'Alkroĉitaj dosieroj', fields: ['files'] },
     logins: { name: 'Historio de ensalutoj', fields: ['logins'] },
