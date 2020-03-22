@@ -4,6 +4,7 @@ import { Checkbox } from '@cpsdqs/yamdl';
 import {
     spec,
     memberFields as fieldsSpec,
+    reverseMap,
     memberFieldsAll,
     memberFieldsRead,
     memberFieldsWrite,
@@ -100,7 +101,7 @@ export default class PermsEditor extends Component {
         return (
             <div class="perms-editor" ref={node => this.#node = node}>
                 <p>
-                    {locale.permsEditorNote}
+                    {locale.permsEditor.note}
                 </p>
                 {spec.map((x, i) => <PermsItem item={x} key={i} ctx={ctx} />)}
                 {unknownPerms}
@@ -109,16 +110,42 @@ export default class PermsEditor extends Component {
     }
 }
 
+/// Renders a human-readable name for a given permission.
+function PermName ({ id }) {
+    if (!reverseMap[id]) return id;
+    const item = reverseMap[id];
+    let c = spec;
+    const nameParts = [];
+    for (const i of item.path) {
+        if (c.name) nameParts.push(c.name);
+        if (Array.isArray(c)) c = c[i]; // root node
+        else c = (c.children || c.options)[i];
+    }
+    if (c.name) nameParts.push(c.name);
+    return nameParts.join(' › ');
+}
+
 function PermsItem ({ item, ctx, disabled }) {
     disabled = disabled || !ctx.editable;
+    const unfulfilledRequirements = [];
     if (item.requires) {
         for (const req of item.requires) {
             if (!hasPermission(ctx.permissions, ctx.memberFields, req)) {
                 disabled = true;
-                break;
+                unfulfilledRequirements.push(req);
             }
         }
     }
+
+    let reqNotice = null;
+    if (unfulfilledRequirements.length) {
+        reqNotice = (
+            <div class="perms-req-notice">
+                {locale.permsEditor.requires} {unfulfilledRequirements.map(i => <PermName key={i} id={i} />)}
+            </div>
+        );
+    }
+
     if (item.type === 'category') {
         const [expanded, setExpanded] = useState(true);
 
@@ -128,6 +155,7 @@ function PermsItem ({ item, ctx, disabled }) {
                     <DisclosureArrow dir={expanded ? 'up' : 'down'} />
                     <span class="category-title-inner">{item.name}</span>
                 </button>
+                {reqNotice}
                 {expanded ? (
                     <div class="perms-category-contents">
                         {item.children.map((x, i) => <PermsItem key={i} item={x} ctx={ctx} disabled={disabled} />)}
@@ -139,6 +167,7 @@ function PermsItem ({ item, ctx, disabled }) {
         return (
             <div class="perms-group">
                 {item.name ? <div class="group-title">{item.name}</div> : null}
+                {reqNotice}
                 {item.children.map((x, i) => <PermsItem key={i} item={x} ctx={ctx} disabled={disabled} />)}
             </div>
         );
@@ -146,6 +175,7 @@ function PermsItem ({ item, ctx, disabled }) {
         return (
             <div class="perms-item perms-switch">
                 {item.name ? <span class="switch-name">{item.name}</span> : <span class="spacer" />}
+                {reqNotice}
                 <div class="switch-options">
                     {item.options.map((opt, i) => {
                         const isActive = hasPermission(ctx.permissions, ctx.memberFields, opt.id);
@@ -183,6 +213,7 @@ function PermsItem ({ item, ctx, disabled }) {
 
         return (
             <div class="perms-item perms-perm">
+                {reqNotice}
                 <Checkbox
                     class={className}
                     disabled={disabled}
@@ -196,6 +227,7 @@ function PermsItem ({ item, ctx, disabled }) {
     } else if (item.type === '!memberRestrictionsSwitch') {
         return (
             <div class="perms-item perms-perm">
+                {reqNotice}
                 <Checkbox
                     class="perm-checkbox"
                     disabled={disabled}

@@ -79,7 +79,10 @@ export const data = {
     },
     weekdays: 'DLMMJVS',
     weekStart: 1, // Monday
-    permsEditorNote: '[[note that permissions will be merged from multiple sources so this isnt a complete picture]]',
+    permsEditor: {
+        note: '[[note that permissions will be merged from multiple sources so this isnt a complete picture]]',
+        requires: 'Bezonas',
+    },
 };
 
 export const errors = {

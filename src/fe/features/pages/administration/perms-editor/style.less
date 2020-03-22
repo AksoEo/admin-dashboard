@@ -4,12 +4,22 @@
     position: relative;
     padding: 24px;
 
+    .perms-req-notice {
+        font-size: small;
+        padding: 8px 16px;
+    }
+
     .perms-item {
         background: @card1-background;
         padding: 16px;
         border-radius: 8px;
         .elevation(4);
         margin-bottom: 16px;
+
+        .perms-req-notice {
+            padding-left: 0;
+            padding-top: 0;
+        }
     }
 
     .perms-category {
@@ -53,6 +63,11 @@
         }
 
         &.is-expanded .category-title {
+            margin-bottom: 16px;
+        }
+
+        &.is-expanded > .perms-req-notice {
+            margin-top: -8px;
             margin-bottom: 16px;
         }
 

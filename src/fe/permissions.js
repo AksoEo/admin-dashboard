@@ -477,8 +477,9 @@ function buildReverseMap (spec, mapping, path = [], reqs = []) {
         }
     } else if (spec.type === 'switch') {
         reqs = reqs.concat(spec.requires || []);
+        let i = 0;
         for (const opt of spec.options) {
-            mapping[opt.id] = { path, type: 'option', node: opt, requires: reqs };
+            mapping[opt.id] = { path: path.concat([i++]), type: 'option', node: opt, requires: reqs };
         }
     } else if (spec.type === 'perm') {
         reqs = reqs.concat(spec.requires || []);
