@@ -157,10 +157,12 @@ function explodeWildcard (xperms, id) {
     // find all perms that would be matched
     const idWithoutWildcard = pop(id);
     const permsToConsider = permsByPrefix(idWithoutWildcard);
+    // prefer wildcards by sorting them to come first
+    permsToConsider.sort(a => a.includes('*') ? -1 : 1);
     for (const p of permsToConsider) {
         // do not match the wildcard itself
         if (p === id) continue;
-        xperms.add(p);
+        if (!isActive(xperms, p)) xperms.add(p);
     }
     return xperms;
 }
@@ -171,7 +173,7 @@ function explodeWildcard (xperms, id) {
 function permsByPrefix (prefix) {
     const perms = [];
     for (const k in reverseMap) {
-        if (k.startsWith(prefix) && k.substr(prefix.length)[0] === '.') {
+        if (!prefix || (k.startsWith(prefix) && k.substr(prefix.length)[0] === '.')) {
             perms.push(k);
         }
     }
@@ -182,7 +184,7 @@ function permsByPrefix (prefix) {
 function deleteByPrefix (xperms, prefix) {
     xperms = clone(xperms);
     for (const p of [...xperms]) {
-        if (p.startsWith(prefix) && p.substr(prefix.length)[0] === '.') {
+        if (!prefix || p.startsWith(prefix) && p.substr(prefix.length)[0] === '.') {
             xperms.delete(p);
         }
     }
@@ -209,14 +211,15 @@ function checkRequirements (xperms, id) {
 function add (xperms, id) {
     xperms = clone(xperms);
 
+    if (isWildcard(id)) {
+        // delete all perms covered by this wildcard
+        xperms = deleteByPrefix(xperms, pop(id));
+    }
+
     // only add if it isn’t already active to prevent wildcards from being useless
     if (!isActive(xperms, id)) xperms.add(id);
 
     if (isWildcard(id)) {
-        // delete all perms covered by this wildcard
-        xperms = deleteByPrefix(xperms, pop(id));
-        xperms.add(id);
-
         // propagate implications
         for (const p of permsByPrefix(pop(id))) {
             if (p === id) continue;
@@ -262,10 +265,9 @@ function remove (xperms, id) {
     }
 
     // explode the closest wildcard
-    for (const candidate of wildcardCandidates(id)) {
+    for (const candidate of wildcardCandidates(id).reverse()) {
         if (candidate !== id && xperms.has(candidate)) {
             xperms = explodeWildcard(xperms, candidate);
-            break;
         }
     }
 
