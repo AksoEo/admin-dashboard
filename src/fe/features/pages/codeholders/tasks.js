@@ -12,9 +12,11 @@ import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
 import {
     codeholders as locale,
+    data as dataLocale,
     detail as detailLocale,
     generic as genericLocale,
 } from '../../../locale';
+import { FileThumbnail, FileSize, Mime } from './files';
 import './style';
 
 export default {
@@ -372,6 +374,64 @@ export default {
                         {Object.entries(locale.resetPassword.orgs).map(([k, v]) => ({ id: k, label: v }))}
                     </Segmented>
                 </div>
+            </TaskDialog>
+        );
+    },
+
+    uploadFile ({ open, task }) {
+        return (
+            <TaskDialog
+                class="codeholders-task-upload-file"
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.uploadFile}
+                actionLabel={locale.uploadThisFile}
+                run={() => task.runOnce()}>
+                <div class="file-preview">
+                    <FileThumbnail file={task.parameters.file} />
+                    <div class="file-preview-details">
+                        <div>
+                            <Mime mime={task.parameters.file.type} />
+                        </div>
+                        <div>
+                            <FileSize bytes={task.parameters.file.size} />
+                        </div>
+                    </div>
+                </div>
+                <Validator
+                    component={TextField}
+                    validate={value => {
+                        if (!value) {
+                            throw { error: dataLocale.requiredField };
+                        }
+                    }}
+                    label={locale.fileName}
+                    maxLength={50}
+                    value={task.parameters.name}
+                    disabled={task.running}
+                    onChange={e => task.update({ name: e.target.value })} />
+                <Validator
+                    component={TextField}
+                    validate={() => {}}
+                    label={locale.fileDescription}
+                    maxLength={300}
+                    value={task.parameters.description}
+                    disabled={task.running}
+                    onChange={e => task.update({ description: e.target.value })} />
+            </TaskDialog>
+        );
+    },
+    deleteFile ({ open, task }) {
+        if (task.options._noGUI) return null;
+
+        return (
+            <TaskDialog
+                class="codeholders-task-delete-file"
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.deleteFile}
+                actionLabel={locale.delete}>
+                {dataLocale.deleteDescription}
             </TaskDialog>
         );
     },

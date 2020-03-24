@@ -4,6 +4,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
+import { LinkButton } from '../../../router';
 import { codeholders as locale, data as dataLocale } from '../../../locale';
 import { Validator } from '../../../components/form';
 import {
@@ -21,8 +22,8 @@ import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
 import TinyProgress from '../../../components/tiny-progress';
 import ProfilePictureEditor from './profile-picture';
+import { FileIcon } from './icons';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
-import Files from './files';
 
 const makeEditable = (Renderer, Editor) => function EditableField ({ value, onChange, editing }) {
     if (!editing) return <Renderer value={value} />;
@@ -273,6 +274,53 @@ function CodeEditor ({ value, item, originalItem, editing, onChange }) {
         keepSuggestions={keepSuggestions} />;
 }
 
+class FileCounter extends Component {
+    state = { count: NaN };
+
+    static contextType = coreContext;
+
+    #updateView;
+    reinit () {
+        if (this.#updateView) this.#updateView.drop();
+        this.#updateView = this.context.createDataView('codeholders/codeholderSigFiles', {
+            id: this.props.id,
+        });
+        this.#updateView.on('update', this.load);
+        this.load();
+    }
+    load = () => {
+        this.context.createTask('codeholders/listFiles', { id: this.props.id }, {
+            offset: 0,
+            limit: 1,
+        }).runOnceAndDrop().then(({ total }) => {
+            this.setState({ count: total });
+        }).catch(console.error); // eslint-disable-line no-console
+    };
+    componentDidMount () {
+        this.reinit();
+    }
+    componentDidUpdate (prevProps) {
+        if (prevProps.id !== this.props.id) this.reinit();
+    }
+
+    render ({ children }, { count }) {
+        return this.props.children(count);
+    }
+}
+
+function FilesButton ({ id }) {
+    return (
+        <LinkButton class="member-files-button" target={`/membroj/${id}/dosieroj`} raised>
+            <span class="file-icon-container">
+                <FileIcon />
+            </span>
+            <FileCounter id={id}>
+                {fileCount => locale.filesButton(fileCount)}
+            </FileCounter>
+        </LinkButton>
+    );
+}
+
 const Header = connectPerms(function Header ({
     item,
     originalItem,
@@ -311,12 +359,19 @@ const Header = connectPerms(function Header ({
                         onChange={code => onItemChange({ ...item, code })} />
                     {!editing && createHistoryLink('code')}
                 </div>
-                {!editing && perms.hasCodeholderField('membership', 'r') && <MembershipInDetailView
-                    id={item.id}
-                    canEdit={perms.hasPerm('codeholders.update')} />}
-                {!editing && perms.hasPerm('codeholder_roles.read') && <RolesInDetailView
-                    id={item.id}
-                    canEdit={perms.hasPerm('codeholder_roles.update')} />}
+                {!editing && perms.hasCodeholderField('membership', 'r') && (
+                    <MembershipInDetailView
+                        id={item.id}
+                        canEdit={perms.hasPerm('codeholders.update')} />
+                )}
+                {!editing && perms.hasPerm('codeholder_roles.read') && (
+                    <RolesInDetailView
+                        id={item.id}
+                        canEdit={perms.hasPerm('codeholder_roles.update')} />
+                )}
+                {!editing && perms.hasCodeholderField('files', 'r') && (
+                    <FilesButton id={item.id} />
+                )}
             </div>
             <div class="decorative-flourish" />
         </div>
@@ -694,18 +749,7 @@ const fields = {
     },
 };
 
-const Footer = connectPerms(function Footer ({ item, editing, perms }) {
-    if (editing) return '';
-    const canReadFiles = perms.hasCodeholderField('files', 'r');
-    const canWriteFiles = perms.hasCodeholderField('files', 'w');
-    return (
-        <div class="member-footer">
-            {canReadFiles ? <Files
-                id={item.id}
-                canUpload={canWriteFiles} /> : null}
-        </div>
-    );
-});
+const Footer = () => null;
 
 export {
     Header,

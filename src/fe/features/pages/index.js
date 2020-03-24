@@ -118,6 +118,21 @@ export default [
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholders.perms.read'),
                             },
+                            {
+                                path: 'dosieroj',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/files-page')),
+                                type: 'stack',
+                                hasPerm: perms => perms.hasCodeholderField('files', 'r'),
+                                paths: [
+                                    {
+                                        match: /^(\d+)$/,
+                                        component: elazy(() =>
+                                            import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/file-detail')),
+                                        type: 'stack',
+                                    },
+                                ],
+                            },
                         ],
                     },
                     {

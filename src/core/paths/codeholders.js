@@ -56,6 +56,7 @@ import { deepMerge, deepEq } from '../../util';
 /// Data store path.
 export const CODEHOLDERS = 'codeholders';
 export const CODEHOLDER_PERMS = 'codeholderPerms';
+export const CODEHOLDER_FILES = 'codeholderFiles';
 
 // signals
 export const SIG_MEMBERSHIPS = '!memberships';
@@ -705,6 +706,19 @@ export const tasks = {
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };
     },
+    codeholderFile: async ({ id, file }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/codeholders/${id}/files`, {
+            offset: 0,
+            limit: 1,
+            filter: { id: +file },
+            // all the fields
+            fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime', 'size'],
+        });
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.insert([CODEHOLDER_FILES, +storeId, +file], res.body[0]);
+        return res.body[0].id;
+    },
     /// codeholders/uploadFile: uploads a file
     ///
     /// # Options and Parameters
@@ -1321,6 +1335,25 @@ export const views = {
 
         drop () {
             store.unsubscribe([CODEHOLDERS, this.id], this.#onUpdate);
+        }
+    },
+
+    codeholderFile: class CodeholderFile extends AbstractDataView {
+        constructor ({ id, codeholderId, noFetch }) {
+            super();
+            this.codeholderId = codeholderId === 'self' ? store.get(LOGIN_ID) : codeholderId; // resolve id
+            this.id = id;
+            store.subscribe([CODEHOLDER_FILES, this.codeholderId, this.id], this.#onUpdate);
+            const current = store.get([CODEHOLDER_FILES, this.codeholderId, this.id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!noFetch) {
+                tasks.codeholderFile({ id: codeholderId, file: id }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = () => this.emit('update', store.get([CODEHOLDER_FILES, this.codeholderId, this.id]));
+        drop () {
+            store.unsubscribe([CODEHOLDER_FILES, this.codeholderId, this.id]);
         }
     },
 

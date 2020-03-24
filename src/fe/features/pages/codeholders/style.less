@@ -611,6 +611,18 @@
                     margin-bottom: 8px;
                 }
             }
+
+            .member-files-button {
+                --md-button-color: @gray-button-color;
+                color: inherit;
+                background: @text-fade-10;
+                padding-left: 16px;
+                padding-right: 16px;
+
+                .file-icon-container {
+                    margin-right: 8px;
+                }
+            }
         }
 
         @media (max-width: 600px) {
@@ -649,74 +661,6 @@
             &:focus {
                 outline: none;
                 border: 1px solid @secondary;
-            }
-        }
-    }
-
-    .member-files {
-        padding: 16px;
-        padding-top: 0;
-
-        .files-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .files-list {
-            .data-list-empty {
-                top: 0;
-            }
-
-            .member-file {
-                display: flex;
-                align-items: center;
-                padding: 8px 0;
-
-                .file-thumbnail {
-                    width: 48px;
-                    height: 48px;
-                    flex-shrink: 0;
-                    background: @text-fade-10;
-                    border-radius: 50%;
-                    text-align: center;
-                    line-height: 48px;
-                    margin-right: 16px;
-                }
-
-                .file-meta {
-                    flex: 1;
-
-                    .file-id {
-                        font-size: small;
-                        padding: 1px 4px;
-                        border-radius: 4px;
-                        background: @text-fade-20;
-                        margin-right: 4px;
-                    }
-
-                    .file-desc, .secondary-info {
-                        font-size: small;
-                        opacity: 0.8;
-                    }
-
-                    .file-desc {
-                        font-size: 0.9em;
-                    }
-
-                    .file-desc:not(:empty), .secondary-info {
-                        margin-top: 4px;
-                    }
-
-                    .mime-type {
-                        .mime-subtype {
-                            text-transform: uppercase;
-                        }
-                        .mime-ty:not(:empty)::before {
-                            content: '-';
-                        }
-                    }
-                }
             }
         }
     }
@@ -892,5 +836,35 @@
             display: block;
             margin-bottom: 8px;
         }
+    }
+}
+
+.codeholders-task-upload-file {
+    width: 400px;
+    max-width: 100%;
+
+    .file-preview {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .file-thumbnail {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+            background: @text-fade-10;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 48px;
+            margin-right: 16px;
+        }
+    }
+
+    .form-validator {
+        margin-bottom: 24px;
+    }
+
+    .paper-text-field {
+        width: 100%;
     }
 }
