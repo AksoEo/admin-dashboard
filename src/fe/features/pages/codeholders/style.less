@@ -615,9 +615,13 @@
             .member-files-button {
                 --md-button-color: @gray-button-color;
                 color: inherit;
-                background: @text-fade-10;
+                background: @card-background;
                 padding-left: 16px;
                 padding-right: 16px;
+
+                @media (prefers-color-scheme: dark) {
+                    background: @text-fade-10;
+                }
 
                 .file-icon-container {
                     margin-right: 8px;
