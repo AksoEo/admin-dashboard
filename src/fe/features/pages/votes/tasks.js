@@ -33,4 +33,31 @@ export default {
             </TaskDialog>
         );
     },
+    createTemplate: makeCreateTask(true),
+    updateTemplate ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.update.templateTitle}
+                actionLabel={locale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={locale.fields} />
+            </TaskDialog>
+        );
+    },
+    deleteTemplate ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.delete.templateTitle}
+                actionLabel={locale.delete.button}
+                run={() => task.runOnce()}>
+                {locale.delete.templateDescription}
+            </TaskDialog>
+        );
+    },
 };

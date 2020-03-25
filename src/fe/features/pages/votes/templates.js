@@ -13,9 +13,18 @@ import { connectPerms } from '../../../perms';
 import { votes as locale, search as searchLocale } from '../../../locale';
 import FIELDS from './fields';
 
+const fields = {
+    org: {
+        ...FIELDS.org,
+        shouldHide: null,
+    },
+    name: FIELDS.name,
+    description: FIELDS.description,
+};
+
 const SEARCHABLE_FIELDS = ['name', 'description'];
 
-export default connectPerms(class Votes extends Page {
+export default connectPerms(class VoteTemplates extends Page {
     state = {
         parameters: {
             search: {
@@ -29,9 +38,8 @@ export default connectPerms(class Votes extends Page {
             },
             fields: [
                 { id: 'org', sorting: 'none' },
-                { id: 'name', sorting: 'none' },
-                { id: 'timespan', sorting: 'desc' },
-                { id: 'state', sorting: 'none' },
+                { id: 'name', sorting: 'asc' },
+                { id: 'description', sorting: 'none' },
             ],
             offset: 0,
             limit: 10,
@@ -81,7 +89,7 @@ export default connectPerms(class Votes extends Page {
             actions.push({
                 label: locale.create.menuItem,
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
-                action: () => this.context.createTask('votes/create'),
+                action: () => this.context.createTask('votes/createTemplate'),
             });
         }
 
@@ -116,15 +124,15 @@ export default connectPerms(class Votes extends Page {
                     view="votes/voteTemplate"
                     updateView={['votes/sigVoteTemplates']}
                     parameters={parameters}
-                    fields={FIELDS}
-                    onGetItemLink={id => `/vochdonado/${id}`}
+                    fields={fields}
+                    onGetItemLink={id => `/vochdonado/shablonoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />
 
                 <FieldPicker
-                    available={Object.keys(FIELDS)}
-                    sortables={Object.keys(FIELDS).filter(x => FIELDS[x].sortable)}
+                    available={Object.keys(fields)}
+                    sortables={Object.keys(fields).filter(x => fields[x].sortable)}
                     selected={parameters.fields}
                     onChange={fields => this.setState({ parameters: { ...parameters, fields }})}
                     open={fieldPickerOpen}

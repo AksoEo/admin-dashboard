@@ -893,6 +893,8 @@ export const votes = {
         timeEnd: '[[timeEnd]]',
         ballotsSecret: '[[ballotsSecret]]',
         config: '[[config]]',
+        // template fields
+        vote: '[[vote]]',
     },
     voterCodeholdersDescription: '[[voter codeholders is a json filter for members etc etc]]',
     viewerCodeholdersSame: '[[same as votercodeholders]]',
@@ -1008,6 +1010,7 @@ export const votes = {
     create: {
         menuItem: 'Krei',
         title: 'Krei voĉdonadon',
+        templateTitle: 'Krei ŝablonon',
         button: 'Krei',
         pages: {
             template: '[[template]]',
@@ -1026,13 +1029,16 @@ export const votes = {
     update: {
         menuItem: 'Aktualigi',
         title: 'Aktualigi voĉdonadon',
+        templateTitle: 'Aktualigi ŝablonon',
         button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
         title: 'Forigi voĉdonadon',
+        templateTitle: 'Forigi ŝablonon',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la voĉdonadon? Ne eblas malfari tiun ĉi agon.',
+        templateDescription: 'Ĉu vi certas, ke vi volas forigi la ŝablonon? Ne eblas malfari tiun ĉi agon.',
     },
     csvFilename: 'vochdonadoj',
 };

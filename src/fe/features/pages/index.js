@@ -211,6 +211,21 @@ export default [
                         component: elazy(() =>
                             import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes/templates')),
                         type: 'stack',
+                        paths: [
+                            {
+                                match: /^(\d+)$/,
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes/template')),
+                                type: 'stack',
+                                paths: [
+                                    {
+                                        path: 'redakti',
+                                        type: 'state',
+                                        state: 'editing',
+                                    },
+                                ],
+                            },
+                        ],
                     },
                 ],
             },

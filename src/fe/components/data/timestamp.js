@@ -12,7 +12,7 @@ function TimestampFormatter ({ value }) {
 function TimestampEditor ({ value, onChange }) {
     const m = moment(Number.isFinite(value) ? value * 1000 : value).utc();
 
-    const dateValue = m.format('YYYY-MM-DD');
+    const dateValue = value === null ? null : m.format('YYYY-MM-DD');
     const timeValue = m.format('HH:mm:ss');
 
     return (

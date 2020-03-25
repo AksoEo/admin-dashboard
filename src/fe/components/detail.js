@@ -5,6 +5,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import HistoryIcon from '@material-ui/icons/History';
 import TinyProgress from './tiny-progress';
 import Form from './form';
+import DisplayError from './error';
 import { detail as locale } from '../locale';
 import { coreContext } from '../core/connection';
 import { Link } from '../router';
@@ -95,7 +96,7 @@ export default class DetailView extends PureComponent {
         if (this.state.error) {
             contents = (
                 <div class="detail-view-error">
-                    {this.state.error.valueOf()}
+                    <DisplayError error={this.state.error} />
                 </div>
             );
         } else if (this.state.data) {

@@ -138,6 +138,51 @@ function TimespanEditor ({ value, onChange }) {
     );
 }
 
+const templatePage = () => ({
+    id: 'template',
+    page: connectPerms(function TemplatePage ({ template: value, onTemplateChange: onChange, next, perms }) {
+        const hasTejo = perms.hasPerm('votes.create.tejo');
+        const hasUea = perms.hasPerm('votes.create.uea');
+
+        if (!hasTejo || !hasUea && !value.org) {
+            // set org field to the one the user has permission to create
+            useEffect(() => {
+                onChange({ ...value, org: hasUea ? 'uea' : 'tejo' });
+            });
+        }
+
+        return (
+            <WizardPage next={next}>
+                <WizardSection title={locale.fields.name} />
+                <Validator
+                    class="name-editor"
+                    validatorProps={{ class: 'block-validator' }}
+                    component={TextField}
+                    value={value.name}
+                    onChange={e => onChange({ ...value, name: e.target.value })}
+                    validate={value => {
+                        if (!value) {
+                            throw { error: locale.create.nameRequired };
+                        }
+                    }} />
+                <WizardSection title={locale.fields.description} />
+                <Validator
+                    class="name-editor"
+                    validatorProps={{ class: 'block-validator' }}
+                    component={TextField}
+                    value={value.description}
+                    onChange={e => onChange({ ...value, description: e.target.value || null })}
+                    validate={() => {}} />
+                {hasTejo && hasUea ? (
+                    <OrgPicker
+                        value={value.org}
+                        onChange={org => onChange({ ...value, org })} />
+                ) : null}
+            </WizardPage>
+        );
+    }),
+});
+
 const generalPage = (isTemplate) => ({
     id: 'general',
     page: connectPerms(function GeneralPage ({ value, onChange, next, perms }) {
@@ -175,7 +220,7 @@ const generalPage = (isTemplate) => ({
     }),
 });
 
-const votePage = () => ({
+const votePage = (isTemplate) => ({
     id: 'vote',
     page: function VotePage ({ value, onChange, next }) {
         return (
@@ -183,9 +228,11 @@ const votePage = () => ({
                 <TypePicker
                     value={value.type}
                     onChange={type => onChange({ ...value, type })} />
-                <TimespanEditor
-                    value={value.timespan}
-                    onChange={timespan => onChange({ ...value, timespan })} />
+                {isTemplate ? null : (
+                    <TimespanEditor
+                        value={value.timespan}
+                        onChange={timespan => onChange({ ...value, timespan })} />
+                )}
             </WizardPage>
         );
     },
@@ -224,15 +271,6 @@ const configPage = () => ({
     },
 });
 
-const templatePage = () => ({
-    id: 'template',
-    page: function TemplatePage ({ value, onChange }) {
-        void value;
-        void onChange;
-        return 'todo';
-    },
-});
-
 export default function makeCreateTask (isTemplate) {
     const pages = [
         generalPage(isTemplate),
@@ -248,6 +286,11 @@ export default function makeCreateTask (isTemplate) {
     return class CreateVote extends Component {
         state = {
             page: 0,
+            template: {
+                name: '',
+                description: '',
+                org: null,
+            },
             vote: {
                 name: '',
                 org: null,
@@ -302,9 +345,16 @@ export default function makeCreateTask (isTemplate) {
                 const isLast = i + 1 === pages.length;
                 const nextAction = () => {
                     if (isLast) {
-                        task.update(this.state.vote);
+                        task.update(isTemplate ? {
+                            ...this.state.template,
+                            vote: this.state.vote,
+                        } : this.state.vote);
                         task.runOnce().then(id => {
-                            this.context.navigate(`/vochdonado/${id}`);
+                            if (isTemplate) {
+                                this.context.navigate(`/vochdonado/shablonoj/${id}`);
+                            } else {
+                                this.context.navigate(`/vochdonado/${id}`);
+                            }
                         }).catch(error => {
                             this.setState({ error });
                             console.error(error); // eslint-disable-line no-console
@@ -328,6 +378,8 @@ export default function makeCreateTask (isTemplate) {
                     <Page
                         value={this.state.vote}
                         onChange={vote => this.setState({ vote })}
+                        template={this.state.template}
+                        onTemplateChange={template => this.setState({ template })}
                         next={[nextButton, nextAction]} />
                 );
                 pageIndex++;
@@ -338,7 +390,7 @@ export default function makeCreateTask (isTemplate) {
                     backdrop
                     open={open}
                     onClose={() => task.drop()}
-                    title={locale.create.title}
+                    title={isTemplate ? locale.create.templateTitle : locale.create.title}
                     class="vote-creator-wizard"
                     fullScreen={width => width <= 420}>
                     <ProgressIndicator selected={page} onBack={() => {

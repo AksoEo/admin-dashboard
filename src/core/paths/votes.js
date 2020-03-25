@@ -173,10 +173,6 @@ const clientFields = {
     },
 };
 
-let templateFields = new Set(Object.values(clientFields).flatMap(item => item.apiFields));
-templateFields.delete('org');
-templateFields = [...templateFields];
-
 const clientFilters = {
     org: {
         toAPI: value => ({ org: value }),
@@ -349,6 +345,26 @@ export const tasks = {
             },
         };
     },
+    createTemplate: async (_, { org, name, description, vote }) => {
+        const client = await asyncClient;
+
+        const apiVote = clientToAPI(vote);
+        delete apiVote.org;
+        delete apiVote.timeStart;
+        delete apiVote.timeEnd;
+
+        const res = await client.post('/vote_templates', {
+            org,
+            name,
+            description: description || null,
+            vote: apiVote,
+        });
+        const id = +res.res.headers.get('x-identifier');
+        store.insert([VOTE_TEMPLATES, +id], { org, name, description, vote });
+        store.signal([VOTE_TEMPLATES, SIG_VOTES]);
+        return id;
+    },
+
     /// votes/voteTemplate: fetches a single vote template
     voteTemplate: async (_, { id }) => {
         const client = await asyncClient;
@@ -358,14 +374,26 @@ export const tasks = {
                 'org',
                 'name',
                 'description',
-                ...templateFields.map(field => `vote.${field}`),
+                'vote',
             ],
         });
 
         const existing = store.get([VOTE_TEMPLATES, +id]);
-        store.insert([VOTE_TEMPLATES, +id], deepMerge(existing, clientFromAPI(res.body)));
+        store.insert([VOTE_TEMPLATES, +id], deepMerge(existing, {
+            id: res.body.id,
+            org: res.body.org,
+            name: res.body.name,
+            description: res.body.description,
+            vote: clientFromAPI(res.body.vote),
+        }));
 
         return +id;
+    },
+    deleteTemplate: async ({ id }) => {
+        const client = await asyncClient;
+        await client.delete(`/vote_templates/${id}`);
+        store.remove([VOTE_TEMPLATES, +id]);
+        store.signal([VOTE_TEMPLATES, SIG_VOTES]);
     },
 
     /// votes/filtersToAPI: converts client filters to API filters
