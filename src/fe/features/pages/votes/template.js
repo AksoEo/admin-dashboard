@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { Button } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailView from '../../../components/detail';
 import Page from '../../../components/page';
@@ -97,7 +98,7 @@ export default connectPerms(class VoteTemplateDetailpage extends Page {
         return (
             <div class="vote-detail-page template-page">
                 <Meta
-                    title={locale.detailTitle}
+                    title={locale.templateDetailTitle}
                     actions={actions} />
 
                 <DetailView
@@ -125,6 +126,13 @@ function Header ({ item, editing, userData: owner }) {
     if (editing) return null;
     owner.setOrg(item.org);
 
+    const createVote = () => {
+        owner.context.createTask('votes/create', {}, {
+            ...item.vote,
+            org: item.org,
+        });
+    };
+
     return (
         <div class="vote-header">
             <h1>
@@ -137,11 +145,15 @@ function Header ({ item, editing, userData: owner }) {
                 </span>
                 {item.name}
             </h1>
+            <Button onClick={createVote}>
+                {locale.templates.createVote}
+            </Button>
         </div>
     );
 }
 
 const FORCE_VISIBLE_FIELDS = ['name'];
+const FORCE_HIDE_FIELDS = ['timespan'];
 const fields = {
     // we can steal these because they’re idential
     name: DETAIL_FIELDS.name,
@@ -150,6 +162,7 @@ const fields = {
         component ({ value, editing, onChange }) {
             const fields = [];
             for (const k in DETAIL_FIELDS) {
+                if (FORCE_HIDE_FIELDS.includes(k)) continue;
                 const Component = DETAIL_FIELDS[k].component;
                 if (DETAIL_FIELDS[k].shouldHide && !FORCE_VISIBLE_FIELDS.includes(k)) {
                     const hide = DETAIL_FIELDS[k].shouldHide(value, editing);
@@ -162,17 +175,19 @@ const fields = {
                             {locale.fields[k]}
                         </div>
                         <div class="vote-field-editor">
-                            <Component
-                                value={value[k]}
-                                editing={editing}
-                                onChange={v => {
-                                    onChange({
-                                        ...value,
-                                        [k]: v,
-                                    });
-                                }}
-                                item={value}
-                                onItemChange={onChange} />
+                            {value[k] ? (
+                                <Component
+                                    value={value[k]}
+                                    editing={editing}
+                                    onChange={v => {
+                                        onChange({
+                                            ...value,
+                                            [k]: v,
+                                        });
+                                    }}
+                                    item={value}
+                                    onItemChange={onChange} />
+                            ) : '—'}
                         </div>
                     </div>
                 );

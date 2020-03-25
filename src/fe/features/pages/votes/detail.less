@@ -52,4 +52,30 @@
         }
         .elevation(2);
     }
+
+    &.template-page {
+        .vote-fields {
+            padding: 8px;
+            background: @text-fade-10;
+            border-radius: 4px;
+
+            .vote-field {
+                padding: 8px 0;
+                border-bottom: 1px solid @separator;
+
+                &:last-child {
+                    border-bottom: none;
+                }
+
+                .vote-field-label {
+                    font-weight: bold;
+                    font-size: small;
+                }
+
+                .vote-field-editor {
+                    margin-top: 8px;
+                }
+            }
+        }
+    }
 }

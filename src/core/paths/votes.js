@@ -389,6 +389,22 @@ export const tasks = {
 
         return +id;
     },
+    updateTemplate: async ({ id }, data) => {
+        const client = await asyncClient;
+
+        const apiData = {
+            ...data,
+            vote: clientToAPI(data.vote),
+        };
+        delete apiData.id;
+        delete apiData.org;
+        delete apiData.vote.timeStart;
+        delete apiData.vote.timeEnd;
+
+        await client.patch(`/vote_templates/${id}`, apiData);
+        const existing = store.get([VOTE_TEMPLATES, +id]);
+        store.insert([VOTE_TEMPLATES, +id], deepMerge(existing, data));
+    },
     deleteTemplate: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/vote_templates/${id}`);

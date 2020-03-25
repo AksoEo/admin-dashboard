@@ -867,10 +867,12 @@ export const lists = {
 
 export const votes = {
     title: 'Voĉdonadoj',
-    templateTitle: '[[tpl]]',
+    templatesTitle: 'Ŝablonoj',
     detailTitle: 'Voĉdonado',
+    templateDetailTitle: 'Ŝablono',
     templates: {
         menuItem: 'Ŝablonoj',
+        createVote: '[[create vote w/ this template]]',
     },
     search: {
         placeholders: {

@@ -12,6 +12,7 @@ import { votes as locale } from '../../../locale';
 import { config as Config, voterCodeholders as VoterCodeholders } from './config';
 import { routerContext } from '../../../router';
 import { connectPerms } from '../../../perms';
+import { deepMerge } from '../../../../util';
 
 function WizardPage ({ children, next }) {
     return (
@@ -327,6 +328,15 @@ export default function makeCreateTask (isTemplate) {
         };
 
         static contextType = routerContext;
+
+        componentDidMount () {
+            if (!isTemplate && this.props.task.parameters.name) {
+                // seems like we’re using a template! copy over data
+                this.setState({
+                    vote: deepMerge({ ...this.state.vote }, this.props.task.parameters),
+                });
+            }
+        }
 
         render ({ open, task }, { page }) {
             const pageTitles = [];
