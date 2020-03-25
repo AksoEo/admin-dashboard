@@ -3,6 +3,7 @@ import { Fragment, createPortal } from 'preact/compat';
 import moment from 'moment';
 import { globalAnimator, TextField, DatePicker } from '@cpsdqs/yamdl';
 import { data as locale } from '../../locale';
+import './style';
 
 /// Renders a formatted date (not editable). Use prop `value`.
 function DateFormatter ({ value }) {

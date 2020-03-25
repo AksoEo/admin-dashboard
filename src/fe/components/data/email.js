@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
+import './style';
 
 const emailRenderer = allowsInteractive => function Email ({ value }) {
     return allowsInteractive

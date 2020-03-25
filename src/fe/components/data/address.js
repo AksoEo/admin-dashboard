@@ -6,6 +6,7 @@ import { data as locale } from '../../locale';
 import { Validator } from '../form';
 import countryField, { WithCountries } from './country';
 import Required from './required';
+import './style';
 
 /// Max char lengths for each of the fields.
 const maxLengthMap = {

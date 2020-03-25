@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import { parsePhoneNumber, AsYouType as AsYouTypePhoneFmt } from 'libphonenumber-js';
 import { CountryFlag } from './country';
+import './style';
 
 const phoneNumberRenderer = allowInteractive => function PhoneNumber ({ value }) {
     let number, trailing;

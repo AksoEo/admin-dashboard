@@ -2,6 +2,7 @@ import { h } from 'preact';
 import moment from 'moment';
 import { timestampFormat } from '../../locale';
 import date from './date';
+import './style';
 
 /// Renders a formatted timestamp (not editable). Use prop `value`.
 function TimestampFormatter ({ value }) {

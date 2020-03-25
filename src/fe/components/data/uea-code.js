@@ -9,6 +9,7 @@ import { data as locale } from '../../locale';
 import { Validator } from '../form';
 import SuggestionField from '../suggestion-field';
 import TinyProgress from '../tiny-progress';
+import './style';
 
 /// Renders a single UEA code. Props: `value`, `old`.
 export function UEACode ({ value, old, ...extra }) {

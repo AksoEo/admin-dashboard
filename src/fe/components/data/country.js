@@ -3,6 +3,7 @@
 import { h } from 'preact';
 import Select from '../select';
 import { connect } from '../../core/connection';
+import './style';
 
 /// Converts a letter to a regional indicator.
 const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);

@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import './style';
 
 /// Renders an API key as a hex string.
 function APIKeyRenderer ({ value }) {
