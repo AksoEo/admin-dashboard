@@ -1,8 +1,5 @@
 import { h } from 'preact';
-import { Fragment } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
-import config from '../../../../config.val';
 import Page from '../../../components/page';
 import Meta from '../../meta';
 import DataList from '../../../components/data-list';
@@ -103,71 +100,3 @@ export default connectPerms(class FilesPage extends Page {
         );
     }
 });
-
-/*
-function Files ({ id, canUpload }) {
-    const canReadFiles = perms.hasCodeholderField('files', 'r');
-
-    return (
-        <div class="member-files">
-            <coreContext.Consumer>
-                {core => <Fragment>
-                    <header class="files-header">
-                        <h3 class="files-title">{locale.filesTitle}</h3>
-                        {canUpload ? <Button onClick={uploadFile(core)}>{locale.uploadFile}</Button> : null}
-                    </header>
-                    <DataList
-                        class="files-list"
-                        onLoad={(offset, limit) => core
-                            .createTask('codeholders/listFiles', { id }, { offset, limit })
-                            .runOnceAndDrop()}
-                        updateView={['codeholders/codeholderSigFiles', { id }]}
-                        useShowMore
-                        emptyLabel={locale.noFiles}
-                        renderItem={item => (
-                            <div class="member-file" data-id={item.id}>
-                                <FileThumbnail id={item.id} mime={item.mime} />
-                                <div class="file-meta">
-                                    <div class="file-name">
-                                        <span class="file-id">#{item.id}</span>
-                                        {item.name}
-                                    </div>
-                                    <div class="file-desc">{item.description}</div>
-                                    <div class="secondary-info">
-                                        <span class="file-type">
-                                            <Mime mime={item.mime} />
-                                        </span>
-                                        {' · '}
-                                        <span class="file-size">
-                                            <FileSize bytes={item.size} />
-                                        </span>
-                                        {' · '}
-                                        <span class="file-added-by">
-                                            {locale.fileAddedBy}
-                                            <IdUEACode id={item.addedBy} />
-                                        </span>
-                                        {' · '}
-                                        <span class="file-time">
-                                            <timestamp.inlineRenderer value={item.time * 1000} />
-                                        </span>
-                                    </div>
-                                </div>
-                                <Button
-                                    class="download-button"
-                                    href={new URL(`/codeholders/${id}/files/${item.id}`, config.base).toString()}
-                                    target="_blank"
-                                    rel="noopener">
-                                    {locale.downloadFile}
-                                </Button>
-                            </div>
-                        )}
-                        onRemove={item => core
-                            .createTask('codeholders/deleteFile', { id, file: item.id })
-                            .runOnceAndDrop()} />
-                </Fragment>}
-            </coreContext.Consumer>
-        </div>
-    );
-}
-
-*/

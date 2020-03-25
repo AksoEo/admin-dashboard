@@ -430,7 +430,8 @@ export default {
                 open={open}
                 onClose={() => task.drop()}
                 title={locale.deleteFile}
-                actionLabel={locale.delete}>
+                actionLabel={locale.delete}
+                run={() => task.runOnce()}>
                 {dataLocale.deleteDescription}
             </TaskDialog>
         );

@@ -1,55 +1,46 @@
 import { h } from 'preact';
-import EditIcon from '@material-ui/icons/Edit';
+import config from '../../../../config.val';
+import DownloadIcon from '@material-ui/icons/SaveAlt';
 import Page from '../../../components/page';
 import DetailView from '../../../components/detail';
+import { timestamp } from '../../../components/data';
+import { IdUEACode } from '../../../components/data/uea-code';
 import Meta from '../../meta';
 import { codeholders as locale } from '../../../locale';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';
-
-const detailFields = {
-    name: {
-        component ({ value, editing, onChange }) {
-            return value;
-        },
-    },
-    mime: {
-        component ({ value, editing, onChange }) {
-            return value;
-        },
-    },
-    size: {
-        component ({ value, editing, onChange }) {
-            return value;
-        },
-    },
-    addedBy: {
-        component ({ value, editing, onChange }) {
-            return value;
-        },
-    },
-    time: {
-        component ({ value, editing, onChange }) {
-            return value;
-        },
-    },
-    description: {
-        component ({ value, editing, onChange }) {
-            return value;
-        },
-    },
-};
+import { FileThumbnail, Mime, FileSize } from './files';
+import './file-detail.less';
 
 export default connectPerms(class FileDetailPage extends Page {
     static contextType = coreContext;
 
+    state = {
+        fileName: '?',
+    };
+
     getCodeholderId = () => +this.props.matches[this.props.matches.length - 3][1];
     getId = () => +this.props.match[1];
 
-    render ({ perms }) {
+    render ({ perms }, { fileName }) {
         const id = this.getId();
         const codeholderId = this.getCodeholderId();
         const actions = [];
+
+        actions.push({
+            icon: <DownloadIcon style={{ verticalAlign: 'middle' }} />,
+            label: locale.downloadFile,
+            action: () => {
+                const downloadURL = new URL(`/codeholders/${codeholderId}/files/${id}`, config.base).toString();
+                const anchor = document.createElement('a');
+                anchor.rel = 'noopener noreferrer';
+                // open in a new tab because some browsers just insist on not downloading the file
+                anchor.target = '_blank';
+                anchor.download = this.state.fileName;
+                anchor.href = downloadURL;
+                anchor.click();
+            },
+        });
 
         if (perms.hasCodeholderField('files', 'w')) {
             actions.push({
@@ -63,7 +54,7 @@ export default connectPerms(class FileDetailPage extends Page {
         }
 
         return (
-            <div class="file-detail-page">
+            <div class="codeholders-file-detail-page">
                 <Meta
                     title={locale.fileTitle}
                     actions={actions} />
@@ -71,10 +62,46 @@ export default connectPerms(class FileDetailPage extends Page {
                     view="codeholders/codeholderFile"
                     id={id}
                     options={{ codeholderId }}
-                    fields={detailFields}
+                    header={Header}
+                    footer={({ item }) => {
+                        // minor hack to get the file name to download with
+                        if (item && item.name !== fileName) this.setState({ fileName: item.name });
+                    }}
                     locale={locale.files}
                     onDelete={() => this.props.pop()} />
             </div>
         );
     }
 });
+
+function Header ({ item }) {
+    return (
+        <div class="file-header">
+            <h1 class="file-title">
+                <FileThumbnail mime={item.mime} />
+                {item.name}
+            </h1>
+            <div class="file-details">
+                <span class="file-type">
+                    <Mime mime={item.mime} />
+                </span>
+                {' · '}
+                <span class="file-size">
+                    <FileSize bytes={item.size} />
+                </span>
+                {' · '}
+                <span class="file-added-by">
+                    {locale.fileAddedBy}
+                    <IdUEACode id={item.addedBy} />
+                </span>
+                {' · '}
+                <span class="file-time">
+                    <timestamp.inlineRenderer value={item.time * 1000} />
+                </span>
+            </div>
+            <p class="file-description">
+                {item.description}
+            </p>
+        </div>
+    );
+}

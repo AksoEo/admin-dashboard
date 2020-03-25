@@ -715,6 +715,7 @@ export const tasks = {
             // all the fields
             fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime', 'size'],
         });
+        if (!res.body[0]) throw { code: 'not-found', message: 'file not found' };
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         store.insert([CODEHOLDER_FILES, +storeId, +file], res.body[0]);
         return res.body[0].id;
@@ -748,6 +749,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`codeholders/${id}/files/${file}`);
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.remove([CODEHOLDER_FILES, storeId, file]);
         store.signal([CODEHOLDERS, storeId, SIG_FILES]);
     },
     /// codeholders/listMemberships: lists memberships for a codeholder
@@ -1351,7 +1353,13 @@ export const views = {
                 tasks.codeholderFile({ id: codeholderId, file: id }).catch(err => this.emit('error', err));
             }
         }
-        #onUpdate = () => this.emit('update', store.get([CODEHOLDER_FILES, this.codeholderId, this.id]));
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([CODEHOLDER_FILES, this.codeholderId, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([CODEHOLDER_FILES, this.codeholderId, this.id]));
+            }
+        };
         drop () {
             store.unsubscribe([CODEHOLDER_FILES, this.codeholderId, this.id]);
         }

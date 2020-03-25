@@ -61,6 +61,7 @@ export default class DataList extends PureComponent {
         for (let i = 0; i < result.items.length; i++) {
             items[i + chunk * VLIST_CHUNK_SIZE] = result.items[i];
         }
+        if (items.length > result.total) items.splice(result.total);
 
         this.setState({
             total: result.total,

@@ -304,7 +304,7 @@ class FileCounter extends Component {
     }
 
     render ({ children }, { count }) {
-        return this.props.children(count);
+        return children(count);
     }
 }
 
