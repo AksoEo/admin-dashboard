@@ -519,14 +519,7 @@ export const codeholders = {
         notADate: 'Ne estas valida dato',
     },
     files: {
-        fields: {
-            name: 'Nomo',
-            description: 'Priskribo',
-            addedBy: 'Aldonita de',
-            time: '[[time]]',
-            mime: '[[mime]]',
-            size: '[[size]]',
-        },
+        downloadToView: '[[dl 2 view]]',
     },
     // TODO: move these in files
     filesButton: n => !n ? 'dosieroj' : n === 1 ? '1 dosiero' : `${n} dosieroj`,
@@ -1075,6 +1068,7 @@ export const mime = {
         'application/octet-stream': 'Dosiero',
         'application/zip': 'ZIP-dosiero',
         'application/x-rar': 'RAR-dosiero',
+        'text/csv': 'CSV-tabelo',
     },
 };
 

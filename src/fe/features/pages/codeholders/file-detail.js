@@ -10,6 +10,7 @@ import { codeholders as locale } from '../../../locale';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';
 import { FileThumbnail, Mime, FileSize } from './files';
+import FileView from './file-view';
 import './file-detail.less';
 
 export default connectPerms(class FileDetailPage extends Page {
@@ -68,13 +69,14 @@ export default connectPerms(class FileDetailPage extends Page {
                         if (item && item.name !== fileName) this.setState({ fileName: item.name });
                     }}
                     locale={locale.files}
-                    onDelete={() => this.props.pop()} />
+                    onDelete={() => this.props.pop()}
+                    userData={{ codeholderId }} />
             </div>
         );
     }
 });
 
-function Header ({ item }) {
+function Header ({ item, userData }) {
     return (
         <div class="file-header">
             <h1 class="file-title">
@@ -102,6 +104,9 @@ function Header ({ item }) {
             <p class="file-description">
                 {item.description}
             </p>
+            <div class="file-view-container">
+                <FileView id={userData.codeholderId} file={item.id} mime={item.mime} />
+            </div>
         </div>
     );
 }
