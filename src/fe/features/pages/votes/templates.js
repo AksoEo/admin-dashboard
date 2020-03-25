@@ -1,7 +1,5 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
-import SortIcon from '@material-ui/icons/Sort';
-import TuneIcon from '@material-ui/icons/Tune';
 import Page from '../../../components/page';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
@@ -10,7 +8,7 @@ import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../component
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
-import { votes as locale, search as searchLocale } from '../../../locale';
+import { votes as locale } from '../../../locale';
 import FIELDS from './fields';
 
 const fields = {
@@ -92,18 +90,6 @@ export default connectPerms(class VoteTemplates extends Page {
                 action: () => this.context.createTask('votes/createTemplate'),
             });
         }
-
-        actions.push({
-            label: searchLocale.pickFields,
-            icon: <SortIcon style={{ verticalAlign: 'middle' }} />,
-            action: () => this.setState({ fieldPickerOpen: true }),
-        });
-
-        actions.push({
-            label: locale.templates.menuItem,
-            icon: <TuneIcon style={{ verticalAlign: 'middle' }} />,
-            action: () => this.props.push('shablonoj'),
-        });
 
         return (
             <div class="votes-page templates-page">

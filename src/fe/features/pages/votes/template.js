@@ -126,6 +126,8 @@ function Header ({ item, editing, userData: owner }) {
     if (editing) return null;
     owner.setOrg(item.org);
 
+    const canCreateVote = owner.props.perms.hasPerm(`votes.create.${item.org}`);
+
     const createVote = () => {
         owner.context.createTask('votes/create', {}, {
             ...item.vote,
@@ -145,9 +147,11 @@ function Header ({ item, editing, userData: owner }) {
                 </span>
                 {item.name}
             </h1>
-            <Button onClick={createVote}>
-                {locale.templates.createVote}
-            </Button>
+            {canCreateVote && (
+                <Button onClick={createVote}>
+                    {locale.templates.createVote}
+                </Button>
+            )}
         </div>
     );
 }
