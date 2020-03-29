@@ -1,7 +1,7 @@
-import config from '../config.val';
+import { buildTime } from 'akso:config';
 
 const startYear = 2019;
-const thisYear = new Date(config.buildTime).getUTCFullYear();
+const thisYear = new Date(buildTime).getUTCFullYear();
 const copyrightYear = `${startYear}–${thisYear}`;
 
 export const timestampFormat = 'LLL [UTC]';

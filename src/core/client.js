@@ -1,4 +1,4 @@
-import config from '../config.val';
+import { base as apiHostBase } from 'akso:config';
 import * as store from './store';
 import { AUTH_STATE, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED, UEA_CODE, LOGIN_ID } from './paths/login-keys';
 import { LoginAuthStates } from '../protocol';
@@ -10,7 +10,7 @@ const getAuth = async () => {
     while (true) { // eslint-disable-line no-constant-condition
         try {
             log.debug('getting auth');
-            const res = await fetch(new URL('auth', config.base).toString(), {
+            const res = await fetch(new URL('auth', apiHostBase).toString(), {
                 credentials: 'include',
                 headers: {
                     'Accept': 'application/json',
@@ -52,7 +52,7 @@ initialAuth.then(auth => {
 
 const lazyUserClient = import(/* webpackChunkName: 'akso-client' */ './user-client').then(res => res.default);
 export default lazyUserClient.then(UserClient => {
-    const client = new UserClient({ host: config.base });
+    const client = new UserClient({ host: apiHostBase });
     return initialAuth.then(auth => {
         if (auth) {
             client.loggedIn = true;

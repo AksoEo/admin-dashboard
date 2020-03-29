@@ -1,7 +1,5 @@
-import config from '../config.val';
-
 const startYear = 2019;
-const thisYear = new Date(config.buildTime).getUTCFullYear();
+const thisYear = new Date(2038).getUTCFullYear();
 const copyrightYear = thisYear === startYear ? thisYear : `${startYear}–${thisYear}`;
 
 /** The default locale (Esperanto). */

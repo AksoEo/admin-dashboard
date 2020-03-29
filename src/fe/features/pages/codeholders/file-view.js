@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import { Button, LinearProgress } from '@cpsdqs/yamdl';
 import DisplayError from '../../../components/error';
 import { data as dataLocale, codeholders as locale } from '../../../locale';
-import config from '../../../../config.val';
+import { base as apiHostBase } from 'akso:config';
 
 /// Previews a file.
 export default class FileView extends Component {
@@ -15,7 +15,7 @@ export default class FileView extends Component {
 
     getFileURL () {
         const { id, file } = this.props;
-        return new URL(`/codeholders/${id}/files/${file}`, config.base).toString();
+        return new URL(`/codeholders/${id}/files/${file}`, apiHostBase).toString();
     }
 
     load () {

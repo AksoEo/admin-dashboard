@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import jdenticon from 'jdenticon';
-import config from '../../config.val';
+import { base as apiHostBase } from 'akso:config';
 
 // to avoid using the cardinal 1, 2, 3 ... identicons
 const DECARDINALIFY = id => [
@@ -35,7 +35,7 @@ export default class ProfilePicture extends Component {
             const ppPath = this.props.profilePictureURL
                 ? this.props.profilePictureURL(this.props.id)
                 : `codeholders/${fid}/profile_picture/`;
-            const urlBase = new URL(ppPath, config.base).toString();
+            const urlBase = new URL(ppPath, apiHostBase).toString();
             const imgSrcSet = [32, 64, 128, 256].map(w => `${urlBase}${w}px?noop=${hash} ${w}w`).join(', ');
             this.setState({ imgSrcSet, isIdenticon: false });
         } else {

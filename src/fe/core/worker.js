@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import Worker from 'worker-loader!../../core';
+import coreWorker from 'omt:../../core';
 import DataView from './view';
 import Task from './task';
 
@@ -9,7 +9,7 @@ export default class WorkerInterface extends EventEmitter {
 
     constructor () {
         super();
-        this.worker = new Worker();
+        this.worker = new Worker(coreWorker);
         this.worker.addEventListener('message', this.#onMessage);
         this.worker.addEventListener('unhandledrejection', this.#onUnhandledRejection);
     }
