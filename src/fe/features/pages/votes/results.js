@@ -128,7 +128,9 @@ export default connect(({ matches }) => ['votes/voteResults', {
 function ResultTitle ({ data }) {
     return (
         <h1 class="result-title">
-            {locale.results.resultTypes[data.result]}
+            {('result' in data)
+                ? locale.results.resultTypes[data.result]
+                : locale.results.resultTypes.success}
         </h1>
     );
 }

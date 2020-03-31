@@ -49,6 +49,7 @@ export function viewerCodeholders ({ value, onChange, editing }) {
                             else onChange('{}');
                         }} />
                 ) : null}
+                {' '}
                 <label>
                     {(editing || value === 'null') ? locale.viewerCodeholdersSame : null}
                 </label>
@@ -163,6 +164,12 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
     let inclusiveCheckbox = null;
     const inclusive = config[field];
 
+    if (relation === '<') {
+        relationLabel = inclusive ? '≤' : '<';
+    } else if (relation === '>') {
+        relationLabel = inclusive ? '≥' : '>';
+    }
+
     if (editing) {
         inclusiveCheckbox = (
             <div class="inclusive-checkbox">
@@ -171,15 +178,12 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
                     onChange={checked => {
                         onConfigChange({ ...config, [field]: checked });
                     }} />
+                {' '}
                 <label>
                     {locale.inclusive}
                 </label>
             </div>
         );
-    } else if (relation === '<') {
-        relationLabel = inclusive ? '≤' : '<';
-    } else if (relation === '>') {
-        relationLabel = inclusive ? '≥' : '>';
     }
 
     return (
@@ -236,7 +240,7 @@ export function numChosenOptions ({ value, onChange, editing }) {
 export const mentionThreshold = requiredRationalInclusive('mentionThresholdInclusive', '>');
 
 export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
-    if (!editing) return value === null ? locale.noMaxOptions : '' + value;
+    if (!editing) return value === null ? locale.config.noMaxOptions : '' + value;
 
     if (item.state.isActive) return locale.cannotEditActive;
 
@@ -245,7 +249,7 @@ export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
             component={TextField}
             type="number"
             value={value || ''}
-            placeholder={locale.noMaxOptions}
+            placeholder={locale.config.noMaxOptions}
             onChange={e => onChange(e.target.value || null)}
             validate={value => {
                 if (!Number.isFinite(+value)) {

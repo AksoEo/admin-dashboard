@@ -9,7 +9,11 @@ import UeaIcon from '../../../components/uea-icon';
 import UeaColorIcon from '../../../components/uea-color-icon';
 import { timestamp } from '../../../components/data';
 import { votes as locale } from '../../../locale';
-import { config as Config, voterCodeholders as VoterCodeholders } from './config';
+import {
+    config as Config,
+    voterCodeholders as VoterCodeholders,
+    viewerCodeholders as ViewerCodeholders,
+} from './config';
 import { routerContext } from '../../../router';
 import { connectPerms } from '../../../perms';
 import { deepMerge } from '../../../../util';
@@ -159,6 +163,7 @@ const templatePage = () => ({
                     class="name-editor"
                     validatorProps={{ class: 'block-validator' }}
                     component={TextField}
+                    outline
                     value={value.name}
                     onChange={e => onChange({ ...value, name: e.target.value })}
                     validate={value => {
@@ -171,6 +176,7 @@ const templatePage = () => ({
                     class="name-editor"
                     validatorProps={{ class: 'block-validator' }}
                     component={TextField}
+                    outline
                     value={value.description}
                     onChange={e => onChange({ ...value, description: e.target.value || null })}
                     validate={() => {}} />
@@ -204,6 +210,7 @@ const generalPage = (isTemplate) => ({
                     class="name-editor"
                     validatorProps={{ class: 'block-validator' }}
                     component={TextField}
+                    outline
                     value={value.name}
                     onChange={e => onChange({ ...value, name: e.target.value })}
                     validate={value => {
@@ -250,6 +257,14 @@ const votersPage = () => ({
                 <VoterCodeholders
                     value={value.voterCodeholders}
                     onChange={voterCodeholders => onChange({ ...value, voterCodeholders })}
+                    item={value}
+                    editing={true} />
+                <p>
+                    {locale.viewerCodeholdersDescription}
+                </p>
+                <ViewerCodeholders
+                    value={value.viewerCodeholders}
+                    onChange={viewerCodeholders => onChange({ ...value, viewerCodeholders })}
                     item={value}
                     editing={true} />
             </WizardPage>
@@ -304,6 +319,7 @@ export default function makeCreateTask (isTemplate) {
                     end: null,
                 },
                 voterCodeholders: '{\n\t\n}',
+                viewerCodeholders: 'null',
                 config: {
                     quorum: 0,
                     quorumInclusive: true,

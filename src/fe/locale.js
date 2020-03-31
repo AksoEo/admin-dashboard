@@ -899,7 +899,8 @@ export const votes = {
         vote: 'Voĉdonagordoj',
     },
     voterCodeholdersDescription: 'Voĉdonantoj estas JSON-filtrilo de membroj, kiuj rajtas voĉdoni.',
-    viewerCodeholdersSame: 'Rigardantoj estas JSON-filtrilo de membroj, kiuj rajtas rigardi la voĉdonon (sed ne nepre voĉdoni).',
+    viewerCodeholdersDescription: 'Rigardantoj estas JSON-filtrilo de membroj, kiuj rajtas rigardi la voĉdonon (sed ne nepre voĉdoni).',
+    viewerCodeholdersSame: '[[same as votercodeholders]]',
     filters: {
         org: 'AKSO-organizo',
         timeStart: 'Komenĉiĝo',
@@ -929,7 +930,6 @@ export const votes = {
         numerator: 'Numeratoro',
         denominator: 'Denominatoro',
     },
-    noMaxOptions: '[[infinite options!!!]]',
     state: {
         hasNotStarted: 'Ankoraŭ ne komenciĝis',
         isActive: 'Voĉdonado malfermita',
@@ -950,6 +950,8 @@ export const votes = {
         publishVoters: 'Publikigi nomojn de voĉdonintoj',
         publishVotersPercentage: 'Publikigi procentaĵon de voĉdonintoj',
         options: 'Opcioj',
+
+        noMaxOptions: '[[infinite options!!!]]',
     },
     inclusive: 'Inkluziva', // checkbox label
     options: {
@@ -970,6 +972,7 @@ export const votes = {
         title: 'Rezultoj',
         resultTypes: {
             undefined: 'Eraro',
+            success: '[[success]]',
             NO_QUORUM: 'Ne atingis kvorumon',
             TOO_MANY_BLANK_BALLOTS: 'Tro da blankaj balotiloj',
             TIE_BREAKER_NEEDED: 'Necesas egalecrompanto',
