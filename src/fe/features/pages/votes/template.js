@@ -179,7 +179,7 @@ const fields = {
                             {locale.fields[k]}
                         </div>
                         <div class="vote-field-editor">
-                            {value[k] ? (
+                            {(editing || value[k]) ? (
                                 <Component
                                     value={value[k]}
                                     editing={editing}

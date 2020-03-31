@@ -15,6 +15,9 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
 
     state = {
         edit: null,
+
+        hasPassword: false,
+        hasEmail: false,
     };
 
     onEndEdit = () => {
@@ -44,7 +47,11 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
         if (this.#commitTask) this.#commitTask.drop();
     }
 
-    render ({ availableFields, editing, match, perms }) {
+    // field callbacks
+    onHasEmail = hasEmail => this.setState({ hasEmail });
+    onHasPassword = hasPassword => this.setState({ hasPassword });
+
+    render ({ availableFields, editing, match, perms }, { hasPassword, hasEmail }) {
         if (!availableFields) return;
         const id = match[1];
 
@@ -75,15 +82,22 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                 label: locale.fieldHistory.title(locale.fields.password.toLowerCase()),
                 action: () => this.props.onNavigate(`/membroj/${id}/historio?password`),
                 overflow: true,
-            }, {
-                label: locale.resetPassword.create,
-                action: () => this.context.createTask('codeholders/createPassword', { id }, { org: 'akso' }),
-                overflow: true,
-            }, {
-                label: locale.resetPassword.reset,
-                action: () => this.context.createTask('codeholders/resetPassword', { id }, { org: 'akso' }),
-                overflow: true,
             });
+
+            if (hasPassword) {
+                actions.push({
+                    label: locale.resetPassword.reset,
+                    action: () => this.context.createTask('codeholders/resetPassword', { id }, { org: 'akso' }),
+                    overflow: true,
+                });
+            } else if (hasEmail) {
+                actions.push({
+                    label: locale.resetPassword.create,
+                    action: () => this.context.createTask('codeholders/createPassword', { id }, { org: 'akso' }),
+                    overflow: true,
+                });
+            }
+
             if (perms.hasPerm('codeholders.delete')) {
                 actions.push({
                     label: locale.delete,
@@ -116,7 +130,8 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                     header={Header}
                     fields={fields}
                     footer={Footer}
-                    locale={locale} />
+                    locale={locale}
+                    userData={this} />
             </div>
         );
     }

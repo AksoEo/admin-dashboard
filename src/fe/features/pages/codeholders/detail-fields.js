@@ -329,7 +329,12 @@ const Header = connectPerms(function Header ({
     createHistoryLink,
     canReadHistory,
     perms,
+    userData,
 }) {
+    // field callbacks for detail view
+    if (userData && userData.onHasEmail) userData.onHasEmail(!!item.email);
+    if (userData && userData.onHasPassword) userData.onHasPassword(!!item.hasPassword);
+
     return (
         <div class="member-header">
             <div class="member-picture">

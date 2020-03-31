@@ -5,6 +5,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
+import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
 import JSONEditor from '../../../components/json-editor';
 import CodeholderPicker from '../../../components/codeholder-picker';
@@ -142,14 +143,13 @@ export function type ({ value, onChange, editing, item }) {
     if (item.state.isActive) return locale.cannotEditActive;
 
     return (
-        <Segmented
-            selected={value}
-            onSelect={value => onChange(value)}>
-            {Object.keys(locale.types).map(type => ({
-                id: type,
+        <Select
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            items={Object.keys(locale.types).map(type => ({
+                value: type,
                 label: locale.types[type],
-            }))}
-        </Segmented>
+            }))} />
     );
 }
 
@@ -295,6 +295,7 @@ export const options = class OptionsEditor extends Component {
     optionKeys = [];
 
     render ({ value, onChange, editing }) {
+        if (!value) return null;
         const items = [];
 
         for (let i = 0; i < value.length; i++) {
