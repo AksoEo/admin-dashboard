@@ -900,7 +900,7 @@ export const votes = {
     },
     voterCodeholdersDescription: 'Voĉdonantoj estas JSON-filtrilo de membroj, kiuj rajtas voĉdoni.',
     viewerCodeholdersDescription: 'Rigardantoj estas JSON-filtrilo de membroj, kiuj rajtas rigardi la voĉdonon (sed ne nepre voĉdoni).',
-    viewerCodeholdersSame: '[[same as votercodeholders]]',
+    viewerCodeholdersSame: 'Nur voĉdonantoj',
     filters: {
         org: 'AKSO-organizo',
         timeStart: 'Komenĉiĝo',
@@ -997,7 +997,7 @@ export const votes = {
         majorityOkay: k => k ? 'Ambaŭ plimultoj estis atingitaj.' : 'Ambaŭ plimultoj NE estis atingitaj.',
         rounds: 'Raŭndoj',
         roundsPagination: (n, m) => `Raŭndo ${n} el ${m}`,
-        roundsChosen: '[[chosen:]] ',
+        roundsChosen: 'Venkintoj: ',
         roundsOptionStats: (won, lost, mentions) => `[[won ${won}, lost ${lost}, mentioned ${mentions} time(s)]]`,
         lockGraph: '[[lock graph]]',
         rankedPairs: {
