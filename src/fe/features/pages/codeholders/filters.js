@@ -12,7 +12,7 @@ import { codeholders as locale } from '../../../locale';
 import CountryPicker from '../../../components/country-picker';
 import MulticolList from '../../../components/multicol-list';
 import RangeEditor from '../../../components/range-editor';
-import { date } from '../../../components/data';
+import { date, ueaCode } from '../../../components/data';
 
 // TEMP: replace with actual multi-<select> when available
 function makeDialogMultiSelect (view, pickSome, render, render2) {
@@ -640,11 +640,16 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <Fragment>
-                    <date.editor
-                        value={value.date}
-                        onChange={date => onChange({ ...value, date })}
-                        disabled={hidden}
-                        tabIndex={hidden ? -1 : undefined} />
+                    <div>
+                        <label>
+                            {locale.search.role.activeAtTime}
+                        </label>
+                        <date.editor
+                            value={value.date}
+                            onChange={date => onChange({ ...value, date })}
+                            disabled={hidden}
+                            tabIndex={hidden ? -1 : undefined} />
+                    </div>
                     <RolePicker
                         style={{ width: '100%' }}
                         disabled={hidden}
@@ -722,6 +727,66 @@ export default {
                             onChange(value);
                             onEnabledChange(true);
                         }} />
+                </div>
+            );
+        },
+    },
+    codeList: {
+        default () {
+            return { enabled: false, value: [] };
+        },
+        serialize ({ value }) {
+            return value.join(',');
+        },
+        deserialize (value) {
+            return { enabled: true, value: value.split(',') };
+        },
+        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
+            const [pickerOpen, setPickerOpen] = useState(false);
+
+            let pickedCodes = (
+                <span class="picker-placeholder">
+                    {locale.search.codeList.pickCodes}
+                </span>
+            );
+
+            if (enabled) {
+                pickedCodes = [];
+                for (const code of value) {
+                    if (pickedCodes.length) pickedCodes.push(' ');
+                    pickedCodes.push(<ueaCode.inlineRenderer key={code} value={code} />);
+                }
+            }
+
+            return (
+                <div class="code-list-editor">
+                    <div class="code-picker" onClick={() => setPickerOpen(true)}>
+                        <span class="picked-codes">
+                            {pickedCodes}
+                        </span>
+                        <ExpandMoreIcon className="expand-icon" />
+                    </div>
+
+                    <Dialog
+                        class="codeholders-code-list-picker"
+                        title={locale.search.codeList.pickCodes}
+                        backdrop
+                        fullScreen={width => width < 600}
+                        open={pickerOpen}
+                        onClose={() => setPickerOpen(false)}>
+                        <p>
+                            {locale.search.codeList.description}
+                        </p>
+                        <textarea
+                            class="picker-text-box"
+                            value={value.join('\n')}
+                            spellCheck="false"
+                            onChange={e => {
+                                const value = e.target.value;
+                                onChange(value.split('\n'));
+                                onEnabledChange(!!value.trim());
+                            }} />
+                    </Dialog>
                 </div>
             );
         },

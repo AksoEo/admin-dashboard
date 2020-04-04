@@ -418,6 +418,13 @@ const clientFilters = {
         },
         fields: [],
     },
+    codeList: {
+        toAPI: codes => ({
+            newCode: {
+                $in: codes,
+            },
+        }),
+    },
 };
 
 /// Transient client fields that will be selected for a given search field.

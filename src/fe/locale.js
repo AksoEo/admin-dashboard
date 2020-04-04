@@ -317,6 +317,7 @@ export const codeholders = {
             roles: 'Roloj',
             isActiveMember: 'Aktiva membro iam en',
             deathdate: 'Mortjaro',
+            codeList: '[[uea code $in filter]]',
         },
         countryFilter: {
             all: 'ne gravas',
@@ -360,11 +361,16 @@ export const codeholders = {
         },
         role: {
             pickSome: 'Elekti rolojn',
+            activeAtTime: '[[active on]] ', // comes before the date picker
         },
         types: {
             all: 'ne gravas',
             human: 'homo',
             org: 'organizo',
+        },
+        codeList: {
+            pickCodes: '[[elekti kodojn]]',
+            description: '[[insert codes in the text field below; one per line]]',
         },
     },
     globalFilterTitle: 'La rezultoj estas filtritaj',

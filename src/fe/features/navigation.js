@@ -40,11 +40,11 @@ function parseHistoryState (url, state, mkPopStack, perms) {
     url = new URL(url);
 
     if (url.search === TRUNCATED_QUERY_NAME) {
-        if (state && state.href) url = new URL(state.href);
+        if (state && state.href) url = new URL(url.origin + state.href);
         else {
             // oh no we don’t have the full url
             // just discard state i guess
-            url = new URL(url.pathname);
+            url = new URL(url.origin + url.pathname);
         }
     }
 
@@ -351,7 +351,7 @@ export default class Navigation extends PureComponent {
             else window.history.pushState(null, '', this.urlLocation);
             // and finally, save state
             this.saveState();
-        } catch {
+        } catch (err) {
             // may fail in browsers that do not allow frequent updates
             this.debouncedNavigate(href, replace);
         }
@@ -436,7 +436,7 @@ export default class Navigation extends PureComponent {
                         .filter(item => item.component)
                         .map(item => ({ data: item.data, query: item.query })),
                     href: this.currentLocation,
-                }, '', this.currentLocation);
+                }, '', this.urlLocation);
             } catch {
                 // shrug
             }
