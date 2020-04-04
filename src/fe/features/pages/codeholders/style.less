@@ -516,6 +516,16 @@
         }
     }
 
+    .codeholder-field-publicity {
+        &:not(.is-editing) {
+            color: @gray-button-color;
+        }
+
+        &.is-static {
+            color: inherit;
+        }
+    }
+
     .fixed-checkbox {
         pointer-events: none;
         --md-checkbox-check: @secondary;
@@ -549,15 +559,23 @@
             margin-right: 16px;
             flex-shrink: 0;
 
-            .picture-history-link {
+            .picture-meta,
+            & > .codeholder-field-publicity {
                 position: absolute;
                 right: 0;
                 bottom: 0;
-                width: 40px;
+
+                @media (max-width: 600px) {
+                    right: calc(50% - 64px);
+                }
+            }
+
+            .picture-meta {
+                padding: 0 8px;
                 height: 40px;
                 text-align: center;
                 line-height: 38px;
-                border-radius: 50%;
+                border-radius: 100px;
                 background: @card-background;
                 .elevation(3);
 
@@ -565,8 +583,8 @@
                     margin: auto;
                 }
 
-                @media (max-width: 600px) {
-                    right: calc(50% - 64px);
+                .codeholder-field-publicity + .history-link {
+                    margin-left: 8px;
                 }
             }
         }
@@ -631,8 +649,36 @@
                     }
                 }
 
+                .codeholder-field-publicity {
+                    margin-left: 8px;
+                }
+
                 &.editing {
                     margin-bottom: 32px;
+                }
+            }
+
+            .last-name-publicity-editor {
+                margin-top: -16px;
+                margin-bottom: 32px;
+
+                padding-left: 16px;
+
+                /*
+                text-align: right;
+                width: 416px;
+
+                @media (max-width: 700px) {
+                    width: auto;
+                    text-align: center;
+                }
+                */
+
+                label {
+                    text-transform: uppercase;
+                    font-size: small;
+                    font-weight: bold;
+                    margin-right: 16px;
                 }
             }
 

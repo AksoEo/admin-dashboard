@@ -34,6 +34,8 @@ import './detail.less';
 /// - makeHistoryLink: if set, should be a callback that returns the url for the given field’s
 ///   history
 /// - onDelete: called when the item is deleted
+/// - userData: arbitrary user data passed to fields
+/// - wideExtra: bool, if true will make extra space wider
 export default class DetailView extends PureComponent {
     static contextType = coreContext;
 
@@ -91,7 +93,7 @@ export default class DetailView extends PureComponent {
         this.props.onCommit(changes);
     }
 
-    render ({ editing, locale: detailLocale, makeHistoryLink, userData }) {
+    render ({ editing, locale: detailLocale, makeHistoryLink, userData, wideExtra }) {
         let contents;
         if (this.state.error) {
             contents = (
@@ -132,7 +134,6 @@ export default class DetailView extends PureComponent {
                 footer = <Footer {...fieldProps} createHistoryLink={createHistoryLink} canReadHistory={canReadHistory} />;
             }
 
-            // TODO: proper field rendering
             for (const fieldId in this.props.fields) {
                 const field = this.props.fields[fieldId];
                 const FieldComponent = field.component;
@@ -150,13 +151,14 @@ export default class DetailView extends PureComponent {
                 if (hasDiff) idClass += ' has-diff';
 
                 let historyLink = null;
-                if (makeHistoryLink && field.history) historyLink = createHistoryLink(fieldId);
-                else if (makeHistoryLink) historyLink = <span class="history-link-placeholder" />;
+                if (!editing) {
+                    if (makeHistoryLink && field.history) historyLink = createHistoryLink(fieldId);
+                    else if (makeHistoryLink) historyLink = <span class="history-link-placeholder" />;
+                }
 
                 const itemId = (
                     <div class={idClass} key={'i' + fieldId} data-id={fieldId}>
                         {detailLocale.fields[fieldId]}
-                        {historyLink}
                     </div>
                 );
                 const itemContents = (
@@ -179,11 +181,23 @@ export default class DetailView extends PureComponent {
                     </div>
                 );
 
+                let fieldExtra;
+                if (field.extra) {
+                    fieldExtra = <field.extra value={itemData[fieldId]} {...fieldProps} />;
+                }
+
+                const itemExtra = (
+                    <div class="detail-field-extra">
+                        {fieldExtra}
+                        {historyLink}
+                    </div>
+                );
+
                 if (isEmpty) {
                     // empty fields go below
-                    emptyItems.push(itemId, itemContents);
+                    emptyItems.push(itemId, itemExtra, itemContents);
                 } else {
-                    items.push(itemId, itemContents);
+                    items.push(itemId, itemExtra, itemContents);
                 }
             }
 
@@ -209,7 +223,7 @@ export default class DetailView extends PureComponent {
                             },
                         ]} />
                     {header}
-                    <div class="detail-fields">
+                    <div class={'detail-fields' + (wideExtra ? ' wide-extra' : '')}>
                         {items}
                         {emptyItems}
                     </div>

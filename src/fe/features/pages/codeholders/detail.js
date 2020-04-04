@@ -131,7 +131,8 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                     fields={fields}
                     footer={Footer}
                     locale={locale}
-                    userData={this} />
+                    userData={this}
+                    wideExtra />
             </div>
         );
     }

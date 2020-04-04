@@ -741,7 +741,7 @@ export default {
         deserialize (value) {
             return { enabled: true, value: value.split(',') };
         },
-        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
+        editor ({ value, onChange, enabled, onEnabledChange }) {
             const [pickerOpen, setPickerOpen] = useState(false);
 
             let pickedCodes = (

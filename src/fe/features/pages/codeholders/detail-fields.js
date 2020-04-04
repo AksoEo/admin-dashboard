@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { Fragment } from 'preact/compat';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
@@ -19,10 +20,10 @@ import {
 } from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
 import Select from '../../../components/select';
-import Segmented from '../../../components/segmented';
 import TinyProgress from '../../../components/tiny-progress';
 import ProfilePictureEditor from './profile-picture';
 import { FileIcon } from './icons';
+import Publicity from './publicity';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
 
 const makeEditable = (Renderer, Editor) => function EditableField ({ value, onChange, editing }) {
@@ -108,7 +109,16 @@ const validators = {
     },
 };
 
-function NameEditor ({ value, item, editing, onChange, noIcon, createHistoryLink }) {
+function NameEditor ({
+    value,
+    item,
+    editing,
+    onChange,
+    noIcon,
+    createHistoryLink,
+    lastNamePublicity,
+    onLastNamePublicityChange,
+}) {
     if (!value) return null;
 
     // use actual type or heuristics otherwise
@@ -168,13 +178,16 @@ function NameEditor ({ value, item, editing, onChange, noIcon, createHistoryLink
                 <div class="name-primary">
                     {!noIcon && <IconType className="type-icon" />}
                     {primaryName}
+                    {!noIcon && itemType === 'human' && (
+                        <Publicity value={lastNamePublicity} style="icon" />
+                    )}
                     {!noIcon && createHistoryLink('name')}
                 </div>
                 {secondaryName}
             </div>
         );
     } else if (itemType === 'human') {
-        return lotsOfTextFields([
+        const lotf = lotsOfTextFields([
             [
                 {
                     component: SuggestionField,
@@ -217,6 +230,20 @@ function NameEditor ({ value, item, editing, onChange, noIcon, createHistoryLink
             class: 'member-name editing',
             key: 'human',
         });
+
+        return (
+            <Fragment>
+                {lotf}
+                <div class="last-name-publicity-editor">
+                    <label>{locale.fields.lastNamePublicity}</label>
+                    <Publicity
+                        value={lastNamePublicity}
+                        onChange={onLastNamePublicityChange}
+                        editing={true}
+                        style="icon" />
+                </div>
+            </Fragment>
+        );
     } else if (itemType === 'org') {
         return lotsOfTextFields([
             [
@@ -344,9 +371,16 @@ const Header = connectPerms(function Header ({
                     profilePictureHash={item.profilePictureHash}
                     canEdit={perms.hasPerm('codeholders.update')}
                     createHistoryLink={createHistoryLink} />
-                {!editing && canReadHistory && <div class="picture-history-link">
+                {!editing && canReadHistory && <div class="picture-meta">
+                    <Publicity value={item.profilePicturePublicity} style="icon" />
                     {createHistoryLink('profilePictureHash')}
                 </div>}
+                {editing && <Publicity
+                    value={item.profilePicturePublicity}
+                    editing={true}
+                    onChange={v => onItemChange({ ...item, profilePicturePublicity: v })}
+                    types={['members', 'public']}
+                    style="icon" />}
             </div>
             <div class="member-info">
                 <NameEditor
@@ -354,6 +388,8 @@ const Header = connectPerms(function Header ({
                     item={item}
                     editing={editing}
                     onChange={name => onItemChange({ ...item, name })}
+                    lastNamePublicity={item.lastNamePublicity}
+                    onLastNamePublicityChange={v => onItemChange({ ...item, lastNamePublicity: v })}
                     createHistoryLink={createHistoryLink} />
                 <div class="member-code">
                     <CodeEditor
@@ -485,39 +521,6 @@ function simpleField (component, extra) {
     };
 }
 
-function makePublicityField (shouldHide) {
-    return {
-        component ({ value, editing, onChange }) {
-            if (editing) {
-                return (
-                    <Segmented
-                        selected={value}
-                        onSelect={selected => onChange(selected)}>
-                        {[
-                            {
-                                id: 'private',
-                                label: locale.publicity.private,
-                            },
-                            {
-                                id: 'members',
-                                label: locale.publicity.members,
-                            },
-                            {
-                                id: 'public',
-                                label: locale.publicity.public,
-                            },
-                        ]}
-                    </Segmented>
-                );
-            }
-            if (!value) return null;
-            return locale.publicity[value];
-        },
-        shouldHide,
-        history: true,
-    };
-}
-
 const fields = {
     // for field history
     name: {
@@ -570,8 +573,6 @@ const fields = {
         },
         history: true,
     },
-    profilePicturePublicity: makePublicityField((item, editing) => !editing && !item.profilePictureHash),
-    lastNamePublicity: makePublicityField((item, editing) => item.type !== 'human' || !editing && (!item.name || (!item.name.lastLegal && !item.name.last))),
     isDead: {
         component ({ value, editing, onChange }) {
             return (
@@ -637,22 +638,35 @@ const fields = {
             }
         },
         isEmpty: value => !value || !Object.values(value).filter(x => x).length,
+        extra: ({ item, editing, onItemChange }) => (
+            <Publicity
+                value={item.addressPublicity}
+                onChange={v => onItemChange({ ...item, addressPublicity: v })}
+                editing={editing}
+                style="icon" />
+        ),
         history: true,
     },
-    addressPublicity: makePublicityField((item, editing) => !editing && (!item.address || !Object.values(item.address).filter(x => x).length)),
     feeCountry: {
         component: makeDataEditable(country),
         history: true,
     },
     email: simpleField(makeDataEditable(email), {
+        extra: ({ item, editing, onItemChange }) => (
+            <Publicity
+                value={item.emailPublicity}
+                onChange={v => onItemChange({ ...item, emailPublicity: v })}
+                editing={editing}
+                style="icon" />
+        ),
         history: true,
     }),
-    emailPublicity: makePublicityField((item, editing) => !editing && !item.email),
     profession: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }, {
         shouldHide: item => item.type !== 'human',
+        extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
     }),
     website: simpleField(function ({ value, editing, onChange }) {
@@ -678,25 +692,44 @@ const fields = {
                 }
             }} />;
     }, {
+        extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
     }),
     landlinePhone: simpleField(makeDataEditable(phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
+        extra: ({ item, editing, onItemChange }) => (
+            <Publicity
+                value={item.landlinePhonePublicity}
+                onChange={v => onItemChange({ ...item, landlinePhonePublicity: v })}
+                editing={editing}
+                style="icon" />
+        ),
         history: true,
     }),
-    landlinePhonePublicity: makePublicityField((item, editing) => item.type !== 'human' || !editing && (!item.landlinePhone || !item.landlinePhone.value)),
     officePhone: simpleField(makeDataEditable(phoneNumber), {
         isEmpty: value => !value.value,
+        extra: ({ item, editing, onItemChange }) => (
+            <Publicity
+                value={item.officePhonePublicity}
+                onChange={v => onItemChange({ ...item, officePhonePublicity: v })}
+                editing={editing}
+                style="icon" />
+        ),
         history: true,
     }),
-    officePhonePublicity: makePublicityField((item, editing) => !editing && (!item.officePhone || !item.officePhone.value)),
     cellphone: simpleField(makeDataEditable(phoneNumber), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
+        extra: ({ item, editing, onItemChange }) => (
+            <Publicity
+                value={item.cellphonePublicity}
+                onChange={v => onItemChange({ ...item, cellphonePublicity: v })}
+                editing={editing}
+                style="icon" />
+        ),
         history: true,
     }),
-    cellphonePublicity: makePublicityField((item, editing) => item.type !== 'human' || !editing && (!item.cellphone || !item.cellphone.value)),
     hasPassword: simpleField(function ({ value }) {
         return <Checkbox class="fixed-checkbox" checked={value} />;
     }, {
@@ -723,6 +756,7 @@ const fields = {
                 );
             }
         },
+        extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
     },
     notes: {
