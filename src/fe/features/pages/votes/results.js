@@ -37,12 +37,12 @@ export default connect(({ matches }) => ['votes/voteResults', {
 
         const stats = [];
         if ('electionQuota' in data) {
-            stats.push(locale.electionQuota(data.electionQuota));
+            stats.push(locale.results.electionQuota(data.electionQuota));
         }
         if ('majorityBallotsOkay' in data) {
-            stats.push(locale.majorityBallotsOkay(data.majorityBallotsOkay));
-            stats.push(locale.majorityVotersOkay(data.majorityVotersOkay));
-            stats.push(locale.majorityOkay(data.majorityOkay));
+            stats.push(locale.results.majorityBallotsOkay(data.majorityBallotsOkay));
+            stats.push(locale.results.majorityVotersOkay(data.majorityVotersOkay));
+            stats.push(locale.results.majorityOkay(data.majorityOkay));
         }
 
         const turnout = (

@@ -70,6 +70,39 @@
         .detail-field-empty {
             opacity: 0.5;
         }
+
+        @media (max-width: 600px) {
+            display: block;
+            padding: 24px;
+
+            .detail-field-id {
+                display: inline-block;
+                text-align: left;
+                width: calc(100% - 56px);
+                margin-bottom: 8px;
+            }
+
+            .detail-field-extra {
+                display: inline-block;
+                width: 56px;
+                padding-right: 0;
+            }
+
+            &.wide-extra {
+                .detail-field-id {
+                    width: calc(100% - 96px);
+                }
+                .detail-field-extra {
+                    width: 96px;
+                }
+            }
+
+            .detail-field-editor:not(:last-of-type) {
+                padding-bottom: 16px;
+                border-bottom: 1px solid @separator;
+                margin-bottom: 16px;
+            }
+        }
     }
 }
 
