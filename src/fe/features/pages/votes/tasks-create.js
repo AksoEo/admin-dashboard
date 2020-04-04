@@ -259,6 +259,7 @@ const votersPage = () => ({
                     onChange={voterCodeholders => onChange({ ...value, voterCodeholders })}
                     item={value}
                     editing={true} />
+                <WizardSection title={locale.fields.viewerCodeholders} />
                 <p>
                     {locale.viewerCodeholdersDescription}
                 </p>

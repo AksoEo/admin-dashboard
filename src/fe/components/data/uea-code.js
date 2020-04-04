@@ -129,6 +129,10 @@ class UEACodeEditor extends Component {
         const className = 'data uea-code-editor' + (extraProps.class ? ' ' + extraProps.class : '');
         delete extraProps.class;
 
+        if (!extraProps.error && this.state.takenState === 'taken') {
+            extraProps.error = locale.ueaCode.codeTaken;
+        }
+
         return <Validator
             class={className}
             component={SuggestionField}

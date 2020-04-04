@@ -946,7 +946,7 @@ export const votes = {
         numChosenOptions: 'Kvanto de venkontaj opcioj',
         mentionThreshold: 'Minimuma postulata kvanto de mencioj por kandidato',
         maxOptionsPerBallot: 'Maksimuma kvanto de elektitaj opcioj sur balotilo',
-        tieBreakerCodeholder: 'egalecrompanto',
+        tieBreakerCodeholder: 'Egalecrompanto',
         publishVoters: 'Publikigi nomojn de voĉdonintoj',
         publishVotersPercentage: 'Publikigi procentaĵon de voĉdonintoj',
         options: 'Opcioj',
@@ -963,9 +963,9 @@ export const votes = {
     types: {
         yn: 'Jes/Ne',
         ynb: 'Jes/Ne/Sindetene',
-        rp: 'TEJO-Paroranga',
+        rp: 'TEJO-Paroranga Sistemo',
         stv: 'TEJO-Unuopa Transdonebla Voĉo',
-        tm: 'UEA-Unuvica plurnoma majoritata balotsistemo',
+        tm: 'UEA-Unuvica Plurnoma Majoritata Balotsistemo',
     },
     results: {
         link: 'Vidi rezultojn',
@@ -1022,7 +1022,7 @@ export const votes = {
         continue: 'Daŭrigi',
 
         nameRequired: 'Necesas nomo',
-        requiresSelection: 'Vi devas elekti AKSO-organizon',
+        requiresSelection: 'Vi devas elekti opcion',
     },
     numberRequired: 'Bv. enmeti nombron',
     optionsRequired: 'Bv. enmeti voĉdonopciojn',
