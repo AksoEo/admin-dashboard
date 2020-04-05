@@ -26,12 +26,19 @@ import { FileIcon } from './icons';
 import Publicity from './publicity';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
 
-const makeEditable = (Renderer, Editor) => function EditableField ({ value, onChange, editing }) {
+const makeEditable = (Renderer, Editor, History) => function EditableField ({
+    value,
+    onChange,
+    editing,
+    item,
+    isHistory,
+}) {
+    if (isHistory && History) return <History value={value} item={item} />;
     if (!editing) return <Renderer value={value} />;
     return <Editor value={value} onChange={onChange} />;
 };
 
-const makeDataEditable = data => makeEditable(data.renderer, data.editor);
+const makeDataEditable = (data, history) => makeEditable(data.renderer, data.editor, history);
 
 // Lots of text fields
 function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
@@ -178,7 +185,7 @@ function NameEditor ({
                 <div class="name-primary">
                     {!noIcon && <IconType className="type-icon" />}
                     {primaryName}
-                    {!noIcon && itemType === 'human' && (
+                    {(itemType === 'human') && (
                         <Publicity value={lastNamePublicity} style="icon" />
                     )}
                     {!noIcon && createHistoryLink('name')}
@@ -521,12 +528,28 @@ function simpleField (component, extra) {
     };
 }
 
+function makePhoneHistory (fieldName) {
+    return ({ value, item }) => (
+        <Fragment>
+            <Publicity value={item[fieldName + 'Publicity']} style="icon" />
+            {' '}
+            <phoneNumber.renderer value={value} />
+        </Fragment>
+    );
+}
+
 const fields = {
     // for field history
     name: {
         component ({ value, item }) {
             if (!value) return null;
-            return <NameEditor value={value} item={item} noIcon />;
+            return (
+                <NameEditor
+                    value={value}
+                    lastNamePublicity={item.lastNamePublicity}
+                    item={item}
+                    noIcon />
+            );
         },
         shouldHide: () => true,
         history: true,
@@ -540,7 +563,7 @@ const fields = {
         history: true,
     },
     profilePictureHash: {
-        component ({ value }) {
+        component ({ value, item }) {
             let formattedValue;
             let hash;
             if (value === null) {
@@ -554,6 +577,8 @@ const fields = {
             return (
                 <div class="profile-picture-hash" title={hash}>
                     {formattedValue}
+                    {' '}
+                    <Publicity value={item.profilePicturePublicity} style="icon" />
                 </div>
             );
         },
@@ -626,7 +651,12 @@ const fields = {
     address: {
         component ({ value, item, editing, onChange, isHistory }) {
             if (isHistory) {
-                return <address.renderer value={value} />;
+                return (
+                    <Fragment>
+                        <Publicity value={item.addressPublicity} style="icon" />
+                        <address.renderer value={value} />
+                    </Fragment>
+                );
             }
 
             if (!editing) {
@@ -651,7 +681,13 @@ const fields = {
         component: makeDataEditable(country),
         history: true,
     },
-    email: simpleField(makeDataEditable(email), {
+    email: simpleField(makeDataEditable(email, ({ value, item }) => (
+        <Fragment>
+            <Publicity value={item.emailPublicity} style="icon" />
+            {' '}
+            <email.renderer value={value} />
+        </Fragment>
+    )), {
         extra: ({ item, editing, onItemChange }) => (
             <Publicity
                 value={item.emailPublicity}
@@ -695,7 +731,7 @@ const fields = {
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
     }),
-    landlinePhone: simpleField(makeDataEditable(phoneNumber), {
+    landlinePhone: simpleField(makeDataEditable(phoneNumber, makePhoneHistory('landlinePhone')), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
         extra: ({ item, editing, onItemChange }) => (
@@ -707,7 +743,7 @@ const fields = {
         ),
         history: true,
     }),
-    officePhone: simpleField(makeDataEditable(phoneNumber), {
+    officePhone: simpleField(makeDataEditable(phoneNumber, makePhoneHistory('officePhone')), {
         isEmpty: value => !value.value,
         extra: ({ item, editing, onItemChange }) => (
             <Publicity
@@ -718,7 +754,7 @@ const fields = {
         ),
         history: true,
     }),
-    cellphone: simpleField(makeDataEditable(phoneNumber), {
+    cellphone: simpleField(makeDataEditable(phoneNumber, makePhoneHistory('cellphone')), {
         isEmpty: value => !value.value,
         shouldHide: item => item.type !== 'human',
         extra: ({ item, editing, onItemChange }) => (

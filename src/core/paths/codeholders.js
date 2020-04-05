@@ -270,6 +270,16 @@ const fieldHistoryBlacklist = [
 ];
 const isFieldHistoryBlacklisted = field => fieldHistoryBlacklist.includes(field);
 
+const fieldHistoryExtraFields = {
+    name: ['lastNamePublicity'],
+    profilePictureHash: ['profilePicturePublicity'],
+    address: ['addressPublicity'],
+    email: ['emailPublicity'],
+    officePhone: ['officePhonePublicity'],
+    landlinePhone: ['landlinePhonePublicity'],
+    cellphone: ['cellphonePublicity'],
+};
+
 /// converts from API repr to client repr (see above)
 export const clientFromAPI = makeClientFromAPI(clientFields);
 const clientToAPI = makeClientToAPI(clientFields);
@@ -966,11 +976,13 @@ export const tasks = {
             apiFields = typeof clientFields[field] === 'string'
                 ? [clientFields[field]]
                 : clientFields[field].apiFields.filter(x => !isFieldHistoryBlacklisted(x));
+
+            if (fieldHistoryExtraFields[field]) apiFields.push(...fieldHistoryExtraFields[field]);
         }
         let histFields = apiFields;
 
         // special history endpoint
-        if (field === 'address') histFields = ['address'];
+        if (field === 'address') histFields = ['address', ...(fieldHistoryExtraFields.address || [])];
 
         const mods = {
             // the “null” change; initial value at db creation time or something
