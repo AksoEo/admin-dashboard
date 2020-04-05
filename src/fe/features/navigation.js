@@ -81,7 +81,7 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                 const item = {
                     path: firstPathPart,
                     source: category,
-                    component: <NotFoundPage />,
+                    component: NotFoundPage,
                     query: '',
                     state: {},
                 };
@@ -162,7 +162,7 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                     const item = {
                         path: pathParts.join('/'),
                         source: subpage,
-                        component: isForbidden ? ForbiddenPage : subpage.component,
+                        component: isForbidden ? ForbiddenPage : subpage.component || NotFoundPage,
                         pathMatch: match,
                         query: '',
                         state: {},
@@ -174,7 +174,7 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                     const item = {
                         path: part,
                         source: subpage,
-                        component: isForbidden ? ForbiddenPage : subpage.component,
+                        component: isForbidden ? ForbiddenPage : subpage.component || NotFoundPage,
                         pathMatch: match,
                         query: '',
                         state: {},
@@ -319,6 +319,7 @@ export default class Navigation extends PureComponent {
             } else newStack[i] = stack[i];
         }
 
+        this.stateIsDirty = true;
         this.setState({ stack: newStack, pathname, query });
     }
 
@@ -388,6 +389,7 @@ export default class Navigation extends PureComponent {
                 // save to URL
                 this.debouncedNavigate(this.state.pathname + (newQuery ? '?' + newQuery : ''), true);
             } else {
+                this.stateIsDirty = true;
                 // just save to state
                 this.setState({ stack }, this.saveState);
             }
@@ -427,8 +429,9 @@ export default class Navigation extends PureComponent {
     }
 
     saveState = () => {
-        if (!this.state.error) {
+        if (!this.state.error && this.stateIsDirty) {
             // only save while we don’t have an error
+            this.stateIsDirty = false;
             try {
                 window.history.replaceState({
                     stack: this.state.stack

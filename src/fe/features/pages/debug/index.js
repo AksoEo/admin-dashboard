@@ -7,6 +7,7 @@ import ObjectViewer from '../../../components/object-viewer';
 import { app as locale } from '../../../locale';
 import permsContext from '../../../perms';
 import { connect, coreContext } from '../../../core/connection';
+import { Link } from '../../../router';
 import Meta from '../../meta';
 
 export default class DebugPage extends Page {
@@ -21,6 +22,8 @@ export default class DebugPage extends Page {
                 <CodeholderFiltersViewer />
                 <RequestRunner />
                 <TaskRunner />
+                <br />
+                <Link target="/debug/launchpad_mcquack.jpg">open launchpad_mcquack.jpg</Link>
             </div>
         );
     }

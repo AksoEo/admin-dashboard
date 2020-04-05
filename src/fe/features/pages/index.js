@@ -58,6 +58,14 @@ export default [
                 path: 'debug',
                 hasPerm: () => true,
                 hidden: true,
+                paths: [
+                    {
+                        type: 'stack',
+                        path: 'launchpad_mcquack.jpg',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "debug-tools" */ './debug/crash')),
+                    },
+                ],
             },
             {
                 id: 'home',
