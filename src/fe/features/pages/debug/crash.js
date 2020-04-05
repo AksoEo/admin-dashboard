@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import Page from '../../../components/page';
 
 export default class CrashPage extends Page {

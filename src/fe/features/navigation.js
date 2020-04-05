@@ -282,6 +282,11 @@ export default class Navigation extends PureComponent {
 
     /// Loads a URL and a history state object.
     loadURL (url, state) {
+        if (this.state.error) {
+            // force reload
+            window.location = url;
+        }
+
         const {
             urlLocation,
             currentLocation,
@@ -331,6 +336,11 @@ export default class Navigation extends PureComponent {
 
     /// Navigates with an href.
     navigate = (href, replace) => {
+        if (this.state.error) {
+            // force reload to clear error state
+            window.location = href;
+        }
+
         this.#lastNavigateTime = Date.now();
         this.#debouncedNavigateTimeout = null;
 
@@ -482,12 +492,24 @@ export default class Navigation extends PureComponent {
             }
             return (
                 <div class="navigation-view error">
+                    <EventProxy
+                        dom target={window}
+                        onpopstate={this.onPopState} />
+                    <h1>{locale.genericErrorTitle}</h1>
                     {locale.genericError}
                     <br />
                     <br />
                     <Button onClick={() => window.location.reload()}>
                         {locale.genericErrorReload}
                     </Button>
+                    <br />
+                    <br />
+                    <details class="error-details">
+                        <summary>{locale.genericErrorViewDetails}</summary>
+                        <pre>
+                            {this.state.error.toString()}
+                        </pre>
+                    </details>
                 </div>
             );
         }

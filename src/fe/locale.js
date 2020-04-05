@@ -174,8 +174,10 @@ export const app = {
     logOut: 'Elsaluti',
 
     // literally any error that causes the UI to fail to render
+    genericErrorTitle: 'Eraro',
     genericError: 'Okazis neatendita eraro. Bonvolu poste reprovi. Se tiu ĉi eraro okazadas indus kontakti administranton.',
     genericErrorReload: 'Reŝarĝi la paĝon',
+    genericErrorViewDetails: '[[view technical details]]',
 
     notFound: 'Ni ne sukcesis trovi tiun ĉi paĝon. Eventaule kontrolu ĉu vi mistajpis adreson.',
     forbidden: 'Vi ne rajtas aliri tiun ĉi paĝon.',
