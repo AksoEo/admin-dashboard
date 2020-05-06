@@ -855,6 +855,7 @@ export const lists = {
         menuItem: 'Krei',
         title: 'Krei liston',
         button: 'Krei',
+        warning: '[[lists are public, gdpr etc etc]]',
     },
     update: {
         menuItem: 'Redakti',

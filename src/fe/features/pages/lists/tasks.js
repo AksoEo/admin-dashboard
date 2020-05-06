@@ -18,6 +18,9 @@ export default {
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/listoj/${id}`);
                         })}>
+                        <p>
+                            {locale.create.warning}
+                        </p>
                         <Validator
                             component={TextField}
                             label={locale.fields.name}
@@ -26,6 +29,7 @@ export default {
                             validate={name => {
                                 if (!name) throw { error: locale.nameRequired };
                             }} />
+                        <br />
                         <Validator
                             component={TextField}
                             label={locale.fields.description}
