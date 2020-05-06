@@ -318,8 +318,8 @@ export default class Navigation extends PureComponent {
                     // if data was decoded; load it
                     // (otherwise just keep current state)
                     newStack[i].data = stack[i].data;
-                    newStack[i].query = stack[i].query;
                 }
+                newStack[i].query = stack[i].query;
                 newStack[i].state = stack[i].state;
             } else newStack[i] = stack[i];
         }
