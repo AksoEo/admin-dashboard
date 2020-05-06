@@ -20,11 +20,9 @@ export default class FileView extends Component {
 
     load () {
         const { mime } = this.props;
-        if (!MIME_TYPES[mime]) {
-            this.setState({ invalid: true });
-        }
+        const typeSpec = getTypespec(mime);
+        if (!typeSpec) this.setState({ invalid: true });
         const fileURL = this.getFileURL();
-        const typeSpec = MIME_TYPES[mime];
 
         this.setState({
             progress: NaN,
@@ -67,7 +65,7 @@ export default class FileView extends Component {
 
     componentWillUnmount () {
         const type = this.props.mime;
-        const typeSpec = MIME_TYPES[type];
+        const typeSpec = getTypespec(type);
         if (typeSpec && typeSpec.release && this.state.data) typeSpec.release(this.state.data);
     }
 
@@ -92,7 +90,7 @@ export default class FileView extends Component {
                 </div>
             );
         } else if (data) {
-            const Renderer = MIME_TYPES[mime].component;
+            const Renderer = getTypespec(mime).component;
             contents = <Renderer data={data} />;
         }
 
@@ -139,8 +137,13 @@ const audioType = {
 };
 
 const MIME_TYPES = {
-    'text/plain': {
-        prep: blob => blob.text(),
+    'text/*': {
+        prep: blob => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject();
+            reader.readAsText(blob);
+        }),
         component ({ data }) {
             return <pre>{data}</pre>;
         },
@@ -152,3 +155,33 @@ const MIME_TYPES = {
     'audio/mpeg': audioType,
     'video/mp4': videoType,
 };
+
+const BROWSER_SUPPORTS_NATIVE_PDF =
+    navigator.userAgent.includes('Mac OS X')
+    || navigator.userAgent.includes('Windows NT')
+    || navigator.userAgent.includes('CrOS')
+    || (navigator.userAgent.includes('Linux') && !navigator.userAgent.includes('Android'));
+
+if (BROWSER_SUPPORTS_NATIVE_PDF) {
+    MIME_TYPES['application/pdf'] = {
+        prep: blob => URL.createObjectURL(blob),
+        release: url => URL.revokeObjectURL(url),
+        component ({ data }) {
+            return <iframe
+                src={data}
+                class="pdf-frame"
+                referrerpolicy="no-referrer" />;
+        },
+    };
+}
+
+const MIME_WILDCARDS = Object.keys(MIME_TYPES).filter(x => x.includes('*'));
+
+function getTypespec (mime) {
+    if (MIME_TYPES[mime]) return MIME_TYPES[mime];
+    for (const wildcard of MIME_WILDCARDS) {
+        const re = new RegExp(`^${wildcard.replace(/[+-/]/, m => '\\' + m).replace(/\*/g, '.+')}$`);
+        if (mime.match(re)) return MIME_TYPES[wildcard];
+    }
+    return null;
+}

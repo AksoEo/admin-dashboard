@@ -319,7 +319,9 @@ export default class Navigation extends PureComponent {
                     // (otherwise just keep current state)
                     newStack[i].data = stack[i].data;
                 }
-                newStack[i].query = stack[i].query;
+                if (stack[i].data || i === stack.length - 1) {
+                    newStack[i].query = stack[i].query;
+                }
                 newStack[i].state = stack[i].state;
             } else newStack[i] = stack[i];
         }
