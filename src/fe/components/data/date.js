@@ -13,6 +13,8 @@ function DateFormatter ({ value }) {
 const MIN_DATE = new Date(1970, 0, 1);
 const MAX_DATE = new Date(2147482647 * 1000);
 
+const APPROX_DATE_EDITOR_HEIGHT = 300; // for deciding whether to show above or below
+
 const dateEditorPortalContainer = document.createElement('div');
 dateEditorPortalContainer.id = 'data-date-editor-portal-container';
 document.body.appendChild(dateEditorPortalContainer);
@@ -47,6 +49,7 @@ class DateEditor extends Component {
         // popout screen pos
         popoutX: 0,
         popoutY: 0,
+        anchorBottom: false,
         // true if input is focused
         focused: false,
         // if true, the pointer is in the popout and popout should remain open
@@ -93,7 +96,12 @@ class DateEditor extends Component {
         if (this.textField && this.textField.node) {
             const rect = this.textField.node.getBoundingClientRect();
             if (rect.left !== this.state.popoutX) this.setState({ popoutX: rect.left });
-            if (rect.bottom !== this.state.popoutY) this.setState({ popoutY: rect.bottom });
+
+            const anchorBottom = window.innerHeight - rect.bottom < APPROX_DATE_EDITOR_HEIGHT;
+            const popoutY = anchorBottom ? rect.top : rect.bottom;
+
+            if (popoutY !== this.state.popoutY) this.setState({ popoutY });
+            if (anchorBottom !== this.state.anchorBottom) this.setState({ anchorBottom });
         }
     }
 
@@ -114,6 +122,7 @@ class DateEditor extends Component {
     render ({ onChange, ...props }, {
         popoutX,
         popoutY,
+        anchorBottom,
         focused,
         pointerInPopout,
         inputText,
@@ -133,7 +142,9 @@ class DateEditor extends Component {
                 <div
                     class="data-date-picker-portal"
                     style={{
-                        transform: `translate(${popoutX}px, ${popoutY}px)`,
+                        transform: anchorBottom
+                            ? `translateY(-100%) translate(${popoutX}px, ${popoutY}px)`
+                            : `translate(${popoutX}px, ${popoutY}px)`,
                     }}
                     onMouseEnter={() => this.setState({ pointerInPopout: true })}
                     onMouseLeave={this.#onMouseLeave}>
