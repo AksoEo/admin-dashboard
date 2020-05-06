@@ -391,7 +391,7 @@ export const codeholders = {
         disjunctCountry: (fee, country) => `Pagas laŭ ${fee}, loĝas en ${country}`,
         disjunctCountryCSV: (fee, country) => `Pago: ${fee}, Loĝo: ${country}`,
         age: 'Aĝo',
-        ageFormat: (age, agep) => `${age} (${agep} jarkomence)`,
+        ageFormat: (age, agep, dead) => `${age}` + (dead ? '' : ` (${agep} jarkomence)`),
         email: 'Retpoŝtadreso',
         address: 'Adreso',
         addressCity: 'Urbo',

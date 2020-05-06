@@ -176,18 +176,18 @@ export default {
     },
     age: {
         sortable: true,
-        component ({ value }) {
+        component ({ value, item }) {
             if (!value) return null;
             const { now, atStartOfYear } = value;
             if (!now) return null;
-            const label = locale.fields.ageFormat(now, atStartOfYear);
+            const label = locale.fields.ageFormat(now, atStartOfYear, item.isDead);
             return <span class="age">{label}</span>;
         },
-        stringify (value) {
+        stringify (value, item) {
             if (!value) return '';
             const { now, atStartOfYear } = value;
             if (!now) return null;
-            return locale.fields.ageFormat(now, atStartOfYear);
+            return locale.fields.ageFormat(now, atStartOfYear, item.isDead);
         },
     },
     membership: {
