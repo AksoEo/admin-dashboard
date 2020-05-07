@@ -107,7 +107,7 @@ class CountryPickerInnerComponent extends PureComponent {
         let searchResults = Object.keys(this.props.countryGroups)
             .map(id => ({ id, name: this.props.countryGroups[id].name }))
             .concat(Object.keys(this.props.countries)
-                .map(id => ({ id, name: this.props.countries[id] })))
+                .map(id => ({ id, name: this.props.countries[id].name_eo })))
             .filter(x => !this.props.value.includes(x));
 
         if (this.state.search) {

@@ -1086,7 +1086,3 @@ export const mime = {
         'text/csv': 'CSV-tabelo',
     },
 };
-
-// TODO: remove this
-import compatLocale from './locale_old';
-export default compatLocale;
