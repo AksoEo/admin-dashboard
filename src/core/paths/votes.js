@@ -217,7 +217,7 @@ export const tasks = {
         const client = await asyncClient;
         const filters = [];
         for (const filter in clientFilters) {
-            if (clientFilters[filter].hasPerm && (await clientFilters[filter].hasPerm(client))) {
+            if (!clientFilters[filter].hasPerm || (await clientFilters[filter].hasPerm(client))) {
                 filters.push(filter);
             }
         }

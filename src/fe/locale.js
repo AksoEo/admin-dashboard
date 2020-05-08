@@ -923,7 +923,6 @@ export const votes = {
         },
         stateTypes: {
             pending: 'Ankoraŭ ne komenciĝis',
-            started: '[[started]]',
             active: '[[active]]',
             ended: '[[ended]]',
             none: 'ne gravas',

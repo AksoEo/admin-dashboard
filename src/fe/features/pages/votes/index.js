@@ -110,7 +110,7 @@ export default connect('votes/filters')(data => ({
 
         let filteredFilters = FILTERS;
         if (availableFilters) {
-            filteredFilters = Object.fromEntries(availableFilters.map(filter => [filter, FILTERS]));
+            filteredFilters = Object.fromEntries(availableFilters.map(filter => [filter, FILTERS[filter]]));
         }
 
         return (
