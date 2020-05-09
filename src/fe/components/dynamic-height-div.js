@@ -12,6 +12,7 @@ export const layoutContext = createContext();
 /// - useCooldown: bool
 ///    - lastChangeTime: number
 ///    - cooldown: cooldown time
+/// - useFirstHeight: bool
 export default class DynamicHeightDiv extends PureComponent {
     static contextType = layoutContext;
 
@@ -23,6 +24,11 @@ export default class DynamicHeightDiv extends PureComponent {
         this.#height.target = [...this.#node.children]
             .map(child => child.offsetHeight)
             .reduce((a, b) => a + b, 0);
+
+        if (!this._usedFirstHeight && this.props.useFirstHeight) {
+            this._usedFirstHeight = true;
+            this.#height.value = this.#height.target;
+        }
 
         if (this.#height.wantsUpdate()) globalAnimator.register(this);
     };

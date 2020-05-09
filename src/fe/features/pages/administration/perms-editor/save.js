@@ -142,7 +142,7 @@ export default class SaveTask extends Component {
 function StateLine ({ state, label, error }) {
     return (
         <li class="state-line">
-            <DynamicHeightDiv class="autosizer">
+            <DynamicHeightDiv class="autosizer" useFirstHeight>
                 <div class="state-line-inner">
                     <span class="state-icon">
                         <CircularProgress
