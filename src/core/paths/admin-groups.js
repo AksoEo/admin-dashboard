@@ -1,4 +1,5 @@
 import { util } from '@tejo/akso-client';
+import JSON5 from 'json5';
 import asyncClient from '../client';
 import { AbstractDataView } from '../view';
 import { CLIENTS } from './clients';
@@ -52,7 +53,7 @@ export const tasks = {
         const client = await asyncClient;
 
         const res = await client.get(`/admin_groups/${id}`, {
-            fields: ['id', 'name', 'description', 'memberRestrictions.filter', 'memberRestrictions.fields'],
+            fields: ['id', 'name', 'description'],
         });
         const existing = store.get([ADMIN_GROUPS, id]);
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, res.body));
@@ -73,15 +74,12 @@ export const tasks = {
         return id;
     },
     /// adminGroups/update: updates an admin group
-    update: async ({ id }, { name, description, memberRestrictions }) => {
+    update: async ({ id }, { name, description }) => {
         const client = await asyncClient;
 
         const options = {};
         if (name) options.name = name;
         if (description !== undefined) options.description = description || null;
-        if (memberRestrictions !== undefined) {
-            options.memberRestrictions = memberRestrictions;
-        }
 
         await client.patch(`/admin_groups/${id}`, options);
 
@@ -97,26 +95,68 @@ export const tasks = {
         store.signal([ADMIN_GROUPS, SIG_LIST]);
     },
 
-    /// adminGroups/permissions: lists admin group permissions
+    /// adminGroups/permissions: returns admin group perm data
     permissions: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/admin_groups/${id}/permissions`);
+        const res2 = await client.get(`/admin_groups/${id}`, {
+            fields: ['memberRestrictions.filter', 'memberRestrictions.fields'],
+        });
 
         const perms = res.body.map(x => x.permission);
+        const mrEnabled = !!res2.body.memberRestrictions;
+        const mrFilter = mrEnabled
+            ? JSON5.stringify(res2.body.memberRestrictions.filter, undefined, 4)
+            : '{\n\t\n}';
+        const mrFields = mrEnabled
+            ? res2.body.memberRestrictions.fields
+            : {};
+
+        const permData = {
+            permissions: perms,
+            mrEnabled,
+            mrFilter,
+            mrFields,
+        };
 
         const existing = store.get([ADMIN_GROUPS, id]);
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, {
-            permissions: perms,
+            permissions: permData,
         }));
-        return perms;
+        return permData;
     },
-    /// adminGroups/setPermissions: sets admin groups permissions
-    setPermissions: async ({ id }, { permissions }) => {
+    setPermissions: () => {}, // dummy for UI
+    /// adminGroups/setPermissionsPX: sets admin group permissions (ONLY sends permissions to
+    /// server).
+    /// consider also calling setPermissionsMR to complete the transaction.
+    setPermissionsPX: async ({ id }, { permissions }) => {
         const client = await asyncClient;
-        await client.put(`/admin_groups/${id}/permissions`, permissions);
+        await client.put(`/admin_groups/${id}/permissions`, permissions.permissions);
         const existing = store.get([ADMIN_GROUPS, id]);
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, {
-            permissions,
+            permissions: { permissions: permissions.permissions },
+        }));
+    },
+    /// adminGroups/setPermissionsMR: sets admin group permissions (ONLY sends MR to server).
+    /// consider also calling setPermissions to complete the transaction.
+    setPermissionsMR: async ({ id }, { permissions }) => {
+        const client = await asyncClient;
+
+
+        await client.patch(`/admin_groups/${id}`, {
+            memberRestrictions: permissions.mrEnabled ? {
+                filter: JSON5.parse(permissions.mrFilter),
+                fields: permissions.mrFields,
+            } : null,
+        });
+
+        const existing = store.get([ADMIN_GROUPS, id]);
+        store.insert([ADMIN_GROUPS, id], deepMerge(existing, {
+            permissions: {
+                mrEnabled: permissions.mrEnabled,
+                mrFilter: permissions.mrFilter,
+                mrFields: permissions.mrFields,
+            },
         }));
     },
 

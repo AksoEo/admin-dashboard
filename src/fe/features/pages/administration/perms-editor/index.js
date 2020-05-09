@@ -10,7 +10,7 @@ import {
     memberFieldsWrite,
 } from '../../../../permissions';
 import { data as locale } from '../../../../locale';
-import JSONFilterEditor from '../../../../components/json-filter-editor';
+import JSONEditor from '../../../../components/json-editor';
 import DisclosureArrow from '../../../../components/disclosure-arrow';
 import {
     addPermission,
@@ -23,13 +23,21 @@ import {
 } from './solver';
 import './style';
 
+
 /// Permissions editor.
 /// Also edits member filter and member fields.
 ///
+/// ```
+/// struct PermsData {
+///     permissions: string[],
+///     mrEnabled: bool,
+///     mrFilter: string,
+///     mrFields: { [string]: string? } | null,
+/// }
+/// ```
+///
 /// # Props
-/// - permissions: list of granted permissions
-/// - memberFilter: member filter (may be none)
-/// - memberFields: member fields (may be none)
+/// - value/onChange: PermsData
 /// - editable: if false, will not show as editable
 export default class PermsEditor extends Component {
     state = {
@@ -41,56 +49,46 @@ export default class PermsEditor extends Component {
     #node = null;
 
     render ({
-        permissions,
-        memberFields,
-        memberFilter,
-        memberRestrictionsEnabled,
+        value,
         onChange,
-        onFieldsChange,
-        onFilterChange,
-        onMemberRestrictionsEnabledChange,
         editable,
     }, { showRaw }) {
+        if (!value) return null;
+        const { permissions, mrEnabled, mrFilter, mrFields } = value;
+
         const ctx = {
             showRaw,
             editable,
             permissions,
-            memberFields,
+            memberFields: mrFields,
             showImplied: new Set(), // TODO
-            // showImplied: this.state.showImplied && permStates.has(this.state.showImplied)
-            //     ? permStates.get(this.state.showImplied).impliedBy
-            //     : new Set(),
             setShowImplied: implied => this.setState({ showImplied: implied }),
             togglePerm: perm => {
-                if (hasPermission(permissions, memberFields, perm)) {
-                    const [p, m] = removePermission(permissions, memberFields, perm);
-                    onChange(p);
-                    onFieldsChange(m);
+                if (hasPermission(permissions, mrFields, perm)) {
+                    const [p, m] = removePermission(permissions, mrFields, perm);
+                    onChange({ ...value, permissions: p, mrFields: m });
                 } else {
-                    const [p, m] = addPermission(permissions, memberFields, perm);
-                    onChange(p);
-                    onFieldsChange(m);
+                    const [p, m] = addPermission(permissions, mrFields, perm);
+                    onChange({ ...value, permissions: p, mrFields: m });
                 }
             },
             toggleField: (field, flags) => {
-                if (hasMemberField(permissions, memberFields, field, flags)) {
-                    const [p, m] = removeMemberField(permissions, memberFields, field, flags);
-                    onChange(p);
-                    onFieldsChange(m);
+                if (hasMemberField(permissions, mrFields, field, flags)) {
+                    const [p, m] = removeMemberField(permissions, mrFields, field, flags);
+                    onChange({ ...value, permissions: p, mrFields: m });
                 } else {
-                    const [p, m] = addMemberField(permissions, memberFields, field, flags);
-                    onChange(p);
-                    onFieldsChange(m);
+                    const [p, m] = addMemberField(permissions, mrFields, field, flags);
+                    onChange({ ...value, permissions: p, mrFields: m });
                 }
             },
             toggleAllFields: () => {
-                if (memberFields === null) onFieldsChange({});
-                else onFieldsChange(null);
+                if (mrFields === null) onChange({ ...value, mrFields: {} });
+                else onChange({ ...value, mrFields: null });
             },
-            memberFilter,
-            setMemberFilter: onFilterChange,
-            memberRestrictionsEnabled,
-            setMemberRestrictionsEnabled: onMemberRestrictionsEnabledChange,
+            memberFilter: mrFilter,
+            setMemberFilter: filter => onChange({ ...value, mrFilter: filter }),
+            mrEnabled: mrEnabled,
+            setMREnabled: enabled => onChange({ ...value, mrEnabled: enabled }),
         };
 
         const unknown = permissions.filter(isPermissionUnknown);
@@ -231,13 +229,13 @@ function PermsItem ({ item, ctx, disabled }) {
                 <Checkbox
                     class="perm-checkbox"
                     disabled={disabled}
-                    checked={ctx.memberRestrictionsEnabled}
-                    onClick={() => ctx.setMemberRestrictionsEnabled(!ctx.memberRestrictionsEnabled)} />
+                    checked={ctx.mrEnabled}
+                    onClick={() => ctx.setMREnabled(!ctx.mrEnabled)} />
                 {item.name}
             </div>
         );
     } else if (item === '!memberFieldsEditor') {
-        if (!ctx.memberRestrictionsEnabled) return null;
+        if (!ctx.mrEnabled) return null;
         return (
             <MemberFieldsEditor
                 disabled={disabled}
@@ -246,7 +244,7 @@ function PermsItem ({ item, ctx, disabled }) {
                 toggleAll={ctx.toggleAllFields} />
         );
     } else if (item === '!memberFilterEditor') {
-        if (!ctx.memberRestrictionsEnabled || !ctx.setMemberFilter) return null;
+        if (!ctx.mrEnabled || !ctx.setMemberFilter) return null;
         const defaultValue = { filter: {} };
         return (
             <MemberFilterEditor
@@ -319,11 +317,10 @@ function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
 function MemberFilterEditor ({ disabled, filter, onFilterChange }) {
     return (
         <div class="member-filter-editor">
-            <JSONFilterEditor
+            <JSONEditor
                 disabled={disabled}
                 value={filter}
-                onChange={onFilterChange}
-                suppressInitialRoundTrip />
+                onChange={onFilterChange} />
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { TextField, AppBarProxy, Button, MenuIcon } from '@cpsdqs/yamdl';
 import DoneIcon from '@material-ui/icons/Done';
+import SavePerms from '../perms-editor/save';
 import { adminGroups as locale } from '../../../../locale';
 import { Validator } from '../../../../components/form';
 import TaskDialog from '../../../../components/task-dialog';
@@ -381,16 +382,14 @@ export default {
         );
     },
 
-    setPermissions ({ open, task }) {
+    setPermissions ({ open, core, task }) {
         return (
-            <TaskDialog
+            <SavePerms
                 open={open}
-                onClose={() => task.drop()}
-                title={locale.setPermissions}
-                actionLabel={locale.setPermsButton}
-                run={() => task.runOnce()}>
-                todo: summary of changes
-            </TaskDialog>
+                core={core}
+                task={task}
+                pxTask="adminGroups/setPermissionsPX"
+                mrTask="adminGroups/setPermissionsMR" />
         );
     },
 };

@@ -1,4 +1,5 @@
 import { util } from '@tejo/akso-client';
+import JSON5 from 'json5';
 import { AbstractDataView } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
@@ -92,25 +93,11 @@ export const tasks = {
         store.remove([CLIENTS, id]);
     },
 
-    /// clients/clientPerms: returns permissions of a client
-    clientPerms: async ({ id }) => {
+    /// clients/permissions: returns permissions of a client
+    permissions: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/clients/${id}/permissions`);
-        const perms = res.body.map(({ permission }) => permission);
-        const existing = store.get([CLIENT_PERMS, id]);
-        store.insert([CLIENT_PERMS, id], deepMerge(existing, { permissions: perms }));
-        return perms;
-    },
-    /// clients/setPermissions: sets client permissions
-    setPermissions: async ({ id }, { permissions }) => {
-        const client = await asyncClient;
-        await client.put(`/clients/${id}/permissions`, permissions);
-        const existing = store.get([CLIENT_PERMS, id]);
-        store.insert([CLIENT_PERMS, id], deepMerge(existing, { permissions }));
-    },
-    /// clients/memberRestrictions: returns member restrictions of a client
-    memberRestrictions: async ({ id }) => {
-        const client = await asyncClient;
+
         let memberRestrictions;
         try {
             const res = await client.get(`/clients/${id}/member_restrictions`, {
@@ -124,25 +111,61 @@ export const tasks = {
                 throw err;
             }
         }
-        const existing = store.get([CLIENT_PERMS, id]);
-        store.insert([CLIENT_PERMS, id], deepMerge(existing, { memberRestrictions }));
-        return memberRestrictions;
+
+        const perms = res.body.map(({ permission }) => permission);
+        const mrEnabled = !!memberRestrictions;
+        const mrFilter = mrEnabled
+            ? JSON5.stringify(memberRestrictions.filter, undefined, 4)
+            : '{\n\t\n}';
+        const mrFields = mrEnabled
+            ? memberRestrictions.fields
+            : {};
+
+        const permData = {
+            permissions: perms,
+            mrEnabled,
+            mrFilter,
+            mrFields,
+        };
+
+        store.insert([CLIENT_PERMS, id], permData);
+        return permData;
     },
-    /// clients/setMemberRestrictions: sets member restrictions of a client
-    setMemberRestrictions: async ({ id }, { enabled, filter, fields }) => {
+    setPermissions: () => {}, // dummy for UI
+    /// clients/setPermissionsPX: sets client permissions (ONLY sends permissions to server)
+    setPermissionsPX: async ({ id }, { permissions }) => {
         const client = await asyncClient;
-        if (enabled) {
+        await client.put(`/clients/${id}/permissions`, permissions.permissions);
+        const existing = store.get([CLIENT_PERMS, id]);
+        store.insert([CLIENT_PERMS, id], deepMerge(existing, {
+            permissions: permissions.permissions,
+        }));
+    },
+    /// clients/setPermissionsMR: sets client permissions (ONLY sends MR to server)
+    setPermissionsMR: async ({ id }, { permissions }) => {
+        const client = await asyncClient;
+        const existing = store.get([CLIENT_PERMS, id]);
+        if (permissions.mrEnabled) {
             await client.put(`/clients/${id}/member_restrictions`, {
-                filter,
-                fields,
+                filter: JSON5.parse(permissions.mrFilter),
+                fields: permissions.mrFields,
             });
-            const existing = store.get([CLIENT_PERMS, id]);
-            store.insert([CLIENT_PERMS, id], deepMerge(existing, { memberRestrictions: { filter, fields } }));
         } else {
-            await client.delete(`/clients/${id}/member_restrictions`);
-            const existing = store.get([CLIENT_PERMS, id]);
-            store.insert([CLIENT_PERMS, id], deepMerge(existing, { memberRestrictions: null }));
+            try {
+                await client.delete(`/clients/${id}/member_restrictions`);
+            } catch (err) {
+                if (err.statusCode === 404) {
+                    // not found; means there weren’t any in the first place
+                } else {
+                    throw err;
+                }
+            }
         }
+        store.insert([CLIENT_PERMS, id], deepMerge(existing, {
+            mrEnabled: permissions.mrEnabled,
+            mrFilter: permissions.mrFilter,
+            mrFields: permissions.mrFields,
+        }));
     },
 };
 
@@ -178,12 +201,12 @@ export const views = {
             store.unsubscribe([CLIENTS, this.id], this.#onUpdate);
         }
     },
-    /// clients/clientPerms: views a client’s permissions
+    /// clients/permissions: views a client’s permissions
     ///
     /// # Options
     /// - id: client id
     /// - noFetch: if true, will not fetch any new data
-    clientPerms: class ClientPerms extends AbstractDataView {
+    permissions: class ClientPerms extends AbstractDataView {
         constructor ({ id, noFetch }) {
             super();
             this.id = id;
@@ -192,8 +215,7 @@ export const views = {
             if (current) setImmediate(this.#onUpdate);
 
             if (!noFetch) {
-                tasks.clientPerms({ id }).catch(err => this.emit('error', err));
-                tasks.memberRestrictions({ id }).catch(err => this.emit('error', err));
+                tasks.permissions({ id }).catch(err => this.emit('error', err));
             }
         }
         #onUpdate = () => this.emit('update', store.get([CLIENT_PERMS, this.id]));

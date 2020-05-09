@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Fragment, PureComponent, createContext } from 'preact/compat';
+import { Fragment, PureComponent } from 'preact/compat';
 import { Checkbox, Button, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -7,11 +7,11 @@ import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
 import ArrowRightIcon from '@material-ui/icons/ChevronRight';
 import { coreContext, connect } from '../core/connection';
 import Select from './select';
-import EventProxy from './event-proxy';
 import { LinkButton } from '../router';
 import { search as locale, data as dataLocale } from '../locale';
 import { deepEq } from '../../util';
 import DisplayError from './error';
+import DynamicHeightDiv, { layoutContext } from './dynamic-height-div';
 import './overview-list.less';
 
 const DEBOUNCE_TIME = 400; // ms
@@ -333,7 +333,11 @@ export default class OverviewList extends PureComponent {
                     <ArrowUpIcon />
                     <div class="page-button-label">{locale.prevPage}</div>
                 </Button>
-                <DynamicHeightDiv class="list-contents" lastPageChangeTime={this.#lastPageChangeTime}>
+                <DynamicHeightDiv
+                    class="list-contents"
+                    useCooldown
+                    cooldown={PAGE_CHANGE_COOLDOWN}
+                    lastChangeTime={this.#lastPageChangeTime}>
                     {contents}
                 </DynamicHeightDiv>
                 <Button
@@ -373,70 +377,8 @@ export default class OverviewList extends PureComponent {
     }
 }
 
-const layoutContext = createContext();
-
 // time interval after changing page during which the results list will not change height
 const PAGE_CHANGE_COOLDOWN = 400; // ms
-
-/// Assumes all children will be laid out vertically without overlapping.
-class DynamicHeightDiv extends PureComponent {
-    #height = new Spring(1, 0.5);
-    #node = null;
-
-    updateHeight = () => {
-        if (!this.#node) return;
-        this.#height.target = [...this.#node.children]
-            .map(child => child.offsetHeight)
-            .reduce((a, b) => a + b, 0);
-
-        if (this.#height.wantsUpdate()) globalAnimator.register(this);
-    };
-
-    #scheduledUpdate;
-    #ffScheduledUpdate;
-    scheduleUpdate = () => {
-        clearTimeout(this.#scheduledUpdate);
-        clearTimeout(this.#ffScheduledUpdate);
-        this.#scheduledUpdate = setTimeout(this.updateHeight, 1);
-        // also a schedule update further in the future
-        // because sometimes layout may be just a tad off
-        this.#ffScheduledUpdate = setTimeout(this.updateHeight, 1000);
-    };
-    // because sometimes layout may be just a tad off
-
-    update (dt) {
-        if (this.props.lastPageChangeTime < Date.now() - PAGE_CHANGE_COOLDOWN) {
-            this.#height.update(dt);
-        }
-        if (!this.#height.wantsUpdate()) globalAnimator.deregister(this);
-        this.forceUpdate();
-    }
-
-    componentDidMount () {
-        globalAnimator.register(this);
-    }
-
-    componentDidUpdate (prevProps) {
-        if (prevProps.children !== this.props.children) this.updateHeight();
-    }
-
-    componentWillUnmount () {
-        globalAnimator.deregister(this);
-        clearTimeout(this.#scheduledUpdate);
-        clearTimeout(this.#ffScheduledUpdate);
-    }
-
-    render (props) {
-        return (
-            <div {...props} ref={node => this.#node = node} style={{ height: this.#height.value }}>
-                <EventProxy dom target={window} onresize={this.updateHeight} />
-                <layoutContext.Provider value={this.scheduleUpdate}>
-                    {props.children}
-                </layoutContext.Provider>
-            </div>
-        );
-    }
-}
 
 function lineLayout (fields, selectedFields, selection) {
     const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);

@@ -1,4 +1,5 @@
 import { UEACode, util } from '@tejo/akso-client';
+import JSON5 from 'json5';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
@@ -1131,24 +1132,10 @@ export const tasks = {
         await client.post(`/codeholders/${ueaCode}/!forgot_password`, { org });
     },
 
-    codeholderPerms: async ({ id }) => {
+    permissions: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/codeholders/${id}/permissions`);
-        const perms = res.body.map(({ permission }) => permission);
-        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
-        const existing = store.get([CODEHOLDER_PERMS, storeId]);
-        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { permissions: perms }));
-        return perms;
-    },
-    setPermissions: async ({ id }, { permissions }) => {
-        const client = await asyncClient;
-        await client.put(`/codeholders/${id}/permissions`, permissions);
-        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
-        const existing = store.get([CODEHOLDER_PERMS, storeId]);
-        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { permissions }));
-    },
-    memberRestrictions: async ({ id }) => {
-        const client = await asyncClient;
+
         let memberRestrictions;
         try {
             const res = await client.get(`/codeholders/${id}/member_restrictions`, {
@@ -1162,21 +1149,45 @@ export const tasks = {
                 throw err;
             }
         }
+
+        const perms = res.body.map(({ permission }) => permission);
+        const mrEnabled = !!memberRestrictions;
+        const mrFilter = mrEnabled
+            ? JSON5.stringify(memberRestrictions.filter, undefined, 4)
+            : '{\n\t\n}';
+        const mrFields = mrEnabled
+            ? memberRestrictions.fields
+            : {};
+
+        const permData = {
+            permissions: perms,
+            mrEnabled,
+            mrFilter,
+            mrFields,
+        };
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        store.insert([CODEHOLDER_PERMS, storeId], permData);
+        return permData;
+    },
+    setPermissions: () => {}, // dummy for UI
+    setPermissionsPX: async ({ id }, { permissions }) => {
+        const client = await asyncClient;
+        await client.put(`/codeholders/${id}/permissions`, permissions.permissions);
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         const existing = store.get([CODEHOLDER_PERMS, storeId]);
-        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions }));
-        return memberRestrictions;
+        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, {
+            permissions: permissions.permissions,
+        }));
     },
-    setMemberRestrictions: async ({ id }, { enabled, filter, fields }) => {
+    setPermissionsMR: async ({ id }, { permissions }) => {
         const client = await asyncClient;
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
-        if (enabled) {
+        if (permissions.mrEnabled) {
             await client.put(`/codeholders/${id}/member_restrictions`, {
-                filter,
-                fields,
+                filter: JSON5.parse(permissions.mrFilter),
+                fields: permissions.mrFields,
             });
-            const existing = store.get([CODEHOLDER_PERMS, storeId]);
-            store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions: { filter, fields } }));
         } else {
             try {
                 await client.delete(`/codeholders/${id}/member_restrictions`);
@@ -1187,9 +1198,13 @@ export const tasks = {
                     throw err;
                 }
             }
-            const existing = store.get([CODEHOLDER_PERMS, storeId]);
-            store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, { memberRestrictions: null }));
         }
+        const existing = store.get([CODEHOLDER_PERMS, storeId]);
+        store.insert([CODEHOLDER_PERMS, storeId], deepMerge(existing, {
+            mrEnabled: permissions.mrEnabled,
+            mrFilter: permissions.mrFilter,
+            mrFields: permissions.mrFields,
+        }));
     },
 
     codeSuggestions: async ({ keep }, parameters) => {
@@ -1384,7 +1399,7 @@ export const views = {
         }
     },
 
-    codeholderPerms: class CodeholderPerms extends AbstractDataView {
+    permissions: class CodeholderPerms extends AbstractDataView {
         constructor ({ id, noFetch }) {
             super();
             this.id = id === 'self' ? store.get(LOGIN_ID) : id; // resolve id
@@ -1393,8 +1408,7 @@ export const views = {
             if (current) setImmediate(this.#onUpdate);
 
             if (!noFetch) {
-                tasks.codeholderPerms({ id }).catch(err => this.emit('error', err));
-                tasks.memberRestrictions({ id }).catch(err => this.emit('error', err));
+                tasks.permissions({ id }).catch(err => this.emit('error', err));
             }
         }
         #onUpdate = () => this.emit('update', store.get([CODEHOLDER_PERMS, this.id]));

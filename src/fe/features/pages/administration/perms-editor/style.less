@@ -1,5 +1,9 @@
 @import '../../../../prelude';
 
+.akso-app .app-header.perms-editor-app-bar {
+    background: #333;
+}
+
 .perms-editor {
     position: relative;
     padding: 24px;
@@ -148,6 +152,12 @@
         }
     }
 
+    .member-filter-editor {
+        .CodeMirror {
+            height: 150px;
+        }
+    }
+
     .perms-switch {
         .switch-name {
             display: inline-block;
@@ -161,6 +171,79 @@
 
                 &:first-child {
                     margin-left: 0;
+                }
+            }
+        }
+    }
+}
+
+.admin-perms-save-dialog {
+    max-width: 100%;
+    width: 350px;
+
+    .autosizer {
+        overflow: hidden;
+    }
+
+    .perms-changes {
+        overflow: hidden;
+        background: @text-fade-10;
+        border-radius: 4px;
+        padding: 16px;
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+    }
+
+    .perms-state {
+        margin: 0;
+
+        .state-line {
+            .state-line-inner {
+                .state-icon {
+                    width: 48px;
+                    height: 48px;
+                    display: inline-block;
+                    vertical-align: middle;
+                    position: relative;
+
+                    .state-progress {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                    }
+                    .state-check-container,
+                    .state-error-container {
+                        display: inline-block;
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        line-height: 1;
+                        transform: translate(-50%, -50%) scale(0.001);
+                        opacity: 0;
+                        transition: transform 0.3s @easing, opacity 0.3s @easing;
+
+                        &.visible {
+                            transform: translate(-50%, -50%);
+                            opacity: 1;
+                        }
+                    }
+                    .state-check-container {
+                        color: @secondary;
+                    }
+                    .state-error-container {
+                        color: @error;
+                    }
+                }
+            }
+            .state-line-error {
+                overflow: hidden;
+
+                .display-error {
+                    text-align: left;
                 }
             }
         }

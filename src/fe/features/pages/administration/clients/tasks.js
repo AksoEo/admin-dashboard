@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../../components/task-dialog';
+import SavePerms from '../perms-editor/save';
 import ChangedFields from '../../../../components/changed-fields';
 import { Validator } from '../../../../components/form';
 import { clients as locale } from '../../../../locale';
@@ -98,16 +99,14 @@ export default {
         );
     },
 
-    setPermissions ({ open, task }) {
+    setPermissions ({ open, core, task }) {
         return (
-            <TaskDialog
+            <SavePerms
                 open={open}
-                onClose={() => task.drop()}
-                title={locale.perms.setTitle}
-                actionLabel={locale.perms.setButton}
-                run={() => task.runOnce()}>
-                todo: summary of changes
-            </TaskDialog>
+                core={core}
+                task={task}
+                pxTask="clients/setPermissionsPX"
+                mrTask="clients/setPermissionsMR" />
         );
     },
 };

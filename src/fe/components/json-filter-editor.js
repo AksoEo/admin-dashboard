@@ -13,8 +13,6 @@ import { search as locale } from '../locale';
 import './json-filter-editor.less';
 
 const DEFAULT_VALUE = '{\n\t\n}'; // must be equal to {}
-// after the tab on the second line
-const DEFAULT_CURSOR_POS = [1, 1]; // FIXME: broken for some reason
 
 const AKSO_REPR = 'org.akso.admin.v1';
 
@@ -174,7 +172,6 @@ export default class JSONFilterEditor extends PureComponent {
 
     onEditorMount = editor => {
         this.editor = editor;
-        editor.doc.setCursor(...DEFAULT_CURSOR_POS);
         editor.on('keydown', this.onKeyDown);
         editor.addOverlay('akso-json-template');
 

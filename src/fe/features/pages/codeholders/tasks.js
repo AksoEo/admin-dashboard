@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { useRef, useState, useEffect } from 'preact/compat';
 import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
+import SavePerms from '../administration/perms-editor/save';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
 import Select from '../../../components/select';
@@ -291,29 +292,14 @@ export default {
     addRole: makeRoleEditor('add'),
     updateRole: makeRoleEditor('update'),
 
-    setPermissions ({ open, task }) {
+    setPermissions ({ open, core, task }) {
         return (
-            <TaskDialog
+            <SavePerms
                 open={open}
-                onClose={() => task.drop()}
-                title={locale.perms.setTitle}
-                actionLabel={locale.perms.setButton}
-                run={() => task.runOnce()}>
-                todo: summary of changes
-            </TaskDialog>
-        );
-    },
-    setMemberRestrictions ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.perms.setRestrictions}
-                actionLabel={locale.perms.setRestrictionsButton}
-                running={task.running}
-                run={() => task.runOnce()}>
-                todo: some view
-            </TaskDialog>
+                core={core}
+                task={task}
+                pxTask="codeholders/setPermissionsPX"
+                mrTask="codeholders/setPermissionsMR" />
         );
     },
 

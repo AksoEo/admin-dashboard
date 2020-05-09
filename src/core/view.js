@@ -22,7 +22,7 @@ export default class DataView {
             }
         }).catch(err => {
             log.debug(`data view ${id} failed to load`, err);
-            this.onError(err);
+            this.#onError(err);
         });
     }
 

@@ -82,6 +82,19 @@ export const data = {
     permsEditor: {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',
         requires: 'Bezonas',
+        update: {
+            title: 'Ĝisdatigi permesojn',
+            button: 'Ĝisdatigi',
+
+            // changes
+            added: n => `[[${n} permission${n === 1 ? '' : 's'} added]]`,
+            removed: n => `[[${n} permission${n === 1 ? '' : 's'} removed]]`,
+            mrChanged: '[[member restrictions changed]]',
+
+            // task completion list
+            px: '[[permissions]]',
+            mr: '[[member restrictions]]',
+        },
     },
 };
 
@@ -606,10 +619,6 @@ export const codeholders = {
     },
     perms: {
         title: 'Permesoj',
-        setTitle: 'Ĝisdatigi permesojn',
-        setButton: 'Ĝisdatigi',
-        setRestrictions: 'Ĝisdatigi restriktojn',
-        setRestrictionsButton: 'Ĝisdatigi',
     },
 
     picker: {
@@ -673,9 +682,6 @@ export const adminGroups = {
 
     nameRequired: 'Necesas nomo',
 
-    setPermissions: 'Agordi permesojn',
-    setPermsButton: 'Agordi permesojn',
-
     csvFilename: 'administraj-grupoj',
 };
 
@@ -716,8 +722,6 @@ export const clients = {
     perms: {
         linkButton: 'Redakti permesojn',
         title: 'Permesoj',
-        setTitle: 'Ĝisdatigi permesojn',
-        setButton: 'Ĝisdatigi',
     },
     csvFilename: 'api-klientoj',
 };
