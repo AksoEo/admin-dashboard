@@ -2,6 +2,8 @@ import { h } from 'preact';
 import { AppBarProxy, Button, MenuIcon, CircularProgress } from '@cpsdqs/yamdl';
 import PermsEditor from '../perms-editor';
 import DoneIcon from '@material-ui/icons/Done';
+import UndoIcon from '@material-ui/icons/Undo';
+import RedoIcon from '@material-ui/icons/Redo';
 import Meta from '../../../meta';
 import Page from '../../../../components/page';
 import { deepEq } from '../../../../../util';
@@ -16,6 +18,8 @@ export default connect(({ matches }) => {
 })((data, core) => ({ clientPerms: data, core }))(connectPerms(class ClientPermsEditor extends Page {
     state = {
         permissions: null,
+        history: [],
+        future: [],
     };
 
     #save = () => {
@@ -26,6 +30,31 @@ export default connect(({ matches }) => {
             original: this.props.clientPerms,
             permissions: this.state.permissions,
         });
+    };
+    #undo = () => {
+        const history = this.state.history.slice();
+        const future = this.state.future.slice();
+
+        if (!history.length) return;
+        future.push(this.state.permissions);
+        const permissions = history.pop();
+
+        this.setState({ history, permissions, future });
+    };
+    #redo = () => {
+        const history = this.state.history.slice();
+        const future = this.state.future.slice();
+
+        if (!future.length) return;
+        history.push(this.state.permissions);
+        const permissions = future.pop();
+
+        this.setState({ history, permissions, future });
+    };
+    #onChange = permissions => {
+        const history = this.state.history.slice();
+        history.push(this.state.permissions);
+        this.setState({ history, permissions, future: [] });
     };
 
     render ({ perms, clientPerms }) {
@@ -39,7 +68,7 @@ export default connect(({ matches }) => {
                 <PermsEditor
                     editable={editable}
                     value={this.state.permissions || clientPerms}
-                    onChange={permissions => this.setState({ permissions })} />
+                    onChange={this.#onChange} />
             );
         } else {
             permsEditor = <center><CircularProgress indeterminate /></center>;
@@ -58,10 +87,9 @@ export default connect(({ matches }) => {
                     )}
                     title={locale.perms.title}
                     actions={[
-                        {
-                            icon: <DoneIcon />,
-                            action: this.#save,
-                        },
+                        { icon: <UndoIcon />, action: this.#undo },
+                        { icon: <RedoIcon />, action: this.#redo },
+                        { icon: <DoneIcon />, action: this.#save },
                     ]} />
                 {permsEditor}
             </div>
