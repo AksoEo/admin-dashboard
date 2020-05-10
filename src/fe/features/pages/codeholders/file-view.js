@@ -158,7 +158,7 @@ const MIME_TYPES = {
 
 const BROWSER_SUPPORTS_NATIVE_PDF =
     navigator.userAgent.includes('Mac OS X')
-    || navigator.userAgent.includes('Windows NT')
+    || (navigator.userAgent.includes('Windows NT') && !navigator.userAgent.includes('EdgeHTML'))
     || navigator.userAgent.includes('CrOS')
     || (navigator.userAgent.includes('Linux') && !navigator.userAgent.includes('Android'));
 
