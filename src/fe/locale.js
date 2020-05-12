@@ -183,7 +183,7 @@ export const login = {
 };
 
 export const app = {
-    title: 'AKSO',
+    title: 'AKSO-Administranto',
     logOut: 'Elsaluti',
 
     // literally any error that causes the UI to fail to render

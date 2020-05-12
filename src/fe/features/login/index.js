@@ -157,7 +157,7 @@ function LoginHeader ({ authenticated, core, mode, selectedPageIndex, showTotp }
                     draggable={0} />
                 <img
                     class="login-logo-label"
-                    src="/assets/logo-label-dark.svg"
+                    src="/assets/logo-label-dark-long.svg"
                     alt="AKSO"
                     draggable={0} />
             </div>
