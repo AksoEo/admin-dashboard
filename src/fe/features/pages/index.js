@@ -40,7 +40,12 @@ const elazy = (inner, map) => lazy(() => inner().then(e => {
     return e;
 }).catch(err => {
     console.error('Failed to load app page', err); // eslint-disable-line no-console
-    return { __esModule: true, default: () => 'okazas eraro' };
+    return {
+        __esModule: true,
+        default: () => {
+            throw err;
+        },
+    };
 }));
 
 /// Navigation hierarchy.
