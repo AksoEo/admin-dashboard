@@ -32,6 +32,7 @@ const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: t
 const lists = () => import(/* webpackChunkName: 'core-lists', webpackPrefetch: true */ './lists');
 const perms = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './perms');
 const memberships = () => import(/* webpackChunkName: 'core-memberships', webpackPrefetch: true */ './memberships');
+const payments = () => import(/* webpackChunkName: 'core-payments', webpackPrefetch: true */ './payments');
 const roles = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './roles');
 const queries = () => import(/* webpackChunkName: 'core-queries', webpackPrefetch: true */ './queries');
 const votes = () => import(/* webpackChunkName: 'core-votes', webpackPrefetch: true */ './votes');
@@ -52,6 +53,7 @@ export const tasks = {
     lists: lazyPath(lists, mapTasks),
     queries: lazyPath(queries, mapTasks),
     perms: lazyPath(perms, mapTasks),
+    payments: lazyPath(payments, mapTasks),
     votes: lazyPath(votes, mapTasks),
     debug: lazyPath(debug, mapTasks),
 };
@@ -68,6 +70,7 @@ export const views = {
     memberships: lazyPath(memberships, mapViews),
     roles: lazyPath(roles, mapViews),
     perms: lazyPath(perms, mapViews),
+    payments: lazyPath(payments, mapViews),
     votes: lazyPath(votes, mapViews),
     debug: lazyPath(debug, mapViews),
 
