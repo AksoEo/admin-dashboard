@@ -1,18 +1,25 @@
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
-import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
+import { AbstractDataView, createStoreObserver } from '../view';
+import { makeParametersToRequestData, makeClientFromAPI } from '../list';
 
 export const PAYMENT_ORGS = 'paymentOrgs';
+export const SIG_PAYMENT_ORGS = '!paymentOrgs';
+export const PO_DATA = 'poData';
 export const PO_ADDONS = 'poAddons';
+export const SIG_PO_ADDONS = '!poAddons';
 export const PO_METHODS = 'poMethods';
+export const SIG_PO_METHODS = '!poMethods';
 export const PAYMENT_INTENTS = 'paymentIntents';
+export const SIG_PAYMENT_INTENTS = '!paymentIntents';
 
 //! # Data structure
 //! ```
 //! PAYMENT_ORGS
 //! |- [org id]
-//!    |- (org data)
+//!    |- PO_DATA
+//!    |  |- (org data)
 //!    |- PO_ADDONS
 //!    |  |- [addon id]
 //!    |     |- ...
@@ -80,8 +87,8 @@ export const tasks = {
             fields: ['id', 'org', 'name', 'description'],
         });
         for (const item of res.body) {
-            const existing = store.get([PAYMENT_ORGS, item.id]);
-            store.insert([PAYMENT_ORGS, item.id], deepMerge(existing, item));
+            const existing = store.get([PAYMENT_ORGS, item.id, PO_DATA]);
+            store.insert([PAYMENT_ORGS, item.id, PO_DATA], deepMerge(existing, item));
         }
         return { items: res.body.map(x => x.id), total: +res.headers.get('x-total-items') };
     },
@@ -94,19 +101,34 @@ export const tasks = {
             description,
         });
         const id = +res.headers.get('x-identifier');
-        store.insert([PAYMENT_ORGS, id], { id, org, name, description });
+        store.insert([PAYMENT_ORGS, id, PO_DATA], { id, org, name, description });
+        store.signal([PAYMENT_ORGS, SIG_PAYMENT_ORGS]);
         return id;
+    },
+    getOrg: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/aksopay/payment_orgs/${id}`, {
+            fields: ['id', 'org', 'name', 'description'],
+        });
+        const path = [PAYMENT_ORGS, id, PO_DATA];
+        const existing = store.get(path);
+        store.insert(path, deepMerge(existing, res.body));
+        return res.body;
     },
     updateOrg: async ({ id }, params) => {
         const client = await asyncClient;
         await client.patch(`/aksopay/payment_orgs/${id}`, params);
         const existing = store.get([PAYMENT_ORGS, +id]);
-        store.insert([PAYMENT_ORGS, +id], deepMerge(existing, params));
+        store.insert([PAYMENT_ORGS, id, PO_DATA], deepMerge(existing, params));
     },
     deleteOrg: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/aksopay/payment_orgs/${id}`);
+        store.remove([PAYMENT_ORGS, id, PO_DATA]);
+        store.remove([PAYMENT_ORGS, id, PO_ADDONS]);
+        store.remove([PAYMENT_ORGS, id, PO_METHODS]);
         store.remove([PAYMENT_ORGS, id]);
+        store.signal([PAYMENT_ORGS, SIG_PAYMENT_ORGS]);
     },
     listAddons: async ({ org }, { offset, limit }) => {
         const client = await asyncClient;
@@ -129,7 +151,18 @@ export const tasks = {
         });
         const id = +res.headers.get('x-identifier');
         store.insert([PAYMENT_ORGS, org, PO_ADDONS, id], { id, name, description });
+        store.signal([PAYMENT_ORGS, org, SIG_PO_ADDONS]);
         return id;
+    },
+    getAddon: async ({ org, id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/aksopay/payment_orgs/${org}/addons/${id}`, {
+            fields: ['id', 'name', 'description'],
+        });
+        const path = [PAYMENT_ORGS, org, PO_ADDONS, id];
+        const existing = store.get(path);
+        store.insert(path, deepMerge(existing, res.body));
+        return res.body;
     },
     updateAddon: async ({ org, id }, params) => {
         const client = await asyncClient;
@@ -142,6 +175,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`/aksopay/payment_orgs/${org}/addons/${id}`);
         store.remove([PAYMENT_ORGS, org, PO_ADDONS, id]);
+        store.signal([PAYMENT_ORGS, org, SIG_PO_ADDONS]);
     },
     listMethods: async ({ org }, { offset, limit }) => {
         const client = await asyncClient;
@@ -163,6 +197,7 @@ export const tasks = {
         const res = await client.post(`/aksopay/payment_orgs/${org}/methods`, params);
         const id = +res.headers.get('x-identifier');
         store.insert([PAYMENT_ORGS, org, PO_METHODS, id], { id, ...params });
+        store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
         return id;
     },
     getMethod: async ({ org, id }) => {
@@ -190,6 +225,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`/aksopay/payment_orgs/${org}/methods/${id}`);
         store.remove([PAYMENT_ORGS, org, PO_METHODS, id]);
+        store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
     },
     updateMethodThumbnail: async ({ org, id }, { thumbnail }) => {
         const client = await asyncClient;
@@ -201,6 +237,7 @@ export const tasks = {
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];
         const existing = store.get(path);
         store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
+        store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
     },
     deleteMethodThumbnail: async ({ org, id }) => {
         const client = await asyncClient;
@@ -208,6 +245,7 @@ export const tasks = {
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];
         const existing = store.get(path);
         store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
+        store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
     },
 
     // MARK - INTENTS
@@ -233,7 +271,7 @@ export const tasks = {
             },
         };
     },
-    intent: async ({ id }, { fields }) => {
+    getIntent: async ({ id }, { fields }) => {
         const client = await asyncClient;
         const res = await client.get(`/aksopay/payment_intents/${id}`, {
             fields: ['id'].concat(fields.flatMap(id => typeof iClientFields[id] === 'string'
@@ -277,4 +315,129 @@ export const tasks = {
         store.insert([PAYMENT_INTENTS, +id], deepMerge(existing, { status: 'submitted' }));
     },
 };
-export const views = {};
+export const views = {
+    org: class Org extends AbstractDataView {
+        constructor (options) {
+            super();
+            const { id } = options;
+            this.id = id;
+
+            store.subscribe([PAYMENT_ORGS, id, PO_DATA], this.#onUpdate);
+            const current = store.get([PAYMENT_ORGS, id, PO_DATA]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!options.noFetch) {
+                tasks.getOrg({ id }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([PAYMENT_ORGS, this.id, PO_DATA]), 'delete');
+            } else {
+                this.emit('update', store.get([PAYMENT_ORGS, this.id, PO_DATA]));
+            }
+        };
+        drop () {
+            store.unsubscribe([PAYMENT_ORGS, this.id, PO_DATA], this.#onUpdate);
+        }
+    },
+
+    addon: class Addon extends AbstractDataView {
+        constructor (options) {
+            super();
+            const { org, id } = options;
+            this.org = org;
+            this.id = id;
+
+            store.subscribe([PAYMENT_ORGS, org, PO_ADDONS, id], this.#onUpdate);
+            const current = store.get([PAYMENT_ORGS, org, PO_ADDONS, id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!options.noFetch) {
+                tasks.getAddon({ org, id }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([PAYMENT_ORGS, this.org, PO_ADDONS, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([PAYMENT_ORGS, this.org, PO_ADDONS, this.id]));
+            }
+        };
+        drop () {
+            store.unsubscribe([PAYMENT_ORGS, this.org, PO_ADDONS, this.id], this.#onUpdate);
+        }
+    },
+
+    method: class Method extends AbstractDataView {
+        constructor (options) {
+            super();
+            const { org, id } = options;
+            this.org = org;
+            this.id = id;
+
+            store.subscribe([PAYMENT_ORGS, org, PO_METHODS, id], this.#onUpdate);
+            const current = store.get([PAYMENT_ORGS, org, PO_METHODS, id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (!options.noFetch) {
+                tasks.getMethod({ org, id }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([PAYMENT_ORGS, this.org, PO_METHODS, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([PAYMENT_ORGS, this.org, PO_METHODS, this.id]));
+            }
+        };
+        drop () {
+            store.unsubscribe([PAYMENT_ORGS, this.org, PO_METHODS, this.id], this.#onUpdate);
+        }
+    },
+
+    intent: class Intent extends AbstractDataView {
+        constructor (options) {
+            super();
+            const { id, fields } = options;
+            this.id = id;
+            this.fields = fields;
+
+            store.subscribe([PAYMENT_INTENTS, this.id], this.#onUpdate);
+            const current = store.get([PAYMENT_INTENTS, this.id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            let shouldFetch = !options.noFetch;
+            if (options.lazyFetch) {
+                shouldFetch = false;
+                for (const field of options.fields) {
+                    if (!current || !current[field]) {
+                        shouldFetch = true;
+                        break;
+                    }
+                }
+            }
+
+            if (shouldFetch) {
+                tasks.getIntent({ id }, { fields }).catch(err => this.emit('error', err));
+            }
+        }
+
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([PAYMENT_INTENTS, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([PAYMENT_INTENTS, this.id]));
+            }
+        };
+
+        drop () {
+            store.unsubscribe([PAYMENT_INTENTS, this.id], this.#onUpdate);
+        }
+    },
+
+    sigOrgs: createStoreObserver([PAYMENT_ORGS, SIG_PAYMENT_ORGS]),
+    sigAddons: createStoreObserver(({ org }) => [PAYMENT_ORGS, org, SIG_PO_ADDONS]),
+    sigMethods: createStoreObserver(({ org }) => [PAYMENT_ORGS, org, SIG_PO_METHODS]),
+    sigIntents: createStoreObserver([PAYMENT_INTENTS, SIG_PAYMENT_INTENTS]),
+};
