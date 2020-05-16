@@ -21,7 +21,8 @@ export class MetaProvider extends PureComponent {
 ///
 /// # Props
 /// - title: title string
-/// - actions: list of app bar actions
+/// - actions: list of app bar actions.
+///            will only update if length changes or if item keys change.
 export default class Meta extends PureComponent {
     static contextType = metaContext;
 
@@ -31,8 +32,8 @@ export default class Meta extends PureComponent {
 
     componentDidUpdate (prevProps) {
         if (prevProps.title !== this.props.title
-            // FIXME: actions needs deep eq
-            || prevProps.actions.length !== this.props.actions.length) {
+            || prevProps.actions.length !== this.props.actions.length
+            || !!prevProps.actions.find((x, i) => this.props.actions[i].key !== x.key)) {
             this.context.update(this.props);
         }
     }

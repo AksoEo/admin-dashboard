@@ -206,3 +206,11 @@ export class Validator extends Component {
         );
     }
 }
+
+export function Field ({ children }) {
+    return (
+        <div class="form-field">
+            {children}
+        </div>
+    );
+}

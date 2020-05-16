@@ -536,12 +536,13 @@ export default class Navigation extends PureComponent {
                 currentActions = stackItem.meta.actions;
             }
 
+            const index = i;
             const isBottom = i === 0;
             const PageComponent = stackItem.component;
             const itemContents = (
                 <MetaProvider onUpdate={({ title, actions }) => {
                     const stack = this.state.stack.slice();
-                    stack[i].meta = { title, actions };
+                    stack[index].meta = { title, actions };
                     this.setState({ stack });
                 }}>
                     <Suspense fallback={

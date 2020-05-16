@@ -1,11 +1,14 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
 import OverviewList from '../../../../components/overview-list';
 import Meta from '../../../meta';
+import { coreContext } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 import { paymentOrgs as locale } from '../../../../locale';
 import { FIELDS } from './fields';
 
-export default class Orgs extends Page {
+export default connectPerms(class Orgs extends Page {
     state = {
         parameters: {
             fields: [
@@ -18,8 +21,19 @@ export default class Orgs extends Page {
         },
     };
 
-    render (_, { parameters }) {
+    static contextType = coreContext;
+
+    render ({ perms }, { parameters }) {
         const actions = [];
+
+        if (perms.hasPerm('pay.payment_orgs.create.tejo')
+            || perms.hasPerm('pay.payment_orgs.create.uea')) {
+            actions.push({
+                icon: <AddIcon />,
+                label: locale.create.menuItem,
+                action: () => this.context.createTask('payments/createOrg'),
+            });
+        }
 
         return (
             <div class="payment-orgs-page">
@@ -34,8 +48,9 @@ export default class Orgs extends Page {
                     onGetItemLink={id => `/pagoj/organizoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
-                    locale={locale.fields} />
+                    locale={locale.fields}
+                    updateView={['payments/sigOrgs']} />
             </div>
         );
     }
-}
+});

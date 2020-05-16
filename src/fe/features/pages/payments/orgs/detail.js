@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import TejoIcon from '../../../../components/tejo-icon';
 import UeaIcon from '../../../../components/uea-icon';
@@ -95,14 +96,37 @@ export default connectPerms(class Org extends Page {
     render ({ perms, editing, addons, methods }, { org, edit }) {
         const actions = [];
         const id = this.getId();
+        const tab = addons ? 'addons' : methods ? 'methods' : 'org';
 
-        if (perms.hasPerm(`pay.payment_orgs.update.${org}`)) {
-            actions.push({
-                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-                label: locale.update.menuItem,
-                action: () => this.props.push('redakti', true),
-            });
+        if (tab === 'addons') {
+            if (perms.hasPerm(`pay.payment_addons.create.${org}`)) {
+                actions.push({
+                    key: 'ca',
+                    icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                    label: locale.createAddon,
+                    action: () => this.context.createTask('payments/createAddon', { org: id }),
+                });
+            }
+        } else if (tab === 'methods') {
+            if (perms.hasPerm(`pay.payment_methods.create.${org}`)) {
+                actions.push({
+                    key: 'cm',
+                    icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                    label: locale.createMethod,
+                    action: () => this.context.createTask('payments/createMethod', { org: id }),
+                });
+            }
+        } else if (tab === 'org') {
+            if (perms.hasPerm(`pay.payment_orgs.update.${org}`)) {
+                actions.push({
+                    key: 'edit',
+                    icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                    label: locale.update.menuItem,
+                    action: () => this.props.push('redakti', true),
+                });
+            }
         }
+
         if (perms.hasPerm(`pay.payment_orgs.delete.${org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
@@ -111,7 +135,6 @@ export default connectPerms(class Org extends Page {
             });
         }
 
-        const tab = addons ? 'addons' : methods ? 'methods' : 'org';
         let contents = null;
 
         if (tab === 'org') {

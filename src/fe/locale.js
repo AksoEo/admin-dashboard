@@ -658,7 +658,14 @@ export const paymentOrgs = {
         menuItem: 'Krei',
         title: '[[create org]]',
         button: 'Krei',
+        orgs: {
+            tejo: 'TEJO',
+            uea: 'UEA',
+        },
+        nameRequired: 'Necesas nomo',
     },
+    createAddon: '[[create addon]]',
+    createMethod: '[[create method]]',
     update: {
         menuItem: 'Redakti',
     },
