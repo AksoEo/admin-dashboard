@@ -29,7 +29,6 @@
             color: inherit;
             background: none;
             border: none;
-            border-bottom: 2px solid transparent;
             text-transform: uppercase;
             font-size: 0.875em;
             font-weight: 500;
@@ -46,8 +45,15 @@
                 color: @secondary;
             }
 
-            &.p-line {
-                border-bottom-color: @secondary;
+            &.p-line::before {
+                content: '';
+                position: absolute;
+                display: block;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                height: 2px;
+                background: @secondary;
             }
         }
     }
