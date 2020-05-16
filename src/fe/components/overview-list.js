@@ -5,6 +5,7 @@ import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
 import ArrowRightIcon from '@material-ui/icons/ChevronRight';
+import RefreshIcon from '@material-ui/icons/Refresh';
 import { coreContext, connect } from '../core/connection';
 import Select from './select';
 import { LinkButton } from '../router';
@@ -324,7 +325,14 @@ export default class OverviewList extends PureComponent {
             <div class={className}>
                 <header class="list-meta" ref={node => this.#listMetaNode = node}>
                     <span>{stats}</span>
-                    <CircularProgress class="loading-indicator" indeterminate={loading} small />
+                    <span class={'list-refresh' + (loading ? ' is-loading' : '')}>
+                        <CircularProgress class="loading-indicator" indeterminate={loading} small />
+                        <ListRefreshButton loading={loading} onClick={() => {
+                            this.#stale = true;
+                            this.setState({ stale: true });
+                            this.load();
+                        }} />
+                    </span>
                 </header>
                 {notice ? <div class="list-notice">{notice}</div> : null}
                 <Button
@@ -553,3 +561,38 @@ const ListItem = connect(props => ([props.view, {
         );
     }
 });
+
+class ListRefreshButton extends PureComponent {
+    state = {
+        loading: this.props.loading,
+    };
+
+    unhideTimeout = null;
+    componentDidUpdate (prevProps) {
+        if (prevProps.loading !== this.props.loading) {
+            if (!this.props.loading) {
+                this.unhideTimeout = setTimeout(() => {
+                    this.setState({ loading: false });
+                }, 1000);
+            } else {
+                clearTimeout(this.unhideTimeout);
+                this.setState({ loading: true });
+            }
+        }
+    }
+    componentWillUnmount () {
+        clearTimeout(this.unhideTimeout);
+    }
+
+    render ({ onClick }, { loading }) {
+        return (
+            <Button
+                icon
+                small
+                class={'refresh-button' + (loading ? ' is-loading' : '')}
+                onClick={onClick}>
+                <RefreshIcon style={{ verticalAlign: 'middle' }} />
+            </Button>
+        );
+    }
+}
