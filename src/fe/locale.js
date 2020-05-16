@@ -682,6 +682,11 @@ export const paymentAddons = {
         name: 'Nomo',
         description: 'Priskribo',
     },
+    create: {
+        title: '[[create addon]]',
+        button: 'Krei',
+        nameRequired: 'Necesas nomo',
+    },
     update: {
         menuItem: 'Redakti',
     },

@@ -69,6 +69,42 @@ export default {
         );
     }),
 
+    createAddon ({ open, task }) {
+        const org = task.options.org;
+
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        open={open}
+                        onClose={() => task.drop()}
+                        title={addonLocale.create.title}
+                        actionLabel={addonLocale.create.button}
+                        run={() => task.runOnce().then(id => {
+                            routerContext.navigate(`/pagoj/organizoj/${org}/[[addons]]/${id}`);
+                        })}>
+                        <Field>
+                            <Validator
+                                component={TextField}
+                                validate={value => {
+                                    if (!value) throw { error: addonLocale.create.nameRequired };
+                                }}
+                                label={addonLocale.fields.name}
+                                value={task.parameters.name || ''}
+                                onChange={e => task.update({ name: e.target.value })} />
+                        </Field>
+                        <Field>
+                            <TextField
+                                label={addonLocale.fields.description}
+                                value={task.parameters.description || ''}
+                                onChange={e => task.update({ description: e.target.value || null })} />
+                        </Field>
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
+
     deleteOrg ({ open, task }) {
         return (
             <TaskDialog

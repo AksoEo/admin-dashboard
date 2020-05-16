@@ -157,7 +157,7 @@ export const tasks = {
         const client = await asyncClient;
         const res = await client.post(`/aksopay/payment_orgs/${org}/addons`, {
             name,
-            description,
+            description: description || null,
         });
         const id = +res.res.headers.get('x-identifier');
         store.insert([PAYMENT_ORGS, org, PO_ADDONS, id], { id, name, description });
