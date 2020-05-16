@@ -670,6 +670,14 @@ export const paymentOrgs = {
     },
 };
 export const paymentAddons = {
+    detailTitle: '[[addon]]',
+    fields: {
+        name: 'Nomo',
+        description: 'Priskribo',
+    },
+    update: {
+        menuItem: 'Redakti',
+    },
     delete: {
         menuItem: 'Forigi',
         title: '[[delete addon]]',
@@ -678,6 +686,15 @@ export const paymentAddons = {
     },
 };
 export const paymentMethods = {
+    detailTitle: '[[method]]',
+    fields: {
+        type: 'Speco',
+        name: 'Nomo',
+        internalDescription: 'Priskribo',
+    },
+    update: {
+        menuItem: 'Redakti',
+    },
     delete: {
         menuItem: 'Forigi',
         title: '[[delete method]]',

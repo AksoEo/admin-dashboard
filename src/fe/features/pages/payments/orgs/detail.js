@@ -10,6 +10,8 @@ import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { paymentOrgs as locale } from '../../../../locale';
 import { FIELDS } from './fields';
+import AddonsTab from './addons';
+import MethodsTab from './methods';
 import './detail.less';
 
 function Header ({ item }) {
@@ -129,13 +131,9 @@ export default connectPerms(class Org extends Page {
                     onDelete={() => this.props.pop()} />
             );
         } else if (tab === 'addons') {
-            contents = (
-                'todo'
-            );
+            contents = <AddonsTab org={id} />;
         } else if (tab === 'methods') {
-            contents = (
-                'todo'
-            );
+            contents = <MethodsTab org={id} />;
         }
 
         return (

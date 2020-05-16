@@ -11,6 +11,7 @@ export const FIELDS = {
             return value;
         },
         shouldHide: () => true,
+        weight: 0.25,
     },
     name: {
         component ({ value }) {
@@ -29,5 +30,6 @@ export const FIELDS = {
             return value;
         },
         shouldHide: (_, editing) => !editing,
+        weight: 2,
     },
 };

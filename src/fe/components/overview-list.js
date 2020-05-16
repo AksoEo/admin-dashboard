@@ -30,6 +30,7 @@ function scrollToNode (node) {
 /// - options: task options
 /// - parameters: task parameters. should adhere to a specific format (See e.g. codeholders/list)
 ///     - fields: objects may also have a `fixed` property to indicate fixed fields.
+/// - viewOptions: view options
 /// - expanded: bool, whether search/filters are expanded
 /// - fields: field renderers
 /// - onGetItemLink: should return a link to an item’s detail view
@@ -306,6 +307,7 @@ export default class OverviewList extends PureComponent {
                 cursed={result.cursed && result.cursed.includes(id)}
                 key={id}
                 id={id}
+                options={this.props.viewOptions || {}}
                 selectedFields={compiledFields}
                 fields={fields}
                 onGetItemLink={onGetItemLink}
@@ -417,6 +419,7 @@ function ListHeader ({ fields, selectedFields, locale, selection }) {
 }
 
 const ListItem = connect(props => ([props.view, {
+    ...props.options,
     id: props.id,
     fields: props.selectedFields,
     noFetch: true,

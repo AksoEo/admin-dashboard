@@ -213,11 +213,41 @@ export default [
                                         path: '[[addons]]',
                                         type: 'state',
                                         state: 'addons',
+                                        paths: [
+                                            {
+                                                match: /^(\d+)$/,
+                                                type: 'stack',
+                                                component: elazy(() =>
+                                                    import(/* webpackChunkName: "payments" */ './payments/orgs/addons/detail')),
+                                                paths: [
+                                                    {
+                                                        path: 'redakti',
+                                                        type: 'state',
+                                                        state: 'editing',
+                                                    },
+                                                ],
+                                            },
+                                        ],
                                     },
                                     {
                                         path: '[[methods]]',
                                         type: 'state',
                                         state: 'methods',
+                                        paths: [
+                                            {
+                                                match: /^(\d+)$/,
+                                                type: 'stack',
+                                                component: elazy(() =>
+                                                    import(/* webpackChunkName: "payments" */ './payments/orgs/methods/detail')),
+                                                paths: [
+                                                    {
+                                                        path: 'redakti',
+                                                        type: 'state',
+                                                        state: 'editing',
+                                                    },
+                                                ],
+                                            },
+                                        ],
                                     },
                                 ],
                             },
