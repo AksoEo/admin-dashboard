@@ -130,6 +130,7 @@ export default class OverviewList extends PureComponent {
                 this.load();
             } else if (!this.#reloadTimeout) {
                 this.#reloadTimeout = setTimeout(() => {
+                    clearTimeout(this.#reloadTimeout);
                     this.#reloadTimeout = null;
                     this.load();
                 }, DEBOUNCE_TIME);
@@ -328,9 +329,12 @@ export default class OverviewList extends PureComponent {
                     <span class={'list-refresh' + (loading ? ' is-loading' : '')}>
                         <CircularProgress class="loading-indicator" indeterminate={loading} small />
                         <ListRefreshButton loading={loading} onClick={() => {
-                            this.#stale = true;
-                            this.setState({ stale: true });
-                            this.load();
+                            this.setState({ stale: true, loading: true });
+                            // fake load delay because actual load times are actually way too fast
+                            // to see any loading happening
+                            this.#reloadTimeout = setTimeout(() => {
+                                this.load();
+                            }, 300);
                         }} />
                     </span>
                 </header>
