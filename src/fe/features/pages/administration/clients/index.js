@@ -142,7 +142,8 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
                     onGetItemLink={id => `/administrado/klientoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
-                    locale={locale.fields} />
+                    locale={locale.fields}
+                    updateView={['clients/sigClients']} />
 
                 <CSVExport
                     open={this.state.csvExportOpen}

@@ -23,6 +23,7 @@ export default class MethodsTab extends PureComponent {
                 <OverviewList
                     task="payments/listMethods"
                     view="payments/method"
+                    updateView={['payments/sigMethods', { org }]}
                     options={{ org }}
                     viewOptions={{ org }}
                     parameters={parameters}

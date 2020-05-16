@@ -277,6 +277,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     selection={listSelection}
                     task="codeholders/list"
                     view="codeholders/codeholder"
+                    updateView={['codeholders/sigCodeholders']}
                     parameters={options}
                     expanded={expanded}
                     fields={FIELDS}

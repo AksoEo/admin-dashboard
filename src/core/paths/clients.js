@@ -1,12 +1,13 @@
 import { util } from '@tejo/akso-client';
 import JSON5 from 'json5';
-import { AbstractDataView } from '../view';
+import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
 
 export const CLIENTS = 'clients';
 export const CLIENT_PERMS = 'clientPerms';
+export const SIG_CLIENTS = '!clients';
 
 export const tasks = {
     /// clients/list: lists clients
@@ -67,6 +68,7 @@ export const tasks = {
     create: async (_, { name, ownerName, ownerEmail }) => {
         const client = await asyncClient;
         const res = await client.post('/clients', { name, ownerName, ownerEmail });
+        store.signal([CLIENTS, SIG_CLIENTS]);
         return {
             id: res.res.headers.get('x-identifier'),
             secret: Buffer.from(res.body.apiSecret).toString('hex'),
@@ -91,6 +93,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`/clients/${id}`);
         store.remove([CLIENTS, id]);
+        store.signal([CLIENTS, SIG_CLIENTS]);
     },
 
     /// clients/permissions: returns permissions of a client
@@ -223,4 +226,6 @@ export const views = {
             store.unsubscribe([CLIENT_PERMS, this.id]);
         }
     },
+
+    sigClients: createStoreObserver([CLIENTS, SIG_CLIENTS]),
 };

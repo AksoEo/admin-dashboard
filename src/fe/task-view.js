@@ -4,6 +4,7 @@ import { h, Component } from 'preact';
 ///
 /// # Props
 /// - id: task id
+/// - path: task path
 /// - core: core ref
 /// - view: task view
 /// - isDead: whether or not this task is dead
@@ -27,7 +28,11 @@ export default class TaskView extends Component {
         setImmediate(() => this.setState({ mayBeOpen: true }));
     }
 
-    render ({ id, core, view: View, isDead }, { mayBeOpen }) {
+    render ({ id, path, core, view: View, isDead }, { mayBeOpen }) {
+        if (this.task.type !== path) {
+            console.error('task type mismatch', this.task, path); // eslint-disable-line no-console
+            throw new Error('wtf?');
+        }
         return (
             <View
                 ref={view => this.viewRef = view}

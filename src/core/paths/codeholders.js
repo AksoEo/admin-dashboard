@@ -60,6 +60,7 @@ export const CODEHOLDER_PERMS = 'codeholderPerms';
 export const CODEHOLDER_FILES = 'codeholderFiles';
 
 // signals
+export const SIG_CODEHOLDERS = '!codeholders';
 export const SIG_MEMBERSHIPS = '!memberships';
 export const SIG_ROLES = '!roles';
 export const SIG_FILES = '!files';
@@ -637,7 +638,9 @@ export const tasks = {
     create: async (_, data) => {
         const client = await asyncClient;
         await client.post('/codeholders', clientToAPI(data));
+        store.signal([CODEHOLDERS, SIG_CODEHOLDERS]);
         // can’t insert anything into the store because we don’t know the id
+        // FIXME: we do now, actually, so we should do that
     },
     /// codeholders/delete: deletes a codeholder
     ///
@@ -649,6 +652,7 @@ export const tasks = {
 
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         store.remove([CODEHOLDERS, storeId]);
+        store.signal([CODEHOLDERS, SIG_CODEHOLDERS]);
     },
     /// codeholders/update: updates a codeholder
     ///
@@ -1416,6 +1420,9 @@ export const views = {
             store.unsubscribe([CODEHOLDER_PERMS, this.id]);
         }
     },
+
+    /// codeholders/sigCodeholders: observes codeholders for client-side changes
+    sigCodeholders: createStoreObserver([CODEHOLDERS, SIG_CODEHOLDERS]),
 
     /// codeholders/codeholderSigFiles: observes codeholder files for client-side changes
     ///

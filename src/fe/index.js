@@ -140,19 +140,26 @@ class Session extends Component {
         this.#tasks.add(id);
         const taskView = await loadTaskView(path);
         if (taskView !== null) {
-            this.#taskViews.set(id, [taskView, 0]);
+            this.#taskViews.set(id, {
+                path,
+                view: taskView,
+                died: 0,
+            });
             this.forceUpdate();
         }
     };
     #onRemoveTask = (id) => {
         this.#tasks.delete(id);
         const view = this.#taskViews.get(id);
-        if (view) this.#taskViews.set(id, [view[0], Date.now()]);
+        if (view) this.#taskViews.set(id, {
+            ...view,
+            died: Date.now(),
+        });
     };
     #cleanTasks = () => {
         const toBeRemoved = new Set();
-        for (const [id, [, deathTime]] of this.#taskViews.entries()) {
-            if (deathTime && Date.now() - deathTime > 500) toBeRemoved.add(id);
+        for (const [id, { died }] of this.#taskViews.entries()) {
+            if (died && Date.now() - died > 500) toBeRemoved.add(id);
         }
         for (const id of toBeRemoved) this.#taskViews.delete(id);
     };
@@ -173,9 +180,15 @@ class Session extends Component {
 
         const tasks = [];
         let renderTasksHere = true;
-        for (const [id, [view, deathTime]] of this.#taskViews.entries()) {
+        for (const [id, { path, view, died }] of this.#taskViews.entries()) {
             tasks.push(
-                <TaskView id={id} core={this.core} view={view} isDead={!!deathTime} />
+                <TaskView
+                    key={id}
+                    id={id}
+                    path={path}
+                    core={this.core}
+                    view={view}
+                    isDead={!!died} />
             );
         }
 

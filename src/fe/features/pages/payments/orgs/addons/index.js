@@ -22,6 +22,7 @@ export default class AddonsTab extends PureComponent {
                 <OverviewList
                     task="payments/listAddons"
                     view="payments/addon"
+                    updateView={['payments/sigAddons', { org }]}
                     options={{ org }}
                     viewOptions={{ org }}
                     parameters={parameters}
