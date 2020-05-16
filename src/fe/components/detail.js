@@ -35,6 +35,7 @@ import './detail.less';
 ///   history
 /// - onDelete: called when the item is deleted
 /// - userData: arbitrary user data passed to fields
+/// - onData: will be called with data when it loads
 /// - wideExtra: bool, if true will make extra space wider
 export default class DetailView extends PureComponent {
     static contextType = coreContext;
@@ -64,6 +65,7 @@ export default class DetailView extends PureComponent {
             if (this.props.onDelete) this.props.onDelete();
         }
         this.setState({ data, error: null });
+        if (this.props.onData) this.props.onData(data);
     }
     #onViewError = error => this.setState({ error });
 

@@ -190,7 +190,40 @@ export default [
                 id: 'payments',
                 icon: PaymentIcon,
                 path: 'pagoj',
-                hasPerm: () => true,
+                hasPerm: perms => perms.hasPerm('pay.read.tejo') || perms.hasPerm('pay.read.uea'),
+                paths: [
+                    {
+                        path: 'organizoj',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "payments" */ './payments/orgs')),
+                        type: 'bottom',
+                        paths: [
+                            {
+                                match: /^(\d+)$/,
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "payments" */ './payments/orgs/detail')),
+                                type: 'stack',
+                                paths: [
+                                    {
+                                        path: 'redakti',
+                                        type: 'state',
+                                        state: 'editing',
+                                    },
+                                    {
+                                        path: '[[addons]]',
+                                        type: 'state',
+                                        state: 'addons',
+                                    },
+                                    {
+                                        path: '[[methods]]',
+                                        type: 'state',
+                                        state: 'methods',
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: 'votes',

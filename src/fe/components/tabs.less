@@ -1,0 +1,54 @@
+@import '../prelude';
+
+.paper-tabs {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+
+    .p-contents {
+        position: relative;
+        display: inline-block;
+        white-space: nowrap;
+
+        .p-dyn-line {
+            position: absolute;
+            left: 0;
+            width: 100px;
+            transform-origin: 0 100%;
+            bottom: 0;
+            height: 2px;
+            background: @secondary;
+        }
+
+        .p-tab {
+            position: relative;
+            padding: 0 16px;
+            min-width: 64px;
+            margin: 0;
+            font: inherit;
+            color: inherit;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            text-transform: uppercase;
+            font-size: 0.875em;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            line-height: 2.5em;
+
+            --md-ripple-color: @secondary;
+            --md-ripple-highlight: @secondary;
+            --md-ripple-highlight-opacity: 0.1;
+
+            transition: color 0.3s @easing;
+
+            &.p-active {
+                color: @secondary;
+            }
+
+            &.p-line {
+                border-bottom-color: @secondary;
+            }
+        }
+    }
+}

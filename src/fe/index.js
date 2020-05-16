@@ -35,6 +35,7 @@ const taskViews = {
     codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
     adminGroups: lazyPath(() => import(/* webpackChunkName: "admin-groups-tasks" */ './features/pages/administration/groups/tasks')),
     lists: lazyPath(() => import(/* webpackChunkName: "lists-tasks" */ './features/pages/lists/tasks')),
+    payments: lazyPath(() => import(/* webpackChunkName: "payments-tasks" */ './features/pages/payments/tasks')),
     votes: lazyPath(() => import(/* webpackChunkName: "votes-tasks" */ './features/pages/votes/tasks')),
     queries: lazyPath(() => import(/* webpackChunkName: "queries-tasks" */ './features/queries')),
 };

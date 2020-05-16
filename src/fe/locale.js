@@ -641,6 +641,52 @@ export const codeholders = {
     },
 };
 
+export const paymentOrgs = {
+    title: '[[paymentorgs]]',
+    detailTitle: '[[paymentorg]]',
+    fields: {
+        org: '[[org]]',
+        name: '[[name]]',
+        description: '[[desc]]',
+    },
+    detailTabs: {
+        org: '[[details]]',
+        addons: '[[addons]]',
+        methods: '[[methods]]',
+    },
+    create: {
+        menuItem: 'Krei',
+        title: '[[create org]]',
+        button: 'Krei',
+    },
+    update: {
+        menuItem: 'Redakti',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: '[[delete org]]',
+        description: '[[are you sure you wanna delete this paymentorg]]',
+        button: 'Forigi',
+    },
+};
+export const paymentAddons = {
+    delete: {
+        menuItem: 'Forigi',
+        title: '[[delete addon]]',
+        description: '[[are you sure you wanna delete this addon]]',
+        button: 'Forigi',
+    },
+};
+export const paymentMethods = {
+    delete: {
+        menuItem: 'Forigi',
+        title: '[[delete method]]',
+        description: '[[are you sure you wanna delete this method]]',
+        button: 'Forigi',
+    },
+};
+export const paymentIntents = {};
+
 export const adminGroups = {
     title: 'Administraj grupoj',
     detailTitle: 'Administra grupo',

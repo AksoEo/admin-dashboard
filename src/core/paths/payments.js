@@ -85,12 +85,17 @@ export const tasks = {
             offset,
             limit,
             fields: ['id', 'org', 'name', 'description'],
+            order: [['name', 'asc']],
         });
         for (const item of res.body) {
             const existing = store.get([PAYMENT_ORGS, item.id, PO_DATA]);
             store.insert([PAYMENT_ORGS, item.id, PO_DATA], deepMerge(existing, item));
         }
-        return { items: res.body.map(x => x.id), total: +res.headers.get('x-total-items') };
+        return {
+            items: res.body.map(x => x.id),
+            total: +res.res.headers.get('x-total-items'),
+            stats: { time: res.resTime, filtered: false },
+        };
     },
     createOrg: async (_, { org, name, description }) => {
         const client = await asyncClient;
@@ -100,7 +105,7 @@ export const tasks = {
             name,
             description,
         });
-        const id = +res.headers.get('x-identifier');
+        const id = +res.res.headers.get('x-identifier');
         store.insert([PAYMENT_ORGS, id, PO_DATA], { id, org, name, description });
         store.signal([PAYMENT_ORGS, SIG_PAYMENT_ORGS]);
         return id;
@@ -136,12 +141,17 @@ export const tasks = {
             offset,
             limit,
             fields: ['id', 'name', 'description'],
+            order: [['name', 'asc']],
         });
         for (const item of res.body) {
             const path = [PAYMENT_ORGS, org, PO_ADDONS, item.id];
             store.insert(path, item);
         }
-        return { items: res.body.map(x => x.id), total: +res.headers.get('x-total-items') };
+        return {
+            items: res.body.map(x => x.id),
+            total: +res.res.headers.get('x-total-items'),
+            stats: { time: res.resTime, filtered: false },
+        };
     },
     createAddon: async ({ org }, { name, description }) => {
         const client = await asyncClient;
@@ -149,7 +159,7 @@ export const tasks = {
             name,
             description,
         });
-        const id = +res.headers.get('x-identifier');
+        const id = +res.res.headers.get('x-identifier');
         store.insert([PAYMENT_ORGS, org, PO_ADDONS, id], { id, name, description });
         store.signal([PAYMENT_ORGS, org, SIG_PO_ADDONS]);
         return id;
@@ -183,6 +193,7 @@ export const tasks = {
             offset,
             limit,
             fields: ['id', 'type', 'name', 'internalDescription'],
+            order: [['name', 'asc']],
         });
         for (const item of res.body) {
             const path = [PAYMENT_ORGS, org, PO_METHODS, item.id];
@@ -190,12 +201,16 @@ export const tasks = {
             const existing = store.get(path);
             store.insert(path, deepMerge(existing, item));
         }
-        return { items: res.body.map(x => x.id), total: +res.headers.get('x-total-items') };
+        return {
+            items: res.body.map(x => x.id),
+            total: +res.res.headers.get('x-total-items'),
+            stats: { time: res.resTime, filtered: false },
+        };
     },
     createMethod: async ({ org }, params) => {
         const client = await asyncClient;
         const res = await client.post(`/aksopay/payment_orgs/${org}/methods`, params);
-        const id = +res.headers.get('x-identifier');
+        const id = +res.res.headers.get('x-identifier');
         store.insert([PAYMENT_ORGS, org, PO_METHODS, id], { id, ...params });
         store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
         return id;

@@ -280,12 +280,17 @@ export default class Navigation extends PureComponent {
     /// Url current location; may be truncated.
     urlLocation = null;
 
+    /// HACKY FIX: do not reload page on first two loads so we don't get stuck in an infinite
+    /// loop
+    loadCount = 2;
+
     /// Loads a URL and a history state object.
     loadURL (url, state) {
-        if (this.state.error) {
+        if (this.state.error && !this.loadCount) {
             // force reload
             window.location = url;
         }
+        this.loadCount = Math.max(this.loadCount - 1, 0);
 
         const {
             urlLocation,
