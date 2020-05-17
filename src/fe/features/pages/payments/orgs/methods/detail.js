@@ -32,7 +32,8 @@ export default connectPerms(class MethodPage extends Page {
         }
 
         this.#commitTask = this.context.createTask('payments/updateMethod', {
-            id: this.props.match[1],
+            org: this.getOrg(),
+            id: this.getId(),
             _changedFields: changedFields,
         }, this.state.edit);
         this.#commitTask.on('success', this.onEndEdit);

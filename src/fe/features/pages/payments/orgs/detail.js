@@ -15,7 +15,8 @@ import AddonsTab from './addons';
 import MethodsTab from './methods';
 import './detail.less';
 
-function Header ({ item }) {
+function Header ({ item, editing }) {
+    if (editing) return null;
     return (
         <div class="payment-org-header">
             <h1 class="payment-org-title">
@@ -85,11 +86,11 @@ export default connectPerms(class Org extends Page {
         } else if (tab === 'addons') {
             if (this.props.addons) return;
             if (this.props.methods) this.props.methods.pop(true);
-            this.props.push('[[addons]]', true);
+            this.props.push('donacebloj', true);
         } else if (tab === 'methods') {
             if (this.props.methods) return;
             if (this.props.addons) this.props.addons.pop(true);
-            this.props.push('[[methods]]', true);
+            this.props.push('metodoj', true);
         }
     };
 

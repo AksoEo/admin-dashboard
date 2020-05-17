@@ -27,7 +27,7 @@ export default class AddonsTab extends PureComponent {
                     viewOptions={{ org }}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/pagoj/organizoj/${org}/[[addons]]/${id}`}
+                    onGetItemLink={id => `/aksopago/organizoj/${org}/donacebloj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />

@@ -32,7 +32,8 @@ export default connectPerms(class AddonPage extends Page {
         }
 
         this.#commitTask = this.context.createTask('payments/updateAddon', {
-            id: this.props.match[1],
+            org: this.getOrg(),
+            id: this.getId(),
             _changedFields: changedFields,
         }, this.state.edit);
         this.#commitTask.on('success', this.onEndEdit);

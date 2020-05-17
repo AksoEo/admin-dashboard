@@ -189,9 +189,13 @@ export default [
             {
                 id: 'payments',
                 icon: PaymentIcon,
-                path: 'pagoj',
+                path: 'aksopago',
                 hasPerm: perms => perms.hasPerm('pay.read.tejo') || perms.hasPerm('pay.read.uea'),
                 paths: [
+                    {
+                        path: 'pagceloj',
+                        type: 'bottom',
+                    },
                     {
                         path: 'organizoj',
                         component: elazy(() =>
@@ -210,7 +214,7 @@ export default [
                                         state: 'editing',
                                     },
                                     {
-                                        path: '[[addons]]',
+                                        path: 'donacebloj',
                                         type: 'state',
                                         state: 'addons',
                                         paths: [
@@ -230,7 +234,7 @@ export default [
                                         ],
                                     },
                                     {
-                                        path: '[[methods]]',
+                                        path: 'metodoj',
                                         type: 'state',
                                         state: 'methods',
                                         paths: [

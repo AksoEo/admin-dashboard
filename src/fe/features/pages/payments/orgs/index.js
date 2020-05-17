@@ -45,7 +45,7 @@ export default connectPerms(class Orgs extends Page {
                     view="payments/org"
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/pagoj/organizoj/${id}`}
+                    onGetItemLink={id => `/aksopago/organizoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields}

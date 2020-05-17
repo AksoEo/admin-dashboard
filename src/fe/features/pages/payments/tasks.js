@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import Segmented from '../../../components/segmented';
+import ChangedFields from '../../../components/changed-fields';
 import { Validator, Field } from '../../../components/form';
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
@@ -44,14 +45,14 @@ export default {
                         title={orgLocale.create.title}
                         actionLabel={orgLocale.create.button}
                         run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/pagoj/organizoj/${id}`);
+                            routerContext.navigate(`/aksopago/organizoj/${id}`);
                         })}>
                         {orgSelector}
                         <Field>
                             <Validator
                                 component={TextField}
                                 validate={value => {
-                                    if (!value) throw { error: orgLocale.create.nameRequired };
+                                    if (!value) throw { error: orgLocale.update.nameRequired };
                                 }}
                                 label={orgLocale.fields.name}
                                 value={task.parameters.name || ''}
@@ -81,13 +82,13 @@ export default {
                         title={addonLocale.create.title}
                         actionLabel={addonLocale.create.button}
                         run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/pagoj/organizoj/${org}/[[addons]]/${id}`);
+                            routerContext.navigate(`/aksopago/organizoj/${org}/donacebloj/${id}`);
                         })}>
                         <Field>
                             <Validator
                                 component={TextField}
                                 validate={value => {
-                                    if (!value) throw { error: addonLocale.create.nameRequired };
+                                    if (!value) throw { error: addonLocale.update.nameRequired };
                                 }}
                                 label={addonLocale.fields.name}
                                 value={task.parameters.name || ''}
@@ -102,6 +103,36 @@ export default {
                     </TaskDialog>
                 )}
             </routerContext.Consumer>
+        );
+    },
+
+    updateOrg ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={orgLocale.update.title}
+                actionLabel={orgLocale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={orgLocale.fields} />
+            </TaskDialog>
+        );
+    },
+
+    updateAddon ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={addonLocale.update.title}
+                actionLabel={addonLocale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={addonLocale.fields} />
+            </TaskDialog>
         );
     },
 

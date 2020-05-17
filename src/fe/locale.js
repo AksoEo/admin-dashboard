@@ -662,12 +662,14 @@ export const paymentOrgs = {
             tejo: 'TEJO',
             uea: 'UEA',
         },
-        nameRequired: 'Necesas nomo',
     },
     createAddon: '[[create addon]]',
     createMethod: '[[create method]]',
     update: {
         menuItem: 'Redakti',
+        title: '[[update]]',
+        button: '[[update]]',
+        nameRequired: 'Necesas nomo',
     },
     delete: {
         menuItem: 'Forigi',
@@ -685,10 +687,12 @@ export const paymentAddons = {
     create: {
         title: '[[create addon]]',
         button: 'Krei',
-        nameRequired: 'Necesas nomo',
     },
     update: {
         menuItem: 'Redakti',
+        title: '[[update]]',
+        button: '[[update]]',
+        nameRequired: 'Necesas nomo',
     },
     delete: {
         menuItem: 'Forigi',
@@ -701,8 +705,14 @@ export const paymentMethods = {
     detailTitle: '[[method]]',
     fields: {
         type: 'Speco',
+        stripeMethods: '[[stripe methods]]',
         name: 'Nomo',
-        internalDescription: 'Priskribo',
+        internalDescription: '[[idesc]]',
+        description: 'Priskribo',
+        currencies: '[[currencies]]',
+        paymentValidity: '[[payment validity]]',
+        isRecommended: '[[isrec]]',
+        stripePublishableKey: '[[spk]]',
     },
     update: {
         menuItem: 'Redakti',

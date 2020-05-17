@@ -122,8 +122,10 @@ export const tasks = {
     },
     updateOrg: async ({ id }, params) => {
         const client = await asyncClient;
+        delete params.id;
+        delete params.org;
         await client.patch(`/aksopay/payment_orgs/${id}`, params);
-        const existing = store.get([PAYMENT_ORGS, +id]);
+        const existing = store.get([PAYMENT_ORGS, +id, PO_DATA]);
         store.insert([PAYMENT_ORGS, id, PO_DATA], deepMerge(existing, params));
     },
     deleteOrg: async ({ id }) => {
@@ -176,6 +178,7 @@ export const tasks = {
     },
     updateAddon: async ({ org, id }, params) => {
         const client = await asyncClient;
+        delete params.id;
         await client.patch(`/aksopay/payment_orgs/${org}/addons/${id}`, params);
         const path = [PAYMENT_ORGS, org, PO_ADDONS, id];
         const existing = store.get(path);
@@ -209,6 +212,7 @@ export const tasks = {
     },
     createMethod: async ({ org }, params) => {
         const client = await asyncClient;
+        delete params.id;
         const res = await client.post(`/aksopay/payment_orgs/${org}/methods`, params);
         const id = +res.res.headers.get('x-identifier');
         store.insert([PAYMENT_ORGS, org, PO_METHODS, id], { id, ...params });
