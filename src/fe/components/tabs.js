@@ -10,6 +10,7 @@ const ANIM_STAGGER_TIME = 0.1;
 /// # Props
 /// - value/onChange: tab id
 /// - tabs: { [id]: label }
+/// - disabled: bool
 export default class Tabs extends PureComponent {
     scrollX = new Spring(1, 1);
 
@@ -206,7 +207,7 @@ export default class Tabs extends PureComponent {
         window.removeEventListener('pointerup', this.#onPointerUp);
     };
 
-    render ({ value, onChange, tabs }) {
+    render ({ value, disabled, onChange, tabs }) {
         const contents = [];
 
         const lineIsIdle = !this.lineLeft.wantsUpdate() && !this.lineRight.wantsUpdate()
@@ -219,6 +220,7 @@ export default class Tabs extends PureComponent {
             contents.push(
                 <Tab
                     key={id}
+                    disabled={disabled}
                     ref={node => this.tabRefs[index] = node}
                     onStartDragging={this.#onStartDragging}
                     onSelect={() => onChange(id)}
@@ -309,10 +311,11 @@ class Tab extends PureComponent {
         this.updateWidth();
     }
 
-    render ({ isActive, hasLine, children }) {
+    render ({ isActive, disabled, hasLine, children }) {
         return (
             <button
                 ref={node => this.node = node}
+                disabled={disabled}
                 class={'p-tab' + (isActive ? ' p-active' : '') + (hasLine ? ' p-line' : '')}
                 onPointerDown={this.#onPointerDown}>
                 <Ripple ref={ripple => this.#ripple = ripple} />

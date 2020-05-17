@@ -42,6 +42,10 @@
 
             transition: color 0.3s @easing;
 
+            &[disabled] {
+                color: @text-fade-60;
+            }
+
             &.p-active {
                 color: @secondary;
             }

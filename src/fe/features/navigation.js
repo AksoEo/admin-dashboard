@@ -29,10 +29,6 @@ function NotFoundPage () {
     );
 }
 
-function TODOPage () {
-    return <center>ankoraŭ ne skribis ĉi tiun paĝon</center>;
-}
-
 // Parses a URL and state into a stack. State is nullable.
 function parseHistoryState (url, state, mkPopStack, perms) {
     const stackState = state && Array.isArray(state.stack) ? state.stack : [];
@@ -96,7 +92,7 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                     const item = {
                         path: firstPathPart,
                         source: page,
-                        component: page.component || TODOPage,
+                        component: page.component || NotFoundPage,
                         query: '',
                         state: {},
                     };

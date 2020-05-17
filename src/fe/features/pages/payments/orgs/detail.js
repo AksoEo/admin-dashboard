@@ -167,6 +167,7 @@ export default connectPerms(class Org extends Page {
                     actions={actions} />
                 <Tabs
                     value={tab}
+                    disabled={editing}
                     onChange={this.#onTabChange}
                     tabs={locale.detailTabs} />
 

@@ -2,7 +2,7 @@ import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import { Button, TextField } from '@cpsdqs/yamdl';
-import Segmented from '../../../../components/segmented';
+import Tabs from '../../../../components/tabs';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
 import { FIELDS as CLIENT_FIELDS } from '../clients/index';
@@ -172,12 +172,14 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit} />
                 {!editing && (
-                    <Segmented class="tab-switcher" selected={tab} onSelect={tab => this.setState({ tab })}>
-                        {[
-                            perms.hasPerm('codeholders.read') && { id: 'codeholders', label: locale.tabs.codeholders },
-                            perms.hasPerm('clients.read') && { id: 'clients', label: locale.tabs.clients },
-                        ].filter(x => x)}
-                    </Segmented>
+                    <Tabs
+                        class="tab-switcher"
+                        value={tab}
+                        onChange={tab => this.setState({ tab })}
+                        tabs={Object.fromEntries([
+                            perms.hasPerm('codeholders.read') && ['codeholders', locale.tabs.codeholders],
+                            perms.hasPerm('clients.read') && ['clients', locale.tabs.clients],
+                        ].filter(x => x))} />
                 )}
                 {!editing && selectionActionButton}
                 {!editing && (
