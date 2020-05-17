@@ -7,7 +7,8 @@
     border-radius: 4px;
     white-space: nowrap;
 
-    & > select {
+    & > select, & > .multi-select {
+        display: inline-block;
         background: none;
         border: none;
         font: inherit;
@@ -27,6 +28,10 @@
         &:focus {
             outline: none;
         }
+    }
+
+    & > .multi-select {
+        cursor: default;
     }
 
     &.p-outline {

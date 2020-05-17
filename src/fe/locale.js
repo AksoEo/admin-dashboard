@@ -715,10 +715,32 @@ export const paymentMethods = {
         currencies: '[[currencies]]',
         paymentValidity: '[[payment validity]]',
         isRecommended: '[[isrec]]',
+        stripeSecretKey: '[[ssk]]',
         stripePublishableKey: '[[spk]]',
+
+        types: {
+            manual: '[[manual]]',
+            stripe: '[[stripe]]',
+        },
+        stripeMethodValues: {
+            card: '[[card]]',
+        },
+        noCurrenciesSelected: '[[none selected]]',
+        paymentValidityTypes: {
+            limited: '[[valid for…]]',
+            forever: '[[valid forever]]',
+        },
+        paymentValidityUnit: 's',
+    },
+    create: {
+        title: '[[create method]]',
+        button: 'Krei',
     },
     update: {
         menuItem: 'Redakti',
+        title: '[[update]]',
+        button: '[[update]]',
+        nameRequired: 'Necesas nomo',
     },
     delete: {
         menuItem: 'Forigi',
@@ -728,6 +750,25 @@ export const paymentMethods = {
     },
 };
 export const paymentIntents = {};
+
+export const currencies = {
+    USD: '[[US Dollar]] (USD)',
+    AUD: '[[Australian Dollar]] (AUD)',
+    CAD: '[[Canadian Dollar]] (CAD)',
+    CHF: '[[Swiss Franc]] (CHF)',
+    DKK: '[[Danish Krone]] (DKK)',
+    EUR: '[[Euro]] (EUR)',
+    GBP: '[[Great British Pound]] (GBP)',
+    HKD: '[[Hong Kong Dollar]] (HKD)',
+    JPY: '[[Japanese Yen]] (JPY)',
+    MXN: '[[Mexican Peso]] (MXN)',
+    MYR: '[[Malaysian Ringgit]] (MYR)',
+    NOK: '[[Norwegian Krone]] (NOK)',
+    NZD: '[[New Zealand Dollar]] (NZD)',
+    PLN: '[[Polish Zloty]] (PLN)',
+    SEK: '[[Swedish Krona]] (SEK)',
+    SGD: '[[Singapore Dollar]] (SGD)',
+};
 
 export const adminGroups = {
     title: 'Administraj grupoj',

@@ -3,6 +3,7 @@ import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import Segmented from '../../../components/segmented';
 import ChangedFields from '../../../components/changed-fields';
+import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import { Validator, Field } from '../../../components/form';
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
@@ -11,6 +12,8 @@ import {
     paymentAddons as addonLocale,
     paymentMethods as methodLocale,
 } from '../../../locale';
+import { CREATION_FIELDS as methodFields } from './orgs/methods/fields';
+import './tasks.less';
 
 export default {
     createOrg: connectPerms(({ perms, open, task }) => {
@@ -106,6 +109,55 @@ export default {
         );
     },
 
+    createMethod ({ open, task }) {
+        const org = task.options.org;
+
+        const item = task.parameters;
+        const fields = [];
+        for (const f in methodFields) {
+            const field = methodFields[f];
+            if (field.shouldHide && field.shouldHide(item, true)) continue;
+            const Component = field.component;
+
+            fields.push(
+                <Field key={f}>
+                    {field.wantsCreationLabel ? (
+                        <label class="creation-label">
+                            {methodLocale.fields[f]}
+                        </label>
+                    ) : null}
+                    <Component
+                        value={item[f]}
+                        editing={true}
+                        onChange={value => task.update({ [f]: value })}
+                        item={item}
+                        isCreation={true}
+                        onItemChange={value => task.update(value)} />
+                </Field>
+            );
+        }
+
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        class="payment-method-task-create"
+                        open={open}
+                        onClose={() => task.drop()}
+                        title={methodLocale.create.title}
+                        actionLabel={methodLocale.create.button}
+                        run={() => task.runOnce().then(id => {
+                            routerContext.navigate(`/aksopago/organizoj/${org}/metodoj/${id}`);
+                        })}>
+                        <DynamicHeightDiv>
+                            {fields}
+                        </DynamicHeightDiv>
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
+
     updateOrg ({ open, task }) {
         return (
             <TaskDialog
@@ -135,6 +187,22 @@ export default {
             </TaskDialog>
         );
     },
+
+    updateMethod ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={methodLocale.update.title}
+                actionLabel={methodLocale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={methodLocale.fields} />
+            </TaskDialog>
+        );
+    },
+
 
     deleteOrg ({ open, task }) {
         return (

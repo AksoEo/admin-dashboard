@@ -1,0 +1,18 @@
+.payment-method-task-create {
+    max-width: 100%;
+    width: 400px;
+
+    .form-field-container {
+        & > .paper-text-field, & > .form-validator .paper-text-field {
+            width: 100%;
+        }
+
+        .creation-label {
+            font-size: small;
+
+            &::after {
+                content: ': ';
+            }
+        }
+    }
+}

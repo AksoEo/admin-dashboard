@@ -235,6 +235,9 @@ export const tasks = {
     },
     updateMethod: async ({ org, id }, params) => {
         const client = await asyncClient;
+        delete params.id;
+        delete params.type;
+        delete params.thumbnailKey;
         await client.patch(`/aksopay/payment_orgs/${org}/methods/${id}`, params);
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];
         const existing = store.get(path);
