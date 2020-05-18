@@ -431,11 +431,27 @@ const clientFilters = {
         fields: [],
     },
     codeList: {
-        toAPI: codes => ({
-            newCode: {
-                $in: codes,
-            },
-        }),
+        toAPI: codes => {
+            const newCodes = [];
+            const oldCodes = [];
+
+            for (const code of codes) {
+                // does it roughly look like an old code?
+                if (code.length === 4) {
+                    oldCodes.push(code);
+                    continue;
+                }
+                if (code.length === 6 && code.includes('-')) {
+                    oldCodes.push(code.substr(0, 4));
+                    continue;
+                }
+                newCodes.push(code);
+            }
+
+            if (!newCodes.length) return { oldCode: { $in: oldCodes } };
+            else if (!oldCodes.length) return { newCode: { $in: newCodes } };
+            return { $or: [{ newCode: { $in: newCodes } }, { oldCode: { $in: oldCodes } }] };
+        },
     },
 };
 
