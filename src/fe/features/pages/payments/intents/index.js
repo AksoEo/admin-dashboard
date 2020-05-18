@@ -63,7 +63,7 @@ export default connectPerms(class Intents extends Page {
                     view="payments/intent"
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/aksopago/pagceloj/${id}`}
+                    onGetItemLink={id => `/aksopago/pagoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields}

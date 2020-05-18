@@ -211,7 +211,7 @@ export const pages = {
     votes: 'Voĉdonado',
     newsletters: 'Bultenoj',
     payments: 'Pagoj',
-    'payment-intents': 'Pagceloj',
+    'payment-intents': 'Pagoj',
     'payment-orgs': 'Pagorganizoj',
     administration: 'Administrado',
     'administration-groups': 'Administraj grupoj',

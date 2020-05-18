@@ -303,7 +303,7 @@ export default [
                 component: elazy(() =>
                     import(/* webpackChunkName: "payment-intents" */ './payments/intents')),
                 type: 'bottom',
-                path: 'pagceloj',
+                path: 'pagoj',
                 hasPerm: () => true,
             },
             {
