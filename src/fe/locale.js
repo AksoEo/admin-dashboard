@@ -749,7 +749,45 @@ export const paymentMethods = {
         button: 'Forigi',
     },
 };
-export const paymentIntents = {};
+export const paymentIntents = {
+    title: '[[paymentintents]]',
+    detailTitle: '[[intent]]',
+    fields: {
+        customer: '[[customer]]',
+        method: '[[method]]',
+        org: '[[org]]',
+        currency: '[[currency]]',
+        status: '[[status]]',
+        events: '[[events]]',
+        timeCreated: '[[timeCreated]]',
+        statusTime: '[[statusTime]]',
+        internalNotes: '[[internalNotes]]',
+        customerNotes: '[[customerNotes]]',
+        foreignId: '[[foreignId]]',
+        stripePaymentIntentId: '[[stripePaymentIntentId]]',
+        stripeClientSecret: '[[stripeClientSecret]]',
+        purposes: '[[purposes]]',
+        totalAmount: '[[totalAmount]]',
+        amountRefunded: '[[amountRefunded]]',
+    },
+    search: {
+        fields: {
+            customerEmail: '[[customeremail]]',
+            customerName: '[[customername]]',
+            internalNotes: '[[internalnotes]]',
+            customerNotes: '[[customernotes]]',
+        },
+        placeholders: {
+            customerEmail: '[[e.g. meow@akso.org]]',
+            customerName: '[[e.g. dr meowington]]',
+            internalNotes: '[[search your(?) notes]]',
+            customerNotes: '[[search customer notes]]',
+        },
+    },
+    create: {
+        menuItem: '[[create]]',
+    },
+};
 
 export const currencies = {
     USD: '[[US Dollar]] (USD)',

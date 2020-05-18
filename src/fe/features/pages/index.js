@@ -300,6 +300,8 @@ export default [
             {
                 id: 'payment-intents',
                 icon: PaymentIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "payment-intents" */ './payments/intents')),
                 type: 'bottom',
                 path: 'pagceloj',
                 hasPerm: () => true,
@@ -310,13 +312,13 @@ export default [
                 type: 'bottom',
                 path: 'organizoj',
                 component: elazy(() =>
-                    import(/* webpackChunkName: "payments" */ './payments/orgs')),
+                    import(/* webpackChunkName: "payment-orgs" */ './payments/orgs')),
                 hasPerm: perms => perms.hasPerm('pay.read.tejo') || perms.hasPerm('pay.read.uea'),
                 paths: [
                     {
                         match: /^(\d+)$/,
                         component: elazy(() =>
-                            import(/* webpackChunkName: "payments" */ './payments/orgs/detail')),
+                            import(/* webpackChunkName: "payment-orgs" */ './payments/orgs/detail')),
                         type: 'stack',
                         paths: [
                             {
@@ -333,7 +335,7 @@ export default [
                                         match: /^(\d+)$/,
                                         type: 'stack',
                                         component: elazy(() =>
-                                            import(/* webpackChunkName: "payments" */ './payments/orgs/addons/detail')),
+                                            import(/* webpackChunkName: "payment-orgs" */ './payments/orgs/addons/detail')),
                                         paths: [
                                             {
                                                 path: 'redakti',
@@ -353,7 +355,7 @@ export default [
                                         match: /^(\d+)$/,
                                         type: 'stack',
                                         component: elazy(() =>
-                                            import(/* webpackChunkName: "payments" */ './payments/orgs/methods/detail')),
+                                            import(/* webpackChunkName: "payment-orgs" */ './payments/orgs/methods/detail')),
                                         paths: [
                                             {
                                                 path: 'redakti',

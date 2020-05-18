@@ -57,6 +57,7 @@ export function filtersToAPI (clientFilters, pfilters) {
 /// Converts params to request options. See e.g. task codeholders/list for details.
 export const makeParametersToRequestData = ({
     searchFieldToTransientFields,
+    mapSearchField,
     handleSearchFields,
     clientFields,
     clientFilters,
@@ -85,7 +86,8 @@ export const makeParametersToRequestData = ({
             if (!util.isValidSearch(transformedQuery)) {
                 throw { code: 'invalid-search-query', message: 'invalid search query' };
             }
-            options.search = { str: transformedQuery, cols: [searchField] };
+            const mappedSearchField = mapSearchField ? mapSearchField(searchField) : searchField;
+            options.search = { str: transformedQuery, cols: [mappedSearchField] };
         }
     }
 

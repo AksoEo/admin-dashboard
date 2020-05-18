@@ -326,17 +326,15 @@ export default class OverviewList extends PureComponent {
             <div class={className}>
                 <header class="list-meta" ref={node => this.#listMetaNode = node}>
                     <span>{stats}</span>
-                    <span class={'list-refresh' + (loading ? ' is-loading' : '')}>
-                        <CircularProgress class="loading-indicator" indeterminate={loading} small />
-                        <ListRefreshButton loading={loading} onClick={() => {
-                            this.setState({ stale: true, loading: true });
-                            // fake load delay because actual load times are actually way too fast
-                            // to see any loading happening
-                            this.#reloadTimeout = setTimeout(() => {
-                                this.load();
-                            }, 300);
-                        }} />
-                    </span>
+                    <ListRefreshButton loading={loading} onClick={() => {
+                        this.setState({ stale: true, loading: true });
+                        // fake load delay because actual load times are actually way too fast
+                        // to see any loading happening
+                        this.#reloadTimeout = setTimeout(() => {
+                            this.#reloadTimeout = null;
+                            this.load();
+                        }, 300);
+                    }} />
                 </header>
                 {notice ? <div class="list-notice">{notice}</div> : null}
                 <Button
@@ -569,18 +567,24 @@ const ListItem = connect(props => ([props.view, {
 class ListRefreshButton extends PureComponent {
     state = {
         loading: this.props.loading,
+        hideButton: this.props.loading,
     };
 
-    unhideTimeout = null;
+    stopLoadingTimeout = null;
+    unhideButtonTimeout = null;
     componentDidUpdate (prevProps) {
         if (prevProps.loading !== this.props.loading) {
             if (!this.props.loading) {
-                this.unhideTimeout = setTimeout(() => {
+                this.stopLoadingTimeout = setTimeout(() => {
                     this.setState({ loading: false });
+                }, 150);
+                this.unhideButtonTimeout = setTimeout(() => {
+                    this.setState({ hideButton: false });
                 }, 1000);
             } else {
-                clearTimeout(this.unhideTimeout);
-                this.setState({ loading: true });
+                clearTimeout(this.stopLoadingTimeout);
+                clearTimeout(this.unhideButtonTimeout);
+                this.setState({ loading: true, hideButton: true });
             }
         }
     }
@@ -588,15 +592,18 @@ class ListRefreshButton extends PureComponent {
         clearTimeout(this.unhideTimeout);
     }
 
-    render ({ onClick }, { loading }) {
+    render ({ onClick }, { loading, hideButton }) {
         return (
-            <Button
-                icon
-                small
-                class={'refresh-button' + (loading ? ' is-loading' : '')}
-                onClick={onClick}>
-                <RefreshIcon style={{ verticalAlign: 'middle' }} />
-            </Button>
+            <span class={'list-refresh' + (loading ? ' is-loading' : '')}>
+                <CircularProgress class="loading-indicator" indeterminate={loading} small />
+                <Button
+                    icon
+                    small
+                    class={'refresh-button' + (hideButton ? ' is-loading' : '')}
+                    onClick={onClick}>
+                    <RefreshIcon style={{ verticalAlign: 'middle' }} />
+                </Button>
+            </span>
         );
     }
 }

@@ -72,7 +72,17 @@ const iClientFields = {
 };
 const iClientFilters = {};
 
+const iSearchFieldToTransientFields = {
+    customerEmail: ['customer'],
+    customerName: ['customer'],
+};
 const iParametersToRequestData = makeParametersToRequestData({
+    searchFieldToTransientFields: iSearchFieldToTransientFields,
+    mapSearchField: field => {
+        if (field === 'customerEmail') return 'customer.email';
+        if (field === 'customerName') return 'customer.name';
+        return field;
+    },
     clientFields: iClientFields,
     clientFilters: iClientFilters,
 });
