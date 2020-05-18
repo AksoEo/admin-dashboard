@@ -179,7 +179,7 @@ export default {
         component ({ value, item }) {
             if (!value) return null;
             const { now, atStartOfYear } = value;
-            if (!now) return null;
+            if (typeof now !== 'number') return null;
             const label = locale.fields.ageFormat(now, atStartOfYear, item.isDead);
             return <span class="age">{label}</span>;
         },
