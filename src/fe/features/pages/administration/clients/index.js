@@ -12,6 +12,7 @@ import { connectPerms } from '../../../../perms';
 import { connectContextualActions } from '../../../../context-action';
 import { apiKey } from '../../../../components/data';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
+import './style';
 
 export const FIELDS = {
     name: {

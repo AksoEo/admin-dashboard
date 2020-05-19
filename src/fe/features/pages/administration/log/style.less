@@ -10,15 +10,37 @@
             vertical-align: middle;
         }
     }
+
+    .ip-address {
+        display: inline-block;
+        font-family: @monospace;
+        font-size: small;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
 }
 
 .http-log-detail-page {
     padding: 24px;
 
     .ip-address {
+        font-family: @monospace;
+        font-size: small;
+
         .ip-copy-button {
             margin-left: 16px;
             --md-button-color: @gray-button-color;
+        }
+    }
+
+    .request-query {
+        width: 100%;
+        max-width: 500px;
+
+        .object-viewer {
+            overflow: auto;
         }
     }
 }

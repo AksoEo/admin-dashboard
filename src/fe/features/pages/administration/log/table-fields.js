@@ -52,11 +52,15 @@ export default {
                 return Buffer.from(value.id || []).toString('hex');
             }
         },
+        weight: 0.5,
     },
     ip: {
-        weight: 2,
+        weight: 1.5,
         sortable: true,
-        ...identityComponent,
+        component ({ value }) {
+            return <code class="ip-address">{value}</code>;
+        },
+        stringify: x => x ? x + '' : x,
     },
     origin: {
         sortable: true,
@@ -65,7 +69,7 @@ export default {
     userAgent: identityComponent,
     userAgentParsed: identityComponent,
     method: {
-        weight: 0.5,
+        weight: 0.3,
         sortable: true,
         ...identityComponent,
     },
