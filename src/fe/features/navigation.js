@@ -520,6 +520,7 @@ export default class Navigation extends PureComponent {
         let bottomPage;
         const stackItems = [];
 
+        let currentTabTitle = '';
         let currentTitle = locale.title;
         let currentActions = [];
 
@@ -528,6 +529,7 @@ export default class Navigation extends PureComponent {
             if (!stackItem.component) continue; // not a view component
 
             if (stackItem.meta) {
+                currentTabTitle = stackItem.meta.title;
                 currentTitle = stackItem.meta.title;
                 currentActions = stackItem.meta.actions;
             }
@@ -594,6 +596,8 @@ export default class Navigation extends PureComponent {
                 </Button>
             )
             : null;
+
+        document.title = locale.title(currentTabTitle);
 
         return (
             <div class="navigation-view">

@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { LoginAuthStates } from '../../../protocol';
 import { connect } from '../../core/connection';
-import { login as locale, meta as localeMeta } from '../../locale';
+import { login as locale, meta as localeMeta, app as appLocale } from '../../locale';
 import ProgressIndicator from '../../components/dialog-progress-indicator';
 import AutosizingPageView from '../../components/autosizing-page-view';
 import DetailsPage from './details';
@@ -76,6 +76,9 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
     #onHeightChange = () => this.#autosizingPageView.pageHeightChanged();
 
     componentDidMount () {
+        // set tab title
+        document.title = appLocale.title(locale.title);
+
         this.setState(getPageMode());
 
         setTimeout(() => {

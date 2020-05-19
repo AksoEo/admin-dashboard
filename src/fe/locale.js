@@ -122,6 +122,7 @@ export const errors = {
 };
 
 export const login = {
+    title: 'Ensaluti',
     details: 'Ensaluti',
     createPassword: 'Krei pasvorton',
     resetPassword: 'Rekrei pasvorton',
@@ -183,7 +184,7 @@ export const login = {
 };
 
 export const app = {
-    title: 'AKSO-Administranto',
+    title: p => p ? `${p} | AKSO-Administranto` : 'AKSO-Administranto',
     logOut: 'Elsaluti',
 
     // literally any error that causes the UI to fail to render
