@@ -305,6 +305,21 @@ export default [
                 type: 'bottom',
                 path: 'pagoj',
                 hasPerm: () => true,
+                paths: [
+                    {
+                        match: /^([0-9a-f]+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "payment-intents" */ './payments/intents/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    }
+                ],
             },
             {
                 id: 'payment-orgs',

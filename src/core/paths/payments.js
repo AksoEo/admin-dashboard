@@ -36,9 +36,17 @@ function getThumbnailKey () {
     return Math.random().toString(36).replace(/\./g, '');
 }
 
+function iReadId (idBuffer) {
+    return idBuffer.toString('hex');
+}
+
 // intents stuff
 const iClientFields = {
-    id: 'id',
+    id: {
+        apiFields: ['id'],
+        fromAPI: intent => iReadId(intent.id),
+        toAPI: () => ({}),
+    },
     customer: {
         apiFields: ['codeholderId', 'customer.email', 'customer.name'],
         fromAPI: intent => ({
@@ -288,13 +296,17 @@ export const tasks = {
         const list = result.body;
         const totalItems = +result.res.headers.get('x-total-items');
 
+        const items = [];
+
         for (const item of list) {
-            const existing = store.get([PAYMENT_INTENTS, item.id]);
-            store.insert([PAYMENT_INTENTS, item.id], deepMerge(existing, iClientFromAPI(item)));
+            const id = iReadId(item.id);
+            const existing = store.get([PAYMENT_INTENTS, id]);
+            store.insert([PAYMENT_INTENTS, id], deepMerge(existing, iClientFromAPI(item)));
+            items.push(id);
         }
 
         return {
-            items: list.map(x => x.id),
+            items,
             total: totalItems,
             transientFields,
             stats: {
@@ -302,6 +314,14 @@ export const tasks = {
                 filtered: usedFilters,
             },
         };
+    },
+    createIntent: async (_, params) => {
+        const client = await asyncClient;
+        const res = await client.post('/aksopay/payment_intents', params);
+        const id = iReadId(res.res.headers.get('x-identifier'));
+        store.insert([PAYMENT_INTENTS, id], params);
+        store.signal([PAYMENT_INTENTS, SIG_PAYMENT_INTENTS]);
+        return id;
     },
     getIntent: async ({ id }, { fields }) => {
         const client = await asyncClient;
@@ -311,40 +331,40 @@ export const tasks = {
                 : iClientFields[id].apiFields)),
         });
 
-        const existing = store.get([PAYMENT_INTENTS, +id]);
-        store.insert([PAYMENT_INTENTS, +id], deepMerge(existing, iClientFromAPI(res.body)));
+        const existing = store.get([PAYMENT_INTENTS, id]);
+        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, iClientFromAPI(res.body)));
 
         return +id;
     },
     cancelIntent: async ({ id }) => {
         const client = await asyncClient;
         await client.post(`/aksopay/payment_intents/${id}/!cancel`);
-        const existing = store.get([PAYMENT_INTENTS, +id]);
-        store.insert([PAYMENT_INTENTS, +id], deepMerge(existing, { status: 'canceled' }));
+        const existing = store.get([PAYMENT_INTENTS, id]);
+        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'canceled' }));
     },
     markIntentDisputed: async ({ id }) => {
         const client = await asyncClient;
         await client.post(`/aksopay/payment_intents/${id}/!mark_disputed`);
-        const existing = store.get([PAYMENT_INTENTS, +id]);
-        store.insert([PAYMENT_INTENTS, +id], deepMerge(existing, { status: 'disputed' }));
+        const existing = store.get([PAYMENT_INTENTS, id]);
+        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'disputed' }));
     },
     markIntentRefunded: async ({ id }) => {
         const client = await asyncClient;
         await client.post(`/aksopay/payment_intents/${id}/!mark_refunded`);
-        const existing = store.get([PAYMENT_INTENTS, +id]);
-        store.insert([PAYMENT_INTENTS, +id], deepMerge(existing, { status: 'refunded' }));
+        const existing = store.get([PAYMENT_INTENTS, id]);
+        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'refunded' }));
     },
     markIntentSucceeded: async ({ id }) => {
         const client = await asyncClient;
         await client.post(`/aksopay/payment_intents/${id}/!mark_succeeded`);
-        const existing = store.get([PAYMENT_INTENTS, +id]);
-        store.insert([PAYMENT_INTENTS, +id], deepMerge(existing, { status: 'succeeded' }));
+        const existing = store.get([PAYMENT_INTENTS, id]);
+        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'succeeded' }));
     },
     submitIntent: async ({ id }) => {
         const client = await asyncClient;
         await client.post(`/aksopay/payment_intents/${id}/!submit`);
-        const existing = store.get([PAYMENT_INTENTS, +id]);
-        store.insert([PAYMENT_INTENTS, +id], deepMerge(existing, { status: 'submitted' }));
+        const existing = store.get([PAYMENT_INTENTS, id]);
+        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'submitted' }));
     },
 };
 export const views = {

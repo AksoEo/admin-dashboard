@@ -787,6 +787,11 @@ export const paymentIntents = {
     create: {
         menuItem: '[[create]]',
     },
+    update: {
+        menuItem: 'Redakti',
+        title: '[[update]]',
+        button: '[[update]]',
+    },
 };
 
 export const currencies = {
