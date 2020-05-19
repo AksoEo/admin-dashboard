@@ -7,7 +7,7 @@ import Page from '../../../components/page';
 import DetailView from '../../../components/detail';
 import JSONEditor from '../../../components/json-editor';
 import RearrangingList from '../../../components/rearranging-list';
-import Segmented from '../../../components/segmented';
+import Tabs from '../../../components/tabs';
 import DataList from '../../../components/data-list';
 import ProfilePicture from '../../../components/profile-picture';
 import Meta from '../../meta';
@@ -80,23 +80,80 @@ export default connectPerms(class ListDetailPage extends Page {
                     onEditChange={edit => this.setState({ edit })}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    header={Header}
+                    header={DetailViewInner}
                     onDelete={() => this.props.pop()} />
             </div>
         );
     }
 });
 
-class Header extends Component {
+class DetailViewInner extends Component {
+    state = {
+        tab: 'preview',
+    };
+
+    render ({ editing, item, onItemChange }) {
+        let tab = this.state.tab;
+        if (editing) tab = 'filters';
+
+        return (
+            <div class={'list-detail-inner' + (editing ? ' is-editing' : '')}>
+                <Tabs
+                    value={tab}
+                    onChange={tab => this.setState({ tab })}
+                    disabled={editing}
+                    tabs={{
+                        preview: locale.preview.title,
+                        filters: locale.filters.title,
+                    }} />
+                <Header
+                    item={item}
+                    editing={editing}
+                    onItemChange={onItemChange} />
+                {tab === 'filters' ? (
+                    <Filters item={item} editing={editing} onItemChange={onItemChange} />
+                ) : (
+                    <ListPreview item={item} />
+                )}
+            </div>
+        );
+    }
+}
+
+function Header ({ item, editing, onItemChange }) {
+    if (editing) {
+        return (
+            <div class="detail-header">
+                <div class="detail-header-field">
+                    <TextField
+                        label={locale.fields.name}
+                        value={item.name}
+                        onChange={e => onItemChange({ ...item, name: e.target.value })} />
+                </div>
+                <div class="detail-header-field">
+                    <TextField
+                        label={locale.fields.description}
+                        value={item.description}
+                        onChange={e => onItemChange({ ...item, description: e.target.value || null })} />
+                </div>
+            </div>
+        );
+    } else {
+        return (
+            <div class="detail-header">
+                <h1>{item.name}</h1>
+                <p>{item.description}</p>
+            </div>
+        );
+    }
+}
+
+class Filters extends Component {
     /// These keys are used to identify filters while editing the list.
     /// This is necessary to enable rearranging that doesn’t look confusing.
     editFilterKeys = [];
 
-    state = {
-        tab: 'filters',
-    };
-
-    render ({ editing, item, onItemChange }) {
+    render ({ item, editing, onItemChange }) {
         const filters = [];
         for (let i = 0; i < (item.filters || []).length; i++) {
             if (!this.editFilterKeys[i]) {
@@ -109,15 +166,17 @@ class Header extends Component {
                 <div class="filter-item" key={this.editFilterKeys[index]}>
                     <div class="filter-item-header">
                         {editing ? (
-                            <Button icon small class="filter-item-remove" onClick={() => {
-                                const newFilters = [...item.filters];
-                                newFilters.splice(index, 1);
-                                this.editFilterKeys.splice(index, 1);
-                                if (!newFilters.length) newFilters.push('{\n\t\n}');
-                                onItemChange({ ...item, filters: newFilters });
-                            }}>
-                                <RemoveIcon style={{ verticalAlign: 'middle' }} />
-                            </Button>
+                            <span class="filter-item-remove-container">
+                                <Button icon small class="filter-item-remove" onClick={() => {
+                                    const newFilters = [...item.filters];
+                                    newFilters.splice(index, 1);
+                                    this.editFilterKeys.splice(index, 1);
+                                    if (!newFilters.length) newFilters.push('{\n\t\n}');
+                                    onItemChange({ ...item, filters: newFilters });
+                                }}>
+                                    <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                                </Button>
+                            </span>
                         ) : null}
                         <span class="filter-item-title">{locale.filters.itemTitle(i)}</span>
                     </div>
@@ -150,66 +209,29 @@ class Header extends Component {
 
         if (editing) {
             return (
-                <div class="detail-header is-editing">
-                    <div class="detail-header-field">
-                        <TextField
-                            label={locale.fields.name}
-                            value={item.name}
-                            onChange={e => onItemChange({ ...item, name: e.target.value })} />
-                    </div>
-                    <div class="detail-header-field">
-                        <TextField
-                            label={locale.fields.description}
-                            value={item.description}
-                            onChange={e => onItemChange({ ...item, description: e.target.value || null })} />
-                    </div>
-                    <h3>{locale.filters.title}</h3>
-                    <RearrangingList
-                        class="detail-filters"
-                        itemHeight={256}
-                        isItemDraggable={(index) => index < filters.length - 1}
-                        canMove={(toPos) => toPos >= 0 && toPos < filters.length - 1}
-                        onMove={(fromPos, toPos) => {
-                            const newFilters = [...item.filters];
-                            const filter = newFilters.splice(fromPos, 1)[0];
-                            newFilters.splice(toPos, 0, filter);
-                            const filterKey = this.editFilterKeys.splice(fromPos, 1)[0];
-                            this.editFilterKeys.splice(toPos, 0, filterKey);
-                            onItemChange({ ...item, filters: newFilters });
-                        }}>
-                        {filters}
-                    </RearrangingList>
+                <RearrangingList
+                    class="detail-filters is-editing"
+                    itemHeight={256}
+                    isItemDraggable={(index) => index < filters.length - 1}
+                    canMove={(toPos) => toPos >= 0 && toPos < filters.length - 1}
+                    onMove={(fromPos, toPos) => {
+                        const newFilters = [...item.filters];
+                        const filter = newFilters.splice(fromPos, 1)[0];
+                        newFilters.splice(toPos, 0, filter);
+                        const filterKey = this.editFilterKeys.splice(fromPos, 1)[0];
+                        this.editFilterKeys.splice(toPos, 0, filterKey);
+                        onItemChange({ ...item, filters: newFilters });
+                    }}>
+                    {filters}
+                </RearrangingList>
+            );
+        } else {
+            return (
+                <div class="detail-filters">
+                    {filters}
                 </div>
             );
         }
-
-        return (
-            <div class="detail-header">
-                <h1>{item.name}</h1>
-                <p>{item.description}</p>
-                <Segmented
-                    selected={this.state.tab}
-                    onSelect={tab => this.setState({ tab })}>
-                    {[
-                        {
-                            id: 'filters',
-                            label: locale.filters.title,
-                        },
-                        {
-                            id: 'preview',
-                            label: locale.preview.title,
-                        },
-                    ]}
-                </Segmented>
-                {this.state.tab === 'filters' ? (
-                    <div class="detail-filters">
-                        {filters}
-                    </div>
-                ) : (
-                    <ListPreview item={item} />
-                )}
-            </div>
-        );
     }
 }
 

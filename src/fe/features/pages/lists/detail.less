@@ -14,21 +14,37 @@
     }
 
     .detail-filters {
-        .rearranging-list-item {
-            border: 1px solid @separator;
-            background: @card-background;
-        }
+        margin: 0 24px;
+        margin-top: 24px;
 
         .filter-item {
+            border-radius: 4px;
+            padding-bottom: 4px;
+            margin: 8px 0;
+            background: var(--editor-background);
+            color: var(--editor-text);
+            overflow: hidden;
+            .elevation(4);
+
             .filter-item-header {
                 padding: 8px 16px;
+                background: var(--editor-text-fade-10);
 
-                .filter-item-remove {
-                    --md-button-color: @gray-button-color;
+                .filter-item-remove-container {
+                    display: inline-block;
+                    height: 24px;
+                    margin-right: 16px;
+                    vertical-align: middle;
+
+                    .filter-item-remove {
+                        --md-button-color: currentColor;
+                        margin-top: -12px;
+                    }
                 }
 
                 .filter-item-title {
-                    margin-left: 16px;
+                    font-weight: 600;
+                    line-height: 24px;
                 }
             }
 
@@ -37,11 +53,27 @@
                     height: 150px;
                 }
             }
+
+            @media (prefers-color-scheme: dark) {
+                --editor-background: @card1-background;
+            }
         }
 
         .add-filter-item {
             text-align: center;
             margin: 8px 0;
+        }
+
+        &.is-editing {
+            .filter-item {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .rearranging-list-item {
+                border: 1px solid @separator;
+                background: @card1-background;
+            }
         }
     }
 

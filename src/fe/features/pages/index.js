@@ -318,7 +318,7 @@ export default [
                                 state: 'editing',
                             },
                         ],
-                    }
+                    },
                 ],
             },
             {

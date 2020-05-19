@@ -240,21 +240,13 @@ export default class DetailView extends PureComponent {
             );
         }
 
-        if (editing) {
-            return (
-                <Form
-                    ref={view => this.#form = view}
-                    class="detail-view"
-                    onSubmit={() => {}}>
-                    {contents}
-                </Form>
-            );
-        } else {
-            return (
-                <div class="detail-view">
-                    {contents}
-                </div>
-            );
-        }
+        return (
+            <Form
+                ref={view => this.#form = view}
+                class="detail-view"
+                onSubmit={() => {}}>
+                {contents}
+            </Form>
+        );
     }
 }
