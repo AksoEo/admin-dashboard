@@ -125,9 +125,9 @@ export class CardStackRenderer extends Component {
                         let style;
 
                         if (window.innerWidth <= FULL_SCREEN_LAYOUT_MAX_WIDTH) {
-                            const dx = -off * 50;
+                            const dx = off >= 0 ? -off * 50 : -off * 100;
                             style = {
-                                transform: `translateX(${dx}vw)`,
+                                transform: `translateX(${dx}%)`,
                             };
                         } else {
                             const dy = -12 * (4 - 4 * 2 ** (-off));

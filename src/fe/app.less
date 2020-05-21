@@ -29,6 +29,10 @@
 .gen-roboto-declaration('/assets/roboto/Roboto-Light', 300);
 .gen-roboto-declaration('/assets/roboto/Roboto-Thin', 100);
 
+.paper-dialog-container .paper-dialog .p-app-bar-placeholder {
+    padding-top: env(safe-area-inset-top);
+}
+
 .akso-app {
     // position: absolute; breaks z-ordering the app header above full screen dialogs
     display: flex;
@@ -110,7 +114,7 @@
             transform-origin: 0 0;
             scrollbar-width: thin;
             -webkit-overflow-scrolling: touch;
-            padding-bottom: env(safe-area-inset-bottom);
+            overscroll-behavior: contain;
             box-sizing: border-box;
         }
 

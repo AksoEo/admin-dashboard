@@ -198,6 +198,7 @@ export default class SidebarContents extends PureComponent {
                             </a>
                         </div>
                     </div>
+                    <div class="sidebar-bottom-padding" />
                 </div>
             </div>
         );

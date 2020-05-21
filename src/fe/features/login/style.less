@@ -277,6 +277,10 @@
                 right: auto;
             }
 
+            @media (max-width: @fullscreen-width), (max-width: 850px) and (max-height: @fullscreen-height) {
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+
             a:hover {
                 color: @text;
             }
