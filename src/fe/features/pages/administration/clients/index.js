@@ -16,12 +16,15 @@ import './style';
 
 export const FIELDS = {
     name: {
-        component ({ value }) {
+        slot: 'title',
+        component ({ value, slot }) {
+            if (slot === 'title') return <b>{value}</b>;
             return value;
         },
         stringify: v => v,
     },
     apiKey: {
+        skipLabel: true,
         component ({ value }) {
             return <apiKey.inlineRenderer value={value} />;
         },

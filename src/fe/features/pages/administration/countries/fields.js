@@ -4,6 +4,7 @@ import { Checkbox, TextField } from '@cpsdqs/yamdl';
 import { countries as locale } from '../../../../locale';
 
 const nameField = {
+    slot: 'title',
     component ({ value, onChange, editing }) {
         if (editing) {
             return (
@@ -20,6 +21,7 @@ const nameField = {
 
 export const FIELDS = {
     code: {
+        slot: 'title',
         weight: 0.5,
         component ({ value }) {
             return <span class="country-code">{value}</span>;
@@ -27,6 +29,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     enabled: {
+        slot: 'titleAlt',
         weight: 0.5,
         component ({ value, onChange, editing }) {
             if (editing) {

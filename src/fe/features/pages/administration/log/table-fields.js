@@ -20,6 +20,7 @@ export default {
         },
     },
     identity: {
+        slot: 'titleAlt',
         sortable: true,
         component ({ value }) {
             if (value.type === 'codeholder') {
@@ -69,11 +70,13 @@ export default {
     userAgent: identityComponent,
     userAgentParsed: identityComponent,
     method: {
+        slot: 'title',
         weight: 0.3,
         sortable: true,
         ...identityComponent,
     },
     path: {
+        slot: 'title',
         sortable: true,
         ...identityComponent,
     },

@@ -12,12 +12,15 @@ import { connectPerms } from '../../../../perms';
 
 const FIELDS = {
     name: {
-        component ({ value }) {
+        slot: 'title',
+        component ({ value, slot }) {
+            if (slot === 'title') return <b>{value}</b>;
             return value;
         },
         stringify: v => v,
     },
     description: {
+        skipLabel: true,
         component ({ value }) {
             return value;
         },

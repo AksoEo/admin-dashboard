@@ -155,16 +155,61 @@
                     font-size: small;
                     font-weight: 600;
                     display: none;
-                    width: 8em;
+                    width: 5em;
                     margin-right: 16px;
                     text-align: right;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
                 }
             }
         }
 
-        .list-item.is-cursed {
-            background: @golden-background;
-            --md-button-color: @golden-background;
+        .list-item {
+            &.is-compact {
+                display: block;
+                border-bottom: 1px solid @separator;
+
+                .li-compact-title {
+                    display: flex;
+                    margin-bottom: 8px;
+
+                    .li-compact-title-inner {
+                        display: flex;
+                        align-items: center;
+                        overflow: hidden;
+                        flex: 1;
+
+                        .list-item-cell:not(:first-child) {
+                            margin-left: 8px;
+                        }
+                    }
+                    .li-compact-title-alt {
+                        flex-shrink: 0;
+                    }
+                }
+
+                .li-compact-body {
+                    .list-item-cell {
+                        display: flex;
+                        overflow: hidden;
+                        margin-bottom: 4px;
+
+                        .cell-label {
+                            display: inline-block;
+                            flex-shrink: 0;
+                        }
+                    }
+                }
+
+                &:last-of-type {
+                    border-bottom-color: transparent;
+                }
+            }
+
+            &.is-cursed {
+                background: @golden-background;
+                --md-button-color: @golden-background;
+            }
         }
 
         .list-header .list-header-cell {
@@ -184,7 +229,7 @@
         opacity: 0.5;
     }
 
-    @media (max-width: @regular-min-width) {
+    &.compact-layout {
         .compact-page-button, .compact-pagination {
             display: block;
         }
@@ -194,17 +239,6 @@
 
         .list-contents .list-header {
             display: none;
-        }
-
-        .list-contents .list-item {
-            display: block;
-            border-bottom: 1px solid @separator;
-
-            .list-item-cell {
-                .cell-label {
-                    display: inline-block;
-                }
-            }
         }
     }
 }

@@ -35,7 +35,8 @@ export default {
     type: {
         sortable: true,
         weight: 0.5,
-        component ({ value, item }) {
+        slot: 'title',
+        component ({ value, item, slot }) {
             let icon;
             if (!value) return <span class="codeholder-type-placeholder" />;
             const { enabled, isDead } = item;
@@ -48,9 +49,11 @@ export default {
             if (!enabled && !isDead) title += ` (${locale.fields.disabledTitle})`;
             else if (!enabled) title += ` (${locale.fields.deadTitle})`;
 
+            const withLabel = slot !== 'title';
+
             return (
                 <span
-                    class={'codeholder-type' + (!enabled ? ' disabled' : '')}
+                    class={'codeholder-type' + (!enabled ? ' disabled' : '') + (withLabel ? ' with-label' : '')}
                     title={title}>
                     <span class="codeholder-type-icon">{icon}</span>
                     <span class="codeholder-type-label">{title}</span>
@@ -69,9 +72,11 @@ export default {
     },
     code: {
         sortable: true,
-        component ({ value }) {
+        slot: 'title',
+        component ({ value, slot }) {
             if (!value) return null;
             const { old: oldCode, new: newCode } = value;
+            if (slot === 'title') return <ueaCode.inlineRenderer value={newCode} />;
             return <ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
         },
         stringify (value) {
@@ -85,6 +90,7 @@ export default {
     name: {
         sortable: true,
         weight: 2,
+        slot: 'title',
         component: class Name extends PureComponent {
             node = null;
             prefixName = null;
@@ -224,13 +230,18 @@ export default {
     country: {
         weight: 1.5,
         sortable: true,
-        component ({ item }) {
+        slot: 'titleAlt',
+        component ({ item, slot }) {
             const { feeCountry, address } = item;
             const addressCountry = address ? address.countryLatin : null;
+
+            const showName = slot !== 'titleAlt';
 
             if (!feeCountry || !addressCountry || feeCountry === addressCountry) {
                 const country = addressCountry || feeCountry;
                 if (!country) return '';
+
+                if (!showName) return <CountryFlag country={country} />;
 
                 return (
                     <WithCountries>
@@ -241,6 +252,13 @@ export default {
                     </WithCountries>
                 );
             } else {
+                if (!showName) return (
+                    <span>
+                        <CountryFlag country={addressCountry} />
+                        <CountryFlag country={feeCountry} />
+                    </span>
+                );
+
                 return (
                     <WithCountries>
                         {countries => {

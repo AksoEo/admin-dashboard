@@ -7,6 +7,7 @@ import { paymentMethods as locale, currencies } from '../../../../../locale';
 
 export const FIELDS = {
     type: {
+        slot: 'titleAlt',
         component ({ value, editing, onChange, isCreation }) {
             if (isCreation && editing) {
                 if (!value) onChange(Object.keys(locale.fields.types)[0]);
@@ -24,7 +25,8 @@ export const FIELDS = {
         weight: 0.25,
     },
     name: {
-        component ({ value, editing, onChange, isCreation }) {
+        slot: 'title',
+        component ({ value, editing, onChange, isCreation, slot }) {
             if (editing) {
                 return <Validator
                     component={TextField}
@@ -35,10 +37,12 @@ export const FIELDS = {
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }
+            if (slot === 'title') return <b>{value}</b>;
             return value;
         },
     },
     internalDescription: {
+        skipLabel: true,
         component ({ value, editing, onChange, isCreation }) {
             if (editing) {
                 return <TextField

@@ -5,7 +5,8 @@ import { paymentAddons as locale } from '../../../../../locale';
 
 export const FIELDS = {
     name: {
-        component ({ value, editing, onChange }) {
+        slot: 'title',
+        component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <Validator
                     component={TextField}
@@ -15,10 +16,12 @@ export const FIELDS = {
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }
+            if (slot === 'title') return <b>{value}</b>;
             return value;
         },
     },
     description: {
+        skipLabel: true,
         component ({ value, editing, onChange }) {
             if (editing) {
                 return <TextField value={value || ''} onChange={e => onChange(e.target.value || null)} />;

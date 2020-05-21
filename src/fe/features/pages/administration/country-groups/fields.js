@@ -3,6 +3,7 @@ import { TextField } from '@cpsdqs/yamdl';
 
 export const FIELDS = {
     code: {
+        slot: 'title',
         weight: 0.5,
         component ({ value }) {
             return <span class="country-group-code">{value}</span>;
@@ -10,6 +11,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     name: {
+        slot: 'title',
         component ({ value, onChange, editing }) {
             if (editing) {
                 return (

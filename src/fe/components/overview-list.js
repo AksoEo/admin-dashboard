@@ -18,6 +18,10 @@ import './overview-list.less';
 const DEBOUNCE_TIME = 400; // ms
 const DEFAULT_LIMITS = [10, 20, 50, 100];
 
+const COMPACT_MAX_WIDTH = 600;
+const MAX_TITLE_CELLS = 3;
+const MAX_TITLE_ALT_CELLS = 1;
+
 function scrollToNode (node) {
     if (!node) return;
     node.scrollIntoView && node.scrollIntoView({ behavior: 'smooth' });
@@ -157,9 +161,12 @@ export default class OverviewList extends PureComponent {
         this.#updateView = null;
     }
 
+    #onWindowResize = () => this.forceUpdate();
+
     componentDidMount () {
         this.maybeReload();
         this.bindUpdates();
+        window.addEventListener('resize', this.#onWindowResize);
     }
 
     componentDidUpdate (prevProps) {
@@ -188,6 +195,7 @@ export default class OverviewList extends PureComponent {
     componentWillUnmount () {
         clearTimeout(this.#reloadTimeout);
         this.unbindUpdates();
+        window.removeEventListener('resize', this.#onWindowResize);
     }
 
     onPrevPageClick = e => {
@@ -241,6 +249,9 @@ export default class OverviewList extends PureComponent {
         if (expanded) className += ' search-expanded';
         if (selection) className += ' is-selectable';
         if (stale) className += ' stale';
+
+        const useCompactLayout = window.innerWidth <= COMPACT_MAX_WIDTH;
+        if (useCompactLayout) className += ' compact-layout';
 
         let stats, contents, paginationText;
         let prevDisabled = true;
@@ -306,6 +317,7 @@ export default class OverviewList extends PureComponent {
 
             contents.push(...result.items.map((id, i) => <ListItem
                 view={view}
+                compact={useCompactLayout}
                 cursed={result.cursed && result.cursed.includes(id)}
                 key={id}
                 id={id}
@@ -491,6 +503,7 @@ const ListItem = connect(props => ([props.view, {
 
     render ({
         id,
+        compact,
         selectedFields,
         data,
         fields,
@@ -503,23 +516,59 @@ const ListItem = connect(props => ([props.view, {
     }) {
         if (!data) return null;
 
+        // compact layout
+        const titleCells = [];
+        const titleAltCells = [];
+        const bodyCells = [];
+
+        // table layout
+        const cells = [];
+
         const selectedFieldIds = selectedFields.map(x => x.id);
 
-        const cells = selectedFields.map(({ id }) => {
+        for (const { id } of selectedFields) {
             let Component;
             if (fields[id]) Component = fields[id].component;
             else Component = () => `unknown field ${id}`;
 
-            return (
+            let slot = 'table';
+            if (compact) {
+                slot = fields[id].slot || 'body';
+
+                if (slot === 'title' && titleCells.length < MAX_TITLE_CELLS) {
+                    slot = 'title';
+                } else if (slot === 'titleAlt' && titleAltCells.length < MAX_TITLE_ALT_CELLS) {
+                    slot = 'titleAlt';
+                } else {
+                    slot = 'body';
+                }
+            }
+
+            const cell = (
                 <div key={id} class="list-item-cell">
-                    <div class="cell-label">{locale[id]}</div>
-                    <Component inline value={data[id]} item={data} fields={selectedFieldIds} />
+                    {fields[id].skipLabel ? null : (
+                        <div class="cell-label">{locale[id]}</div>
+                    )}
+                    <Component
+                        inline
+                        slot={slot}
+                        value={data[id]}
+                        item={data}
+                        fields={selectedFieldIds} />
                 </div>
             );
-        });
+
+            if (compact) {
+                if (slot === 'title') titleCells.push(cell);
+                else if (slot === 'titleAlt') titleAltCells.push(cell);
+                else if (slot === 'body') bodyCells.push(cell);
+            } else {
+                cells.push(cell);
+            }
+        }
 
         if (selection) {
-            cells.unshift(
+            const boxCell = (
                 <div key="selection" class="list-item-cell selection-cell" onClick={e => {
                     // FIXME: hacky because we need to prevent the link from doing stuff
                     e.stopPropagation();
@@ -531,6 +580,11 @@ const ListItem = connect(props => ([props.view, {
                         checked={selection.has(id)} />
                 </div>
             );
+            if (compact) {
+                titleCells.unshift(boxCell);
+            } else {
+                cells.unshift(boxCell);
+            }
         }
 
         const style = lineLayout(fields, selectedFields, selection);
@@ -551,14 +605,28 @@ const ListItem = connect(props => ([props.view, {
         return (
             <ItemComponent
                 target={itemLink}
-                class={'list-item' + (cursed ? ' is-cursed' : '')}
+                class={'list-item' + (cursed ? ' is-cursed' : '') + (compact ? ' is-compact' : '')}
                 style={style}
                 ref={node => this.#node = node}
                 onClick={e => {
                     // don’t keep focus on what is essentially button
                     e.currentTarget.blur();
                 }}>
-                {cells}
+                {compact ? (
+                    <div class="li-compact-inner">
+                        <div class="li-compact-title">
+                            <div class="li-compact-title-inner">
+                                {titleCells}
+                            </div>
+                            <div class="li-compact-title-alt">
+                                {titleAltCells}
+                            </div>
+                        </div>
+                        <div class="li-compact-body">
+                            {bodyCells}
+                        </div>
+                    </div>
+                ) : cells}
             </ItemComponent>
         );
     }

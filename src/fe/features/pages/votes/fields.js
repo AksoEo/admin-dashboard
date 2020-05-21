@@ -10,6 +10,7 @@ export default {
     org: {
         sortable: true,
         weight: 0.5,
+        slot: 'title',
         component ({ value }) {
             if (value === 'tejo') {
                 return <TejoIcon />;
@@ -25,6 +26,7 @@ export default {
     },
     name: {
         sortable: true,
+        slot: 'title',
         component ({ value, onChange, editing }) {
             if (!editing) return value;
             return (

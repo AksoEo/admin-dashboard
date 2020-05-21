@@ -196,6 +196,9 @@ class SidebarDragHandler {
     shouldIgnoreEventFor (target) {
         if (!target) return false;
         if (target.tagName === 'BUTTON') return true;
+        if (target.tagName === 'INPUT') return true;
+        if (target.tagName === 'TEXTAREA') return true;
+        if (target.tagName === 'A') return true;
         return this.shouldIgnoreEventFor(target.parentNode);
     }
 
