@@ -770,7 +770,26 @@ export const paymentIntents = {
         purposes: '[[purposes]]',
         totalAmount: '[[totalAmount]]',
         amountRefunded: '[[amountRefunded]]',
+
+        statuses: {
+            created: '[[created]]', // not a real status; used in event log
+            pending: '[[pending]]',
+            processing: '[[processing]]',
+            submitted: '[[submitted]]',
+            canceled: '[[canceled]]',
+            succeeded: '[[succeeded]]',
+            abandoned: '[[abandoned]]',
+            disputed: '[[disputed]]',
+            refunded: '[[refunded]]',
+        },
+        purposeTypes: {
+            trigger: '[[trigger]]',
+            manual: '[[manual]]',
+            addon: '[[addon]]',
+        },
     },
+    detailTo: '[[to]]', // X currency >to< org
+    detailViewCodeholder: '[[view member]]',
     search: {
         fields: {
             customerEmail: '[[customeremail]]',

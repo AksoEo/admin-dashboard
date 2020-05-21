@@ -513,7 +513,7 @@ const ListItem = connect(props => ([props.view, {
             return (
                 <div key={id} class="list-item-cell">
                     <div class="cell-label">{locale[id]}</div>
-                    <Component value={data[id]} item={data} fields={selectedFieldIds} />
+                    <Component inline value={data[id]} item={data} fields={selectedFieldIds} />
                 </div>
             );
         });

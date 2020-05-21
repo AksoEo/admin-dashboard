@@ -1,8 +1,24 @@
+import { h } from 'preact';
+import { currencyAmount, email, timestamp } from '../../../../components/data';
+
 export const FIELDS = {
     customer: {
-        component ({ value }) {
-            void value;
-            return 'todo';
+        component ({ value, inline }) {
+            if (!value) return null;
+            return (
+                <span class="intent-customer">
+                    <span class="customer-name">
+                        {value.name}
+                    </span>
+                    {' <'}
+                    {inline ? (
+                        <email.inlineRenderer value={value.email} />
+                    ) : (
+                        <email.renderer value={value.email} />
+                    )}
+                    {'>'}
+                </span>
+            );
         },
     },
     method: {
@@ -19,8 +35,7 @@ export const FIELDS = {
     },
     currency: {
         component ({ value }) {
-            void value;
-            return 'todo';
+            return value;
         },
     },
     status: {
@@ -37,14 +52,14 @@ export const FIELDS = {
     },
     timeCreated: {
         component ({ value }) {
-            void value;
-            return 'todo';
+            if (!value) return null;
+            return <timestamp.renderer value={value * 1000} />;
         },
     },
     statusTime: {
         component ({ value }) {
-            void value;
-            return 'todo';
+            if (!value) return null;
+            return <timestamp.renderer value={value * 1000} />;
         },
     },
     internalNotes: {
@@ -65,18 +80,6 @@ export const FIELDS = {
             return 'todo';
         },
     },
-    stripePaymentIntentId: {
-        component ({ value }) {
-            void value;
-            return 'todo';
-        },
-    },
-    stripeClientSecret: {
-        component ({ value }) {
-            void value;
-            return 'todo';
-        },
-    },
     purposes: {
         component ({ value }) {
             void value;
@@ -84,9 +87,8 @@ export const FIELDS = {
         },
     },
     totalAmount: {
-        component ({ value }) {
-            void value;
-            return 'todo';
+        component ({ value, item }) {
+            return <currencyAmount.renderer value={value} currency={item.currency} />;
         },
     },
     amountRefunded: {

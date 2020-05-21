@@ -307,7 +307,7 @@ export default [
                 hasPerm: () => true,
                 paths: [
                     {
-                        match: /^([0-9a-f]+)$/,
+                        match: /^(\w+)$/,
                         component: elazy(() =>
                             import(/* webpackChunkName: "payment-intents" */ './payments/intents/detail')),
                         type: 'stack',

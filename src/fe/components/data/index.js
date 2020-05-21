@@ -1,6 +1,7 @@
 import address from './address';
 import apiKey from './apikey';
 import country from './country';
+import currencyAmount from './currency-amount';
 import date from './date';
 import email from './email';
 import phoneNumber from './phone-number';
@@ -49,6 +50,7 @@ export {
     address,
     apiKey,
     country,
+    currencyAmount,
     date,
     email,
     phoneNumber,

@@ -8,7 +8,7 @@ const DECARDINALIFY = id => [
     `${id} is now represented by a bunch of geometric shapes`,
     `this is the identicon hash for ${id}`,
     `${id} vershajne parolas Esperanton (auh estas organizo)`,
-][id % 4];
+][(id | 0) % 4];
 
 /// Renders a member’s profile picture.
 ///

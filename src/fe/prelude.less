@@ -6,12 +6,15 @@
 
     @primary--internal: #004c3f;
     @secondary--internal: #31a64f;
+    @warning--internal: #ffe330;
     @danger--internal: #f44336;
 
     --primary: @primary--internal;
     --secondary: @secondary--internal;
     --secondary-lighten-10: lighten(@secondary--internal, 10%);
     --secondary-fade-50: fade(@secondary--internal, 50%);
+    --warning: @warning--internal;
+    --warning-text: #cfad20;
     --danger: @danger--internal;
     --danger-fade-20: fade(@danger--internal, 20%);
 
@@ -49,6 +52,8 @@
 
         .gen-text(white, white);
 
+        --warning-text: @warning--internal;
+
         --page-background: #1a1a1a;
         --card-background: #222;
         --card1-background: #2a2a2a;
@@ -82,6 +87,8 @@
 @secondary: var(--secondary);
 @secondary-lighten-10: var(--secondary-lighten-10);
 @secondary-fade-50: var(--secondary-fade-50);
+@warning: var(--warning);
+@warning-text: var(--warning-text);
 @danger: var(--danger);
 @error: @danger;
 @danger-fade-20: var(--danger-fade-20);

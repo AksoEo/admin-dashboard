@@ -1,3 +1,4 @@
+import { base32 } from 'rfc4648';
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
@@ -37,7 +38,7 @@ function getThumbnailKey () {
 }
 
 function iReadId (idBuffer) {
-    return idBuffer.toString('hex');
+    return base32.stringify(idBuffer);
 }
 
 // intents stuff
@@ -57,7 +58,7 @@ const iClientFields = {
         toAPI: () => ({}),
     },
     method: {
-        apiFields: ['paymentMethod.id'],
+        apiFields: ['paymentMethodId'],
         fromAPI: intent => ({
             id: intent.paymentMethodId,
         }),
@@ -73,9 +74,13 @@ const iClientFields = {
     customerNotes: 'customerNotes',
     foreignId: 'foreignId',
     stripePaymentIntentId: 'stripePaymentIntentId',
-    stripeClientSecret: 'stripeClientSecret',
     purposes: 'purposes',
-    totalAmount: 'totalAmount',
+    totalAmount: {
+        apiFields: ['totalAmount'],
+        fromAPI: intent => intent.totalAmount,
+        toAPI: totalAmount => ({ totalAmount }),
+        requires: ['currency'],
+    },
     amountRefunded: 'amountRefunded',
 };
 const iClientFilters = {};
