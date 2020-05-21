@@ -1,11 +1,15 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Spring } from '@cpsdqs/yamdl';
+import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 import SidebarContents from './contents';
 import './style';
 
 /// Width of the region at the left screen edge from which the sidebar may be dragged out.
 const EDGE_DRAG_WIDTH = 50;
+
+/// After holding down on the edge for this long, the sidebar will peek out and start a dragging
+/// action.
+const PEEK_TIMEOUT = 0.3;
 
 /// Renders the sidebar.
 ///
@@ -20,7 +24,7 @@ export default class Sidebar extends PureComponent {
     backdropNode = null;
 
     /// The spring used to animate the sidebar’s X position.
-    spring = new Spring(1, 0.5);
+    position = new Spring(1, 0.5);
 
     /// Called when the sidebar drag ends, by the sidebar drag handler.
     onDragEnd = (open) => {
@@ -28,18 +32,23 @@ export default class Sidebar extends PureComponent {
         else if (!open && this.props.onClose) this.props.onClose();
     };
 
-    sidebarDragHandler = new SidebarDragHandler(this.spring, this.onDragEnd);
-
-    constructor (props) {
-        super(props);
-        this.spring.on('update', this.onSpringUpdate);
-    }
+    sidebarDragHandler = new SidebarDragHandler(this, this.position, this.onDragEnd);
 
     /// Updates the spring target; called when the `open` property changes.
     updateSpringTarget () {
-        this.spring.target = this.props.permanent || this.props.open ? 1 : 0;
-        this.spring.locked = false;
-        this.spring.start();
+        this.position.target = this.props.permanent || this.props.open ? 1 : 0;
+        this.position.locked = false;
+        globalAnimator.register(this);
+    }
+
+    update (dt) {
+        this.sidebarDragHandler.update(dt);
+        this.position.update(dt);
+        this.onSpringUpdate(this.position.value);
+
+        if (!this.position.wantsUpdate() && !this.sidebarDragHandler.wantsUpdate()) {
+            globalAnimator.deregister(this);
+        }
     }
 
     /// Called when the position spring updates.
@@ -58,24 +67,27 @@ export default class Sidebar extends PureComponent {
     componentDidMount () {
         this.updateSpringTarget();
         if ((this.props.permanent || this.props.open) && !this.animatingIn) {
-            this.spring.value = 1;
+            this.position.value = 1;
         }
-        this.spring.start();
         if (!this.props.permanent) this.sidebarDragHandler.bind();
         this.sidebarDragHandler.setSidebarNode(this.node);
+        globalAnimator.register(this);
     }
 
     /// Will animate the sidebar sliding in.
     animateIn (delay) {
-        this.spring.value = 0;
+        this.position.value = 0;
         this.onSpringUpdate(0);
-        this.spring.stop();
+        this.position.stop();
         this.animatingIn = true;
-        setTimeout(() => this.spring.start(), delay);
+        this.position.locked = true;
+        setTimeout(() => this.position.locked = false, delay);
+        globalAnimator.register(this);
     }
 
     componentDidUpdate (prevProps) {
         if (this.props.open !== prevProps.open) {
+            this.position.locked = false;
             this.updateSpringTarget();
         }
         if (this.props.permanent !== prevProps.permanent) {
@@ -86,7 +98,7 @@ export default class Sidebar extends PureComponent {
     }
 
     componentWillUnmount () {
-        this.spring.stop();
+        globalAnimator.deregister(this);
         this.sidebarDragHandler.unbind();
     }
 
@@ -103,7 +115,7 @@ export default class Sidebar extends PureComponent {
                     class="app-sidebar-backdrop"
                     ref={node => this.backdropNode = node}
                     onClick={() => {
-                        this.spring.locked = false;
+                        this.position.locked = false;
                         this.props.onClose();
                     }} />
                 <div
@@ -111,7 +123,7 @@ export default class Sidebar extends PureComponent {
                     ref={node => this.node = node}
                     onKeyDown={e => {
                         if (e.key === 'Escape') {
-                            this.spring.locked = false;
+                            this.position.locked = false;
                             this.props.onClose();
                         }
                     }}
@@ -160,10 +172,12 @@ class SidebarDragHandler {
     lastTouchTime = 0;
 
     /// # Parameters
+    /// - owner: { update: number => void } - update target
     /// - sidebarSpring: Spring - the sidebar spring. Should be 0 when closed and 1 when open.
     /// - onEnd: `(bool) => void` - called when the user ends the drag with whether or not the
     ///   sidebar should be considered open or not.
-    constructor (sidebarSpring, onEnd) {
+    constructor (owner, sidebarSpring, onEnd) {
+        this.owner = owner;
         this.spring = sidebarSpring;
         this.onEnd = onEnd;
     }
@@ -210,25 +224,62 @@ class SidebarDragHandler {
         if (e.touches.length > 1) {
             // exit if there are multiple touches
             this.mayDrag = false;
+            this.peekTimeout = null;
             return;
         }
 
         this.sidebarWidth = this.sidebarNode.offsetWidth;
+        if (this.spring.target === 0) {
+            // currently closed; start peek timeout
+            this.peekTimeout = PEEK_TIMEOUT;
+        }
 
         this.startTouchX = this.lastTouchX = e.touches[0].clientX;
-        this.startTouchOffset = this.startTouchX / this.sidebarWidth - this.spring.value;
         this.startTouchY = e.touches[0].clientY;
         this.lastTouchTime = Date.now();
 
         this.mayDrag = this.spring.target === 1 || this.startTouchX < EDGE_DRAG_WIDTH;
 
-        this.spring.locked = true;
         this.spring.velocity = 0;
+
+        globalAnimator.register(this.owner);
     }
 
-    onTouchMove = e => {
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
+    peekTimeout = null;
+    peekWaiting = false;
+
+    update (dt) {
+        if (this.peekTimeout !== null) {
+            this.peekTimeout -= dt;
+            if (this.peekTimeout < 0) {
+                this.peekTimeout = null;
+                if (this.mayDrag && !this.isDragging) {
+                    this.spring.target = EDGE_DRAG_WIDTH / this.sidebarWidth;
+                    this.peekWaiting = true;
+
+                    // HACK: fire last event again to update position
+                    this.onPointerMove(this.lastTouchX, this.startTouchY);
+                }
+            }
+        }
+        if (this.peekWaiting && this.mayDrag) {
+            if (Math.abs(this.spring.value - EDGE_DRAG_WIDTH / this.sidebarWidth) < 1e-2) {
+                // close enough
+                this.peekWaiting = false;
+                // start dragging
+                this.isDragging = true;
+                this.startTouchOffset = this.lastTouchX / this.sidebarWidth - this.spring.value;
+                this.spring.locked = true;
+            }
+        }
+    }
+
+    wantsUpdate () {
+        return this.peekTimeout !== null || this.peekWaiting;
+    }
+
+    onPointerMove (touchX, touchY, preventDefault) {
+        let signal = null;
 
         if (this.mayDrag && !this.isDragging) {
             const wouldClose = this.spring.target === 1;
@@ -241,30 +292,58 @@ class SidebarDragHandler {
             const touchYHasntMovedTooFar = Math.abs(touchY - this.startTouchY) < 5;
             if (touchXIsMovingInTheRightDirection && touchYHasntMovedTooFar) {
                 this.isDragging = true;
+                this.startTouchOffset = touchX / this.sidebarWidth - this.spring.value;
+                this.spring.locked = true;
+                signal = 'drag';
             } else if (touchXIsMovingInTheWrongDirection) {
                 this.mayDrag = false;
+                signal = 'cancel';
             }
         }
 
         if (this.isDragging) {
-            e.preventDefault();
+            if (preventDefault) preventDefault();
 
             this.spring.value = touchX / this.sidebarWidth - this.startTouchOffset;
             const deltaTime = (Date.now() - this.lastTouchTime) / 1000;
-            this.lastTouchTime = Date.now();
             this.spring.velocity = (touchX - this.lastTouchX) / this.sidebarWidth / deltaTime;
-            this.lastTouchX = touchX;
 
             // make sure update is still being fired
-            this.spring.start();
+            globalAnimator.register(this.owner);
+        }
+
+        this.lastTouchX = touchX;
+        this.lastTouchTime = Date.now();
+
+        return signal;
+    }
+
+    onTouchMove = e => {
+        const touchX = e.touches[0].clientX;
+        const touchY = e.touches[0].clientY;
+
+        const signal = this.onPointerMove(touchX, touchY, () => e.preventDefault());
+
+        if (signal === 'drag') {
+            // started drag
+            this.peekTimeout = null;
+            this.peekWaiting = false;
+        } else if (signal === 'cancel') {
+            this.peekTimeout = null;
+            this.peekWaiting = false;
+            this.spring.locked = false;
         }
     }
 
     onTouchEnd = e => {
+        this.spring.locked = false;
+        this.spring.target = Math.round(this.spring.target);
+        this.peekTimeout = null;
+        this.peekWaiting = false;
+
         if (this.isDragging) {
             e.preventDefault();
             this.isDragging = false;
-            this.spring.locked = false;
 
             // guess where it’s going to land
             const projectedPosition = this.spring.value + this.spring.velocity;
@@ -275,16 +354,19 @@ class SidebarDragHandler {
                 this.spring.target = 1;
                 this.onEnd(true);
             }
-
-            this.spring.start();
         }
+        globalAnimator.register(this.owner);
     }
 
     onTouchCancel = () => {
+        this.spring.locked = false;
+        this.spring.target = Math.round(this.spring.target);
+        this.peekTimeout = null;
+        this.peekWaiting = false;
+
         if (this.isDragging) {
             this.isDragging = false;
-            this.spring.locked = false;
-            this.spring.start();
         }
+        globalAnimator.register(this.owner);
     }
 }
