@@ -155,9 +155,9 @@ function DetailViewInner ({ item }) {
             <div class="intent-method-container">
                 <div class="intent-section-title">{locale.fields.method}</div>
                 <div class="intent-card">
-                todo
-                <br />
-                also link to https://dashboard.stripe.com/test/payments/pi_intent_id_goes_here
+                    todo
+                    <br />
+                    also link to https://dashboard.stripe.com/test/payments/pi_intent_id_goes_here
                 </div>
             </div>
             <div class="intent-events-container">

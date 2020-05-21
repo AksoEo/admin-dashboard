@@ -42,6 +42,7 @@ export default class TaskDialog extends Component {
         mapError,
         running,
         container,
+        ...extra
     }, { loading: loadingState, error }) {
         const className = 'task-dialog ' + (this.props.class || '');
 
@@ -49,6 +50,7 @@ export default class TaskDialog extends Component {
 
         return (
             <Dialog
+                {...extra}
                 class={className}
                 backdrop
                 open={open}

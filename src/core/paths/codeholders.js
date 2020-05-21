@@ -653,10 +653,11 @@ export const tasks = {
     /// - all codeholder fields, really
     create: async (_, data) => {
         const client = await asyncClient;
-        await client.post('/codeholders', clientToAPI(data));
+        const res = await client.post('/codeholders', clientToAPI(data));
         store.signal([CODEHOLDERS, SIG_CODEHOLDERS]);
-        // can’t insert anything into the store because we don’t know the id
-        // FIXME: we do now, actually, so we should do that
+        const id = +res.res.headers.get('x-identifier');
+        store.insert([CODEHOLDERS, id], data);
+        return id;
     },
     /// codeholders/delete: deletes a codeholder
     ///
