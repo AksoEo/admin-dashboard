@@ -36,11 +36,12 @@ const parseFormatsToTry = [
 ];
 
 function tryParseDate (input) {
+    if (!input) return null;
     for (const f of parseFormatsToTry) {
         const m = moment.utc(input, f);
         if (m.isValid()) return m.toDate();
     }
-    return null;
+    return undefined;
 }
 
 /// Edits a date. Value must be formatted as YYYY-MM-DD.
@@ -82,8 +83,8 @@ class DateEditor extends Component {
         this.setState({ inputText: e.target.value });
         const date = tryParseDate(e.target.value);
 
-        if (date) {
-            this.props.onChange(moment(date).format('YYYY-MM-DD'));
+        if (date !== undefined) {
+            this.props.onChange(date ? moment(date).format('YYYY-MM-DD') : date);
         }
     };
 
