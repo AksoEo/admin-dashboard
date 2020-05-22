@@ -282,6 +282,12 @@ const fieldHistoryExtraFields = {
     cellphone: ['cellphonePublicity'],
 };
 
+// fields that, when changed, should cause other fields to be refetched
+// note that this maps *api fields* to *client fields*
+const refetchFields = {
+    birthdate: ['age'],
+};
+
 /// converts from API repr to client repr (see above)
 export const clientFromAPI = makeClientFromAPI(clientFields);
 const clientToAPI = makeClientToAPI(clientFields);
@@ -691,8 +697,11 @@ export const tasks = {
         const currentData = clientToAPI(existing);
         const newData = clientToAPI(codeholderData);
         const diff = {};
+        const refetch = [];
 
         for (const k in newData) {
+            if (refetchFields[k]) refetch.push(refetchFields[k]);
+
             if (!deepEq(currentData[k], newData[k])) {
                 diff[k] = newData[k];
             }
@@ -708,6 +717,12 @@ export const tasks = {
 
         // also update data in store
         store.insert([CODEHOLDERS, storeId], deepMerge(existing, codeholderData));
+
+        if (refetch.length) {
+            // refetch requested
+            // do a fetch, but we don't really mind if it fails
+            tasks.codeholder({}, { id, fields: [refetch] }).catch(() => {});
+        }
     },
     /// codeholders/setProfilePicture: sets a codeholder’s profile picture
     ///

@@ -13,6 +13,7 @@ import ProfilePicture from '../../../components/profile-picture';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
+import { Link } from '../../../router';
 import { lists as locale } from '../../../locale';
 import './detail.less';
 
@@ -256,7 +257,7 @@ function ListPreview ({ item }) {
                                             profilePictureURL={id => `/lists/public/${listId}/codeholders/${id}/profile_picture/`} />
                                     </div>
                                     <div class="codeholder-name">
-                                        {item.name}
+                                        <Link target={`/membroj/${item.id}`}>{item.name}</Link>
                                     </div>
                                 </div>
                             );
