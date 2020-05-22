@@ -369,6 +369,26 @@ const Header = connectPerms(function Header ({
     if (userData && userData.onHasEmail) userData.onHasEmail(!!item.email);
     if (userData && userData.onHasPassword) userData.onHasPassword(!!item.hasPassword);
 
+    let pictureMeta = null;
+    if (!editing) {
+        let pub;
+        let histLink;
+        if (perms.hasCodeholderField('profilePicturePublicity')) {
+            pub = <Publicity value={item.profilePicturePublicity} style="icon" />;
+        }
+        if (canReadHistory && perms.hasCodeholderField('profilePictureHash', 'r')) {
+            histLink = createHistoryLink('profilePictureHash');
+        }
+        if (pub || histLink) {
+            pictureMeta = (
+                <div class="picture-meta">
+                    {pub}
+                    {histLink}
+                </div>
+            );
+        }
+    }
+
     return (
         <div class="member-header">
             <div class="member-picture">
@@ -378,11 +398,8 @@ const Header = connectPerms(function Header ({
                     profilePictureHash={item.profilePictureHash}
                     canEdit={perms.hasPerm('codeholders.update')}
                     createHistoryLink={createHistoryLink} />
-                {!editing && canReadHistory && <div class="picture-meta">
-                    <Publicity value={item.profilePicturePublicity} style="icon" />
-                    {createHistoryLink('profilePictureHash')}
-                </div>}
-                {editing && <Publicity
+                {pictureMeta}
+                {editing && perms.hasCodeholderField('profilePicturePublicity') && <Publicity
                     value={item.profilePicturePublicity}
                     editing={true}
                     onChange={v => onItemChange({ ...item, profilePicturePublicity: v })}
@@ -412,7 +429,7 @@ const Header = connectPerms(function Header ({
                         id={item.id}
                         canEdit={perms.hasPerm('codeholders.update')} />
                 )}
-                {!editing && perms.hasPerm('codeholder_roles.read') && (
+                {!editing && perms.hasCodeholderField('roles') && perms.hasPerm('codeholder_roles.read') && (
                     <RolesInDetailView
                         id={item.id}
                         canEdit={perms.hasPerm('codeholder_roles.update')} />
@@ -552,6 +569,7 @@ const fields = {
             );
         },
         shouldHide: () => true,
+        hasPerm: 'self',
         history: true,
     },
     code: {
@@ -560,6 +578,7 @@ const fields = {
             return <CodeEditor value={value} item={item} />;
         },
         shouldHide: () => true,
+        hasPerm: 'self',
         history: true,
     },
     profilePictureHash: {
@@ -583,6 +602,7 @@ const fields = {
             );
         },
         shouldHide: () => true,
+        hasPerm: 'self',
         history: true,
     },
     // --
@@ -596,6 +616,7 @@ const fields = {
                     onChange={enabled => editing && onChange(enabled)} />
             );
         },
+        hasPerm: 'self',
         history: true,
     },
     isDead: {
@@ -607,6 +628,7 @@ const fields = {
                     onChange={isDead => editing && onChange(isDead)} />
             );
         },
+        hasPerm: 'self',
         history: true,
     },
     birthdate: {
@@ -628,6 +650,7 @@ const fields = {
             );
         },
         shouldHide: item => item.type !== 'human',
+        hasPerm: 'self',
         history: true,
     },
     careOf: simpleField(function ({ value, editing, onChange }) {
@@ -635,10 +658,12 @@ const fields = {
         return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }, {
         shouldHide: item => item.type !== 'org',
+        hasPerm: 'self',
         history: true,
     }),
     deathdate: {
         component: makeDataEditable(date),
+        hasPerm: 'self',
         history: true,
     },
     creationTime: {
@@ -647,6 +672,7 @@ const fields = {
             return <timestamp.renderer value={value * 1000} />;
         },
         shouldHide: (_, editing) => editing,
+        hasPerm: 'self',
     },
     address: {
         component ({ value, item, editing, onChange, isHistory }) {
@@ -676,10 +702,12 @@ const fields = {
                 style="icon" />
         ),
         history: true,
+        hasPerm: 'self',
     },
     feeCountry: {
         component: makeDataEditable(country),
         history: true,
+        hasPerm: 'self',
     },
     email: simpleField(makeDataEditable(email, ({ value, item }) => (
         <Fragment>
@@ -696,6 +724,7 @@ const fields = {
                 style="icon" />
         ),
         history: true,
+        hasPerm: 'self',
     }),
     profession: simpleField(function ({ value, editing, onChange }) {
         if (!editing) return value;
@@ -704,6 +733,7 @@ const fields = {
         shouldHide: item => item.type !== 'human',
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
+        hasPerm: 'self',
     }),
     website: simpleField(function ({ value, editing, onChange }) {
         if (!editing) {
@@ -730,6 +760,7 @@ const fields = {
     }, {
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
+        hasPerm: 'self',
     }),
     landlinePhone: simpleField(makeDataEditable(phoneNumber, makePhoneHistory('landlinePhone')), {
         isEmpty: value => !value.value,
@@ -742,6 +773,7 @@ const fields = {
                 style="icon" />
         ),
         history: true,
+        hasPerm: 'self',
     }),
     officePhone: simpleField(makeDataEditable(phoneNumber, makePhoneHistory('officePhone')), {
         isEmpty: value => !value.value,
@@ -753,6 +785,7 @@ const fields = {
                 style="icon" />
         ),
         history: true,
+        hasPerm: 'self',
     }),
     cellphone: simpleField(makeDataEditable(phoneNumber, makePhoneHistory('cellphone')), {
         isEmpty: value => !value.value,
@@ -765,12 +798,14 @@ const fields = {
                 style="icon" />
         ),
         history: true,
+        hasPerm: 'self',
     }),
     hasPassword: simpleField(function ({ value }) {
         return <Checkbox class="fixed-checkbox" checked={value} />;
     }, {
         isEmpty: value => !value,
         shouldHide: (_, editing) => editing,
+        hasPerm: 'self',
     }),
     biography: {
         component ({ value, editing, onChange }) {
@@ -794,6 +829,7 @@ const fields = {
         },
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
+        hasPerm: 'self',
     },
     notes: {
         component ({ value, editing, onChange }) {
@@ -816,6 +852,7 @@ const fields = {
             }
         },
         history: true,
+        hasPerm: 'self',
     },
     // for field history only
     password: {

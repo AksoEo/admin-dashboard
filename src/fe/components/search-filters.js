@@ -232,7 +232,9 @@ const FiltersBar = connectPerms(function FiltersBar ({
     }
 
     const canReadFilters = perms.hasPerm('queries.read');
-    const canSaveFilters = perms.hasPerm('queries.create') && perms.hasPerm('queries.update');
+    const canSaveFilters = loadedFilter
+        ? perms.hasPerm('queries.update')
+        : perms.hasPerm('queries.create');
 
     const viewJSON = core => async () => {
         const filter = await core.createTask(filtersToAPITask, {

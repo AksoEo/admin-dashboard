@@ -149,7 +149,7 @@ const templatePage = () => ({
         const hasTejo = perms.hasPerm('votes.create.tejo');
         const hasUea = perms.hasPerm('votes.create.uea');
 
-        if (!hasTejo || !hasUea && !value.org) {
+        if ((!hasTejo || !hasUea) && !value.org) {
             // set org field to the one the user has permission to create
             useEffect(() => {
                 onChange({ ...value, org: hasUea ? 'uea' : 'tejo' });
@@ -196,7 +196,7 @@ const generalPage = (isTemplate) => ({
         const hasTejo = perms.hasPerm('votes.create.tejo');
         const hasUea = perms.hasPerm('votes.create.uea');
 
-        if (!hasTejo || !hasUea && !value.org) {
+        if ((!hasTejo || !hasUea) && !value.org) {
             // set org field to the one the user has permission to create
             useEffect(() => {
                 onChange({ ...value, org: hasUea ? 'uea' : 'tejo' });

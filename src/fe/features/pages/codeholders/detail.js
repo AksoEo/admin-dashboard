@@ -55,6 +55,8 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
         if (!availableFields) return;
         const id = match[1];
 
+        const canReadHistory = perms.hasPerm('codeholders.hist.read');
+
         const actions = [];
         if (!editing) {
             if (perms.hasPerm('codeholders.perms.read')) {
@@ -78,11 +80,14 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                     overflow: true,
                 });
             }
-            actions.push({
-                label: locale.fieldHistory.title(locale.fields.password.toLowerCase()),
-                action: () => this.props.onNavigate(`/membroj/${id}/historio?password`),
-                overflow: true,
-            });
+
+            if (canReadHistory && (!availableFields || availableFields.includes('password'))) {
+                actions.push({
+                    label: locale.fieldHistory.title(locale.fields.password.toLowerCase()),
+                    action: () => this.props.onNavigate(`/membroj/${id}/historio?password`),
+                    overflow: true,
+                });
+            }
 
             if (hasPassword) {
                 actions.push({
@@ -107,7 +112,13 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
             }
         }
 
-        const canReadHistory = perms.hasPerm('codeholders.hist.read');
+        const sfields = !availableFields ? fields : Object.fromEntries(Object.keys(fields)
+            .filter(f => {
+                if (!fields[f].hasPerm) return true;
+                if (fields[f].hasPerm === 'self') return availableFields.includes(f);
+                return fields[f].hasPerm(availableFields, perms);
+            })
+            .map(f => [f, fields[f]]));
 
         return (
             <div class="codeholder-detail-page">
@@ -128,7 +139,7 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
                         : null}
                     options={{ fields: availableFields }}
                     header={Header}
-                    fields={fields}
+                    fields={sfields}
                     footer={Footer}
                     locale={locale}
                     userData={this}

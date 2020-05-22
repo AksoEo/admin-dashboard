@@ -8,10 +8,11 @@ import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../compon
 import Meta from '../../../meta';
 import { countryGroups as locale, search as searchLocale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 import './style';
 
-export default class CountryGroupsPage extends Page {
+export default connectPerms(class CountryGroupsPage extends Page {
     static contextType = coreContext;
 
     state = {
@@ -62,14 +63,16 @@ export default class CountryGroupsPage extends Page {
         }
     }
 
-    render (_, { parameters }) {
+    render ({ perms }, { parameters }) {
         const actions = [];
 
-        actions.push({
-            icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
-            label: locale.create.menuItem,
-            action: () => this.context.createTask('countries/createGroup'),
-        });
+        if (perms.hasPerm('country_groups.create')) {
+            actions.push({
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.create.menuItem,
+                action: () => this.context.createTask('countries/createGroup'),
+            });
+        }
 
         actions.push({
             label: searchLocale.csvExport,
@@ -113,4 +116,4 @@ export default class CountryGroupsPage extends Page {
             </div>
         );
     }
-}
+});

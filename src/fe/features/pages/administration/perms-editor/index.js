@@ -64,6 +64,7 @@ export default class PermsEditor extends Component {
             showImplied: new Set(), // TODO
             setShowImplied: implied => this.setState({ showImplied: implied }),
             togglePerm: perm => {
+                if (!editable) return;
                 if (hasPermission(permissions, mrFields, perm)) {
                     const [p, m] = removePermission(permissions, mrFields, perm);
                     onChange({ ...value, permissions: p, mrFields: m });
@@ -73,6 +74,7 @@ export default class PermsEditor extends Component {
                 }
             },
             toggleField: (field, flags) => {
+                if (!editable) return;
                 if (hasMemberField(permissions, mrFields, field, flags)) {
                     const [p, m] = removeMemberField(permissions, mrFields, field, flags);
                     onChange({ ...value, permissions: p, mrFields: m });
@@ -82,13 +84,20 @@ export default class PermsEditor extends Component {
                 }
             },
             toggleAllFields: () => {
+                if (!editable) return;
                 if (mrFields === null) onChange({ ...value, mrFields: {} });
                 else onChange({ ...value, mrFields: null });
             },
             memberFilter: mrFilter,
-            setMemberFilter: filter => onChange({ ...value, mrFilter: filter }),
+            setMemberFilter: filter => {
+                if (!editable) return;
+                onChange({ ...value, mrFilter: filter });
+            },
             mrEnabled: mrEnabled,
-            setMREnabled: enabled => onChange({ ...value, mrEnabled: enabled }),
+            setMREnabled: enabled => {
+                if (!editable) return;
+                onChange({ ...value, mrEnabled: enabled });
+            },
         };
 
         const unknown = permissions.filter(isPermissionUnknown);
@@ -187,7 +196,6 @@ function PermsItem ({ item, ctx, disabled }) {
                             <span class="switch-option" key={i}>
                                 <Checkbox
                                     class={className}
-                                    disabled={disabled}
                                     checked={isActive}
                                     onMouseOver={() => ctx.setShowImplied(opt.id)}
                                     onMouseOut={() => ctx.setShowImplied(null)}
@@ -214,7 +222,6 @@ function PermsItem ({ item, ctx, disabled }) {
                 {reqNotice}
                 <Checkbox
                     class={className}
-                    disabled={disabled}
                     checked={isActive}
                     onMouseOver={() => ctx.setShowImplied(item.id)}
                     onMouseOut={() => ctx.setShowImplied(null)}
@@ -228,7 +235,6 @@ function PermsItem ({ item, ctx, disabled }) {
                 {reqNotice}
                 <Checkbox
                     class="perm-checkbox"
-                    disabled={disabled}
                     checked={ctx.mrEnabled}
                     onClick={() => ctx.setMREnabled(!ctx.mrEnabled)} />
                 {item.name}
@@ -299,7 +305,6 @@ function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
                         <th>
                             <Checkbox
                                 class="perm-checkbox"
-                                disabled={disabled}
                                 checked={fields === null}
                                 onClick={toggleAll} />
                             {memberFieldsAll}

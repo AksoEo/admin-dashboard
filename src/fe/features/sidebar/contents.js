@@ -246,9 +246,18 @@ const SidebarUser = connect('codeholders/codeholder', {
 
     const onLogout = () => props.core.createTask('login/logOut').run();
 
+    const onPictureClick = e => {
+        if (e.altKey) {
+            // reload perms and tasks
+            e.preventDefault();
+            this.props.core.createTask('perms/perms').runOnce().catch(() => {});
+            this.props.core.createTask('tasks/tasks').runOnce().catch(() => {});
+        }
+    };
+
     return (
         <div class="sidebar-user">
-            <div class="user-profile-picture">
+            <div class="user-profile-picture" onClick={onPictureClick}>
                 <ProfilePicture
                     id={props.id}
                     self={true}

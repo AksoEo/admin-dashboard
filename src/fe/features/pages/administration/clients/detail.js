@@ -145,20 +145,26 @@ export default connectPerms(class ClientDetailPage extends Page {
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    onDelete={() => this.props.pop()} />
+                    onDelete={() => this.props.pop()}
+                    userData={{ perms }} />
             </div>
         );
     }
 });
 
-function Header ({ item, editing }) {
+function Header ({ item, editing, userData: { perms } }) {
     if (editing) return null;
+
+    const canReadPerms = perms.hasPerm('clients.perms.read');
+
     return (
         <div class="client-header">
             <h1>{item.name}</h1>
-            <LinkButton target={`/administrado/klientoj/${item.id}/permesoj`}>
-                {locale.perms.linkButton}
-            </LinkButton>
+            {canReadPerms ? (
+                <LinkButton target={`/administrado/klientoj/${item.id}/permesoj`}>
+                    {locale.perms.linkButton}
+                </LinkButton>
+            ) : null}
         </div>
     );
 }

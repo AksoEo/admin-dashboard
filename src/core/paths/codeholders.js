@@ -458,6 +458,7 @@ const clientFilters = {
             else if (!oldCodes.length) return { newCode: { $in: newCodes } };
             return { $or: [{ newCode: { $in: newCodes } }, { oldCode: { $in: oldCodes } }] };
         },
+        fields: ['newCode'],
     },
 };
 
@@ -514,8 +515,8 @@ export const tasks = {
         for (const field in clientFields) {
             const spec = clientFields[field];
             let hasPerm;
-            if (typeof spec === 'string') hasPerm = await client.hasCodeholderField(spec);
-            else if (typeof spec.apiFields === 'string') hasPerm = await client.hasCodeholderField(spec.apiFields);
+            if (typeof spec === 'string') hasPerm = await client.hasCodeholderField(spec, 'r');
+            else if (typeof spec.apiFields === 'string') hasPerm = await client.hasCodeholderField(spec.apiFields, 'r');
             else {
                 for (const f of spec.apiFields) {
                     if (await client.hasCodeholderField(f, 'r')) {
@@ -569,6 +570,14 @@ export const tasks = {
         const {
             options, prependedUeaCodeSearch, usedFilters, transientFields,
         } = parametersToRequestData(parameters);
+
+        const originalFields = options.fields;
+        options.fields = [];
+        for (const f of originalFields) {
+            if (await client.hasCodeholderField(f, 'r')) {
+                options.fields.push(f);
+            }
+        }
 
         let itemToPrepend = null;
         if (prependedUeaCodeSearch) {
@@ -640,10 +649,20 @@ export const tasks = {
     /// Returns the resolved id (i.e. always a number, never `self`)
     codeholder: async (_, { id, fields }) => {
         const client = await asyncClient;
+
+        const rawApiFields = ['id'].concat(fields.flatMap(id => typeof clientFields[id] === 'string'
+            ? [clientFields[id]]
+            : clientFields[id].apiFields));
+        const apiFields = [];
+
+        for (const f of rawApiFields) {
+            if (await client.hasCodeholderField(f, 'r')) {
+                apiFields.push(f);
+            }
+        }
+
         const res = await client.get(`/codeholders/${id}`, {
-            fields: ['id'].concat(fields.flatMap(id => typeof clientFields[id] === 'string'
-                ? [clientFields[id]]
-                : clientFields[id].apiFields)),
+            fields: apiFields,
         });
 
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
@@ -1005,17 +1024,25 @@ export const tasks = {
     fieldHistory: async ({ id, field }) => {
         const client = await asyncClient;
 
-        let apiFields;
+        let rawApiFields;
         if (field === 'password') {
             // special otherwise non-existent field
-            apiFields = ['password'];
+            rawApiFields = ['password'];
         } else {
-            apiFields = typeof clientFields[field] === 'string'
+            rawApiFields = typeof clientFields[field] === 'string'
                 ? [clientFields[field]]
                 : clientFields[field].apiFields.filter(x => !isFieldHistoryBlacklisted(x));
 
-            if (fieldHistoryExtraFields[field]) apiFields.push(...fieldHistoryExtraFields[field]);
+            if (fieldHistoryExtraFields[field]) rawApiFields.push(...fieldHistoryExtraFields[field]);
         }
+
+        const apiFields = [];
+        for (const f of rawApiFields) {
+            if (await client.hasCodeholderField(f, 'r')) {
+                apiFields.push(f);
+            }
+        }
+
         let histFields = apiFields;
 
         // special history endpoint

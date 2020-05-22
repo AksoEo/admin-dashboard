@@ -40,20 +40,20 @@ export default {
             let icon;
             if (!value) return <span class="codeholder-type-placeholder" />;
             const { enabled, isDead } = item;
-            if (value === 'human' && enabled) icon = <PersonIcon />;
-            else if (enabled) icon = <BusinessIcon />;
+            if (value === 'human' && enabled !== false) icon = <PersonIcon />;
+            else if (enabled !== false) icon = <BusinessIcon />;
             else if (value === 'human') icon = <CodeholderDisabledIcon />;
             else icon = <DomainDisabledIcon />;
 
             let title = locale.fields.types[value];
-            if (!enabled && !isDead) title += ` (${locale.fields.disabledTitle})`;
-            else if (!enabled) title += ` (${locale.fields.deadTitle})`;
+            if (enabled === false && isDead === false) title += ` (${locale.fields.disabledTitle})`;
+            else if (enabled === false) title += ` (${locale.fields.deadTitle})`;
 
             const withLabel = slot !== 'title' && slot !== 'table';
 
             return (
                 <span
-                    class={'codeholder-type' + (!enabled ? ' disabled' : '') + (withLabel ? ' with-label' : '')}
+                    class={'codeholder-type' + (enabled === false ? ' disabled' : '') + (withLabel ? ' with-label' : '')}
                     title={title}>
                     <span class="codeholder-type-icon">{icon}</span>
                     <span class="codeholder-type-label">{title}</span>

@@ -10,11 +10,12 @@ import DetailView from '../../../../components/detail';
 import RearrangingList from '../../../../components/rearranging-list';
 import Meta from '../../../meta';
 import { connect, coreContext } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 import { countryGroups as locale, detail as detailLocale } from '../../../../locale';
 import './style';
 
-export default class CountryGroupPage extends Page {
+export default connectPerms(class CountryGroupPage extends Page {
     static contextType = coreContext;
 
     state = {
@@ -47,22 +48,26 @@ export default class CountryGroupPage extends Page {
         if (this.#commitTask) this.#commitTask.drop();
     }
 
-    render ({ match, editing }, { edit }) {
+    render ({ perms, match, editing }, { edit }) {
         const id = match[1];
 
         const actions = [];
 
-        actions.push({
-            label: detailLocale.edit,
-            icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-            action: () => this.props.onNavigate(`/administrado/landaroj/${id}/redakti`, true),
-        });
+        if (perms.hasPerm('country_groups.update')) {
+            actions.push({
+                label: detailLocale.edit,
+                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                action: () => this.props.onNavigate(`/administrado/landaroj/${id}/redakti`, true),
+            });
+        }
 
-        actions.push({
-            label: detailLocale.delete,
-            action: () => this.context.createTask('countries/deleteGroup', {}, { id }),
-            overflow: true,
-        });
+        if (perms.hasPerm('country_groups.delete')) {
+            actions.push({
+                label: detailLocale.delete,
+                action: () => this.context.createTask('countries/deleteGroup', {}, { id }),
+                overflow: true,
+            });
+        }
 
         return (
             <div class="country-group-page">
@@ -83,7 +88,7 @@ export default class CountryGroupPage extends Page {
             </div>
         );
     }
-}
+});
 
 const Footer = connect('countries/countries')(countries => ({
     countries,

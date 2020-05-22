@@ -148,21 +148,48 @@ export default connectToEverything(class CodeholdersPage extends Page {
         }
         if (prevState.options !== this.state.options) {
             this.encodeURLQuery();
+            this.shouldFilterFields = true;
         }
 
-        if (prevProps.perms !== this.props.perms || prevProps.fields !== this.props.fields) {
+        if (this.shouldFilterFields
+            || prevProps.perms !== this.props.perms
+            || prevProps.fields !== this.props.fields
+            || prevProps.filters !== this.props.filters) {
             this.#filterFieldsWithPerms();
         }
     }
 
+    shouldFilterFields = true;
+
     #filterFieldsWithPerms = () => {
         if (!this.props.perms._isDummy) {
+            this.shouldFilterFields = false;
             const fields = this.state.options.fields.filter(({ id }) => {
                 return !this.props.fields || this.props.fields.includes(id);
             });
+
+            let newOptions = null;
+
             if (fields.length < this.state.options.fields.length) {
-                this.setState({ options: { ...this.state.options, fields } });
+                newOptions = { ...this.state.options, fields };
             }
+
+            let newFilters = null;
+            for (const k in this.state.options.filters) {
+                if (k === '_disabled') continue;
+                if (!this.state.options.filters[k].enabled) continue;
+                if (this.props.filters && !this.props.filters.includes(k)) {
+                    const filter = this.state.options.filters[k];
+                    if (!newFilters) newFilters = this.state.options.filters;
+                    newFilters = { ...this.state.options.filters, [k]: { ...filter, enabled: false } };
+                }
+            }
+            if (newFilters) {
+                if (!newOptions) newOptions = this.state.options;
+                newOptions = { ...newOptions, newFilters };
+            }
+
+            if (newOptions) this.setState({ options: newOptions });
         }
     };
 

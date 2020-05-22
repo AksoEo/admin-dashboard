@@ -16,6 +16,9 @@ export const tasks = {
 // update every minute
 const AUTO_UPDATE_INTERVAL = 60000;
 
+let currentUpdater = null;
+let updaterRefCount = 0;
+
 export const views = {
     tasks: class TasksView extends AbstractDataView {
         constructor () {
@@ -23,7 +26,9 @@ export const views = {
             store.subscribe([TASKS], this.#onUpdate);
             if (store.get([TASKS])) setImmediate(this.#onUpdate);
 
-            this.updateInterval = setInterval(this.#requestUpdate, AUTO_UPDATE_INTERVAL);
+            if (updaterRefCount++ === 0) {
+                currentUpdater = setInterval(this.#requestUpdate, AUTO_UPDATE_INTERVAL);
+            }
             this.#requestUpdate();
         }
         #requestUpdate = () => {
@@ -33,7 +38,9 @@ export const views = {
             this.emit('update', store.get([TASKS]));
         };
         drop () {
-            clearInterval(this.updateInterval);
+            if (--updaterRefCount === 0) {
+                clearInterval(currentUpdater);
+            }
             store.unsubscribe([TASKS], this.#onUpdate);
         }
     },

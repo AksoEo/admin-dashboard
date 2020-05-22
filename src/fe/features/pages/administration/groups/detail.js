@@ -55,6 +55,24 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
         this.#commitTask.on('drop', () => this.#commitTask = null);
     };
 
+    componentDidUpdate () {
+        if (!this.didInitWithPerms) this.tryInitWithPerms();
+    }
+
+    tryInitWithPerms () {
+        if (this.props.perms._isDummy) return;
+        this.didInitWithPerms = true;
+
+        const tab = this.state.tab;
+        const perms = this.props.perms;
+
+        if (tab === 'clients' && !perms.hasPerm('clients.read')) {
+            this.setState({ tab: 'codeholders' });
+        } else if (tab === 'codeholders' && !perms.hasPerm('codeholders.read')) {
+            this.setState({ tab: 'clients' });
+        }
+    }
+
     componentWillUnmount () {
         if (this.#commitTask) this.#commitTask.drop();
     }
@@ -89,6 +107,12 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
         const canAddItem = perms.hasPerm('admin_groups.update') && (tab === 'clients'
             ? perms.hasPerm('clients.read')
             : perms.hasPerm('codeholders.read'));
+
+        const showTable = perms.hasPerm('clients.read') || perms.hasPerm('codeholders.read');
+
+        // we still show the other tab items to imply that they exist, but we disable the
+        // ability to switch to them
+        const canChangeTabs = perms.hasPerm('clients.read') && perms.hasPerm('codeholders.read');
 
         const updateView = ['adminGroups/group', { id }];
 
@@ -171,18 +195,19 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit} />
-                {!editing && (
+                {!editing && showTable && (
                     <Tabs
                         class="tab-switcher"
                         value={tab}
                         onChange={tab => this.setState({ tab })}
-                        tabs={Object.fromEntries([
-                            perms.hasPerm('codeholders.read') && ['codeholders', locale.tabs.codeholders],
-                            perms.hasPerm('clients.read') && ['clients', locale.tabs.clients],
-                        ].filter(x => x))} />
+                        disabled={!canChangeTabs}
+                        tabs={{
+                            codeholders: locale.tabs.codeholders,
+                            clients: locale.tabs.clients,
+                        }} />
                 )}
-                {!editing && selectionActionButton}
-                {!editing && (
+                {!editing && showTable && selectionActionButton}
+                {!editing && showTable && (
                     <OverviewList
                         task={itemsTask}
                         notice={itemsNotice}

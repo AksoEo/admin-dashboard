@@ -307,7 +307,7 @@ export default [
                 badge: tasks => tasks.aksopay
                     ? tasks.aksopay.submitted + tasks.aksopay.disputed
                     : null,
-                hasPerm: () => true,
+                hasPerm: perms => perms.hasPerm('pay.payment_intents.read.tejo') || perms.hasPerm('pay.payment_intents.read.uea'),
                 paths: [
                     {
                         match: /^(\w+)$/,
