@@ -41,6 +41,9 @@ export const data = {
         postalCode: 'Poŝtkodo',
         sortingCode: 'Ordigkodo',
     },
+    address: {
+        invalidPostalCode: '[[invalid postal code]]',
+    },
     ueaCode: {
         newCode: 'Seslitera UEA-kodo',
         invalidUEACode: 'Nevalida seslitera UEA-kodo',

@@ -92,6 +92,9 @@ class AddressEditor extends Component {
 
         const rules = this.state.validationRules || {};
         const requiredFields = rules.requiredFields || [];
+        const allowedFields = rules.allowedFields || [];
+        const upperFields = rules.upperFields || [];
+        const postalCodeMatchers = rules.postalCodeMatchers || [];
 
         if (requiredFields.includes('countryArea')) {
             items.push(
@@ -113,11 +116,21 @@ class AddressEditor extends Component {
         }
 
         for (const k of ['city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode']) {
+            if (!allowedFields.includes(k)) continue;
             const isRequired = requiredFields.includes(k);
+            const isUpper = upperFields.includes(k);
             items.push(<Validator
                 component={TextField}
                 validate={value => {
                     if (country && !value && isRequired) throw { error: locale.requiredField };
+
+                    if (k === 'postalCode' && postalCodeMatchers.length) {
+                        for (const matcher of postalCodeMatchers) {
+                            if (!value.match(matcher)) {
+                                throw { error: locale.address.invalidPostalCode };
+                            }
+                        }
+                    }
                 }}
                 class="address-editor-line"
                 key={k}
@@ -126,7 +139,11 @@ class AddressEditor extends Component {
                 label={isRequired
                     ? <Required>{locale.addressFields[k]}</Required>
                     : locale.addressFields[k]}
-                onChange={onChangeField(k, e => e.target.value || null)} />);
+                onChange={onChangeField(k, e => {
+                    const v = e.target.value || null;
+                    if (isUpper) return v ? v.toUpperCase() : v;
+                    else return v;
+                })} />);
         }
 
         return <div class="data address-editor">{items}</div>;
