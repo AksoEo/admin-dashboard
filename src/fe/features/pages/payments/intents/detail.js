@@ -6,6 +6,7 @@ import TejoIcon from '../../../../components/tejo-icon';
 import UeaIcon from '../../../../components/uea-icon';
 import ProfilePicture from '../../../../components/profile-picture';
 import { currencyAmount, email, timestamp } from '../../../../components/data';
+import { IdUEACode } from '../../../../components/data/uea-code';
 import Meta from '../../../meta';
 import { connectPerms } from '../../../../perms';
 import { coreContext } from '../../../../core/connection';
@@ -112,6 +113,7 @@ function DetailViewInner ({ item }) {
     const {
         status,
         totalAmount,
+        amountRefunded_,
         currency,
         purposes,
         org,
@@ -120,6 +122,9 @@ function DetailViewInner ({ item }) {
     let orgIcon = null;
     if (org === 'tejo') orgIcon = <TejoIcon class="payment-org-icon" />;
     else if (org === 'uea') orgIcon = <UeaIcon class="payment-org-icon" />;
+
+    const amountRefunded = 20;
+    const currentAmount = totalAmount - amountRefunded;
 
     return (
         <div class="payment-intent-inner">
@@ -133,7 +138,12 @@ function DetailViewInner ({ item }) {
             </div>
             <div class="intent-amount">
                 <span class="intent-amount-inner">
-                    <currencyAmount.renderer value={totalAmount} currency={currency} />
+                    {amountRefunded ? (
+                        <span class="original-amount">
+                            <currencyAmount.renderer value={totalAmount} currency={currency} />
+                        </span>
+                    ) : null}
+                    <currencyAmount.renderer value={currentAmount} currency={currency} />
                 </span>
                 <span class="intent-amount-to">
                     <span>{locale.detailTo}</span>
@@ -145,6 +155,13 @@ function DetailViewInner ({ item }) {
                     </span>
                 </span>
             </div>
+            {amountRefunded ? (
+                <div class="refund-status">
+                    <currencyAmount.renderer value={amountRefunded} currency={currency} />
+                    {' '}
+                    {locale.detailRefundSuffix}
+                </div>
+            ) : null}
             <div class="intent-purposes">
                 {(purposes || []).map((purpose, i) => <Purpose key={i} purpose={purpose} item={item} />)}
             </div>
@@ -170,7 +187,7 @@ function DetailViewInner ({ item }) {
 
 function PaymentOrgName () {
     // TODO
-    return 'todo';
+    return '(no orgId in data)';
 }
 
 function Purpose ({ purpose, item }) {
@@ -216,6 +233,7 @@ function Customer ({ item }) {
     let codeholderLink;
     let customerName;
     let customerEmail;
+    let ueaCode;
 
     if (item.customer) {
         if (item.customer.id !== null) {
@@ -224,6 +242,7 @@ function Customer ({ item }) {
             codeholderLink = `/membroj/${item.customer.id}`;
             // TODO: use actual hash
             profilePictureHash = `fake_hash_for_${item.customer.id}`;
+            ueaCode = <IdUEACode id={item.customer.id} />;
         } else {
             profilePictureId = item.customer.email;
         }
@@ -246,6 +265,8 @@ function Customer ({ item }) {
                     {customerName}
                 </div>
                 <div class="card-description">
+                    {ueaCode}
+                    {ueaCode ? ' ' : ''}
                     <email.renderer value={customerEmail} />
                 </div>
             </div>
@@ -256,13 +277,25 @@ function Customer ({ item }) {
                         target={codeholderLink}>
                         {locale.detailViewCodeholder}
                     </LinkButton>
-                ) : null}
+                ) : (
+                    <div class="customer-no-codeholder">
+                        {locale.detailNoCodeholder}
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
 function Events ({ item }) {
+    if (!window.meow) {
+        return (
+            <div class="intent-card">
+                events are broken
+            </div>
+        );
+    }
+
     const rawEvents = [];
     if (item.timeCreated) {
         rawEvents.push({ status: 'created', time: item.timeCreated });
@@ -270,6 +303,7 @@ function Events ({ item }) {
     if (item.events) {
         rawEvents.push(...item.events);
     }
+    rawEvents.reverse();
 
     return (
         <div class="intent-card">

@@ -790,6 +790,8 @@ export const paymentIntents = {
     },
     detailTo: '[[to]]', // X currency >to< org
     detailViewCodeholder: '[[view member]]',
+    detailNoCodeholder: '[[no linked member]]',
+    detailRefundSuffix: '[[refunded]]', // goes after the refunded amount
     search: {
         fields: {
             customerEmail: '[[customeremail]]',
