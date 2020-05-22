@@ -118,6 +118,21 @@
                 svg {
                     vertical-align: middle;
                 }
+
+                .nav-item-inner {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    .nav-item-badge {
+                        display: inline-block;
+                        background: @secondary;
+                        color: @text-on-primary;
+                        padding: 0 8px;
+                        border-radius: 100px;
+                        line-height: 1.3;
+                    }
+                }
             }
         }
     }

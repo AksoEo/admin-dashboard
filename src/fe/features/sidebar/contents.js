@@ -53,10 +53,22 @@ class NavItem extends PureComponent {
         this.forceUpdate();
     }
 
-    render ({ category, item, currentPage, locked }) {
+    render ({ category, item, currentPage, locked, tasks }) {
         const { id, icon, path } = item;
 
         const targetPath = category.path ? category.path + '/' + path : path;
+
+        let badge = null;
+        if (item.badge && tasks) {
+            const contents = item.badge(tasks);
+            if (contents) {
+                badge = (
+                    <span class="nav-item-badge">
+                        {contents}
+                    </span>
+                );
+            }
+        }
 
         const Icon = icon || (() => null);
         return (
@@ -88,7 +100,12 @@ class NavItem extends PureComponent {
                             }
                         }
                     }}>
-                    {localePages[id]}
+                    <span class="nav-item-inner">
+                        <span class="nav-item-label">
+                            {localePages[id]}
+                        </span>
+                        {badge}
+                    </span>
                 </DrawerItem>
             </Link>
         );
@@ -100,10 +117,10 @@ class NavItem extends PureComponent {
 /// # Props
 /// - currentPage: current page id
 /// - locked: if true, the sidebar is locked and can’t be used
-class SidebarNav extends Component {
+const SidebarNav = connect('tasks/tasks')(tasks => ({ tasks }))(class SidebarNav extends Component {
     static contextType = permsContext;
 
-    render ({ currentPage, locked }) {
+    render ({ currentPage, locked, tasks }) {
         const perms = this.context;
 
         const items = [];
@@ -133,6 +150,7 @@ class SidebarNav extends Component {
                             index={itemIndex}
                             category={category}
                             item={item}
+                            tasks={tasks}
                             currentPage={currentPage}
                             locked={locked} />
                     );
@@ -149,7 +167,7 @@ class SidebarNav extends Component {
             </div>
         );
     }
-}
+});
 
 /// Renders the sidebar contents.
 ///

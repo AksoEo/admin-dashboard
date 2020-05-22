@@ -304,6 +304,9 @@ export default [
                     import(/* webpackChunkName: "payment-intents" */ './payments/intents')),
                 type: 'bottom',
                 path: 'pagoj',
+                badge: tasks => tasks.aksopay
+                    ? tasks.aksopay.submitted + tasks.aksopay.disputed
+                    : null,
                 hasPerm: () => true,
                 paths: [
                     {
