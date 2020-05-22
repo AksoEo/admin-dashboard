@@ -49,7 +49,7 @@ export default {
             if (!enabled && !isDead) title += ` (${locale.fields.disabledTitle})`;
             else if (!enabled) title += ` (${locale.fields.deadTitle})`;
 
-            const withLabel = slot !== 'title';
+            const withLabel = slot !== 'title' && slot !== 'table';
 
             return (
                 <span

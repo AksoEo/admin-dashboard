@@ -1314,7 +1314,9 @@ function fetchCodeholderForView (id, fields) {
                 const items = arg;
                 if (!items.includes(+id)) {
                     // id not found; codeholder doesn’t exist
-                    reject(new Error(`codeholder ${id} does not exist`));
+                    const err = new Error(`codeholder ${id} does not exist`);
+                    err.statusCode = 404;
+                    reject(err);
                 }
             } else {
                 const error = arg;
