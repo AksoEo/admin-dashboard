@@ -113,7 +113,7 @@ function DetailViewInner ({ item }) {
     const {
         status,
         totalAmount,
-        amountRefunded_,
+        amountRefunded,
         currency,
         purposes,
         org,
@@ -123,7 +123,6 @@ function DetailViewInner ({ item }) {
     if (org === 'tejo') orgIcon = <TejoIcon class="payment-org-icon" />;
     else if (org === 'uea') orgIcon = <UeaIcon class="payment-org-icon" />;
 
-    const amountRefunded = 20;
     const currentAmount = totalAmount - amountRefunded;
 
     return (
