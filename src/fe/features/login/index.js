@@ -117,7 +117,8 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
                             allowsNonAdmin={allowsNonAdmin}
                             onHeightChange={this.#onHeightChange}
                             token={token}
-                            mode={mode} />
+                            mode={mode}
+                            onSetNormalMode={() => this.setState({ mode: Mode.NORMAL })} />
                         <TotpPage
                             ref={view => this.#totpPage = view}
                             core={core}

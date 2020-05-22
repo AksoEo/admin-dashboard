@@ -82,6 +82,7 @@ export default class DetailsPage extends Component {
                 window.history.pushState(null, null, '/');
 
                 if (nope) {
+                    this.props.onSetNormalMode();
                     this.setState({ notAdminButPasswordSuccess: true });
                 }
             } else if (nope) {
