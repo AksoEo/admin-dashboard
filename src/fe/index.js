@@ -6,6 +6,7 @@ import isSpecialPage from './features/login/is-special-page';
 import { Worker } from './core';
 import { coreContext } from './core/connection';
 import { routerContext } from './router';
+import { insecureContext } from './locale';
 import TaskView from './task-view';
 import './style';
 
@@ -257,7 +258,14 @@ const sessionRoot = document.createElement('div');
 sessionRoot.id = 'session-root';
 sessionRoot.className = 'root-container';
 document.body.appendChild(sessionRoot);
-render(<Session />, sessionRoot);
+if (window.isSecureContext) {
+    render(<Session />, sessionRoot);
+} else {
+    console.error('insecure context!'); // eslint-disable-line no-console
+    sessionRoot.style.padding = '24px';
+    sessionRoot.style.textAlign = 'center';
+    sessionRoot.textContent = insecureContext;
+}
 
 // don’t show “add to homescreen” prompt
 window.addEventListener('beforeinstallprompt', e => e.preventDefault());

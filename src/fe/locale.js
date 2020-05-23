@@ -6,6 +6,8 @@ const copyrightYear = `${startYear}–${thisYear}`;
 
 export const timestampFormat = 'LLL [UTC]';
 
+export const insecureContext = '[[page is in an insecure context!]]';
+
 export const meta = {
     copyright: `© ${copyrightYear}`,
     copyrightHolder: 'TEJO',
