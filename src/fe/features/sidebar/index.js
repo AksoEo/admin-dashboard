@@ -9,7 +9,7 @@ const EDGE_DRAG_WIDTH = 50;
 
 /// After holding down on the edge for this long, the sidebar will peek out and start a dragging
 /// action.
-const PEEK_TIMEOUT = 0.3;
+const PEEK_TIMEOUT = 0.2;
 
 /// Renders the sidebar.
 ///
