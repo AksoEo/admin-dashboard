@@ -6,6 +6,9 @@
     "*.less",
     "*.css"
   ],
+  "scripts": {
+    "start": "./dev-server.sh"
+  },
   "dependencies": {
     "@babel/polyfill": "^7.8.3",
     "@cpsdqs/google-i18n-address": "^1.0.2",
