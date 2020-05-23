@@ -521,7 +521,7 @@ export default class Navigation extends PureComponent {
         const stackItems = [];
 
         let currentTabTitle = '';
-        let currentTitle = locale.title;
+        let currentTitle = locale.title();
         let currentActions = [];
 
         for (let i = 0; i < this.state.stack.length; i++) {

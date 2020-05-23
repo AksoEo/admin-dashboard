@@ -306,7 +306,9 @@ class SidebarDragHandler {
 
             this.spring.value = touchX / this.sidebarWidth - this.startTouchOffset;
             const deltaTime = (Date.now() - this.lastTouchTime) / 1000;
-            this.spring.velocity = (touchX - this.lastTouchX) / this.sidebarWidth / deltaTime;
+            if (deltaTime !== 0) {
+                this.spring.velocity = (touchX - this.lastTouchX) / this.sidebarWidth / deltaTime;
+            }
 
             // make sure update is still being fired
             globalAnimator.register(this.owner);
