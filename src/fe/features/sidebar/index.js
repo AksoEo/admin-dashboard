@@ -170,6 +170,8 @@ class SidebarDragHandler {
     startTouchOffset = 0;
     /// Previous event timestamp.
     lastTouchTime = 0;
+    /// Current pointer id
+    currentPointer = null;
 
     /// # Parameters
     /// - owner: { update: number => void } - update target
@@ -180,6 +182,26 @@ class SidebarDragHandler {
         this.owner = owner;
         this.spring = sidebarSpring;
         this.onEnd = onEnd;
+
+        this.dragSurface = document.createElement('div');
+        this.dragSurface.id = 'sidebar-drag-event-surface';
+        Object.assign(this.dragSurface.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            right: '0',
+            bottom: '0',
+            zIndex: '999999',
+        });
+        this.dragSurface.addEventListener('pointermove', e => {
+            this.onPointerMove(e);
+            e.stopPropagation();
+        });
+        this.dragSurface.addEventListener('pointerend', e => {
+            this.onPointerEnd(e);
+            e.stopPropagation();
+        });
+        this.dragSurface.addEventListener('pointercancel', this.onPointerCancel);
     }
 
     /// Sets the sidebar node.
@@ -187,46 +209,42 @@ class SidebarDragHandler {
         this.sidebarNode = sidebarNode;
     }
 
+    #capturedPointer = null;
+    beginDragging () {
+        if (this.isDragging) return;
+        this.isDragging = true;
+        document.body.appendChild(this.dragSurface);
+        this.dragSurface.setPointerCapture(this.currentPointer);
+        this.#capturedPointer = this.currentPointer;
+    }
+
+    endDragging () {
+        if (!this.isDragging) return;
+        this.isDragging = false;
+        this.dragSurface.releasePointerCapture(this.#capturedPointer);
+        document.body.removeChild(this.dragSurface);
+    }
+
     /// Binds global event handlers.
     bind () {
-        window.addEventListener('touchstart', this.onTouchStart);
-        window.addEventListener('touchmove', this.onTouchMove, { passive: false });
-        window.addEventListener('touchend', this.onTouchEnd, { passive: false });
-        window.addEventListener('touchcancel', this.onTouchCancel);
+        window.addEventListener('pointerdown', this.onPointerDown);
+        window.addEventListener('pointermove', this.onPointerMove);
+        window.addEventListener('pointerup', this.onPointerUp);
     }
 
     /// Unbinds global event handlers.
     unbind () {
-        window.removeEventListener('touchstart', this.onTouchStart);
-        window.removeEventListener('touchmove', this.onTouchMove);
-        window.removeEventListener('touchend', this.onTouchEnd);
-        window.removeEventListener('touchcancel', this.onTouchCancel);
+        window.removeEventListener('pointerdown', this.onPointerDown);
+        window.removeEventListener('pointermove', this.onPointerMove);
+        window.removeEventListener('pointerup', this.onPointerUp);
     }
 
-    /// Returns true if a touch event should be ignored, e.g. because the target is a button.
-    ///
-    /// # Parameters
-    /// - target: Node
-    shouldIgnoreEventFor (target) {
-        if (!target) return false;
-        if (target.tagName === 'BUTTON') return true;
-        if (target.tagName === 'INPUT') return true;
-        if (target.tagName === 'TEXTAREA') return true;
-        if (target.tagName === 'A') return true;
-        return this.shouldIgnoreEventFor(target.parentNode);
-    }
-
-    onTouchStart = e => {
-        this.isDragging = false;
-
-        if (this.shouldIgnoreEventFor(e.target)) return;
-
-        if (e.touches.length > 1) {
-            // exit if there are multiple touches
-            this.mayDrag = false;
-            this.peekTimeout = null;
-            return;
-        }
+    onPointerDown = e => {
+        if (e.pointerType !== 'touch') return;
+        if (this.currentPointer !== null) return;
+        this.currentPointer = e.pointerId;
+        this.spring.locked = false;
+        this.endDragging();
 
         this.sidebarWidth = this.sidebarNode.offsetWidth;
         if (this.spring.target === 0) {
@@ -234,8 +252,8 @@ class SidebarDragHandler {
             this.peekTimeout = PEEK_TIMEOUT;
         }
 
-        this.startTouchX = this.lastTouchX = e.touches[0].clientX;
-        this.startTouchY = e.touches[0].clientY;
+        this.startTouchX = this.lastTouchX = e.clientX;
+        this.startTouchY = e.clientY;
         this.lastTouchTime = Date.now();
 
         this.mayDrag = this.spring.target === 1 || this.startTouchX < EDGE_DRAG_WIDTH;
@@ -258,7 +276,7 @@ class SidebarDragHandler {
                     this.peekWaiting = true;
 
                     // HACK: fire last event again to update position
-                    this.onPointerMove(this.lastTouchX, this.startTouchY);
+                    this.onMove(this.lastTouchX, this.startTouchY);
                 }
             }
         }
@@ -267,9 +285,10 @@ class SidebarDragHandler {
                 // close enough
                 this.peekWaiting = false;
                 // start dragging
-                this.isDragging = true;
+                this.beginDragging();
                 this.startTouchOffset = this.lastTouchX / this.sidebarWidth - this.spring.value;
                 this.spring.locked = true;
+                document.body.setPointerCapture(this.currentPointer);
             }
         }
     }
@@ -278,7 +297,7 @@ class SidebarDragHandler {
         return this.peekTimeout !== null || this.peekWaiting;
     }
 
-    onPointerMove (touchX, touchY, preventDefault) {
+    onMove (touchX, touchY) {
         let signal = null;
 
         if (this.mayDrag && !this.isDragging) {
@@ -291,7 +310,7 @@ class SidebarDragHandler {
                 : touchX < this.startTouchX;
             const touchYHasntMovedTooFar = Math.abs(touchY - this.startTouchY) < 5;
             if (touchXIsMovingInTheRightDirection && touchYHasntMovedTooFar) {
-                this.isDragging = true;
+                this.beginDragging();
                 this.startTouchOffset = touchX / this.sidebarWidth - this.spring.value;
                 this.spring.locked = true;
                 signal = 'drag';
@@ -302,11 +321,11 @@ class SidebarDragHandler {
         }
 
         if (this.isDragging) {
-            if (preventDefault) preventDefault();
-
             this.spring.value = touchX / this.sidebarWidth - this.startTouchOffset;
             const deltaTime = (Date.now() - this.lastTouchTime) / 1000;
-            this.spring.velocity = (touchX - this.lastTouchX) / this.sidebarWidth / deltaTime;
+            if (deltaTime !== 0) {
+                this.spring.velocity = (touchX - this.lastTouchX) / this.sidebarWidth / deltaTime;
+            }
 
             // make sure update is still being fired
             globalAnimator.register(this.owner);
@@ -318,11 +337,14 @@ class SidebarDragHandler {
         return signal;
     }
 
-    onTouchMove = e => {
-        const touchX = e.touches[0].clientX;
-        const touchY = e.touches[0].clientY;
+    onPointerMove = e => {
+        if (e.pointerId !== this.currentPointer) return;
+        const touchX = e.clientX;
+        const touchY = e.clientY;
 
-        const signal = this.onPointerMove(touchX, touchY, () => e.preventDefault());
+        const signal = this.onMove(touchX, touchY);
+
+        if (this.isDragging) e.preventDefault();
 
         if (signal === 'drag') {
             // started drag
@@ -335,7 +357,10 @@ class SidebarDragHandler {
         }
     }
 
-    onTouchEnd = e => {
+    onPointerUp = e => {
+        if (e.pointerId !== this.currentPointer) return;
+        this.currentPointer = null;
+
         this.spring.locked = false;
         this.spring.target = Math.round(this.spring.target);
         this.peekTimeout = null;
@@ -343,7 +368,7 @@ class SidebarDragHandler {
 
         if (this.isDragging) {
             e.preventDefault();
-            this.isDragging = false;
+            this.endDragging();
 
             // guess where it’s going to land
             const projectedPosition = this.spring.value + this.spring.velocity;
@@ -358,14 +383,17 @@ class SidebarDragHandler {
         globalAnimator.register(this.owner);
     }
 
-    onTouchCancel = () => {
+    onPointerCancel = e => {
+        if (e.pointerId !== this.currentPointer) return;
+        this.currentPointer = null;
+
         this.spring.locked = false;
         this.spring.target = Math.round(this.spring.target);
         this.peekTimeout = null;
         this.peekWaiting = false;
 
         if (this.isDragging) {
-            this.isDragging = false;
+            this.endDragging();
         }
         globalAnimator.register(this.owner);
     }
