@@ -295,8 +295,10 @@ export default {
 
                 <Field>
                     <currencyAmount.editor
+                        label={intentLocale.actions.markRefunded.amount}
                         value={task.parameters.amount}
                         onChange={amount => task.update({ amount })}
+                        max={task.options._max}
                         currency={task.options._currency} />
                 </Field>
             </TaskDialog>

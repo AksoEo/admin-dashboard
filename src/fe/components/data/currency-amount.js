@@ -10,7 +10,7 @@ function CurrencyAmount ({ value, currency }) {
 }
 
 /// - currency: currency id
-function CurrencyEditor ({ value, onChange, currency }) {
+function CurrencyEditor ({ value, onChange, currency, max, ...extra }) {
     const node = useRef(null);
     const formattedValue = stdlib.currency_fmt.apply(null, [currency || '?', value | 0])
         .replace('\u202f', '\u00a0');
@@ -26,8 +26,11 @@ function CurrencyEditor ({ value, onChange, currency }) {
         setCaret();
     });
 
+    const maxValue = max || 2147483647;
+
     return (
         <TextField
+            {...extra}
             value={formattedValue}
             ref={node}
             style={{ textAlign: 'right' }}
@@ -39,9 +42,9 @@ function CurrencyEditor ({ value, onChange, currency }) {
                 if (e.key === 'Backspace') {
                     const v = value.toString().split('');
                     v.pop();
-                    onChange(Math.min(2147483647, +v.join('')));
+                    onChange(Math.min(maxValue, +v.join('')));
                 } else if (e.key.match(/^[0-9]$/)) {
-                    onChange(Math.min(2147483647, +(value.toString() + e.key)));
+                    onChange(Math.min(maxValue, +(value.toString() + e.key)));
                 }
             }} />
     );

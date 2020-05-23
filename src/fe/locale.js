@@ -822,6 +822,7 @@ export const paymentIntents = {
         markRefunded: {
             title: '[[mark refunded]]',
             description: '[[mark this intent refunded?]]',
+            amount: '[[refund amount]]',
             button: '[[mark]]',
         },
         markSucceeded: {

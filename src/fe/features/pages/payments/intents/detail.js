@@ -301,6 +301,7 @@ function IntentActions ({ item }) {
                         <Button key="refund" onClick={() => core.createTask('payments/markIntentRefunded', {
                             id,
                             _currency: item.currency,
+                            _max: item.totalAmount,
                         }, {
                             amount: item.amountRefunded ? item.amountRefunded : item.totalAmount,
                         })}>
