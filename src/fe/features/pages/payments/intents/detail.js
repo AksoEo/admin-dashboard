@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { Button, TextField } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail';
@@ -193,6 +193,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                             .map((purpose, i) => <Purpose key={i} purpose={purpose} item={item} />)}
                     </div>
                 )}
+                {!editing && <IntentActions item={item} />}
             </DynamicHeightDiv>
             <div class="intent-customer-container">
                 <div class="intent-section-title">{locale.fields.customer}</div>
@@ -254,6 +255,67 @@ function Purpose ({ purpose, item }) {
                 </div>
             </div>
         </div>
+    );
+}
+
+function IntentActions ({ item }) {
+    return (
+        <coreContext.Consumer>{core => {
+            const actions = [];
+
+            const id = item.id;
+            const t = item.method && item.method.type;
+            const s = item.status;
+
+            if (s === 'pending' || s === 'submitted' || (t === 'manual' && s === 'disputed')) {
+                actions.push(
+                    <Button key="cancel" onClick={() => core.createTask('payments/cancelIntent', { id })}>
+                        {locale.actions.cancel.title}
+                    </Button>
+                );
+            }
+            if (t === 'manual') {
+                if (s === 'submitted' || s === 'succeeded') {
+                    actions.push(
+                        <Button key="dispute" onClick={() => core.createTask('payments/markIntentDisputed', { id })}>
+                            {locale.actions.markDisputed.title}
+                        </Button>
+                    );
+                }
+                if (s === 'pending') {
+                    actions.push(
+                        <Button key="submit" onClick={() => core.createTask('payments/submitIntent', { id })}>
+                            {locale.actions.submit.title}
+                        </Button>
+                    );
+                }
+                if (s === 'submitted') {
+                    actions.push(
+                        <Button key="succeed" onClick={() => core.createTask('payments/markIntentSucceeded', { id })}>
+                            {locale.actions.markSucceeded.title}
+                        </Button>
+                    );
+                }
+                if (['pending', 'submitted', 'canceled', 'succeeded', 'refunded', 'disputed'].includes(s)) {
+                    actions.push(
+                        <Button key="refund" onClick={() => core.createTask('payments/markIntentRefunded', {
+                            id,
+                            _currency: item.currency,
+                        }, {
+                            amount: item.amountRefunded ? item.amountRefunded : item.totalAmount,
+                        })}>
+                            {locale.actions.markRefunded.title}
+                        </Button>
+                    );
+                }
+            }
+
+            return (
+                <div class="intent-actions-container">
+                    {actions}
+                </div>
+            );
+        }}</coreContext.Consumer>
     );
 }
 

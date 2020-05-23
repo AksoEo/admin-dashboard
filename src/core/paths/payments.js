@@ -376,11 +376,16 @@ export const tasks = {
         const existing = store.get([PAYMENT_INTENTS, id]);
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'disputed' }));
     },
-    markIntentRefunded: async ({ id }) => {
+    markIntentRefunded: async ({ id }, { amount }) => {
         const client = await asyncClient;
-        await client.post(`/aksopay/payment_intents/${id}/!mark_refunded`);
+        await client.post(`/aksopay/payment_intents/${id}/!mark_refunded`, {
+            totalRefund: amount,
+        });
         const existing = store.get([PAYMENT_INTENTS, id]);
-        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'refunded' }));
+        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, {
+            status: 'refunded',
+            amountRefunded: amount,
+        }));
     },
     markIntentSucceeded: async ({ id }) => {
         const client = await asyncClient;

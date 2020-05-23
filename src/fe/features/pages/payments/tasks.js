@@ -4,6 +4,7 @@ import TaskDialog from '../../../components/task-dialog';
 import Segmented from '../../../components/segmented';
 import ChangedFields from '../../../components/changed-fields';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
+import { currencyAmount } from '../../../components/data';
 import { Validator, Field } from '../../../components/form';
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
@@ -252,6 +253,76 @@ export default {
                 actionLabel={methodLocale.delete.button}
                 run={() => task.runOnce()}>
                 {methodLocale.delete.description}
+            </TaskDialog>
+        );
+    },
+
+    cancelIntent ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.actions.cancel.title}
+                actionLabel={intentLocale.actions.cancel.button}
+                run={() => task.runOnce()}>
+                {intentLocale.actions.cancel.description}
+            </TaskDialog>
+        );
+    },
+    markIntentDisputed ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.actions.markDisputed.title}
+                actionLabel={intentLocale.actions.markDisputed.button}
+                run={() => task.runOnce()}>
+                {intentLocale.actions.markDisputed.description}
+            </TaskDialog>
+        );
+    },
+    markIntentRefunded ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.actions.markRefunded.title}
+                actionLabel={intentLocale.actions.markRefunded.button}
+                run={() => task.runOnce()}>
+                <div>
+                    {intentLocale.actions.markRefunded.description}
+                </div>
+
+                <Field>
+                    <currencyAmount.editor
+                        value={task.parameters.amount}
+                        onChange={amount => task.update({ amount })}
+                        currency={task.options._currency} />
+                </Field>
+            </TaskDialog>
+        );
+    },
+    markIntentSucceeded ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.actions.markSucceeded.title}
+                actionLabel={intentLocale.actions.markSucceeded.button}
+                run={() => task.runOnce()}>
+                {intentLocale.actions.markSucceeded.description}
+            </TaskDialog>
+        );
+    },
+    submitIntent ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.actions.submit.title}
+                actionLabel={intentLocale.actions.submit.button}
+                run={() => task.runOnce()}>
+                {intentLocale.actions.submit.description}
             </TaskDialog>
         );
     },

@@ -808,6 +808,33 @@ export const paymentIntents = {
     detailViewCodeholder: '[[view member]]',
     detailNoCodeholder: '[[no linked member]]',
     detailRefundSuffix: '[[refunded]]', // goes after the refunded amount
+    actions: {
+        cancel: {
+            title: '[[cancel]]',
+            description: '[[cancel this intent?]]',
+            button: '[[cancel]]',
+        },
+        markDisputed: {
+            title: '[[mark disputed]]',
+            description: '[[mark this intent disputed?]]',
+            button: '[[mark]]',
+        },
+        markRefunded: {
+            title: '[[mark refunded]]',
+            description: '[[mark this intent refunded?]]',
+            button: '[[mark]]',
+        },
+        markSucceeded: {
+            title: '[[mark succeeded]]',
+            description: '[[mark this intent succeeded?]]',
+            button: '[[mark]]',
+        },
+        submit: {
+            title: '[[submit]]',
+            description: '[[submit this intent?]]',
+            button: '[[submit]]',
+        },
+    },
     search: {
         fields: {
             customerEmail: '[[customeremail]]',
