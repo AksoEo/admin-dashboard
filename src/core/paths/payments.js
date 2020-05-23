@@ -61,10 +61,8 @@ const iClientFields = {
         }),
     },
     method: {
-        apiFields: ['paymentMethodId'],
-        fromAPI: intent => ({
-            id: intent.paymentMethodId,
-        }),
+        apiFields: ['paymentMethod'],
+        fromAPI: intent => intent.paymentMethod,
         toAPI: () => ({}),
     },
     org: 'org',

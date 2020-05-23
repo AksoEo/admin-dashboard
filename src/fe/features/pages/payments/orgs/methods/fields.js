@@ -3,6 +3,7 @@ import { Checkbox, TextField } from '@cpsdqs/yamdl';
 import { Validator } from '../../../../../components/form';
 import Segmented from '../../../../../components/segmented';
 import Select from '../../../../../components/select';
+import { timespan } from '../../../../../components/data';
 import { paymentMethods as locale, currencies } from '../../../../../locale';
 
 export const FIELDS = {
@@ -152,7 +153,7 @@ export const FIELDS = {
             }
             return value === null
                 ? locale.fields.paymentValidityTypes.forever
-                : `${value} ${locale.fields.paymentValidityUnit}`;
+                : <timespan.renderer value={value} />;
         },
     },
     isRecommended: {

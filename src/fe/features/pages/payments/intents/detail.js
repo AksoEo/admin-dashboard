@@ -5,16 +5,22 @@ import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail';
 import TejoIcon from '../../../../components/tejo-icon';
 import UeaIcon from '../../../../components/uea-icon';
+import StripeIcon from '../../../../components/stripe-icon';
 import ProfilePicture from '../../../../components/profile-picture';
 import DynamicHeightDiv from '../../../../components/dynamic-height-div';
 import CodeholderPicker from '../../../../components/codeholder-picker';
 import { Field, Validator } from '../../../../components/form';
 import { currencyAmount, email, timestamp } from '../../../../components/data';
 import { IdUEACode } from '../../../../components/data/uea-code';
+import { FIELDS as METHOD_FIELDS } from '../orgs/methods/fields';
 import Meta from '../../../meta';
 import { connectPerms } from '../../../../perms';
 import { coreContext } from '../../../../core/connection';
-import { paymentIntents as locale, data as dataLocale } from '../../../../locale';
+import {
+    paymentIntents as locale,
+    data as dataLocale,
+    paymentMethods as methodsLocale,
+} from '../../../../locale';
 import { LinkButton } from '../../../../router';
 import './detail.less';
 
@@ -95,6 +101,7 @@ export default connectPerms(class IntentPage extends Page {
                             'purposes',
                             'totalAmount',
                             'amountRefunded',
+                            'stripePaymentIntentId',
                         ],
                     }}
                     header={DetailViewInner}
@@ -127,6 +134,22 @@ function DetailViewInner ({ item, editing, onItemChange }) {
 
     const currentAmount = totalAmount - amountRefunded;
 
+    let methodType = null;
+    if (item.method) {
+        if (item.method.type === 'stripe') {
+            const link = locale.stripeIntentLink(item.stripePaymentIntentId);
+            methodType = (
+                <a class="method-stripe" target="_blank" rel="noopener noreferrer nofollow" href={link}>
+                    {locale.openInStripePrefix}
+                    {' '}
+                    <StripeIcon />™
+                </a>
+            );
+        } else {
+            methodType = <span class="method-manual">{methodsLocale.fields.types.manual}</span>;
+        }
+    }
+
     return (
         <div class="payment-intent-inner">
             <div class="intent-status">
@@ -134,7 +157,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                     {locale.fields.statuses[status]}
                 </div>
                 <div class="intent-method-type">
-                    todo:stripe/manual
+                    {methodType}
                 </div>
             </div>
             <div class="intent-amount">
@@ -175,17 +198,11 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                 <div class="intent-section-title">{locale.fields.customer}</div>
                 <Customer item={item} editing={editing} onItemChange={onItemChange} />
             </div>
+            <div class="intent-method-container">
+                <div class="intent-section-title">{locale.fields.method}</div>
+                <Method method={item.method} item={item} editing={editing} onItemChange={onItemChange} />
+            </div>
             <DynamicHeightDiv useFirstHeight>
-                {!editing && (
-                    <div class="intent-method-container">
-                        <div class="intent-section-title">{locale.fields.method}</div>
-                        <div class="intent-card">
-                            todo
-                            <br />
-                            also link to https://dashboard.stripe.com/test/payments/pi_intent_id_goes_here
-                        </div>
-                    </div>
-                )}
                 {!editing && (
                     <div class="intent-events-container">
                         <div class="intent-section-title">{locale.fields.events}</div>
@@ -193,9 +210,6 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                     </div>
                 )}
             </DynamicHeightDiv>
-            <div>
-                <div class="intent-section-title">{locale.fields.foreignId}</div>
-            </div>
             <NotesField item={item} editing={editing} onItemChange={onItemChange} field="internalNotes" />
             <NotesField item={item} editing={editing} onItemChange={onItemChange} field="customerNotes" />
         </div>
@@ -345,6 +359,76 @@ function Customer ({ item, editing, onItemChange }) {
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+function Method ({ method, item, editing, onItemChange }) {
+    if (!method) return null;
+
+    const fields = (
+        <div class="method-fields">
+            <div class="method-field">
+                <div class="field-name">{methodsLocale.fields.currencies}</div>
+                <METHOD_FIELDS.currencies.component item={method} value={method.currencies} />
+            </div>
+            {method.type === 'stripe' ? (
+                <div class="method-field">
+                    <div class="field-name">{methodsLocale.fields.stripeMethods}</div>
+                    <METHOD_FIELDS.stripeMethods.component item={method} value={method.stripeMethods} />
+                </div>
+            ) : null}
+            <div class="method-field">
+                <div class="field-name">{methodsLocale.fields.paymentValidity}</div>
+                <METHOD_FIELDS.paymentValidity.component item={method} value={method.paymentValidity} />
+            </div>
+            {method.internalDescription && (
+                <div class="method-field">
+                    <div class="field-name">{methodsLocale.fields.internalDescription}</div>
+                    <METHOD_FIELDS.internalDescription.component item={method} value={method.internalDescription} />
+                </div>
+            )}
+            {method.description && (
+                <div class="method-field">
+                    <div class="field-name">{methodsLocale.fields.description}</div>
+                    <METHOD_FIELDS.description.component item={method} value={method.description} />
+                </div>
+            )}
+        </div>
+    );
+
+    const foreignId = (editing || item.foreignId) && (
+        <div class="foreign-id">
+            <div class="intent-section-title">{locale.fields.foreignId}</div>
+            {editing ? (
+                <TextField
+                    class="fid-inner"
+                    value={item.foreignId}
+                    onChange={e => onItemChange({ ...item, foreignId: e.target.value })} />
+            ) : (
+                <div class="fid-inner">
+                    {item.foreignId}
+                </div>
+            )}
+        </div>
+    );
+
+    return (
+        <div class="intent-card intent-method">
+            <div class="method-title">
+                <span class="method-type">
+                    {method.type === 'stripe' ? (
+                        <span><StripeIcon class="stripe-icon" />™</span>
+                    ) : <span class="type-badge">{methodsLocale.fields.types.manual}</span>}
+                </span>
+
+                <span class="method-name">{method.name}</span>
+            </div>
+            <DynamicHeightDiv useFirstHeight>
+                {!editing && fields}
+            </DynamicHeightDiv>
+
+            {foreignId}
         </div>
     );
 }

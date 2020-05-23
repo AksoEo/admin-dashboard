@@ -6,6 +6,7 @@ import date from './date';
 import email from './email';
 import phoneNumber from './phone-number';
 import ueaCode from './uea-code';
+import timespan from './timespan';
 import timestamp from './timestamp';
 
 export Required from './required';
@@ -55,5 +56,6 @@ export {
     email,
     phoneNumber,
     ueaCode,
+    timespan,
     timestamp,
 };

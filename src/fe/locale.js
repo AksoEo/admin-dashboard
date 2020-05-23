@@ -732,7 +732,7 @@ export const paymentMethods = {
 
         types: {
             manual: '[[manual]]',
-            stripe: '[[stripe]]',
+            stripe: 'Stripe™',
         },
         stripeMethodValues: {
             card: '[[card]]',
@@ -762,6 +762,9 @@ export const paymentMethods = {
     },
 };
 export const paymentIntents = {
+    openInStripePrefix: '[[open in]]',
+    stripeIntentLink: id => `https://dashboard.stripe.com/test/payments/${id}`,
+
     title: '[[paymentintents]]',
     detailTitle: '[[intent]]',
     fields: {
