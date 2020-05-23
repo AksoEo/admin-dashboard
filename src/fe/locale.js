@@ -230,6 +230,12 @@ export const pages = {
     documents: 'Ŝpureblaj dokumentoj',
 };
 
+export const index = {
+    tasks: {
+        title: '[[tasks]]',
+    },
+};
+
 export const search = {
     normalFilter: 'Facilaj filtriloj',
     jsonFilter: 'JSON-filtriloj',

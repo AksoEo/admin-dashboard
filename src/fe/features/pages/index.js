@@ -84,6 +84,8 @@ export default [
             {
                 id: 'home',
                 icon: HomeIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "home" */ './home')),
                 path: '',
                 hasPerm: () => true,
             },

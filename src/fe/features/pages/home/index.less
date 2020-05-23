@@ -1,0 +1,73 @@
+@import '../../../prelude';
+
+.home-page {
+    .home-card {
+        margin: 24px;
+        border-radius: 8px;
+        background: @card1-background;
+        .elevation(7);
+
+        .hc-title {
+            padding: 16px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        @media (min-width: 700px) and (max-width: 899px), (min-width: 1000px) {
+            vertical-align: top;
+            display: inline-block;
+            width: calc(50% - 36px);
+
+            &:nth-child(2n) {
+                margin-left: 0;
+            }
+        }
+    }
+
+    .home-tasks {
+        .home-task {
+            display: block;
+            width: 100%;
+            text-align: left;
+            text-transform: none;
+            font: inherit;
+            color: inherit;
+            margin: 0;
+            border-radius: 0;
+            border-bottom: 1px solid @separator;
+            --md-button-color: @gray-button-color;
+            display: flex;
+            align-items: center;
+            padding: 16px;
+
+            .task-icon, .task-alt-icon {
+                flex-shrink: 0;
+                width: 64px;
+                text-align: center;
+            }
+            .task-details {
+                flex: 1;
+
+                .task-title {
+                    margin-bottom: 4px;
+                }
+
+                .task-badge {
+                    display: inline-block;
+                    color: @warning-text;
+                    padding: 2px 4px;
+                    border-radius: 4px;
+                    border: 1px solid currentColor;
+                    text-transform: uppercase;
+                    font-weight: 500;
+                    font-size: 0.8em;
+                    letter-spacing: 0.06em;
+                }
+            }
+
+            &:last-of-type {
+                border-bottom: none;
+            }
+        }
+    }
+}
