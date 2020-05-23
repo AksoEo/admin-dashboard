@@ -766,6 +766,8 @@ export const paymentIntents = {
     detailTitle: '[[intent]]',
     fields: {
         customer: '[[customer]]',
+        customerName: '[[name]]',
+        customerEmail: '[[email]]',
         method: '[[method]]',
         org: '[[org]]',
         currency: '[[currency]]',

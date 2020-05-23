@@ -1,24 +1,28 @@
 import { h } from 'preact';
+import { TextField } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail';
 import TejoIcon from '../../../../components/tejo-icon';
 import UeaIcon from '../../../../components/uea-icon';
 import ProfilePicture from '../../../../components/profile-picture';
+import DynamicHeightDiv from '../../../../components/dynamic-height-div';
+import CodeholderPicker from '../../../../components/codeholder-picker';
+import { Field, Validator } from '../../../../components/form';
 import { currencyAmount, email, timestamp } from '../../../../components/data';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import Meta from '../../../meta';
 import { connectPerms } from '../../../../perms';
 import { coreContext } from '../../../../core/connection';
-import { paymentIntents as locale } from '../../../../locale';
+import { paymentIntents as locale, data as dataLocale } from '../../../../locale';
 import { LinkButton } from '../../../../router';
-import { FIELDS } from './fields';
 import './detail.less';
 
 export default connectPerms(class IntentPage extends Page {
     state = {
         edit: null,
         org: 'meow', // nonsense default value
+        status: 'meow', // nonsense default value
     };
 
     static contextType = coreContext;
@@ -53,12 +57,12 @@ export default connectPerms(class IntentPage extends Page {
         return this.props.match[1];
     }
 
-    render ({ perms, editing }, { edit, org }) {
+    render ({ perms, editing }, { edit, org, status }) {
         const actions = [];
 
         const id = this.getId();
 
-        if (perms.hasPerm(`pay.payment_intents.update.${org}`)) {
+        if (status === 'pending' && perms.hasPerm(`pay.payment_intents.update.${org}`)) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
@@ -85,7 +89,6 @@ export default connectPerms(class IntentPage extends Page {
                             'status',
                             'events',
                             'timeCreated',
-                            'statusTime',
                             'internalNotes',
                             'customerNotes',
                             'foreignId',
@@ -95,11 +98,10 @@ export default connectPerms(class IntentPage extends Page {
                         ],
                     }}
                     header={DetailViewInner}
-                    fields={FIELDS}
                     locale={locale}
                     edit={edit}
                     onEditChange={edit => this.setState({ edit })}
-                    onData={data => this.setState({ org: data.org })}
+                    onData={data => this.setState({ org: data.org, status: data.status })}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
@@ -109,7 +111,7 @@ export default connectPerms(class IntentPage extends Page {
     }
 });
 
-function DetailViewInner ({ item }) {
+function DetailViewInner ({ item, editing, onItemChange }) {
     const {
         status,
         totalAmount,
@@ -161,25 +163,41 @@ function DetailViewInner ({ item }) {
                     {locale.detailRefundSuffix}
                 </div>
             ) : null}
-            <div class="intent-purposes">
-                {(purposes || []).map((purpose, i) => <Purpose key={i} purpose={purpose} item={item} />)}
-            </div>
+            <DynamicHeightDiv useFirstHeight>
+                {!editing && (
+                    <div class="intent-purposes">
+                        {(purposes || [])
+                            .map((purpose, i) => <Purpose key={i} purpose={purpose} item={item} />)}
+                    </div>
+                )}
+            </DynamicHeightDiv>
             <div class="intent-customer-container">
                 <div class="intent-section-title">{locale.fields.customer}</div>
-                <Customer item={item} />
+                <Customer item={item} editing={editing} onItemChange={onItemChange} />
             </div>
-            <div class="intent-method-container">
-                <div class="intent-section-title">{locale.fields.method}</div>
-                <div class="intent-card">
-                    todo
-                    <br />
-                    also link to https://dashboard.stripe.com/test/payments/pi_intent_id_goes_here
-                </div>
+            <DynamicHeightDiv useFirstHeight>
+                {!editing && (
+                    <div class="intent-method-container">
+                        <div class="intent-section-title">{locale.fields.method}</div>
+                        <div class="intent-card">
+                            todo
+                            <br />
+                            also link to https://dashboard.stripe.com/test/payments/pi_intent_id_goes_here
+                        </div>
+                    </div>
+                )}
+                {!editing && (
+                    <div class="intent-events-container">
+                        <div class="intent-section-title">{locale.fields.events}</div>
+                        <Events item={item} />
+                    </div>
+                )}
+            </DynamicHeightDiv>
+            <div>
+                <div class="intent-section-title">{locale.fields.foreignId}</div>
             </div>
-            <div class="intent-events-container">
-                <div class="intent-section-title">{locale.fields.events}</div>
-                <Events item={item} />
-            </div>
+            <NotesField item={item} editing={editing} onItemChange={onItemChange} field="internalNotes" />
+            <NotesField item={item} editing={editing} onItemChange={onItemChange} field="customerNotes" />
         </div>
     );
 }
@@ -225,7 +243,7 @@ function Purpose ({ purpose, item }) {
     );
 }
 
-function Customer ({ item }) {
+function Customer ({ item, editing, onItemChange }) {
     let profilePictureHash;
     let profilePictureId;
     let isCodeholder = false;
@@ -234,7 +252,42 @@ function Customer ({ item }) {
     let customerEmail;
     let ueaCode;
 
-    if (item.customer) {
+    if (editing && item.customer) {
+        const onCustomerChange = customer => onItemChange({ ...item, customer });
+
+        customerName = (
+            <Field>
+                <Validator
+                    label={locale.fields.customerName}
+                    component={TextField}
+                    validate={value => {
+                        if (!value) throw { error: dataLocale.requiredField };
+                    }}
+                    value={item.customer.name}
+                    onChange={e => onCustomerChange({ ...item.customer, name: e.target.value })} />
+            </Field>
+        );
+        customerEmail = (
+            <Validator
+                label={locale.fields.customerEmail}
+                component={TextField}
+                type="email"
+                validate={value => {
+                    if (!value) throw { error: dataLocale.requiredField };
+                }}
+                value={item.customer.email}
+                onChange={e => onCustomerChange({ ...item.customer, email: e.target.value })} />
+        );
+        codeholderLink = (
+            <CodeholderPicker
+                value={item.customer.id ? [item.customer.id] : []}
+                onChange={([id]) => onCustomerChange({
+                    ...item.customer,
+                    id: id || null,
+                })}
+                limit={1} />
+        );
+    } else if (item.customer) {
         if (item.customer.id !== null) {
             isCodeholder = true;
             profilePictureId = item.customer.id;
@@ -252,25 +305,35 @@ function Customer ({ item }) {
 
     return (
         <div class="intent-split-card">
-            <div class="card-id">
-                <div class="customer-picture">
-                    <ProfilePicture
-                        id={profilePictureId}
-                        profilePictureHash={profilePictureHash} />
+            {!editing && (
+                <div class="card-id">
+                    <div class="customer-picture">
+                        <ProfilePicture
+                            id={profilePictureId}
+                            profilePictureHash={profilePictureHash} />
+                    </div>
                 </div>
-            </div>
+            )}
             <div class="card-details">
                 <div class="card-title">
                     {customerName}
                 </div>
-                <div class="card-description">
-                    {ueaCode}
-                    {ueaCode ? ' ' : ''}
-                    <email.renderer value={customerEmail} />
-                </div>
+                {editing ? (
+                    <div class="card-description">
+                        {customerEmail}
+                    </div>
+                ) : (
+                    <div class="card-description">
+                        {ueaCode}
+                        {ueaCode ? ' ' : ''}
+                        <email.renderer value={customerEmail} />
+                    </div>
+                )}
             </div>
             <div class="card-after">
-                {isCodeholder ? (
+                {editing ? (
+                    codeholderLink
+                ) : isCodeholder ? (
                     <LinkButton
                         class="customer-codeholder-link"
                         target={codeholderLink}>
@@ -287,14 +350,6 @@ function Customer ({ item }) {
 }
 
 function Events ({ item }) {
-    if (!window.meow) {
-        return (
-            <div class="intent-card">
-                events are broken
-            </div>
-        );
-    }
-
     const rawEvents = [];
     if (item.timeCreated) {
         rawEvents.push({ status: 'created', time: item.timeCreated });
@@ -328,6 +383,35 @@ function Events ({ item }) {
                     </div>
                 );
             })}
+        </div>
+    );
+}
+
+function NotesField ({ item, editing, onItemChange, field }) {
+    const value = item[field];
+
+    if (editing) {
+        return (
+            <div>
+                <div class="intent-section-title">{locale.fields[field]}</div>
+                <div class="intent-card notes-field">
+                    <textarea
+                        value={value}
+                        onKeyDown={e => e.stopPropagation()}
+                        onChange={e => onItemChange({ ...item, [field]: e.target.value })} />
+                </div>
+            </div>
+        );
+    }
+
+    if (!value) return null;
+
+    return (
+        <div>
+            <div class="intent-section-title">{locale.fields[field]}</div>
+            <div class="intent-card">
+                {value.split('\n').map((l, i) => <span key={i}>{l}<br /></span>)}
+            </div>
         </div>
     );
 }

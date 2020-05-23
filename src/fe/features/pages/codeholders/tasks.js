@@ -64,7 +64,7 @@ export default {
                                 { id: 'org', label: locale.fields.types.org },
                             ]}
                         </Validator>
-                        <DynamicHeightDiv>
+                        <DynamicHeightDiv useFirstHeight>
                             {nameFields.map((field, isOptional) => (
                                 // we assume only the first field is required, so !!index == isOptional
                                 <Validator

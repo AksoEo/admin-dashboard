@@ -11,6 +11,7 @@ import {
     paymentOrgs as orgLocale,
     paymentAddons as addonLocale,
     paymentMethods as methodLocale,
+    paymentIntents as intentLocale,
 } from '../../../locale';
 import { CREATION_FIELDS as methodFields } from './orgs/methods/fields';
 import './tasks.less';
@@ -203,6 +204,20 @@ export default {
         );
     },
 
+    updateIntent ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.update.title}
+                actionLabel={intentLocale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={intentLocale.fields} />
+            </TaskDialog>
+        );
+    },
 
     deleteOrg ({ open, task }) {
         return (

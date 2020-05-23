@@ -3,7 +3,7 @@ import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
-import { makeParametersToRequestData, makeClientFromAPI } from '../list';
+import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
 
 export const PAYMENT_ORGS = 'paymentOrgs';
 export const SIG_PAYMENT_ORGS = '!paymentOrgs';
@@ -55,7 +55,10 @@ const iClientFields = {
             email: intent.customer.email,
             name: intent.customer.name,
         }),
-        toAPI: () => ({}),
+        toAPI: ({ id, email, name }) => ({
+            customer: { email, name },
+            codeholderId: id,
+        }),
     },
     method: {
         apiFields: ['paymentMethodId'],
@@ -100,6 +103,14 @@ const iParametersToRequestData = makeParametersToRequestData({
     clientFilters: iClientFilters,
 });
 const iClientFromAPI = makeClientFromAPI(iClientFields);
+const iClientToAPI = makeClientToAPI(iClientFields);
+const INTENT_ALLOWED_PATCH_FIELDS = [
+    'codeholderId',
+    'customer',
+    'internalNotes',
+    'customerNotes',
+    'foreignId',
+];
 
 export const tasks = {
     listOrgs: async (_, { offset, limit }) => {
@@ -340,6 +351,20 @@ export const tasks = {
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, iClientFromAPI(res.body)));
 
         return +id;
+    },
+    updateIntent: async ({ id }, params) => {
+        const client = await asyncClient;
+        const data = iClientToAPI(params);
+
+        for (const k in data) {
+            if (!INTENT_ALLOWED_PATCH_FIELDS.includes(k)) {
+                delete data[k];
+            }
+        }
+
+        await client.patch(`/aksopay/payment_intents/${id}`, data);
+        const existing = store.get([PAYMENT_INTENTS, id]);
+        store.insert([PAYMENT_INTENTS, id], deepMerge(existing, params));
     },
     cancelIntent: async ({ id }) => {
         const client = await asyncClient;
