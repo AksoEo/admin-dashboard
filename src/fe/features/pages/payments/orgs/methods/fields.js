@@ -22,7 +22,7 @@ export const FIELDS = {
                     </Segmented>
                 );
             }
-            if (value === 'stripe') return <span class="payment-method-type is-stripe"><StripeIcon /></span>;
+            if (value === 'stripe') return <span class="payment-method-type is-stripe"><StripeIcon />™</span>;
             return <span class="payment-method-type">{locale.fields.types[value]}</span>;
         },
         weight: 0.5,
