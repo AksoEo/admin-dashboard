@@ -833,7 +833,7 @@ export const paymentIntents = {
             button: 'Krei disputon',
         },
         markRefunded: {
-            title: 'Indikado de redonita mono',
+            title: 'Indiki pagon redonita',
             description: 'Ĉu vi certas, ke vi volas indiki, ke mono estis redonita el tiu ĉi pago? Bv. aldoni detalojn pri la redonita mono en la internaj notoj.',
             amount: 'Redonita monkvanto',
             button: 'Indiki',
@@ -843,12 +843,12 @@ export const paymentIntents = {
             upperBound: 'Ne eblas redoni pli ol estis pagita',
         },
         markSucceeded: {
-            title: 'Indikado de ricevita mono',
+            title: 'Indiki pagon ricevita',
             description: 'Ĉu vi certas, ke la mono estis ricevita? Bv. aldoni la eksteran identigilon de la pago se eblas.',
             button: 'Indiki',
         },
         submit: {
-            title: 'Indikado de sendita mono',
+            title: 'Indiki monon sendita',
             description: 'Ĉu vi certas, ke la mono estis sendita (eĉ se ankoraŭ ne ricevita)?',
             button: 'Indiki',
         },
