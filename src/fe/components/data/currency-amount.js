@@ -1,7 +1,9 @@
 import { h } from 'preact';
-import { useRef, useEffect } from 'preact/compat';
-import { stdlib } from '@tejo/akso-script';
+import { useState } from 'preact/compat';
+import { stdlib, currencies } from '@tejo/akso-script';
 import { TextField } from '@cpsdqs/yamdl';
+import { Validator } from '../form';
+import { data as locale } from '../../locale';
 
 /// - value: amount in smallest currecy unit
 /// - currency: currency id
@@ -10,43 +12,48 @@ function CurrencyAmount ({ value, currency }) {
 }
 
 /// - currency: currency id
-function CurrencyEditor ({ value, onChange, currency, max, ...extra }) {
-    const node = useRef(null);
-    const formattedValue = stdlib.currency_fmt.apply(null, [currency || '?', value | 0])
-        .replace('\u202f', '\u00a0');
-    const caretPos = formattedValue.split('').findIndex(x => !x.match(/[0-9.,\u00a0]/)) - 1;
-
-    const setCaret = () => {
-        if (!node.current) return;
-        if (document.activeElement !== node.current.inputNode) return;
-        node.current.inputNode.setSelectionRange(caretPos, caretPos);
-    };
-
-    useEffect(() => {
-        setCaret();
+function CurrencyEditor ({ value, onChange, currency, ...extra }) {
+    const fractValue = (value | 0) / currencies[currency];
+    const minimumFractionDigits = Math.log10(currencies[currency]);
+    const formattedValue = fractValue.toLocaleString('fr-FR', {
+        minimumFractionDigits,
     });
 
-    const maxValue = max || 2147483647;
+    const [disp, setDisp] = useState(formattedValue);
+    const [error, setError] = useState(false);
+
+    const onInputChange = e => {
+        setDisp(e.target.value);
+
+        const v = parseFloat(e.target.value.replace(/,/g, '.'));
+        if (Number.isNaN(v)) {
+            setError(true);
+        } else {
+            setError(false);
+            onChange(v * currencies[currency]);
+        }
+    };
+    const canonicalize = () => {
+        setDisp(formattedValue);
+    };
 
     return (
-        <TextField
+        <Validator
+            component={TextField}
+            validate={() => {
+                if (error) throw { error: locale.invalidCurrencyAmount };
+            }}
             {...extra}
-            value={formattedValue}
-            ref={node}
-            style={{ textAlign: 'right' }}
-            onFocus={setCaret}
-            onClick={setCaret}
+            value={disp}
+            onChange={onInputChange}
+            onBlur={canonicalize}
             onKeyDown={e => {
-                if (e.key !== 'Tab' && !e.ctrlKey && !e.metaKey) e.preventDefault();
-                else setCaret();
-                if (e.key === 'Backspace') {
-                    const v = value.toString().split('');
-                    v.pop();
-                    onChange(Math.min(maxValue, +v.join('')));
-                } else if (e.key.match(/^[0-9]$/)) {
-                    onChange(Math.min(maxValue, +(value.toString() + e.key)));
-                }
-            }} />
+                if (e.ctrlKey || e.metaKey) return;
+                if (e.key.length == 1 && !e.key.match(/[-\d,.]/)) e.preventDefault();
+            }}
+            inputMode="numeric"
+            style={{ textAlign: 'right' }}
+            trailing={currency} />
     );
 }
 

@@ -260,6 +260,7 @@ export default {
     cancelIntent ({ open, task }) {
         return (
             <TaskDialog
+                class="payments-task-intent-action"
                 open={open}
                 onClose={() => task.drop()}
                 title={intentLocale.actions.cancel.title}
@@ -272,6 +273,7 @@ export default {
     markIntentDisputed ({ open, task }) {
         return (
             <TaskDialog
+                class="payments-task-intent-action"
                 open={open}
                 onClose={() => task.drop()}
                 title={intentLocale.actions.markDisputed.title}
@@ -284,6 +286,7 @@ export default {
     markIntentRefunded ({ open, task }) {
         return (
             <TaskDialog
+                class="payments-task-intent-action"
                 open={open}
                 onClose={() => task.drop()}
                 title={intentLocale.actions.markRefunded.title}
@@ -293,12 +296,19 @@ export default {
                     {intentLocale.actions.markRefunded.description}
                 </div>
 
-                <Field>
-                    <currencyAmount.editor
+                <Field class="task-refund-amount-container">
+                    <Validator
+                        component={currencyAmount.editor}
+                        outline
+                        validate={value => {
+                            if (value < 0) throw { error: intentLocale.actions.markRefunded.lowerBound };
+                            if (value > task.options._max) {
+                                throw { error: intentLocale.actions.markRefunded.upperBound };
+                            }
+                        }}
                         label={intentLocale.actions.markRefunded.amount}
                         value={task.parameters.amount}
                         onChange={amount => task.update({ amount })}
-                        max={task.options._max}
                         currency={task.options._currency} />
                 </Field>
             </TaskDialog>
@@ -307,6 +317,7 @@ export default {
     markIntentSucceeded ({ open, task }) {
         return (
             <TaskDialog
+                class="payments-task-intent-action"
                 open={open}
                 onClose={() => task.drop()}
                 title={intentLocale.actions.markSucceeded.title}
@@ -319,6 +330,7 @@ export default {
     submitIntent ({ open, task }) {
         return (
             <TaskDialog
+                class="payments-task-intent-action"
                 open={open}
                 onClose={() => task.drop()}
                 title={intentLocale.actions.submit.title}

@@ -207,9 +207,9 @@ export class Validator extends Component {
     }
 }
 
-export function Field ({ children }) {
+export function Field ({ class: className, children, ...extra }) {
     return (
-        <div class="form-field-container">
+        <div class={'form-field-container ' + (className || '')} {...extra}>
             {children}
         </div>
     );
