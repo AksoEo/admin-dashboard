@@ -8,7 +8,7 @@ export const timestampFormat = 'LLL [UTC]';
 // for dates that are today
 export const timestampFormatToday = '[hodiaŭ] LT [UTC]';
 
-export const insecureContext = '[[page is in an insecure context!]]';
+export const insecureContext = 'La paĝo ne estas sekura (http)!';
 
 export const meta = {
     copyright: `© ${copyrightYear}`,
@@ -46,7 +46,7 @@ export const data = {
         sortingCode: 'Ordigkodo',
     },
     address: {
-        invalidPostalCode: '[[invalid postal code]]',
+        invalidPostalCode: 'Nevalida poŝtkodo',
     },
     ueaCode: {
         newCode: 'Seslitera UEA-kodo',
@@ -104,13 +104,13 @@ export const data = {
             button: 'Ĝisdatigi',
 
             // changes
-            added: n => `[[${n} permission${n === 1 ? '' : 's'} added]]`,
-            removed: n => `[[${n} permission${n === 1 ? '' : 's'} removed]]`,
-            mrChanged: '[[member restrictions changed]]',
+            added: n => `Aldonis ${n} permeso${n === 1 ? '' : 'j'}n`,
+            removed: n => `Forigis ${n} permeso${n === 1 ? '' : 'j'}n`,
+            mrChanged: 'Ŝanĝis membrorestriktojn',
 
             // task completion list
-            px: '[[permissions]]',
-            mr: '[[member restrictions]]',
+            px: 'Permesoj',
+            mr: 'Membrorestriktoj',
         },
     },
 };
@@ -131,10 +131,10 @@ export const errors = {
         post: ['Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.'],
     },
     'bad-request': err => `Nevalida peto: ${err}`,
-    'unauthorized': '[[unauthorized]]',
-    'forbidden': '[[forbidden]]',
-    'not-found': 'Paĝo ne estis trovita',
-    'conflict': '[[conflict]]',
+    'unauthorized': 'Mankas aŭtentiko',
+    'forbidden': 'Mankas permeso',
+    'not-found': 'La paĝo ne estis trovita',
+    'conflict': 'Okazis interna konflikto, bonvolu reprovi',
     'internal-server-error': 'Okazis interna eraro',
 };
 
@@ -208,7 +208,7 @@ export const app = {
     genericErrorTitle: 'Eraro',
     genericError: 'Okazis neatendita eraro. Bonvolu poste reprovi. Se tiu ĉi eraro okazadas indus kontakti administranton.',
     genericErrorReload: 'Reŝarĝi la paĝon',
-    genericErrorViewDetails: '[[view technical details]]',
+    genericErrorViewDetails: 'Montri teĥnikajn detalojn',
 
     notFound: 'Ni ne sukcesis trovi tiun ĉi paĝon. Eventaule kontrolu ĉu vi mistajpis adreson.',
     forbidden: 'Vi ne rajtas aliri tiun ĉi paĝon.',
@@ -219,7 +219,7 @@ export const app = {
 
 export const pages = {
     home: 'Hejmo',
-    ch: '[[membroj?]]',
+    ch: 'Membroj',
     codeholders: 'Membroj',
     statistics: 'Statistiko',
     membership: 'Membreco',
@@ -244,7 +244,7 @@ export const pages = {
 
 export const index = {
     tasks: {
-        title: '[[tasks]]',
+        title: 'Taskoj',
     },
 };
 
@@ -359,7 +359,7 @@ export const codeholders = {
             roles: 'Roloj',
             isActiveMember: 'Aktiva membro iam en',
             deathdate: 'Mortjaro',
-            codeList: '[[uea code $in filter]]',
+            codeList: 'Listo de UEA-kodoj',
         },
         countryFilter: {
             all: 'ne gravas',
@@ -403,7 +403,7 @@ export const codeholders = {
         },
         role: {
             pickSome: 'Elekti rolojn',
-            activeAtTime: '[[active on]] ', // comes before the date picker
+            activeAtTime: 'aktiva je', // comes before the date picker
         },
         types: {
             all: 'ne gravas',
@@ -411,8 +411,8 @@ export const codeholders = {
             org: 'organizo',
         },
         codeList: {
-            pickCodes: '[[elekti kodojn]]',
-            description: '[[insert codes in the text field below; one per line]]',
+            pickCodes: 'Elekti kodojn',
+            description: 'Enmetu UEA-kodojn en la ĉi-suban liston; po unu en unu vico.',
         },
     },
     globalFilterTitle: 'La rezultoj estas filtritaj',
@@ -567,7 +567,7 @@ export const codeholders = {
         notADate: 'Ne estas valida dato',
     },
     files: {
-        downloadToView: '[[dl 2 view]]',
+        downloadToView: 'Elŝuti',
     },
     // TODO: move these in files
     filesButton: n => !n ? 'dosieroj' : n === 1 ? '1 dosiero' : `${n} dosieroj`,
@@ -669,226 +669,226 @@ export const codeholders = {
 };
 
 export const paymentOrgs = {
-    title: '[[paymentorgs]]',
-    detailTitle: '[[paymentorg]]',
+    title: 'Pagorganizoj',
+    detailTitle: 'Pagorganizo',
     fields: {
-        org: '[[org]]',
-        name: '[[name]]',
-        description: '[[desc]]',
+        org: 'Organizo',
+        name: 'Nomo',
+        description: 'Priskribo',
     },
     detailTabs: {
-        org: '[[details]]',
-        addons: '[[addons]]',
-        methods: '[[methods]]',
+        org: 'Pri la pagorganizo',
+        addons: 'Donacebloj',
+        methods: 'Pagmetodoj',
     },
     create: {
         menuItem: 'Krei',
-        title: '[[create org]]',
+        title: 'Krei pagorganizon',
         button: 'Krei',
         orgs: {
             tejo: 'TEJO',
             uea: 'UEA',
         },
     },
-    createAddon: '[[create addon]]',
-    createMethod: '[[create method]]',
+    createAddon: 'Krei donaceblon',
+    createMethod: 'Krei pagmetodon',
     update: {
         menuItem: 'Redakti',
-        title: '[[update]]',
-        button: '[[update]]',
+        title: 'Ĝisdatigi',
+        button: 'Konservi',
         nameRequired: 'Necesas nomo',
     },
     delete: {
         menuItem: 'Forigi',
-        title: '[[delete org]]',
-        description: '[[are you sure you wanna delete this paymentorg]]',
+        title: 'Forigi pagorganizon',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi pagorganizon?',
         button: 'Forigi',
     },
 };
 export const paymentAddons = {
-    detailTitle: '[[addon]]',
+    detailTitle: 'Donacebloj',
     fields: {
         name: 'Nomo',
         description: 'Priskribo',
     },
     create: {
-        title: '[[create addon]]',
+        title: 'Krei donaceblon',
         button: 'Krei',
     },
     update: {
         menuItem: 'Redakti',
-        title: '[[update]]',
-        button: '[[update]]',
+        title: 'Ĝisdatigi',
+        button: 'Konservi',
         nameRequired: 'Necesas nomo',
     },
     delete: {
         menuItem: 'Forigi',
-        title: '[[delete addon]]',
-        description: '[[are you sure you wanna delete this addon]]',
+        title: 'Forigi donaceblon',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi donaceblon?',
         button: 'Forigi',
     },
 };
 export const paymentMethods = {
-    detailTitle: '[[method]]',
+    detailTitle: 'Pagmetodo',
     fields: {
-        type: 'Speco',
-        stripeMethods: '[[stripe methods]]',
+        type: 'Pagmaniero',
+        stripeMethods: 'Stripe-metodoj',
         name: 'Nomo',
-        internalDescription: '[[idesc]]',
-        description: 'Priskribo',
-        currencies: '[[currencies]]',
-        paymentValidity: '[[payment validity]]',
-        isRecommended: '[[isrec]]',
-        stripeSecretKey: '[[ssk]]',
-        stripePublishableKey: '[[spk]]',
+        internalDescription: 'Internaj notoj',
+        description: 'Publika priskribo',
+        currencies: 'Valutoj',
+        paymentValidity: 'Valideco de neplenumitaj pagoj',
+        isRecommended: 'Rekomendita',
+        stripeSecretKey: 'Sekreta ŝlosilo de Stripe',
+        stripePublishableKey: 'Publika ŝlosilo de Stripe',
 
         types: {
-            manual: '[[manual]]',
+            manual: 'Permana',
             stripe: 'Stripe™',
         },
         stripeMethodValues: {
-            card: '[[card]]',
+            card: 'Karto',
         },
-        noCurrenciesSelected: '[[none selected]]',
+        noCurrenciesSelected: 'Neniu valuto estis elektita',
         paymentValidityTypes: {
-            limited: '[[valid for…]]',
-            forever: '[[valid forever]]',
+            limited: 'Validas dum ...',
+            forever: 'Neniam ekvalidiĝas',
         },
     },
     create: {
-        title: '[[create method]]',
+        title: 'Krei pagmetodon',
         button: 'Krei',
     },
     update: {
         menuItem: 'Redakti',
-        title: '[[update]]',
-        button: '[[update]]',
+        title: 'Ĝisdatigi',
+        button: 'Konservi',
         nameRequired: 'Necesas nomo',
     },
     delete: {
         menuItem: 'Forigi',
-        title: '[[delete method]]',
-        description: '[[are you sure you wanna delete this method]]',
+        title: 'Forigi pagmetodon',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi pagmetodon?',
         button: 'Forigi',
     },
 };
 export const paymentIntents = {
-    openInStripePrefix: '[[open in]]',
+    openInStripePrefix: 'Malfermi ĉe',
     stripeIntentLink: id => `https://dashboard.stripe.com/test/payments/${id}`,
 
-    title: '[[paymentintents]]',
-    detailTitle: '[[intent]]',
+    title: 'Pagoj',
+    detailTitle: 'Pago',
     fields: {
-        customer: '[[customer]]',
-        customerName: '[[name]]',
-        customerEmail: '[[email]]',
-        method: '[[method]]',
-        org: '[[org]]',
-        currency: '[[currency]]',
-        status: '[[status]]',
-        events: '[[events]]',
-        timeCreated: '[[timeCreated]]',
-        statusTime: '[[statusTime]]',
-        internalNotes: '[[internalNotes]]',
-        customerNotes: '[[customerNotes]]',
-        foreignId: '[[foreignId]]',
-        stripePaymentIntentId: '[[stripePaymentIntentId]]',
-        stripeClientSecret: '[[stripeClientSecret]]',
-        purposes: '[[purposes]]',
-        totalAmount: '[[totalAmount]]',
-        amountRefunded: '[[amountRefunded]]',
+        customer: 'Kliento',
+        customerName: 'Nomo',
+        customerEmail: 'Retpoŝtadreso',
+        method: 'Pagmetodo',
+        org: 'Organizo',
+        currency: 'Valuto',
+        status: 'Stato',
+        events: 'Okazintaĵoj',
+        timeCreated: 'Kreiĝhoro',
+        statusTime: 'Horo de lasta okazintaĵo',
+        internalNotes: 'Internaj notoj',
+        customerNotes: 'Notoj de la kliento',
+        foreignId: 'Eksterna identigilo',
+        stripePaymentIntentId: 'Identigilo ĉe Stripe (PaymentIntent ID)',
+        stripeClientSecret: 'Sekreta klientŝlosilo ĉe Stripe (Client Secret)',
+        purposes: 'Pagceloj',
+        totalAmount: 'Sumo',
+        amountRefunded: 'Sumo redonita',
 
         statuses: {
-            created: '[[created]]', // not a real status; used in event log
-            pending: '[[pending]]',
-            processing: '[[processing]]',
-            submitted: '[[submitted]]',
-            canceled: '[[canceled]]',
-            succeeded: '[[succeeded]]',
-            abandoned: '[[abandoned]]',
-            disputed: '[[disputed]]',
-            refunded: '[[refunded]]',
-            willBeAbandoned: '[[will be abandoned]]', // used to indicate future abandonment
+            created: 'Kreita', // not a real status; used in event log
+            pending: 'Ankoraŭ ne plenumita',
+            processing: 'Traktata de sistemo',
+            submitted: 'Pago sendita de kliento',
+            canceled: 'Nuligita',
+            succeeded: 'Fintraktita',
+            abandoned: 'Eksvalidiĝis',
+            disputed: 'Disputita',
+            refunded: 'Mono redonita',
+            willBeAbandoned: 'Eksvalidiĝos', // used to indicate future abandonment
         },
         purposeTypes: {
-            trigger: '[[trigger]]',
-            manual: '[[manual]]',
-            addon: '[[addon]]',
+            trigger: 'AKSO-ago',
+            manual: 'Permana',
+            addon: 'Donaco',
         },
     },
-    detailTo: '[[to]]', // X currency >to< org
-    detailViewCodeholder: '[[view member]]',
-    detailNoCodeholder: '[[no linked member]]',
-    detailRefundSuffix: '[[refunded]]', // goes after the refunded amount
+    detailTo: 'al', // X currency >to< org
+    detailViewCodeholder: 'Montri membron',
+    detailNoCodeholder: 'Neniu ligita membro',
+    detailRefundSuffix: 'redonita', // goes after the refunded amount
     actions: {
         cancel: {
-            title: '[[cancel]]',
-            description: '[[cancel this intent?]]',
-            button: '[[cancel]]',
+            title: 'Nuligi',
+            description: 'Ĉu vi certas, ke vi volas nuligi tiun ĉi pagon?',
+            button: 'Nuligi',
         },
         markDisputed: {
-            title: '[[mark disputed]]',
-            description: '[[mark this intent disputed?]]',
-            button: '[[mark]]',
+            title: 'Krei disputon',
+            description: 'Ĉu vi certas, ke vi volas krei disputon pri tiu ĉi pago? Bv. aldoni detalojn pri la disputo en la internaj notoj.',
+            button: 'Krei disputon',
         },
         markRefunded: {
-            title: '[[mark refunded]]',
-            description: '[[mark this intent refunded?]]',
-            amount: '[[refund amount]]',
-            button: '[[mark]]',
+            title: 'Indikado de redonita mono',
+            description: 'Ĉu vi certas, ke vi volas indiki, ke mono estis redonita el tiu ĉi pago? Bv. aldoni detalojn pri la redonita mono en la internaj notoj.',
+            amount: 'Redonita monkvanto',
+            button: 'Indiki',
         },
         markSucceeded: {
-            title: '[[mark succeeded]]',
-            description: '[[mark this intent succeeded?]]',
-            button: '[[mark]]',
+            title: 'Indikado de ricevita mono',
+            description: 'Ĉu vi certas, ke la mono estis ricevita? Bv. aldoni la eksteran identigilon de la pago se eblas.',
+            button: 'Indiki',
         },
         submit: {
-            title: '[[submit]]',
-            description: '[[submit this intent?]]',
-            button: '[[submit]]',
+            title: 'Indikado de sendita mono',
+            description: 'Ĉu vi certas, ke la mono estis sendita (eĉ se ankoraŭ ne ricevita)?',
+            button: 'Indiki',
         },
     },
     search: {
         fields: {
-            customerEmail: '[[customeremail]]',
-            customerName: '[[customername]]',
-            internalNotes: '[[internalnotes]]',
-            customerNotes: '[[customernotes]]',
+            customerEmail: 'Retpoŝtadreso de la kliento',
+            customerName: 'Nomo de la kliento',
+            internalNotes: 'Internaj notoj',
+            customerNotes: 'Notoj de la kliento',
         },
         placeholders: {
-            customerEmail: '[[e.g. meow@akso.org]]',
-            customerName: '[[e.g. dr meowington]]',
-            internalNotes: '[[search your(?) notes]]',
-            customerNotes: '[[search customer notes]]',
+            customerEmail: 'ekz. zamenhof@akso.org',
+            customerName: 'ekz. Zamenhof',
+            internalNotes: 'Traserĉi internajn notojn',
+            customerNotes: 'Traserĉi notojn de klientoj',
         },
     },
     create: {
-        menuItem: '[[create]]',
+        menuItem: 'Krei',
     },
     update: {
         menuItem: 'Redakti',
-        title: '[[update]]',
-        button: '[[update]]',
+        title: 'Ĝisdatigi',
+        button: 'Konservi',
     },
 };
 
 export const currencies = {
-    USD: '[[US Dollar]] (USD)',
-    AUD: '[[Australian Dollar]] (AUD)',
-    CAD: '[[Canadian Dollar]] (CAD)',
-    CHF: '[[Swiss Franc]] (CHF)',
-    DKK: '[[Danish Krone]] (DKK)',
-    EUR: '[[Euro]] (EUR)',
-    GBP: '[[Great British Pound]] (GBP)',
-    HKD: '[[Hong Kong Dollar]] (HKD)',
-    JPY: '[[Japanese Yen]] (JPY)',
-    MXN: '[[Mexican Peso]] (MXN)',
-    MYR: '[[Malaysian Ringgit]] (MYR)',
-    NOK: '[[Norwegian Krone]] (NOK)',
-    NZD: '[[New Zealand Dollar]] (NZD)',
-    PLN: '[[Polish Zloty]] (PLN)',
-    SEK: '[[Swedish Krona]] (SEK)',
-    SGD: '[[Singapore Dollar]] (SGD)',
+    USD: 'Usonaj Dolaroj (USD)',
+    AUD: 'Aŭstraliaj Dolaroj (AUD)',
+    CAD: 'Kanadaj Dolaroj (CAD)',
+    CHF: 'Svisaj Frankoj (CHF)',
+    DKK: 'Danaj Kronoj (DKK)',
+    EUR: 'Eŭroj (EUR)',
+    GBP: 'Britaj Pundoj (GBP)',
+    HKD: 'Honkonga Dolaro (HKD)',
+    JPY: 'Japana eno (JPY)',
+    MXN: 'Meksika peso (MXN)',
+    MYR: 'Malajzia ringito (MYR)',
+    NOK: 'Norvega krono (NOK)',
+    NZD: 'Nov-Zelanda dolaro (NZD)',
+    PLN: 'Polaj zlotoj (PLN)',
+    SEK: 'Svedaj kronoj (SEK)',
+    SGD: 'Singapuraj dolaroj (SGD)',
 };
 
 export const adminGroups = {
@@ -1109,7 +1109,7 @@ export const lists = {
         menuItem: 'Krei',
         title: 'Krei liston',
         button: 'Krei',
-        warning: '[[lists are public, gdpr etc etc]]',
+        warning: 'Notu: Listoj kaj ĝiaj apartenantaj membroj estas publikaj. Tial nur kreu listojn de membroj, kies datumoj laŭ ĜDPR rajtas esti publikaj. Se vi havas ajnan dubon pri tio ĉi, ne kreu liston sen antaŭkonsulto.',
     },
     update: {
         menuItem: 'Redakti',
