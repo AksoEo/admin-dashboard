@@ -254,18 +254,24 @@ class LoadingIndicator extends Component {
     }
 }
 
-const sessionRoot = document.createElement('div');
-sessionRoot.id = 'session-root';
-sessionRoot.className = 'root-container';
-document.body.appendChild(sessionRoot);
-if (window.isSecureContext) {
-    render(<Session />, sessionRoot);
-} else {
-    console.error('insecure context!'); // eslint-disable-line no-console
-    sessionRoot.style.padding = '24px';
-    sessionRoot.style.textAlign = 'center';
-    sessionRoot.textContent = insecureContext;
-}
+(async () => {
+    if (!('PointerEvent' in window)) {
+        await import('@wessberg/pointer-events');
+    }
+
+    const sessionRoot = document.createElement('div');
+    sessionRoot.id = 'session-root';
+    sessionRoot.className = 'root-container';
+    document.body.appendChild(sessionRoot);
+    if (window.isSecureContext) {
+        render(<Session />, sessionRoot);
+    } else {
+        console.error('insecure context!'); // eslint-disable-line no-console
+        sessionRoot.style.padding = '24px';
+        sessionRoot.style.textAlign = 'center';
+        sessionRoot.textContent = insecureContext;
+    }
+})();
 
 // don’t show “add to homescreen” prompt
 window.addEventListener('beforeinstallprompt', e => e.preventDefault());

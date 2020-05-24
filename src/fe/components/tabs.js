@@ -83,15 +83,43 @@ export default class Tabs extends PureComponent {
     componentDidMount () {
         this.scrollX.target = null;
         this.updateLineTarget();
+        this.scrollTabIntoView();
         globalAnimator.register(this);
     }
 
     componentDidUpdate (prevProps) {
-        if (this.props.value !== prevProps.value) this.updateLineTarget();
+        if (this.props.value !== prevProps.value) {
+            this.updateLineTarget();
+            this.scrollTabIntoView();
+        }
     }
 
     componentWillUnmount () {
         globalAnimator.deregister(this);
+    }
+
+    scrollTabIntoView () {
+        if (!this.node) return;
+
+        let tab;
+        let i = 0;
+        for (const id in this.props.tabs) {
+            if (this.props.value === id) {
+                tab = this.tabRefs[i];
+                break;
+            }
+            i++;
+        }
+
+        if (tab) {
+            const { scrollMin, scrollMax } = this.getScrollBounds();
+            const targetX = Math.max(scrollMin,
+                Math.min(tab.node.offsetLeft + (tab.node.offsetWidth - this.node.offsetWidth) / 2,
+                    scrollMax));
+
+            this.scrollX.target = targetX;
+            globalAnimator.register(this);
+        }
     }
 
     getScrollBounds () {
@@ -111,14 +139,12 @@ export default class Tabs extends PureComponent {
         // make sure scroll stays in bounds
         const scrollIsOOB = this.scrollX.value < scrollMin || this.scrollX.value > scrollMax;
         if (scrollIsOOB) {
-            this.scrollX.setPeriod(0.5);
-
             if (this.scrollX.value <= scrollMin) this.scrollX.target = scrollMin;
             else this.scrollX.target = scrollMax;
-        } else {
-            this.scrollX.setPeriod(3);
-            this.scrollX.target = null;
         }
+
+        if (!this.scrollX.wantsUpdate()) this.scrollX.target = null;
+        this.scrollX.setPeriod(this.scrollX.target === null ? 3 : 0.5);
 
         // dequeue buffered targets for lineLeft/Right
         for (const item of this.bufferedLeft) {
@@ -169,6 +195,7 @@ export default class Tabs extends PureComponent {
 
         window.addEventListener('pointermove', this.#onPointerMove);
         window.addEventListener('pointerup', this.#onPointerUp);
+        window.addEventListener('pointercancel', this.#onPointerUp);
 
         globalAnimator.register(this);
     };
@@ -205,6 +232,7 @@ export default class Tabs extends PureComponent {
         this.scrollX.locked = false;
         window.removeEventListener('pointermove', this.#onPointerMove);
         window.removeEventListener('pointerup', this.#onPointerUp);
+        window.removeEventListener('pointercancel', this.#onPointerUp);
     };
 
     render ({ value, disabled, onChange, tabs }) {
@@ -269,23 +297,27 @@ class Tab extends PureComponent {
     #ripple;
     #startPos = null;
     #isDragging = false;
+    #capturedPointer = null;
     #onPointerDown = e => {
         if (e.target !== this.node) return;
         this.#startPos = [e.clientX, e.clientY];
         this.#isDragging = false;
-        this.#ripple.onPointerDown(e.clientX, e.clientY);
-
-        window.addEventListener('pointermove', this.#onPointerMove);
-        window.addEventListener('pointerup', this.#onPointerUp);
+        this.#ripple.onPointerDown(e);
+        this.node.setPointerCapture(e.pointerId);
+        this.#capturedPointer = e.pointerId;
+        e.preventDefault();
+        e.stopPropagation();
     };
     #onPointerMove = e => {
         if (!this.#startPos) return; // pointer not down
         if (this.#isDragging) return;
+        e.preventDefault();
+        e.stopPropagation();
         const pos = [e.clientX, e.clientY];
         const dist = Math.hypot(pos[0] - this.#startPos[0], pos[1] - this.#startPos[1]);
 
         if (dist > 10) {
-            this.#ripple.onPointerUp();
+            this.#ripple.onUp(); // fake cancel
             this.props.onStartDragging(e);
             this.#isDragging = true;
         }
@@ -296,8 +328,17 @@ class Tab extends PureComponent {
             this.props.onSelect();
         }
         this.#startPos = null;
-        window.removeEventListener('pointermove', this.#onPointerMove);
-        window.removeEventListener('pointerup', this.#onPointerUp);
+        if (this.#capturedPointer) {
+            this.node.releasePointerCapture(this.#capturedPointer);
+            this.#capturedPointer = null;
+        }
+    };
+    #onPointerCancel = () => {
+        this.#startPos = null;
+        if (this.#capturedPointer) {
+            this.node.releasePointerCapture(this.#capturedPointer);
+            this.#capturedPointer = null;
+        }
     };
 
     updateWidth () {
@@ -317,7 +358,10 @@ class Tab extends PureComponent {
                 ref={node => this.node = node}
                 disabled={disabled}
                 class={'p-tab' + (isActive ? ' p-active' : '') + (hasLine ? ' p-line' : '')}
-                onPointerDown={this.#onPointerDown}>
+                onPointerDown={this.#onPointerDown}
+                onPointerMove={this.#onPointerMove}
+                onPointerUp={this.#onPointerUp}
+                onPointerCancel={this.#onPointerCancel}>
                 <Ripple ref={ripple => this.#ripple = ripple} />
                 {children}
             </button>
