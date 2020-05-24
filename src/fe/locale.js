@@ -5,6 +5,8 @@ const thisYear = new Date(config.buildTime).getUTCFullYear();
 const copyrightYear = `${startYear}–${thisYear}`;
 
 export const timestampFormat = 'LLL [UTC]';
+// for dates that are today
+export const timestampFormatToday = '[hodiaŭ] LT [UTC]';
 
 export const insecureContext = '[[page is in an insecure context!]]';
 
@@ -84,6 +86,12 @@ export const data = {
     },
     weekdays: 'DLMMJVS',
     weekStart: 1, // Monday
+    timespanUnits: {
+        d: d => d === 1 ? '1 tago' : `${d} tagoj`,
+        h: h => h === 1 ? '1 horo' : `${h} horoj`,
+        m: m => m === 1 ? '1 minuto' : `${m} minutoj`,
+        s: s => s === 1 ? '1 sekundo' : `${s} sekundoj`,
+    },
     permsEditor: {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',
         requires: 'Bezonas',
@@ -742,7 +750,6 @@ export const paymentMethods = {
             limited: '[[valid for…]]',
             forever: '[[valid forever]]',
         },
-        paymentValidityUnit: 's',
     },
     create: {
         title: '[[create method]]',

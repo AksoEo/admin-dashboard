@@ -3,6 +3,7 @@ import { currencyAmount, email, timestamp } from '../../../../components/data';
 
 export const FIELDS = {
     customer: {
+        sortable: true,
         component ({ value, inline }) {
             if (!value) return null;
             return (
@@ -22,6 +23,7 @@ export const FIELDS = {
         },
     },
     method: {
+        sortable: true,
         component ({ value }) {
             void value;
             return 'todo';
@@ -34,11 +36,13 @@ export const FIELDS = {
         },
     },
     currency: {
+        sortable: true,
         component ({ value }) {
             return value;
         },
     },
     status: {
+        sortable: true,
         component ({ value }) {
             void value;
             return 'todo';
@@ -51,15 +55,17 @@ export const FIELDS = {
         },
     },
     timeCreated: {
+        sortable: true,
         component ({ value }) {
             if (!value) return null;
-            return <timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value * 1000} maybeRelative />;
         },
     },
     statusTime: {
+        sortable: true,
         component ({ value }) {
             if (!value) return null;
-            return <timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value * 1000} maybeRelative />;
         },
     },
     internalNotes: {
@@ -87,11 +93,13 @@ export const FIELDS = {
         },
     },
     totalAmount: {
+        sortable: true,
         component ({ value, item }) {
             return <currencyAmount.renderer value={value} currency={item.currency} />;
         },
     },
     amountRefunded: {
+        sortable: true,
         component ({ value }) {
             void value;
             return 'todo';

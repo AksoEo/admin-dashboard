@@ -1,12 +1,21 @@
 import { h } from 'preact';
 import moment from 'moment';
-import { timestampFormat } from '../../locale';
+import { timestampFormat, timestampFormatToday } from '../../locale';
 import date from './date';
 import './style';
 
 /// Renders a formatted timestamp (not editable). Use prop `value`.
 function TimestampFormatter ({ value }) {
-    return value ? moment(value).format(timestampFormat) : '';
+    if (value) {
+        const m = moment(value).utc();
+        const now = moment().utc();
+        if (m.year() === now.year() && m.dayOfYear() === now.dayOfYear()) {
+            // is today
+            return m.format(timestampFormatToday);
+        }
+        return m.format(timestampFormat);
+    }
+    return null;
 }
 
 // FIXME: hacky; should be replaced with a proper datetime editor

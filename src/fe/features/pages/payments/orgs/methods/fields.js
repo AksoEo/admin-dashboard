@@ -139,14 +139,10 @@ export const FIELDS = {
                                 else onChange(null);
                             }} />
                         {typeof value === 'number' ? (
-                            <TextField
-                                type="number"
-                                min="0"
-                                step="1"
-                                max="2147483647"
-                                value={value.toString()}
-                                onChange={e => onChange(+e.target.value || 0)}
-                                trailing={locale.fields.paymentValidityUnit} />
+                            <timespan.editor
+                                max={2147483647}
+                                value={value}
+                                onChange={value => onChange(value)} />
                         ) : null}
                     </div>
                 );
