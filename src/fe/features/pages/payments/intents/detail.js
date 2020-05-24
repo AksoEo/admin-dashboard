@@ -258,6 +258,45 @@ function Purpose ({ purpose, item }) {
     );
 }
 
+const ACTIONS = {
+    cancel: {
+        state: 'canceled',
+        enabled: (t, s) => s === 'pending' || s === 'submitted' || (t === 'manual' && s === 'disputed'),
+        task: id => ['payments/cancelIntent', { id }],
+    },
+    markDisputed: {
+        state: 'disputed',
+        enabled: (t, s) => t === 'manual' && (s === 'submitted' || s === 'succeeded'),
+        manualOnly: true,
+        task: id => ['payments/markIntentDisputed', { id }],
+    },
+    submit: {
+        state: 'submitted',
+        enabled: (t, s) => t === 'manual' && s === 'pending',
+        manualOnly: true,
+        task: id => ['payments/submitIntent', { id }],
+    },
+    markSucceeded: {
+        state: 'succeeded',
+        enabled: (t, s) => t === 'manual' && s === 'submitted',
+        manualOnly: true,
+        task: id => ['payments/markIntentSucceeded', { id }],
+    },
+    markRefunded: {
+        state: 'refunded',
+        manualOnly: true,
+        enabled: (t, s) => t === 'manual'
+            && ['pending', 'submitted', 'canceled', 'succeeded', 'refunded', 'disputed'].includes(s),
+        task: (id, item) => ['payments/markIntentRefunded', {
+            id,
+            _currency: item.currency,
+            _max: item.totalAmount,
+        }, {
+            amount: item.amountRefunded ? item.amountRefunded : item.totalAmount,
+        }],
+    },
+};
+
 function IntentActions ({ item }) {
     return (
         <coreContext.Consumer>{core => {
@@ -267,48 +306,44 @@ function IntentActions ({ item }) {
             const t = item.method && item.method.type;
             const s = item.status;
 
-            if (s === 'pending' || s === 'submitted' || (t === 'manual' && s === 'disputed')) {
+            for (const k in ACTIONS) {
+                const isRefund = k === 'markRefunded';
+                let enabled = ACTIONS[k].enabled(t, s);
+                let whyNot = null;
+                let whyNotBecauseStripe = false;
+                if (!enabled) {
+                    const tur = locale.transitionUnavailabilityReasons;
+                    {
+                        const turState = tur[s];
+                        if (typeof turState === 'string') whyNot = turState;
+                        else {
+                            const subState = turState[ACTIONS[k].state];
+                            if (typeof subState === 'string') whyNot = subState;
+                            else whyNot = subState[t];
+                        }
+                    }
+
+                    if (!whyNot && t === 'stripe' && ACTIONS[k].manualOnly) {
+                        whyNot = tur.stripe;
+                        whyNotBecauseStripe = true;
+                    }
+                }
+                let task = ACTIONS[k].task(id, item);
+                if (isRefund && !enabled && whyNotBecauseStripe) {
+                    // stripe
+                    enabled = true;
+                    whyNot = null;
+                    task = ['payments/_stripeRefund', { id: item.stripePaymentIntentId }];
+                }
                 actions.push(
-                    <Button key="cancel" onClick={() => core.createTask('payments/cancelIntent', { id })}>
-                        {locale.actions.cancel.title}
+                    <Button
+                        disabled={!enabled}
+                        title={whyNot}
+                        key={k}
+                        onClick={() => core.createTask(...task)}>
+                        {locale.actions[k].title}
                     </Button>
                 );
-            }
-            if (t === 'manual') {
-                if (s === 'submitted' || s === 'succeeded') {
-                    actions.push(
-                        <Button key="dispute" onClick={() => core.createTask('payments/markIntentDisputed', { id })}>
-                            {locale.actions.markDisputed.title}
-                        </Button>
-                    );
-                }
-                if (s === 'pending') {
-                    actions.push(
-                        <Button key="submit" onClick={() => core.createTask('payments/submitIntent', { id })}>
-                            {locale.actions.submit.title}
-                        </Button>
-                    );
-                }
-                if (s === 'submitted') {
-                    actions.push(
-                        <Button key="succeed" onClick={() => core.createTask('payments/markIntentSucceeded', { id })}>
-                            {locale.actions.markSucceeded.title}
-                        </Button>
-                    );
-                }
-                if (['pending', 'submitted', 'canceled', 'succeeded', 'refunded', 'disputed'].includes(s)) {
-                    actions.push(
-                        <Button key="refund" onClick={() => core.createTask('payments/markIntentRefunded', {
-                            id,
-                            _currency: item.currency,
-                            _max: item.totalAmount,
-                        }, {
-                            amount: item.amountRefunded ? item.amountRefunded : item.totalAmount,
-                        })}>
-                            {locale.actions.markRefunded.title}
-                        </Button>
-                    );
-                }
             }
 
             return (

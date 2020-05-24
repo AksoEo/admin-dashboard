@@ -314,6 +314,26 @@ export default {
             </TaskDialog>
         );
     },
+    _stripeRefund ({ open, task }) {
+        return (
+            <TaskDialog
+                class="payments-task-intent-action"
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.actions.markRefunded.stripeTitle}
+                actionLabel={intentLocale.actions.markRefunded.stripeButton}
+                run={() => {
+                    task.drop();
+                    const a = document.createElement('a');
+                    a.href = intentLocale.stripeIntentLink(task.options.id);
+                    a.rel = 'noopener noreferrer';
+                    a.target = '_blank';
+                    a.click();
+                }}>
+                {intentLocale.actions.markRefunded.stripeDescription}
+            </TaskDialog>
+        );
+    },
     markIntentSucceeded ({ open, task }) {
         return (
             <TaskDialog

@@ -838,6 +838,10 @@ export const paymentIntents = {
             amount: 'Redonita monkvanto',
             button: 'Indiki',
 
+            stripeTitle: '[[you need to do this in stripe]]',
+            stripeDescription: '[[we were too lazy to implement this in the admin fe]]',
+            stripeButton: '[[do it in stripe]]',
+
             // errors
             lowerBound: 'Ne eblas redoni negativan monkvanton',
             upperBound: 'Ne eblas redoni pli ol estis pagita',
@@ -851,6 +855,60 @@ export const paymentIntents = {
             title: 'Indiki monon sendita',
             description: 'Ĉu vi certas, ke la mono estis sendita (eĉ se ankoraŭ ne ricevita)?',
             button: 'Indiki',
+        },
+    },
+    transitionUnavailabilityReasons: {
+        stripe: '[[not available for stripe intents]]', // fallback
+
+        // current state -> new state
+        // the following table is for MANUAL methods. If something is allowed in manual but not
+        // in stripe, the stripe fallback above will be shown
+        pending: {
+            submitted: '', // allowed
+            canceled: '', // allowed
+            succeeded: '[[submit first]]',
+            disputed: '[[nope]]',
+            refunded: '', // allowed
+        },
+        processing: '[[patience]]',
+        submitted: {
+            submitted: '[[already submitted]]',
+            canceled: '', // allowed
+            succeeded: '', // allowed
+            disputed: '[[nope]]',
+            refunded: '', // allowed
+        },
+        canceled: {
+            submitted: '[[nope]]',
+            canceled: '[[already canceled]]',
+            succeeded: '[[nope]]',
+            disputed: '[[nope]]',
+            refunded: '[[nope]]',
+        },
+        abandoned: '[[nope]]',
+        succeeded: {
+            submitted: '[[nope]]',
+            canceled: '[[nope]]',
+            succeeded: '[[already succeeded]]',
+            disputed: {
+                stripe: '[[idk why]]',
+                manual: '', // allowed,
+            },
+            refunded: '[[nope]]',
+        },
+        disputed: {
+            submitted: '[[nope]]',
+            canceled: '', // allowed
+            succeeded: '[[nope]]',
+            disputed: '[[already disputed]]',
+            refunded: '', // allowed
+        },
+        refunded: {
+            submitted: '[[nope]]',
+            canceled: '[[nope]]',
+            succeeded: '[[nope]]',
+            disputed: '[[nope]]',
+            refunded: '', // allowed
         },
     },
     search: {
