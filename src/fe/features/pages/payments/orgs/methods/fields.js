@@ -3,6 +3,7 @@ import { Checkbox, TextField } from '@cpsdqs/yamdl';
 import { Validator } from '../../../../../components/form';
 import Segmented from '../../../../../components/segmented';
 import Select from '../../../../../components/select';
+import StripeIcon from '../../../../../components/stripe-icon';
 import { timespan } from '../../../../../components/data';
 import { paymentMethods as locale, currencies } from '../../../../../locale';
 
@@ -21,9 +22,10 @@ export const FIELDS = {
                     </Segmented>
                 );
             }
-            return value;
+            if (value === 'stripe') return <span class="payment-method-type is-stripe"><StripeIcon /></span>;
+            return <span class="payment-method-type">{locale.fields.types[value]}</span>;
         },
-        weight: 0.25,
+        weight: 0.5,
     },
     name: {
         slot: 'title',
