@@ -313,6 +313,59 @@
                         margin-bottom: 4px;
                     }
                 }
+
+                &.is-abandonment {
+                    .event-line-container {
+                        .event-line-a {
+                            visibility: hidden;
+                        }
+                        .event-line-b {
+                            background: none;
+                            border: 2px solid currentColor;
+                        }
+                        .event-line-c {
+                            position: relative;
+                            background: none;
+
+                            .elc-a, .elc-b, .elc-c, .elc-d, .elc-e, .elc-f {
+                                position: absolute;
+                                left: 0;
+                                right: 0;
+                                background: currentColor;
+                            }
+                            @al: 6px;
+                            @as: 3px;
+                            @bl: 2px;
+                            @bs: 3px;
+                            @cl: 1px;
+                            .elc-a {
+                                top: 0;
+                                height: @al;
+                            }
+                            .elc-b {
+                                top: @al + @as;
+                                height: @bl;
+                            }
+                            .elc-c {
+                                top: @al + @as + @bl + @bs;
+                                height: @cl;
+                            }
+                            .elc-d {
+                                bottom: @as + @bl + @bs;
+                                height: @cl;
+                            }
+                            .elc-e {
+                                bottom: @as;
+                                height: @bl;
+                            }
+                        }
+                    }
+
+                    .event-details {
+                        opacity: 0.6;
+                        padding-bottom: 24px;
+                    }
+                }
             }
         }
 

@@ -797,6 +797,7 @@ export const paymentIntents = {
             abandoned: '[[abandoned]]',
             disputed: '[[disputed]]',
             refunded: '[[refunded]]',
+            willBeAbandoned: '[[will be abandoned]]', // used to indicate future abandonment
         },
         purposeTypes: {
             trigger: '[[trigger]]',

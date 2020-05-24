@@ -506,10 +506,42 @@ function Events ({ item }) {
     }
     rawEvents.reverse();
 
+    let abandonment = null;
+    if (item.status === 'pending' && item.method && item.method.paymentValidity !== null) {
+        // calculate abandonment time
+        const statusTime = rawEvents[0].time;
+        const abandonmentTime = statusTime + item.method.paymentValidity;
+
+        abandonment = (
+            <div key="abandonment" class="intent-event is-abandonment">
+                <div class="event-line-container">
+                    <span class="event-line-a"></span>
+                    <span class="event-line-b"></span>
+                    <span class="event-line-c">
+                        <span class="elc-a"></span>
+                        <span class="elc-b"></span>
+                        <span class="elc-c"></span>
+                        <span class="elc-d"></span>
+                        <span class="elc-e"></span>
+                    </span>
+                </div>
+                <div class="event-details">
+                    <div class="event-timestamp">
+                        <timestamp.renderer value={abandonmentTime * 1000} />
+                    </div>
+                    <div class="event-title">
+                        {locale.fields.statuses.willBeAbandoned}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div class="intent-card">
+            {abandonment}
             {rawEvents.map((e, i) => {
-                const isFirst = i === 0;
+                const isFirst = !abandonment && i === 0;
                 const isLast = i === rawEvents.length - 1;
                 const className = 'intent-event' + (isFirst ? ' is-first' : '') + (isLast ? ' is-last' : '');
                 return (

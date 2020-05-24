@@ -63,7 +63,7 @@ const iClientFields = {
     method: {
         apiFields: ['paymentMethod'],
         fromAPI: intent => intent.paymentMethod,
-        toAPI: () => ({}),
+        toAPI: ({ id }) => ({ paymentMethodId: id }),
     },
     org: 'org',
     currency: 'currency',
@@ -331,7 +331,7 @@ export const tasks = {
     },
     createIntent: async (_, params) => {
         const client = await asyncClient;
-        const res = await client.post('/aksopay/payment_intents', params);
+        const res = await client.post('/aksopay/payment_intents', iClientToAPI(params));
         const id = iReadId(res.res.headers.get('x-identifier'));
         store.insert([PAYMENT_INTENTS, id], params);
         store.signal([PAYMENT_INTENTS, SIG_PAYMENT_INTENTS]);
@@ -369,12 +369,16 @@ export const tasks = {
         await client.post(`/aksopay/payment_intents/${id}/!cancel`);
         const existing = store.get([PAYMENT_INTENTS, id]);
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'canceled' }));
+        // event log should be updated
+        tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
     },
     markIntentDisputed: async ({ id }) => {
         const client = await asyncClient;
         await client.post(`/aksopay/payment_intents/${id}/!mark_disputed`);
         const existing = store.get([PAYMENT_INTENTS, id]);
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'disputed' }));
+        // event log should be updated
+        tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
     },
     markIntentRefunded: async ({ id }, { amount }) => {
         const client = await asyncClient;
@@ -386,18 +390,24 @@ export const tasks = {
             status: 'refunded',
             amountRefunded: amount,
         }));
+        // event log should be updated
+        tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
     },
     markIntentSucceeded: async ({ id }) => {
         const client = await asyncClient;
         await client.post(`/aksopay/payment_intents/${id}/!mark_succeeded`);
         const existing = store.get([PAYMENT_INTENTS, id]);
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'succeeded' }));
+        // event log should be updated
+        tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
     },
     submitIntent: async ({ id }) => {
         const client = await asyncClient;
         await client.post(`/aksopay/payment_intents/${id}/!submit`);
         const existing = store.get([PAYMENT_INTENTS, id]);
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'submitted' }));
+        // event log should be updated
+        tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
     },
 };
 export const views = {
