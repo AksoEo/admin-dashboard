@@ -833,21 +833,14 @@ export const paymentIntents = {
             button: 'Krei disputon',
         },
         markRefunded: {
-<<<<<<< HEAD
             title: 'Indikado de redonita mono',
             description: 'Ĉu vi certas, ke vi volas indiki, ke mono estis redonita el tiu ĉi pago? Bv. aldoni detalojn pri la redonita mono en la internaj notoj.',
             amount: 'Redonita monkvanto',
             button: 'Indiki',
-=======
-            title: '[[mark refunded]]',
-            description: '[[mark this intent refunded?]]',
-            amount: '[[refund amount]]',
-            button: '[[mark]]',
 
             // errors
-            lowerBound: '[[cannot refund negative amount]]',
-            upperBound: '[[cannot refund more than total]]',
->>>>>>> 52b2b337439275fe744fe2be9f8eb51f2f6a2030
+            lowerBound: 'Ne eblas redoni negativan monkvanton',
+            upperBound: 'Ne eblas redoni pli ol estis pagita',
         },
         markSucceeded: {
             title: 'Indikado de ricevita mono',
