@@ -412,7 +412,7 @@ export const codeholders = {
             org: 'organizo',
         },
         codeList: {
-            pickCodes: 'Elekti kodojn',
+            pickCodes: 'Listo de kodoj',
             description: 'Enmetu UEA-kodojn en la ĉi-suban liston; po unu en unu vico.',
         },
     },
