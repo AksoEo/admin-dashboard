@@ -8,9 +8,12 @@ import './style';
 function TimestampFormatter ({ value }) {
     if (value) {
         const m = moment(value).utc();
+        const mlt = moment(value);
         const now = moment().utc();
-        if (m.year() === now.year() && m.dayOfYear() === now.dayOfYear()) {
-            // is today
+        if (m.year() === now.year() && m.dayOfYear() === now.dayOfYear()
+            && mlt.dayOfYear() === moment().dayOfYear()) {
+            // is today in both UTC and local time
+            // we don't want to show “today” if it’s not today in local time to avoid confusion
             return m.format(timestampFormatToday);
         }
         return m.format(timestampFormat);
