@@ -101,9 +101,9 @@ export default class CodeholderPicker extends Component {
         });
     };
 
-    render ({ value, onChange }) {
+    render ({ value, onChange, limit }) {
         return (
-            <div class="codeholder-picker">
+            <div class="codeholder-picker" data-limit={limit}>
                 <div
                     class="selected-codeholders"
                     onClick={() => this.setState({ dialogOpen: true })}>
