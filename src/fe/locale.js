@@ -96,6 +96,7 @@ export const data = {
         m: 'm',
         s: 's',
     },
+    invalidCurrencyAmount: '[[invalid currency amount]]', // this will only happen very rarely
     permsEditor: {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',
         requires: 'Bezonas',
@@ -836,6 +837,10 @@ export const paymentIntents = {
             description: '[[mark this intent refunded?]]',
             amount: '[[refund amount]]',
             button: '[[mark]]',
+
+            // errors
+            lowerBound: '[[cannot refund negative amount]]',
+            upperBound: '[[cannot refund more than total]]',
         },
         markSucceeded: {
             title: '[[mark succeeded]]',
