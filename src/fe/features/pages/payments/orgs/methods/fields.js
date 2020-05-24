@@ -140,7 +140,6 @@ export const FIELDS = {
                             }} />
                         {typeof value === 'number' ? (
                             <timespan.editor
-                                max={2147483647}
                                 value={value}
                                 onChange={value => onChange(value)} />
                         ) : null}

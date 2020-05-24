@@ -87,10 +87,14 @@ export const data = {
     weekdays: 'DLMMJVS',
     weekStart: 1, // Monday
     timespanUnits: {
-        d: d => d === 1 ? '1 tago' : `${d} tagoj`,
-        h: h => h === 1 ? '1 horo' : `${h} horoj`,
-        m: m => m === 1 ? '1 minuto' : `${m} minutoj`,
-        s: s => s === 1 ? '1 sekundo' : `${s} sekundoj`,
+        days: d => d === 1 ? '1 tago' : `${d} tagoj`,
+        hours: h => h === 1 ? '1 horo' : `${h} horoj`,
+        minutes: m => m === 1 ? '1 minuto' : `${m} minutoj`,
+        seconds: s => s === 1 ? '1 sekundo' : `${s} sekundoj`,
+        d: 't',
+        h: 'h',
+        m: 'm',
+        s: 's',
     },
     permsEditor: {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',

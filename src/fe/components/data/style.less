@@ -59,6 +59,42 @@
         }
     }
 
+    &.timespan-editor {
+        display: inline-block;
+        font-size: small;
+        border: 1px solid @separator;
+        border-radius: 4px;
+
+        &:focus-within {
+            border-color: @secondary;
+        }
+
+        .te-field {
+            .te-field-input {
+                font: inherit;
+                text-align: right;
+                border: none;
+                padding: 8px 2px;
+                margin: 0;
+                background: none;
+                color: inherit;
+                max-width: 5em;
+
+                // hide spinner
+                -moz-appearance: textfield;
+                &::-webkit-inner-spin-button {
+                    display: none;
+                }
+
+                &:focus {
+                    outline: none;
+                }
+            }
+
+            margin-right: 8px;
+        }
+    }
+
     &.yelling-asterisk {
         color: @danger;
     }
