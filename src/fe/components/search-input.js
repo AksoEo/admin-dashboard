@@ -12,6 +12,10 @@ export default class SearchInputFocusable extends Component {
 
     focus (delay) {
         if (!this.#node) return;
+
+        // MINOR HACK: don’t focus on android because it will open the soft keyboard
+        if (navigator.userAgent.includes('Android')) return;
+
         this.#node.classList.remove('focus-animation');
         clearTimeout(this.#scheduledFocus);
         this.#scheduledFocus = setTimeout(() => {
