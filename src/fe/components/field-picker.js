@@ -77,7 +77,9 @@ export default class FieldPicker extends PureComponent {
 
             if (!searchResults.includes(field.id)) continue;
 
-            const onCheckboxClick = () => setImmediate(() => this.onRemoveField(index));
+            const isLastField = this.props.selected.length === 1;
+
+            const onCheckboxClick = () => !isLastField && setImmediate(() => this.onRemoveField(index));
 
             const sortingControl = this.props.sortables.includes(field.id)
                 ? (
@@ -89,7 +91,10 @@ export default class FieldPicker extends PureComponent {
 
             fields.push(
                 <div className="field-picker-field selected" key={field.id}>
-                    <Checkbox checked={true} onClick={onCheckboxClick} disabled={field.fixed} />
+                    <Checkbox
+                        checked={true}
+                        onClick={onCheckboxClick}
+                        disabled={isLastField || field.fixed} />
                     <label className="field-label" onClick={onCheckboxClick}>
                         {this.props.locale[field.id]}
                     </label>
