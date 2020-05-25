@@ -145,13 +145,14 @@ export default {
                     <TaskDialog
                         class="payment-method-task-create"
                         open={open}
+                        fullScreen={width => width < 400}
                         onClose={() => task.drop()}
                         title={methodLocale.create.title}
                         actionLabel={methodLocale.create.button}
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/aksopago/organizoj/${org}/metodoj/${id}`);
                         })}>
-                        <DynamicHeightDiv>
+                        <DynamicHeightDiv useFirstHeight>
                             {fields}
                         </DynamicHeightDiv>
                     </TaskDialog>

@@ -21,7 +21,7 @@ import {
     data as dataLocale,
     paymentMethods as methodsLocale,
 } from '../../../../locale';
-import { LinkButton } from '../../../../router';
+import { Link, LinkButton } from '../../../../router';
 import './detail.less';
 
 export default connectPerms(class IntentPage extends Page {
@@ -221,8 +221,9 @@ function DetailViewInner ({ item, editing, onItemChange }) {
 
 const PaymentOrgName = connect(({ id }) => ['payments/org', {
     id,
-}], ['id'])()(function PaymentOrgName ({ name }) {
-    return name;
+}], ['id'])()(function PaymentOrgName ({ id, org, name }) {
+    if (!org) return; // check existence with org field
+    return <Link target={`/aksopago/organizoj/${id}`}>{name}</Link>;
 });
 
 function Purpose ({ purpose, item }) {

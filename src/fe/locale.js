@@ -229,7 +229,7 @@ export const pages = {
     congresses: 'Kongresoj',
     votes: 'Voĉdonado',
     newsletters: 'Bultenoj',
-    payments: 'Pagoj',
+    payments: 'AKSOPago',
     'payment-intents': 'Pagoj',
     'payment-orgs': 'Pagorganizoj',
     administration: 'Administrado',
