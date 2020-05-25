@@ -245,14 +245,17 @@ export const tasks = {
         store.remove([PAYMENT_ORGS, org, PO_ADDONS, id]);
         store.signal([PAYMENT_ORGS, org, SIG_PO_ADDONS]);
     },
-    listMethods: async ({ org }, { offset, limit }) => {
+    listMethods: async ({ org }, { offset, limit, jsonFilter }) => {
         const client = await asyncClient;
-        const res = await client.get(`/aksopay/payment_orgs/${org}/methods`, {
+        const opts = {
             offset,
             limit,
             fields: ['id', 'type', 'name', 'internalDescription'],
             order: [['name', 'asc']],
-        });
+        };
+        if (jsonFilter) opts.filter = jsonFilter.filter;
+
+        const res = await client.get(`/aksopay/payment_orgs/${org}/methods`, opts);
         for (const item of res.body) {
             const path = [PAYMENT_ORGS, org, PO_METHODS, item.id];
             item.thumbnailKey = getThumbnailKey();

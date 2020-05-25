@@ -6,9 +6,11 @@
     border-radius: 0;
     max-width: 100%;
     padding: 8px 16px;
+    margin: 0;
     grid-template-rows: 1fr;
     justify-content: stretch;
     align-items: center;
+    box-sizing: border-box;
 
     --md-button-color: @gray-button-color;
 
@@ -40,6 +42,7 @@
 
     &.is-compact {
         display: block;
+        width: 100%;
         border-bottom: 1px solid @separator;
 
         .li-compact-title {

@@ -32,7 +32,7 @@ export default connect(props => ([props.view, {
     ...props.options,
     id: props.id,
     fields: props.selectedFields,
-    noFetch: true,
+    noFetch: !props.doFetch,
 }]))(data => ({ data }))(class ListItem extends PureComponent {
     #inTime = 0;
     #yOffset = new Spring(1, 0.5);

@@ -1,0 +1,16 @@
+.static-overview-list {
+    .list-contents {
+        overflow: hidden;
+        overflow-x: auto;
+        transition: opacity 0.3s;
+
+        .empty-label {
+            padding: 16px;
+            text-align: center;
+        }
+
+        &.is-loading {
+            opacity: 0.5;
+        }
+    }
+}

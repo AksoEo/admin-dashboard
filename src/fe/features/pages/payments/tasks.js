@@ -191,6 +191,8 @@ export default {
         fields.push(
             <Field>
                 <MethodPicker
+                    org={task.parameters.paymentOrg}
+                    onOrgChange={paymentOrg => task.update({ paymentOrg })}
                     value={method.id}
                     onChange={id => task.update({ method: { id } })} />
             </Field>
