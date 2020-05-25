@@ -5,6 +5,7 @@ import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import FieldPicker from '../../../../components/field-picker';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
@@ -34,6 +35,38 @@ export default connectPerms(class Intents extends Page {
     };
 
     static contextType = coreContext;
+
+    #searchInput = null;
+    #currentQuery = '';
+
+    decodeURLQuery () {
+        this.setState({
+            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
+        });
+        this.#currentQuery = this.props.query;
+    }
+
+    encodeURLQuery () {
+        const encoded = encodeURLQuery(this.state.parameters, {});
+        if (encoded === this.#currentQuery) return;
+        this.#currentQuery = encoded;
+        this.props.onQueryChange(encoded);
+    }
+
+    componentDidMount () {
+        this.decodeURLQuery();
+
+        this.#searchInput.focus(500);
+    }
+
+    componentDidUpdate (prevProps, prevState) {
+        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
+            this.decodeURLQuery();
+        }
+        if (prevState.parameters !== this.state.parameters) {
+            this.encodeURLQuery();
+        }
+    }
 
     render ({ perms }, { parameters, expanded, fieldPickerOpen }) {
         const actions = [];
@@ -67,7 +100,8 @@ export default connectPerms(class Intents extends Page {
                     locale={{
                         searchPlaceholders: locale.search.placeholders,
                         searchFields: locale.search.fields,
-                    }} />
+                    }}
+                    inputRef={view => this.#searchInput = view} />
                 <OverviewList
                     expanded={expanded}
                     task="payments/listIntents"

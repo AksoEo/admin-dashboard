@@ -6,6 +6,13 @@ import Select from '../../../../../components/select';
 import StripeIcon from '../../../../../components/stripe-icon';
 import { timespan } from '../../../../../components/data';
 import { paymentMethods as locale, currencies } from '../../../../../locale';
+import './fields.less';
+
+export function PaymentMethodType ({ value }) {
+    if (value === 'stripe') return <span class="payment-method-type is-stripe"><StripeIcon />™</span>;
+    else if (value === 'manual') return <span class="payment-method-type">{locale.fields.types[value]}</span>;
+    return null;
+}
 
 export const FIELDS = {
     type: {
@@ -22,8 +29,7 @@ export const FIELDS = {
                     </Segmented>
                 );
             }
-            if (value === 'stripe') return <span class="payment-method-type is-stripe"><StripeIcon />™</span>;
-            return <span class="payment-method-type">{locale.fields.types[value]}</span>;
+            return <PaymentMethodType value={value} />;
         },
         weight: 0.5,
     },

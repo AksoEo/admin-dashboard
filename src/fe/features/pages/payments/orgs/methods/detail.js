@@ -8,7 +8,6 @@ import { coreContext } from '../../../../../core/connection';
 import { paymentMethods as locale } from '../../../../../locale';
 import PaymentOrgOrg from '../org-org';
 import { FIELDS } from './fields';
-import './style';
 
 export default connectPerms(class MethodPage extends Page {
     state = {

@@ -3,7 +3,6 @@ import { PureComponent } from 'preact/compat';
 import OverviewList from '../../../../../components/overview-list';
 import { paymentMethods as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
-import './style';
 
 export default class MethodsTab extends PureComponent {
     state = {

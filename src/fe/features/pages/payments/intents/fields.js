@@ -1,5 +1,10 @@
 import { h } from 'preact';
 import { currencyAmount, email, timestamp } from '../../../../components/data';
+import TejoIcon from '../../../../components/tejo-icon';
+import UeaIcon from '../../../../components/uea-icon';
+import { paymentIntents as locale } from '../../../../locale';
+import { PaymentMethodType } from '../orgs/methods/fields';
+import './fields.less';
 
 export const FIELDS = {
     customer: {
@@ -25,14 +30,14 @@ export const FIELDS = {
     method: {
         sortable: true,
         component ({ value }) {
-            void value;
-            return 'todo';
+            if (!value) return;
+            return <PaymentMethodType value={value.type} />;
         },
     },
     org: {
         component ({ value }) {
-            void value;
-            return 'todo';
+            if (value === 'tejo') return <TejoIcon />;
+            if (value === 'uea') return <UeaIcon />;
         },
     },
     currency: {
@@ -44,14 +49,7 @@ export const FIELDS = {
     status: {
         sortable: true,
         component ({ value }) {
-            void value;
-            return 'todo';
-        },
-    },
-    events: {
-        component ({ value }) {
-            void value;
-            return 'todo';
+            return locale.fields.statuses[value];
         },
     },
     timeCreated: {
@@ -70,26 +68,18 @@ export const FIELDS = {
     },
     internalNotes: {
         component ({ value }) {
-            void value;
-            return 'todo';
+            return value;
         },
     },
     customerNotes: {
         component ({ value }) {
-            void value;
-            return 'todo';
+            // TODO: format properly
+            return value;
         },
     },
     foreignId: {
         component ({ value }) {
-            void value;
-            return 'todo';
-        },
-    },
-    purposes: {
-        component ({ value }) {
-            void value;
-            return 'todo';
+            return <code class="payment-intent-foreign-id">{value}</code>;
         },
     },
     totalAmount: {
@@ -100,9 +90,8 @@ export const FIELDS = {
     },
     amountRefunded: {
         sortable: true,
-        component ({ value }) {
-            void value;
-            return 'todo';
+        component ({ value, item }) {
+            return <currencyAmount.renderer value={value} currency={item.currency} />;
         },
     },
 };

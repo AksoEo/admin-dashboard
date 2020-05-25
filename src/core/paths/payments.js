@@ -50,11 +50,11 @@ const iClientFields = {
     },
     customer: {
         apiFields: ['codeholderId', 'customer.email', 'customer.name'],
-        fromAPI: intent => ({
+        fromAPI: intent => intent.customer ? ({
             id: intent.codeholderId,
             email: intent.customer.email,
             name: intent.customer.name,
-        }),
+        }) : undefined,
         toAPI: ({ id, email, name }) => ({
             customer: { email, name },
             codeholderId: id,

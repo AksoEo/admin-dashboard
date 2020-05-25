@@ -1,0 +1,20 @@
+@import '../../../../../prelude';
+
+.payment-method-type {
+    display: inline-block;
+    border: 1px solid @separator;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-size: small;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+
+    &.is-stripe {
+        padding-top: 0;
+        padding-bottom: 0;
+        svg {
+            vertical-align: -8px;
+            margin-right: -4px;
+        }
+    }
+}
