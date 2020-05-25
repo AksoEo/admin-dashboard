@@ -85,7 +85,29 @@ const iClientFields = {
     },
     amountRefunded: 'amountRefunded',
 };
-const iClientFilters = {};
+const iClientFilters = {
+    customerName: {
+        toAPI: value => ({ 'customer.name': { $pre: value } }),
+    },
+    customerEmail: {
+        toAPI: value => ({ 'customer.email': value }),
+    },
+    paymentOrg: {
+        toAPI: value => ({ paymentOrgId: value }),
+    },
+    paymentMethod: {
+        toAPI: value => ({ paymentMethodId: value }),
+    },
+    org: {
+        toAPI: value => ({ org: value }),
+    },
+    currencies: {
+        toAPI: value => ({ currency: { $in: value } }),
+    },
+    status: {
+        toAPI: value => ({ status: value }),
+    },
+};
 
 const iSearchFieldToTransientFields = {
     customerEmail: ['customer'],

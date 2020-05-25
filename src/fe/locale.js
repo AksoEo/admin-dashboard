@@ -779,6 +779,32 @@ export const paymentIntents = {
 
     title: 'Pagoj',
     detailTitle: 'Pago',
+    filters: {
+        customerName: 'Nomo de Kliento',
+        customerEmail: 'Retpoŝtadreso de Kliento',
+        paymentOrg: 'Pagorganizo',
+        paymentMethod: 'Pagmetodo',
+        org: 'AKSO-Organizo',
+        currencies: 'Valutoj',
+        status: 'Stato',
+
+        orgs: {
+            tejo: 'TEJO',
+            uea: 'UEA',
+            '': 'ne gravas',
+        },
+        statuses: {
+            '': 'ne gravas',
+            pending: 'ankoraŭ ne plenumita',
+            processing: 'traktata de sistemo',
+            submitted: 'pago sendita de kliento',
+            canceled: 'nuligita',
+            succeeded: 'fintraktita',
+            abandoned: 'eksvalidiĝis',
+            disputed: 'disputita',
+            refunded: 'mono redonita',
+        },
+    },
     fields: {
         customer: 'Kliento',
         customerName: 'Nomo',

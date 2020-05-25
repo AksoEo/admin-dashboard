@@ -11,6 +11,7 @@ import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { paymentIntents as locale, search as searchLocale } from '../../../../locale';
 import { FIELDS } from './fields';
+import { FILTERS } from './filters';
 
 const SEARCHABLE_FIELDS = ['customerEmail', 'customerName', 'internalNotes', 'customerNotes'];
 
@@ -20,6 +21,11 @@ export default connectPerms(class Intents extends Page {
             search: {
                 field: SEARCHABLE_FIELDS[0],
                 query: '',
+            },
+            filters: {},
+            jsonFilter: {
+                _disabled: true,
+                filter: {},
             },
             fields: [
                 { id: 'statusTime', sorting: 'desc' },
@@ -41,13 +47,13 @@ export default connectPerms(class Intents extends Page {
 
     decodeURLQuery () {
         this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
+            parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
         });
         this.#currentQuery = this.props.query;
     }
 
     encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, {});
+        const encoded = encodeURLQuery(this.state.parameters, FILTERS);
         if (encoded === this.#currentQuery) return;
         this.#currentQuery = encoded;
         this.props.onQueryChange(encoded);
@@ -97,11 +103,14 @@ export default connectPerms(class Intents extends Page {
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     searchFields={SEARCHABLE_FIELDS}
+                    filters={FILTERS}
                     locale={{
                         searchPlaceholders: locale.search.placeholders,
                         searchFields: locale.search.fields,
+                        filters: locale.filters,
                     }}
-                    inputRef={view => this.#searchInput = view} />
+                    inputRef={view => this.#searchInput = view}
+                    category="aksopay_payment_intents" />
                 <OverviewList
                     expanded={expanded}
                     task="payments/listIntents"
