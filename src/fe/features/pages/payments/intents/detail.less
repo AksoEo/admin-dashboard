@@ -205,12 +205,19 @@
         }
 
         .intent-method {
+            .method-title {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
             .method-type {
                 display: inline-block;
                 padding: 2px 4px;
                 border: 1px solid @separator;
                 border-radius: 4px;
                 margin-right: 8px;
+                flex-shrink: 0;
 
                 .stripe-icon {
                     vertical-align: middle;
@@ -229,6 +236,12 @@
             }
             .method-name {
                 font-weight: 600;
+                flex: 1;
+                line-height: 2.5em;
+            }
+            .method-link {
+                --md-button-color: @gray-button-color;
+                border: 1px solid var(--md-button-color);
             }
             .method-field {
                 margin: 4px 0;

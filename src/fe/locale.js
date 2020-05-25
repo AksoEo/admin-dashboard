@@ -821,6 +821,7 @@ export const paymentIntents = {
     detailViewCodeholder: 'Montri membron',
     detailNoCodeholder: 'Neniu ligita membro',
     detailRefundSuffix: 'redonita', // goes after the refunded amount
+    detailViewMethod: 'Montri pagmetodon',
     actions: {
         cancel: {
             title: 'Nuligi',

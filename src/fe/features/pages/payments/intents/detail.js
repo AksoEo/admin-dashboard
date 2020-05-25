@@ -524,6 +524,8 @@ function Method ({ method, item, editing, onItemChange }) {
                 </span>
 
                 <span class="method-name">{method.name}</span>
+
+                <MethodLink org={item.paymentOrg} id={method.id} />
             </div>
             <DynamicHeightDiv useFirstHeight>
                 {!editing && fields}
@@ -533,6 +535,18 @@ function Method ({ method, item, editing, onItemChange }) {
         </div>
     );
 }
+
+const MethodLink = connect(({ org, id }) => ['payments/method', { org, id }], ['org', 'id'])(data => ({
+    exists: !!data,
+}))(function MethodLink ({ exists, org, id }) {
+    if (!exists) return;
+
+    return (
+        <LinkButton class="method-link" target={`/aksopago/organizoj/${org}/metodoj/${id}`}>
+            {locale.detailViewMethod}
+        </LinkButton>
+    );
+});
 
 function Events ({ item }) {
     const rawEvents = [];
