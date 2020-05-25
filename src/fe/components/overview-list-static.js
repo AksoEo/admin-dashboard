@@ -1,14 +1,13 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
+import { Button } from '@cpsdqs/yamdl';
+import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
+import ArrowRightIcon from '@material-ui/icons/ChevronRight';
 import { coreContext } from '../core/connection';
 import DynamicHeightDiv from './dynamic-height-div';
 import ListItem from './overview-list-item';
+import { search as searchLocale } from '../locale';
 import './overview-list-static.less';
-
-function scrollToNode (node) {
-    if (!node) return;
-    node.scrollIntoView && node.scrollIntoView({ behavior: 'smooth' });
-}
 
 /// Because the OverviewList component is very unwieldy, this is a variant that is specifically
 /// meant for being embedded. This does not have any fancy `parameters` integration or anything
@@ -20,7 +19,7 @@ function scrollToNode (node) {
 /// - sorting: optional object { [field]: sorting }
 /// - jsonFilter: optional JSON filter
 /// - offset/onSetOffset: list offset
-/// - limit/onSetLimit: page limit. onSetLimit is optional
+/// - limit: page limit
 /// - emptyLabel: empty label
 /// - onItemClick: callback (id) => void
 /// - compact: bool
@@ -37,7 +36,6 @@ export default class StaticOverviewList extends PureComponent {
     #currentTask = null;
     #nextLoadIsBackwards = false;
     #lastPageChangeTime = null;
-    #scrollToNodeOnLoad = null;
 
     load () {
         if (this.#currentTask) this.#currentTask.drop();
@@ -63,11 +61,6 @@ export default class StaticOverviewList extends PureComponent {
                 animateBackwards: this.#nextLoadIsBackwards,
             });
 
-            if (this.#scrollToNodeOnLoad) {
-                scrollToNode(this.#scrollToNodeOnLoad);
-                this.#scrollToNodeOnLoad = null;
-            }
-
             if (offset >= result.total && result.total !== 0) {
                 // we’re out of bounds; adjust
                 this.props.onSetOffset(Math.floor(result.total / limit) * limit);
@@ -89,6 +82,7 @@ export default class StaticOverviewList extends PureComponent {
     componentDidUpdate (prevProps) {
         if (prevProps.offset !== this.props.offset
             || prevProps.limit !== this.props.limit) {
+            if (prevProps.offset > this.props.offset) this.#nextLoadIsBackwards = true;
             this.load();
         }
         if (prevProps.task !== this.props.task
@@ -98,6 +92,16 @@ export default class StaticOverviewList extends PureComponent {
         }
     }
 
+    #prevPage = () => {
+        const { offset, limit } = this.props;
+        if (offset > 0) this.props.onSetOffset(Math.max(0, offset - limit));
+    };
+    #nextPage = () => {
+        const { offset, limit } = this.props;
+        const maxOffset = Math.ceil(((this.state.result ? this.state.result.total : 0) - 1) / limit) * limit;
+        if (offset < maxOffset) this.props.onSetOffset(Math.min(maxOffset, offset + limit));
+    };
+
     render ({
         view,
         viewOptions,
@@ -106,10 +110,13 @@ export default class StaticOverviewList extends PureComponent {
         locale,
         onItemClick,
         emptyLabel,
+        offset,
+        limit,
     }, { loading, error, result, animateBackwards }) {
         const selectedFields = Object.keys(fields).map(f => ({ id: f }));
 
         let contents = null;
+        let pagination = null;
         if (error) {
             // TODO
         } else if (result) {
@@ -141,6 +148,32 @@ export default class StaticOverviewList extends PureComponent {
                 );
                 i++;
             }
+            if (result.total > limit) {
+                const minItem = offset + 1;
+                const maxItem = Math.min(result.total, offset + limit);
+
+                pagination = (
+                    <div class="list-pagination-inner">
+                        <Button
+                            class="pagination-button"
+                            disabled={offset === 0}
+                            icon small
+                            onClick={this.#prevPage}>
+                            <ArrowLeftIcon />
+                        </Button>
+                        <div class="pagination-inner-label">
+                            {searchLocale.paginationItems(minItem, maxItem, result.total)}
+                        </div>
+                        <Button
+                            class="pagination-button"
+                            disabled={offset === Math.ceil(result.total / limit - 1) * limit}
+                            icon small
+                            onClick={this.#nextPage}>
+                            <ArrowRightIcon />
+                        </Button>
+                    </div>
+                );
+            }
         }
 
         return (
@@ -150,6 +183,9 @@ export default class StaticOverviewList extends PureComponent {
                     useCooldown cooldown={400}
                     lastChangeTime={this.#lastPageChangeTime}>
                     {contents}
+                </DynamicHeightDiv>
+                <DynamicHeightDiv class="list-pagination">
+                    {pagination}
                 </DynamicHeightDiv>
             </div>
         );

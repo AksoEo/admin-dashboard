@@ -32,6 +32,8 @@ const REDUCED_METHOD_FIELDS = Object.fromEntries(METHOD_FIELD_IDS
 export default class PaymentMethodPicker extends PureComponent {
     state = {
         pickerOpen: false,
+        orgOffset: 0,
+        methodOffset: 0,
     };
 
     static contextType = coreContext;
@@ -48,7 +50,7 @@ export default class PaymentMethodPicker extends PureComponent {
         this.#ripple.onPointerDown(e);
     };
 
-    render ({ value, onChange, org, onOrgChange }, { pickerOpen }) {
+    render ({ value, onChange, org, onOrgChange }, { pickerOpen, orgOffset, methodOffset }) {
         let contents, orgItem;
 
         if (org && value) {
@@ -86,7 +88,7 @@ export default class PaymentMethodPicker extends PureComponent {
         }
 
         if (org) {
-            const orgFields = Object.keys(ORG_FIELDS).map(f => ({ id: f }));
+            const orgFields = ['org', 'name'].map(f => ({ id: f }));
 
             orgItem = (
                 <div class="picker-chosen-org">
@@ -101,7 +103,8 @@ export default class PaymentMethodPicker extends PureComponent {
                         selectedFields={orgFields}
                         fields={ORG_FIELDS}
                         index={0}
-                        locale={orgLocale.fields} />
+                        locale={orgLocale.fields}
+                        skipAnimation />
                 </div>
             );
         }
@@ -119,10 +122,11 @@ export default class PaymentMethodPicker extends PureComponent {
                     class="payment-method-picker-dialog"
                     container={portalContainer}
                     backdrop
+                    title={methodLocale.methodPicker.title}
                     fullScreen={width => width < 400}
                     open={pickerOpen}
                     onClose={() => this.setState({ pickerOpen: false })}>
-                    <DynamicHeightDiv>
+                    <DynamicHeightDiv class="picker-org-item-container">
                         {orgItem}
                     </DynamicHeightDiv>
                     <StaticOverviewList
@@ -131,20 +135,31 @@ export default class PaymentMethodPicker extends PureComponent {
                         view={org ? 'payments/method' : 'payments/org'}
                         viewOptions={org ? { org } : null}
                         fields={org ? REDUCED_METHOD_FIELDS : ORG_FIELDS}
+                        sorting={{ name: 'asc' }}
                         jsonFilter={org ? {
                             type: 'manual',
                         } : null}
-                        offset={0}
+                        offset={org ? methodOffset : orgOffset}
+                        onSetOffset={offset => {
+                            if (org) this.setState({ methodOffset: offset });
+                            else this.setState({ orgOffset: offset });
+                        }}
                         limit={10}
                         locale={org ? orgLocale.fields : methodLocale.fields}
                         onItemClick={id => {
-                            if (!org) onOrgChange(id);
-                            else {
+                            if (!org) {
+                                if (org !== id) {
+                                    onOrgChange(id);
+                                    this.setState({ methodOffset: 0 });
+                                }
+                            } else {
                                 onChange(id);
                                 this.setState({ pickerOpen: false });
                             }
                         }}
-                        emptyLabel={org ? methodLocale.pickerEmpty : methodLocale.pickerOrgsEmpty}
+                        emptyLabel={org
+                            ? methodLocale.methodPicker.empty
+                            : methodLocale.methodPicker.orgsEmpty}
                         compact />
                 </Dialog>
             </span>

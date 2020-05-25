@@ -772,8 +772,11 @@ export const paymentMethods = {
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi pagmetodon?',
         button: 'Forigi',
     },
-    pickerOrgsEmpty: '[[no payment orgs]]',
-    pickerEmpty: '[[no manual methods in this org]]',
+    methodPicker: {
+        title: '[[pick payment method]]',
+        orgsEmpty: '[[no payment orgs]]',
+        empty: '[[no manual methods in this org]]',
+    },
 };
 export const paymentIntents = {
     openInStripePrefix: 'Malfermi ĉe',
