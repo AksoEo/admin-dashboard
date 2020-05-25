@@ -229,7 +229,7 @@ export const pages = {
     congresses: 'Kongresoj',
     votes: 'Voĉdonado',
     newsletters: 'Bultenoj',
-    payments: 'AKSOPago',
+    payments: 'AKSO-Pago',
     'payment-intents': 'Pagoj',
     'payment-orgs': 'Pagorganizoj',
     administration: 'Administrado',
@@ -954,6 +954,8 @@ export const paymentIntents = {
     },
     create: {
         menuItem: 'Krei',
+        title: 'Krei pagon',
+        button: 'Krei',
     },
     update: {
         menuItem: 'Redakti',

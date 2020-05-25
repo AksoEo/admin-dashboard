@@ -3,7 +3,7 @@ import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
-import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
+import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
 
 export const PAYMENT_ORGS = 'paymentOrgs';
 export const SIG_PAYMENT_ORGS = '!paymentOrgs';
@@ -431,6 +431,10 @@ export const tasks = {
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'submitted' }));
         // event log should be updated
         tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
+    },
+
+    iFiltersToAPI: async ({ filters }) => {
+        return filtersToAPI(iClientFilters, filters);
     },
 };
 export const views = {

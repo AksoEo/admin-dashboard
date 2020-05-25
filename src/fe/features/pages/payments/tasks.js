@@ -15,6 +15,7 @@ import {
     paymentIntents as intentLocale,
 } from '../../../locale';
 import { CREATION_FIELDS as methodFields } from './orgs/methods/fields';
+import MethodPicker from './method-picker';
 import './tasks.less';
 
 export default {
@@ -151,6 +152,62 @@ export default {
                         actionLabel={methodLocale.create.button}
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/aksopago/organizoj/${org}/metodoj/${id}`);
+                        })}>
+                        <DynamicHeightDiv useFirstHeight>
+                            {fields}
+                        </DynamicHeightDiv>
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
+
+    createIntent ({ open, task }) {
+        const fields = [];
+
+        const customer = task.parameters.customer || {};
+        const method = task.parameters.method || {};
+
+        fields.push(
+            <Field>
+                <TextField
+                    key="customer.name"
+                    outline
+                    label={intentLocale.fields.customerName}
+                    value={customer.name}
+                    onChange={e => task.update({ customer: { ...customer, name: e.target.value } })} />
+            </Field>
+        );
+        fields.push(
+            <Field>
+                <TextField
+                    key="customer.email"
+                    outline
+                    label={intentLocale.fields.customerEmail}
+                    value={customer.email}
+                    onChange={e => task.update({ customer: { ...customer, email: e.target.value } })} />
+            </Field>
+        );
+        fields.push(
+            <Field>
+                <MethodPicker
+                    value={method.id}
+                    onChange={id => task.update({ method: { id } })} />
+            </Field>
+        );
+
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        class="payments-task-create-intent"
+                        open={open}
+                        fullScreen={width => width < 400}
+                        onClose={() => task.drop()}
+                        title={intentLocale.create.title}
+                        actionLabel={intentLocale.create.button}
+                        run={() => task.runOnce().then(id => {
+                            routerContext.navigate(`/aksopago/pagoj/${id}`);
                         })}>
                         <DynamicHeightDiv useFirstHeight>
                             {fields}

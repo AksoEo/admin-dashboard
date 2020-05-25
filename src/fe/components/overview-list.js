@@ -1,26 +1,24 @@
 import { h } from 'preact';
 import { Fragment, PureComponent } from 'preact/compat';
-import { Checkbox, Button, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
 import ArrowRightIcon from '@material-ui/icons/ChevronRight';
 import RefreshIcon from '@material-ui/icons/Refresh';
-import { coreContext, connect } from '../core/connection';
+import { coreContext } from '../core/connection';
 import Select from './select';
-import { LinkButton } from '../router';
 import { search as locale, data as dataLocale } from '../locale';
 import { deepEq } from '../../util';
 import DisplayError from './error';
-import DynamicHeightDiv, { layoutContext } from './dynamic-height-div';
+import DynamicHeightDiv from './dynamic-height-div';
+import ListItem, { lineLayout } from './overview-list-item';
 import './overview-list.less';
 
 const DEBOUNCE_TIME = 400; // ms
 const DEFAULT_LIMITS = [10, 20, 50, 100];
 
 const COMPACT_MAX_WIDTH = 600;
-const MAX_TITLE_CELLS = 3;
-const MAX_TITLE_ALT_CELLS = 1;
 
 function scrollToNode (node) {
     if (!node) return;
@@ -404,25 +402,6 @@ export default class OverviewList extends PureComponent {
 // time interval after changing page during which the results list will not change height
 const PAGE_CHANGE_COOLDOWN = 400; // ms
 
-function lineLayout (fields, selectedFields, selection) {
-    const fieldWeights = selectedFields.map(x => fields[x.id].weight || 1);
-    let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
-    if (selection) weightSum += 0.5;
-    const actualUnit = 100 / weightSum;
-    const unit = Math.max(10, actualUnit);
-
-    const totalWidth = Math.round(weightSum * unit);
-
-    const style = {
-        gridTemplateColumns: fieldWeights.map(x => (x * actualUnit) + '%').join(' '),
-        width: totalWidth > 100 ? `${totalWidth}%` : null,
-    };
-    if (selection) style.gridTemplateColumns = (actualUnit / 2) + '% ' + style.gridTemplateColumns;
-    style.maxWidth = style.width;
-
-    return style;
-}
-
 function ListHeader ({ fields, selectedFields, locale, selection }) {
     const style = lineLayout(fields, selectedFields, selection);
 
@@ -437,200 +416,8 @@ function ListHeader ({ fields, selectedFields, locale, selection }) {
         cells.unshift(<div key="selection" class="list-header-cell selection-cell"></div>);
     }
 
-    return <div class="list-header" style={style}>{cells}</div>;
+    return <div class="overview-list-item list-header" style={style}>{cells}</div>;
 }
-
-const ListItem = connect(props => ([props.view, {
-    ...props.options,
-    id: props.id,
-    fields: props.selectedFields,
-    noFetch: true,
-}]))(data => ({ data }))(class ListItem extends PureComponent {
-    #inTime = 0;
-    #yOffset = new Spring(1, 0.5);
-    #node = null;
-
-    static contextType = layoutContext;
-
-    componentDidMount () {
-        if (this.props.lastCollapseTime > Date.now() - 500) this.#inTime = -0.5;
-
-        globalAnimator.register(this);
-    }
-
-    getSnapshotBeforeUpdate (prevProps) {
-        if (prevProps.index !== this.props.index) {
-            return this.#node && this.#node.button ? this.#node.button.getBoundingClientRect() : null;
-        }
-        return null;
-    }
-
-    componentDidUpdate (prevProps, _, oldRect) {
-        if (prevProps.index !== this.props.index && this.#node && oldRect) {
-            const newRect = this.#node.button.getBoundingClientRect();
-            this.#yOffset.value = oldRect.top - newRect.top;
-            globalAnimator.register(this);
-        }
-
-        if (prevProps.expanded && !this.props.expanded) {
-            this.#inTime = -0.5;
-            globalAnimator.register(this);
-        }
-
-        if (!prevProps.data && this.props.data) this.context();
-    }
-
-    componentWillUnmount () {
-        globalAnimator.deregister(this);
-    }
-
-    update (dt) {
-        this.#inTime += dt;
-        this.#yOffset.update(dt);
-
-        if (this.props.skipAnimation) {
-            this.#yOffset.finish();
-            this.#inTime = 5;
-        }
-
-        if (!this.#yOffset.wantsUpdate() && this.#inTime >= 5) {
-            this.#inTime = 5;
-            globalAnimator.deregister(this);
-        }
-
-        this.forceUpdate();
-    }
-
-    render ({
-        id,
-        compact,
-        selectedFields,
-        data,
-        fields,
-        onGetItemLink,
-        index,
-        locale,
-        cursed,
-        selection,
-        animateBackwards,
-    }) {
-        if (!data) return null;
-
-        // compact layout
-        const titleCells = [];
-        const titleAltCells = [];
-        const bodyCells = [];
-
-        // table layout
-        const cells = [];
-
-        const selectedFieldIds = selectedFields.map(x => x.id);
-
-        for (const { id } of selectedFields) {
-            let Component;
-            if (fields[id]) Component = fields[id].component;
-            else Component = () => `unknown field ${id}`;
-
-            let slot = 'table';
-            if (compact) {
-                slot = fields[id].slot || 'body';
-
-                if (slot === 'title' && titleCells.length < MAX_TITLE_CELLS) {
-                    slot = 'title';
-                } else if (slot === 'titleAlt' && titleAltCells.length < MAX_TITLE_ALT_CELLS) {
-                    slot = 'titleAlt';
-                } else {
-                    slot = 'body';
-                }
-            }
-
-            const cell = (
-                <div key={id} class="list-item-cell">
-                    {fields[id].skipLabel ? null : (
-                        <div class="cell-label">{locale[id]}</div>
-                    )}
-                    <Component
-                        inline
-                        slot={slot}
-                        value={data[id]}
-                        item={data}
-                        fields={selectedFieldIds} />
-                </div>
-            );
-
-            if (compact) {
-                if (slot === 'title') titleCells.push(cell);
-                else if (slot === 'titleAlt') titleAltCells.push(cell);
-                else if (slot === 'body') bodyCells.push(cell);
-            } else {
-                cells.push(cell);
-            }
-        }
-
-        if (selection) {
-            const boxCell = (
-                <div key="selection" class="list-item-cell selection-cell" onClick={e => {
-                    // FIXME: hacky because we need to prevent the link from doing stuff
-                    e.stopPropagation();
-                    e.preventDefault();
-                    if (selection.has(id)) selection.delete(id);
-                    else selection.add(id);
-                }}>
-                    <Checkbox
-                        checked={selection.has(id)} />
-                </div>
-            );
-            if (compact) {
-                titleCells.unshift(boxCell);
-            } else {
-                cells.unshift(boxCell);
-            }
-        }
-
-        const style = lineLayout(fields, selectedFields, selection);
-
-        const animScale = animateBackwards ? -1 : 1;
-        const constOffset = this.#inTime === 5 ? 0 : 15 * Math.exp(-10 * this.#inTime);
-        const spreadFactor = this.#inTime === 5 ? 0 : 4 * Math.exp(-10 * this.#inTime);
-        const yOffset = this.#yOffset.value;
-
-        Object.assign(style, {
-            transform: `translateY(${animScale * (constOffset + spreadFactor * index) * 10 + yOffset}px)`,
-            opacity: Math.max(0, Math.min(1 - spreadFactor * index / 2, 1)),
-        });
-
-        const itemLink = onGetItemLink ? onGetItemLink(id) : null;
-        const ItemComponent = onGetItemLink ? LinkButton : 'div';
-
-        return (
-            <ItemComponent
-                target={itemLink}
-                class={'list-item' + (cursed ? ' is-cursed' : '') + (compact ? ' is-compact' : '')}
-                style={style}
-                ref={node => this.#node = node}
-                onClick={e => {
-                    // don’t keep focus on what is essentially button
-                    e.currentTarget.blur();
-                }}>
-                {compact ? (
-                    <div class="li-compact-inner">
-                        <div class="li-compact-title">
-                            <div class="li-compact-title-inner">
-                                {titleCells}
-                            </div>
-                            <div class="li-compact-title-alt">
-                                {titleAltCells}
-                            </div>
-                        </div>
-                        <div class="li-compact-body">
-                            {bodyCells}
-                        </div>
-                    </div>
-                ) : cells}
-            </ItemComponent>
-        );
-    }
-});
 
 class ListRefreshButton extends PureComponent {
     state = {

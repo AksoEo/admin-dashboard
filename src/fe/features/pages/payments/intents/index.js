@@ -110,6 +110,7 @@ export default connectPerms(class Intents extends Page {
                         filters: locale.filters,
                     }}
                     inputRef={view => this.#searchInput = view}
+                    filtersToAPI="payments/iFiltersToAPI"
                     category="aksopay_payment_intents" />
                 <OverviewList
                     expanded={expanded}
