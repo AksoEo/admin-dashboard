@@ -66,6 +66,7 @@ const iClientFields = {
         toAPI: ({ id }) => ({ paymentMethodId: id }),
     },
     org: 'org',
+    paymentOrg: 'paymentOrgId',
     currency: 'currency',
     status: 'status',
     events: 'events',

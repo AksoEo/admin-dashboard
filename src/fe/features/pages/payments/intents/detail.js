@@ -15,7 +15,7 @@ import { IdUEACode } from '../../../../components/data/uea-code';
 import { FIELDS as METHOD_FIELDS } from '../orgs/methods/fields';
 import Meta from '../../../meta';
 import { connectPerms } from '../../../../perms';
-import { coreContext } from '../../../../core/connection';
+import { connect, coreContext } from '../../../../core/connection';
 import {
     paymentIntents as locale,
     data as dataLocale,
@@ -91,6 +91,7 @@ export default connectPerms(class IntentPage extends Page {
                             'customer',
                             'method',
                             'org',
+                            'paymentOrg',
                             'currency',
                             'status',
                             'events',
@@ -126,6 +127,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
         currency,
         purposes,
         org,
+        paymentOrg,
     } = item;
 
     let orgIcon = null;
@@ -175,7 +177,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                     <span class="intent-payment-org">
                         {orgIcon}
                         {' '}
-                        <PaymentOrgName />
+                        {!!paymentOrg && <PaymentOrgName id={paymentOrg} />}
                     </span>
                 </span>
             </div>
@@ -217,10 +219,11 @@ function DetailViewInner ({ item, editing, onItemChange }) {
     );
 }
 
-function PaymentOrgName () {
-    // TODO
-    return '(no orgId in data)';
-}
+const PaymentOrgName = connect(({ id }) => ['payments/org', {
+    id,
+}], ['id'])()(function PaymentOrgName ({ name }) {
+    return name;
+});
 
 function Purpose ({ purpose, item }) {
     let title = '';
