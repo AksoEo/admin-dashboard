@@ -358,7 +358,7 @@ export const tasks = {
     createIntent: async (_, params) => {
         const client = await asyncClient;
         const res = await client.post('/aksopay/payment_intents', iClientToAPI(params));
-        const id = iReadId(res.res.headers.get('x-identifier'));
+        const id = res.res.headers.get('x-identifier');
         store.insert([PAYMENT_INTENTS, id], params);
         store.signal([PAYMENT_INTENTS, SIG_PAYMENT_INTENTS]);
         return id;

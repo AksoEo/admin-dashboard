@@ -14,7 +14,7 @@ document.body.appendChild(selectPortalContainer);
 /// # Props
 /// - `value`: currently selected value
 /// - `onChange`: (value) => void
-/// - `items`: select items { value, label, shortLabel? }
+/// - `items`: select items { value, label, shortLabel?, disabled? }
 /// - `outline`: pass true for outline style
 /// - `multi`: pass true for multi-select. Value must be an array
 /// - `emptyLabel`: label to use in multi-select mode when empty
@@ -66,7 +66,12 @@ export default class Select extends Component {
                             onChange(e.target.value);
                         }}>
                         {(items || []).map((item, i) => (
-                            <option key={i} value={item.value}>{item.label}</option>
+                            <option
+                                key={i}
+                                value={item.value}
+                                disabled={item.disabled}>
+                                {item.label}
+                            </option>
                         ))}
                     </select>
                     {selectIcon}

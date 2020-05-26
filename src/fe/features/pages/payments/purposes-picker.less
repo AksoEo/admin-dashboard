@@ -1,0 +1,36 @@
+@import '../../../prelude';
+
+.payment-purposes-picker {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    border: 1px solid @separator;
+    border-radius: 4px;
+    box-sizing: border-box;
+
+    .purposes-picker-inner {
+        padding: 16px;
+    }
+
+    .purposes-picker-add {
+        display: block;
+        width: 100%;
+        margin: 0;
+    }
+}
+
+.payment-purposes-picker-dialog {
+    max-width: 100%;
+    width: 400px;
+
+    .type-selection {
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    .no-org {
+        text-align: center;
+        padding: 16px;
+    }
+}

@@ -13,8 +13,8 @@ function CurrencyAmount ({ value, currency }) {
 
 /// - currency: currency id
 function CurrencyEditor ({ value, onChange, currency, ...extra }) {
-    const fractValue = (value | 0) / currencies[currency];
-    const minimumFractionDigits = Math.log10(currencies[currency]);
+    const fractValue = currency ? (value | 0) / currencies[currency] : (value | 0);
+    const minimumFractionDigits = Math.log10(currencies[currency]) | 0;
     const formattedValue = fractValue.toLocaleString('fr-FR', {
         minimumFractionDigits,
     });

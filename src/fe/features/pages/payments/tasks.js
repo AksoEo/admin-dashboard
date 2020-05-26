@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import Segmented from '../../../components/segmented';
+import Select from '../../../components/select';
 import ChangedFields from '../../../components/changed-fields';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import { currencyAmount } from '../../../components/data';
@@ -13,9 +14,11 @@ import {
     paymentAddons as addonLocale,
     paymentMethods as methodLocale,
     paymentIntents as intentLocale,
+    currencies,
 } from '../../../locale';
 import { CREATION_FIELDS as methodFields } from './orgs/methods/fields';
 import MethodPicker from './method-picker';
+import PurposesPicker from './purposes-picker';
 import './tasks.less';
 
 export default {
@@ -169,9 +172,8 @@ export default {
         const method = task.parameters.method || {};
 
         fields.push(
-            <Field>
+            <Field key="customer.name">
                 <TextField
-                    key="customer.name"
                     outline
                     label={intentLocale.fields.customerName}
                     value={customer.name}
@@ -179,9 +181,8 @@ export default {
             </Field>
         );
         fields.push(
-            <Field>
+            <Field key="customer.email">
                 <TextField
-                    key="customer.email"
                     outline
                     label={intentLocale.fields.customerEmail}
                     value={customer.email}
@@ -189,12 +190,39 @@ export default {
             </Field>
         );
         fields.push(
-            <Field>
+            <Field key="method">
                 <MethodPicker
                     org={task.parameters.paymentOrg}
-                    onOrgChange={paymentOrg => task.update({ paymentOrg })}
+                    onOrgChange={paymentOrg => {
+                        // clear all addons because they're org-specific
+                        const purposes = (task.parameters.purposes || [])
+                            .filter(purpose => purpose.type !== 'addon');
+                        task.update({ paymentOrg, purposes });
+                    }}
                     value={method.id}
                     onChange={id => task.update({ method: { id } })} />
+            </Field>
+        );
+        fields.push(
+            <Field key="currency">
+                <Select
+                    value={task.parameters.currency || ''}
+                    onChange={currency => task.update({ currency })}
+                    items={[!task.parameters.currency && {
+                        value: '',
+                        label: intentLocale.create.noCurrencySelected,
+                        disabled: true,
+                    }].filter(x => x).concat(Object.keys(currencies)
+                        .map(c => ({ value: c, label: currencies[c] })))} />
+            </Field>
+        );
+        fields.push(
+            <Field key="purposes">
+                <PurposesPicker
+                    org={task.parameters.paymentOrg}
+                    currency={task.parameters.currency}
+                    value={task.parameters.purposes || []}
+                    onChange={purposes => task.update({ purposes })} />
             </Field>
         );
 

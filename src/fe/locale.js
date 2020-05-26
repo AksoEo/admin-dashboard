@@ -957,10 +957,22 @@ export const paymentIntents = {
             customerNotes: 'Traserĉi notojn de klientoj',
         },
     },
+    purposesPicker: {
+        addTitle: '[[add purpose]]',
+        selectMethodFirst: '[[select a payment method first]]',
+        selectCurrencyFirst: '[[select a currency first]]',
+        addPurposeButton: '[[add]]',
+        types: {
+            manual: 'Permana',
+            addon: 'Donaceblo',
+        },
+    },
     create: {
         menuItem: 'Krei',
         title: 'Krei pagon',
         button: 'Krei',
+
+        noCurrencySelected: '[[no currency selected]]',
     },
     update: {
         menuItem: 'Redakti',
