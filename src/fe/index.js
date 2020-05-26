@@ -254,6 +254,11 @@ class LoadingIndicator extends Component {
     }
 }
 
+if (navigator.standalone) {
+    // iOS standalone mode
+    document.body.classList.add('is-ios-standalone');
+}
+
 (async () => {
     if (!('PointerEvent' in window)) {
         await import('@wessberg/pointer-events');
