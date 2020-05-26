@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { useState } from 'preact/compat';
 import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import Segmented from '../../../components/segmented';
@@ -14,6 +15,7 @@ import {
     paymentAddons as addonLocale,
     paymentMethods as methodLocale,
     paymentIntents as intentLocale,
+    data as dataLocale,
     currencies,
 } from '../../../locale';
 import { CREATION_FIELDS as methodFields } from './orgs/methods/fields';
@@ -170,11 +172,17 @@ export default {
 
         const customer = task.parameters.customer || {};
         const method = task.parameters.method || {};
+        const [availableCurrencies, setCurrencies] = useState([]);
 
         fields.push(
             <Field key="customer.name">
-                <TextField
+                <Validator
+                    component={TextField}
+                    validate={value => {
+                        if (!value) throw { error: dataLocale.requiredField };
+                    }}
                     outline
+                    required
                     label={intentLocale.fields.customerName}
                     value={customer.name}
                     onChange={e => task.update({ customer: { ...customer, name: e.target.value } })} />
@@ -182,7 +190,13 @@ export default {
         );
         fields.push(
             <Field key="customer.email">
-                <TextField
+                <Validator
+                    component={TextField}
+                    type="email"
+                    required
+                    validate={value => {
+                        if (!value) throw { error: dataLocale.requiredField };
+                    }}
                     outline
                     label={intentLocale.fields.customerEmail}
                     value={customer.email}
@@ -192,6 +206,7 @@ export default {
         fields.push(
             <Field key="method">
                 <MethodPicker
+                    onGetCurrencies={setCurrencies}
                     org={task.parameters.paymentOrg}
                     onOrgChange={paymentOrg => {
                         // clear all addons because they're org-specific
@@ -200,31 +215,40 @@ export default {
                         task.update({ paymentOrg, purposes });
                     }}
                     value={method.id}
-                    onChange={id => task.update({ method: { id } })} />
+                    onChange={id => {
+                        if (id) task.update({ method: { id } });
+                        else task.update({ method: null, currency: null });
+                    }} />
             </Field>
         );
-        fields.push(
-            <Field key="currency">
-                <Select
-                    value={task.parameters.currency || ''}
-                    onChange={currency => task.update({ currency })}
-                    items={[!task.parameters.currency && {
-                        value: '',
-                        label: intentLocale.create.noCurrencySelected,
-                        disabled: true,
-                    }].filter(x => x).concat(Object.keys(currencies)
-                        .map(c => ({ value: c, label: currencies[c] })))} />
-            </Field>
-        );
-        fields.push(
-            <Field key="purposes">
-                <PurposesPicker
-                    org={task.parameters.paymentOrg}
-                    currency={task.parameters.currency}
-                    value={task.parameters.purposes || []}
-                    onChange={purposes => task.update({ purposes })} />
-            </Field>
-        );
+        if (method.id) {
+            fields.push(
+                <Field key="currency">
+                    <Select
+                        value={task.parameters.currency || ''}
+                        onChange={currency => task.update({ currency })}
+                        items={[!task.parameters.currency && {
+                            value: '',
+                            label: intentLocale.create.noCurrencySelected,
+                            disabled: true,
+                        }].filter(x => x).concat(Object.keys(currencies)
+                            .filter(x => availableCurrencies.includes(x))
+                            .map(c => ({ value: c, label: currencies[c] })))} />
+                </Field>
+            );
+        }
+        if (task.parameters.currency) {
+            fields.push(
+                <Field key="purposes">
+                    <PurposesPicker
+                        org={task.parameters.paymentOrg}
+                        currency={task.parameters.currency}
+                        value={task.parameters.purposes || []}
+                        onChange={purposes => task.update({ purposes })} />
+                </Field>
+            );
+        }
+        const ready = task.parameters.purposes && task.parameters.purposes.length;
 
         return (
             <routerContext.Consumer>
@@ -235,7 +259,7 @@ export default {
                         fullScreen={width => width < 400}
                         onClose={() => task.drop()}
                         title={intentLocale.create.title}
-                        actionLabel={intentLocale.create.button}
+                        actionLabel={!!ready && intentLocale.create.button}
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/aksopago/pagoj/${id}`);
                         })}>

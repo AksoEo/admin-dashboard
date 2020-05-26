@@ -65,7 +65,12 @@ export default connect(props => ([props.view, {
             globalAnimator.register(this);
         }
 
-        if (!prevProps.data && this.props.data) this.context();
+        if (!prevProps.data && this.props.data) {
+            this.context();
+        }
+        if (this.props.data !== prevProps.data) {
+            this.props.onData && this.props.onData(this.props.data);
+        }
     }
 
     componentWillUnmount () {

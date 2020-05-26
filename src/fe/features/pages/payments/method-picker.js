@@ -29,6 +29,7 @@ const REDUCED_METHOD_FIELDS = Object.fromEntries(METHOD_FIELD_IDS
 /// # Props
 /// - value/onChange
 /// - org/onOrgChange
+/// - onGetCurrencies
 export default class PaymentMethodPicker extends PureComponent {
     state = {
         pickerOpen: false,
@@ -50,7 +51,13 @@ export default class PaymentMethodPicker extends PureComponent {
         this.#ripple.onPointerDown(e);
     };
 
-    render ({ value, onChange, org, onOrgChange }, { pickerOpen, orgOffset, methodOffset }) {
+    render ({
+        value,
+        onChange,
+        org,
+        onOrgChange,
+        onGetCurrencies,
+    }, { pickerOpen, orgOffset, methodOffset }) {
         let contents, orgItem;
 
         if (org && value) {
@@ -65,7 +72,12 @@ export default class PaymentMethodPicker extends PureComponent {
                         selectedFields={METHOD_FIELD_IDS}
                         fields={REDUCED_METHOD_FIELDS}
                         index={0}
-                        locale={methodLocale.fields} />
+                        locale={methodLocale.fields}
+                        onData={method => {
+                            if (method.currencies) {
+                                onGetCurrencies && onGetCurrencies(method.currencies);
+                            }
+                        }} />
                     <Button
                         class="remove-button"
                         onPointerDown={e => e.stopPropagation()}

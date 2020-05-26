@@ -176,6 +176,7 @@ class AddPurposeDialog extends PureComponent {
                     <Field>
                         <Validator
                             component={TextField}
+                            outline
                             value={manualTitle}
                             validate={value => {
                                 if (!value) {
@@ -186,11 +187,12 @@ class AddPurposeDialog extends PureComponent {
                     </Field>
                     <Field>
                         <TextField
+                            outline
                             value={manualDescription || ''}
                             onChange={e => this.setState({ manualDescription: e.target.value || null })}/>
                     </Field>
                     <div class="form-footer">
-                        <Button>
+                        <Button raised>
                             {locale.purposesPicker.addPurposeButton}
                         </Button>
                     </div>
