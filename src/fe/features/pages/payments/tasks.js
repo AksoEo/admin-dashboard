@@ -211,6 +211,51 @@ export default {
         );
 
         fields.push(
+            <div key="cnotes-title" class="create-intent-subtitle">
+                {intentLocale.fields.customerNotes}
+            </div>
+        );
+        fields.push(
+            <Field>
+                <textarea
+                    class="notes-field"
+                    value={task.parameters.customerNotes || ''}
+                    onChange={e => task.update({ customerNotes: e.target.value || null })} />
+            </Field>
+        );
+        fields.push(
+            <div key="notes-title" class="create-intent-subtitle">
+                {intentLocale.fields.internalNotes}
+            </div>
+        );
+        fields.push(
+            <Field>
+                <textarea
+                    class="notes-field"
+                    value={task.parameters.internalNotes || ''}
+                    onChange={e => task.update({ internalNotes: e.target.value || null })} />
+            </Field>
+        );
+
+        /*
+        fields.push(
+            <div key="state-title" class="create-intent-subtitle">
+                {intentLocale.fields.status}
+            </div>
+        );
+        fields.push(
+            <Field>
+                <Select
+                    class="status-select"
+                    value={task.parameters.status || 'pending'}
+                    onChange={status => task.update({ status })}
+                    items={Object.keys(intentLocale.filters.statuses).filter(x => x)
+                        .map(i => ({ value: i, label: intentLocale.filters.statuses[i] }))} />
+            </Field>
+        );
+        */
+
+        fields.push(
             <div key="method-title" class="create-intent-subtitle">
                 {intentLocale.create.paymentMethod}
             </div>
@@ -235,6 +280,11 @@ export default {
             </Field>
         );
         if (method.id) {
+            fields.push(
+                <div key="currency-title" class="create-intent-subtitle">
+                    {intentLocale.fields.currency}
+                </div>
+            );
             fields.push(
                 <Field key="currency">
                     <Select
@@ -278,9 +328,14 @@ export default {
         if (ready) {
             fields.push(
                 <div key="total" class="create-intent-total">
-                    {intentLocale.create.total}
-                    {' '}
-                    <currencyAmount.renderer value={total} currency={task.parameters.currency} />
+                    <div>
+                        {intentLocale.create.total}
+                        {' '}
+                        <currencyAmount.renderer value={total} currency={task.parameters.currency} />
+                    </div>
+                    <div class="total-note">
+                        {intentLocale.create.totalNote}
+                    </div>
                 </div>
             );
         }

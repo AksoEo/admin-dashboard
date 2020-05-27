@@ -980,6 +980,7 @@ export const paymentIntents = {
         paymentMethod: 'Pagmetodo',
         purposes: '[[purposes]]',
         total: '[[Total:]]',
+        totalNote: '[[estimate; actual value will be clamped to 1USD-500KUSD]]',
     },
     update: {
         menuItem: 'Redakti',
