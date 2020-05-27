@@ -71,7 +71,7 @@ export default class Report extends Page {
         });
 
         return (
-            <div class="payments-report-page">
+            <div class="payments-balance-report-page">
                 <Meta
                     title={locale.report.title}
                     actions={actions} />
@@ -113,10 +113,18 @@ function TimeRangePicker ({ start, end, onStartChange, onEndChange }) {
     return (
         <div class="report-time-range">
             <div class="range-field">
-                <date.editor value={start} onChange={onStartChange} />
+                <date.editor
+                    label={locale.report.startTime}
+                    outline
+                    value={start}
+                    onChange={onStartChange} />
             </div>
             <div class="range-field">
-                <date.editor value={end} onChange={onEndChange} />
+                <date.editor
+                    label={locale.report.endTime}
+                    outline
+                    value={end}
+                    onChange={onEndChange} />
             </div>
         </div>
     );

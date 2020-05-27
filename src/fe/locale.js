@@ -991,6 +991,9 @@ export const paymentIntents = {
     report: {
         title: '[[report]]',
         csvFilename: '[[payment_report]]',
+
+        startTime: '[[range start]]',
+        endTime: '[[range end]]',
     },
 };
 
