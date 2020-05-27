@@ -966,6 +966,10 @@ export const paymentIntents = {
             manual: 'Permana',
             addon: 'Donaceblo',
         },
+        manual: {
+            title: '[[title]]',
+            description: 'Priskribo',
+        },
     },
     create: {
         menuItem: 'Krei',
@@ -973,6 +977,9 @@ export const paymentIntents = {
         button: 'Krei',
 
         noCurrencySelected: '[[no currency selected]]',
+        paymentMethod: 'Pagmetodo',
+        purposes: '[[purposes]]',
+        total: '[[Total:]]',
     },
     update: {
         menuItem: 'Redakti',

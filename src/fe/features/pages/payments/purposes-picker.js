@@ -1,8 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
-import { Button, Dialog, TextField } from '@cpsdqs/yamdl';
+import { Button, Dialog, MenuIcon, TextField } from '@cpsdqs/yamdl';
 import Segmented from '../../../components/segmented';
 import Form, { Validator, Field } from '../../../components/form';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
@@ -74,7 +73,7 @@ export default class PurposesPicker extends PureComponent {
                         e.stopPropagation();
                         this.#open();
                     }}>
-                    <AddIcon />
+                    <AddIcon style={{ verticalAlign: 'middle' }} />
                 </Button>
 
                 <AddPurposeDialog
@@ -92,6 +91,7 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
 
     const amountEditor = currency ? (
         <currencyAmount.editor
+            outline
             currency={currency}
             value={value.amount}
             onChange={amount => onChange({ ...value, amount })} />
@@ -102,12 +102,12 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
     );
 
     const removeButton = (
-        <Button icon small onClick={e => {
+        <Button class="remove-button" onClick={e => {
             e.preventDefault();
             e.stopPropagation();
             onRemove();
         }}>
-            <RemoveIcon />
+            <MenuIcon type="close" />
         </Button>
     );
 
@@ -115,28 +115,38 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
         // TODO: format description properly
         return (
             <div class="payment-purpose is-manual">
-                {removeButton}
-                <div class="purpose-title">{value.title}</div>
-                <div class="purpose-description">
-                    {value.description}
+                <div class="purpose-inner">
+                    <div class="purpose-details">
+                        <div class="purpose-title">{value.title}</div>
+                        <div class="purpose-description">
+                            {value.description}
+                        </div>
+                    </div>
+                    <div class="purpose-amount-container">
+                        {amountEditor}
+                    </div>
                 </div>
-                {amountEditor}
+                {removeButton}
             </div>
         );
     } else if (type === 'addon') {
         return (
             <div class="payment-purpose is-addon">
+                <div class="purpose-inner">
+                    <OverviewListItem
+                        doFetch compact view="payments/addon"
+                        skipAnimation
+                        id={value.paymentAddonId}
+                        options={{ org }}
+                        selectedFields={ADDON_FIELD_IDS}
+                        fields={REDUCED_ADDON_FIELDS}
+                        index={0}
+                        locale={addonLocale.fields} />
+                    <div class="purpose-amount-container">
+                        {amountEditor}
+                    </div>
+                </div>
                 {removeButton}
-                <OverviewListItem
-                    doFetch compact view="payments/addon"
-                    skipAnimation
-                    id={value.paymentAddonId}
-                    options={{ org }}
-                    selectedFields={ADDON_FIELD_IDS}
-                    fields={REDUCED_ADDON_FIELDS}
-                    index={0}
-                    locale={addonLocale.fields} />
-                {amountEditor}
             </div>
         );
     }
@@ -172,10 +182,11 @@ class AddPurposeDialog extends PureComponent {
         let contents = '';
         if (type === 'manual') {
             contents = (
-                <Form onSubmit={this.#add}>
+                <Form onSubmit={this.#add} class="manual-purpose">
                     <Field>
                         <Validator
                             component={TextField}
+                            label={locale.purposesPicker.manual.title}
                             outline
                             value={manualTitle}
                             validate={value => {
@@ -187,6 +198,7 @@ class AddPurposeDialog extends PureComponent {
                     </Field>
                     <Field>
                         <TextField
+                            label={locale.purposesPicker.manual.description}
                             outline
                             value={manualDescription || ''}
                             onChange={e => this.setState({ manualDescription: e.target.value || null })}/>

@@ -175,6 +175,12 @@ export default {
         const [availableCurrencies, setCurrencies] = useState([]);
 
         fields.push(
+            <div key="customer" class="create-intent-subtitle">
+                {intentLocale.fields.customer}
+            </div>
+        );
+
+        fields.push(
             <Field key="customer.name">
                 <Validator
                     component={TextField}
@@ -203,6 +209,13 @@ export default {
                     onChange={e => task.update({ customer: { ...customer, email: e.target.value } })} />
             </Field>
         );
+
+        fields.push(
+            <div key="method-title" class="create-intent-subtitle">
+                {intentLocale.create.paymentMethod}
+            </div>
+        );
+
         fields.push(
             <Field key="method">
                 <MethodPicker
@@ -225,6 +238,7 @@ export default {
             fields.push(
                 <Field key="currency">
                     <Select
+                        class="currency-select"
                         value={task.parameters.currency || ''}
                         onChange={currency => task.update({ currency })}
                         items={[!task.parameters.currency && {
@@ -237,7 +251,13 @@ export default {
                 </Field>
             );
         }
+
         if (task.parameters.currency) {
+            fields.push(
+                <div key="purposes-title" class="create-intent-subtitle">
+                    {intentLocale.create.purposes}
+                </div>
+            );
             fields.push(
                 <Field key="purposes">
                     <PurposesPicker
@@ -249,6 +269,21 @@ export default {
             );
         }
         const ready = task.parameters.purposes && task.parameters.purposes.length;
+
+        let total = 0;
+        if (task.parameters.purposes) {
+            total = task.parameters.purposes.map(p => p.amount).reduce((a, b) => a + b, 0);
+        }
+
+        if (ready) {
+            fields.push(
+                <div key="total" class="create-intent-total">
+                    {intentLocale.create.total}
+                    {' '}
+                    <currencyAmount.renderer value={total} currency={task.parameters.currency} />
+                </div>
+            );
+        }
 
         return (
             <routerContext.Consumer>

@@ -234,6 +234,7 @@ function Purpose ({ purpose, item }) {
         title = purpose.title;
         description = purpose.description;
     } else if (purpose.type === 'addon') {
+        if (!purpose.paymentAddon) return null;
         title = purpose.paymentAddon.name;
         description = purpose.paymentAddon.description;
     }
@@ -320,7 +321,7 @@ function IntentActions ({ item }) {
                     {
                         const turState = tur[s];
                         if (typeof turState === 'string') whyNot = turState;
-                        else {
+                        else if (turState) {
                             const subState = turState[ACTIONS[k].state];
                             if (typeof subState === 'string') whyNot = subState;
                             else whyNot = subState[t];
