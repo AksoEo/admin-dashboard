@@ -167,7 +167,7 @@ export default {
         );
     },
 
-    createIntent ({ open, task }) {
+    createIntent ({ open, core, task }) {
         const fields = [];
 
         const customer = task.parameters.customer || {};
@@ -352,6 +352,8 @@ export default {
                         actionLabel={!!ready && intentLocale.create.button}
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/aksopago/pagoj/${id}`);
+                            // immediately submit
+                            core.createTask('payments/submitIntent', { id }).run();
                         })}>
                         <DynamicHeightDiv useFirstHeight>
                             {fields}
@@ -556,6 +558,7 @@ export default {
                 open={open}
                 onClose={() => task.drop()}
                 title={intentLocale.actions.submit.title}
+                running={task.running}
                 actionLabel={intentLocale.actions.submit.button}
                 run={() => task.runOnce()}>
                 {intentLocale.actions.submit.description}
