@@ -92,6 +92,12 @@ export default connectPerms(class Intents extends Page {
             action: () => this.setState({ fieldPickerOpen: true }),
         });
 
+        actions.push({
+            label: locale.report.title,
+            action: () => this.props.push('raporto'),
+            overflow: true,
+        });
+
         return (
             <div class="payment-orgs-page">
                 <Meta

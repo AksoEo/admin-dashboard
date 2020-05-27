@@ -312,6 +312,12 @@ export default [
                 hasPerm: perms => perms.hasPerm('pay.payment_intents.read.tejo') || perms.hasPerm('pay.payment_intents.read.uea'),
                 paths: [
                     {
+                        path: 'raporto',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "payment-balance-report" */ './payments/intents/report')),
+                        type: 'stack',
+                    },
+                    {
                         match: /^(\w+)$/,
                         component: elazy(() =>
                             import(/* webpackChunkName: "payment-intents" */ './payments/intents/detail')),

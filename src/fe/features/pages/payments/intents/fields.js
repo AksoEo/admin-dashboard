@@ -1,8 +1,9 @@
 import { h } from 'preact';
+import moment from 'moment';
 import { currencyAmount, email, timestamp } from '../../../../components/data';
 import TejoIcon from '../../../../components/tejo-icon';
 import UeaIcon from '../../../../components/uea-icon';
-import { paymentIntents as locale } from '../../../../locale';
+import { paymentIntents as locale, timestampFormat } from '../../../../locale';
 import { PaymentMethodType } from '../orgs/methods/fields';
 import './fields.less';
 
@@ -26,6 +27,10 @@ export const FIELDS = {
                 </span>
             );
         },
+        stringify (value) {
+            if (!value) return '';
+            return `${value.name} <${value.email}>`;
+        },
     },
     method: {
         sortable: true,
@@ -33,11 +38,17 @@ export const FIELDS = {
             if (!value) return;
             return <PaymentMethodType value={value.type} />;
         },
+        stringify (value) {
+            return value;
+        },
     },
     org: {
         component ({ value }) {
             if (value === 'tejo') return <TejoIcon />;
             if (value === 'uea') return <UeaIcon />;
+        },
+        stringify (value) {
+            return value;
         },
     },
     currency: {
@@ -45,10 +56,16 @@ export const FIELDS = {
         component ({ value }) {
             return value;
         },
+        stringify (value) {
+            return value;
+        },
     },
     status: {
         sortable: true,
         component ({ value }) {
+            return locale.fields.statuses[value];
+        },
+        stringify (value) {
             return locale.fields.statuses[value];
         },
     },
@@ -58,6 +75,10 @@ export const FIELDS = {
             if (!value) return null;
             return <timestamp.renderer value={value * 1000} maybeRelative />;
         },
+        stringify (value) {
+            if (!value) return '';
+            return moment(value * 1000).format(timestampFormat);
+        },
     },
     statusTime: {
         sortable: true,
@@ -65,9 +86,16 @@ export const FIELDS = {
             if (!value) return null;
             return <timestamp.renderer value={value * 1000} maybeRelative />;
         },
+        stringify (value) {
+            if (!value) return '';
+            return moment(value * 1000).format(timestampFormat);
+        },
     },
     internalNotes: {
         component ({ value }) {
+            return value;
+        },
+        stringify (value) {
             return value;
         },
     },
@@ -76,10 +104,16 @@ export const FIELDS = {
             // TODO: format properly
             return value;
         },
+        stringify (value) {
+            return value;
+        },
     },
     foreignId: {
         component ({ value }) {
             return <code class="payment-intent-foreign-id">{value}</code>;
+        },
+        stringify (value) {
+            return value;
         },
     },
     totalAmount: {
@@ -87,11 +121,17 @@ export const FIELDS = {
         component ({ value, item }) {
             return <currencyAmount.renderer value={value} currency={item.currency} />;
         },
+        stringify (value) {
+            return '' + value;
+        },
     },
     amountRefunded: {
         sortable: true,
         component ({ value, item }) {
             return <currencyAmount.renderer value={value} currency={item.currency} />;
+        },
+        stringify (value) {
+            return '' + value;
         },
     },
 };

@@ -987,6 +987,11 @@ export const paymentIntents = {
         title: 'Ĝisdatigi',
         button: 'Konservi',
     },
+
+    report: {
+        title: '[[report]]',
+        csvFilename: '[[payment_report]]',
+    },
 };
 
 export const currencies = {
