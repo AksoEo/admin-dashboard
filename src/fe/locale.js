@@ -96,7 +96,7 @@ export const data = {
         m: 'm',
         s: 's',
     },
-    invalidCurrencyAmount: '[[invalid currency amount]]', // this will only happen very rarely
+    invalidCurrencyAmount: 'Nealida valutokvanto', // this will only happen very rarely
     permsEditor: {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',
         requires: 'Bezonas',
@@ -773,9 +773,9 @@ export const paymentMethods = {
         button: 'Forigi',
     },
     methodPicker: {
-        title: '[[pick payment method]]',
-        orgsEmpty: '[[no payment orgs]]',
-        empty: '[[no manual methods in this org]]',
+        title: 'Elekti pagmetodon',
+        orgsEmpty: 'Ekzistas neniu pagorganizo',
+        empty: 'Tiu ĉi pagorganizo ne enhavas ajnan permanan pagmetodon',
     },
 };
 export const paymentIntents = {
@@ -870,9 +870,9 @@ export const paymentIntents = {
             amount: 'Redonita monkvanto',
             button: 'Indiki',
 
-            stripeTitle: '[[you need to do this in stripe]]',
-            stripeDescription: '[[we were too lazy to implement this in the admin fe]]',
-            stripeButton: '[[do it in stripe]]',
+            stripeTitle: 'Tio ĉi eblas nur en la retejo de Stripe',
+            stripeDescription: 'Redonado de mono nur eblas per la platformo de Stripe. Kiam la mono estas redonita pere de Stripe, AKSO aŭtomate estos ĝidatigita.',
+            stripeButton: 'Iri al Stripe',
 
             // errors
             lowerBound: 'Ne eblas redoni negativan monkvanton',
@@ -890,7 +890,7 @@ export const paymentIntents = {
         },
     },
     transitionUnavailabilityReasons: {
-        stripe: '[[not available for stripe intents]]', // fallback
+        stripe: 'Ne eblas fari tion ĉi por pagoj faritaj per Stripe.', // fallback
 
         // current state -> new state
         // the following table is for MANUAL methods. If something is allowed in manual but not
@@ -898,30 +898,30 @@ export const paymentIntents = {
         pending: {
             submitted: '', // allowed
             canceled: '', // allowed
-            succeeded: '[[submit first]]',
-            disputed: '[[nope]]',
+            succeeded: 'Ne eblas indiki, ke pago estis ricevita antaŭ ol ĝi estis sendita.',
+            disputed: 'Ne eblas krei disputon pri pago, kiu ankoraŭ ne estis sendita.',
             refunded: '', // allowed
         },
-        processing: '[[patience]]',
+        processing: 'Bonvolu atendi, la pago estas nuntempe traktata de la sistemo.',
         submitted: {
-            submitted: '[[already submitted]]',
+            submitted: 'La pago estis jam indikita kiel sendita.',
             canceled: '', // allowed
             succeeded: '', // allowed
-            disputed: '[[nope]]',
+            disputed: '[[THIS IS A BUG]]',
             refunded: '', // allowed
         },
         canceled: {
-            submitted: '[[nope]]',
-            canceled: '[[already canceled]]',
-            succeeded: '[[nope]]',
-            disputed: '[[nope]]',
-            refunded: '[[nope]]',
+            submitted: 'La pago estis nuligita; tial ne eblas indiki, ke la pago estis sendita. Se mono tamen estis sendita post nuligo, la mono estu resendita.',
+            canceled: 'La pago estis jam nuligita.',
+            succeeded: 'La pago estis nuligita; tial ne eblas indiki, ke la pago estis sukcese ricevita. Se mono tamen estis sendita post nuligo, la mono estu resendita.',
+            disputed: 'La pago estis nuligita; tial ne eblas krei disputon.',
+            refunded: 'La pago estis nuligita; tial ne eblas repagi ĝin.',
         },
-        abandoned: '[[nope]]',
+        abandoned: 'La pago eksvalidiĝis; tial ne eblas agi pri ĝi.',
         succeeded: {
-            submitted: '[[nope]]',
-            canceled: '[[nope]]',
-            succeeded: '[[already succeeded]]',
+            submitted: 'La pago estis sukcesa; ne necesas indiki ke la mono estis sendita.',
+            canceled: 'La pago estis sukcesa; ne eblas nun nuligi ĝin. Eblas redoni la monon aŭ krei disputon.',
+            succeeded: 'La pago jam estis indikita kiel sukcesa.',
             disputed: {
                 stripe: '[[idk why]]',
                 manual: '', // allowed,
@@ -929,10 +929,10 @@ export const paymentIntents = {
             refunded: '[[nope]]',
         },
         disputed: {
-            submitted: '[[nope]]',
+            submitted: 'La pago jam havas disputon; kaj do jam estas indikita, ke la pago estis ricevita. Se vi volas fini la disputon, elektu inter sukcesa kaj redonita.',
             canceled: '', // allowed
-            succeeded: '[[nope]]',
-            disputed: '[[already disputed]]',
+            succeeded: '[[THIS WILL BE ALLOWED BY API]]',
+            disputed: 'Tiu ĉi pago jam estas disputata.',
             refunded: '', // allowed
         },
         refunded: {
@@ -958,16 +958,16 @@ export const paymentIntents = {
         },
     },
     purposesPicker: {
-        addTitle: '[[add purpose]]',
-        selectMethodFirst: '[[select a payment method first]]',
-        selectCurrencyFirst: '[[select a currency first]]',
-        addPurposeButton: '[[add]]',
+        addTitle: 'Aldoni celon de la pago',
+        selectMethodFirst: 'Unue necesas elekti pagmetodon',
+        selectCurrencyFirst: 'Unue necesas elekti valuton',
+        addPurposeButton: 'Aldoni pagcelon',
         types: {
             manual: 'Permana',
             addon: 'Donaceblo',
         },
         manual: {
-            title: '[[title]]',
+            title: 'Titolo',
             description: 'Priskribo',
         },
     },
@@ -976,11 +976,11 @@ export const paymentIntents = {
         title: 'Krei pagon',
         button: 'Krei',
 
-        noCurrencySelected: '[[no currency selected]]',
+        noCurrencySelected: 'Neniu valuto estis elektita',
         paymentMethod: 'Pagmetodo',
-        purposes: '[[purposes]]',
-        total: '[[Total:]]',
-        totalNote: '[[estimate; actual value will be clamped to 1USD-500KUSD]]',
+        purposes: 'Pagceloj',
+        total: 'Sumo',
+        totalNote: 'La sumo estas supozo, la ver valoro estos la ekvivalento de minimume 1 USD/maksimume 500.000 USD',
     },
     update: {
         menuItem: 'Redakti',
