@@ -247,6 +247,10 @@ export const index = {
     tasks: {
         title: 'Taskoj',
     },
+    admin: {
+        title: '[[admin]]',
+        description: '[[for help contact your sysadmin at fdsahfjs]]',
+    },
 };
 
 export const search = {
