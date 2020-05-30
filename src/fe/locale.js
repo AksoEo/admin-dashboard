@@ -248,8 +248,8 @@ export const index = {
         title: 'Taskoj',
     },
     admin: {
-        title: '[[admin]]',
-        description: '[[for help contact your sysadmin at fdsahfjs]]',
+        title: 'Asisto',
+        description: 'Se vi spertas problemojn pri AKSO-Administranto, vi ĉiam povas sendi retmesaĝon al helpo@akso.org. Bonvolu indiki detale la problemon, eventuale aldonante ekranfotojn.',
     },
 };
 
