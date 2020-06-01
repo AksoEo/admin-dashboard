@@ -867,6 +867,10 @@ export const paymentIntents = {
             title: 'Krei disputon',
             description: 'Ĉu vi certas, ke vi volas krei disputon pri tiu ĉi pago? Bv. aldoni detalojn pri la disputo en la internaj notoj.',
             button: 'Krei disputon',
+
+            stripeTitle: 'Tio ĉi eblas nur en la retejo de Stripe',
+            stripeDescription: '[[kreado de disputo nur eblas etc etc]]',
+            stripeButton: 'Iri al Stripe',
         },
         markRefunded: {
             title: 'Indiki pagon redonita',

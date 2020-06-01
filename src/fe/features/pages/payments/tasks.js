@@ -518,6 +518,26 @@ export default {
             </TaskDialog>
         );
     },
+    _stripeDispute ({ open, task }) {
+        return (
+            <TaskDialog
+                class="payments-task-intent-action"
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.actions.markDisputed.stripeTitle}
+                actionLabel={intentLocale.actions.markDisputed.stripeButton}
+                run={() => {
+                    task.drop();
+                    const a = document.createElement('a');
+                    a.href = intentLocale.stripeIntentLink(task.options.id);
+                    a.rel = 'noopener noreferrer';
+                    a.target = '_blank';
+                    a.click();
+                }}>
+                {intentLocale.actions.markDisputed.stripeDescription}
+            </TaskDialog>
+        );
+    },
     _stripeRefund ({ open, task }) {
         return (
             <TaskDialog

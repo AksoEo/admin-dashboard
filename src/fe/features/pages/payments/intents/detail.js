@@ -314,6 +314,7 @@ function IntentActions ({ item }) {
 
             for (const k in ACTIONS) {
                 const isRefund = k === 'markRefunded';
+                const isDispute = k === 'markDisputed';
                 let enabled = ACTIONS[k].enabled(t, s);
                 let whyNot = null;
                 let whyNotBecauseStripe = false;
@@ -335,11 +336,14 @@ function IntentActions ({ item }) {
                     }
                 }
                 let task = ACTIONS[k].task(id, item);
-                if (isRefund && !enabled && whyNotBecauseStripe) {
+                if ((isRefund || isDispute) && !enabled && whyNotBecauseStripe) {
                     // stripe
                     enabled = true;
                     whyNot = null;
-                    task = ['payments/_stripeRefund', { id: item.stripePaymentIntentId }];
+                    task = [
+                        isRefund ? 'payments/_stripeRefund' : 'payments/_stripeDispute',
+                        { id: item.stripePaymentIntentId },
+                    ];
                 }
                 actions.push(
                     <Button
