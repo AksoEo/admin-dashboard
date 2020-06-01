@@ -28,7 +28,6 @@ export default connectPerms(class IntentPage extends Page {
     state = {
         edit: null,
         org: 'meow', // nonsense default value
-        status: 'meow', // nonsense default value
     };
 
     static contextType = coreContext;
@@ -63,12 +62,12 @@ export default connectPerms(class IntentPage extends Page {
         return this.props.match[1];
     }
 
-    render ({ perms, editing }, { edit, org, status }) {
+    render ({ perms, editing }, { edit, org }) {
         const actions = [];
 
         const id = this.getId();
 
-        if (status === 'pending' && perms.hasPerm(`pay.payment_intents.update.${org}`)) {
+        if (perms.hasPerm(`pay.payment_intents.update.${org}`)) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
@@ -109,7 +108,7 @@ export default connectPerms(class IntentPage extends Page {
                     locale={locale}
                     edit={edit}
                     onEditChange={edit => this.setState({ edit })}
-                    onData={data => this.setState({ org: data.org, status: data.status })}
+                    onData={data => this.setState({ org: data.org })}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
@@ -129,6 +128,8 @@ function DetailViewInner ({ item, editing, onItemChange }) {
         org,
         paymentOrg,
     } = item;
+
+    const fullEditing = editing && status === 'pending';
 
     let orgIcon = null;
     if (org === 'tejo') orgIcon = <TejoIcon class="payment-org-icon" />;
@@ -199,7 +200,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
             </DynamicHeightDiv>
             <div class="intent-customer-container">
                 <div class="intent-section-title">{locale.fields.customer}</div>
-                <Customer item={item} editing={editing} onItemChange={onItemChange} />
+                <Customer item={item} editing={fullEditing} onItemChange={onItemChange} />
             </div>
             <div class="intent-method-container">
                 <div class="intent-section-title">{locale.fields.method}</div>
@@ -214,7 +215,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                 )}
             </DynamicHeightDiv>
             <NotesField item={item} editing={editing} onItemChange={onItemChange} field="internalNotes" />
-            <NotesField item={item} editing={editing} onItemChange={onItemChange} field="customerNotes" />
+            <NotesField item={item} editing={fullEditing} onItemChange={onItemChange} field="customerNotes" />
         </div>
     );
 }
