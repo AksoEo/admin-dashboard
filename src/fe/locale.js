@@ -915,7 +915,7 @@ export const paymentIntents = {
             submitted: 'La pago estis jam indikita kiel sendita.',
             canceled: '', // allowed
             succeeded: '', // allowed
-            disputed: '[[THIS IS A BUG]]',
+            disputed: '', // allowed
             refunded: '', // allowed
         },
         canceled: {
@@ -930,16 +930,12 @@ export const paymentIntents = {
             submitted: 'La pago estis sukcesa; ne necesas indiki ke la mono estis sendita.',
             canceled: 'La pago estis sukcesa; ne eblas nun nuligi ĝin. Eblas redoni la monon aŭ krei disputon.',
             succeeded: 'La pago jam estis indikita kiel sukcesa.',
-            disputed: {
-                stripe: '[[idk why]]',
-                manual: '', // allowed,
-            },
-            refunded: '[[nope]]',
+            disputed: '', // allowed
         },
         disputed: {
             submitted: 'La pago jam havas disputon; kaj do jam estas indikita, ke la pago estis ricevita. Se vi volas fini la disputon, elektu inter sukcesa kaj redonita.',
             canceled: '', // allowed
-            succeeded: '[[THIS WILL BE ALLOWED BY API]]',
+            succeeded: '', // allowed
             disputed: 'Tiu ĉi pago jam estas disputata.',
             refunded: '', // allowed
         },
