@@ -1,4 +1,5 @@
 import { UEACode, util } from '@tejo/akso-client';
+import moment from 'moment';
 import JSON5 from 'json5';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
@@ -414,13 +415,13 @@ const clientFilters = {
                 dateFilter.$and = [
                     {
                         $or: [
-                            { durationFrom: { $lte: date / 1000 } },
+                            { durationFrom: { $lte: +moment.utc(date) / 1000 } },
                             { durationFrom: null },
                         ],
                     },
                     {
                         $or: [
-                            { durationTo: { $gte: date / 1000 } },
+                            { durationTo: { $gte: +moment.utc(date) / 1000 } },
                             { durationTo: null },
                         ],
                     },
