@@ -288,6 +288,29 @@ export default [
                 hasPerm: () => true,
             },
             {
+                id: 'roles',
+                icon: CardMembershipIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "roles" */ './roles')),
+                path: 'roloj',
+                hasPerm: perms => perms.hasPerm('codeholder_roles.read'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "roles" */ './roles/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
                 id: 'statistics',
                 icon: AssessmentIcon,
                 path: 'statistiko',

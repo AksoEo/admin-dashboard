@@ -224,6 +224,7 @@ export const pages = {
     codeholders: 'Membroj',
     statistics: 'Statistiko',
     membership: 'Membreco',
+    roles: 'Roloj',
     email: 'Amasmesaĝoj',
     magazines: 'Revuoj',
     congresses: 'Kongresoj',
@@ -671,6 +672,40 @@ export const codeholders = {
         send: 'Sciigo',
         success: 'Sciigo sendita',
     },
+};
+
+export const roles = {
+    title: 'Roloj',
+    detailTitle: 'Rolo',
+    fields: {
+        name: 'Nomo',
+        description: 'Priskribo',
+    },
+    search: {
+        placeholders: {
+            name: 'Serĉi nomon',
+            description: 'Serĉi priskribon',
+        },
+    },
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei rolon',
+        button: 'Krei',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Alŝuti rolon',
+        button: 'Alŝuti',
+
+        nameRequired: 'Necesas nomo',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi rolon',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la rolon? Ne eblas malfari tiun ĉi agon.',
+    },
+    csvFilename: 'roloj',
 };
 
 export const paymentOrgs = {

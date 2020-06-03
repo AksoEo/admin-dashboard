@@ -52,6 +52,7 @@ export const tasks = {
     httpLog: lazyPath(httpLog, mapTasks),
     login: lazyPath(login, mapTasks),
     lists: lazyPath(lists, mapTasks),
+    roles: lazyPath(roles, mapTasks),
     queries: lazyPath(queries, mapTasks),
     perms: lazyPath(perms, mapTasks),
     payments: lazyPath(payments, mapTasks),
