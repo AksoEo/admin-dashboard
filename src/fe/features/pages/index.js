@@ -17,6 +17,7 @@ import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import FileIcon from '@material-ui/icons/InsertDriveFile';
+import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
 
 export function NewspaperIcon () {
     return (
@@ -289,7 +290,7 @@ export default [
             },
             {
                 id: 'roles',
-                icon: CardMembershipIcon,
+                icon: WorkOutlineIcon,
                 component: elazy(() =>
                     import(/* webpackChunkName: "roles" */ './roles')),
                 path: 'roloj',
