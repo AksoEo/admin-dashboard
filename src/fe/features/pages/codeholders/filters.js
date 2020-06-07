@@ -3,6 +3,7 @@ import { Fragment, useState } from 'preact/compat';
 import { Checkbox, Button, Dialog } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
+import CloseIcon from '@material-ui/icons/Close';
 import CheckIcon from '@material-ui/icons/Check';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import moment from 'moment';
@@ -640,14 +641,23 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <Fragment>
-                    <div>
+                    <div class="role-editor-top">
                         <label>
                             {locale.search.role.activeAtTime}
                         </label>
                         <date.editor
+                            class="role-date-editor"
+                            placeholder={locale.search.role.anyTime}
                             value={value.date}
-                            onChange={date => onChange({ ...value, date })}
+                            onChange={date => onChange({ ...value, date: date })}
                             disabled={hidden}
+                            trailing={value.date ? (
+                                <span
+                                    class="date-editor-clear"
+                                    onClick={() => onChange({ ...value, date: '' })}>
+                                    <CloseIcon />
+                                </span>
+                            ) : null}
                             tabIndex={hidden ? -1 : undefined} />
                     </div>
                     <RolePicker

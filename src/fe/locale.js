@@ -410,6 +410,7 @@ export const codeholders = {
         role: {
             pickSome: 'Elekti rolojn',
             activeAtTime: 'aktiva je', // comes before the date picker
+            anyTime: '[[any time]]', // null value for date picker
         },
         types: {
             all: 'ne gravas',

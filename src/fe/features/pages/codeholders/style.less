@@ -145,6 +145,24 @@
         }
     }
 
+    .role-editor-top {
+        .role-date-editor {
+            vertical-align: middle;
+            margin-left: 8px;
+
+            .date-editor-clear {
+                // FIXME: rudimentary “button”
+                display: inline-block;
+                color: @gray-button-color;
+                transform: scale(0.8);
+
+                &:hover {
+                    color: inherit;
+                }
+            }
+        }
+    }
+
     .active-member-editor, .death-date-editor {
         display: flex;
         margin-top: 8px;
