@@ -687,6 +687,9 @@ export const roles = {
             description: 'Serĉi priskribon',
         },
     },
+    detail: {
+        viewMembers: 'Vidi membrojn',
+    },
     create: {
         menuItem: 'Krei',
         title: 'Krei rolon',
