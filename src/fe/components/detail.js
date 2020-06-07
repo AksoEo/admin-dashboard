@@ -111,6 +111,7 @@ export default class DetailView extends PureComponent {
                 originalItem: this.state.data,
                 onItemChange: item => this.props.onEditChange(item),
                 userData,
+                slot: 'detail',
             };
 
             const createHistoryLink = field => makeHistoryLink && (

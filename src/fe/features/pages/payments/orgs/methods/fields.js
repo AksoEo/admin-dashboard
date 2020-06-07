@@ -4,6 +4,7 @@ import { Validator } from '../../../../../components/form';
 import Segmented from '../../../../../components/segmented';
 import Select from '../../../../../components/select';
 import StripeIcon from '../../../../../components/stripe-icon';
+import MdField from '../../../../../components/md-field';
 import { timespan } from '../../../../../components/data';
 import { paymentMethods as locale, currencies } from '../../../../../locale';
 import './fields.less';
@@ -64,14 +65,14 @@ export const FIELDS = {
         weight: 2,
     },
     description: {
-        component ({ value, editing, onChange, isCreation }) {
-            if (editing) {
-                return <TextField
-                    label={isCreation ? locale.fields.description : null}
-                    value={value}
-                    onChange={e => onChange(e.target.value)} />;
-            }
-            return value;
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange, isCreation, slot }) {
+            return <MdField
+                rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
+                value={value}
+                editing={editing}
+                inline={slot !== 'detail' && !isCreation}
+                onChange={onChange} />;
         },
     },
     stripeMethods: {

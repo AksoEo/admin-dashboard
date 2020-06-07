@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import moment from 'moment';
 import { TextField } from '@cpsdqs/yamdl';
+import MdField from '../../../components/md-field';
 import TejoIcon from '../../../components/tejo-icon';
 import UeaIcon from '../../../components/uea-icon';
 import { votes as locale, timestampFormat } from '../../../locale';
@@ -42,12 +43,13 @@ export default {
     },
     description: {
         sortable: true,
-        component ({ value, onChange, editing }) {
-            if (!editing) return value;
+        component ({ value, onChange, editing, slot }) {
             return (
-                <textarea
-                    class="vote-description-editor"
+                <MdField
+                    rules={['emphasis', 'strikethrough', 'link', 'list', 'table', 'image']}
                     value={value}
+                    editing={editing}
+                    inline={slot !== 'detail'}
                     onChange={e => onChange(e.target.value)} />
             );
         },

@@ -1,0 +1,57 @@
+@import '../prelude';
+
+.CodeMirror.cm-s-akso {
+    font-family: @monospace;
+    font-size: 12px;
+    background: var(--editor-background);
+    color: var(--editor-text);
+
+    .CodeMirror-cursor {
+        border-left-color: var(--editor-text);
+    }
+    .CodeMirror-selected {
+        background: var(--editor-selection);
+    }
+    .CodeMirror-gutters {
+        background: var(--editor-background);
+        border-right-color: transparent;
+    }
+    .CodeMirror-linenumber {
+        color: var(--editor-line-number);
+        font-size: 0.8em;
+        margin-top: 0.25em;
+    }
+    .CodeMirror-nonmatchingbracket {
+        color: var(--editor-error);
+    }
+    .CodeMirror-matchingbracket {
+        color: var(--editor-match);
+    }
+
+    .cm-property { color: var(--editor-syntax-property); }
+    .cm-string { color: var(--editor-syntax-string); }
+    .cm-atom { color: var(--editor-syntax-atom); }
+    .cm-number { color: var(--editor-syntax-number); }
+    .cm-comment { color: var(--editor-syntax-comment); }
+
+    .json-error-line {
+        background: var(--editor-error-background);
+    }
+    .json-error-message {
+        font-family: Roboto, sans-serif; // FIXME: hardcoded font
+    }
+
+    .cm-akso-template {
+        background: var(--editor-template-background);
+
+        .cm-invalidchar[title="\\u91"] {
+            display: inline-block;
+            color: transparent;
+            width: 2px;
+            background: var(--editor-template-delimiter);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+    }
+}
+

@@ -1,0 +1,53 @@
+@import '../prelude';
+@import './codemirror-style';
+
+.markdown-text-field {
+    &.editing {
+        border: 1px solid var(--md-text-field-idle);
+        border-radius: 4px;
+        overflow: hidden;
+
+        &:focus-within {
+            border-color: @secondary;
+        }
+
+        .CodeMirror {
+            height: 180px;
+        }
+    }
+
+    .markdown-contents {
+        table {
+            border: 1px solid @separator;
+            border-radius: 4px;
+            border-spacing: 0px;
+
+            td, th {
+                padding: 4px 8px;
+            }
+
+            thead tr {
+                background: @text-fade-10;
+            }
+            thead th {
+                border-bottom: 1px solid @separator;
+            }
+
+            tbody tr:nth-child(2n) {
+                background: @text-fade-10;
+            }
+        }
+
+        &.is-inline {
+            height: 1.3em;
+            line-height: 1.3em;
+            overflow: hidden;
+
+            p {
+                margin: 0;
+                display: inline-block;
+                margin-right: 1em;
+            }
+        }
+    }
+}

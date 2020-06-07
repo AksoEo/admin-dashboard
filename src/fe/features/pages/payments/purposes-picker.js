@@ -7,6 +7,7 @@ import Form, { Validator, Field } from '../../../components/form';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import StaticOverviewList from '../../../components/overview-list-static';
 import OverviewListItem from '../../../components/overview-list-item';
+import MdField from '../../../components/md-field';
 import { currencyAmount } from '../../../components/data';
 import {
     paymentIntents as locale,
@@ -112,15 +113,15 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
     );
 
     if (type === 'manual') {
-        // TODO: format description properly
         return (
             <div class="payment-purpose is-manual">
                 <div class="purpose-inner">
                     <div class="purpose-details">
                         <div class="purpose-title">{value.title}</div>
-                        <div class="purpose-description">
-                            {value.description}
-                        </div>
+                        <MdField
+                            class="purpose-description"
+                            rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
+                            value={value.description} />
                     </div>
                     <div class="purpose-amount-container">
                         {amountEditor}
@@ -197,11 +198,11 @@ class AddPurposeDialog extends PureComponent {
                             onChange={e => this.setState({ manualTitle: e.target.value })}/>
                     </Field>
                     <Field>
-                        <TextField
-                            label={locale.purposesPicker.manual.description}
-                            outline
-                            value={manualDescription || ''}
-                            onChange={e => this.setState({ manualDescription: e.target.value || null })}/>
+                        <label>{locale.purposesPicker.manual.description}</label>
+                        <MdField
+                            rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
+                            editing value={manualDescription || ''}
+                            onChange={value => this.setState({ manualDescription: value || null })}/>
                     </Field>
                     <div class="form-footer">
                         <Button raised>

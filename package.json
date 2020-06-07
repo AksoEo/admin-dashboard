@@ -27,6 +27,7 @@
     "jdenticon": "^2.2.0",
     "json5": "^2.1.1",
     "libphonenumber-js": "^1.7.44",
+    "markdown-it": "^11.0.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
     "msgpack-lite": "^0.1.26",

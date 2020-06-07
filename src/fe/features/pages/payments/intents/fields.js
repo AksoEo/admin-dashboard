@@ -101,7 +101,6 @@ export const FIELDS = {
     },
     customerNotes: {
         component ({ value }) {
-            // TODO: format properly
             return value;
         },
         stringify (value) {
