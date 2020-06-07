@@ -382,6 +382,21 @@
             padding-top: 8px;
             padding-right: 8px;
 
+            .gen-presets {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                --md-button-color: @gray-button-color;
+
+                .loaded-preset {
+                    margin-right: 8px;
+
+                    .preset-unlink-button {
+                        margin-right: 8px;
+                    }
+                }
+            }
+
             .settings-item {
                 display: flex;
                 justify-content: space-between;
@@ -445,6 +460,12 @@
             }
         }
     }
+}
+.address-label-preset-picker {
+    width: 400px;
+    height: 600px;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .codeholder-detail-page, .codeholder-field-history {

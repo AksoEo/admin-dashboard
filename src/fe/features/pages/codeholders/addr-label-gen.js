@@ -1,11 +1,14 @@
 import { h } from 'preact';
 import { useState, Fragment, PureComponent } from 'preact/compat';
 import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from '@cpsdqs/yamdl';
+import RemoveIcon from '@material-ui/icons/Remove';
 import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
+import DataList from '../../../components/data-list';
 import { CardStackItem } from '../../../components/card-stack';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
+import { connectPerms } from '../../../perms';
 
 export default function AddrLabelGenContainer ({
     open, lvIsCursed, options, onClose,
@@ -204,6 +207,7 @@ const SETTINGS = {
     fontSize: boundedNumber(8, 30, 1, 'pt'),
     drawOutline: ValCheckbox,
 };
+const CLIENT_FIELDS = ['language', 'latin', 'includeCode', '_unitSwitch'];
 
 function GenSettings ({ value, onChange, view, onViewChange }) {
     const items = Object.entries(SETTINGS).map(([id, Editor]) => {
@@ -225,8 +229,126 @@ function GenSettings ({ value, onChange, view, onViewChange }) {
         );
     });
 
-    return <div class="gen-settings">{items}</div>;
+    return (
+        <div class="gen-settings">
+            <GenPresets value={value} onChange={onChange} />
+            {items}
+        </div>
+    );
 }
+
+const PresetPicker = connectPerms(function PresetPicker ({ open, onClose, core, onLoad, perms }) {
+    const canDelete = perms.hasPerm('address_label_templates.delete');
+
+    return (
+        <Dialog
+            backdrop
+            open={open}
+            onClose={onClose}
+            title={locale.addrLabelGen.presets.pick}
+            class="address-label-preset-picker">
+            <DataList
+                onLoad={(offset, limit) => core.createTask('codeholders/listAddrLabelPresets', {}, {
+                    offset,
+                    limit,
+                }).runOnceAndDrop()}
+                itemHeight={56}
+                renderItem={item => (
+                    <div class="preset-item">
+                        {item.name}
+                    </div>
+                )}
+                onItemClick={item => onLoad(item)}
+                onRemove={canDelete
+                    ? (item => core.createTask('codeholders/deleteAddrLabelPreset', { id: item.id }).runOnceAndDrop())
+                    : null}
+                emptyLabel={locale.addrLabelGen.presets.empty} />
+        </Dialog>
+    );
+});
+
+
+const GenPresets = connectPerms(function GenPresets ({ value, onChange, perms }) {
+    const [loadedPreset, setLoadedPreset] = useState(null);
+    const [pickerOpen, setPickerOpen] = useState(false);
+
+    if (!perms.hasPerm('address_label_templates.read')) return null;
+
+    let loaded;
+    if (loadedPreset) {
+        loaded = (
+            <span class="loaded-preset">
+                <Button icon small class="preset-unlink-button" onClick={() => {
+                    setLoadedPreset(null);
+                }}>
+                    <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                </Button>
+                <span class="preset-name">{loadedPreset.name}</span>
+            </span>
+        );
+    }
+
+    const canSavePreset = loadedPreset
+        ? perms.hasPerm('address_label_templates.update')
+        : perms.hasPerm('address_label_templates.create');
+
+    const load = preset => {
+        setLoadedPreset(preset);
+        const newValue = { ...value };
+        for (const k in preset) if (k in newValue) newValue[k] = preset[k];
+        onChange(newValue);
+    };
+
+    const store = core => {
+        const apiValue = {};
+        for (const k in value) {
+            if (!CLIENT_FIELDS.includes(k)) apiValue[k] = value[k];
+        }
+
+        let task;
+        if (loadedPreset) {
+            task = core.createTask('codeholders/updateAddrLabelPreset', { id: loadedPreset.id }, {
+                name: loadedPreset.name,
+                ...apiValue,
+            });
+        } else {
+            task = core.createTask('codeholders/createAddrLabelPreset', {}, {
+                name: '',
+                ...apiValue,
+            });
+        }
+        task.on('success', id => {
+            setLoadedPreset({ id, ...task.parameters });
+        });
+    };
+
+    return (
+        <coreContext.Consumer>{core => (
+            <div class="gen-presets">
+                {loaded ? loaded : (
+                    <Button
+                        class="load-preset"
+                        onClick={() => setPickerOpen(true)}>
+                        {locale.addrLabelGen.presets.load}
+                    </Button>
+                )}
+                {canSavePreset ? <Button
+                    class="store-preset"
+                    onClick={() => store(core)}>
+                    {loaded
+                        ? locale.addrLabelGen.presets.update.menuItem
+                        : locale.addrLabelGen.presets.create.menuItem}
+                </Button> : null}
+
+                <PresetPicker
+                    open={pickerOpen}
+                    onClose={() => setPickerOpen(false)}
+                    onLoad={load}
+                    core={core} />
+            </div>
+        )}</coreContext.Consumer>
+    );
+});
 
 function MarginsEditor ({ value, onChange, view }) {
     return (

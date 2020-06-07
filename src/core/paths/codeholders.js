@@ -1300,6 +1300,33 @@ export const tasks = {
             return codeSuggestions;
         }
     },
+
+    listAddrLabelPresets: async (_, { offset, limit }) => {
+        const client = await asyncClient;
+        const res = await client.get('/address_label_templates', {
+            offset,
+            limit,
+            fields: [
+                'id', 'name', 'paper', 'margins', 'cols', 'rows', 'colGap', 'rowGap',
+                'cellPadding', 'fontSize', 'drawOutline',
+            ],
+        });
+        return { items: res.body, total: +res.res.headers.get('x-total-items') };
+    },
+    createAddrLabelPreset: async (_, data) => {
+        const client = await asyncClient;
+        const res = await client.post('/address_label_templates', data);
+        return +res.res.headers.get('x-identifier');
+    },
+    updateAddrLabelPreset: async ({ id }, data) => {
+        const client = await asyncClient;
+        await client.patch(`/address_label_templates/${id}`, data);
+        return +id;
+    },
+    deleteAddrLabelPreset: async ({ id }) => {
+        const client = await asyncClient;
+        await client.delete(`/address_label_templates/${id}`);
+    },
 };
 
 const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms

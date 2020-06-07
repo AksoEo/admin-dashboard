@@ -8,7 +8,7 @@ import Segmented from '../../../components/segmented';
 import Select from '../../../components/select';
 import ChangedFields from '../../../components/changed-fields';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
-import Form, { Validator } from '../../../components/form';
+import Form, { Field, Validator } from '../../../components/form';
 import { ueaCode, date } from '../../../components/data';
 import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
@@ -381,6 +381,51 @@ export default {
                 actionLabel={locale.delete}
                 run={() => task.runOnce()}>
                 {dataLocale.deleteDescription}
+            </TaskDialog>
+        );
+    },
+
+    createAddrLabelPreset ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.addrLabelGen.presets.create.title}
+                actionLabel={locale.addrLabelGen.presets.create.button}
+                run={() => task.runOnce()}>
+                <Field>
+                    <Validator
+                        component={TextField}
+                        value={task.parameters.name}
+                        onChange={e => task.update({ name: e.target.value })}
+                        validate={value => {
+                            if (!value) throw { error: dataLocale.requiredField };
+                        }}
+                        outline
+                        label={locale.addrLabelGen.presets.name} />
+                </Field>
+            </TaskDialog>
+        );
+    },
+    updateAddrLabelPreset ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.addrLabelGen.presets.update.title}
+                actionLabel={locale.addrLabelGen.presets.update.button}
+                run={() => task.runOnce()}>
+                <Field>
+                    <Validator
+                        component={TextField}
+                        value={task.parameters.name}
+                        onChange={e => task.update({ name: e.target.value })}
+                        validate={value => {
+                            if (!value) throw { error: dataLocale.requiredField };
+                        }}
+                        outline
+                        label={locale.addrLabelGen.presets.name} />
+                </Field>
             </TaskDialog>
         );
     },

@@ -632,6 +632,22 @@ export const codeholders = {
         genericError: 'Ne sukcesis sendi la adresetikedpeton.',
         closeDialog: 'Fermi',
         stats: ({ perPage, pages, total, withAddresses }) => `Trovis ${withAddresses} rezultojn (el entute ${total}) kiuj havas poŝtadreson. Kun po ${perPage} adreso${perPage === 1 ? '' : 'j'} por paĝo, tio estos ${pages} paĝo${pages === 1 ? '' : 'j'}`,
+        presets: {
+            load: '[[load preset]]',
+            pick: '[[load preset]]',
+            empty: '[[no presets]]',
+            name: 'Nomo',
+            create: {
+                menuItem: '[[save preset]]',
+                title: '[[create preset]]',
+                button: '[[create]]',
+            },
+            update: {
+                menuItem: '[[save preset]]',
+                title: '[[update preset]]',
+                button: '[[update]]',
+            },
+        },
     },
     publicity: {
         private: 'Privata',
