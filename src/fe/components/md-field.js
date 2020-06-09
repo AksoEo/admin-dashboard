@@ -3,6 +3,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import 'codemirror';
 import { Controlled as RCodeMirror } from 'react-codemirror2';
+import { layoutContext } from './dynamic-height-div';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown';
 import './md-field.less';
@@ -15,6 +16,8 @@ import './md-field.less';
 /// - rules: list of enabled rules
 /// - inline: if true, will try to style it without line breaks
 export default class MarkdownTextField extends PureComponent {
+    static contextType = layoutContext;
+
     #cachedHtml = null;
 
     updateCache () {
@@ -23,6 +26,7 @@ export default class MarkdownTextField extends PureComponent {
         if (this.props.rules) md.enable(this.props.rules);
         this.#cachedHtml = md.render(this.props.value || '');
         this.forceUpdate();
+        this.context && this.context();
     }
 
     componentDidMount () {

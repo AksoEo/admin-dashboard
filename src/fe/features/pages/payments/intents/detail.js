@@ -9,6 +9,7 @@ import StripeIcon from '../../../../components/stripe-icon';
 import ProfilePicture from '../../../../components/profile-picture';
 import DynamicHeightDiv from '../../../../components/dynamic-height-div';
 import CodeholderPicker from '../../../../components/codeholder-picker';
+import MdField from '../../../../components/md-field';
 import { Field, Validator } from '../../../../components/form';
 import { currencyAmount, email, timestamp } from '../../../../components/data';
 import { IdUEACode } from '../../../../components/data/uea-code';
@@ -252,7 +253,9 @@ function Purpose ({ purpose, item }) {
                     {title}
                 </div>
                 <div class="card-description">
-                    {description}
+                    <MdField
+                        rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
+                        value={description} />
                 </div>
             </div>
             <div class="card-after">
