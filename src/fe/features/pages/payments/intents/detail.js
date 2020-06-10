@@ -321,7 +321,7 @@ function IntentActions ({ item }) {
                 let enabled = ACTIONS[k].enabled(t, s);
                 let whyNot = null;
                 let whyNotBecauseStripe = false;
-                if (!enabled) {
+                if (!enabled && ACTIONS[k].state) {
                     const tur = locale.transitionUnavailabilityReasons;
                     {
                         const turState = tur[s];

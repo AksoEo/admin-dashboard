@@ -245,7 +245,7 @@ export const tasks = {
         store.remove([PAYMENT_ORGS, org, PO_ADDONS, id]);
         store.signal([PAYMENT_ORGS, org, SIG_PO_ADDONS]);
     },
-    listMethods: async ({ org }, { offset, limit, jsonFilter }) => {
+    listMethods: async ({ org }, { offset, limit, jsonFilter, _skipMapHack }) => {
         const client = await asyncClient;
         const opts = {
             offset,
@@ -263,7 +263,7 @@ export const tasks = {
             store.insert(path, deepMerge(existing, item));
         }
         return {
-            items: res.body.map(x => x.id),
+            items: _skipMapHack ? res.body : res.body.map(x => x.id),
             total: +res.res.headers.get('x-total-items'),
             stats: { time: res.resTime, filtered: false },
         };
@@ -434,6 +434,25 @@ export const tasks = {
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'submitted' }));
         // event log should be updated
         tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
+    },
+
+    report: async (_, { time, currency, filters, jsonFilter }) => {
+        const client = await asyncClient;
+
+        let filter = {};
+        if (jsonFilter && !jsonFilter._disabled) {
+            filter = jsonFilter.filter;
+        } else if (filters) {
+            filter = filtersToAPI(iClientFilters, filters);
+        }
+
+        const res = await client.get('/aksopay/payment_intents/balance_report', {
+            time: time.join('-'),
+            currency,
+            filter,
+        });
+
+        return res.body;
     },
 
     iFiltersToAPI: async ({ filters }) => {

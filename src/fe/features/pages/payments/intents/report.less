@@ -17,4 +17,88 @@
             padding: 16px;
         }
     }
+
+    .report-loading {
+        text-align: center;
+        padding: 24px;
+    }
+
+    .payments-report {
+        margin: 24px;
+
+        .report-section {
+            margin-bottom: 16px;
+
+            .section-title {
+                font-size: small;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                margin-bottom: 8px;
+            }
+            .section-contents {
+                background: @text-fade-10;
+                padding: 16px;
+                border-radius: 4px;
+                overflow: auto;
+            }
+        }
+
+        .report-total-total {
+            font-size: 24px;
+        }
+        .report-total-sub {
+            .report-total-earned, .report-total-refunded {
+                display: inline-block;
+            }
+            .report-total-earned, {
+                margin-right: 32px;
+            }
+        }
+
+        .currency-table {
+            min-width: 100%;
+            border-spacing: 0;
+
+            th, td {
+                text-align: left;
+                padding: 4px;
+            }
+
+            thead tr {
+                background: @text-fade-10;
+            }
+
+            tr:nth-child(2n) {
+                background: @text-fade-10;
+            }
+
+            tr.currency-totals {
+                background: none;
+
+                th, td {
+                    border-top: 1px solid @separator;
+                }
+            }
+
+            .totals-set {
+                .totals-sub {
+                    font-size: 0.8em;
+
+                    .totals-subfield {
+                        &::before {
+                            content: ' · ';
+                        }
+                        &:first-child::before {
+                            content: '';
+                        }
+                    }
+                }
+            }
+
+            .method-id {
+                color: inherit;
+            }
+        }
+    }
 }

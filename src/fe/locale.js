@@ -1049,12 +1049,26 @@ export const paymentIntents = {
 
     report: {
         title: '[[report]]',
-        csvFilename: '[[payment_report]]',
-
-        totals: '[[totals]]',
 
         startTime: '[[range start]]',
         endTime: '[[range end]]',
+
+        total: '[[total]]',
+        totalEarned: '[[earned]]', // suffix
+        totalRefunded: '[[refunded]]', // suffix
+
+        byMethodAndCurrency: '[[By method/currency]]',
+        methodHeader: '[[method]]', // table header
+        totalHeader: '[[total]]', // bottom
+
+        totals: {
+            // prefixes
+            earned: '[[earned]]',
+            refunded: '[[refunded]]',
+            // suffixes
+            count: n => `${n} [[payment${n === 1 ? '' : 's'}]]`,
+            refunds: n => `${n} [[refund${n === 1 ? '' : 's'}]]`,
+        },
     },
 };
 
