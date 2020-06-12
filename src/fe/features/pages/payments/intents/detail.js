@@ -329,7 +329,7 @@ function IntentActions ({ item }) {
                         else if (turState) {
                             const subState = turState[ACTIONS[k].state];
                             if (typeof subState === 'string') whyNot = subState;
-                            else whyNot = subState[t];
+                            else if (subState) whyNot = subState[t];
                         }
                     }
 
