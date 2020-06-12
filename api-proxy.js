@@ -21,7 +21,8 @@ const server = http.createServer((req, res) => {
     });
     inner.on('error', err => {
         console.error(err.toString());
-        res.end(502);
+        res.writeHead(502, 'Bad Gateway');
+        res.end('Bad Gateway');
     });
     req.on('data', data => inner.write(data));
     req.on('end', () => inner.end());

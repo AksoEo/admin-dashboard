@@ -138,50 +138,6 @@ function TimeRangePicker ({ start, end, onStartChange, onEndChange }) {
 
 /// This function must be pure because we're also using it to render the printed version
 function ReportRender ({ data, currency }) {
-    const rows = [];
-
-    const currencyKeys = Object.keys(data.totals.currency);
-
-    for (const org in data.totals.paymentMethod) {
-        for (const method in data.totals.paymentMethod[org]) {
-            const cells = [];
-
-            cells.push(
-                <th key="id">
-                    <MethodName org={org} method={method} />
-                </th>
-            );
-
-            const methodTotals = data.totals.paymentMethod[org][method].totals;
-            for (const c of currencyKeys) {
-                cells.push(
-                    <td key={c}>
-                        <ReportCell
-                            value={methodTotals[c]}
-                            currency={c} />
-                    </td>
-                );
-            }
-
-            rows.push(<tr key={`${org}-${method}`}>{cells}</tr>);
-        }
-    }
-
-    const sumTotals = data.totals.currency;
-    const sumCells = [
-        <th key="id">{locale.report.totalHeader}</th>,
-    ];
-    for (const c of currencyKeys) {
-        sumCells.push(
-            <td key={c}>
-                <ReportCell
-                    value={sumTotals[c]}
-                    currency={c} />
-            </td>
-        );
-    }
-    rows.push(<tr class="currency-totals" key="total">{sumCells}</tr>);
-
     return (
         <div class="payments-report">
             <div class="report-section">
@@ -213,24 +169,68 @@ function ReportRender ({ data, currency }) {
             <div class="report-section">
                 <div class="section-title">{locale.report.byMethodAndCurrency}</div>
                 <div class="section-contents">
-                    <table class="currency-table">
-                        <thead>
-                            <tr>
-                                <th key="method">{locale.report.methodHeader}</th>
-                                {currencyKeys.map(c => (
-                                    <th key={c}>
-                                        {currencies[c]}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {rows}
-                        </tbody>
-                    </table>
+                    <CurrencyTable totals={data.totals} />
                 </div>
             </div>
         </div>
+    );
+}
+
+function CurrencyTable ({ totals }) {
+    const currencyKeys = Object.keys(totals.currency);
+
+    const table = {};
+    const tableIndex1 = {};
+    const tableIndex2 = {};
+
+    for (const c of currencyKeys) tableIndex2[c] = currencies[c];
+
+    {
+        const k = 'sum';
+        const sumTotals = totals.currency;
+        table[k] = {};
+        tableIndex1[k] = locale.report.totalHeader;
+        for (const c of currencyKeys) {
+            table[k][c] = sumTotals[c];
+        }
+    }
+
+    for (const org in totals.paymentMethod) {
+        for (const method in totals.paymentMethod[org]) {
+            const k = `${org}-${method}`;
+
+            table[k] = {};
+            tableIndex1[k] = <MethodName org={org} method={method} />;
+
+            const methodTotals = totals.paymentMethod[org][method].totals;
+
+            for (const c of currencyKeys) {
+                table[k][c] = methodTotals[c];
+            }
+        }
+    }
+
+    return (
+        <table class="currency-table">
+            <thead>
+                <tr>
+                    <th key="method">{locale.report.methodHeader}</th>
+                    {Object.entries(tableIndex1).map(([i, j]) => <th key={i}>{j}</th>)}
+                </tr>
+            </thead>
+            <tbody>
+                {Object.keys(tableIndex2).map(i => (
+                    <tr key={i}>
+                        <th>{tableIndex2[i]}</th>
+                        {Object.keys(tableIndex1).map(j => (
+                            <td key={j}>
+                                <ReportCell value={table[j][i]} currency={i} />
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     );
 }
 
