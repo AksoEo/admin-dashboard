@@ -1069,6 +1069,9 @@ export const paymentIntents = {
             count: n => `${n} [[payment${n === 1 ? '' : 's'}]]`,
             refunds: n => `${n} [[refund${n === 1 ? '' : 's'}]]`,
         },
+
+        print: '[[print]]',
+        failedToOpenPrintWindow: '[[failed to open print window]]',
     },
 };
 

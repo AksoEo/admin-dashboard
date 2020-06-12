@@ -148,7 +148,28 @@ module.exports = function (env, argv) {
                     }],
                 },
                 {
+                    test: /noextract\.css$/,
+                    use: [
+                        { loader: 'to-string-loader' },
+                        {
+                            loader: 'css-loader',
+                            options: { url: false },
+                        },
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                                plugins: [
+                                    autoprefixer({
+                                        env: browserTargets
+                                    })
+                                ]
+                            }
+                        },
+                    ],
+                },
+                {
                     test: /\.(c|le)ss$/,
+                    exclude: /noextract\.css$/,
                     use: [
                         {
                             loader: MiniCssExtractPlugin.loader,

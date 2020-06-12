@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, render } from 'preact';
 import { PureComponent } from 'preact/compat';
 import moment from 'moment';
 import { CircularProgress } from '@cpsdqs/yamdl';
@@ -13,6 +13,7 @@ import { paymentIntents as locale, currencies } from '../../../../locale';
 import { Link } from '../../../../router';
 import { coreContext } from '../../../../core/connection';
 import './report.less';
+import reportPrintStyles from './report-print.noextract.css';
 
 export default class Report extends Page {
     state = {
@@ -65,13 +66,36 @@ export default class Report extends Page {
         }
     }
 
+    print = () => {
+        const printWindow = window.open('', 'paymentBalanceReportPopout');
+        if (!printWindow) {
+            this.context.createTask('info', {
+                message: locale.report.failedToOpenPrintWindow,
+            });
+            return;
+        }
+        render(
+            <coreContext.Provider value={this.context}>
+                <PrintAction window={printWindow} />
+                <ReportRender
+                    data={this.state.data}
+                    currency={this.state.currency}
+                    print />
+                <style>{reportPrintStyles}</style>
+            </coreContext.Provider>,
+            printWindow.document.body,
+        );
+    };
+
     render (_, { rangeStart, rangeEnd, currency, loading, data, error }) {
         const actions = [];
 
-        actions.push({
-            icon: <PrintIcon />,
-            action: () => alert('todo'),
-        });
+        if (!error && data) {
+            actions.push({
+                icon: <PrintIcon />,
+                action: this.print,
+            });
+        }
 
         let contents = null;
 
@@ -136,8 +160,22 @@ function TimeRangePicker ({ start, end, onStartChange, onEndChange }) {
     );
 }
 
-/// This function must be pure because we're also using it to render the printed version
-function ReportRender ({ data, currency }) {
+class PrintAction extends PureComponent {
+    componentDidMount () {
+        this.props.window.print();
+    }
+
+    render ({ window }) {
+        return (
+            <div class="print-action-container">
+                <button onClick={() => window.print()}>{locale.report.print}</button>
+            </div>
+        );
+    }
+}
+
+/// This function should be pure because we're also using it to render the printed version
+function ReportRender ({ data, currency, print }) {
     return (
         <div class="payments-report">
             <div class="report-section">
@@ -169,14 +207,14 @@ function ReportRender ({ data, currency }) {
             <div class="report-section">
                 <div class="section-title">{locale.report.byMethodAndCurrency}</div>
                 <div class="section-contents">
-                    <CurrencyTable totals={data.totals} />
+                    <CurrencyTable totals={data.totals} print={print} />
                 </div>
             </div>
         </div>
     );
 }
 
-function CurrencyTable ({ totals }) {
+function CurrencyTable ({ totals, print }) {
     const currencyKeys = Object.keys(totals.currency);
 
     const table = {};
@@ -200,7 +238,14 @@ function CurrencyTable ({ totals }) {
             const k = `${org}-${method}`;
 
             table[k] = {};
-            tableIndex1[k] = <MethodName org={org} method={method} />;
+            if (print) {
+                tableIndex1[k] = <MethodName
+                    org={org}
+                    method={method}
+                    useCache />;
+            } else {
+                tableIndex1[k] = <MethodName org={org} method={method} />;
+            }
 
             const methodTotals = totals.paymentMethod[org][method].totals;
 
@@ -208,6 +253,30 @@ function CurrencyTable ({ totals }) {
                 table[k][c] = methodTotals[c];
             }
         }
+    }
+
+    if (print) {
+        return (
+            <div class="currency-table-unrolled">
+                {Object.keys(tableIndex1).map(i => (
+                    <div class="unrolled-method" key={i}>
+                        <div class="unrolled-title">{tableIndex1[i]}</div>
+                        <table class="unrolled-contents">
+                            <tbody>
+                                {Object.keys(tableIndex2).map(j => (
+                                    <tr key={j}>
+                                        <th>{tableIndex2[j]}</th>
+                                        <td>
+                                            <ReportCell value={table[i][j]} currency={j} />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ))}
+            </div>
+        );
     }
 
     return (
@@ -305,6 +374,9 @@ function batchLoadMethodName (org, method) {
     });
 }
 
+// used to instantly determine names in printing dialog
+const globalMethodNameCache = {};
+
 class MethodName extends PureComponent {
     state = {
         name: null,
@@ -322,6 +394,8 @@ class MethodName extends PureComponent {
         batchLoadMethodName(this.props.org, this.props.method).then(name => {
             if (this.loadLock !== lock) return;
             this.setState({ name, error: null });
+
+            globalMethodNameCache[`${this.props.org}-${this.props.method}`] = name;
         }).catch(error => {
             if (this.loadLock !== lock) return;
             this.setState({ name: null, error });
@@ -338,7 +412,9 @@ class MethodName extends PureComponent {
         }
     }
 
-    render ({ org, method }, { name, error }) {
+    render ({ org, method, useCache }, { name, error }) {
+        if (useCache) name = globalMethodNameCache[`${org}-${method}`];
+
         let contents = null;
         if (error) contents = '?';
         else if (!name) contents = <TinyProgress />;
