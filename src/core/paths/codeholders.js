@@ -197,8 +197,8 @@ const clientFields = {
             if (sendNormal) codeholder.address = {};
             if (sendLatin) codeholder.addressLatin = {};
             for (const f of addressSubfields) {
-                if (sendNormal && value[f] !== undefined) codeholder.address[f] = value[f];
-                if (sendLatin && value[f + 'Latin'] !== undefined) codeholder.addressLatin[f] = value[f + 'Latin'];
+                if (sendNormal && value[f]) codeholder.address[f] = value[f];
+                if (sendLatin && value[f + 'Latin']) codeholder.addressLatin[f] = value[f + 'Latin'];
             }
             if (!Object.keys(codeholder.address).length) delete codeholder.address;
             if (!Object.keys(codeholder.addressLatin).length) delete codeholder.addressLatin;
