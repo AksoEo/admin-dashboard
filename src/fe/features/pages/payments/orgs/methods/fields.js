@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { Checkbox, TextField } from '@cpsdqs/yamdl';
+import CreditCardIcon from '@material-ui/icons/CreditCard';
 import { Validator } from '../../../../../components/form';
 import Segmented from '../../../../../components/segmented';
 import Select from '../../../../../components/select';
@@ -14,6 +15,22 @@ export function PaymentMethodType ({ value }) {
     else if (value === 'manual') return <span class="payment-method-type">{locale.fields.types[value]}</span>;
     return null;
 }
+
+const STRIPE_METHOD_ICONS = {
+    card: CreditCardIcon,
+};
+const STRIPE_METHOD_EXTRA = {
+    card: () => {
+        return (
+            <span class="credit-card-types">
+                <img draggable={0} src="/assets/payments/accept_visa.png" />
+                <img draggable={0} src="/assets/payments/accept_mc.svg" />
+                <img draggable={0} src="/assets/payments/accept_ms.svg" />
+                <img draggable={0} src="/assets/payments/accept_axp.png" />
+            </span>
+        );
+    },
+};
 
 export const FIELDS = {
     type: {
@@ -84,6 +101,10 @@ export const FIELDS = {
             for (const k in locale.fields.stripeMethodValues) {
                 const name = locale.fields.stripeMethodValues[k];
                 if (!editing && !v.includes(k)) continue;
+
+                const Icon = STRIPE_METHOD_ICONS[k] || (() => null);
+                const Extra = STRIPE_METHOD_EXTRA[k];
+
                 items.push(
                     <li key={k}>
                         {editing ? (
@@ -98,8 +119,15 @@ export const FIELDS = {
                         ) : null}
                         {' '}
                         <label>
+                            <Icon style={{ verticalAlign: 'middle' }} />
+                            {' '}
                             {name}
                         </label>
+                        {Extra ? (
+                            <div class="stripe-method-extra">
+                                <Extra />
+                            </div>
+                        ) : null}
                     </li>
                 );
             }

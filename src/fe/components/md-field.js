@@ -1,9 +1,11 @@
 import Markdown from 'markdown-it';
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
+import { Button } from '@cpsdqs/yamdl';
 import 'codemirror';
 import { Controlled as RCodeMirror } from 'react-codemirror2';
 import { layoutContext } from './dynamic-height-div';
+import { data as locale } from '../locale';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown';
 import './md-field.less';
@@ -17,6 +19,10 @@ import './md-field.less';
 /// - inline: if true, will try to style it without line breaks
 export default class MarkdownTextField extends PureComponent {
     static contextType = layoutContext;
+
+    state = {
+        preview: false,
+    };
 
     #cachedHtml = null;
 
@@ -38,29 +44,73 @@ export default class MarkdownTextField extends PureComponent {
             this.#cachedHtml = null;
         }
 
-        if (!this.props.editing && this.#cachedHtml === null) this.updateCache();
+        if ((!this.props.editing || this.state.preview) && this.#cachedHtml === null) {
+            this.updateCache();
+        }
+        if (!this.props.editing && this.state.preview) this.setState({ preview: false });
     }
 
-    render ({ value, editing, onChange, inline, disabled, rules, ...extra }) {
+    onEditorMount = editor => {
+        this.editor = editor;
+    };
+
+    render ({ value, editing, onChange, inline, disabled, rules, ...extra }, { preview }) {
         void rules;
 
-        let contents;
+        let editorBar;
+
         if (editing) {
+            editorBar = (
+                <div class={'md-editor-bar' + (preview ? ' is-previewing' : '')}>
+                    <Button
+                        class="editor-preview-open-button"
+                        disabled={preview}
+                        onClick={e => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            this.setState({ preview: true });
+                        }}>
+                        {locale.mdEditor.previewOn}
+                    </Button>
+                    <div class="editor-bar-preview-state">
+                        <label class="editor-preview-title">
+                            {locale.mdEditor.previewTitle}
+                        </label>
+                        <Button
+                            disabled={!preview}
+                            class="editor-preview-close-button"
+                            onClick={e => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                this.setState({ preview: false }, () => {
+                                    this.editor && this.editor.focus();
+                                });
+                            }}>
+                            {locale.mdEditor.previewOff}
+                        </Button>
+                    </div>
+                </div>
+            );
+        }
+
+        let contents;
+        if (editing && !preview) {
             contents = <RCodeMirror
                 value={value}
                 options={{
                     mode: 'text/markdown',
                     theme: 'akso',
-                    lineNumbers: true,
+                    lineNumbers: false,
                     indentWithTabs: true,
                     indentUnit: 4,
                     matchBrackets: true,
                     readOnly: disabled,
                 }}
+                editorDidMount={this.onEditorMount}
                 onBeforeChange={(editor, data, value) => onChange(value)} />;
         } else {
             contents = <div
-                class={'markdown-contents' + (inline ? ' is-inline' : '')}
+                class={'markdown-contents' + (inline ? ' is-inline' : '') + (preview ? ' is-preview' : '')}
                 dangerouslySetInnerHTML={{ __html: this.#cachedHtml }} />;
         }
 
@@ -68,6 +118,7 @@ export default class MarkdownTextField extends PureComponent {
 
         return (
             <div {...extra}>
+                {editorBar}
                 {contents}
             </div>
         );

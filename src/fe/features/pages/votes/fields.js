@@ -50,7 +50,7 @@ export default {
                     value={value}
                     editing={editing}
                     inline={slot !== 'detail'}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={onChange} />
             );
         },
         stringify (value) {

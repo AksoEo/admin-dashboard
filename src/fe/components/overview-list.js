@@ -407,7 +407,7 @@ function ListHeader ({ fields, selectedFields, locale, selection }) {
 
     const cells = selectedFields.map(({ id }) => (
         <div key={id} class="list-header-cell">
-            <div class="cell-label">{locale[id]}</div>
+            <div class="cell-label" title={locale[id]}>{locale[id]}</div>
             {/* sorting? */}
         </div>
     ));

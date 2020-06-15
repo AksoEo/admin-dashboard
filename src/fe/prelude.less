@@ -83,6 +83,25 @@
 
 }
 
+.editor-light() {
+    --editor-background: #fff;
+    --editor-selection: @secondary-fade-50;
+    --editor-line-number: #333;
+    --editor-text: #222;
+    --editor-text-fade-10: fade(#222, 10%);
+    --editor-syntax-string: #273;
+    --editor-syntax-atom: #931;
+    --editor-syntax-number: #931;
+    --editor-syntax-property: #921;
+    --editor-syntax-comment: #666;
+    --editor-error: @error;
+    --editor-error-background: @error-fade-20;
+    --editor-match: #159;
+
+    --editor-template-background: fade(#75f, 40%);
+    --editor-template-delimiter: #77f;
+}
+
 @primary: var(--primary);
 @secondary: var(--secondary);
 @secondary-lighten-10: var(--secondary-lighten-10);

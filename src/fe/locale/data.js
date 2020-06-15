@@ -93,6 +93,11 @@ export const data = {
             mr: 'Membrorestriktoj',
         },
     },
+    mdEditor: {
+        previewOn: '[[Preview Markdown]]',
+        previewTitle: '[[Preview]]',
+        previewOff: '[[Close Preview]]',
+    },
 };
 
 export const search = {

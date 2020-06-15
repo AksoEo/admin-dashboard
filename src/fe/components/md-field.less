@@ -2,6 +2,36 @@
 @import './codemirror-style';
 
 .markdown-text-field {
+    @cm-height: 180px;
+
+    .md-editor-bar {
+        position: relative;
+        padding: 2px;
+
+        button {
+            padding: 4px 8px;
+            text-transform: none;
+            line-height: 1.2;
+            font-weight: normal;
+            --md-button-color: @gray-button-color;
+            vertical-align: middle;
+        }
+
+        .editor-bar-preview-state {
+            display: none;
+            justify-content: space-between;
+        }
+
+        &.is-previewing {
+            .editor-preview-open-button {
+                display: none;
+            }
+            .editor-bar-preview-state {
+                display: flex;
+            }
+        }
+    }
+
     &.editing {
         border: 1px solid var(--md-text-field-idle);
         border-radius: 4px;
@@ -12,11 +42,18 @@
         }
 
         .CodeMirror {
-            height: 180px;
+            height: @cm-height;
+            .editor-light();
         }
     }
 
     .markdown-contents {
+        &.is-preview {
+            height: @cm-height;
+            padding: 8px;
+            overflow: auto;
+        }
+
         table {
             border: 1px solid @separator;
             border-radius: 4px;
