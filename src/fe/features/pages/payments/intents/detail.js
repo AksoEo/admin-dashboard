@@ -1,6 +1,11 @@
 import { h } from 'preact';
 import { Button, TextField } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
+import CloseIcon from '@material-ui/icons/Close';
+import AnnouncementIcon from '@material-ui/icons/Announcement';
+import SendIcon from '@material-ui/icons/Send';
+import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
+import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
 import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail';
 import TejoIcon from '../../../../components/tejo-icon';
@@ -271,24 +276,28 @@ const ACTIONS = {
     cancel: {
         state: 'canceled',
         enabled: (t, s) => s === 'pending' || s === 'submitted' || (t === 'manual' && s === 'disputed'),
+        icon: CloseIcon,
         task: id => ['payments/cancelIntent', { id }],
     },
     markDisputed: {
         state: 'disputed',
         enabled: (t, s) => t === 'manual' && (s === 'submitted' || s === 'succeeded'),
         manualOnly: true,
+        icon: AnnouncementIcon,
         task: id => ['payments/markIntentDisputed', { id }],
     },
     submit: {
         state: 'submitted',
         enabled: (t, s) => t === 'manual' && s === 'pending',
         manualOnly: true,
+        icon: SendIcon,
         task: id => ['payments/submitIntent', { id }],
     },
     markSucceeded: {
         state: 'succeeded',
         enabled: (t, s) => t === 'manual' && s === 'submitted',
         manualOnly: true,
+        icon: AssignmentTurnedInIcon,
         task: id => ['payments/markIntentSucceeded', { id }],
     },
     markRefunded: {
@@ -296,6 +305,7 @@ const ACTIONS = {
         manualOnly: true,
         enabled: (t, s) => t === 'manual'
             && ['pending', 'submitted', 'canceled', 'succeeded', 'refunded', 'disputed'].includes(s),
+        icon: AssignmentReturnIcon,
         task: (id, item) => ['payments/markIntentRefunded', {
             id,
             _currency: item.currency,
@@ -319,6 +329,7 @@ function IntentActions ({ item }) {
                 const isRefund = k === 'markRefunded';
                 const isDispute = k === 'markDisputed';
                 let enabled = ACTIONS[k].enabled(t, s);
+                const Icon = ACTIONS[k].icon || (() => null);
                 let whyNot = null;
                 let whyNotBecauseStripe = false;
                 if (!enabled && ACTIONS[k].state) {
@@ -354,6 +365,8 @@ function IntentActions ({ item }) {
                         title={whyNot}
                         key={k}
                         onClick={() => core.createTask(...task)}>
+                        <Icon style={{ verticalAlign: 'middle' }} />
+                        {' '}
                         {locale.actions[k].title}
                     </Button>
                 );
