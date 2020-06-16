@@ -120,7 +120,7 @@ class DateEditor extends Component {
         globalAnimator.deregister(this);
     }
 
-    render ({ onChange, ...props }, {
+    render ({ onChange, disabled, ...props }, {
         popoutX,
         popoutY,
         anchorBottom,
@@ -174,6 +174,7 @@ class DateEditor extends Component {
                 <TextField
                     {...props}
                     ref={view => this.textField = view}
+                    disabled={disabled}
                     onFocus={this.#onFocus}
                     onBlur={this.#onBlur}
                     value={inputText}

@@ -101,7 +101,7 @@ export default class CodeholderPicker extends Component {
         });
     };
 
-    render ({ value, onChange, limit }) {
+    render ({ value, onChange, limit, disabled }) {
         return (
             <div class="codeholder-picker" data-limit={limit}>
                 <div
@@ -125,6 +125,7 @@ export default class CodeholderPicker extends Component {
 
                     {(this.props.limit && value.length >= this.props.limit) ? null : (
                         <SuggestionField
+                            disabled={disabled}
                             class="codeholder-search"
                             value={this.state.search}
                             onChange={this.onSearchChange}

@@ -26,6 +26,9 @@
     }
 
     .filters-disclosure {
+        width: 100%;
+        border-radius: 4px;
+        text-align: left;
         background: none;
         color: inherit;
         font: inherit;
@@ -43,8 +46,11 @@
         &::-moz-focus-inner {
             border: 0;
         }
+
+        .simple-focus-ring-idle();
         &:focus {
-            color: @secondary;
+            outline: none;
+            .simple-focus-ring-focused();
         }
     }
 

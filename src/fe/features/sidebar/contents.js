@@ -71,8 +71,9 @@ class NavItem extends PureComponent {
         }
 
         const Icon = icon || (() => null);
+        // using tabIndex -1 on Link because DrawerItem is focusable anyway
         return (
-            <Link target={`/${targetPath}`} class="sidebar-link">
+            <Link target={`/${targetPath}`} class="sidebar-link" tabIndex={-1}>
                 <DrawerItem
                     style={{
                         transform: `translateX(${this.offsetX.value * 100}%)`,

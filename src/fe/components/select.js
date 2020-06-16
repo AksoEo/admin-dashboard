@@ -30,7 +30,7 @@ export default class Select extends Component {
         this.setState({ focused: false });
     };
 
-    render ({ value, outline, multi, onChange, emptyLabel, items, ...extra }, { focused }) {
+    render ({ value, outline, multi, onChange, emptyLabel, items, disabled, ...extra }, { focused }) {
         const props = extra;
         props.class = (props.class || '') + ' paper-select';
         if (focused) props.class += ' is-focused';
@@ -46,6 +46,7 @@ export default class Select extends Component {
             return (
                 <span {...props}>
                     <MultiSelect
+                        disabled={disabled}
                         value={value}
                         items={items}
                         onFocus={this.onFocus}
@@ -59,6 +60,7 @@ export default class Select extends Component {
             return (
                 <span {...props}>
                     <select
+                        disabled={disabled}
                         value={value}
                         onFocus={this.onFocus}
                         onBlur={this.onBlur}
@@ -111,7 +113,7 @@ class MultiSelect extends Component {
         });
     }
 
-    render ({ value, onChange, items, emptyLabel }, { open, clientX, clientY }) {
+    render ({ value, onChange, items, emptyLabel, disabled }, { open, clientX, clientY }) {
         const keyedItems = {};
         for (const item of items) {
             keyedItems[item.value] = item;
@@ -124,6 +126,7 @@ class MultiSelect extends Component {
         return (
             <span
                 class="multi-select"
+                tabIndex={disabled ? -1 : 0}
                 onClick={this.#open}
                 ref={node => this.node = node}>
                 {label}

@@ -223,7 +223,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                 <Button icon small class="filter-remove-button" onClick={() => {
                     // remove savedFilter link
                     onChange({ ...value, _savedFilter: null });
-                }}>
+                }} disabled={hidden}>
                     <RemoveIcon style={{ verticalAlign: 'middle' }} />
                 </Button>
                 {value._savedFilter.name}
@@ -277,12 +277,18 @@ const FiltersBar = connectPerms(function FiltersBar ({
                 {core => (
                     <Fragment>
                         {(filterType === 'normal' && filtersToAPITask) ? (
-                            <Button class="tiny-button" onClick={viewJSON(core)}>
+                            <Button
+                                class="tiny-button"
+                                onClick={viewJSON(core)}
+                                disabled={hidden}>
                                 {locale.viewJSON}
                             </Button>
                         ) : null}
                         {canReadFilters ? (
-                            <Button class="tiny-button" onClick={() => setPickerOpen(true)}>
+                            <Button
+                                class="tiny-button"
+                                onClick={() => setPickerOpen(true)}
+                                disabled={hidden}>
                                 {locale.loadFilter}
                             </Button>
                         ) : null}
@@ -308,7 +314,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                             }} />
 
                         {(filterType === 'json' || filtersToAPITask) && canSaveFilters ? (
-                            <Button class="tiny-button" onClick={async () => {
+                            <Button class="tiny-button" disabled={hidden} onClick={async () => {
                                 let filter;
                                 if (filterType === 'normal' && filtersToAPITask) {
                                     // we need to save the api representation

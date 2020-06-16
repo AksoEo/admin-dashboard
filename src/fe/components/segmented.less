@@ -23,7 +23,8 @@
         margin: 0;
         display: inline-block;
         border-radius: inherit;
-        transition: color 0.3s @easing;
+        .simple-focus-ring-idle();
+        transition: color 0.3s @easing, box-shadow 0.3s @easing;
         z-index: 1;
         -webkit-tap-highlight-color: transparent;
 
@@ -37,6 +38,8 @@
 
         &:focus {
             outline: none;
+            .simple-focus-ring-focused();
+            transition: color 0.3s @easing;
         }
 
         &.selected:not(.hidden-background) {
@@ -44,12 +47,9 @@
             .elevation(4);
 
             &:focus {
-                background: @secondary-lighten-10;
+                .simple-focus-ring-focused();
+                transition: color 0.3s @easing;
             }
-        }
-
-        &:not(.selected):focus {
-            text-decoration: underline;
         }
 
         &[disabled] {
@@ -71,7 +71,7 @@
                 box-shadow: none;
 
                 &:focus {
-                    background: @text-fade-60;
+                    .simple-focus-ring-focused();
                 }
             }
         }

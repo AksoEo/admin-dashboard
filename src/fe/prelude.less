@@ -265,3 +265,19 @@
         fade(@color, (@most - @least) * 0.75 + @least) 88%,
         fade(@color, (@most - @least) * 1.00 + @least) 100%);
 }
+
+.simple-focus-ring-idle() {
+    box-shadow: 0 0 0 0 transparent;
+    transition: box-shadow 0.3s @easing;
+}
+.simple-focus-ring-focused(@color: @secondary-fade-50) {
+    animation: simple-focus-ring-in 0.3s @easing;
+    box-shadow: 0 0 0 4px @color;
+    transition: none;
+
+    @keyframes simple-focus-ring-in {
+        0% {
+            box-shadow: 0 0 0 30px transparent;
+        }
+    }
+}

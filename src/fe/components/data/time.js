@@ -122,11 +122,12 @@ class TimeEditor extends PureComponent {
         if (!isEqual) this.deriveEditingValue();
     }
 
-    render (_, { editingValue }) {
+    render ({ disabled }, { editingValue }) {
         return (
             <TextField
                 ref={view => this.input = view}
                 class="data time-editor"
+                disabled={disabled}
                 onBlur={this.onBlur}
                 value={editingValue}
                 onKeyDown={this.onKeyDown}

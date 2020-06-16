@@ -45,6 +45,16 @@
         }
     }
 
+    &:not(.p-outline) {
+        box-shadow: 0 0 0 0 transparent;
+        transition: box-shadow 0.3s @easing;
+
+        .simple-focus-ring-idle();
+        &.is-focused {
+            .simple-focus-ring-focused();
+        }
+    }
+
     .p-select-icon {
         margin-left: -24px;
         width: 24px;

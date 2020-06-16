@@ -13,8 +13,8 @@ export default {
         default: () => ({ enabled: false, value: [] }),
         serialize: ({ value }) => value.join(','),
         deserialize: value => ({ enabled: true, value: value.split(',') }),
-        editor ({ value, onChange, onEnabledChange }) {
-            return <CodeholderPicker value={value} onChange={value => {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            return <CodeholderPicker disabled={hidden} value={value} onChange={value => {
                 onChange(value);
                 onEnabledChange(!!value.length);
             }} />;
@@ -25,14 +25,14 @@ export default {
         default: () => ({ enabled: false, value: [MIN_TIME, new Date()] }),
         serialize: ({ value }) => `${value[0].toISOString()}$${value[1].toISOString()}`,
         deserialize: value => ({ enabled: true, value: value.split('$').map(date => new Date(date)) }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="time-filter">
-                    <timestamp.editor value={+value[0] / 1000} onChange={v => {
+                    <timestamp.editor disabled={hidden} value={+value[0] / 1000} onChange={v => {
                         onChange([new Date(v * 1000), value[1]]);
                         onEnabledChange(true);
                     }} />
-                    <timestamp.editor value={+value[1] / 1000} onChange={v => {
+                    <timestamp.editor disabled={hidden} value={+value[1] / 1000} onChange={v => {
                         onChange([value[0], new Date(v * 1000)]);
                         onEnabledChange(true);
                     }} />
@@ -44,10 +44,10 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: ({ value }) => value,
         deserialize: value => ({ enabled: true, value }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="api-key-filter">
-                    <TextField value={value} onChange={e => {
+                    <TextField value={value} disabled={hidden} onChange={e => {
                         onChange(e.target.value);
                         onEnabledChange(!!e.target.value);
                     }} />
@@ -59,10 +59,10 @@ export default {
         default: () => ({ enabled: false, value: '' }),
         serialize: ({ value }) => value,
         deserialize: value => ({ enabled: true, value }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="ip-filter">
-                    <TextField value={value} onChange={e => {
+                    <TextField disabled={hidden} value={value} onChange={e => {
                         onChange(e.target.value);
                         onEnabledChange(!!e.target.value);
                     }} />
@@ -135,6 +135,7 @@ export default {
                     <Select
                         class="path-filter-invert"
                         value={value.type}
+                        disabled={hidden}
                         onChange={type => onChange({ ...value, type })}
                         items={[
                             {
