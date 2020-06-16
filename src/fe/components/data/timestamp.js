@@ -2,6 +2,7 @@ import { h } from 'preact';
 import moment from 'moment';
 import { timestampFormat, timestampFormatToday } from '../../locale';
 import date from './date';
+import time from './time';
 import './style';
 
 /// Renders a formatted timestamp (not editable). Use prop `value`.
@@ -26,7 +27,7 @@ function TimestampEditor ({ value, onChange }) {
     const m = moment(Number.isFinite(value) ? value * 1000 : value).utc();
 
     const dateValue = value === null ? null : m.format('YYYY-MM-DD');
-    const timeValue = m.format('HH:mm:ss');
+    const timeValue = m.hour() * 3600 + m.minute() * 60 + m.second();
 
     return (
         <span class="timestamp-editor">
@@ -34,9 +35,9 @@ function TimestampEditor ({ value, onChange }) {
                 const newDate = moment.utc(v + '$' + timeValue, 'YYYY-MM-DD$HH:mm:ss');
                 onChange(newDate.unix());
             }} />
-            <input type="time" value={timeValue} onChange={e => {
-                const v = e.target.value;
-                const newDate = moment.utc(dateValue + '$' + v, 'YYYY-MM-DD$HH:mm:ss');
+            <time.editor value={timeValue} onChange={v => {
+                const newDate = moment.utc(dateValue + '$00:00:00', 'YYYY-MM-DD$HH:mm:ss');
+                newDate.seconds(v);
                 onChange(newDate.unix());
             }} />
         </span>

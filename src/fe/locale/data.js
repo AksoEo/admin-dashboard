@@ -4,6 +4,7 @@ export const generic = {
 };
 
 export const data = {
+    timeSeparator: ':',
     requiredField: 'Tiu ĉi kampo estas deviga',
     byteSizes: [
         ['bajto', 'bajtoj'],
