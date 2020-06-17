@@ -66,7 +66,7 @@ class TimeEditor extends PureComponent {
         // mod 86400
         value = mod(value, 86400);
 
-        this.props.onChange && this.props.onChange(value);
+        if (value !== this.props.value) this.props.onChange && this.props.onChange(value);
     };
 
     onBlur = () => this.commitEditing();

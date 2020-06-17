@@ -59,8 +59,9 @@ export const data = {
         fee: 'paglando',
         address: 'loĝlando',
         dialogTitle: 'Elekti land(ar)ojn',
-        placeholder: 'Elekti land(ar)ojn',
-        search: 'Serĉi land(ar)ojn',
+    },
+    largeMultiSelect: {
+        search: 'Serĉi…',
         selectAll: 'Elekti ĉiujn',
         deselectAll: 'Malelekti ĉiujn',
     },
