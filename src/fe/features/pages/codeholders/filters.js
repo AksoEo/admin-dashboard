@@ -4,102 +4,62 @@ import { Checkbox, Button, Dialog } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CloseIcon from '@material-ui/icons/Close';
-import CheckIcon from '@material-ui/icons/Check';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import moment from 'moment';
 import Segmented from '../../../components/segmented';
 import { connect } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
 import CountryPicker from '../../../components/country-picker';
-import MulticolList from '../../../components/multicol-list';
+import LargeMultiSelect from '../../../components/large-multi-select';
 import RangeEditor from '../../../components/range-editor';
 import { date, ueaCode } from '../../../components/data';
 
-// TEMP: replace with actual multi-<select> when available
-function makeDialogMultiSelect (view, pickSome, render, render2) {
+function makeDialogMultiSelect (view, pickSome, render, itemName, itemPreview) {
     return connect(view)(data => ({
         available: data,
-    }))(function MembershipCategoryPicker ({ value, onChange, available, style, disabled }) {
+    }))(function CoreMultiSelect ({ value, onChange, available, style, disabled }) {
         if (!available) return null;
-        const [open, setOpen] = useState(false);
 
         const sortedAvailable = Object.keys(available).sort((a, b) => {
-            const an = available[a].name;
-            const bn = available[b].name;
+            const an = itemName(available[a]);
+            const bn = itemName(available[b].name);
             return an > bn ? 1 : an < bn ? -1 : 0;
         });
 
-        const items = [];
-        for (const id of sortedAvailable) {
-            const column = value.includes(id) ? 0 : 1;
-            items.push({
-                key: id,
-                column,
-                node: (
-                    <div style={{
-                        display: 'flex',
-                        height: '48px',
-                        alignItems: 'center',
-                        userSelect: 'none',
-                    }} onClick={() => {
-                        const newValue = [...value];
-                        if (newValue.includes(id)) newValue.splice(newValue.indexOf(id), 1);
-                        else newValue.push(id);
-                        onChange(newValue);
-                    }}>
-                        {render(available[id])}
-                        <div style={{ marginRight: '16px' }}>
-                            {value.includes(id)
-                                ? <CheckIcon />
-                                : null}
-                        </div>
-                    </div>
-                ),
-            });
-        }
-
-        return (
-            <div
-                class="country-picker"
-                style={{ width: 'auto', textAlign: 'left', ...(style || {}) }}
-                tabIndex={disabled ? -1 : 0}
-                onClick={() => !disabled && setOpen(true)}>
-                <div class="picked-countries">
-                    {value.map(id => render2(available[id])).join(', ') || pickSome}
-                </div>
-                <ExpandMoreIcon className="expand-icon" />
-
-                <Dialog
-                    class="country-picker-dialog"
-                    backdrop
-                    open={open}
-                    onClose={() => setOpen(false)}
-                    title={pickSome}>
-                    <MulticolList columns={2} itemHeight={48}>
-                        {items}
-                    </MulticolList>
-                </Dialog>
-            </div>
-        );
+        return <LargeMultiSelect
+            value={value}
+            items={sortedAvailable}
+            onChange={onChange}
+            renderPreviewItem={({ id }) => itemPreview(available[id])}
+            renderItemContents={({ id }) => render(available[id])}
+            itemName={id => itemName(available[id])}
+            title={pickSome}
+            disabled={disabled}
+            style={style} />;
     });
 }
 
-const MembershipCategoryPicker = makeDialogMultiSelect('memberships/categories', locale.search.membership.pickSome, item => (
-    <Fragment>
-        <div style={{ marginLeft: '16px' }}>
-            {item.nameAbbrev}
+const MembershipCategoryPicker = makeDialogMultiSelect(
+    'memberships/categories',
+    locale.search.membership.pickSome,
+    item => (
+        <div class="codeholder-filters-membership-category-picker-item">
+            <div class="item-abbrev">
+                {item.nameAbbrev}
+            </div>
+            <div class="item-name" title={item.name}>
+                {item.name}
+            </div>
         </div>
-        <span>{'\u00a0'}</span>
-        <div style={{ flex: '1' }}>
-            {item.name}
-        </div>
-    </Fragment>
-), item => item.nameAbbrev);
+    ),
+    item => item.name,
+    item => item.nameAbbrev,
+);
 const RolePicker = makeDialogMultiSelect('roles/roles', locale.search.role.pickSome, item => (
-    <div style={{ flex: '1' }}>
+    <div class="codeholder-filters-role-picker-item">
         {item.name}
     </div>
-), item => item.name);
+), item => item.name, item => item.name);
 
 /**
  * Renders a segmented control with three options, [a] [b] [all].
