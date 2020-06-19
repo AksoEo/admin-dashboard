@@ -1,12 +1,13 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
 import ArrowRightIcon from '@material-ui/icons/ChevronRight';
 import { coreContext } from '../core/connection';
 import DynamicHeightDiv from './dynamic-height-div';
 import ListItem from './overview-list-item';
-import { search as searchLocale } from '../locale';
+import DisplayError from './error';
+import { data as dataLocale, search as searchLocale } from '../locale';
 import './overview-list-static.less';
 
 /// Because the OverviewList component is very unwieldy, this is a variant that is specifically
@@ -118,7 +119,21 @@ export default class StaticOverviewList extends PureComponent {
         let contents = null;
         let pagination = null;
         if (error) {
-            // TODO
+            contents = (
+                <div class="list-error">
+                    <DisplayError error={error} />
+                    <Button onClick={() => {
+                        // without the delay it doesn't seem like it's doing anything if
+                        // your connection is too fast
+                        this.setState({ error: null, loading: true });
+                        setTimeout(() => {
+                            this.load();
+                        }, 500);
+                    }}>
+                        {dataLocale.retry}
+                    </Button>
+                </div>
+            );
         } else if (result) {
             contents = [];
 
@@ -183,6 +198,9 @@ export default class StaticOverviewList extends PureComponent {
                     useCooldown cooldown={400}
                     lastChangeTime={this.#lastPageChangeTime}>
                     {contents}
+                    {loading ? <div class="list-loading">
+                        <CircularProgress indeterminate />
+                    </div> : null}
                 </DynamicHeightDiv>
                 <DynamicHeightDiv class="list-pagination">
                     {pagination}
