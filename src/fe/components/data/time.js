@@ -42,9 +42,7 @@ class TimeEditor extends PureComponent {
 
     deriveEditingValue = () => {
         this.setState({
-            editingValue: Number.isFinite(this.props.value)
-                ? formatTime(this.props.value)
-                : '',
+            editingValue: Number.isFinite(this.props.value) ? formatTime(this.props.value) : '',
         });
     };
 
@@ -66,7 +64,13 @@ class TimeEditor extends PureComponent {
         // mod 86400
         value = mod(value, 86400);
 
-        if (value !== this.props.value) this.props.onChange && this.props.onChange(value);
+        this.setState({
+            editingValue: formatTime(value),
+        }, () => {
+            if (value !== this.props.value) {
+                this.props.onChange && this.props.onChange(value);
+            }
+        });
     };
 
     onBlur = () => this.commitEditing();
@@ -119,14 +123,19 @@ class TimeEditor extends PureComponent {
             ? true // we pretend it's equal because otherwise we might get an infinite loop
             : prevProps.value === this.props.value;
 
-        if (!isEqual) this.deriveEditingValue();
+        if (!isEqual || this._alwaysDeriveNext) this.deriveEditingValue();
+        this._alwaysDeriveNext = false;
     }
 
-    render ({ disabled }, { editingValue }) {
+    render ({ value, onChange, disabled, ...extra }, { editingValue }) {
+        void value;
+        void onChange;
+        extra.class = (extra.class || '') + ' data time-editor';
+
         return (
             <TextField
+                {...extra}
                 ref={view => this.input = view}
-                class="data time-editor"
                 disabled={disabled}
                 onBlur={this.onBlur}
                 value={editingValue}

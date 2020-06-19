@@ -20,6 +20,7 @@ dateEditorPortalContainer.id = 'data-date-editor-portal-container';
 document.body.appendChild(dateEditorPortalContainer);
 
 function stringifyDate (date) {
+    if (date && Number.isNaN(new Date(date).getSeconds())) return '';
     return date ? moment(date).format('D[-a de] MMMM Y') : '';
 }
 

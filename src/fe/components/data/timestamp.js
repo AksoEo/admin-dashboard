@@ -22,8 +22,7 @@ function TimestampFormatter ({ value }) {
     return null;
 }
 
-// FIXME: hacky; should be replaced with a proper datetime editor
-function TimestampEditor ({ value, onChange, disabled }) {
+function TimestampEditor ({ value, onChange, disabled, error }) {
     const m = moment(Number.isFinite(value) ? value * 1000 : value).utc();
 
     const dateValue = value === null ? null : m.format('YYYY-MM-DD');
@@ -33,13 +32,15 @@ function TimestampEditor ({ value, onChange, disabled }) {
         <span class="timestamp-editor">
             <date.editor disabled={disabled} value={dateValue} onChange={v => {
                 const newDate = moment.utc(v + '$' + timeValue, 'YYYY-MM-DD$HH:mm:ss');
-                onChange(newDate.unix());
-            }} />
+                const newValue = newDate.unix();
+                if (Number.isFinite(newValue)) onChange(newValue);
+            }} error={error} />
             <time.editor disabled={disabled} value={timeValue} onChange={v => {
                 const newDate = moment.utc(dateValue + '$00:00:00', 'YYYY-MM-DD$HH:mm:ss');
                 newDate.seconds(v);
-                onChange(newDate.unix());
-            }} />
+                const newValue = newDate.unix();
+                if (Number.isFinite(newValue)) onChange(newValue);
+            }} error={!!error} />
         </span>
     );
 }
