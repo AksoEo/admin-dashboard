@@ -44,6 +44,7 @@ export const pages = {
 export const index = {
     tasks: {
         title: 'Taskoj',
+        empty: 'Neniuj taskoj',
     },
     admin: {
         title: 'Asisto',

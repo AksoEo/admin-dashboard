@@ -82,6 +82,12 @@ class HomeTmpTasks extends Component {
             for (const id of items) {
                 contents.push(<HomeTmpTaskItem key={id} id={id} />);
             }
+
+            if (!contents.length) contents.push(
+                <div class="tasks-empty">
+                    {locale.tasks.empty}
+                </div>
+            );
         }
 
         return (
