@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Button, TextField } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
@@ -446,7 +447,7 @@ function Customer ({ item, editing, onItemChange }) {
             {!editing && (
                 <div class="card-id">
                     <div class="customer-picture">
-                        <ProfilePicture
+                        <CustomerProfilePicture
                             id={profilePictureId}
                             profilePictureHash={profilePictureHash} />
                     </div>
@@ -485,6 +486,52 @@ function Customer ({ item, editing, onItemChange }) {
             </div>
         </div>
     );
+}
+
+/// Renders a customer's profile picture.
+/// If profilePictureHash is given, will try fetch their actual picture.
+class CustomerProfilePicture extends PureComponent {
+    static contextType = coreContext;
+
+    state = {
+        hasProfilePicture: false,
+    };
+
+    loadLock = 0;
+    load () {
+        if (!this.props.profilePictureHash) {
+            this.setState({ hasProfilePicture: false });
+            return;
+        }
+
+        const lock = ++this.loadLock;
+        const dv = this.context.createDataView('codeholders/codeholder', {
+            id: this.props.id,
+            fields: ['profilePictureHash'],
+        });
+        dv.on('update', data => {
+            if (this.loadLock > lock) dv.drop();
+            if (!data || lock !== this.loadLock) return;
+            dv.drop();
+            this.loadLock++;
+            this.setState({ hasProfilePicture: !!data.profilePictureHash });
+        });
+        dv.on('error', () => dv.drop());
+    }
+
+    componentDidMount () {
+        this.load();
+    }
+    componentDidUpdate (prevProps) {
+        if (prevProps.id !== this.props.id
+            || prevProps.profilePictureHash !== this.props.profilePictureHash) this.load();
+    }
+
+    render ({ id, profilePictureHash }, { hasProfilePicture }) {
+        return <ProfilePicture
+            id={id}
+            profilePictureHash={hasProfilePicture ? profilePictureHash : null}/>;
+    }
 }
 
 function Method ({ method, item, editing, onItemChange }) {
