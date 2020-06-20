@@ -2,8 +2,9 @@ import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../../components/task-dialog';
 import ChangedFields from '../../../../components/changed-fields';
+import { Validator, Field } from '../../../../components/form';
 import { routerContext } from '../../../../router';
-import { countries as locale, countryGroups as groupsLocale } from '../../../../locale';
+import { countries as locale, countryGroups as groupsLocale, data as dataLocale } from '../../../../locale';
 
 export default {
     update ({ open, task }) {
@@ -41,14 +42,28 @@ export default {
                         run={() => task.runOnce().then(() => {
                             routerContext.navigate(`/administrado/landaroj/${task.parameters.code}`);
                         })}>
-                        <TextField
-                            label={groupsLocale.fields.code}
-                            value={fixCodeValue(task.parameters.code)}
-                            onChange={e => task.update({ code: fixCodeValue(e.target.value) })} />
-                        <TextField
-                            label={groupsLocale.fields.name}
-                            value={task.parameters.name || ''}
-                            onChange={e => task.update({ name: e.target.value })} />
+                        <Field>
+                            <Validator
+                                component={TextField}
+                                validate={value => {
+                                    if (!value.match(/^x[\w]{2}$/)) {
+                                        throw { error: groupsLocale.create.invalidCode };
+                                    }
+                                }}
+                                label={groupsLocale.fields.code}
+                                value={fixCodeValue(task.parameters.code)}
+                                onChange={e => task.update({ code: fixCodeValue(e.target.value) })} />
+                        </Field>
+                        <Field>
+                            <Validator
+                                component={TextField}
+                                validate={value => {
+                                    if (!value) throw { error: dataLocale.requiredField };
+                                }}
+                                label={groupsLocale.fields.name}
+                                value={task.parameters.name || ''}
+                                onChange={e => task.update({ name: e.target.value })} />
+                        </Field>
                     </TaskDialog>
                 )}
             </routerContext.Consumer>

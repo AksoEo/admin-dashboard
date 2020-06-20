@@ -177,6 +177,8 @@ export const countryGroups = {
         menuItem: 'Krei',
         title: 'Krei landaron',
         button: 'Krei',
+
+        invalidCode: '[[invalid code]]',
     },
     update: {
         title: 'Redakti landaron',
