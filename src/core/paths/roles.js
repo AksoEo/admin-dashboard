@@ -74,6 +74,10 @@ export const tasks = {
         return {
             items: res.body.map(item => item.id),
             total: +res.res.headers.get('x-total-items'),
+            stats: {
+                time: res.resTime,
+                filtered: false,
+            },
         };
     },
     role: async ({ id }) => {

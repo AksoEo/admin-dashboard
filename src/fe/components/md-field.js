@@ -105,6 +105,7 @@ export default class MarkdownTextField extends PureComponent {
                     indentUnit: 4,
                     matchBrackets: true,
                     readOnly: disabled,
+                    lineWrapping: true,
                 }}
                 editorDidMount={this.onEditorMount}
                 onBeforeChange={(editor, data, value) => onChange(value)} />;

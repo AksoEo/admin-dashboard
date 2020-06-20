@@ -285,8 +285,25 @@ export default [
             {
                 id: 'membership',
                 icon: CardMembershipIcon,
-                path: 'membreco',
-                hasPerm: () => true,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "memberships" */ './memberships')),
+                path: 'membrecoj',
+                hasPerm: perms => perms.hasPerm('membership_categories.read'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "memberships" */ './memberships/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: 'roles',
