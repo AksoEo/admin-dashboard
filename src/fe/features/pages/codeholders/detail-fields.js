@@ -81,11 +81,15 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                                     editor.intoValue ? editor.intoValue(newValue) : newValue,
                                 )
                             ),
+                            disabled: !editor.hasPerm(),
+                            helperLabel: !editor.hasPerm() && locale.fieldEditorInsufficientPerms,
                             ...(editor.props || {}),
                         })
                     ) : (
                         <Validator
                             component={TextField}
+                            disabled={!editor.hasPerm()}
+                            helperLabel={!editor.hasPerm() && locale.fieldEditorInsufficientPerms}
                             validate={editor.validate || (() => {})}
                             key={i}
                             label={editor.label}
@@ -116,7 +120,8 @@ const validators = {
     },
 };
 
-function NameEditor ({
+const NameEditor = connectPerms(function NameEditor ({
+    perms,
     value,
     item,
     editing,
@@ -204,6 +209,7 @@ function NameEditor ({
                         suggestions: locale.honorificSuggestions,
                         label: locale.nameSubfields.honorific,
                     },
+                    hasPerm: () => perms.hasCodeholderField('honorific', 'w'),
                 },
             ],
             [
@@ -212,11 +218,13 @@ function NameEditor ({
                     label: <Required>{locale.nameSubfields.firstLegal}</Required>,
                     props: { maxLength: 50 },
                     validate: validators.required(),
+                    hasPerm: () => perms.hasCodeholderField('firstNameLegal', 'w'),
                 },
                 {
                     key: 'lastLegal',
                     label: locale.nameSubfields.lastLegal,
                     props: { maxLength: 50 },
+                    hasPerm: () => perms.hasCodeholderField('lastNameLegal', 'w'),
                 },
             ],
             [
@@ -224,11 +232,13 @@ function NameEditor ({
                     key: 'first',
                     label: locale.nameSubfields.first,
                     props: { maxLength: 50 },
+                    hasPerm: () => perms.hasCodeholderField('firstName', 'w'),
                 },
                 {
                     key: 'last',
                     label: locale.nameSubfields.last,
                     props: { maxLength: 50 },
+                    hasPerm: () => perms.hasCodeholderField('lastName', 'w'),
                 },
             ],
         ], {
@@ -238,9 +248,9 @@ function NameEditor ({
             key: 'human',
         });
 
-        return (
-            <Fragment>
-                {lotf}
+        let lastNamePublicity;
+        if (perms.hasPerm('lastNamePublicity', 'w')) {
+            lastNamePublicity = (
                 <div class="last-name-publicity-editor">
                     <label>{locale.fields.lastNamePublicity}</label>
                     <Publicity
@@ -249,6 +259,13 @@ function NameEditor ({
                         editing={true}
                         style="icon" />
                 </div>
+            );
+        }
+
+        return (
+            <Fragment>
+                {lotf}
+                {lastNamePublicity}
             </Fragment>
         );
     } else if (itemType === 'org') {
@@ -262,6 +279,7 @@ function NameEditor ({
                         validatorProps: { class: 'full-name-editor' },
                     },
                     validate: validators.required(),
+                    hasPerm: () => perms.hasCodeholderField('fullName', 'w'),
                 },
             ],
             [
@@ -272,6 +290,7 @@ function NameEditor ({
                         maxLength: 100,
                         validatorProps: { class: 'full-name-editor' },
                     },
+                    hasPerm: () => perms.hasCodeholderField('fullNameLocal', 'w'),
                 },
             ],
             [
@@ -279,6 +298,7 @@ function NameEditor ({
                     key: 'abbrev',
                     label: locale.nameSubfields.abbrev,
                     props: { maxLength: 12 },
+                    hasPerm: () => perms.hasCodeholderField('nameAbbrev', 'w'),
                 },
             ],
         ], {
@@ -288,13 +308,16 @@ function NameEditor ({
             key: 'org',
         });
     }
-}
+});
 
-function CodeEditor ({ value, item, originalItem, editing, onChange }) {
+const CodeEditor = connectPerms(function CodeEditor ({
+    perms, value, item, originalItem, editing, onChange,
+}) {
     if (!value) return null;
     if (!editing) {
         return <ueaCode.renderer value={value.new} value2={value.old} />;
     }
+    if (editing && !perms.hasCodeholderField('newCode', 'w')) return null;
 
     // keep own code as a suggestion
     const keepSuggestions = [];
@@ -306,7 +329,7 @@ function CodeEditor ({ value, item, originalItem, editing, onChange }) {
         id={item.id}
         suggestionParameters={item}
         keepSuggestions={keepSuggestions} />;
-}
+});
 
 class FileCounter extends Component {
     state = { count: NaN };
@@ -373,7 +396,7 @@ const Header = connectPerms(function Header ({
     if (!editing) {
         let pub;
         let histLink;
-        if (perms.hasCodeholderField('profilePicturePublicity')) {
+        if (perms.hasCodeholderField('profilePicturePublicity', 'r')) {
             pub = <Publicity value={item.profilePicturePublicity} style="icon" />;
         }
         if (canReadHistory && perms.hasCodeholderField('profilePictureHash', 'r')) {
@@ -396,10 +419,10 @@ const Header = connectPerms(function Header ({
                     id={item.id}
                     editing={editing}
                     profilePictureHash={item.profilePictureHash}
-                    canEdit={perms.hasPerm('codeholders.update')}
+                    canEdit={perms.hasPerm('codeholders.update') && perms.hasCodeholderField('profilePicture', 'w')}
                     createHistoryLink={createHistoryLink} />
                 {pictureMeta}
-                {editing && perms.hasCodeholderField('profilePicturePublicity') && <Publicity
+                {editing && perms.hasCodeholderField('profilePicturePublicity', 'w') && <Publicity
                     value={item.profilePicturePublicity}
                     editing={true}
                     onChange={v => onItemChange({ ...item, profilePicturePublicity: v })}

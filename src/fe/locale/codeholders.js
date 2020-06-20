@@ -147,6 +147,7 @@ export const codeholders = {
         // used only in field history
         profilePictureHash: 'Profilbildo',
     },
+    fieldEditorInsufficientPerms: '[[editing not allowed]]',
     profilePictureHashSome: 'Havas bildon',
     profilePictureHashNone: 'Havas neniun bildon',
     csvFields: {

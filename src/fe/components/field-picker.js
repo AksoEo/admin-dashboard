@@ -90,12 +90,12 @@ export default class FieldPicker extends PureComponent {
                 : null;
 
             fields.push(
-                <div className="field-picker-field selected" key={field.id}>
+                <div class="field-picker-field selected" key={field.id}>
                     <Checkbox
                         checked={true}
                         onClick={onCheckboxClick}
                         disabled={isLastField || field.fixed} />
-                    <label className="field-label" onClick={onCheckboxClick}>
+                    <label class="field-label" onClick={onCheckboxClick}>
                         {this.props.locale[field.id]}
                     </label>
                     {sortingControl}
@@ -109,12 +109,20 @@ export default class FieldPicker extends PureComponent {
 
             fields.push(
                 <div
-                    className="field-picker-field" key={field}
+                    class="field-picker-field" key={field}
                     onClick={() => this.onAddField(field)}>
                     <Checkbox checked={false} />
-                    <div className="field-label">
+                    <div class="field-label">
                         {this.props.locale[field]}
                     </div>
+                </div>
+            );
+        }
+
+        if (!this.props.available || !this.props.available.length) {
+            fields.push(
+                <div class="field-picker-empty" key="--empty--">
+                    {locale.fieldPicker.noFieldsAvailable}
                 </div>
             );
         }

@@ -110,7 +110,11 @@ export default {
                 if (!value) return null;
                 const { type, isDead } = item;
 
-                if (type === 'human') {
+                const guessedType = type ? type
+                    : ('firstLegal' in value) ? 'human'
+                        : ('full' in value) ? 'org' : null;
+
+                if (guessedType === 'human') {
                     const { honorific, first: f, firstLegal, last: l, lastLegal } = value;
                     const first = f || firstLegal;
                     const last = l || lastLegal;
@@ -138,7 +142,7 @@ export default {
                             </span>
                         </span>
                     );
-                } else if (type === 'org') {
+                } else if (guessedType === 'org') {
                     const { full, abbrev } = value;
 
                     return (

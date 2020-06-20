@@ -4,6 +4,7 @@ import { Button, Checkbox, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import { connect } from '../core/connection';
 import { LinkButton } from '../router';
 import { layoutContext } from './dynamic-height-div';
+import { search as searchLocale } from '../locale';
 import './overview-list-item.less';
 
 const MAX_TITLE_CELLS = 3;
@@ -161,6 +162,15 @@ export default connect(props => ([props.view, {
             }
         }
 
+        let emptyNotice = null;
+        if (!selectedFields.length) {
+            emptyNotice = (
+                <div class="list-item-empty">
+                    {searchLocale.noFieldsSelected}
+                </div>
+            );
+        }
+
         if (selection) {
             const boxCell = (
                 <div key="selection" class="list-item-cell selection-cell" onClick={e => {
@@ -222,6 +232,7 @@ export default connect(props => ([props.view, {
                         </div>
                     </div>
                 ) : cells}
+                {emptyNotice}
             </ItemComponent>
         );
     }

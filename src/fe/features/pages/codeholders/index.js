@@ -20,15 +20,16 @@ import AddrLabelGen from './addr-label-gen';
 import GlobalFilterNotice from './global-filter-notice';
 import './style';
 
-const SEARCHABLE_FIELDS = [
-    'nameOrCode',
-    'email',
-    'landlinePhone',
-    'cellphone',
-    'officePhone',
-    'searchAddress',
-    'notes',
-];
+// search fields and their corresponding client fields
+const SEARCHABLE_FIELDS = {
+    nameOrCode: ['name', 'code'],
+    email: ['email'],
+    landlinePhone: ['landlinePhone'],
+    cellphone: ['cellphone'],
+    officePhone: ['officePhone'],
+    searchAddress: ['address'],
+    notes: ['notes'],
+};
 
 const connectToEverything = a => connect('codeholders/fields')(fields => ({
     fields,
@@ -45,7 +46,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
     state = {
         options: {
             search: {
-                field: SEARCHABLE_FIELDS[0],
+                field: Object.keys(SEARCHABLE_FIELDS)[0],
                 query: '',
             },
             filters: {},
@@ -257,6 +258,9 @@ export default connectToEverything(class CodeholdersPage extends Page {
             if (!availableFilters.includes(k)) delete filteredFilters[k];
         }
 
+        const searchableFields = Object.keys(SEARCHABLE_FIELDS)
+            .filter(fields => perms.hasCodeholderFields('r', ...fields));
+
         const { options, expanded } = this.state;
 
         let listSelection;
@@ -277,7 +281,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                             },
                         });
                     }}
-                    searchFields={SEARCHABLE_FIELDS}
+                    searchFields={searchableFields}
                     fields={availableFields}
                     filters={filteredFilters}
                     expanded={expanded}

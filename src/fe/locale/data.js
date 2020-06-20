@@ -141,6 +141,7 @@ export const search = {
     savedFilterName: 'Nomo',
     savedFilterDesc: 'Priskribo',
     csvExport: 'Elporti kiel CSV',
+    noFieldsSelected: '[[no fields selected]]',
     sorting: {
         none: 'ne ordigata',
         asc: 'kreskanta',
@@ -149,6 +150,7 @@ export const search = {
     fieldPicker: {
         title: 'Montrotaj kampoj',
         searchPlaceholder: 'Serĉi kampon',
+        noFieldsAvailable: '[[no fields available]]',
     },
 };
 
