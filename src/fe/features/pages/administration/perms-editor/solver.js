@@ -33,7 +33,7 @@ function clone (xperms) {
 function xpDecodeField (id) {
     if (!id.startsWith('@.')) throw new Error('invalid argument to xpDecodeField: should start with @.');
     const parts = id.split('.');
-    return [parts[1], parts[2]];
+    return [parts.slice(1, parts.length - 1).join('.'), parts[parts.length - 1]];
 }
 /// Encodes a field in the xperms format.
 function xpEncodeField (field, flag) {

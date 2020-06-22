@@ -9,6 +9,7 @@ import DataList from '../../../components/data-list';
 import { date } from '../../../components/data';
 import TinyProgress from '../../../components/tiny-progress';
 import { coreContext } from '../../../core/connection';
+import { connectPerms } from '../../../perms';
 import { codeholders as locale } from '../../../locale';
 import Meta from '../../meta';
 import { LinkButton } from '../../../router';
@@ -125,12 +126,12 @@ export const RolesInDetailView = makeInDetailView(
     'role',
 );
 
-function makePage (createTask, signal, listTask, deleteTask, deleteKey, renderItem, renderMenu, title, add, empty) {
-    return class MRPage extends Page {
+function makePage (createTask, signal, listTask, deleteTask, fieldId, perm, renderItem, renderMenu, title, add, empty) {
+    return connectPerms(class MRPage extends Page {
         static contextType = coreContext;
 
-        render () {
-            const canEdit = true; // TODO
+        render ({ perms }) {
+            const canEdit = perms.hasCodeholderField(perm, 'w');
 
             // get codeholder id from the match above
             const id = +this.props.matches[this.props.matches.length - 2][1];
@@ -158,13 +159,13 @@ function makePage (createTask, signal, listTask, deleteTask, deleteKey, renderIt
                         onRemove={canEdit && (item =>
                             this.context.createTask(deleteTask, {
                                 id,
-                            }, { [deleteKey]: item.id }).runOnceAndDrop())}
+                            }, { [fieldId]: item.id }).runOnceAndDrop())}
                         renderItem={renderItem}
                         renderMenu={renderMenu(id)} />
                 </div>
             );
         }
-    };
+    });
 }
 
 export const MembershipPage = makePage(
@@ -172,6 +173,7 @@ export const MembershipPage = makePage(
     'codeholders/codeholderSigMemberships',
     'codeholders/listMemberships',
     'codeholders/deleteMembership',
+    'membership',
     'membership',
     item => (
         <div class="membership-item">
@@ -201,6 +203,7 @@ export const RolesPage = makePage(
     'codeholders/listRoles',
     'codeholders/deleteRole',
     'role',
+    'roles',
     item => (
         <div class="role-item">
             <div class="item-name">

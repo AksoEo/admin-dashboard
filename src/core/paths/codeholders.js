@@ -79,6 +79,7 @@ const addressSubfields = [
 // ditto
 const phoneFormat = field => ({
     apiFields: [field, field + 'Formatted'],
+    permFields: [field],
     fromAPI: codeholder => codeholder[field] === undefined
         ? undefined
         : { value: codeholder[field], formatted: codeholder[field + 'Formatted'] },
@@ -172,6 +173,7 @@ const clientFields = {
     hasPassword: 'hasPassword',
     address: {
         apiFields: addressSubfields.flatMap(f => [`address.${f}`, `addressLatin.${f}`]),
+        permFields: ['address', 'addressLatin'],
         fromAPI: codeholder => {
             const value = {};
             let isEmpty = true;
@@ -518,7 +520,14 @@ export const tasks = {
             let hasPerm;
             if (typeof spec === 'string') hasPerm = await client.hasCodeholderField(spec, 'r');
             else if (typeof spec.apiFields === 'string') hasPerm = await client.hasCodeholderField(spec.apiFields, 'r');
-            else {
+            else if (spec.permFields) {
+                for (const f of spec.permFields) {
+                    if (await client.hasCodeholderField(f, 'r')) {
+                        hasPerm = true;
+                        break;
+                    }
+                }
+            } else {
                 for (const f of spec.apiFields) {
                     if (await client.hasCodeholderField(f, 'r')) {
                         hasPerm = true;

@@ -416,6 +416,7 @@ export const memberFields = {
     code: { name: 'Kodo', fields: ['newCode', 'oldCode'] },
     codeholderType: { name: 'Membrospeco', fields: ['codeholderType'] },
     creationTime: { name: 'Horo de kreiĝo', fields: ['creationTime'] },
+    feeCountry: { name: 'Paglando', fields: ['feeCountry'] },
     address: { name: 'Adreso', fields: ['address', 'addressLatin', 'searchAddress'] },
     addressCountry: { name: 'Lando', fields: ['address.country', 'addressLatin.country'] },
     addressCountryArea: { name: 'Regiono', fields: ['address.countryArea', 'addressLatin.countryArea'] },

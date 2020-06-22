@@ -37,12 +37,13 @@ function CountryRenderer ({ value }) {
 }
 
 /// Renders a countries dropdown.
-export function CountryEditor ({ value, onChange }) {
+export function CountryEditor ({ value, onChange, disabled }) {
     return (
         <div class="data country-editor">
             <WithCountries>
                 {countries => (
                     <Select
+                        disabled={disabled}
                         value={value}
                         onChange={value => onChange(value || null)}
                         items={[{ value: '', label: '—' }].concat(Object.entries(countries)

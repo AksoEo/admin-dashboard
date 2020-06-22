@@ -47,6 +47,8 @@ function BasicAddressRenderer ({ value }) {
 }
 
 /// Edits an address. Also handles locale-based validation.
+///
+/// - editableMask: if set, only allows editing the given fields
 class AddressEditor extends Component {
     state = {
         validationRules: null,
@@ -80,15 +82,24 @@ class AddressEditor extends Component {
         clearTimeout(this.#reloadTimeout);
     }
 
-    render ({ value, onChange }) {
+    render ({ value, onChange, readableMask, editableMask }) {
         if (!value) return null;
+        const rmask = field => readableMask ? readableMask.includes(field) : true;
+        const wmask = field => editableMask ? editableMask.includes(field) : true;
         const country = value.country;
 
         const onChangeField = (key, map = (x => x)) => v => onChange({ ...value, [key]: map(v) });
 
-        const items = [
-            <countryField.editor key="country" value={country} onChange={onChangeField('country')} />,
-        ];
+        const items = [];
+        if (rmask('country')) {
+            items.push(
+                <countryField.editor
+                    key="country"
+                    value={country}
+                    onChange={onChangeField('country')}
+                    disabled={!wmask('country')} />,
+            );
+        }
 
         const rules = this.state.validationRules || {};
         const requiredFields = rules.requiredFields || [];
@@ -96,10 +107,11 @@ class AddressEditor extends Component {
         const upperFields = rules.upperFields || [];
         const postalCodeMatchers = rules.postalCodeMatchers || [];
 
-        if (requiredFields.includes('countryArea')) {
+        if (rmask('countryArea') && requiredFields.includes('countryArea')) {
             items.push(
                 <Validator
                     component={Select}
+                    disabled={!wmask('countryArea')}
                     validate={value => {
                         if (country && !value) throw { error: locale.requiredField };
                     }}
@@ -116,7 +128,7 @@ class AddressEditor extends Component {
         }
 
         for (const k of ['city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode']) {
-            if (!allowedFields.includes(k)) continue;
+            if (!allowedFields.includes(k) || !rmask(k)) continue;
             const isRequired = requiredFields.includes(k);
             const isUpper = upperFields.includes(k);
             items.push(<Validator
@@ -132,6 +144,7 @@ class AddressEditor extends Component {
                         }
                     }
                 }}
+                disabled={!wmask(k)}
                 class="address-editor-line"
                 key={k}
                 value={value[k]}
