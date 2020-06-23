@@ -112,11 +112,11 @@ export const MembershipInDetailView = makeInDetailView(
 
 export const RolesInDetailView = makeInDetailView(
     'codeholders/listRoles',
-    { filter: { isActive: true } },
+    {},
     'codeholders/codeholderSigRoles',
     item => {
         return (
-            <span key={item.id} class="role">
+            <span key={item.id} class={'role' + (!item.isActive ? ' is-inactive' : '')}>
                 {item.role.name}
             </span>
         );
