@@ -359,6 +359,9 @@ class FileCounter extends Component {
     componentDidUpdate (prevProps) {
         if (prevProps.id !== this.props.id) this.reinit();
     }
+    componentWillUnmount () {
+        if (this.#updateView) this.#updateView.drop();
+    }
 
     render ({ children }, { count }) {
         return children(count);

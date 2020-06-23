@@ -56,6 +56,9 @@ function makeInDetailView (task, extra, signal, render, empty, target, className
                 this.bindSigView();
             }
         }
+        componentWillUnmount () {
+            if (this.#sigView) this.#sigView.drop();
+        }
 
         render () {
             const memberships = this.state.items ? this.state.items.map(render) : [];
