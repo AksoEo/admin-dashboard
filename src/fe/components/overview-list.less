@@ -126,14 +126,52 @@
         transition: opacity 0.3s;
 
         .list-header .list-header-cell {
-            overflow: hidden;
-            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
 
             .cell-label {
                 text-align: left;
                 display: inline;
+                flex: 1;
                 margin: 0;
                 width: auto;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            &.is-sortable {
+                position: relative;
+                &::before {
+                    content: '';
+                    position: absolute;
+                    display: block;
+                    top: -2px;
+                    left: -4px;
+                    right: -4px;
+                    bottom: -2px;
+                    border-radius: 4px;
+                    background: @text-fade-10;
+                    opacity: 0;
+                    transition: opacity 0.1s;
+                    pointer-events: none;
+                }
+
+                &:hover::before {
+                    opacity: 1;
+                }
+            }
+
+            .cell-sorting {
+                display: inline-block;
+                flex-shrink: 0;
+
+                &.sorting-none {
+                    opacity: 0.3;
+                }
+
+                svg {
+                    vertical-align: middle;
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';
 import ArrowRightIcon from '@material-ui/icons/ChevronRight';
+import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore';
 import RefreshIcon from '@material-ui/icons/Refresh';
 import { coreContext } from '../core/connection';
 import Select from './select';
@@ -37,6 +38,7 @@ function scrollToNode (node) {
 /// - expanded: bool, whether search/filters are expanded
 /// - fields: field renderers
 /// - onGetItemLink: should return a link to an item’s detail view
+/// - onSetFields: callback for changing fields
 /// - onSetOffset: callback for changing the current page
 /// - onSetLimit: callback for changing the current items per page
 /// - onResult: result callback
@@ -238,6 +240,7 @@ export default class OverviewList extends PureComponent {
         fields,
         parameters,
         onGetItemLink,
+        onSetFields,
         locale: localizedFields,
         view,
         notice,
@@ -286,6 +289,22 @@ export default class OverviewList extends PureComponent {
 
             compiledFields = compiledFields.filter(({ id }) => !fields[id].hide);
 
+            const setFieldSorting = !!onSetFields && ((id, sorting) => {
+                const newFields = selectedFields.slice();
+                if (result.transientFields && result.transientFields.includes(id)) {
+                    newFields.push({ id, sorting });
+                } else {
+                    for (let i = 0; i < newFields.length; i++) {
+                        const f = newFields[i];
+                        if (f.id === id) {
+                            newFields[i] = { id, sorting };
+                            break;
+                        }
+                    }
+                }
+                onSetFields(newFields);
+            });
+
             if (result.stats) {
                 stats = locale.stats(
                     result.items.length,
@@ -308,6 +327,7 @@ export default class OverviewList extends PureComponent {
                 <ListHeader
                     key="header"
                     selectedFields={compiledFields}
+                    setFieldSorting={setFieldSorting}
                     selection={selection}
                     fields={fields}
                     locale={localizedFields} />,
@@ -402,13 +422,27 @@ export default class OverviewList extends PureComponent {
 // time interval after changing page during which the results list will not change height
 const PAGE_CHANGE_COOLDOWN = 400; // ms
 
-function ListHeader ({ fields, selectedFields, locale, selection }) {
+function ListHeader ({ fields, selectedFields, setFieldSorting, locale, selection }) {
     const style = lineLayout(fields, selectedFields, selection);
 
-    const cells = selectedFields.map(({ id }) => (
-        <div key={id} class="list-header-cell">
+    const cells = selectedFields.map(({ id, sorting }) => (
+        <div
+            key={id}
+            class={'list-header-cell' + (setFieldSorting ? ' is-sortable' : '')}
+            onClick={() => {
+                const newSorting = sorting === 'asc' ? 'desc' : sorting === 'desc' ? 'none' : 'asc';
+                setFieldSorting(id, newSorting);
+            }}>
             <div class="cell-label" title={locale[id]}>{locale[id]}</div>
-            {/* sorting? */}
+            {setFieldSorting ? (
+                <div class={`cell-sorting sorting-${sorting}`}>
+                    {sorting === 'asc'
+                        ? <ArrowUpIcon />
+                        : sorting === 'desc'
+                            ? <ArrowDownIcon />
+                            : <UnfoldMoreIcon />}
+                </div>
+            ) : null}
         </div>
     ));
 

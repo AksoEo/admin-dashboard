@@ -313,6 +313,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     expanded={expanded}
                     fields={FIELDS}
                     onGetItemLink={listSelection ? null : id => `/membroj/${id}`}
+                    onSetFields={fields => this.setState({ options: { ...options, fields }})}
                     onSetOffset={offset => this.setState({ options: { ...options, offset }})}
                     onSetLimit={limit => this.setState({ options: { ...options, limit }})}
                     onResult={result => this.setState({ currentResultIsCursed: result.cursed })}
