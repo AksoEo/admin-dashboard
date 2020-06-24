@@ -7,8 +7,8 @@ import { CodeholderDisabledIcon } from './icons';
 import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
 import { UEACode as AKSOUEACode } from '@tejo/akso-client';
 import moment from 'moment';
-import { codeholders as locale } from '../../../locale';
-import { ueaCode, date, email, phoneNumber } from '../../../components/data';
+import { codeholders as locale, timestampFormat } from '../../../locale';
+import { ueaCode, date, email, timestamp, phoneNumber } from '../../../components/data';
 import { WithCountries, CountryFlag } from '../../../components/data/country';
 
 function getCountries (core) {
@@ -419,6 +419,16 @@ export default {
         },
         stringify (value) {
             return value;
+        },
+    },
+    creationTime: {
+        sortable: true,
+        component ({ value }) {
+            if (!value) return null;
+            return <timestamp.renderer value={value * 1000} />;
+        },
+        stringify (value) {
+            return moment(value * 1000).utc().format(timestampFormat);
         },
     },
     notes: {
