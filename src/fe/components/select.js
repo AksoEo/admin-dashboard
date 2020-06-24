@@ -35,6 +35,7 @@ export default class Select extends Component {
         props.class = (props.class || '') + ' paper-select';
         if (focused) props.class += ' is-focused';
         if (outline) props.class += ' p-outline';
+        if (disabled) props.class += ' is-disabled';
 
         const selectIcon = (
             <svg class="p-select-icon" width="24" height="24">
