@@ -8,6 +8,7 @@ import { memberships as locale } from '../../../locale';
 
 export const FIELDS = {
     nameAbbrev: {
+        sortable: true,
         weight: 0.25,
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
@@ -27,6 +28,7 @@ export const FIELDS = {
         },
     },
     name: {
+        sortable: true,
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (editing) {

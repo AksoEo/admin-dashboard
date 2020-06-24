@@ -6,6 +6,7 @@ import { paymentAddons as locale } from '../../../../../locale';
 
 export const FIELDS = {
     name: {
+        sortable: true,
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (editing) {

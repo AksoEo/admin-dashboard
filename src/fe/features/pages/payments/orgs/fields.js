@@ -7,6 +7,7 @@ import { paymentOrgs as locale } from '../../../../locale';
 
 export const FIELDS = {
     org: {
+        sortable: true,
         slot: 'title',
         component ({ value }) {
             return value === 'tejo' ? <TejoIcon /> : value === 'uea' ? <UeaIcon /> : null;
@@ -18,6 +19,7 @@ export const FIELDS = {
         weight: 0.25,
     },
     name: {
+        sortable: true,
         slot: 'title',
         component ({ value, editing, onChange }) {
             if (editing) {

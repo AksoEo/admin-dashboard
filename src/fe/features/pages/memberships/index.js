@@ -16,7 +16,7 @@ export default connectPerms(class Memberships extends Page {
             search: { query: '' },
             fields: [
                 { id: 'nameAbbrev', sorting: 'none', fixed: true },
-                { id: 'name', sorting: 'none', fixed: true },
+                { id: 'name', sorting: 'asc', fixed: true },
                 { id: 'description', sorting: 'none', fixed: true },
             ],
             offset: 0,
@@ -84,6 +84,7 @@ export default connectPerms(class Memberships extends Page {
                     parameters={parameters}
                     fields={FIELDS}
                     onGetItemLink={id => `/membrecoj/${id}`}
+                    onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />

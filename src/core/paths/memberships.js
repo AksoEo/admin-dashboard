@@ -3,6 +3,7 @@ import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
+import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 
 /// Data store path.
@@ -65,13 +66,14 @@ const FIELDS = [
 ];
 
 export const tasks = {
-    list: async (_, { offset, limit, search }) => {
+    list: async (_, { offset, limit, fields, search }) => {
         const client = await asyncClient;
 
         const opts = {
             offset,
             limit,
             fields: FIELDS,
+            order: fieldsToOrder(fields),
         };
 
         if (search && search.query) {

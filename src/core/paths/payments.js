@@ -1,6 +1,7 @@
 import { base32 } from 'rfc4648';
 import asyncClient from '../client';
 import * as store from '../store';
+import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
@@ -134,13 +135,13 @@ const INTENT_ALLOWED_PATCH_FIELDS = [
 ];
 
 export const tasks = {
-    listOrgs: async (_, { offset, limit }) => {
+    listOrgs: async (_, { offset, limit, fields }) => {
         const client = await asyncClient;
         const res = await client.get('/aksopay/payment_orgs', {
             offset,
             limit,
             fields: ['id', 'org', 'name', 'description'],
-            order: [['name', 'asc']],
+            order: fieldsToOrder(fields),
         });
         for (const item of res.body) {
             const existing = store.get([PAYMENT_ORGS, item.id, PO_DATA]);
@@ -192,13 +193,13 @@ export const tasks = {
         store.remove([PAYMENT_ORGS, id]);
         store.signal([PAYMENT_ORGS, SIG_PAYMENT_ORGS]);
     },
-    listAddons: async ({ org }, { offset, limit }) => {
+    listAddons: async ({ org }, { offset, limit, fields }) => {
         const client = await asyncClient;
         const res = await client.get(`/aksopay/payment_orgs/${org}/addons`, {
             offset,
             limit,
             fields: ['id', 'name', 'description'],
-            order: [['name', 'asc']],
+            order: fieldsToOrder(fields),
         });
         for (const item of res.body) {
             const path = [PAYMENT_ORGS, org, PO_ADDONS, item.id];
@@ -245,13 +246,13 @@ export const tasks = {
         store.remove([PAYMENT_ORGS, org, PO_ADDONS, id]);
         store.signal([PAYMENT_ORGS, org, SIG_PO_ADDONS]);
     },
-    listMethods: async ({ org }, { offset, limit, jsonFilter, _skipMapHack }) => {
+    listMethods: async ({ org }, { offset, limit, jsonFilter, fields, _skipMapHack }) => {
         const client = await asyncClient;
         const opts = {
             offset,
             limit,
             fields: ['id', 'type', 'name', 'internalDescription'],
-            order: [['name', 'asc']],
+            order: fieldsToOrder(fields),
         };
         if (jsonFilter) opts.filter = jsonFilter.filter;
 

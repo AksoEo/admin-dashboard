@@ -38,7 +38,8 @@ function scrollToNode (node) {
 /// - expanded: bool, whether search/filters are expanded
 /// - fields: field renderers
 /// - onGetItemLink: should return a link to an item’s detail view
-/// - onSetFields: callback for changing fields
+/// - onSetFields: callback for changing fields. If set, will show inline sorting controls.
+///     - Make sure to also set sortable: true on field renderers wher esorting is supported
 /// - onSetOffset: callback for changing the current page
 /// - onSetLimit: callback for changing the current items per page
 /// - onResult: result callback
@@ -291,16 +292,17 @@ export default class OverviewList extends PureComponent {
 
             const setFieldSorting = !!onSetFields && ((id, sorting) => {
                 const newFields = selectedFields.slice();
-                if (result.transientFields && result.transientFields.includes(id)) {
-                    newFields.push({ id, sorting });
-                } else {
-                    for (let i = 0; i < newFields.length; i++) {
-                        const f = newFields[i];
-                        if (f.id === id) {
-                            newFields[i] = { id, sorting };
-                            break;
-                        }
+                let found = false;
+                for (let i = 0; i < newFields.length; i++) {
+                    const f = newFields[i];
+                    if (f.id === id) {
+                        newFields[i] = { ...f, sorting };
+                        found = true;
+                        break;
                     }
+                }
+                if (!found && result.transientFields && result.transientFields.includes(id)) {
+                    newFields.push({ id, sorting });
                 }
                 onSetFields(newFields);
             });
@@ -425,26 +427,31 @@ const PAGE_CHANGE_COOLDOWN = 400; // ms
 function ListHeader ({ fields, selectedFields, setFieldSorting, locale, selection }) {
     const style = lineLayout(fields, selectedFields, selection);
 
-    const cells = selectedFields.map(({ id, sorting }) => (
-        <div
-            key={id}
-            class={'list-header-cell' + (setFieldSorting ? ' is-sortable' : '')}
-            onClick={() => {
-                const newSorting = sorting === 'asc' ? 'desc' : sorting === 'desc' ? 'none' : 'asc';
-                setFieldSorting(id, newSorting);
-            }}>
-            <div class="cell-label" title={locale[id]}>{locale[id]}</div>
-            {setFieldSorting ? (
-                <div class={`cell-sorting sorting-${sorting}`}>
-                    {sorting === 'asc'
-                        ? <ArrowUpIcon />
-                        : sorting === 'desc'
-                            ? <ArrowDownIcon />
-                            : <UnfoldMoreIcon />}
-                </div>
-            ) : null}
-        </div>
-    ));
+    const cells = selectedFields.map(({ id, sorting }) => {
+        const sortable = fields[id].sortable && setFieldSorting;
+
+        return (
+            <div
+                key={id}
+                class={'list-header-cell' + (sortable ? ' is-sortable' : '')}
+                onClick={() => {
+                    if (!sortable) return;
+                    const newSorting = sorting === 'asc' ? 'desc' : sorting === 'desc' ? 'none' : 'asc';
+                    setFieldSorting(id, newSorting);
+                }}>
+                <div class="cell-label" title={locale[id]}>{locale[id]}</div>
+                {sortable ? (
+                    <div class={`cell-sorting sorting-${sorting}`}>
+                        {sorting === 'asc'
+                            ? <ArrowUpIcon />
+                            : sorting === 'desc'
+                                ? <ArrowDownIcon />
+                                : <UnfoldMoreIcon />}
+                    </div>
+                ) : null}
+            </div>
+        );
+    });
 
     if (selection) {
         cells.unshift(<div key="selection" class="list-header-cell selection-cell"></div>);

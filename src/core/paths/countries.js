@@ -3,6 +3,7 @@ import { AbstractDataView, createStoreObserver } from '../view';
 import * as store from '../store';
 import * as log from '../log';
 import asyncClient from '../client';
+import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 
 /// Data store path.
@@ -79,7 +80,7 @@ async function loadAllCountryGroups () {
 
 export const tasks = {
     /// countries/list: lists countries
-    list: async (_, { search, offset, limit }) => {
+    list: async (_, { search, offset, limit, fields }) => {
         const client = await asyncClient;
 
         const options = {
@@ -90,7 +91,7 @@ export const tasks = {
                 'enabled',
                 ...COUNTRY_LANGS.map(code => `name_${code}`),
             ],
-            order: [['code', 'asc']],
+            order: fieldsToOrder(fields),
         };
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
@@ -118,14 +119,14 @@ export const tasks = {
     },
 
     /// countries/listGroups: lists country groups
-    listGroups: async (_, { search, offset, limit }) => {
+    listGroups: async (_, { search, offset, limit, fields }) => {
         const client = await asyncClient;
 
         const options = {
             offset,
             limit,
             fields: ['code', 'name'],
-            order: [['code', 'asc']],
+            order: fieldsToOrder(fields),
         };
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);

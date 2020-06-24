@@ -34,7 +34,7 @@ export default class APILogListView extends Page {
                 filter: {},
             },
             fields: [
-                { id: 'time', sorting: 'desc'},
+                { id: 'time', sorting: 'desc' },
                 { id: 'identity', sorting: 'none' },
                 { id: 'ip', sorting: 'none' },
                 { id: 'method', sorting: 'none' },
@@ -163,6 +163,7 @@ export default class APILogListView extends Page {
                     expanded={expanded}
                     fields={FIELDS}
                     onGetItemLink={id => `/administrado/protokolo/${id}`}
+                    onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />

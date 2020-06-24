@@ -8,6 +8,7 @@ import {
     parametersToRequestData as codeholdersPTRD,
     clientFromAPI as codeholderFromAPI,
 } from './codeholders';
+import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import * as store from '../store';
 
@@ -17,7 +18,7 @@ export const SIG_LIST = '!list';
 
 export const tasks = {
     /// adminGroups/list: lists admin groups
-    list: async (_, { search, offset, limit }) => {
+    list: async (_, { search, offset, fields, limit }) => {
         const client = await asyncClient;
 
         const opts = { offset, limit };
@@ -31,6 +32,7 @@ export const tasks = {
 
         const res = await client.get('/admin_groups', {
             fields: ['id', 'name', 'description', 'memberRestrictions.filter', 'memberRestrictions.fields'],
+            order: fieldsToOrder(fields),
             ...opts,
         });
 
@@ -161,10 +163,11 @@ export const tasks = {
     },
 
     /// adminGroups/listCodeholders: lists codeholders that are part of an admin group
-    listCodeholders: async ({ group }, { offset, limit }) => {
+    listCodeholders: async ({ group }, { offset, limit, fields }) => {
         const client = await asyncClient;
         const { options } = codeholdersPTRD({
             fields: [{ id: 'code', sorting: 'asc' }, { id: 'name', sorting: 'asc' }],
+            order: fieldsToOrder(fields),
             offset,
             limit,
         });
@@ -188,12 +191,12 @@ export const tasks = {
     },
 
     /// adminGroups/listClients: lists clients that are part of an admin group
-    listClients: async ({ group }, { offset, limit }) => {
+    listClients: async ({ group }, { offset, limit, fields }) => {
         const client = await asyncClient;
 
         const res = await client.get(`/admin_groups/${group}/clients`, {
             fields: ['apiKey', 'name', 'ownerName', 'ownerEmail'],
-            order: [['apiKey', 'asc']],
+            order: fieldsToOrder(fields),
             offset,
             limit,
         });

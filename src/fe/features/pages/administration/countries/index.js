@@ -17,7 +17,7 @@ export default class CountriesPage extends Page {
                 query: '',
             },
             fields: [
-                { id: 'code', sorting: 'none', fixed: true },
+                { id: 'code', sorting: 'asc', fixed: true },
                 { id: 'enabled', sorting: 'none', fixed: true },
                 { id: 'name_eo', sorting: 'none', fixed: true },
             ],
@@ -86,6 +86,7 @@ export default class CountriesPage extends Page {
                     parameters={parameters}
                     fields={FIELDS}
                     onGetItemLink={id => `/administrado/landoj/${id}`}
+                    onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields}

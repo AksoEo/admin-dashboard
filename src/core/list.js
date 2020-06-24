@@ -16,6 +16,13 @@ export function transformError (err) {
     };
 }
 
+export function fieldsToOrder (fields) {
+    if (!Array.isArray(fields)) return [];
+    return fields
+        .filter(({ sorting }) => sorting !== 'none')
+        .map(({ id, sorting }) => [id, sorting]);
+}
+
 export function filtersToAPI (clientFilters, pfilters) {
     const filters = [];
     if (pfilters && !pfilters._disabled) {

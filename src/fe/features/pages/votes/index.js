@@ -141,6 +141,7 @@ export default connect('votes/filters')(data => ({
                     parameters={parameters}
                     fields={FIELDS}
                     onGetItemLink={id => `/vochdonado/${id}`}
+                    onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />

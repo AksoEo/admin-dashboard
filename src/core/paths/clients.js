@@ -3,6 +3,7 @@ import JSON5 from 'json5';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
+import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 
 export const CLIENTS = 'clients';
@@ -11,7 +12,7 @@ export const SIG_CLIENTS = '!clients';
 
 export const tasks = {
     /// clients/list: lists clients
-    list: async (_, { search, offset, limit }) => {
+    list: async (_, { search, offset, limit, fields }) => {
         const client = await asyncClient;
 
         const opts = { offset, limit };
@@ -29,6 +30,7 @@ export const tasks = {
 
         const res = await client.get('/clients', {
             fields: ['name', 'apiKey', 'ownerName', 'ownerEmail'],
+            order: fieldsToOrder(fields),
             ...opts,
         });
 

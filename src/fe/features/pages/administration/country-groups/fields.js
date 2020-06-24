@@ -3,6 +3,7 @@ import { TextField } from '@cpsdqs/yamdl';
 
 export const FIELDS = {
     code: {
+        sortable: true,
         slot: 'title',
         weight: 0.5,
         component ({ value }) {
@@ -11,6 +12,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     name: {
+        sortable: true,
         slot: 'title',
         component ({ value, onChange, editing }) {
             if (editing) {

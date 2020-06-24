@@ -141,13 +141,13 @@ const clientFields = {
         },
         toAPI: value => {
             const codeholder = {};
-            if (value !== undefined && ('firstLegal' in value)) {
+            if (typeof value === 'object' && ('firstLegal' in value)) {
                 // human
                 for (const f of ['firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific']) {
                     const cf = f.replace(/Name/, '');
                     if (value[cf] !== undefined) codeholder[f] = value[cf] || null;
                 }
-            } else if (value !== undefined) {
+            } else if (typeof value === 'object') {
                 // org
                 if (value.full !== undefined) codeholder.fullName = value.full || null;
                 if (value.local !== undefined) codeholder.fullNameLocal = value.local || null;

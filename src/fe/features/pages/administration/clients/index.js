@@ -16,6 +16,7 @@ import './style';
 
 export const FIELDS = {
     name: {
+        sortable: true,
         slot: 'title',
         component ({ value, slot }) {
             if (slot === 'title') return <b>{value}</b>;
@@ -24,6 +25,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     apiKey: {
+        sortable: true,
         skipLabel: true,
         component ({ value }) {
             return <apiKey.inlineRenderer value={value} />;
@@ -31,12 +33,14 @@ export const FIELDS = {
         stringify: v => Buffer.from(v).toString('hex'),
     },
     ownerName: {
+        sortable: true,
         component ({ value }) {
             return value;
         },
         stringify: v => v,
     },
     ownerEmail: {
+        sortable: true,
         component ({ value }) {
             return <email.inlineRenderer value={value} />;
         },
@@ -52,7 +56,7 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
                 query: '',
             },
             fields: [
-                { id: 'name', sorting: 'none', fixed: true },
+                { id: 'name', sorting: 'asc', fixed: true },
                 { id: 'apiKey', sorting: 'none', fixed: true },
                 { id: 'ownerName', sorting: 'none', fixed: true },
                 { id: 'ownerEmail', sorting: 'none', fixed: true },
@@ -144,6 +148,7 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
                     selection={selection}
                     fields={FIELDS}
                     onGetItemLink={id => `/administrado/klientoj/${id}`}
+                    onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields}

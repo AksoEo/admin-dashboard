@@ -111,8 +111,9 @@ export default {
                 const { type, isDead } = item;
 
                 const guessedType = type ? type
-                    : ('firstLegal' in value) ? 'human'
-                        : ('full' in value) ? 'org' : null;
+                    : (typeof value !== 'object') ? null
+                        : ('firstLegal' in value) ? 'human'
+                            : ('full' in value) ? 'org' : null;
 
                 if (guessedType === 'human') {
                     const { honorific, first: f, firstLegal, last: l, lastLegal } = value;

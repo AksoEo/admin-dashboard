@@ -9,7 +9,7 @@ export default class MethodsTab extends PureComponent {
         parameters: {
             fields: [
                 { id: 'type', sorting: 'none', fixed: true },
-                { id: 'name', sorting: 'none', fixed: true },
+                { id: 'name', sorting: 'asc', fixed: true },
                 { id: 'internalDescription', sorting: 'none', fixed: true },
             ],
             offset: 0,
@@ -29,6 +29,7 @@ export default class MethodsTab extends PureComponent {
                     parameters={parameters}
                     fields={FIELDS}
                     onGetItemLink={id => `/aksopago/organizoj/${org}/metodoj/${id}`}
+                    onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />

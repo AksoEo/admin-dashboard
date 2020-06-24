@@ -34,6 +34,7 @@ const STRIPE_METHOD_EXTRA = {
 
 export const FIELDS = {
     type: {
+        sortable: true,
         slot: 'titleAlt',
         component ({ value, editing, onChange, isCreation }) {
             if (isCreation && editing) {
@@ -52,6 +53,7 @@ export const FIELDS = {
         weight: 0.5,
     },
     name: {
+        sortable: true,
         slot: 'title',
         component ({ value, editing, onChange, isCreation, slot }) {
             if (editing) {
@@ -189,6 +191,7 @@ export const FIELDS = {
         },
     },
     isRecommended: {
+        sortable: true,
         wantsCreationLabel: true,
         component ({ value, editing, onChange }) {
             if (editing) {

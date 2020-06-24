@@ -21,6 +21,7 @@ const nameField = {
 
 export const FIELDS = {
     code: {
+        sortable: true,
         slot: 'title',
         weight: 0.5,
         component ({ value }) {
@@ -29,6 +30,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     enabled: {
+        sortable: true,
         slot: 'titleAlt',
         weight: 0.5,
         component ({ value, onChange, editing }) {
@@ -43,7 +45,7 @@ export const FIELDS = {
         },
         stringify: v => locale.enabled[v.toString()],
     },
-    name_eo: nameField,
+    name_eo: { ...nameField, sortable: true },
     name_en: nameField,
     name_fr: nameField,
     name_es: nameField,

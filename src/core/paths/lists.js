@@ -2,6 +2,7 @@ import { util } from '@tejo/akso-client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
+import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import JSON5 from 'json5';
 
@@ -10,7 +11,7 @@ export const SIG_LISTS = '!lists';
 
 export const tasks = {
     /// lists/list: lists lists
-    list: async (_, { search, offset, limit }) => {
+    list: async (_, { search, offset, fields, limit }) => {
         const client = await asyncClient;
 
         const opts = { offset, limit };
@@ -24,7 +25,7 @@ export const tasks = {
 
         const res = await client.get('/lists', {
             fields: ['id', 'name', 'description'],
-            order: [['name', 'asc']],
+            order: fieldsToOrder(fields),
             ...opts,
         });
 
