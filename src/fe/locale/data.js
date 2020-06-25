@@ -151,6 +151,7 @@ export const search = {
         title: 'Montrotaj kampoj',
         searchPlaceholder: 'Serĉi kampon',
         noFieldsAvailable: '[[no fields available]]',
+        sortingDescription: '[[fields at the top will be sorted first]]',
     },
 };
 

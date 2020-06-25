@@ -5,6 +5,7 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
 import RearrangingList from './rearranging-list';
+import DynamicHeightDiv from './dynamic-height-div';
 import { search as locale } from '../locale';
 import './field-picker.less';
 
@@ -70,12 +71,16 @@ export default class FieldPicker extends PureComponent {
         }
         searchResults = searchResults.map(x => x.id);
 
+        let hasSortedFields = false;
+
         let i = 0;
         for (const field of this.props.selected) {
             selectedFieldNames.push(field.id);
             const index = i++;
 
             if (!searchResults.includes(field.id)) continue;
+
+            if (field.sorting !== 'none') hasSortedFields = true;
 
             const isLastField = this.props.selected.length === 1;
 
@@ -141,10 +146,21 @@ export default class FieldPicker extends PureComponent {
                         onChange={e => this.setState({ search: e.target.value })}
                         placeholder={locale.fieldPicker.searchPlaceholder} />
                 </div>
+                <DynamicHeightDiv useFirstHeight>
+                    {hasSortedFields ? (
+                        <div class="picker-sorting-notice">
+                            {locale.fieldPicker.sortingDescription}
+                        </div>
+                    ) : null}
+                </DynamicHeightDiv>
                 <RearrangingList
                     onMove={(fromIndex, toIndex) => this.onMoveField(fromIndex, toIndex)}
-                    canMove={index => index < this.props.selected.length}
-                    isItemDraggable={index => index < this.props.selected.length}>
+                    isItemDraggable={index => {
+                        if (index >= this.props.selected.length) return false;
+                        if (this.props.selected[index].fixed) return false;
+                        return true;
+                    }}
+                    canMove={index => index < this.props.selected.length}>
                     {fields}
                 </RearrangingList>
             </Dialog>
