@@ -92,12 +92,7 @@ class Session extends Component {
     }
 
     componentDidMount () {
-        this.core = new Worker();
-        this.loginView = this.core.createDataView('login');
-        this.loginView.on('update', this.#onLoginUpdate);
-
-        this.tasksView = this.core.createDataView('#tasks');
-        this.tasksView.on('update', this.#onTasksUpdate);
+        this.createCore();
 
         if (isSpecialPage()) {
             this.setState({ specialPage: true });
@@ -106,12 +101,32 @@ class Session extends Component {
         this.loadApp();
     }
 
+    createCore () {
+        if (this.loginView) this.loginView.drop();
+        if (this.tasksView) this.tasksView.drop();
+        if (this.core) this.core.drop();
+
+        this.core = new Worker();
+        this.loginView = this.core.createDataView('login');
+        this.loginView.on('update', this.#onLoginUpdate);
+
+        this.tasksView = this.core.createDataView('#tasks');
+        this.tasksView.on('update', this.#onTasksUpdate);
+    }
+
     #hideLoginTimeout = null;
     #onLoginUpdate = data => {
+        if (data.completed) {
+            // session completed; re-create core
+            this.createCore();
+            this.setState({ showLogin: true });
+            return;
+        }
+
         this.setState({ loggedIn: data.authState === LoginAuthStates.LOGGED_IN && data.isAdmin });
         if (data.authState && (data.authState !== LoginAuthStates.LOGGED_IN || !data.isAdmin)) {
             clearTimeout(this.#hideLoginTimeout);
-            this.setState({ showLogin: true, wasLoggedOut: true });
+            this.setState({ wasLoggedOut: true });
             this.loadLogin();
         } else if (data.authState && this.state.showLogin) {
             if (this.#hideLoginTimeout === null) {

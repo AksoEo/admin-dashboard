@@ -1,6 +1,15 @@
 import asyncClient from '../client';
 import * as store from '../store';
-import { LOGIN, AUTH_STATE, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED, UEA_CODE, LOGIN_ID } from './login-keys';
+import {
+    LOGIN,
+    AUTH_STATE,
+    IS_ADMIN,
+    TOTP_REQUIRED,
+    TOTP_SETUP_REQUIRED,
+    UEA_CODE,
+    LOGIN_ID,
+    COMPLETED,
+} from './login-keys';
 import { LoginAuthStates } from '../../protocol';
 import { createStoreObserver } from '../view';
 
@@ -13,6 +22,7 @@ export const tasks = {
         if (client.loggedIn) {
             throw { code: 'already-logged-in', message: 'already logged in' };
         }
+        store.insert(COMPLETED, false);
         store.insert(AUTH_STATE, LoginAuthStates.AUTHENTICATING);
         let result;
         try {
@@ -82,8 +92,8 @@ export const tasks = {
             store.insert(AUTH_STATE, LoginAuthStates.LOGGED_IN);
             throw err;
         }
-        store.purge();
         store.insert(AUTH_STATE, LoginAuthStates.LOGGED_OUT);
+        store.insert(COMPLETED, true);
     },
     /// login/hasPassword: checks if the user has a password
     hasPassword: async (_, { login }) => {

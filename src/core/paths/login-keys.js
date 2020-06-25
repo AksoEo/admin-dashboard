@@ -7,3 +7,4 @@ export const TOTP_REQUIRED = [LOGIN, 'totpRequired'];
 export const TOTP_SETUP_REQUIRED = [LOGIN, 'totpSetupRequired'];
 export const UEA_CODE = [LOGIN, 'ueaCode'];
 export const LOGIN_ID = [LOGIN, 'id'];
+export const COMPLETED = [LOGIN, 'completed'];
