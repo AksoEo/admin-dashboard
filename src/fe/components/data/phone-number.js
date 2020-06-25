@@ -1,62 +1,42 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
-import { parsePhoneNumber, AsYouType as AsYouTypePhoneFmt } from 'libphonenumber-js';
-import { CountryFlag } from './country';
+import { lazy, Suspense } from 'preact/compat';
+import TinyProgress from '../tiny-progress';
 import './style';
 
-const phoneNumberRenderer = allowInteractive => function PhoneNumber ({ value }) {
-    let number, trailing;
-    try {
-        const parsed = parsePhoneNumber(value.value);
+// we have separate renderers using libphonenumber because libphonenumber is huuuuge
+const PhoneNumberRenderer = lazy(() => import(/* webpackChunkName: "libphonenumber" */ './phone-number--render'));
+const PhoneNumberEditor = lazy(() => import(/* webpackChunkName: "libphonenumber" */ './phone-number--editor'));
 
-        if (value.formatted) number = value.formatted;
-        else number = parsed.format('INTERNATIONAL');
-
-        if (parsed.country) {
-            trailing = <CountryFlag country={parsed.country.toLowerCase()} />;
-        }
-    } catch {
-        number = value; // close enough, probably
-    }
-
+const fallbackPhoneNumberRenderer = allowInteractive => function FPhoneNumberRenderer ({ value }) {
     return allowInteractive
-        ? <a class="data phone-number" href={`tel:${value.value}`}>{number} {trailing}</a>
-        : <span class="data phone-number not-interactive">{number}</span>;
+        ? <a class="data phone-number" href={`tel:${value.value}`}>{value.formatted ?? value.value}</a>
+        : <span class="data phone-number not-interactive">{value.formatted ?? value.value}</span>;
 };
 
-function PhoneNumberEditor ({ value, onChange }) {
-    if (!value || value.value === undefined) return null;
-    const wholeValue = value;
-    value = value.value;
+const phoneNumberRendererShim = allowInteractive => {
+    const FallbackRenderer = fallbackPhoneNumberRenderer(allowInteractive);
 
-    let trailing = '';
-    try {
-        const num = parsePhoneNumber(value);
-        if (num.country) {
-            trailing = <CountryFlag country={num.country.toLowerCase()} />;
-        }
-    } catch (_) {
-        // this comment exists because eslint
-    }
+    return function PhoneNumberRendererShim ({ value }) {
+        if (!value) return null;
 
-    if (value && !value.startsWith('+')) value = '+' + value;
-    if (value) value = value.replace(/^[+]+/g, '+');
-    value = new AsYouTypePhoneFmt().input(value);
+        return (
+            <Suspense fallback={<FallbackRenderer value={value} />}>
+                <PhoneNumberRenderer value={value} allowInteractive={allowInteractive} />
+            </Suspense>
+        );
+    };
+};
 
-    return <TextField
-        class="data phone-number-editor"
-        value={value}
-        onChange={e => onChange({ ...wholeValue, value: e.target.value || null })}
-        type="tel"
-        placeholder="+"
-        maxLength="50"
-        trailing={trailing}
-        onFocus={() => (!value && onChange({ ...wholeValue, value: '+' }))}
-        onBlur={() => (value.trim() === '+' && onChange({ ...wholeValue, value: null }))} />;
+function PhoneNumberEditorShim (props) {
+    return (
+        <Suspense fallback={<TinyProgress />}>
+            <PhoneNumberEditor {...props} />
+        </Suspense>
+    );
 }
 
 export default {
-    renderer: phoneNumberRenderer(true),
-    inlineRenderer: phoneNumberRenderer(),
-    editor: PhoneNumberEditor,
+    renderer: phoneNumberRendererShim(true),
+    inlineRenderer: phoneNumberRendererShim(),
+    editor: PhoneNumberEditorShim,
 };

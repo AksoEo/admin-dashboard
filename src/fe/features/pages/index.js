@@ -214,7 +214,7 @@ export default [
                     {
                         match: /^(\d+)$/,
                         component: elazy(() =>
-                            import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/detail')),
+                            import(/* webpackChunkName: "codeholder-detail", webpackPrefetch: true */ './codeholders/detail')),
                         type: 'stack',
                         paths: [
                             {
@@ -225,49 +225,49 @@ export default [
                             {
                                 path: 'membrecoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.MembershipPage),
+                                    import(/* webpackChunkName: "codeholder-memberships", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.MembershipPage),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasCodeholderField('membership', 'r'),
                             },
                             {
                                 path: 'roloj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.RolesPage),
+                                    import(/* webpackChunkName: "codeholder-roles", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.RolesPage),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholder_roles.read'),
                             },
                             {
                                 path: 'historio',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/history')),
+                                    import(/* webpackChunkName: "codeholder-history", webpackPrefetch: true */ './codeholders/history')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholders.hist.read'),
                             },
                             {
                                 path: 'ensalutoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/logins')),
+                                    import(/* webpackChunkName: "codeholder-logins", webpackPrefetch: true */ './codeholders/logins')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasCodeholderField('logins', 'r'),
                             },
                             {
                                 path: 'permesoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/perms')),
+                                    import(/* webpackChunkName: "codeholder-perms", webpackPrefetch: true */ './codeholders/perms')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholders.perms.read'),
                             },
                             {
                                 path: 'dosieroj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/files-page')),
+                                    import(/* webpackChunkName: "codeholder-files", webpackPrefetch: true */ './codeholders/files-page')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasCodeholderField('files', 'r'),
                                 paths: [
                                     {
                                         match: /^(\d+)$/,
                                         component: elazy(() =>
-                                            import(/* webpackChunkName: "codeholders", webpackPrefetch: true */ './codeholders/file-detail')),
+                                            import(/* webpackChunkName: "codeholder-files", webpackPrefetch: true */ './codeholders/file-detail')),
                                         type: 'stack',
                                     },
                                 ],
@@ -446,7 +446,7 @@ export default [
             {
                 id: 'administration-groups',
                 component: elazy(() =>
-                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups')),
+                    import(/* webpackChunkName: "admin-groups", webpackPrefetch: true */ './administration/groups')),
                 icon: SupervisorAccountIcon,
                 type: 'bottom',
                 path: 'grupoj',
@@ -455,13 +455,13 @@ export default [
                     {
                         match: /^(\d+)$/,
                         component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/detail')),
+                            import(/* webpackChunkName: "admin-groups", webpackPrefetch: true */ './administration/groups/detail')),
                         type: 'stack',
                         paths: [
                             {
                                 path: 'permesoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/groups/perms')),
+                                    import(/* webpackChunkName: "admin-group-perms", webpackPrefetch: true */ './administration/groups/perms')),
                                 type: 'stack',
                             },
                             {
@@ -477,7 +477,7 @@ export default [
                 id: 'administration-clients',
                 icon: DeveloperModeIcon,
                 component: elazy(() =>
-                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients')),
+                    import(/* webpackChunkName: "admin-clients", webpackPrefetch: true */ './administration/clients')),
                 type: 'bottom',
                 path: 'klientoj',
                 hasPerm: perms => perms.hasPerm('clients.read'),
@@ -485,13 +485,13 @@ export default [
                     {
                         match: /^([\da-fA-F]+)$/,
                         component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/detail')),
+                            import(/* webpackChunkName: "admin-clients", webpackPrefetch: true */ './administration/clients/detail')),
                         type: 'stack',
                         paths: [
                             {
                                 path: 'permesoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/clients/perms')),
+                                    import(/* webpackChunkName: "admin-client-perms", webpackPrefetch: true */ './administration/clients/perms')),
                                 type: 'stack',
                             },
                             {
@@ -507,7 +507,7 @@ export default [
                 id: 'administration-log',
                 icon: HttpIcon,
                 component: elazy(() =>
-                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log')),
+                    import(/* webpackChunkName: "admin-log", webpackPrefetch: true */ './administration/log')),
                 type: 'bottom',
                 path: 'protokolo',
                 hasPerm: perms => perms.hasPerm('log.read'),
@@ -515,7 +515,7 @@ export default [
                     {
                         match: /^(\d+)$/,
                         component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/log/detail')),
+                            import(/* webpackChunkName: "admin-log", webpackPrefetch: true */ './administration/log/detail')),
                         type: 'stack',
                     },
                 ],
@@ -524,7 +524,7 @@ export default [
                 id: 'administration-countries',
                 icon: PublicIcon,
                 component: elazy(() =>
-                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries')),
+                    import(/* webpackChunkName: "admin-countries", webpackPrefetch: true */ './administration/countries')),
                 type: 'bottom',
                 path: 'landoj',
                 hasPerm: () => true,
@@ -532,7 +532,7 @@ export default [
                     {
                         match: /^([a-z]{2})$/i,
                         component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/countries/detail')),
+                            import(/* webpackChunkName: "admin-countries", webpackPrefetch: true */ './administration/countries/detail')),
                         type: 'stack',
                         paths: [
                             {
@@ -548,7 +548,7 @@ export default [
                 id: 'administration-country-groups',
                 icon: LanguageIcon,
                 component: elazy(() =>
-                    import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups')),
+                    import(/* webpackChunkName: "admin-country-groups", webpackPrefetch: true */ './administration/country-groups')),
                 type: 'bottom',
                 path: 'landaroj',
                 hasPerm: () => true,
@@ -556,7 +556,7 @@ export default [
                     {
                         match: /^(x[a-z0-9]{2})$/i,
                         component: elazy(() =>
-                            import(/* webpackChunkName: "administration", webpackPrefetch: true */ './administration/country-groups/detail')),
+                            import(/* webpackChunkName: "admin-country-groups", webpackPrefetch: true */ './administration/country-groups/detail')),
                         type: 'stack',
                         paths: [
                             {

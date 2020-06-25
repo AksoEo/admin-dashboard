@@ -65,7 +65,7 @@ module.exports = function (env, argv) {
         entry,
         output: {
             filename: prod ? '[name].[hash].js' : '[name].js',
-            chunkFilename: prod ? '[id].[chunkhash].js' : '[name].js',
+            chunkFilename: (prod && !analyze) ? '[id].[chunkhash].js' : '[name].js',
             path: path.resolve(__dirname, 'dist'),
             globalObject: 'this',
         },

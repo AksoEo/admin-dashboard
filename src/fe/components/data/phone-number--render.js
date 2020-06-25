@@ -1,0 +1,24 @@
+import { h } from 'preact';
+import { CountryFlag } from './country';
+import { parsePhoneNumber } from 'libphonenumber-js';
+
+export default function PhoneNumber ({ value, allowInteractive }) {
+    let number, trailing;
+    try {
+        const parsed = parsePhoneNumber(value.value);
+
+        if (value.formatted) number = value.formatted;
+        else number = parsed.format('INTERNATIONAL');
+
+        if (parsed.country) {
+            trailing = <CountryFlag country={parsed.country.toLowerCase()} />;
+        }
+    } catch {
+        number = value; // close enough, probably
+    }
+
+    return allowInteractive
+        ? <a class="data phone-number" href={`tel:${value.value}`}>{number} {trailing}</a>
+        : <span class="data phone-number not-interactive">{number}</span>;
+}
+
