@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import { useRef, useState, useEffect } from 'preact/compat';
-import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
+import { useEffect } from 'preact/compat';
+import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import SavePerms from '../administration/perms-editor/save';
 import { UEACode } from '@tejo/akso-client';
@@ -8,7 +8,7 @@ import Segmented from '../../../components/segmented';
 import Select from '../../../components/select';
 import ChangedFields from '../../../components/changed-fields';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
-import Form, { Field, Validator } from '../../../components/form';
+import { Field, Validator } from '../../../components/form';
 import { ueaCode, date } from '../../../components/data';
 import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
@@ -16,7 +16,6 @@ import {
     codeholders as locale,
     data as dataLocale,
     detail as detailLocale,
-    generic as genericLocale,
 } from '../../../locale';
 import { FileThumbnail, FileSize, Mime } from './files';
 import './style';
@@ -107,81 +106,38 @@ export default {
         );
     },
     update ({ open, task }) {
-        const buttonValidator = useRef(null);
-        const [error, setError] = useState(null);
-
         const changedFields = task.options._changedFields || [];
 
         return (
-            <Dialog
-                backdrop
+            <TaskDialog
                 title={detailLocale.saveTitle}
+                run={() => task.runOnce()}
+                actionLabel={detailLocale.commit}
                 class="codeholders-task-update"
                 open={open}
                 onClose={() => task.drop()}>
-                <Form class="task-update-form" onSubmit={() => {
-                    setError(null);
-                    task.runOnce().catch(err => {
-                        setError(err);
-                        buttonValidator.current.shake();
-                    });
-                }}>
-                    <ChangedFields changedFields={changedFields} locale={locale.fields} />
+                <ChangedFields changedFields={changedFields} locale={locale.fields} />
+                <Field>
                     <TextField
+                        outline
                         class="update-comment"
                         label={detailLocale.updateComment}
                         value={task.parameters.updateComment || ''}
                         onChange={e => task.update({ updateComment: e.target.value })} />
-                    {error ? (
-                        <div class="error-message">
-                            {'' + error}
-                        </div>
-                    ) : null}
-                    <footer class="form-footer">
-                        <span class="footer-spacer" />
-                        <Validator
-                            component={Button}
-                            raised
-                            type="submit"
-                            disabled={task.running}
-                            ref={buttonValidator}
-                            validate={() => {}}>
-                            <CircularProgress
-                                class="progress-overlay"
-                                indeterminate={task.running}
-                                small />
-                            <span>
-                                {detailLocale.commit}
-                            </span>
-                        </Validator>
-                    </footer>
-                </Form>
-            </Dialog>
+                </Field>
+            </TaskDialog>
         );
     },
-    delete ({ open, core, task }) {
+    delete ({ open, task }) {
         return (
-            <Dialog
-                backdrop
+            <TaskDialog
                 class="codeholders-task-delete"
+                run={() => task.runOnce()}
+                actionLabel={locale.delete}
                 open={open}
-                onClose={() => task.drop()}
-                actions={[
-                    {
-                        label: genericLocale.cancel,
-                        action: () => task.drop(),
-                    },
-                    {
-                        label: locale.delete,
-                        action: () => task.runOnceAndDrop().catch(err => {
-                            core.createTask('info', {
-                                message: err.toString(),
-                            });
-                        }),
-                    },
-                ]}>
+                onClose={() => task.drop()}>
                 {locale.deleteDescription}
-            </Dialog>
+            </TaskDialog>
         );
     },
     addMembership: connect('memberships/categories')(categories => ({

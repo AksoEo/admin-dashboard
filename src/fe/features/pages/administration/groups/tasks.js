@@ -3,7 +3,7 @@ import { TextField, AppBarProxy, Button, MenuIcon } from '@cpsdqs/yamdl';
 import DoneIcon from '@material-ui/icons/Done';
 import SavePerms from '../perms-editor/save';
 import { adminGroups as locale } from '../../../../locale';
-import { Validator } from '../../../../components/form';
+import { Field, Validator } from '../../../../components/form';
 import TaskDialog from '../../../../components/task-dialog';
 import ChangedFields from '../../../../components/changed-fields';
 import { IdUEACode } from '../../../../components/data/uea-code';
@@ -24,20 +24,26 @@ export default {
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/administrado/grupoj/${id}`);
                         })}>
-                        <Validator
-                            component={TextField}
-                            label={locale.fields.name}
-                            value={task.parameters.name || ''}
-                            onChange={e => task.update({ name: e.target.value })}
-                            validate={name => {
-                                if (!name) throw { error: locale.nameRequired };
-                            }} />
-                        <Validator
-                            component={TextField}
-                            label={locale.fields.description}
-                            value={task.parameters.description || ''}
-                            onChange={e => task.update({ description: e.target.value })}
-                            validate={() => {}} />
+                        <Field>
+                            <Validator
+                                outline
+                                component={TextField}
+                                label={locale.fields.name}
+                                value={task.parameters.name || ''}
+                                onChange={e => task.update({ name: e.target.value })}
+                                validate={name => {
+                                    if (!name) throw { error: locale.nameRequired };
+                                }} />
+                        </Field>
+                        <Field>
+                            <Validator
+                                outline
+                                component={TextField}
+                                label={locale.fields.description}
+                                value={task.parameters.description || ''}
+                                onChange={e => task.update({ description: e.target.value })}
+                                validate={() => {}} />
+                        </Field>
                     </TaskDialog>
                 )}
             </routerContext.Consumer>
