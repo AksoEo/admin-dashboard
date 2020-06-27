@@ -133,20 +133,37 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
 /* eslint-disable react/display-name */
 
 const ValCheckbox = ({ value, onChange }) => <Checkbox checked={value} onChange={onChange} />;
-const boundedNumber = (min, max, step, unit) => ({ value, onChange }) =>
-    <TextField
-        type="number"
-        class={unit === 'mm' ? 'is-mm' : ''}
-        step={step}
-        trailing={unit}
-        min={min}
-        max={max}
-        value={value}
-        onChange={e => onChange(+e.target.value)}
-        onBlur={() => setImmediate(() => {
-            const bounded = Math.max(min, Math.min(value | 0, max));
-            if (bounded !== value) onChange(bounded);
-        })} />;
+const boundedNumber = (min, max, step, unit) => ({ value, onChange }) => {
+    const [editingText, setEditingText] = useState(value);
+    const [isFocused, setFocused] = useState(false);
+
+    return (
+        <TextField
+            type="number"
+            class={unit === 'mm' ? 'is-mm' : ''}
+            step={null}
+            trailing={unit}
+            min={min}
+            max={max}
+            value={isFocused ? editingText : +value.toFixed(1)}
+            onChange={e => {
+                setEditingText(e.target.value);
+            }}
+            onFocus={() => {
+                setFocused(true);
+                setEditingText(+value.toFixed(1));
+            }}
+            onBlur={() => setImmediate(() => {
+                setFocused(false);
+                let value = parseFloat(editingText);
+                if (!Number.isFinite(value)) value = 0;
+
+                const bounded = Math.max(min, Math.min(value, max));
+                onChange(bounded);
+                setEditingText(bounded);
+            })} />
+    );
+};
 
 function UnitSwitch ({ value, onChange }) {
     return (

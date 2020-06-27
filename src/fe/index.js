@@ -115,6 +115,7 @@ class Session extends Component {
     }
 
     #hideLoginTimeout = null;
+    #firstSession = true;
     #onLoginUpdate = data => {
         if (data.completed) {
             // session completed; re-create core
@@ -127,6 +128,10 @@ class Session extends Component {
         if (data.authState && (data.authState !== LoginAuthStates.LOGGED_IN || !data.isAdmin)) {
             clearTimeout(this.#hideLoginTimeout);
             this.setState({ wasLoggedOut: true });
+            if (this.#firstSession) {
+                this.setState({ showLogin: true });
+                this.#firstSession = false;
+            }
             this.loadLogin();
         } else if (data.authState && this.state.showLogin) {
             if (this.#hideLoginTimeout === null) {
