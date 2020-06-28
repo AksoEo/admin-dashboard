@@ -61,6 +61,7 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef
             type="number"
             class="bound-editor"
             center
+            outline
             disabled={disabled}
             ref={innerRef}
             min={min}

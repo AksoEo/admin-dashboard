@@ -104,6 +104,14 @@ export default class Segmented extends PureComponent {
             const leftRect = this.childRefs[left] && this.childRefs[left].getBoundingClientRect();
             const rightRect = this.childRefs[right] && this.childRefs[right].getBoundingClientRect();
 
+            let targetChild = null;
+            for (const c of this.props.children) {
+                if (c.id === this.props.selected) {
+                    targetChild = c;
+                    break;
+                }
+            }
+
             if (leftRect && rightRect) {
                 const dx = lerp(leftRect.left, rightRect.left, p) - nodeRect.left;
                 const dy = lerp(leftRect.top, rightRect.top, p) - nodeRect.top;
@@ -115,7 +123,11 @@ export default class Segmented extends PureComponent {
                 const sy = styleHeight / height;
                 const transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
                 const style = { transform, width: styleWidth, height: styleHeight };
-                animatedBackground = <div class="segmented-control-background" style={style} />;
+                let className = 'segmented-control-background';
+                if (targetChild && targetChild.class) className += ' ' + targetChild.class;
+                animatedBackground = <div
+                    class={className}
+                    style={style} />;
             }
         }
 
@@ -125,6 +137,7 @@ export default class Segmented extends PureComponent {
                 className += ' selected';
                 if (!idleBackgroundPos) className += ' hidden-background';
             }
+            if (option.class) className += ' ' + option.class;
             return (
                 <button
                     key={option.id}

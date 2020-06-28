@@ -78,7 +78,7 @@ function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
 
         return (
             <div class="left-right-editor">
-                <Segmented selected={selected} onSelect={selected => {
+                <Segmented class="smaller" selected={selected} onSelect={selected => {
                     onSelect(selected, { value, onChange, enabled, onEnabledChange, filter });
                 }} disabled={hidden}>
                     {[
@@ -96,6 +96,7 @@ function tripleSwitch (all, a, b, labels, decode, onSelect, isOptionDisabled) {
                             id: all,
                             label: labels[all],
                             disabled: isOptionDisabled(all, value, filter),
+                            class: 'bordered',
                         },
                     ]}
                 </Segmented>
@@ -181,23 +182,11 @@ export default {
             if (!set.length) return { enabled: false, value: { set: [], type: null } };
             return { enabled: true, value: { type, set } };
         },
-        editor ({ value, onChange, onEnabledChange, hidden }) {
+        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
             const selectedType = value.type === null ? 'all' : value.type;
 
             return (
                 <Fragment>
-                    <div class="country-editor-type-selector">
-                        <Segmented selected={selectedType} onSelect={type => {
-                            if (type === 'all') type = null;
-                            onChange({ ...value, type });
-                        }} disabled={hidden}>
-                            {[
-                                { id: 'fee', label: locale.search.countryFilter.fee },
-                                { id: 'address', label: locale.search.countryFilter.address },
-                                { id: 'all', label: locale.search.countryFilter.all },
-                            ]}
-                        </Segmented>
-                    </div>
                     <CountryPicker
                         hidden={hidden}
                         onChange={set => {
@@ -205,6 +194,20 @@ export default {
                             onEnabledChange(set.length);
                         }}
                         value={value.set} />
+                    {enabled ? (
+                        <div class="country-editor-type-selector">
+                            <Segmented class="smaller" selected={selectedType} onSelect={type => {
+                                if (type === 'all') type = null;
+                                onChange({ ...value, type });
+                            }} disabled={hidden}>
+                                {[
+                                    { id: 'fee', label: locale.search.countryFilter.fee },
+                                    { id: 'address', label: locale.search.countryFilter.address },
+                                    { id: 'all', label: locale.search.countryFilter.all, class: 'bordered' },
+                                ]}
+                            </Segmented>
+                        </div>
+                    ) : null}
                 </Fragment>
             );
         },
@@ -288,22 +291,6 @@ export default {
 
             return (
                 <Fragment>
-                    <div class="age-editor-top">
-                        <div class="age-prime-switch">
-                            <span class="age-birth-year">
-                                {locale.search.ageBirthYear(birthYearRange)}
-                            </span>
-                            <label>{locale.search.agePrime}</label>
-                            <Checkbox
-                                class="inner-switch"
-                                switch
-                                disabled={hidden}
-                                checked={value.atStartOfYear}
-                                onChange={checked => {
-                                    onChange({ ...topValue, atStartOfYear: checked });
-                                }} />
-                        </div>
-                    </div>
                     <RangeEditor
                         min={0}
                         max={150}
@@ -315,6 +302,24 @@ export default {
                             onEnabledChange(true);
                         }}
                         tickDistance={5} />
+                    {enabled ? (
+                        <div class="age-editor-extra">
+                            <span class="age-birth-year">
+                                {locale.search.ageBirthYear(birthYearRange)}
+                            </span>
+                            <div class="age-prime-switch">
+                                <label>{locale.search.agePrime}</label>
+                                <Checkbox
+                                    class="inner-switch"
+                                    switch
+                                    disabled={hidden}
+                                    checked={value.atStartOfYear}
+                                    onChange={checked => {
+                                        onChange({ ...topValue, atStartOfYear: checked });
+                                    }} />
+                            </div>
+                        </div>
+                    ) : null}
                 </Fragment>
             );
         },
@@ -433,7 +438,7 @@ export default {
                                 invert: selected === 'yes',
                             };
                             onChange(newValue);
-                        }} disabled={hidden}>
+                        }} disabled={hidden} class="smaller">
                             {[
                                 {
                                     id: 'yes',
@@ -448,6 +453,7 @@ export default {
                     </div>
                     <div class="membership-item-line">
                         <Segmented
+                            class="smaller"
                             selected={lifetime ? 'yes' : lifetime === false ? 'no' : 'all'}
                             onSelect={selected => {
                                 const newValue = [...value];
@@ -470,12 +476,14 @@ export default {
                                 {
                                     id: 'all',
                                     label: locale.search.membership.lifetime.all,
+                                    class: 'bordered',
                                 },
                             ]}
                         </Segmented>
                     </div>
                     <div class="membership-item-line">
                         <Segmented
+                            class="smaller"
                             selected={givesMembership
                                 ? 'yes' : givesMembership === false ? 'no' : 'all'}
                             onSelect={selected => {
@@ -499,6 +507,7 @@ export default {
                                 {
                                     id: 'all',
                                     label: locale.search.membership.givesMembership.all,
+                                    class: 'bordered',
                                 },
                             ]}
                         </Segmented>
@@ -598,28 +607,9 @@ export default {
             const parts = value.split('$');
             return { enabled: true, value: { roles: parts[0].split(','), date: parts[1] } };
         },
-        editor ({ value, onChange, onEnabledChange, hidden }) {
+        editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
             return (
                 <Fragment>
-                    <div class="role-editor-top">
-                        <label>
-                            {locale.search.role.activeAtTime}
-                        </label>
-                        <date.editor
-                            class="role-date-editor"
-                            placeholder={locale.search.role.anyTime}
-                            value={value.date}
-                            onChange={date => onChange({ ...value, date: date })}
-                            disabled={hidden}
-                            trailing={value.date ? (
-                                <span
-                                    class="date-editor-clear"
-                                    onClick={() => onChange({ ...value, date: '' })}>
-                                    <CloseIcon />
-                                </span>
-                            ) : null}
-                            tabIndex={hidden ? -1 : undefined} />
-                    </div>
                     <RolePicker
                         style={{ width: '100%' }}
                         disabled={hidden}
@@ -628,6 +618,28 @@ export default {
                             onChange({ ...value, roles });
                             onEnabledChange(!!roles.length);
                         }} />
+                    {enabled ? (
+                        <div class="role-editor-date">
+                            <label>
+                                {locale.search.role.activeAtTime}
+                            </label>
+                            <date.editor
+                                outline
+                                class="role-date-editor"
+                                placeholder={locale.search.role.anyTime}
+                                value={value.date}
+                                onChange={date => onChange({ ...value, date: date })}
+                                disabled={hidden}
+                                trailing={value.date ? (
+                                    <span
+                                        class="date-editor-clear"
+                                        onClick={() => onChange({ ...value, date: '' })}>
+                                        <CloseIcon />
+                                    </span>
+                                ) : null}
+                                tabIndex={hidden ? -1 : undefined} />
+                        </div>
+                    ) : null}
                 </Fragment>
             );
         },

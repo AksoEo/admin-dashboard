@@ -98,23 +98,18 @@
         }
     }
 
-    .age-editor .age-editor-top,
-    .country-editor .country-editor-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        @media (max-width: 600px) {
-            flex-direction: column;
-            align-items: flex-end;
-
-            .filter-header {
-                align-self: flex-start;
-            }
-        }
+    .country-editor-type-selector {
+        width: 100%;
+        text-align: right;
     }
 
-    .age-editor-top {
+    .age-editor-extra {
+        margin-top: 8px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
         .age-birth-year {
             margin-right: 16px;
             opacity: 0.8;
@@ -128,24 +123,20 @@
     }
 
     .left-right-editor {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
         @media (max-width: 600px) {
-            flex-direction: column;
-
-            *:first-child {
-                align-self: flex-start;
-            }
-
-            *:last-child {
-                align-self: flex-end;
-            }
+            display: block;
+            width: 100%;
+            text-align: right;
         }
     }
 
-    .role-editor-top {
+    .role-editor-date {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: small;
+
         .role-date-editor {
             vertical-align: middle;
             margin-left: 8px;
@@ -166,7 +157,6 @@
     .active-member-editor, .death-date-editor {
         display: flex;
         margin-top: 8px;
-        padding-right: 16px;
         width: 100%;
 
         .filter-header {
@@ -176,16 +166,6 @@
         .range-editor {
             width: 0;
             flex: 1;
-            margin-left: 16px;
-        }
-
-        @media (max-width: 600px) {
-            display: block;
-
-            .range-editor {
-                margin: 0 20px;
-                width: calc(100% - 40px);
-            }
         }
     }
 
@@ -320,9 +300,11 @@
         width: 100%;
 
         .code-picker {
+            margin-top: 8px;
             width: 100%;
             padding: 8px 16px;
-            border-bottom: 2px solid @separator;
+            border: 1px solid @control-idle;
+            border-radius: 4px;
             box-sizing: border-box;
             font-size: small;
 
@@ -343,8 +325,8 @@
                 vertical-align: middle;
             }
 
-            &:hover {
-                border-bottom-color: @secondary;
+            &:hover, &:focus {
+                border-color: @secondary;
             }
         }
     }

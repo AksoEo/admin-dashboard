@@ -135,7 +135,7 @@ export default class LargeMultiSelect extends PureComponent {
                 }}
                 onClick={e => {
                     if (extra.onClick) extra.onClick(e);
-                    if (!e.defaultPrevented) this.setState({ dialogOpen: true });
+                    if (!e.defaultPrevented) this.setState({ dialogOpen: true, search: '' });
                 }}>
                 <span class="lms-preview">
                     {previewItems.length

@@ -57,6 +57,40 @@
         }
     }
 
+    // these classes are kind of hacks
+    &.smaller {
+        .segmented-control-background {
+            box-sizing: border-box;
+            border: 1px solid @secondary;
+            transition: background 0.3s @easing, box-shadow 0.3s @easing;
+
+            &.bordered {
+                background: none;
+                box-shadow: none;
+            }
+        }
+
+        .segmented-control-option {
+            padding: 4px 8px;
+
+            &.bordered {
+                border: 1px solid transparent;
+                color: @text-fade-80;
+            }
+
+            &.selected.bordered {
+                color: inherit;
+            }
+            &.selected:not(.hidden-background) {
+                &.bordered {
+                    background: none;
+                    border-color: @secondary;
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+
     &.minimal {
         .segmented-control-background {
             background: @text-fade-40;

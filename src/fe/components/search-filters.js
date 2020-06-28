@@ -130,6 +130,12 @@ export default function SearchFilters ({
         const isEnabled = value.filters[filterId].enabled;
         const filterIsHidden = !filtersEnabled || (!isEnabled && !expanded);
         items.push({
+            node: <div style={{ height: 8 }} />,
+            paper: false,
+            hidden: filterIsHidden,
+            staticHeight: true,
+        });
+        items.push({
             node: <Filter
                 id={filterId}
                 spec={filters[filterId]}
@@ -267,7 +273,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                 ]}
             </Segmented>
 
-            <span class="filters-bar-spacer" />
+            <span class="filters-bar-spacer filters-bar-break" />
 
             {loadedFilter}
 

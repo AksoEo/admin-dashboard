@@ -102,12 +102,14 @@ export default class PaperList extends PureComponent {
         const clipY = state.height.value < childHeight
             ? `inset(0 0 ${childHeight - state.height.value} 0)`
             : null;
+        const baseOpacity = 1 - state.hidden.value;
+        const opacity = clamp(baseOpacity * 3 - 2, 0, 1);
 
         return {
             transform: `translateY(${state.y.value}px)` + (USE_SCALE ? ` scaleY(${scaleY})` : ''),
             clipPath: USE_SCALE ? null : clipY,
             zIndex: Math.round(lerp(this.props.children[index].zIndex | 0, 0, state.hidden.value)),
-            opacity: clamp(1 - state.hidden.value, 0, 1),
+            opacity,
             pointerEvents: state.hidden.value > 0.5 ? 'none' : '',
         };
     }
