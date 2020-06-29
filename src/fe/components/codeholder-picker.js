@@ -1,11 +1,27 @@
 import { h, Component } from 'preact';
-import { Button } from '@cpsdqs/yamdl';
+import { useState } from 'preact/compat';
+import { Button, Dialog } from '@cpsdqs/yamdl';
+import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
+import StaticOverviewList from './overview-list-static';
 import { ueaCode } from './data';
-import SuggestionField from './suggestion-field';
 import { coreContext } from '../core/connection';
 import { codeholders as locale } from '../locale';
+import FIELDS from '../features/pages/codeholders/table-fields'; // FIXME: dont ximport
 import './codeholder-picker.less';
+
+const REDUCED_FIELD_IDS = ['type', 'code', 'name'];
+const REDUCED_FIELDS = Object.fromEntries(REDUCED_FIELD_IDS.map(id => [id, FIELDS[id]]));
+
+const portalContainer = document.createElement('div');
+portalContainer.id = 'codeholder-picker-portal-container';
+document.body.appendChild(portalContainer);
+
+function orderPortalContainerFront () {
+    document.body.removeChild(portalContainer);
+    document.body.appendChild(portalContainer);
+}
+
 
 /// Picks a codeholder and displays their UEA code.
 ///
@@ -15,7 +31,7 @@ import './codeholder-picker.less';
 export default class CodeholderPicker extends Component {
     state = {
         search: '',
-        suggestions: [],
+        addDialogOpen: false,
 
         // cached id -> uea code mappings
         codeCache: {},
@@ -101,7 +117,9 @@ export default class CodeholderPicker extends Component {
         });
     };
 
-    render ({ value, onChange, limit, disabled }) {
+    render ({ value, onChange, limit, disabled }, { addDialogOpen }) {
+        const canAddMore = !this.props.limit || value.length < this.props.limit;
+
         return (
             <div class="codeholder-picker" data-limit={limit}>
                 <div
@@ -123,30 +141,69 @@ export default class CodeholderPicker extends Component {
                     ))}
                     {(!value.length && this.props.limit !== 1) && locale.picker.none}
 
-                    {(this.props.limit && value.length >= this.props.limit) ? null : (
-                        <SuggestionField
-                            disabled={disabled}
-                            class="codeholder-search"
-                            value={this.state.search}
-                            onChange={this.onSearchChange}
-                            placeholder={locale.picker.search}
-                            skipFilter={true}
-                            alwaysHighlight={true}
-                            autocomplete="off"
-                            spellcheck="false"
-                            autocorrect="off"
-                            onSelect={selected => {
-                                if (!selected) return;
-                                const value = this.props.value.slice();
-                                if (value.includes(selected.id)) return;
-                                value.push(selected.id);
-                                this.onSearchChange('');
-                                onChange(value);
-                            }}
-                            suggestions={this.state.suggestions} />
-                    )}
+                    {canAddMore ? (
+                        <Button small icon onClick={() => {
+                            this.setState({ addDialogOpen: true });
+                            orderPortalContainerFront();
+                        }}>
+                            <AddIcon />
+                        </Button>
+                    ) : null}
+
+                    <Dialog
+                        class="codeholder-picker-add-dialog"
+                        backdrop
+                        fullScreen={width => width < 600}
+                        title={this.props.limit === 1 ? locale.picker.addOne : locale.picker.add}
+                        container={portalContainer}
+                        open={canAddMore && addDialogOpen}
+                        onClose={() => this.setState({ addDialogOpen: false })}>
+                        <AddDialogInner
+                            value={value}
+                            onChange={onChange}
+                            limit={this.props.limit} />
+                    </Dialog>
                 </div>
             </div>
         );
     }
+}
+
+function AddDialogInner ({ value, onChange, limit }) {
+    const [offset, setOffset] = useState(0);
+
+    const selection = {
+        add: id => {
+            if (value.includes('' + id)) return;
+            onChange(value.concat(['' + id]));
+        },
+        has: id => value.includes('' + id),
+        delete: id => {
+            if (!value.includes('' + id)) return;
+            const newValue = value.slice();
+            newValue.splice(value.indexOf('' + id), 1);
+            onChange(newValue);
+        },
+    };
+
+    return (
+        <StaticOverviewList
+            compact
+            task="codeholders/list"
+            view="codeholders/codeholder"
+            fields={REDUCED_FIELDS}
+            sorting={{ code: 'asc' }}
+            offset={offset}
+            onSetOffset={setOffset}
+            selection={limit === 1 ? null : selection}
+            onItemClick={id => {
+                if (value.includes('' + id)) {
+                    selection.delete(id);
+                } else {
+                    selection.add(id);
+                }
+            }}
+            limit={10}
+            locale={locale.fields} />
+    );
 }

@@ -10,6 +10,7 @@ import moment from 'moment';
 import { codeholders as locale, timestampFormat } from '../../../locale';
 import { ueaCode, date, email, timestamp, phoneNumber } from '../../../components/data';
 import { WithCountries, CountryFlag } from '../../../components/data/country';
+import './table-fields.less';
 
 function getCountries (core) {
     return new Promise((resolve, reject) => {
@@ -121,7 +122,7 @@ export default {
                     const last = l || lastLegal;
                     return (
                         <span
-                            class={'name' + (isDead ? ' is-dead' : '')}
+                            class={'codeholder-name' + (isDead ? ' is-dead' : '')}
                             title={`${honorific ? honorific + ' ' : ''}${first} ${last}`}
                             ref={node => {
                                 this.node = node;
@@ -148,7 +149,7 @@ export default {
 
                     return (
                         <span
-                            class={'name' + (isDead ? ' is-dead' : '')}
+                            class={'codeholder-name' + (isDead ? ' is-dead' : '')}
                             title={`${full} ${abbrev}`}
                             ref={node => {
                                 this.node = node;
@@ -167,7 +168,7 @@ export default {
                         </span>
                     );
                 } else {
-                    return <span class="name"></span>;
+                    return <span class="codeholder-name"></span>;
                 }
             }
         },
@@ -192,7 +193,7 @@ export default {
             const { now, atStartOfYear } = value;
             if (typeof now !== 'number') return null;
             const label = locale.fields.ageFormat(now, atStartOfYear, item.isDead);
-            return <span class="age">{label}</span>;
+            return <span class="codeholder-age">{label}</span>;
         },
         stringify (value, item) {
             if (!value) return '';
@@ -206,7 +207,7 @@ export default {
         component ({ value }) {
             if (!value) return null;
             return (
-                <span class="memberships">
+                <span class="codeholder-memberships">
                     {value.flatMap((item, i) => {
                         let className = 'membership-item';
                         if (item.lifetime) className += ' is-lifetime';
@@ -378,7 +379,7 @@ export default {
     addressCity: {
         sortable: true,
         component ({ item }) {
-            return <span class="address-city">{item.address.cityLatin}</span>;
+            return <span class="codeholder-address-city">{item.address.cityLatin}</span>;
         },
         stringify (value, item) {
             return item.address.cityLatin;
@@ -387,7 +388,7 @@ export default {
     addressCountryArea: {
         sortable: true,
         component ({ item }) {
-            return <span class="address-country-area">{item.address.countryAreaLAtin}</span>;
+            return <span class="codeholder-address-country-area">{item.address.countryAreaLAtin}</span>;
         },
         stringify (value, item) {
             return item.address.countryAreaLatin;
@@ -416,7 +417,7 @@ export default {
     },
     profession: {
         component ({ value }) {
-            return <span class="profession">{value}</span>;
+            return <span class="codeholder-profession">{value}</span>;
         },
         stringify (value) {
             return value;

@@ -343,6 +343,8 @@ export const codeholders = {
 
     picker: {
         none: 'Neniu elektita',
+        add: '[[select members]]',
+        addOne: '[[select member]]',
         search: 'Aldoni laŭ nomo aŭ UEA-kodo',
     },
     resetPassword: {

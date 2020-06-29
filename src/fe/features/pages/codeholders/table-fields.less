@@ -1,0 +1,83 @@
+@import '../../../prelude';
+
+.codeholder-type {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+
+    .codeholder-type-label {
+        display: none;
+    }
+
+    &.with-label {
+        width: auto;
+
+        .codeholder-type-icon {
+            margin-right: 4px;
+
+            & > * {
+                vertical-align: middle;
+            }
+        }
+        .codeholder-type-label {
+            display: inline;
+        }
+    }
+}
+
+.codeholder-type.disabled {
+    color: @error;
+}
+
+.codeholder-name {
+    display: inline-block;
+    white-space: nowrap;
+    justify-content: flex-start;
+    max-width: 100%;
+
+    .honorific, .first-name, .last-name, .org-full-name, .org-abbrev {
+        display: inline-block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    &.is-dead,
+    &.is-dead * {
+        text-decoration-line: line-through;
+        text-decoration-color: @error;
+    }
+}
+
+.codeholder-address {
+    .address-pseudoline {
+        &:not(:first-of-type)::before {
+            content: ', ';
+        }
+    }
+}
+
+.codeholder-memberships {
+    .membership-item {
+        .membership-item-id {
+            display: inline-block;
+            background: @text-fade-20;
+            padding: 2px 4px;
+            border-radius: 4px;
+            margin-right: 2px;
+            text-decoration: none;
+            font-size: small;
+        }
+
+        &.gives-membership .membership-item-id {
+            background: @membership-gives-membership-background;
+        }
+        &.is-lifetime .membership-item-id {
+            background: @membership-is-lifetime-background;
+        }
+        &.gives-membership.is-lifetime .membership-item-id {
+            background: @membership-gives-lifetime-membership-background;
+        }
+    }
+}
+

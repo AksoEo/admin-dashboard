@@ -24,6 +24,7 @@ import './overview-list-static.less';
 /// - emptyLabel: empty label
 /// - onItemClick: callback (id) => void
 /// - compact: bool
+/// - selection: same as OL
 export default class StaticOverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -45,7 +46,7 @@ export default class StaticOverviewList extends PureComponent {
 
         const s = sorting || {};
         const params = {
-            fields: Object.keys(fields).map(f => s[f] ? [f, s[f]] : f),
+            fields: Object.keys(fields).map(f => ({ id: f, sorting: s[f] || 'none' })),
             jsonFilter: jsonFilter ? { filter: jsonFilter } : null,
             offset,
             limit,
@@ -113,6 +114,7 @@ export default class StaticOverviewList extends PureComponent {
         emptyLabel,
         offset,
         limit,
+        selection,
     }, { loading, error, result, animateBackwards }) {
         const selectedFields = Object.keys(fields).map(f => ({ id: f }));
 
@@ -156,6 +158,7 @@ export default class StaticOverviewList extends PureComponent {
                         key={id}
                         id={id}
                         selectedFields={selectedFields}
+                        selection={selection}
                         fields={fields}
                         index={animateBackwards ? result.items.length - 1 - i : i}
                         animateBackwards={animateBackwards}

@@ -160,7 +160,11 @@ export default class FieldPicker extends PureComponent {
                         if (this.props.selected[index].fixed) return false;
                         return true;
                     }}
-                    canMove={index => index < this.props.selected.length}>
+                    canMove={index => {
+                        if (index > this.props.selected.length) return false;
+                        if (this.props.selected[index].fixed) return false;
+                        return true;
+                    }}>
                     {fields}
                 </RearrangingList>
             </Dialog>
