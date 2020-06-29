@@ -15,6 +15,7 @@ export default {
             return (
                 <div class="org-filter">
                     <Segmented
+                        class="smaller"
                         selected={value || 'none'}
                         onSelect={value => {
                             onChange(value === 'none' ? null : value);
@@ -23,6 +24,7 @@ export default {
                         {Object.keys(locale.filters.orgTypes).map(type => ({
                             id: type,
                             label: locale.filters.orgTypes[type],
+                            class: type === 'none' ? 'bordered' : '',
                         }))}
                     </Segmented>
                 </div>
@@ -38,17 +40,16 @@ export default {
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="state-filter">
-                    <Segmented
-                        selected={value || 'none'}
-                        onSelect={value => {
+                    <Select
+                        value={value || 'none'}
+                        onChange={value => {
                             onChange(value === 'none' ? null : value);
                             onEnabledChange(value !== 'none');
-                        }}>
-                        {Object.keys(locale.filters.stateTypes).map(type => ({
-                            id: type,
+                        }}
+                        items={Object.keys(locale.filters.stateTypes).map(type => ({
+                            value: type,
                             label: locale.filters.stateTypes[type],
-                        }))}
-                    </Segmented>
+                        }))} />
                 </div>
             );
         },
@@ -84,12 +85,18 @@ export default {
         editor ({ value, onChange }) {
             return (
                 <div class="time-range-editor">
-                    <timestamp.editor
-                        value={value[0]}
-                        onChange={v => onChange([v, value[1]])} />
-                    <timestamp.editor
-                        value={value[1]}
-                        onChange={v => onChange([value[0], v])} />
+                    <div>
+                        <timestamp.editor
+                            label={locale.filters.timeRangeStart}
+                            value={value[0]}
+                            onChange={v => onChange([v, value[1]])} />
+                    </div>
+                    <div>
+                        <timestamp.editor
+                            label={locale.filters.timeRangeEnd}
+                            value={value[1]}
+                            onChange={v => onChange([value[0], v])} />
+                    </div>
                 </div>
             );
         },

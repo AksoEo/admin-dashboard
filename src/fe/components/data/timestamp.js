@@ -22,7 +22,7 @@ function TimestampFormatter ({ value }) {
     return null;
 }
 
-function TimestampEditor ({ value, onChange, disabled, error }) {
+function TimestampEditor ({ label, value, onChange, disabled, error, outline }) {
     const m = moment(Number.isFinite(value) ? value * 1000 : value).utc();
 
     const dateValue = value === null ? null : m.format('YYYY-MM-DD');
@@ -30,12 +30,13 @@ function TimestampEditor ({ value, onChange, disabled, error }) {
 
     return (
         <span class="timestamp-editor">
-            <date.editor disabled={disabled} value={dateValue} onChange={v => {
+            <date.editor label={label} outline={outline} disabled={disabled} value={dateValue} onChange={v => {
                 const newDate = moment.utc(v + '$' + timeValue, 'YYYY-MM-DD$HH:mm:ss');
                 const newValue = newDate.unix();
                 if (Number.isFinite(newValue)) onChange(newValue);
             }} error={error} />
-            <time.editor disabled={disabled} value={timeValue} onChange={v => {
+            {outline ? ' ' : ''}
+            <time.editor outline={outline} disabled={disabled} value={timeValue} onChange={v => {
                 const newDate = moment.utc(dateValue + '$00:00:00', 'YYYY-MM-DD$HH:mm:ss');
                 newDate.seconds(v);
                 const newValue = newDate.unix();

@@ -28,14 +28,18 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="time-filter">
-                    <timestamp.editor disabled={hidden} value={+value[0] / 1000} onChange={v => {
-                        onChange([new Date(v * 1000), value[1]]);
-                        onEnabledChange(true);
-                    }} />
-                    <timestamp.editor disabled={hidden} value={+value[1] / 1000} onChange={v => {
-                        onChange([value[0], new Date(v * 1000)]);
-                        onEnabledChange(true);
-                    }} />
+                    <div>
+                        <timestamp.editor label={locale.search.filters.timeRangeStart} disabled={hidden} value={+value[0] / 1000} onChange={v => {
+                            onChange([new Date(v * 1000), value[1]]);
+                            onEnabledChange(true);
+                        }} />
+                    </div>
+                    <div>
+                        <timestamp.editor label={locale.search.filters.timeRangeEnd} disabled={hidden} value={+value[1] / 1000} onChange={v => {
+                            onChange([value[0], new Date(v * 1000)]);
+                            onEnabledChange(true);
+                        }} />
+                    </div>
                 </div>
             );
         },
@@ -47,7 +51,7 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="api-key-filter">
-                    <TextField value={value} disabled={hidden} onChange={e => {
+                    <TextField outline value={value} disabled={hidden} onChange={e => {
                         onChange(e.target.value);
                         onEnabledChange(!!e.target.value);
                     }} />
@@ -62,7 +66,7 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="ip-filter">
-                    <TextField disabled={hidden} value={value} onChange={e => {
+                    <TextField outline disabled={hidden} value={value} onChange={e => {
                         onChange(e.target.value);
                         onEnabledChange(!!e.target.value);
                     }} />
@@ -78,6 +82,7 @@ export default {
             return (
                 <div class="origin-filter">
                     <TextField
+                        outline
                         disabled={hidden}
                         placeholder={locale.search.filters.originPlaceholder}
                         value={value}
@@ -152,6 +157,7 @@ export default {
                             },
                         ]} />
                     <TextField
+                        outline
                         class="path-filter-path"
                         value={value.path}
                         disabled={hidden}
@@ -172,6 +178,7 @@ export default {
             return (
                 <div class="res-status-filter">
                     <TextField
+                        outline
                         value={value}
                         disabled={hidden}
                         placeholder={locale.search.filters.resStatusPlaceholder}

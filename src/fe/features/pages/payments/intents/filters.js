@@ -11,6 +11,7 @@ export const FILTERS = {
         deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return <TextField
+                outline
                 disabled={hidden}
                 value={value}
                 onChange={e => {
@@ -26,6 +27,7 @@ export const FILTERS = {
         deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return <TextField
+                outline
                 type="email"
                 disabled={hidden}
                 value={value}
@@ -43,6 +45,7 @@ export const FILTERS = {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <Segmented
+                    class="smaller"
                     disabled={hidden}
                     selected={value || ''}
                     onSelect={value => {
@@ -52,6 +55,7 @@ export const FILTERS = {
                     {Object.keys(locale.filters.orgs).map(type => ({
                         id: type,
                         label: locale.filters.orgs[type],
+                        class: !type ? 'bordered' : '',
                     }))}
                 </Segmented>
             );

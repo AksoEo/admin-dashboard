@@ -38,6 +38,8 @@ export const votes = {
         org: 'AKSO-organizo',
         timeStart: 'Komenĉiĝo',
         timeEnd: 'Finiĝo',
+        timeRangeStart: '[[range start]]',
+        timeRangeEnd: '[[range end]]',
         state: 'Ŝtato',
         type: 'Speco',
         orgTypes: {

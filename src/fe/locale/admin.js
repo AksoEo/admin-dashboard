@@ -108,6 +108,9 @@ export const httpLog = {
             pathInverted: 'ne komenciĝas je',
             pathPlaceholder: 'Ekz. /auth',
             resStatusPlaceholder: 'Ekz. 200',
+
+            timeRangeStart: '[[range start]]',
+            timeRangeEnd: '[[range end]]',
         },
     },
     fields: {
