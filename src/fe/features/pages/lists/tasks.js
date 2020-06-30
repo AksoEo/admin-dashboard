@@ -1,9 +1,10 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
-import { Validator } from '../../../components/form';
+import { Field, Validator } from '../../../components/form';
 import { lists as locale } from '../../../locale';
 import { routerContext } from '../../../router';
+import './tasks.less';
 
 export default {
     create ({ open, task }) {
@@ -11,6 +12,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="lists-task-create"
                         open={open}
                         onClose={() => task.drop()}
                         title={locale.create.title}
@@ -21,21 +23,26 @@ export default {
                         <p>
                             {locale.create.warning}
                         </p>
-                        <Validator
-                            component={TextField}
-                            label={locale.fields.name}
-                            value={task.parameters.name || ''}
-                            onChange={e => task.update({ name: e.target.value })}
-                            validate={name => {
-                                if (!name) throw { error: locale.nameRequired };
-                            }} />
-                        <br />
-                        <Validator
-                            component={TextField}
-                            label={locale.fields.description}
-                            value={task.parameters.description || ''}
-                            onChange={e => task.update({ description: e.target.value || null })}
-                            validate={() => {}} />
+                        <Field>
+                            <Validator
+                                outline
+                                component={TextField}
+                                label={locale.fields.name}
+                                value={task.parameters.name || ''}
+                                onChange={e => task.update({ name: e.target.value })}
+                                validate={name => {
+                                    if (!name) throw { error: locale.nameRequired };
+                                }} />
+                        </Field>
+                        <Field>
+                            <Validator
+                                outline
+                                component={TextField}
+                                label={locale.fields.description}
+                                value={task.parameters.description || ''}
+                                onChange={e => task.update({ description: e.target.value || null })}
+                                validate={() => {}} />
+                        </Field>
                     </TaskDialog>
                 )}
             </routerContext.Consumer>
