@@ -109,8 +109,8 @@ export const httpLog = {
             pathPlaceholder: 'Ekz. /auth',
             resStatusPlaceholder: 'Ekz. 200',
 
-            timeRangeStart: '[[range start]]',
-            timeRangeEnd: '[[range end]]',
+            timeRangeStart: 'Komenco',
+            timeRangeEnd: 'Fino',
         },
     },
     fields: {
@@ -181,7 +181,7 @@ export const countryGroups = {
         title: 'Krei landaron',
         button: 'Krei',
 
-        invalidCode: '[[invalid code]]',
+        invalidCode: 'Nevalida landokodo',
     },
     update: {
         title: 'Redakti landaron',

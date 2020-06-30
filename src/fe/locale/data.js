@@ -96,9 +96,9 @@ export const data = {
         },
     },
     mdEditor: {
-        previewOn: '[[Preview Markdown]]',
-        previewTitle: '[[Preview]]',
-        previewOff: '[[Close Preview]]',
+        previewOn: 'Antaŭvidi formatigon',
+        previewTitle: 'Antaŭvidi',
+        previewOff: 'Fermi antaŭvidon',
     },
 };
 
@@ -141,7 +141,7 @@ export const search = {
     savedFilterName: 'Nomo',
     savedFilterDesc: 'Priskribo',
     csvExport: 'Elporti kiel CSV',
-    noFieldsSelected: '[[no fields selected]]',
+    noFieldsSelected: 'Neniuj kampoj elektitaj',
     sorting: {
         none: 'ne ordigata',
         asc: 'kreskanta',
@@ -150,8 +150,8 @@ export const search = {
     fieldPicker: {
         title: 'Montrotaj kampoj',
         searchPlaceholder: 'Serĉi kampon',
-        noFieldsAvailable: '[[no fields available]]',
-        sortingDescription: '[[fields at the top will be sorted first]]',
+        noFieldsAvailable: 'Neniuj kampoj estas elekteblaj',
+        sortingDescription: 'La rezultoj estas ordigitaj laŭ la ordo de la kampoj, de supro al malsupro',
     },
 };
 

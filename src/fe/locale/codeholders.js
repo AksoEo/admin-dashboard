@@ -79,7 +79,7 @@ export const codeholders = {
         role: {
             pickSome: 'Elekti rolojn',
             activeAtTime: 'aktiva je', // comes before the date picker
-            anyTime: '[[any time]]', // null value for date picker
+            anyTime: 'Iam ajn', // null value for date picker
         },
         types: {
             all: 'ne gravas',
@@ -147,7 +147,7 @@ export const codeholders = {
         // used only in field history
         profilePictureHash: 'Profilbildo',
     },
-    fieldEditorInsufficientPerms: '[[editing not allowed]]',
+    fieldEditorInsufficientPerms: 'Vi ne havas redaktorajton',
     profilePictureHashSome: 'Havas bildon',
     profilePictureHashNone: 'Havas neniun bildon',
     csvFields: {
@@ -303,19 +303,19 @@ export const codeholders = {
         closeDialog: 'Fermi',
         stats: ({ perPage, pages, total, withAddresses }) => `Trovis ${withAddresses} rezultojn (el entute ${total}) kiuj havas poŝtadreson. Kun po ${perPage} adreso${perPage === 1 ? '' : 'j'} por paĝo, tio estos ${pages} paĝo${pages === 1 ? '' : 'j'}`,
         presets: {
-            load: '[[load preset]]',
-            pick: '[[load preset]]',
-            empty: '[[no presets]]',
+            load: 'Ŝarĝi',
+            pick: 'Ŝarĝi ŝablonon',
+            empty: 'Estas neniuj ŝablonoj',
             name: 'Nomo',
             create: {
-                menuItem: '[[save preset]]',
-                title: '[[create preset]]',
-                button: '[[create]]',
+                menuItem: 'Konservi',
+                title: 'Krei ŝablonon',
+                button: 'Krei',
             },
             update: {
-                menuItem: '[[save preset]]',
-                title: '[[update preset]]',
-                button: '[[update]]',
+                menuItem: 'Konservi',
+                title: 'Ĝisdatigi ŝablonon',
+                button: 'Ĝisdatigi',
             },
         },
     },
@@ -343,8 +343,8 @@ export const codeholders = {
 
     picker: {
         none: 'Neniu elektita',
-        add: '[[select members]]',
-        addOne: '[[select member]]',
+        add: 'Elekti membrojn',
+        addOne: 'Elekti membron',
         search: 'Serĉi laŭ nomo aŭ UEA-kodo',
     },
     resetPassword: {

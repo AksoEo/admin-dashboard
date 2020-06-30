@@ -3,12 +3,12 @@ export const memberships = {
     detailTitle: 'Membreco',
     fields: {
         name: 'Nomo',
-        nameAbbrev: '[[nameabbrev]]',
+        nameAbbrev: 'Mallongigo',
         description: 'Priskribo',
-        givesMembership: '[[gives membership]]',
-        lifetime: '[[lifetime]]',
-        availableFrom: '[[availableFrom]]',
-        availableTo: '[[availableTo]]',
+        givesMembership: 'Membrecdona',
+        lifetime: 'Dumviva',
+        availableFrom: 'Uzebla ekde',
+        availableTo: 'Uzebla ĝis',
     },
     create: {
         menuItem: 'Krei',
