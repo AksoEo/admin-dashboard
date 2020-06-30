@@ -345,7 +345,7 @@ export const codeholders = {
         none: 'Neniu elektita',
         add: '[[select members]]',
         addOne: '[[select member]]',
-        search: 'Aldoni laŭ nomo aŭ UEA-kodo',
+        search: 'Serĉi laŭ nomo aŭ UEA-kodo',
     },
     resetPassword: {
         create: 'Sciigi pri kontokreado',

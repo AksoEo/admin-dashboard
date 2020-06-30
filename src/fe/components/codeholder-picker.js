@@ -3,6 +3,7 @@ import { useState } from 'preact/compat';
 import { Button, Dialog } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
+import SearchIcon from '@material-ui/icons/Search';
 import StaticOverviewList from './overview-list-static';
 import { ueaCode } from './data';
 import { coreContext } from '../core/connection';
@@ -28,6 +29,7 @@ function orderPortalContainerFront () {
 /// # Props
 /// - value/onChange
 /// - limit: if set, will limit number of selectable codeholders
+/// - disabled
 export default class CodeholderPicker extends Component {
     state = {
         search: '',
@@ -121,17 +123,22 @@ export default class CodeholderPicker extends Component {
         const canAddMore = !this.props.limit || value.length < this.props.limit;
 
         return (
-            <div class="codeholder-picker" data-limit={limit}>
+            <div class={'codeholder-picker' + (disabled ? ' is-disabled' : '')} data-limit={limit}>
                 <div
                     class="selected-codeholders"
                     onClick={() => this.setState({ dialogOpen: true })}>
                     {value.map(id => (
                         <div class="codeholder-item" key={id}>
-                            <Button class="remove-button" icon small onClick={() => {
-                                const value = this.props.value.slice();
-                                value.splice(value.indexOf(id), 1);
-                                onChange(value);
-                            }}>
+                            <Button
+                                disabled={disabled}
+                                class="remove-button"
+                                icon
+                                small
+                                onClick={() => {
+                                    const value = this.props.value.slice();
+                                    value.splice(value.indexOf(id), 1);
+                                    onChange(value);
+                                }}>
                                 <RemoveIcon />
                             </Button>
                             {this.state.codeCache[id]
@@ -139,14 +146,23 @@ export default class CodeholderPicker extends Component {
                                 : `(${id})`}
                         </div>
                     ))}
-                    {(!value.length && this.props.limit !== 1) && locale.picker.none}
+                    {(!value.length && this.props.limit !== 1) && (
+                        <span class="selected-empty">
+                            {locale.picker.none}
+                        </span>
+                    )}
 
                     {canAddMore ? (
-                        <Button small icon onClick={() => {
-                            this.setState({ addDialogOpen: true });
-                            orderPortalContainerFront();
-                        }}>
-                            <AddIcon />
+                        <Button
+                            disabled={disabled}
+                            class="add-button"
+                            small
+                            icon
+                            onClick={() => {
+                                this.setState({ addDialogOpen: true });
+                                orderPortalContainerFront();
+                            }}>
+                            <AddIcon style={{ verticalAlign: 'middle' }} />
                         </Button>
                     ) : null}
 
@@ -171,6 +187,7 @@ export default class CodeholderPicker extends Component {
 
 function AddDialogInner ({ value, onChange, limit }) {
     const [offset, setOffset] = useState(0);
+    const [search, setSearch] = useState('');
 
     const selection = {
         add: id => {
@@ -187,23 +204,36 @@ function AddDialogInner ({ value, onChange, limit }) {
     };
 
     return (
-        <StaticOverviewList
-            compact
-            task="codeholders/list"
-            view="codeholders/codeholder"
-            fields={REDUCED_FIELDS}
-            sorting={{ code: 'asc' }}
-            offset={offset}
-            onSetOffset={setOffset}
-            selection={limit === 1 ? null : selection}
-            onItemClick={id => {
-                if (value.includes('' + id)) {
-                    selection.delete(id);
-                } else {
-                    selection.add(id);
-                }
-            }}
-            limit={10}
-            locale={locale.fields} />
+        <div>
+            <div class="codeholder-picker-search">
+                <div class="search-icon-container">
+                    <SearchIcon />
+                </div>
+                <input
+                    class="search-inner"
+                    placeholder={locale.picker.search}
+                    value={search}
+                    onChange={e => setSearch(e.target.value)} />
+            </div>
+            <StaticOverviewList
+                compact
+                task="codeholders/list"
+                view="codeholders/codeholder"
+                search={{ field: 'nameOrCode', query: search }}
+                fields={REDUCED_FIELDS}
+                sorting={{ code: 'asc' }}
+                offset={offset}
+                onSetOffset={setOffset}
+                selection={limit === 1 ? null : selection}
+                onItemClick={id => {
+                    if (value.includes('' + id)) {
+                        selection.delete(id);
+                    } else {
+                        selection.add(id);
+                    }
+                }}
+                limit={10}
+                locale={locale.fields} />
+        </div>
     );
 }

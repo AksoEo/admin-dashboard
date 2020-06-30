@@ -19,6 +19,7 @@ import './overview-list-static.less';
 /// - fields: same as OL, but all of them will be shown (in order)
 /// - sorting: optional object { [field]: sorting }
 /// - jsonFilter: optional JSON filter
+/// - search: same as parameters.search in OL
 /// - offset/onSetOffset: list offset
 /// - limit: page limit
 /// - emptyLabel: empty label
@@ -52,6 +53,8 @@ export default class StaticOverviewList extends PureComponent {
             limit,
         };
 
+        if (this.props.search) params.search = this.props.search;
+
         const t = this.#currentTask = this.context.createTask(task, options || {}, params);
 
         this.#currentTask.runOnceAndDrop().then(result => {
@@ -83,7 +86,9 @@ export default class StaticOverviewList extends PureComponent {
 
     componentDidUpdate (prevProps) {
         if (prevProps.offset !== this.props.offset
-            || prevProps.limit !== this.props.limit) {
+            || prevProps.limit !== this.props.limit
+            || prevProps.search?.field !== this.props.search?.field
+            || prevProps.search?.query !== this.props.search?.query) {
             if (prevProps.offset > this.props.offset) this.#nextLoadIsBackwards = true;
             this.load();
         }
