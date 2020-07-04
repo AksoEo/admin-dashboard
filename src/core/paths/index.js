@@ -25,6 +25,7 @@ const mapViews = res => res.views;
 
 const clients = () => import(/* webpackChunkName: 'core-clients', webpackPrefetch: true */ './clients');
 const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './codeholders');
+const congresses = () => import(/* webpackChunkName: 'core-congresses', webpackPrefetch: true */ './congresses');
 const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
 const adminGroups = () => import(/* webpackChunkName: 'core-admin', webpackPrefetch: true */ './admin-groups');
 const httpLog = () => import(/* webpackChunkName: 'core-admin', webpackPrefetch: true */ './http-log');
@@ -47,6 +48,7 @@ export const tasks = {
 
     clients: lazyPath(clients, mapTasks),
     codeholders: lazyPath(codeholders, mapTasks),
+    congresses: lazyPath(congresses, mapTasks),
     countries: lazyPath(countries, mapTasks),
     adminGroups: lazyPath(adminGroups, mapTasks),
     httpLog: lazyPath(httpLog, mapTasks),
@@ -66,6 +68,7 @@ export const tasks = {
 export const views = {
     clients: lazyPath(clients, mapViews),
     codeholders: lazyPath(codeholders, mapViews),
+    congresses: lazyPath(congresses, mapViews),
     countries: lazyPath(countries, mapViews),
     adminGroups: lazyPath(adminGroups, mapViews),
     httpLog: lazyPath(httpLog, mapViews),

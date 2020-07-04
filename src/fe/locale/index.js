@@ -24,6 +24,7 @@ export * from './errors';
 export * from './login';
 export * from './app';
 export * from './codeholders';
+export * from './congresses';
 export * from './memberships';
 export * from './roles';
 export * from './payments';

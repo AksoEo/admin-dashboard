@@ -106,7 +106,17 @@ export default [
                 id: 'congresses',
                 icon: BusinessIcon,
                 path: 'kongresoj',
-                hasPerm: () => true,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "congresses", webpackPrefetch: true */ './congresses')),
+                hasPerm: perms => perms.hasPerm('congresses.read.uea') || perms.hasPerm('congresses.read.tejo'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "congresses" */ './congresses/detail')),
+                        type: 'stack',
+                    },
+                ],
             },
             {
                 id: 'votes',
