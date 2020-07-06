@@ -115,6 +115,13 @@ export default [
                         component: elazy(() =>
                             import(/* webpackChunkName: "congresses" */ './congresses/detail')),
                         type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
                     },
                 ],
             },

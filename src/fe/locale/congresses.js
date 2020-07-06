@@ -1,5 +1,6 @@
 export const congresses = {
     title: 'Kongresoj',
+    detailTitle: 'Kongreso',
     search: {
         placeholders: {
             name: '[[search name…]]',
