@@ -130,7 +130,10 @@ export const tasks = {
     instance: async ({ congress, id }) => {
         const client = await asyncClient;
         const res = await client.get(`/congresses/${congress}/instances/${id}`, {
-            fields: ['id', 'name', 'abbrev', 'org'],
+            fields: [
+                'id', 'name', 'humanId', 'dateFrom', 'dateTo', 'locationName', 'locationNameLocal',
+                'locationCoords', 'locationAddress', 'tz',
+            ],
         });
         const item = res.body;
         const existing = store.get([CONGRESSES, congress, INSTANCES, item.id, DATA]);

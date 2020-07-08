@@ -19,3 +19,31 @@ export const congresses = {
         menuItem: 'Forigi',
     },
 };
+
+export const congressInstances = {
+    detailTitle: '[[instance]]',
+    search: {
+        placeholders: {
+            name: '[[search name…]]',
+            locationName: '[[locationName]]',
+            locationNameLocal: '[[locationNameLocal]]',
+        },
+    },
+    fields: {
+        name: 'Nomo',
+        humanId: '[[humanId]]',
+        dateFrom: '[[dateFrom]]',
+        dateTo: '[[dateTo]]',
+        locationName: '[[locationName]]',
+        locationNameLocal: '[[locationNameLocal]]',
+        locationCoords: '[[locationCoords]]',
+        locationAddress: '[[locationAddress]]',
+        tz: '[[tz]]',
+    },
+    update: {
+        menuItem: 'Redakti',
+    },
+    delete: {
+        menuItem: 'Forigi',
+    },
+};

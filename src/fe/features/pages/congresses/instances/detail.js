@@ -1,15 +1,14 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
-import Page from '../../../components/page';
-import DetailView from '../../../components/detail';
-import Meta from '../../meta';
-import { coreContext } from '../../../core/connection';
-import { connectPerms } from '../../../perms';
-import { congresses as locale } from '../../../locale';
+import Page from '../../../../components/page';
+import DetailView from '../../../../components/detail';
+import Meta from '../../../meta';
+import { coreContext } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
+import { congressInstances as locale } from '../../../../locale';
 import { FIELDS } from './fields';
-import InstancesView from './instances';
 
-export default connectPerms(class CongressDetailPage extends Page {
+export default connectPerms(class CongressInstancePage extends Page {
     state = {
         edit: null,
         org: 'meow', // dummy placeholder
@@ -26,7 +25,7 @@ export default connectPerms(class CongressDetailPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('congresses/update', {
+        this.#commitTask = this.context.createTask('congresses/updateInstance', {
             id: this.props.match[1],
             _changedFields: changedFields,
         }, this.state.edit);
@@ -38,12 +37,19 @@ export default connectPerms(class CongressDetailPage extends Page {
         this.setState({ edit: null });
     };
 
-    render ({ match, perms, editing }, { org }) {
-        const id = +match[1];
+    get congress () {
+        return +this.props.matches[this.props.matches.length - 3][1];
+    }
+    get id () {
+        return +this.props.match[1];
+    }
+
+    render ({ perms, editing }, { org }) {
+        const { congress, id } = this;
 
         const actions = [];
 
-        if (perms.hasPerm(`congresses.delete.${org}`)) {
+        if (perms.hasPerm(`congress_instances.delete.${org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('congresses/delete', {}, { id }),
@@ -51,7 +57,7 @@ export default connectPerms(class CongressDetailPage extends Page {
             });
         }
 
-        if (perms.hasPerm(`congresses.update.${org}`)) {
+        if (perms.hasPerm(`congress_instances.update.${org}`)) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
@@ -60,32 +66,30 @@ export default connectPerms(class CongressDetailPage extends Page {
         }
 
         return (
-            <div class="congresses-detail-page">
+            <div class="congress-instance-detail-page">
                 <Meta
                     title={locale.detailTitle}
                     actions={actions} />
                 <DetailView
-                    view="congresses/congress"
+                    view="congresses/instance"
                     id={id}
+                    options={{ congress }}
                     editing={editing}
                     edit={this.state.edit}
                     onEditChange={edit => this.setState({ edit })}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
                     fields={FIELDS}
-                    footer={Footer}
-                    onData={data => data && this.setState({ org: data.org })}
                     locale={locale}
                     onDelete={() => this.props.pop()} />
+                <DetailView
+                    /* this is kind of a hack to get the org field */
+                    view="congresses/congress"
+                    id={congress}
+                    fields={{}}
+                    locale={{}}
+                    onData={data => data && this.setState({ org: data.org })} />
             </div>
         );
     }
 });
-
-function Footer ({ item }) {
-    if (!item) return;
-
-    return (
-        <InstancesView congress={item.id} />
-    );
-}

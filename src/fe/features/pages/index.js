@@ -121,6 +121,26 @@ export default [
                                 type: 'state',
                                 state: 'editing',
                             },
+                            {
+                                path: 'okazigoj',
+                                type: 'state',
+                                state: 'dummyStateForInstances',
+                                paths: [
+                                    {
+                                        match: /^(\d+)$/,
+                                        component: elazy(() =>
+                                            import(/* webpackChunkName: "congresses-instances" */ './congresses/instances/detail')),
+                                        type: 'stack',
+                                        paths: [
+                                            {
+                                                path: 'redakti',
+                                                type: 'state',
+                                                state: 'editing',
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
                         ],
                     },
                 ],
