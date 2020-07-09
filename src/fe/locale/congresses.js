@@ -40,6 +40,10 @@ export const congressInstances = {
         locationAddress: '[[locationAddress]]',
         tz: '[[tz]]',
     },
+    tabs: {
+        locations: '[[locations]]',
+        program: '[[program]]',
+    },
     update: {
         menuItem: 'Redakti',
     },

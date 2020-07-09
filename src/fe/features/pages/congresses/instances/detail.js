@@ -1,7 +1,13 @@
 import { h } from 'preact';
+import { TextField } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../components/page';
-import DetailView from '../../../../components/detail';
+import DetailShell from '../../../../components/detail-shell';
+import DynamicHeightDiv from '../../../../components/dynamic-height-div';
+import TejoIcon from '../../../../components/tejo-icon';
+import UeaIcon from '../../../../components/uea-icon';
+import Tabs from '../../../../components/tabs';
+import { date } from '../../../../components/data';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
@@ -14,6 +20,7 @@ export default connectPerms(class CongressInstancePage extends Page {
     state = {
         edit: null,
         org: 'meow', // dummy placeholder
+        tab: 'locations',
     };
 
     static contextType = coreContext;
@@ -46,7 +53,7 @@ export default connectPerms(class CongressInstancePage extends Page {
         return +this.props.match[1];
     }
 
-    render ({ perms, editing }, { org }) {
+    render ({ perms, editing }, { org, tab }) {
         const { congress, id } = this;
 
         const actions = [];
@@ -72,7 +79,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                 <Meta
                     title={locale.detailTitle}
                     actions={actions} />
-                <DetailView
+                <DetailShell
                     view="congresses/instance"
                     id={id}
                     options={{ congress }}
@@ -81,11 +88,21 @@ export default connectPerms(class CongressInstancePage extends Page {
                     onEditChange={edit => this.setState({ edit })}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    fields={FIELDS}
-                    footer={Footer}
                     locale={locale}
-                    onDelete={() => this.props.pop()} />
-                <DetailView
+                    onDelete={() => this.props.pop()}>
+                    {data => (
+                        <div class="instance-inner">
+                            <Header
+                                editing={editing}
+                                onItemChange={edit => this.setState({ edit })}
+                                item={this.state.edit || data}
+                                org={org}
+                                tab={tab} 
+                                onTabChange={tab => this.setState({ tab })} />
+                        </div>
+                    )}
+                </DetailShell>
+                <DetailShell
                     /* this is kind of a hack to get the org field */
                     view="congresses/congress"
                     id={congress}
@@ -96,6 +113,58 @@ export default connectPerms(class CongressInstancePage extends Page {
         );
     }
 });
+
+function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
+    let orgIcon;
+    if (org === 'tejo') orgIcon = <TejoIcon />;
+    else if (org === 'uea') orgIcon = <UeaIcon />;
+
+    return (
+        <div class="instance-header">
+            <DynamicHeightDiv useFirstHeight>
+                <div class="header-title">
+                    {!editing && <span class="org-icon">{orgIcon}</span>}
+                    {editing ? (
+                        <TextField
+                            class="title-editor"
+                            outline
+                            label={locale.fields.name}
+                            value={item.name}
+                            onChange={e => onItemChange({ ...item, name: e.target.value })} />
+                    ) : item.name}
+                </div>
+            </DynamicHeightDiv>
+            <DynamicHeightDiv useFirstHeight>
+                {editing ? (
+                    <div class="header-timespan is-editing">
+                        <date.editor
+                            class="date-bound-editor"
+                            outline
+                            label={locale.fields.dateFrom}
+                            value={item.dateFrom}
+                            onChange={dateFrom => onItemChange({ ...item, dateFrom })} />
+                        <date.editor
+                            class="date-bound-editor"
+                            outline
+                            label={locale.fields.dateTo}
+                            value={item.dateTo}
+                            onChange={dateTo => onItemChange({ ...item, dateTo })} />
+                    </div>
+                ) : (
+                    <div class="header-timespan">
+                        <date.renderer value={item.dateFrom} />
+                        {'–'}
+                        <date.renderer value={item.dateTo} />
+                    </div>
+                )}
+            </DynamicHeightDiv>
+            <Tabs
+                value={editing ? null : tab}
+                onChange={!editing && onTabChange}
+                tabs={locale.tabs} />
+        </div>
+    );
+}
 
 function Footer ({ item }) {
     if (!item) return null;

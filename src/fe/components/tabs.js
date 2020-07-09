@@ -235,7 +235,7 @@ export default class Tabs extends PureComponent {
         window.removeEventListener('pointercancel', this.#onPointerUp);
     };
 
-    render ({ value, disabled, onChange, tabs }) {
+    render ({ value, disabled, onChange, tabs, ...extra }) {
         const contents = [];
 
         const lineIsIdle = !this.lineLeft.wantsUpdate() && !this.lineRight.wantsUpdate()
@@ -276,9 +276,11 @@ export default class Tabs extends PureComponent {
             );
         }
 
+        extra.class = (extra.class || '') + ' paper-tabs';
+
         return (
             <div
-                class="paper-tabs"
+                {...extra}
                 ref={node => this.node = node}>
                 <div
                     class="p-contents"

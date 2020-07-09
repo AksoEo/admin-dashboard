@@ -1,1 +1,54 @@
-.congress-instance-detail-page {}
+@import '../../../../prelude';
+
+.congress-instance-detail-page {
+    .instance-inner {
+        .instance-header {
+            background: @text-fade-10;
+
+            .header-title {
+                font-size: 1.4em;
+                font-weight: 600;
+                padding: 24px;
+                padding-bottom: 8px;
+
+                .org-icon {
+                    display: inline-block;
+                    vertical-align: middle;
+                    margin-right: 8px;
+
+                    & > * {
+                        width: 1.5em;
+                        height: 1.5em;
+                    }
+                }
+
+                .title-editor {
+                    width: 100%;
+                    font-weight: normal;
+
+                    input {
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            .header-timespan {
+                font-style: italic;
+                padding-left: calc(2.1em + 32px);
+                padding-right: 24px;
+                padding-bottom: 16px;
+
+                &.is-editing {
+                    font-style: normal;
+                    padding: 16px 24px;
+                    display: flex;
+                    justify-content: space-between;
+
+                    .date-bound-editor {
+                        width: 45%;
+                    }
+                }
+            }
+        }
+    }
+}

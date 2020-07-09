@@ -113,7 +113,7 @@ export default class DetailShell extends PureComponent {
                                 action: () => this.beginCommit(),
                             },
                         ]} />
-                    {children(this.state.data)}
+                    {!!children && children(this.state.data)}
                 </Fragment>
             );
         } else {
