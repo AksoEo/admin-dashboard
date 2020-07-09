@@ -1,8 +1,5 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { Map, TileLayer, Marker } from 'react-leaflet';
 import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail';
 import Meta from '../../../meta';
@@ -10,16 +7,8 @@ import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { congressInstances as locale } from '../../../../locale';
 import { FIELDS } from './fields';
+import Map from '../map';
 import './detail.less';
-
-const lIcon = L.icon({
-    iconUrl: '/assets/maps/pin.svg',
-    iconSize: [64, 64],
-    iconAnchor: [32, 60],
-    shadowUrl: '/assets/maps/pin-shadow.svg',
-    shadowSize: [90, 64],
-    shadowAnchor: [32, 60],
-});
 
 export default connectPerms(class CongressInstancePage extends Page {
     state = {
@@ -113,14 +102,14 @@ function Footer ({ item }) {
 
     return (
         <div class="instance-detail-footer">
-            <Map class="instance-map" center={item.locationCoords} zoom={12}>
-                <TileLayer
-                    url="https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png?lang=eo"
-                    attribution="&copy <a href=&quot;https://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
-                <Marker
-                    position={item.locationCoords}
-                    icon={lIcon} />
-            </Map>
+            <Map
+                center={item.locationCoords}
+                zoom={10}
+                markers={[
+                    {
+                        location: item.locationCoords,
+                    },
+                ]} />
         </div>
     );
 }
