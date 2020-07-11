@@ -3,13 +3,13 @@ export const congresses = {
     detailTitle: 'Kongreso',
     search: {
         placeholders: {
-            name: '[[search name…]]',
-            abbrev: '[[search abbrev…]]',
+            name: 'Serĉi kongresan nomon',
+            abbrev: 'Serĉi kongresan mallongigon',
         },
     },
     fields: {
         name: 'Nomo',
-        abbrev: '[[abbrev]]',
+        abbrev: 'Mallongigo',
         org: 'Organizo',
     },
     update: {
@@ -21,28 +21,28 @@ export const congresses = {
 };
 
 export const congressInstances = {
-    detailTitle: '[[instance]]',
+    detailTitle: 'Kongresa okazigo',
     search: {
         placeholders: {
-            name: '[[search name…]]',
-            locationName: '[[locationName]]',
-            locationNameLocal: '[[locationNameLocal]]',
+            name: 'Serĉi nomon de kongresa okazigo',
+            locationName: 'Serĉi nomon de kongresa loko',
+            locationNameLocal: 'Serĉi lokan nomon de kongresa loko',
         },
     },
     fields: {
         name: 'Nomo',
-        humanId: '[[humanId]]',
-        dateFrom: '[[dateFrom]]',
-        dateTo: '[[dateTo]]',
-        locationName: '[[locationName]]',
-        locationNameLocal: '[[locationNameLocal]]',
-        locationCoords: '[[locationCoords]]',
-        locationAddress: '[[locationAddress]]',
-        tz: '[[tz]]',
+        humanId: 'Homa ID',
+        dateFrom: 'Komenciĝdato',
+        dateTo: 'Finiĝdato',
+        locationName: 'Loko',
+        locationNameLocal: 'Loka nomo de loko',
+        locationCoords: 'Koordinatoj de loko',
+        locationAddress: 'Adreso de loko',
+        tz: 'Horzono',
     },
     tabs: {
-        locations: '[[locations]]',
-        program: '[[program]]',
+        locations: 'Lokoj',
+        program: 'Programeroj',
     },
     update: {
         menuItem: 'Redakti',
