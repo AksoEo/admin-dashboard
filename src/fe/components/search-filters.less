@@ -14,7 +14,7 @@
         height: 32px;
     }
 
-    @media (max-width: @regular-min-width) {
+    &.is-compact {
         padding: 0;
         margin-left: 4px;
         margin-right: 4px;
@@ -92,14 +92,14 @@
             text-transform: none;
             --md-button-color: @gray-button-color;
         }
+    }
 
-        @media (max-width: @compact-max-width) {
+    .is-compact .filters-bar {
+        display: block;
+
+        .filters-bar-break {
             display: block;
-
-            .filters-bar-break {
-                display: block;
-                height: 8px;
-            }
+            height: 8px;
         }
     }
 

@@ -51,3 +51,30 @@ export const congressInstances = {
         menuItem: 'Forigi',
     },
 };
+
+export const congressLocations = {
+    detailTitle: 'Kongresa loko',
+    search: {
+        placeholders: {
+            name: '[[name]]',
+            description: '[[desc]]',
+        },
+    },
+    fields: {
+        name: 'Nomo',
+        type: '[[type]]',
+        description: '[[description]]',
+        address: '[[address]]',
+        ll: '[[ll]]',
+        rating: '[[rating]]',
+        icon: '[[icon]]',
+        externalLoc: '[[externalLoc]]',
+    },
+    update: {
+        menuItem: 'Redakti',
+    },
+    delete: {
+        menuItem: 'Forigi',
+    },
+};
+

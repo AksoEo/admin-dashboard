@@ -41,9 +41,17 @@
     }
 
     &.is-compact {
-        display: block;
+        display: flex;
         width: 100%;
         border-bottom: 1px solid @separator;
+
+        .li-compact-icon {
+            flex-shrink: 0;
+        }
+
+        .li-compact-inner {
+            flex: 1;
+        }
 
         .li-compact-title {
             display: flex;

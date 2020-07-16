@@ -7,6 +7,7 @@ import { layoutContext } from './dynamic-height-div';
 import { search as searchLocale } from '../locale';
 import './overview-list-item.less';
 
+const MAX_ICON_CELLS = 1;
 const MAX_TITLE_CELLS = 3;
 const MAX_TITLE_ALT_CELLS = 1;
 
@@ -66,7 +67,7 @@ export default connect(props => ([props.view, {
             globalAnimator.register(this);
         }
 
-        if (!prevProps.data && this.props.data) {
+        if (!prevProps.data && this.props.data && this.context) {
             this.context();
         }
         if (this.props.data !== prevProps.data) {
@@ -112,6 +113,7 @@ export default connect(props => ([props.view, {
         if (!data) return null;
 
         // compact layout
+        const iconCells = [];
         const titleCells = [];
         const titleAltCells = [];
         const bodyCells = [];
@@ -134,6 +136,8 @@ export default connect(props => ([props.view, {
                     slot = 'title';
                 } else if (slot === 'titleAlt' && titleAltCells.length < MAX_TITLE_ALT_CELLS) {
                     slot = 'titleAlt';
+                } else if (slot === 'icon' && iconCells.length < MAX_ICON_CELLS) {
+                    slot = 'icon';
                 } else {
                     slot = 'body';
                 }
@@ -157,6 +161,7 @@ export default connect(props => ([props.view, {
                 if (slot === 'title') titleCells.push(cell);
                 else if (slot === 'titleAlt') titleAltCells.push(cell);
                 else if (slot === 'body') bodyCells.push(cell);
+                else if (slot === 'icon') iconCells.push(cell);
             } else {
                 cells.push(cell);
             }
@@ -217,6 +222,11 @@ export default connect(props => ([props.view, {
                     e.currentTarget.blur();
                     if (onClick) onClick(e);
                 }}>
+                {!!(compact && iconCells.length) && (
+                    <div class="li-compact-icon">
+                        {iconCells}
+                    </div>
+                )}
                 {compact ? (
                     <div class="li-compact-inner">
                         <div class="li-compact-title">

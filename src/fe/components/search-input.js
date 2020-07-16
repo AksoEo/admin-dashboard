@@ -46,6 +46,7 @@ export default class SearchInputFocusable extends Component {
 /// - localizedFields: object
 /// - localizedPlaceholders: object, or string if no searchFields are given
 /// - onSubmit: submit callback
+/// - compact: if true, will use compact view
 function SearchInput ({
     value,
     onChange,
@@ -56,9 +57,10 @@ function SearchInput ({
     onSubmit,
     innerRef,
     inputRef,
+    compact,
 }) {
     return (
-        <div class="search-input" ref={innerRef}>
+        <div class={'search-input' + (compact ? ' is-compact' : '')} ref={innerRef}>
             {!!searchFields && (
                 <Select
                     class="search-field"

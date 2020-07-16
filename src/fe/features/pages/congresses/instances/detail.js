@@ -13,6 +13,7 @@ import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { congressInstances as locale } from '../../../../locale';
 import { FIELDS } from './fields';
+import Locations from './locations';
 import Map from '../map';
 import './detail.less';
 
@@ -97,8 +98,14 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 onItemChange={edit => this.setState({ edit })}
                                 item={this.state.edit || data}
                                 org={org}
-                                tab={tab} 
+                                tab={tab}
                                 onTabChange={tab => this.setState({ tab })} />
+                            {!!editing && <LocationEditor
+                                item={this.state.edit || data}
+                                onItemChange={edit => this.setState({ edit })}/>}
+                            {!editing && (tab === 'locations') && <Locations
+                                congress={congress}
+                                instance={id} />}
                         </div>
                     )}
                 </DetailShell>
@@ -113,6 +120,17 @@ export default connectPerms(class CongressInstancePage extends Page {
         );
     }
 });
+
+function FieldWrapper ({ field, item, onItemChange }) {
+    const Component = FIELDS[field].component;
+    return <Component
+        item={item}
+        onItemChange={onItemChange}
+        value={item[field]}
+        onChange={value => onItemChange({ ...item, [field]: value })}
+        slot="detail"
+        editing={true} />;
+}
 
 function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
     let orgIcon;
@@ -133,22 +151,10 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
                             onChange={e => onItemChange({ ...item, name: e.target.value })} />
                     ) : item.name}
                 </div>
-            </DynamicHeightDiv>
-            <DynamicHeightDiv useFirstHeight>
                 {editing ? (
                     <div class="header-timespan is-editing">
-                        <date.editor
-                            class="date-bound-editor"
-                            outline
-                            label={locale.fields.dateFrom}
-                            value={item.dateFrom}
-                            onChange={dateFrom => onItemChange({ ...item, dateFrom })} />
-                        <date.editor
-                            class="date-bound-editor"
-                            outline
-                            label={locale.fields.dateTo}
-                            value={item.dateTo}
-                            onChange={dateTo => onItemChange({ ...item, dateTo })} />
+                        <FieldWrapper field="dateFrom" item={item} onItemChange={onItemChange} />
+                        <FieldWrapper field="dateTo" item={item} onItemChange={onItemChange} />
                     </div>
                 ) : (
                     <div class="header-timespan">
@@ -157,28 +163,40 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
                         <date.renderer value={item.dateTo} />
                     </div>
                 )}
+                {!editing && (
+                    <div class="header-location">
+                        {item.locationName}
+                    </div>
+                )}
+                {!editing && (
+                    <Tabs
+                        value={tab}
+                        onChange={onTabChange}
+                        tabs={locale.tabs} />
+                )}
             </DynamicHeightDiv>
-            <Tabs
-                value={editing ? null : tab}
-                onChange={!editing && onTabChange}
-                tabs={locale.tabs} />
         </div>
     );
 }
 
-function Footer ({ item }) {
+function LocationEditor ({ item, onItemChange }) {
     if (!item) return null;
 
     return (
-        <div class="instance-detail-footer">
+        <div class="instance-location-editor">
+            <div class="location-editor-top">
+                <FieldWrapper field="locationName" item={item} onItemChange={onItemChange} />
+                <FieldWrapper field="locationNameLocal" item={item} onItemChange={onItemChange} />
+                <FieldWrapper field="locationAddress" item={item} onItemChange={onItemChange} />
+            </div>
             <Map
-                center={item.locationCoords}
+                center={item.locationCoords || [0, 0]}
                 zoom={10}
                 markers={[
-                    {
+                    item.locationCoords && {
                         location: item.locationCoords,
                     },
-                ]} />
+                ].filter(x => x)} />
         </div>
     );
 }

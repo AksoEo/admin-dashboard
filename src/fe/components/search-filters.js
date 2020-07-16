@@ -6,6 +6,7 @@ import PaperList from './paper-list';
 import DataList from './data-list';
 import SearchInput from './search-input';
 import Segmented from './segmented';
+import EventProxy from './event-proxy';
 import DisclosureArrow from './disclosure-arrow';
 import { search as locale } from '../locale';
 import { connectPerms } from '../perms';
@@ -40,6 +41,7 @@ import './search-filters.less';
 /// - locale: object with `{ searchFields, searchPlaceholders, filters }`
 /// - category: category id for saved filters
 /// - filtersToAPI: name of a task that will convert client filters to an api filter
+/// - compact: if true, forces compact view
 export default function SearchFilters ({
     value,
     onChange,
@@ -51,8 +53,14 @@ export default function SearchFilters ({
     category,
     inputRef,
     filtersToAPI,
+    compact: _compact,
 }) {
     const items = [];
+
+    // FIXME: this is a hack to force an update when the window size is changed
+    const [forceUpdate, setForceUpdate] = useState(0);
+
+    const compact = _compact || (window.innerWidth <= 600);
 
     items.push({
         node: <div class="top-padding" />,
@@ -61,6 +69,7 @@ export default function SearchFilters ({
 
     items.push({
         node: <SearchInput
+            compact={compact}
             ref={inputRef}
             value={value.search}
             onChange={search => onChange({ ...value, search, offset: 0 })}
@@ -173,12 +182,15 @@ export default function SearchFilters ({
     });
 
     items.push({
-        node: <div class="bottom-padding" />,
+        node: <div class="bottom-padding">
+            {/* This event proxy needs to go *somewhere* and this seemed as good a place as any */}
+            <EventProxy dom target={window} onresize={() => setForceUpdate(forceUpdate + 1)} />
+        </div>,
         hidden: !expanded,
         flush: true,
     });
 
-    return <PaperList class="search-filters">{items}</PaperList>;
+    return <PaperList class={'search-filters' + (compact ? ' is-compact' : '')}>{items}</PaperList>;
 }
 
 function FiltersDisclosure ({ expanded, onExpandedChange }) {

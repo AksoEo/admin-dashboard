@@ -49,6 +49,7 @@ function scrollToNode (node) {
 ///   add, delete, has
 /// - updateView: argument list to create a data view that emits updates (if available)
 /// - limits: available limit options. if not given, will use default
+/// - compact: if true, will force compact view
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -246,13 +247,14 @@ export default class OverviewList extends PureComponent {
         view,
         notice,
         selection,
+        compact,
     }, { error, result, stale, loading, animateBackwards }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
         if (selection) className += ' is-selectable';
         if (stale) className += ' stale';
 
-        const useCompactLayout = window.innerWidth <= COMPACT_MAX_WIDTH;
+        const useCompactLayout = compact || window.innerWidth <= COMPACT_MAX_WIDTH;
         if (useCompactLayout) className += ' compact-layout';
 
         let stats, contents, paginationText;

@@ -32,11 +32,12 @@
                 }
             }
 
+            @lpad: calc(2.1em + 32px);
+
             .header-timespan {
                 font-style: italic;
-                padding-left: calc(2.1em + 32px);
+                padding-left: @lpad;
                 padding-right: 24px;
-                padding-bottom: 16px;
 
                 &.is-editing {
                     font-style: normal;
@@ -44,11 +45,20 @@
                     display: flex;
                     justify-content: space-between;
 
-                    .date-bound-editor {
+                    .date-editor {
                         width: 45%;
                     }
                 }
             }
+
+            .header-location {
+                padding-left: @lpad;
+                padding-bottom: 16px;
+            }
+        }
+
+        .instance-location-editor {
+            padding: 24px 0;
         }
     }
 }
