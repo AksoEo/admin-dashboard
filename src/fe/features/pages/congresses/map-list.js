@@ -1,8 +1,12 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { PureComponent, useState } from 'preact/compat';
+import { CircularProgress, LinearProgress } from '@cpsdqs/yamdl';
+import SearchIcon from '@material-ui/icons/Search';
 import L from 'leaflet';
+import fuzzaldrin from 'fuzzaldrin';
+import DisplayError from '../../../components/error';
 import { coreContext } from '../../../core/connection';
+import { data as locale } from '../../../locale';
 import LMap from './map';
 import './map-list.less';
 
@@ -74,6 +78,9 @@ class DataLoader {
 /// - item: item component. Will be passed the following props: { id }
 /// - detail: if not none, will display an overlay over the list
 /// - itemToMarker: should either turn an item into a marker or return something falsy
+/// - searchFields: array of fields to use for searching
+/// - itemParent: (item_data) => id or null. Use to create sub-items. Only supports one level.
+/// - onItemClick: (id) => void
 export default class MapList extends PureComponent {
     state = {
         /// If not null, then this is an instanceof DataLoader, loading data.
@@ -82,6 +89,9 @@ export default class MapList extends PureComponent {
         error: null,
         /// List of loaded items, by id.
         items: [],
+
+        /// If not null, the id of a highlighted item.
+        highlighted: null,
 
         /// hacky way of coalescing force updates by incrementing this variable
         coalescedForceUpdate: 0,
@@ -149,7 +159,8 @@ export default class MapList extends PureComponent {
                 for (const id of newItems) this.#addItemViewForId(id);
             },
             () => {
-                this.setState({}, () => {
+                // done
+                this.setState({ loading: null }, () => {
                     // we need to delay flushing until after state has been set
                     this.#flushItemViews();
 
@@ -173,11 +184,26 @@ export default class MapList extends PureComponent {
         for (const view of this.#itemViews.values()) view.drop();
     }
 
-    render ({ item, itemToMarker }, { items, loading, error }) {
+    #onItemClick = (id) => {
+        if (this.props.onItemClick) this.props.onItemClick(id);
+    };
+    #onItemHover = (id) => {
+        this.setState({ highlighted: id });
+    };
+    #onItemOut = () => {
+        this.setState({ highlighted: null });
+    };
+
+    render ({ item, itemToMarker, itemParent, searchFields, detail }, { items, loading, error }) {
         const markers = [];
-        for (const item of this.#itemData.values()) {
+        for (const [id, item] of this.#itemData) {
             const m = itemToMarker(item);
-            if (m) markers.push(m);
+            if (m) {
+                if (this.state.highlighted === id) {
+                    m.highlighted = true;
+                }
+                markers.push(m);
+            }
         }
 
         return (
@@ -185,13 +211,26 @@ export default class MapList extends PureComponent {
                 <div class="inner-list-container">
                     <InnerList
                         item={item}
+                        itemData={this.#itemData}
                         items={items}
                         loading={loading}
-                        error={error} />
+                        error={error}
+                        itemParent={itemParent}
+                        onItemClick={this.#onItemClick}
+                        onItemHover={this.#onItemHover}
+                        onItemOut={this.#onItemOut}
+                        searchFields={searchFields} />
+                    {detail ? (
+                        <div class="inner-list-detail-overlay">
+                            {detail}
+                        </div>
+                    ) : null}
                 </div>
                 <div class="inner-map-container">
-                    <CircularProgress
+                    <LinearProgress
+                        class="map-loading-progress"
                         onClick={() => this.load()}
+                        hideIfNone
                         indeterminate={loading && loading.progress === null}
                         progress={loading && +loading.progress} />
                     <LMap
@@ -207,17 +246,136 @@ export default class MapList extends PureComponent {
     }
 }
 
-function InnerList ({ items, item, loading, error }) {
-    const Item = item;
+function InnerList ({
+    items,
+    itemData,
+    item,
+    loading,
+    error,
+    itemParent,
+    searchFields,
+    onItemClick,
+    onItemHover,
+    onItemOut,
+}) {
+    const [search, setSearch] = useState('');
+
+    let filteredIds;
+    if (search) {
+        // multi-field fuzzy filter
+        // TODO: extract this somewhere
+        filteredIds = [];
+        const scores = new Map();
+        for (const id of items) {
+            const data = itemData.get(id);
+            if (!data) {
+                if (!loading) loading = true;
+                continue;
+            }
+            let score = 0;
+            for (const field of searchFields) {
+                score += Math.max(0, fuzzaldrin.score(data[field], search));
+            }
+            if (score > 0) {
+                scores.set(id, score);
+                filteredIds.push(id);
+            }
+        }
+        filteredIds.sort((a, b) => scores.get(b) - scores.get(a));
+    } else {
+        filteredIds = items;
+    }
+
+    const topIds = new Map();
+    for (const id of filteredIds) {
+        const data = itemData.get(id);
+        if (!data) {
+            if (!loading) loading = true;
+            continue;
+        }
+
+        const node = { id, children: [] };
+
+        const parent = itemParent ? itemParent(data) : null;
+        if (parent === null) {
+            topIds.set(id, node);
+        } else {
+            if (!topIds.has(parent)) topIds.set(parent, { id: parent, children: [] });
+            topIds.get(parent).children.push(node);
+        }
+    }
 
     return (
         <div class="inner-list">
-            <div class="list-search">
-                meow
-            </div>
+            {searchFields ? (
+                <div class="list-search">
+                    <SearchIcon />
+                    <input
+                        value={search}
+                        placeholder={locale.mapList.searchPlaceholder}
+                        onChange={e => setSearch(e.target.value)} />
+                </div>
+            ) : null}
             <div class="list-items">
-                {items.map(id => <Item key={id} id={id} />)}
+                {[...topIds.values()].map(node => (
+                    <Item
+                        key={node.id}
+                        id={node.id}
+                        subnodes={node.children}
+                        item={item}
+                        onItemClick={onItemClick}
+                        onItemHover={onItemHover}
+                        onItemOut={onItemOut} />
+                ))}
+                {error ? (
+                    <div key="error" class="list-items-error">
+                        <DisplayError error={error} />
+                    </div>
+                ) : loading ? (
+                    <div key="loading" class="list-items-loading">
+                        <CircularProgress indeterminate />
+                    </div>
+                ) : !items.length ? (
+                    <div class="list-items-empty">
+                        {locale.mapList.empty}
+                    </div>
+                ) : null}
             </div>
         </div>
     );
+}
+
+function Item ({ item, id, subnodes, onItemClick, onItemHover, onItemOut }) {
+    const ItemComponent = item;
+
+    const li = (
+        <div
+            class="list-item"
+            onClick={e => onItemClick(id, e)}
+            onpointerover={e => onItemHover(id, e)}
+            onpointerout={e => onItemOut(id, e)}>
+            <ItemComponent id={id} />
+        </div>
+    );
+
+    if (subnodes.length) {
+        return (
+            <div class="list-item-container" data-id={id}>
+                {li}
+                <div class="list-item-children">
+                    {subnodes.map(node => (
+                        <Item
+                            key={node.id}
+                            id={node.id}
+                            subnodes={node.children}
+                            item={item}
+                            onItemClick={onItemClick}
+                            onItemHover={onItemHover}
+                            onItemOut={onItemOut} />
+                    ))}
+                </div>
+            </div>
+        );
+    }
+    return li;
 }

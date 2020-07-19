@@ -100,6 +100,10 @@ export const data = {
         previewTitle: 'Antaŭvidi',
         previewOff: 'Fermi antaŭvidon',
     },
+    mapList: {
+        empty: '[[empty]]',
+        searchPlaceholder: 'Serĉi…',
+    },
 };
 
 export const search = {

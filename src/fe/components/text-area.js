@@ -1,4 +1,4 @@
-import { h, Component } from 'preact'; 
+import { h, Component } from 'preact';
 import './text-area.less';
 
 export default class TextArea extends Component {

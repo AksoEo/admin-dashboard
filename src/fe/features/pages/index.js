@@ -137,6 +137,23 @@ export default [
                                                 type: 'state',
                                                 state: 'editing',
                                             },
+                                            {
+                                                path: 'lokoj',
+                                                type: 'state',
+                                                state: 'locations',
+                                                paths: [
+                                                    {
+                                                        match: /^(\d+)$/,
+                                                        type: 'state',
+                                                        state: 'locationDetail',
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                path: 'programeroj',
+                                                type: 'state',
+                                                state: 'program',
+                                            },
                                         ],
                                     },
                                 ],

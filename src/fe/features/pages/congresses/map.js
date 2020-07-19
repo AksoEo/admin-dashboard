@@ -4,6 +4,16 @@ import { Map, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.less';
 
+// TODO: use proper DOM elements for these
+const hlIcon = L.icon({
+    iconUrl: '/assets/maps/pin.svg',
+    iconSize: [128, 128],
+    iconAnchor: [64, 120],
+    shadowUrl: '/assets/maps/pin-shadow.svg',
+    shadowSize: [180, 128],
+    shadowAnchor: [64, 120],
+});
+
 const lIcon = L.icon({
     iconUrl: '/assets/maps/pin.svg',
     iconSize: [64, 64],
@@ -30,17 +40,18 @@ export default function AMap ({
             {(markers || []).map((m, i) => <MarkerRenderer
                 key={m.key || i}
                 location={m.location}
+                highlighted={m.highlighted}
                 icon={m.icon} />)}
         </Map>
     );
 }
 
-function MarkerRenderer ({ location, icon }) {
+function MarkerRenderer ({ location, icon, highlighted }) {
     // TODO: render icon
     void icon;
     return (
         <Marker
             position={location}
-            icon={lIcon} />
+            icon={highlighted ? hlIcon : lIcon} />
     );
 }

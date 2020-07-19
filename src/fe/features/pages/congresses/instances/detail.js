@@ -21,7 +21,6 @@ export default connectPerms(class CongressInstancePage extends Page {
     state = {
         edit: null,
         org: 'meow', // dummy placeholder
-        tab: 'locations',
     };
 
     static contextType = coreContext;
@@ -54,8 +53,27 @@ export default connectPerms(class CongressInstancePage extends Page {
         return +this.props.match[1];
     }
 
-    render ({ perms, editing }, { org, tab }) {
-        const { congress, id } = this;
+    get tab () {
+        if (this.props.locations) return 'locations';
+        if (this.props.program) return 'program';
+        else {
+            this.props.push('lokoj', true);
+            return 'locations';
+        }
+    }
+    set tab (tab) {
+        if (tab === this.tab) return;
+        if (this.props.locations) this.props.locations.pop(true);
+        if (this.props.program) this.props.program.pop(true);
+        if (tab === 'locations') {
+            this.props.push('lokoj', true);
+        } else if (tab === 'program') {
+            this.props.push('programeroj', true);
+        }
+    }
+
+    render ({ perms, editing }, { org }) {
+        const { congress, id, tab } = this;
 
         const actions = [];
 
@@ -99,13 +117,15 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 item={this.state.edit || data}
                                 org={org}
                                 tab={tab}
-                                onTabChange={tab => this.setState({ tab })} />
+                                onTabChange={tab => this.tab = tab} />
                             {!!editing && <LocationEditor
                                 item={this.state.edit || data}
                                 onItemChange={edit => this.setState({ edit })}/>}
                             {!editing && (tab === 'locations') && <Locations
                                 congress={congress}
-                                instance={id} />}
+                                instance={id}
+                                push={this.props.push}
+                                detail={this.props.locationDetail} />}
                         </div>
                     )}
                 </DetailShell>

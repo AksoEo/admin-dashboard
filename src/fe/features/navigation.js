@@ -180,6 +180,7 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                 } else if (subpage.type === 'state') {
                     const stateKey = subpage.state;
                     viewStack[viewStack.length - 1].state[stateKey] = {
+                        match: match,
                         pop: mkPopStack(stack.length),
                     };
                     stack.push({

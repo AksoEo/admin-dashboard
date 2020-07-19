@@ -1,7 +1,5 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import SearchFilters from '../../../../../components/search-filters';
-import OverviewList from '../../../../../components/overview-list';
 import OverviewListItem from '../../../../../components/overview-list-item';
 import { congressLocations as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
@@ -13,27 +11,10 @@ import './index.less';
 /// # Props
 /// - congress: congress id
 /// - instance: instance id
+/// - push: proxy for navigation API
+/// - detail: locationDetail state
 export default class LocationsView extends PureComponent {
-    state = {
-        parameters: {
-            search: {
-                field: 'name',
-                query: '',
-            },
-            fields: [
-                { id: 'type', sorting: 'none', fixed: true },
-                { id: 'icon', sorting: 'none', fixed: true },
-                { id: 'name', sorting: 'asc', fixed: true },
-                { id: 'description', sorting: 'none', fixed: true },
-            ],
-            offset: 0,
-            limit: 10,
-        },
-    };
-
-    #searchInput;
-
-    render ({ congress, instance }, { parameters }) {
+    render ({ congress, instance, detail }) {
         return (
             <div class="congresses-instance-locations">
                 <MapList
@@ -46,37 +27,13 @@ export default class LocationsView extends PureComponent {
                         key: item.id,
                         location: item.ll,
                         icon: 'meow',
-                    })}/>
-                <div class="locations-list">
-                    delete this
-                    <SearchFilters
-                        compact
-                        value={parameters}
-                        searchFields={[
-                            'name',
-                            'description',
-                        ]}
-                        onChange={parameters => this.setState({ parameters })}
-                        locale={{
-                            searchPlaceholders: locale.search.placeholders,
-                            searchFields: locale.fields,
-                        }}
-                        inputRef={view => this.#searchInput = view} />
-                    <OverviewList
-                        compact
-                        options={{ congress, instance }}
-                        viewOptions={{ congress, instance }}
-                        task="congresses/listLocations"
-                        view="congresses/location"
-                        updateView={['congresses/sigLocations', { congress, instance }]}
-                        parameters={parameters}
-                        fields={FIELDS}
-                        onGetItemLink={id => `/kongresoj/${congress}/okazigoj/${instance}/lokoj/${id}`}
-                        onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
-                        onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
-                        onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
-                        locale={locale.fields} />
-                </div>
+                    })}
+                    detail={detail ? <LocationDetail id={+detail.match[1]} /> : null}
+                    onItemClick={id => {
+                        this.props.push('lokoj/' + id);
+                    }}
+                    itemParent={item => item.type === 'internal' ? item.externalLoc : null}
+                    searchFields={['name', 'description']} />
             </div>
         );
     }
@@ -102,3 +59,7 @@ const listItemConstructor = ({ congress, instance }) => function ListItem ({ id 
         </div>
     );
 };
+
+function LocationDetail ({ id }) {
+    return 'detail view for id ' + id + ' goes here';
+}
