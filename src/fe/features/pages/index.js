@@ -144,8 +144,15 @@ export default [
                                                 paths: [
                                                     {
                                                         match: /^(\d+)$/,
-                                                        type: 'state',
-                                                        state: 'locationDetail',
+                                                        type: 'stack',
+                                                        component: elazy(() => import(/* webpackChunkName: "congresses-locations" */ './congresses/instances/locations/detail')),
+                                                        paths: [
+                                                            {
+                                                                path: 'redakti',
+                                                                type: 'state',
+                                                                state: 'editing',
+                                                            },
+                                                        ],
                                                     },
                                                 ],
                                             },

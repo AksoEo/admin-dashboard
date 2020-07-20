@@ -9,12 +9,14 @@ import './index.less';
 /// Shows an overview over locations, with a map
 ///
 /// # Props
+/// - org: org (for perms)
 /// - congress: congress id
 /// - instance: instance id
 /// - push: proxy for navigation API
 /// - detail: locationDetail state
+/// - editing: locationEditing state
 export default class LocationsView extends PureComponent {
-    render ({ congress, instance, detail }) {
+    render ({ org, congress, instance }) {
         return (
             <div class="congresses-instance-locations">
                 <MapList
@@ -28,7 +30,6 @@ export default class LocationsView extends PureComponent {
                         location: item.ll,
                         icon: 'meow',
                     })}
-                    detail={detail ? <LocationDetail id={+detail.match[1]} /> : null}
                     onItemClick={id => {
                         this.props.push('lokoj/' + id);
                     }}
@@ -59,7 +60,3 @@ const listItemConstructor = ({ congress, instance }) => function ListItem ({ id 
         </div>
     );
 };
-
-function LocationDetail ({ id }) {
-    return 'detail view for id ' + id + ' goes here';
-}

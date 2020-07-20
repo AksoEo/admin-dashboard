@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { CircularProgress, LinearProgress } from '@cpsdqs/yamdl';
+import { CircularProgress } from '@cpsdqs/yamdl';
 import SearchIcon from '@material-ui/icons/Search';
 import L from 'leaflet';
 import fuzzaldrin from 'fuzzaldrin';
@@ -227,12 +227,13 @@ export default class MapList extends PureComponent {
                     ) : null}
                 </div>
                 <div class="inner-map-container">
-                    <LinearProgress
-                        class="map-loading-progress"
-                        onClick={() => this.load()}
-                        hideIfNone
-                        indeterminate={loading && loading.progress === null}
-                        progress={loading && +loading.progress} />
+                    <div class="map-loading-progress">
+                        <CircularProgress
+                            small
+                            onClick={() => this.load()}
+                            indeterminate={loading && loading.progress === null}
+                            progress={loading && +loading.progress} />
+                    </div>
                     <LMap
                         class="inner-map"
                         center={[0, 0]}
@@ -291,6 +292,7 @@ function InnerList ({
         const data = itemData.get(id);
         if (!data) {
             if (!loading) loading = true;
+            topIds.set(id, { id, children: [] });
             continue;
         }
 

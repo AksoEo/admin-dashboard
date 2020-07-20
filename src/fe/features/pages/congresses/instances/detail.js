@@ -54,6 +54,7 @@ export default connectPerms(class CongressInstancePage extends Page {
     }
 
     get tab () {
+        if (this.props.editing) return null;
         if (this.props.locations) return 'locations';
         if (this.props.program) return 'program';
         else {
@@ -123,9 +124,11 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 onItemChange={edit => this.setState({ edit })}/>}
                             {!editing && (tab === 'locations') && <Locations
                                 congress={congress}
+                                org={org}
                                 instance={id}
                                 push={this.props.push}
-                                detail={this.props.locationDetail} />}
+                                detail={this.props.locationDetail}
+                                editing={this.props.locationEditing} />}
                         </div>
                     )}
                 </DetailShell>
