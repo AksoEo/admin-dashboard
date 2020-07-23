@@ -69,6 +69,13 @@ export const congressLocations = {
         rating: '[[rating]]',
         icon: '[[icon]]',
         externalLoc: '[[externalLoc]]',
+
+        ratingInfixOf: '[[of]]',
+        ratingInvalid: '[[invalid]]',
+        nameRequired: 'Necesas nomo',
+
+        llLat: '[[Lat]]',
+        llLon: '[[Lon]]',
     },
     locatedWithinExternalLoc: '[[located within]]', // prefix
     locatedWithinNowhere: '[[nowhere]]', // if externalLoc is null

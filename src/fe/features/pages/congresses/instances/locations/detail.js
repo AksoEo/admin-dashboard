@@ -107,17 +107,27 @@ export default connectPerms(class LocationPage extends Page {
     }
 });
 
-function DetailInner ({ congress, instance, item, editing, onItemChange, org }) {
-    const Icon = FIELDS.icon.component;
-    const Name = FIELDS.name.component;
-    const Desc = FIELDS.description.component;
-    const Addr = FIELDS.address.component;
+function InnerField ({ field, item, editing, onItemChange }) {
+    const Component = FIELDS[field].component;
+    return <Component
+        slot="detail"
+        value={item[field]}
+        editing={editing}
+        onChange={v => onItemChange({ ...item, [field]: v })}
+        item={item}
+        onItemChange={onItemChange} />;
+}
 
+function DetailInner ({ congress, instance, item, editing, onItemChange }) {
     const ll = item.ll;
     const markers = [
         {
             location: ll,
-            icon: <Icon value={item.icon} />,
+            icon: <InnerField field="icon" item={item} />,
+            onDragEnd: editing && (e => {
+                const newPos = e.target.getLatLng();
+                onItemChange({ ll: [newPos.lat, newPos.lng] });
+            }),
         },
     ];
 
@@ -137,8 +147,8 @@ function DetailInner ({ congress, instance, item, editing, onItemChange, org }) 
                             <Link
                                 target={`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${item.externalLoc}`}
                                 class="external-loc-summary">
-                                <Icon value={data.icon} />
-                                <Name value={data.name} />
+                                <InnerField field="icon" item={data} />
+                                <InnerField field="name" item={data} />
                             </Link>
                         )}
                     </DetailShell>
@@ -151,14 +161,24 @@ function DetailInner ({ congress, instance, item, editing, onItemChange, org }) 
         <div class="location-inner">
             <div class="inner-header">
                 <div class="header-title">
-                    <Icon value={item.icon} />
-                    <Name value={item.name} />
+                    <InnerField field="icon" item={item} editing={editing} onItemChange={onItemChange} />
+                    <InnerField field="name" item={item} editing={editing} onItemChange={onItemChange} />
                 </div>
                 {locatedWithin}
             </div>
-            <Desc value={item.description} />
-            <Addr value={item.address} />
-            {ll ? <Map center={ll} zoom={13} markers={markers} /> : null}
+            <div class="inner-desc">
+                <InnerField field="rating" item={item} editing={editing} onItemChange={onItemChange} />
+                <InnerField field="description" item={item} editing={editing} onItemChange={onItemChange} />
+            </div>
+            <div class="inner-map-container">
+                <div class="inner-address">
+                    <InnerField field="address" item={item} editing={editing} onItemChange={onItemChange} />
+                </div>
+                {ll ? <Map class="inner-map" center={ll} zoom={13} markers={markers} /> : null}
+                <div class="inner-ll">
+                    <InnerField field="ll" item={item} editing={editing} onItemChange={onItemChange} />
+                </div>
+            </div>
         </div>
     );
 }

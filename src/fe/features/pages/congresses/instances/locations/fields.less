@@ -1,3 +1,5 @@
+@import '../../../../../prelude';
+
 .congress-location-icon {
     // this element only appears in 2 locations and both require a right margin
     margin-right: 16px;
@@ -17,5 +19,51 @@
         white-space: nowrap;
         text-overflow: ellipsis;
         max-width: 200px;
+    }
+}
+
+.congress-location-rating {
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+
+    .rating-cell {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        transition: opacity 0.3s @easing;
+
+        &:first-child {
+            margin-left: 0;
+        }
+
+        .rating-cell-blend {
+            display: inline-block;
+            position: relative;
+
+            .blend-top {
+                position: absolute;
+                top: 0;
+                left: 0;
+                overflow: hidden;
+                height: 100%;
+            }
+        }
+
+        &[data-null] {
+            opacity: 0.5;
+        }
+
+        &[data-type="stars"] {
+            color: @rating-stars;
+        }
+        &[data-type="hearts"] {
+            color: @rating-hearts;
+        }
+    }
+
+    .rating-numeric {
+        margin-left: 4px;
+        color: @text-fade-60;
     }
 }

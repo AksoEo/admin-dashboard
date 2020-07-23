@@ -38,20 +38,20 @@ export default function AMap ({
                 url="https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png?lang=eo"
                 attribution="&copy <a href=&quot;https://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
             {(markers || []).map((m, i) => <MarkerRenderer
-                key={m.key || i}
-                location={m.location}
-                highlighted={m.highlighted}
-                icon={m.icon} />)}
+                {...m}
+                key={m.key || i} />)}
         </Map>
     );
 }
 
-function MarkerRenderer ({ location, icon, highlighted }) {
+function MarkerRenderer ({ location, icon, highlighted, onDragEnd }) {
     // TODO: render icon
     void icon;
     return (
         <Marker
             position={location}
-            icon={highlighted ? hlIcon : lIcon} />
+            icon={highlighted ? hlIcon : lIcon}
+            draggable={!!onDragEnd}
+            onDragEnd={onDragEnd} />
     );
 }
