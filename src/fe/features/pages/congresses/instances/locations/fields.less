@@ -1,0 +1,21 @@
+.congress-location-icon {
+    // this element only appears in 2 locations and both require a right margin
+    margin-right: 16px;
+    width: 24px;
+    height: 24px;
+
+    & > * {
+        max-width: 100%;
+        max-height: 100%;
+    }
+}
+
+.congress-location-description {
+    &[data-slot=body] {
+        font-size: small;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+}

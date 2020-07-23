@@ -9,14 +9,13 @@ import './index.less';
 /// Shows an overview over locations, with a map
 ///
 /// # Props
-/// - org: org (for perms)
 /// - congress: congress id
 /// - instance: instance id
 /// - push: proxy for navigation API
 /// - detail: locationDetail state
 /// - editing: locationEditing state
 export default class LocationsView extends PureComponent {
-    render ({ org, congress, instance }) {
+    render ({ congress, instance }) {
         return (
             <div class="congresses-instance-locations">
                 <MapList

@@ -70,6 +70,8 @@ export const congressLocations = {
         icon: '[[icon]]',
         externalLoc: '[[externalLoc]]',
     },
+    locatedWithinExternalLoc: '[[located within]]', // prefix
+    locatedWithinNowhere: '[[nowhere]]', // if externalLoc is null
     update: {
         menuItem: 'Redakti',
     },

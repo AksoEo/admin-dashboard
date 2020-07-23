@@ -25,6 +25,7 @@ import './detail-shell.less';
 /// - onDelete: called when the item is deleted
 /// - onData: will be called with data when it loads
 /// - children: (data) => Node
+/// - inline: if true, will use a smaller inline style
 export default class DetailShell extends PureComponent {
     static contextType = coreContext;
 
@@ -68,7 +69,7 @@ export default class DetailShell extends PureComponent {
     }
 
     componentWillUnmount () {
-        this.#view.drop();
+        if (this.#view) this.#view.drop();
     }
 
     getChangedFields () {
@@ -83,7 +84,7 @@ export default class DetailShell extends PureComponent {
         this.props.onCommit(changes);
     }
 
-    render ({ editing, children }) {
+    render ({ inline, editing, children }) {
         let contents;
         if (this.state.error) {
             contents = (
@@ -119,7 +120,7 @@ export default class DetailShell extends PureComponent {
         } else {
             contents = (
                 <div class="detail-view-loading">
-                    <CircularProgress indeterminate />
+                    <CircularProgress indeterminate small={inline} />
                 </div>
             );
         }
@@ -127,7 +128,7 @@ export default class DetailShell extends PureComponent {
         return (
             <Form
                 ref={view => this.#form = view}
-                class="detail-view"
+                class={'detail-view' + (inline ? ' p-inline' : '')}
                 onSubmit={() => {}}>
                 {contents}
             </Form>
