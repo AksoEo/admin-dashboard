@@ -17,7 +17,7 @@ export default class InstancesView extends PureComponent {
                 query: '',
             },
             fields: [
-                { id: 'humanId', sorting: 'asc', fixed: true },
+                { id: 'humanId', sorting: 'desc', fixed: true },
                 { id: 'name', sorting: 'none', fixed: true },
                 { id: 'dateFrom', sorting: 'none', fixed: true },
                 { id: 'dateTo', sorting: 'none', fixed: true },

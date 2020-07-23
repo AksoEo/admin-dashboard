@@ -89,6 +89,7 @@ export const tasks = {
     update: async ({ id }, params) => {
         const client = await asyncClient;
         delete params.id;
+        delete params.org;
         await client.patch(`/congresses/${id}`, params);
         const existing = store.get([CONGRESSES, id, DATA]);
         store.insert([CONGRESSES, id, DATA], deepMerge(existing, params));

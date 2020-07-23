@@ -1,11 +1,12 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../components/page';
 import DetailView from '../../../components/detail';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
-import { congresses as locale } from '../../../locale';
+import { congresses as locale, congressInstances as instanceLocale } from '../../../locale';
 import { FIELDS } from './fields';
 import InstancesView from './instances';
 
@@ -43,11 +44,11 @@ export default connectPerms(class CongressDetailPage extends Page {
 
         const actions = [];
 
-        if (perms.hasPerm(`congresses.delete.${org}`)) {
+        if (perms.hasPerm(`congress_instances.create.${org}`)) {
             actions.push({
-                label: locale.delete.menuItem,
-                action: () => this.context.createTask('congresses/delete', {}, { id }),
-                overflow: true,
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                label: instanceLocale.create.menuItem,
+                action: () => this.context.createTask('congresses/createInstance', { congress: id }),
             });
         }
 
@@ -58,6 +59,15 @@ export default connectPerms(class CongressDetailPage extends Page {
                 action: () => this.props.push('redakti', true),
             });
         }
+
+        if (perms.hasPerm(`congresses.delete.${org}`)) {
+            actions.push({
+                label: locale.delete.menuItem,
+                action: () => this.context.createTask('congresses/delete', { id }),
+                overflow: true,
+            });
+        }
+
 
         return (
             <div class="congresses-detail-page">
@@ -82,8 +92,8 @@ export default connectPerms(class CongressDetailPage extends Page {
     }
 });
 
-function Footer ({ item }) {
-    if (!item) return;
+function Footer ({ item, editing }) {
+    if (!item || editing) return;
 
     return (
         <InstancesView congress={item.id} />

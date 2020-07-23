@@ -33,6 +33,8 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <TextField
+                    outline
+                    label={locale.fields.humanId}
                     value={value}
                     maxLength={20}
                     onChange={e => onChange(e.target.value)} />;

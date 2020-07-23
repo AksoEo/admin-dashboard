@@ -12,11 +12,21 @@ export const congresses = {
         abbrev: 'Mallongigo',
         org: 'Organizo',
     },
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei kongreson',
+        button: 'Krei',
+    },
     update: {
         menuItem: 'Redakti',
+        title: 'Alŝuti kongreson',
+        button: 'Alŝuti',
     },
     delete: {
         menuItem: 'Forigi',
+        title: 'Forigi kongreson',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la kongreson? Ne eblas malfari tiun ĉi agon.',
     },
 };
 
@@ -44,11 +54,21 @@ export const congressInstances = {
         locations: 'Lokoj',
         program: 'Programeroj',
     },
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei okazigon',
+        button: 'Krei',
+    },
     update: {
         menuItem: 'Redakti',
+        title: 'Alŝuti okazigon',
+        button: 'Alŝuti',
     },
     delete: {
         menuItem: 'Forigi',
+        title: 'Forigi okazigon',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la okazigon? Ne eblas malfari tiun ĉi agon.',
     },
 };
 
@@ -79,11 +99,21 @@ export const congressLocations = {
     },
     locatedWithinExternalLoc: '[[located within]]', // prefix
     locatedWithinNowhere: '[[nowhere]]', // if externalLoc is null
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei lokon',
+        button: 'Krei',
+    },
     update: {
         menuItem: 'Redakti',
+        title: 'Alŝuti lokon',
+        button: 'Alŝuti',
     },
     delete: {
         menuItem: 'Forigi',
+        title: 'Forigi lokon',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la lokon? Ne eblas malfari tiun ĉi agon.',
     },
 };
 

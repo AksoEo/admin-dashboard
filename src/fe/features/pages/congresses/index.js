@@ -1,13 +1,16 @@
 import { h } from 'preact';
+import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../components/page';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
 import Meta from '../../meta';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
 import { congresses as locale } from '../../../locale';
+import { connectPerms } from '../../../perms';
+import { coreContext } from '../../../core/connection';
 import { FIELDS } from './fields';
 
-export default class CongressesPage extends Page {
+export default connectPerms(class CongressesPage extends Page {
     state = {
         parameters: {
             search: {
@@ -23,6 +26,8 @@ export default class CongressesPage extends Page {
             limit: 10,
         },
     };
+
+    static contextType = coreContext;
 
     #searchInput;
     #currentQuery = '';
@@ -56,8 +61,16 @@ export default class CongressesPage extends Page {
         }
     }
 
-    render (_, { parameters }) {
+    render ({ perms }, { parameters }) {
         const actions = [];
+
+        if (perms.hasPerm('congresses.create.uea') || perms.hasPerm('congresses.create.tejo')) {
+            actions.push({
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.create.menuItem,
+                action: () => this.context.createTask('congresses/create'),
+            });
+        }
 
         return (
             <div class="congresses-page">
@@ -90,4 +103,4 @@ export default class CongressesPage extends Page {
             </div>
         );
     }
-}
+});
