@@ -23,6 +23,7 @@ export default class LocationsView extends PureComponent {
                     options={{ congress, instance }}
                     view="congresses/location"
                     viewOptions={{ congress, instance, noFetch: true }}
+                    updateView={['congresses/sigLocations', { congress, instance }]}
                     item={listItemConstructor({ congress, instance })}
                     itemToMarker={item => item.type === 'internal' ? null : ({
                         key: item.id,

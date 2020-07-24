@@ -28,8 +28,10 @@ export default connectPerms(class LocationPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('congresses/updateInstance', {
-            id: this.props.match[1],
+        this.#commitTask = this.context.createTask('congresses/updateLocation', {
+            congress: this.congress,
+            instance: this.instance,
+            id: this.id,
             _changedFields: changedFields,
         }, this.state.edit);
         this.#commitTask.on('success', this.onEndEdit);
@@ -90,7 +92,7 @@ export default connectPerms(class LocationPage extends Page {
                             congress={congress}
                             instance={instance}
                             editing={editing}
-                            onItemChange={edit => this.setState({ edit})}
+                            onItemChange={edit => this.setState({ edit })}
                             item={this.state.edit || data}
                             org={org} />
                     )}
@@ -126,7 +128,7 @@ function DetailInner ({ congress, instance, item, editing, onItemChange }) {
             icon: <InnerField field="icon" item={item} />,
             onDragEnd: editing && (e => {
                 const newPos = e.target.getLatLng();
-                onItemChange({ ll: [newPos.lat, newPos.lng] });
+                onItemChange({ ...item, ll: [newPos.lat, newPos.lng] });
             }),
         },
     ];

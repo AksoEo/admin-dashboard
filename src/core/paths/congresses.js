@@ -83,6 +83,7 @@ export const tasks = {
     delete: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/congresses/${id}`);
+        store.remove([CONGRESSES, id, DATA]);
         store.remove([CONGRESSES, id]);
         store.signal([CONGRESSES, SIG_CONGRESSES]);
     },
@@ -152,6 +153,7 @@ export const tasks = {
     deleteInstance: async ({ congress, id }) => {
         const client = await asyncClient;
         await client.delete(`/congresses/${congress}/instances/${id}`);
+        store.remove([CONGRESSES, congress, INSTANCES, id, DATA]);
         store.remove([CONGRESSES, congress, INSTANCES, id]);
         store.signal([CONGRESSES, congress, SIG_INSTANCES]);
     },
@@ -281,11 +283,14 @@ export const tasks = {
     deleteLocation: async ({ congress, instance, id }) => {
         const client = await asyncClient;
         await client.delete(`/congresses/${congress}/instances/${instance}/locations/${id}`);
+        store.remove([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA]);
         store.remove([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id]);
         store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_LOCATIONS]);
     },
     updateLocation: async ({ congress, instance, id }, params) => {
         const client = await asyncClient;
+        delete params.id;
+        delete params.type;
         await client.patch(`/congresses/${congress}/instances/${instance}/locations/${id}`, params);
         const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA]);
         store.insert([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA], deepMerge(existing, params));
@@ -450,6 +455,7 @@ export const tasks = {
     deleteProgram: async ({ congress, instance, id }) => {
         const client = await asyncClient;
         await client.delete(`/congresses/${congress}/instances/${instance}/programs/${id}`);
+        store.remove([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA]);
         store.remove([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id]);
         store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS]);
     },

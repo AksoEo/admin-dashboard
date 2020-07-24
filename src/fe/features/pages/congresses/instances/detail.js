@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
+import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../components/page';
 import DetailShell from '../../../../components/detail-shell';
@@ -11,7 +12,7 @@ import { date } from '../../../../components/data';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
-import { congressInstances as locale } from '../../../../locale';
+import { congressInstances as locale, congressLocations as locationLocale } from '../../../../locale';
 import { FIELDS } from './fields';
 import Locations from './locations';
 import Map from '../map';
@@ -35,7 +36,8 @@ export default connectPerms(class CongressInstancePage extends Page {
         }
 
         this.#commitTask = this.context.createTask('congresses/updateInstance', {
-            id: this.props.match[1],
+            congress: this.congress,
+            id: this.id,
             _changedFields: changedFields,
         }, this.state.edit);
         this.#commitTask.on('success', this.onEndEdit);
@@ -78,19 +80,23 @@ export default connectPerms(class CongressInstancePage extends Page {
 
         const actions = [];
 
-        if (perms.hasPerm(`congress_instances.delete.${org}`)) {
-            actions.push({
-                label: locale.delete.menuItem,
-                action: () => this.context.createTask('congresses/delete', {}, { id }),
-                overflow: true,
-            });
-        }
-
         if (perms.hasPerm(`congress_instances.update.${org}`)) {
             actions.push({
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                label: locationLocale.create.menuItem,
+                action: () => this.context.createTask('congresses/createLocation', { congress, instance: id }),
+            }, {
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
                 action: () => this.props.push('redakti', true),
+            });
+        }
+
+        if (perms.hasPerm(`congress_instances.delete.${org}`)) {
+            actions.push({
+                label: locale.delete.menuItem,
+                action: () => this.context.createTask('congresses/deleteInstance', { congress, id }),
+                overflow: true,
             });
         }
 

@@ -75,6 +75,7 @@ class DataLoader {
 /// - options: task options
 /// - view: item view
 /// - viewOptions: view options
+/// - updateView: update view parameters
 /// - item: item component. Will be passed the following props: { id }
 /// - detail: if not none, will display an overlay over the list
 /// - itemToMarker: should either turn an item into a marker or return something falsy
@@ -101,6 +102,8 @@ export default class MapList extends PureComponent {
 
     // a ref to the leaflet map
     #map;
+
+    #updateView;
 
     #itemViews = new Map();
     #itemData = new Map();
@@ -177,11 +180,17 @@ export default class MapList extends PureComponent {
 
     componentDidMount () {
         this.load();
+
+        if (this.props.updateView) {
+            this.#updateView = this.context.createDataView(...this.props.updateView);
+            this.#updateView.on('update', () => this.load());
+        }
     }
 
     componentWillUnmount () {
         if (this.state.loading) this.state.loading.drop();
         for (const view of this.#itemViews.values()) view.drop();
+        if (this.#updateView) this.#updateView.drop();
     }
 
     #onItemClick = (id) => {

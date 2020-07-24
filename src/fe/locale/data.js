@@ -104,6 +104,9 @@ export const data = {
         empty: '[[empty]]',
         searchPlaceholder: 'Serĉi…',
     },
+    mapPicker: {
+        pickPrompt: '[[click to pick a location]]',
+    },
 };
 
 export const search = {

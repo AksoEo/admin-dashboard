@@ -96,6 +96,11 @@ export const congressLocations = {
 
         llLat: '[[Lat]]',
         llLon: '[[Lon]]',
+
+        types: {
+            external: '[[external]]',
+            internal: '[[internal]]',
+        }
     },
     locatedWithinExternalLoc: '[[located within]]', // prefix
     locatedWithinNowhere: '[[nowhere]]', // if externalLoc is null
