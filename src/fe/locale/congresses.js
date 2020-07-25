@@ -100,7 +100,7 @@ export const congressLocations = {
         types: {
             external: '[[external]]',
             internal: '[[internal]]',
-        }
+        },
     },
     locatedWithinExternalLoc: '[[located within]]', // prefix
     locatedWithinNowhere: '[[nowhere]]', // if externalLoc is null

@@ -9,6 +9,7 @@ import { congressLocations as locale } from '../../../../../locale';
 import { Link } from '../../../../../router';
 import { FIELDS } from './fields';
 import Map from '../../map';
+import TagManager from '../tag-manager';
 import './detail.less';
 
 export default connectPerms(class LocationPage extends Page {
@@ -91,6 +92,7 @@ export default connectPerms(class LocationPage extends Page {
                         <DetailInner
                             congress={congress}
                             instance={instance}
+                            id={id}
                             editing={editing}
                             onItemChange={edit => this.setState({ edit })}
                             item={this.state.edit || data}
@@ -120,7 +122,7 @@ function InnerField ({ field, item, editing, onItemChange }) {
         onItemChange={onItemChange} />;
 }
 
-function DetailInner ({ congress, instance, item, editing, onItemChange }) {
+function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
     const ll = item.ll;
     const markers = [
         {
@@ -167,6 +169,18 @@ function DetailInner ({ congress, instance, item, editing, onItemChange }) {
                     <InnerField field="name" item={item} editing={editing} onItemChange={onItemChange} />
                 </div>
                 {locatedWithin}
+                <TagManager
+                    list="congresses/listLocationTags"
+                    selected="congresses/listTagsOfLocation"
+                    options={{ congress, instance, location: id }}
+                    view="congresses/locationTag"
+                    viewOptions={{ congress, instance }}
+                    taskOptions={{ congress, instance, location: id }}
+                    addTask="congresses/createLocationTag"
+                    updateTask="congresses/updateLocationTag"
+                    deleteTask="congresses/removeLocationTag"
+                    attachTask="congresses/addTagToLocation"
+                    removeTask="congresses/removeTagFromLocation" />
             </div>
             <div class="inner-desc">
                 <InnerField field="rating" item={item} editing={editing} onItemChange={onItemChange} />

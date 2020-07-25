@@ -107,6 +107,11 @@ export const data = {
     mapPicker: {
         pickPrompt: '[[click to pick a location]]',
     },
+    tagManager: {
+        noTags: '[[no tags]]',
+        searchPlaceholder: 'Serĉi…',
+        dialogTitle: '[[Manage tags]]',
+    },
 };
 
 export const search = {

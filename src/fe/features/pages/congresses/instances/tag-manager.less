@@ -1,0 +1,48 @@
+@import '../../../../prelude';
+
+.congress-tag-manager {
+    .congress-tag {
+        margin-left: 4px;
+        padding: 4px 8px;
+        background: @text-fade-10;
+        border-radius: 100px;
+        text-transform: uppercase;
+        font-size: small;
+        font-weight: 500;
+
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+    .empty-label {
+        font-style: italic;
+        color: @text-fade-60;
+    }
+}
+
+.congress-tag-manager-popout {
+    width: 400px;
+    max-width: 100%;
+
+    .list-inner {
+        overflow-y: auto;
+    }
+
+    .congress-tag {
+        display: flex;
+
+        .tag-name {
+            flex: 1;
+        }
+
+        .tag-check {
+            .check-icon {
+                transform: scale(0);
+                transition: transform 0.3s @easing;
+            }
+        }
+        &.is-selected .tag-check .check-icon {
+            transform: none;
+        }
+    }
+}
