@@ -52,7 +52,7 @@ export const congressInstances = {
     },
     tabs: {
         locations: 'Lokoj',
-        program: 'Programeroj',
+        programs: 'Programeroj',
     },
     create: {
         menuItem: 'Krei',
@@ -94,6 +94,8 @@ export const congressLocations = {
         ratingInvalid: '[[invalid]]',
         nameRequired: 'Necesas nomo',
 
+        location: '[[location]]',
+
         llLat: '[[Lat]]',
         llLon: '[[Lon]]',
 
@@ -119,6 +121,41 @@ export const congressLocations = {
         title: 'Forigi lokon',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la lokon? Ne eblas malfari tiun ĉi agon.',
+    },
+};
+
+export const congressPrograms = {
+    detailTitle: 'Kongresa programero',
+    search: {
+        placeholders: {
+            title: '[[title]]',
+            description: '[[desc]]',
+        },
+    },
+    fields: {
+        title: '[[title]]',
+        description: '[[description]]',
+        owner: '[[owner]]',
+        timeFrom: '[[timeFrom]]',
+        timeTo: '[[timeTo]]',
+        location: '[[location]]',
+    },
+    locatedWithinNowhere: '[[nowhere]]', // if location is null
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei programeron',
+        button: 'Krei',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Alŝuti programeron',
+        button: 'Alŝuti',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi programeron',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la programeron? Ne eblas malfari tiun ĉi agon.',
     },
 };
 

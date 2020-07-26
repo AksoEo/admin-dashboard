@@ -128,7 +128,12 @@ export const FIELDS = {
             if (editing) {
                 return <TextArea value={value} onChange={onChange} />;
             }
-            return <div class="congress-location-address">{value}</div>;
+            if (!value) return null;
+            return (
+                <div class="congress-location-address">
+                    {('' + value).split('\n').map((l, i) => <div key={i}>{l}</div>)}
+                </div>
+            );
         },
     },
     ll: {

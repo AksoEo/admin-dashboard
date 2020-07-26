@@ -12,8 +12,6 @@ import './index.less';
 /// - congress: congress id
 /// - instance: instance id
 /// - push: proxy for navigation API
-/// - detail: locationDetail state
-/// - editing: locationEditing state
 export default class LocationsView extends PureComponent {
     render ({ congress, instance }) {
         return (

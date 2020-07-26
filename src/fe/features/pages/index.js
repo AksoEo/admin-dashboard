@@ -159,7 +159,21 @@ export default [
                                             {
                                                 path: 'programeroj',
                                                 type: 'state',
-                                                state: 'program',
+                                                state: 'programs',
+                                                paths: [
+                                                    {
+                                                        match: /^(\d+)$/,
+                                                        type: 'stack',
+                                                        component: elazy(() => import(/* webpackChunkName: "congresses-programs" */ './congresses/instances/programs/detail')),
+                                                        paths: [
+                                                            {
+                                                                path: 'redakti',
+                                                                type: 'state',
+                                                                state: 'editing',
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
                                             },
                                         ],
                                     },

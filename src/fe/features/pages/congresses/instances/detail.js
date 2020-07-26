@@ -15,6 +15,7 @@ import { connectPerms } from '../../../../perms';
 import { congressInstances as locale, congressLocations as locationLocale } from '../../../../locale';
 import { FIELDS } from './fields';
 import Locations from './locations';
+import Programs from './programs';
 import Map from '../map';
 import './detail.less';
 
@@ -58,7 +59,7 @@ export default connectPerms(class CongressInstancePage extends Page {
     get tab () {
         if (this.props.editing) return null;
         if (this.props.locations) return 'locations';
-        if (this.props.program) return 'program';
+        if (this.props.programs) return 'programs';
         else {
             this.props.push('lokoj', true);
             return 'locations';
@@ -67,10 +68,10 @@ export default connectPerms(class CongressInstancePage extends Page {
     set tab (tab) {
         if (tab === this.tab) return;
         if (this.props.locations) this.props.locations.pop(true);
-        if (this.props.program) this.props.program.pop(true);
+        if (this.props.programs) this.props.programs.pop(true);
         if (tab === 'locations') {
             this.props.push('lokoj', true);
-        } else if (tab === 'program') {
+        } else if (tab === 'programs') {
             this.props.push('programeroj', true);
         }
     }
@@ -132,9 +133,12 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 congress={congress}
                                 org={org}
                                 instance={id}
-                                push={this.props.push}
-                                detail={this.props.locationDetail}
-                                editing={this.props.locationEditing} />}
+                                push={this.props.push} />}
+                            {!editing && (tab === 'programs') && <Programs
+                                congress={congress}
+                                org={org}
+                                instance={id}
+                                push={this.props.push} />}
                         </div>
                     )}
                 </DetailShell>

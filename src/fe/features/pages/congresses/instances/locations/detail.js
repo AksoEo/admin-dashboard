@@ -186,6 +186,9 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
                 <InnerField field="rating" item={item} editing={editing} onItemChange={onItemChange} />
                 <InnerField field="description" item={item} editing={editing} onItemChange={onItemChange} />
             </div>
+            <div class="inner-map-title">
+                {locale.fields.location}
+            </div>
             <div class="inner-map-container">
                 <div class="inner-address">
                     <InnerField field="address" item={item} editing={editing} onItemChange={onItemChange} />
