@@ -6,9 +6,9 @@ import DetailShell from '../../../../../components/detail-shell';
 import { coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';
 import { congressLocations as locale } from '../../../../../locale';
-import { Link } from '../../../../../router';
 import { FIELDS } from './fields';
 import Map from '../../map';
+import LocationPicker from '../location-picker';
 import TagManager from '../tag-manager';
 import './detail.less';
 
@@ -111,9 +111,10 @@ export default connectPerms(class LocationPage extends Page {
     }
 });
 
-function InnerField ({ field, item, editing, onItemChange }) {
+function InnerField ({ field, item, editing, onItemChange, ...extra }) {
     const Component = FIELDS[field].component;
     return <Component
+        {...extra}
         slot="detail"
         value={item[field]}
         editing={editing}
@@ -141,21 +142,13 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
             <div class="header-external-loc">
                 {locale.locatedWithinExternalLoc}
                 {item.externalLoc ? (
-                    <DetailShell
-                        inline
-                        view="congresses/location"
-                        options={{ congress, instance }}
-                        id={item.externalLoc}
-                        locale={{}}>
-                        {data => (
-                            <Link
-                                target={`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${item.externalLoc}`}
-                                class="external-loc-summary">
-                                <InnerField field="icon" item={data} />
-                                <InnerField field="name" item={data} />
-                            </Link>
-                        )}
-                    </DetailShell>
+                    <LocationPicker
+                        externalOnly
+                        congress={congress}
+                        instance={instance}
+                        value={item.externalLoc}
+                        editing={editing}
+                        onChange={externalLoc => onItemChange({ ...item, externalLoc })} />
                 ) : ' ' + locale.locatedWithinNowhere}
             </div>
         );

@@ -6,7 +6,6 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from '@material-ui/icons/Edit';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
-import SearchIcon from '@material-ui/icons/Search';
 import DisplayError from '../../../../components/error';
 import TinyProgress from '../../../../components/tiny-progress';
 import { connect, coreContext } from '../../../../core/connection';
@@ -158,7 +157,7 @@ class ListLoader {
 
         this.total = res.total;
 
-        if (res.items.length === 0 && this.offset < this.count) throw new Error('internal error');
+        if (res.items.length === 0 && this.offset < this.total) throw new Error('internal error');
         this.offset += res.items.length;
         this.items.push(...res.items);
 
@@ -219,7 +218,7 @@ const PopoutTag = connect(({ id, view, options }) =>
         <div
             class={'congress-tag' + (selected ? ' is-selected' : '')}
             onClick={e => {
-                if (loadingAttachment) return;
+                if (loadingAttachment || editing) return;
                 if (e.target.tagName === 'BUTTON') return;
                 if (e.target.tagName === 'INPUT') return;
 
@@ -232,7 +231,10 @@ const PopoutTag = connect(({ id, view, options }) =>
             }}>
             {editing ? (
                 <div class="tag-edit-cancel">
-                    <Button icon small onClick={onEndEdit}>
+                    <Button icon small onClick={e => {
+                        e.stopPropagation(); // prevent this click from modifying attachment
+                        onEndEdit();
+                    }}>
                         <CancelIcon />
                     </Button>
                 </div>
@@ -241,6 +243,7 @@ const PopoutTag = connect(({ id, view, options }) =>
                 {editing ? (
                     <TextField
                         outline
+                        maxLength="50"
                         value={editedName}
                         onChange={e => setEditedName(e.target.value)} />
                 ) : data ? data.name : <TinyProgress />}
@@ -308,6 +311,7 @@ function AddTag ({ onCreate }) {
             <TextField
                 disabled={loading}
                 outline
+                maxLength="50"
                 value={name}
                 onChange={e => setName(e.target.value)} />
             <Button icon small onClick={() => {

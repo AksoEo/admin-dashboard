@@ -3,10 +3,12 @@ import EditIcon from '@material-ui/icons/Edit';
 import Meta from '../../../../meta';
 import Page from '../../../../../components/page';
 import DetailShell from '../../../../../components/detail-shell';
+import Detail from '../../../../../components/detail';
 import { coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';
 import { congressPrograms as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
+import TagManager from '../tag-manager';
 
 export default connectPerms(class ProgramPage extends Page {
     state = {
@@ -73,7 +75,19 @@ export default connectPerms(class ProgramPage extends Page {
                 <Meta
                     title={locale.detailTitle}
                     actions={actions} />
-                <DetailShell
+                <TagManager
+                    list="congresses/listProgramTags"
+                    selected="congresses/listTagsOfProgram"
+                    options={{ congress, instance, program: id }}
+                    view="congresses/programTag"
+                    viewOptions={{ congress, instance }}
+                    taskOptions={{ congress, instance, program: id }}
+                    addTask="congresses/createProgramTag"
+                    updateTask="congresses/updateProgramTag"
+                    deleteTask="congresses/removeProgramTag"
+                    attachTask="congresses/addTagToProgram"
+                    removeTask="congresses/removeTagFromProgram" />
+                <Detail
                     view="congresses/program"
                     id={id}
                     options={{ congress, instance }}
@@ -83,18 +97,9 @@ export default connectPerms(class ProgramPage extends Page {
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
                     locale={locale}
-                    onDelete={() => this.props.pop()}>
-                    {data => (
-                        <DetailInner
-                            congress={congress}
-                            instance={instance}
-                            id={id}
-                            editing={editing}
-                            onItemChange={edit => this.setState({ edit })}
-                            item={this.state.edit || data}
-                            org={org} />
-                    )}
-                </DetailShell>
+                    onDelete={() => this.props.pop()}
+                    userData={{ congress, instance }}
+                    fields={FIELDS} />
                 <DetailShell
                     /* this is kind of a hack to get the org field */
                     view="congresses/congress"
@@ -106,18 +111,3 @@ export default connectPerms(class ProgramPage extends Page {
         );
     }
 });
-
-function InnerField ({ field, item, editing, onItemChange }) {
-    const Component = FIELDS[field].component;
-    return <Component
-        slot="detail"
-        value={item[field]}
-        editing={editing}
-        onChange={v => onItemChange({ ...item, [field]: v })}
-        item={item}
-        onItemChange={onItemChange} />;
-}
-
-function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
-    return 'meow';
-}

@@ -19,9 +19,9 @@ export default class ProgramsView extends PureComponent {
                 query: '',
             },
             fields: [
-                { id: 'title', sorting: 'desc', fixed: true },
+                { id: 'title', sorting: 'none', fixed: true },
                 { id: 'description', sorting: 'none', fixed: true },
-                { id: 'timeFrom', sorting: 'none', fixed: true },
+                { id: 'timeFrom', sorting: 'asc', fixed: true },
                 { id: 'location', sorting: 'none', fixed: true },
             ],
             offset: 0,

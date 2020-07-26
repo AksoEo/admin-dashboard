@@ -12,7 +12,11 @@ import { date } from '../../../../components/data';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
-import { congressInstances as locale, congressLocations as locationLocale } from '../../../../locale';
+import {
+    congressInstances as locale,
+    congressLocations as locationLocale,
+    congressPrograms as programLocale,
+} from '../../../../locale';
 import { FIELDS } from './fields';
 import Locations from './locations';
 import Programs from './programs';
@@ -82,11 +86,22 @@ export default connectPerms(class CongressInstancePage extends Page {
         const actions = [];
 
         if (perms.hasPerm(`congress_instances.update.${org}`)) {
+            if (tab === 'locations') {
+                actions.push({
+                    key: 'locations',
+                    icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                    label: locationLocale.create.menuItem,
+                    action: () => this.context.createTask('congresses/createLocation', { congress, instance: id }),
+                });
+            } else {
+                actions.push({
+                    key: 'programs',
+                    icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                    label: programLocale.create.menuItem,
+                    action: () => this.context.createTask('congresses/createProgram', { congress, instance: id }),
+                });
+            }
             actions.push({
-                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
-                label: locationLocale.create.menuItem,
-                action: () => this.context.createTask('congresses/createLocation', { congress, instance: id }),
-            }, {
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
                 action: () => this.props.push('redakti', true),

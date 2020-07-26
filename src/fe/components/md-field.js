@@ -17,6 +17,7 @@ import './md-field.less';
 /// - editing: bool
 /// - rules: list of enabled rules
 /// - inline: if true, will try to style it without line breaks
+/// - singleLine: if true, will not allow line breaks
 export default class MarkdownTextField extends PureComponent {
     static contextType = layoutContext;
 
@@ -54,7 +55,7 @@ export default class MarkdownTextField extends PureComponent {
         this.editor = editor;
     };
 
-    render ({ value, editing, onChange, inline, disabled, rules, ...extra }, { preview }) {
+    render ({ value, editing, onChange, inline, disabled, rules, singleLine, ...extra }, { preview }) {
         void rules;
 
         let editorBar;
@@ -108,7 +109,9 @@ export default class MarkdownTextField extends PureComponent {
                     lineWrapping: true,
                 }}
                 editorDidMount={this.onEditorMount}
-                onBeforeChange={(editor, data, value) => onChange(value)} />;
+                onBeforeChange={(editor, data, value) => singleLine
+                    ? onChange(value.replace(/\n/g, ''))
+                    : onChange(value)} />;
         } else {
             contents = <div
                 class={'markdown-contents' + (inline ? ' is-inline' : '') + (preview ? ' is-preview' : '')}

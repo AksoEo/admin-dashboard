@@ -8,10 +8,12 @@ import Segmented from '../../../components/segmented';
 import TejoIcon from '../../../components/tejo-icon';
 import UeaIcon from '../../../components/uea-icon';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
+import { timestamp } from '../../../components/data';
 import {
     congresses as locale,
     congressInstances as instanceLocale,
     congressLocations as locationLocale,
+    congressPrograms as programLocale,
     data as dataLocale,
 } from '../../../locale';
 import { connectPerms } from '../../../perms';
@@ -245,6 +247,85 @@ export default {
                 actionLabel={locationLocale.delete.button}
                 run={() => task.runOnce()}>
                 {locationLocale.delete.description}
+            </TaskDialog>
+        );
+    },
+
+    createProgram ({ open, task }) {
+        const { congress, instance } = task.options;
+
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        open={open}
+                        onClose={() => task.drop()}
+                        title={programLocale.create.title}
+                        actionLabel={programLocale.create.button}
+                        run={() => task.runOnce().then(id => {
+                            routerContext.navigate(`/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`);
+                        })}>
+                        <Field>
+                            <Validator
+                                component={TextField}
+                                outline
+                                label={programLocale.fields.title}
+                                validate={value => {
+                                    if (!value) throw { error: dataLocale.requiredField };
+                                }}
+                                value={task.parameters.title || ''}
+                                onChange={e => task.update({ title: e.target.value })} />
+                        </Field>
+                        <Field>
+                            <Validator
+                                component={timestamp.editor}
+                                outline
+                                label={programLocale.fields.timeFrom}
+                                validate={value => {
+                                    if (!value) throw { error: dataLocale.requiredField };
+                                }}
+                                value={task.parameters.timeFrom || null}
+                                onChange={timeFrom => task.update({ timeFrom })} />
+                        </Field>
+                        <Field>
+                            <Validator
+                                component={timestamp.editor}
+                                outline
+                                label={programLocale.fields.timeTo}
+                                validate={value => {
+                                    if (!value) throw { error: dataLocale.requiredField };
+                                }}
+                                value={task.parameters.timeTo || null}
+                                onChange={timeTo => task.update({ timeTo })} />
+                        </Field>
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
+    updateProgram ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={programLocale.update.title}
+                actionLabel={programLocale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={programLocale.fields} />
+            </TaskDialog>
+        );
+    },
+    deleteProgram ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={programLocale.delete.title}
+                actionLabel={programLocale.delete.button}
+                run={() => task.runOnce()}>
+                {programLocale.delete.description}
             </TaskDialog>
         );
     },

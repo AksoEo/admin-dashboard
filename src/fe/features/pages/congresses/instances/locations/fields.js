@@ -282,8 +282,8 @@ export const FIELDS = {
         },
     },
     externalLoc: {
-        component ({ value }) {
-            return value;
+        component () {
+            throw new Error('illegal invocation');
         },
     },
 };

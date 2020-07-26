@@ -106,6 +106,10 @@ export const congressLocations = {
     },
     locatedWithinExternalLoc: '[[located within]]', // prefix
     locatedWithinNowhere: '[[nowhere]]', // if externalLoc is null
+    locationPicker: {
+        pick: 'Elekti lokon',
+        search: 'Serĉi…',
+    },
     create: {
         menuItem: 'Krei',
         title: 'Krei lokon',
@@ -140,7 +144,6 @@ export const congressPrograms = {
         timeTo: '[[timeTo]]',
         location: '[[location]]',
     },
-    locatedWithinNowhere: '[[nowhere]]', // if location is null
     create: {
         menuItem: 'Krei',
         title: 'Krei programeron',

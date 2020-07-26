@@ -236,7 +236,7 @@ export const tasks = {
 
     // MARK - locations
 
-    listLocations: async ({ congress, instance }, { offset, limit, fields, search }) => {
+    listLocations: async ({ congress, instance, externalOnly }, { offset, limit, fields, search }) => {
         const client = await asyncClient;
         const opts = {
             offset,
@@ -244,6 +244,7 @@ export const tasks = {
             fields: ['id', 'name', 'description', 'll', 'icon', 'address', 'type', 'externalLoc'],
             order: fieldsToOrder(fields),
         };
+        if (externalOnly) opts.filter = { type: 'external' };
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
             if (!util.isValidSearch(transformedQuery)) {
@@ -462,6 +463,8 @@ export const tasks = {
     },
     updateProgram: async ({ congress, instance, id }, params) => {
         const client = await asyncClient;
+        delete params.id;
+        console.log(params);
         await client.patch(`/congresses/${congress}/instances/${instance}/programs/${id}`, params);
         const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA]);
         store.insert([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA], deepMerge(existing, params));
