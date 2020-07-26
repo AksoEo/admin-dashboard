@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { Button, Dialog, TextField } from '@cpsdqs/yamdl';
 import Brightness1Icon from '@material-ui/icons/Brightness1';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
@@ -39,6 +39,8 @@ import CenterFocusStrongIcon from '@material-ui/icons/CenterFocusStrong';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import ExploreIcon from '@material-ui/icons/Explore';
 import LocalHotelIcon from '@material-ui/icons/LocalHotel';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import CheckIcon from '@material-ui/icons/Check';
 import TextArea from '../../../../../components/text-area';
 import { Validator } from '../../../../../components/form';
 import { congressLocations as locale } from '../../../../../locale';
@@ -91,7 +93,11 @@ export const FIELDS = {
     },
     icon: {
         slot: 'icon',
-        component ({ value }) {
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return <IconPicker value={value} onChange={onChange} />;
+            }
+
             const Icon = ICON_LUT[value];
             if (!Icon) return <span class="congress-location-icon is-empty" />;
             return <span class="congress-location-icon"><Icon style={{ verticalAlign: 'middle' }} /></span>;
@@ -176,18 +182,22 @@ export const FIELDS = {
         component ({ value, editing, onChange }) {
             const [virtualType, setVirtualType] = useState('stars');
             const [virtualMax, setVirtualMax] = useState(5);
-            if (!value && !editing) return;
 
             let type, rating, max;
-            if (value) {
+            if (value && Number.isFinite(value.rating)) {
                 type = value.type;
                 rating = value.rating;
                 max = value.max;
             } else {
                 type = virtualType;
-                rating = '';
+                rating = NaN;
                 max = virtualMax;
+                // if the server sends a bogus object (value.rating is not finite) then we need to
+                // pretend we don't have a value
+                value = null;
             }
+
+            if (!value && !editing) return;
 
             // blendMin and blendMax are the left and right edges of the filled icon size. because
             // the icons are inset a bit and not actually 24px wide, e.g. 0.9 would appear as
@@ -229,8 +239,8 @@ export const FIELDS = {
                         <Validator
                             component={TextField}
                             validate={value => {
-                                if (value === '') return;
-                                if (!Number.isFinite(+value)) throw { error: locale.fields.ratingInvalid };
+                                if (Number.isNaN(rating)) return;
+                                if (!Number.isFinite(value)) throw { error: locale.fields.ratingInvalid };
                                 if (value < 0 || value > max) throw { error: locale.fields.ratingInvalid };
                             }}
                             outline
@@ -240,7 +250,7 @@ export const FIELDS = {
                             step="0.1"
                             value={rating}
                             onChange={e => e.target.value
-                                ? onChange({ type, rating: e.target.value, max })
+                                ? onChange({ type, rating: +e.target.value, max })
                                 : onChange(null)} />
                         {locale.fields.ratingInfixOf}
                         <Validator
@@ -287,3 +297,61 @@ export const FIELDS = {
         },
     },
 };
+
+function IconPicker ({ value, onChange }) {
+    const [open, setOpen] = useState(false);
+
+    const CurrentIcon = ICON_LUT[value];
+
+    return (
+        <Button class="congress-location-icon-picker" onClick={e => {
+            e.stopPropagation();
+            e.preventDefault();
+            setOpen(true);
+        }}>
+            {value ? (
+                <span class="picker-preview">
+                    <CurrentIcon style={{ verticalAlign: 'middle' }} />
+                    {' '}
+                    {locale.iconPicker.labels[value]}
+                </span>
+            ) : (
+                <span class="picker-preview no-icon">
+                    {locale.iconPicker.empty}
+                </span>
+            )}
+            <div class="expand-icon">
+                <ExpandMoreIcon style={{ verticalAlign: 'middle' }} />
+            </div>
+
+            <Dialog
+                class="congress-location-icon-picker-dialog"
+                backdrop
+                title={locale.iconPicker.pick}
+                open={open}
+                onClose={() => setOpen(false)}>
+                {Object.keys(ICON_LUT).map(id => {
+                    const Icon = ICON_LUT[id];
+                    return (
+                        <Button
+                            key={id}
+                            class={'picker-item' + ((id === value) ? ' is-selected' : '')}
+                            onClick={() => {
+                                onChange(id);
+                                setOpen(false);
+                            }}>
+                            <div class="picker-label">
+                                <Icon style={{ verticalAlign: 'middle' }} />
+                                {' '}
+                                {locale.iconPicker.labels[id]}
+                            </div>
+                            <div class="picker-check">
+                                <CheckIcon />
+                            </div>
+                        </Button>
+                    );
+                })}
+            </Dialog>
+        </Button>
+    );
+}

@@ -34,5 +34,6 @@ export function deepEq (a, b) {
             }
         }
         return true;
-    } else return a === b;
+    } else if (Number.isNaN(a) && Number.isNaN(b)) return true;
+    else return a === b;
 }

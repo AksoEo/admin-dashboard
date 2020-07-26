@@ -1,4 +1,5 @@
 import { util } from '@tejo/akso-client';
+import { deepEq } from '../util';
 
 export function transformError (err) {
     if (!err) return { code: '?', message: '??' };
@@ -21,6 +22,16 @@ export function fieldsToOrder (fields) {
     return fields
         .filter(({ sorting }) => sorting !== 'none')
         .map(({ id, sorting }) => [id, sorting]);
+}
+
+export function fieldDiff (existing, changed) {
+    const delta = {};
+    const keySet = new Set(Object.keys(existing));
+    for (const k in changed) keySet.add(k);
+    for (const k of keySet) {
+        if (!deepEq(existing[k], changed[k])) delta[k] = changed[k];
+    }
+    return delta;
 }
 
 export function filtersToAPI (clientFilters, pfilters) {

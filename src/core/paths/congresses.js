@@ -2,7 +2,7 @@ import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import * as store from '../store';
-import { fieldsToOrder } from '../list';
+import { fieldsToOrder, fieldDiff } from '../list';
 import { deepMerge } from '../../util';
 
 export const CONGRESSES = 'congresses';
@@ -89,10 +89,8 @@ export const tasks = {
     },
     update: async ({ id }, params) => {
         const client = await asyncClient;
-        delete params.id;
-        delete params.org;
-        await client.patch(`/congresses/${id}`, params);
         const existing = store.get([CONGRESSES, id, DATA]);
+        await client.patch(`/congresses/${id}`, fieldDiff(existing, params));
         store.insert([CONGRESSES, id, DATA], deepMerge(existing, params));
     },
 
@@ -159,9 +157,8 @@ export const tasks = {
     },
     updateInstance: async ({ congress, id }, params) => {
         const client = await asyncClient;
-        delete params.id;
-        await client.patch(`/congresses/${congress}/instances/${id}`, params);
         const existing = store.get([CONGRESSES, congress, INSTANCES, id, DATA]);
+        await client.patch(`/congresses/${congress}/instances/${id}`, fieldDiff(existing, params));
         store.insert([CONGRESSES, congress, INSTANCES, id, DATA], deepMerge(existing, params));
     },
     instanceMap: async ({ congress, id }) => {
@@ -291,10 +288,8 @@ export const tasks = {
     },
     updateLocation: async ({ congress, instance, id }, params) => {
         const client = await asyncClient;
-        delete params.id;
-        delete params.type;
-        await client.patch(`/congresses/${congress}/instances/${instance}/locations/${id}`, params);
         const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA]);
+        await client.patch(`/congresses/${congress}/instances/${instance}/locations/${id}`, fieldDiff(existing, params));
         store.insert([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA], deepMerge(existing, params));
     },
     updateLocationThumbnail: async ({ congress, instance, id }, { thumbnail }) => {
@@ -463,10 +458,8 @@ export const tasks = {
     },
     updateProgram: async ({ congress, instance, id }, params) => {
         const client = await asyncClient;
-        delete params.id;
-        console.log(params);
-        await client.patch(`/congresses/${congress}/instances/${instance}/programs/${id}`, params);
         const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA]);
+        await client.patch(`/congresses/${congress}/instances/${instance}/programs/${id}`, fieldDiff(existing, params));
         store.insert([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA], deepMerge(existing, params));
     },
 

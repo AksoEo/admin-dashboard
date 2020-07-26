@@ -2,12 +2,14 @@ import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
 import { Dialog } from '@cpsdqs/yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import CloseIcon from '@material-ui/icons/Close';
 import SearchIcon from '@material-ui/icons/Search';
 import DetailShell from '../../../../components/detail-shell';
 import StaticOverviewList from '../../../../components/overview-list-static';
 import { LinkButton } from '../../../../router';
 import { congressLocations as locale } from '../../../../locale';
 import { FIELDS } from './locations/fields';
+import './location-picker.less';
 
 /// Location picker.
 ///
@@ -16,12 +18,13 @@ import { FIELDS } from './locations/fields';
 /// - externalOnly: will only show external locations if set
 /// - value/onChange: id
 /// - editing: editing state
+/// - canClear
 export default class LocationPicker extends PureComponent {
     state = {
         pickerOpen: false,
     };
 
-    render ({ congress, instance, value, editing, onChange, externalOnly }, { pickerOpen }) {
+    render ({ congress, instance, value, editing, onChange, externalOnly, canClear }, { pickerOpen }) {
         let preview;
         if (value) {
             preview = (
@@ -32,14 +35,14 @@ export default class LocationPicker extends PureComponent {
                     id={value}
                     locale={{}}>
                     {data => editing ? (
-                        <div class="picker-selected">
+                        <div class="picker-selected-inner">
                             <FIELDS.icon.component value={data.icon} />
                             <FIELDS.name.component value={data.name} />
                         </div>
                     ) : (
                         <LinkButton
                             target={`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${value}`}
-                            class="picker-selected">
+                            class="picker-selected-inner">
                             <FIELDS.icon.component value={data.icon} />
                             <FIELDS.name.component value={data.name} />
                         </LinkButton>
@@ -54,12 +57,21 @@ export default class LocationPicker extends PureComponent {
             <div
                 class={'congress-location-picker' + (editing ? ' is-editing' : '')}
                 tabIndex={editing ? 0 : undefined}
-                onClick={() => this.setState({ pickerOpen: true })}>
-                {preview}
-                {editing ? (
-                    <span class="editable-indicator">
+                onClick={() => editing && this.setState({ pickerOpen: true })}>
+                <div class="picker-selected">
+                    {preview}
+                </div>
+                {(editing && canClear && value) ? (
+                    <div class="clear-button" onClick={e => {
+                        e.stopPropagation();
+                        onChange(null);
+                    }}>
+                        <CloseIcon />
+                    </div>
+                ) : editing ? (
+                    <div class="editable-indicator">
                         <ExpandMoreIcon />
-                    </span>
+                    </div>
                 ) : null}
 
                 <Dialog

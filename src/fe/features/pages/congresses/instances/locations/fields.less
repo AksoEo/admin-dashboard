@@ -12,6 +12,59 @@
     }
 }
 
+.congress-location-icon-picker {
+    font-size: 1rem;
+    font-weight: normal;
+    text-transform: none;
+    border: 1px solid @control-idle;
+    border-radius: 4px;
+    --md-button-color: @gray-button-color;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    letter-spacing: inherit;
+    min-width: 0;
+
+    .picker-preview {
+        padding-left: 8px;
+    }
+    .expand-icon {
+        padding: 0 8px;
+    }
+}
+.congress-location-icon-picker-dialog {
+    width: 400px;
+    max-width: 100%;
+
+    .picker-item {
+        display: flex;
+        width: 100%;
+        padding: 16px;
+        box-sizing: border-box;
+        margin: 0;
+        min-width: 0;
+        font: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+        text-align: left;
+        --md-button-color: @gray-button-color;
+        color: inherit;
+        align-items: center;
+
+        .picker-label {
+            flex: 1;
+        }
+        .picker-check {
+            transform: scale(0);
+            transition: transform 0.3s @easing;
+        }
+        &.is-selected .picker-check {
+            transform: none;
+        }
+    }
+}
+
 .congress-location-description {
     &[data-slot=body] {
         font-size: small;

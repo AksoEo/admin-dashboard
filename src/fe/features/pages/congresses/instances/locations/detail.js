@@ -124,6 +124,7 @@ function InnerField ({ field, item, editing, onItemChange, ...extra }) {
 }
 
 function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
+    const external = item.type === 'external';
     const ll = item.ll;
     const markers = [
         {
@@ -141,9 +142,10 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
         locatedWithin = (
             <div class="header-external-loc">
                 {locale.locatedWithinExternalLoc}
-                {item.externalLoc ? (
+                {(item.externalLoc || editing) ? (
                     <LocationPicker
                         externalOnly
+                        canClear
                         congress={congress}
                         instance={instance}
                         value={item.externalLoc}
@@ -176,21 +178,27 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
                     removeTask="congresses/removeTagFromLocation" />
             </div>
             <div class="inner-desc">
-                <InnerField field="rating" item={item} editing={editing} onItemChange={onItemChange} />
+                {external ? (
+                    <InnerField field="rating" item={item} editing={editing} onItemChange={onItemChange} />
+                ) : null}
                 <InnerField field="description" item={item} editing={editing} onItemChange={onItemChange} />
             </div>
-            <div class="inner-map-title">
-                {locale.fields.location}
-            </div>
-            <div class="inner-map-container">
-                <div class="inner-address">
-                    <InnerField field="address" item={item} editing={editing} onItemChange={onItemChange} />
+            {external ? (
+                <div class="inner-map-title">
+                    {locale.fields.location}
                 </div>
-                {ll ? <Map class="inner-map" center={ll} zoom={13} markers={markers} /> : null}
-                <div class="inner-ll">
-                    <InnerField field="ll" item={item} editing={editing} onItemChange={onItemChange} />
+            ) : null}
+            {external ? (
+                <div class="inner-map-container">
+                    <div class="inner-address">
+                        <InnerField field="address" item={item} editing={editing} onItemChange={onItemChange} />
+                    </div>
+                    {ll ? <Map class="inner-map" center={ll} zoom={13} markers={markers} /> : null}
+                    <div class="inner-ll">
+                        <InnerField field="ll" item={item} editing={editing} onItemChange={onItemChange} />
+                    </div>
                 </div>
-            </div>
+            ) : null}
         </div>
     );
 }
