@@ -84,7 +84,7 @@ export default connectPerms(class ProgramPage extends Page {
                     taskOptions={{ congress, instance, program: id }}
                     addTask="congresses/createProgramTag"
                     updateTask="congresses/updateProgramTag"
-                    deleteTask="congresses/removeProgramTag"
+                    deleteTask="congresses/deleteProgramTag"
                     attachTask="congresses/addTagToProgram"
                     removeTask="congresses/removeTagFromProgram" />
                 <Detail

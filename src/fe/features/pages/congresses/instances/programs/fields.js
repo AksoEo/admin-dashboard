@@ -54,9 +54,10 @@ export const FIELDS = {
     },
     location: {
         sortable: true,
-        component ({ value, editing, onChange, userData }) {
+        component ({ value, editing, onChange, userData, slot }) {
             if (!userData) return null;
             return <LocationPicker
+                disabled={slot !== 'detail'}
                 congress={userData.congress}
                 instance={userData.instance}
                 value={value}

@@ -4,14 +4,19 @@
     display: inline-block;
     margin: 0 4px;
 
-    .picker-selected-inner {
-        --md-button-color: @gray-button-color;
-        text-transform: inherit;
-        font: inherit;
-        color: inherit;
-        letter-spacing: inherit;
-        padding: 4px 8px;
-        background: @text-fade-10;
+    &:not(.is-editing) {
+        .picker-selected-inner {
+            --md-button-color: @gray-button-color;
+            text-transform: inherit;
+            font: inherit;
+            color: inherit;
+            letter-spacing: inherit;
+            padding: 4px 8px;
+            min-width: 0;
+        }
+        &:not(.is-disabled) .picker-selected-inner {
+            background: @text-fade-10;
+        }
     }
 
     &.is-editing {

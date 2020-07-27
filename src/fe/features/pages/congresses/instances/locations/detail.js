@@ -160,7 +160,9 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
         <div class="location-inner">
             <div class="inner-header">
                 <div class="header-title">
-                    <InnerField field="icon" item={item} editing={editing} onItemChange={onItemChange} />
+                    {external ? (
+                        <InnerField field="icon" item={item} editing={editing} onItemChange={onItemChange} />
+                    ) : null}
                     <InnerField field="name" item={item} editing={editing} onItemChange={onItemChange} />
                 </div>
                 {locatedWithin}
@@ -173,7 +175,7 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
                     taskOptions={{ congress, instance, location: id }}
                     addTask="congresses/createLocationTag"
                     updateTask="congresses/updateLocationTag"
-                    deleteTask="congresses/removeLocationTag"
+                    deleteTask="congresses/deleteLocationTag"
                     attachTask="congresses/addTagToLocation"
                     removeTask="congresses/removeTagFromLocation" />
             </div>

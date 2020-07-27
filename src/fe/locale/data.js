@@ -111,6 +111,10 @@ export const data = {
         noTags: '[[no tags]]',
         searchPlaceholder: 'Serĉi…',
         dialogTitle: '[[Manage tags]]',
+        addTag: '[[add tag]]',
+        deleteYouSure: '[[Are you sure?]]', // keep this short
+        deleting: '[[Deleting tag]]',
+        delete: 'Forigi',
     },
 };
 

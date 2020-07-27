@@ -109,6 +109,7 @@ export default connect(props => ([props.view, {
         cursed,
         selection,
         animateBackwards,
+        userData,
     }) {
         if (!data) return null;
 
@@ -153,7 +154,8 @@ export default connect(props => ([props.view, {
                         slot={slot}
                         value={data[id]}
                         item={data}
-                        fields={selectedFieldIds} />
+                        fields={selectedFieldIds}
+                        userData={userData} />
                 </div>
             );
 

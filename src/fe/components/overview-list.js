@@ -50,6 +50,7 @@ function scrollToNode (node) {
 /// - updateView: argument list to create a data view that emits updates (if available)
 /// - limits: available limit options. if not given, will use default
 /// - compact: if true, will force compact view
+/// - userData: user data to pass to fields
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -248,6 +249,7 @@ export default class OverviewList extends PureComponent {
         notice,
         selection,
         compact,
+        userData,
     }, { error, result, stale, loading, animateBackwards }) {
         let className = 'overview-list';
         if (expanded) className += ' search-expanded';
@@ -353,6 +355,7 @@ export default class OverviewList extends PureComponent {
                 selection={selection}
                 expanded={expanded}
                 lastCollapseTime={this.#lastCollapseTime}
+                userData={userData}
                 locale={localizedFields} />));
         }
 

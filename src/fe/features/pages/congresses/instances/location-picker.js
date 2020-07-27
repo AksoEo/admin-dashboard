@@ -18,13 +18,13 @@ import './location-picker.less';
 /// - externalOnly: will only show external locations if set
 /// - value/onChange: id
 /// - editing: editing state
-/// - canClear
+/// - disabled: will disable interaction
 export default class LocationPicker extends PureComponent {
     state = {
         pickerOpen: false,
     };
 
-    render ({ congress, instance, value, editing, onChange, externalOnly, canClear }, { pickerOpen }) {
+    render ({ congress, instance, value, editing, onChange, externalOnly, disabled }, { pickerOpen }) {
         let preview;
         if (value) {
             preview = (
@@ -34,16 +34,20 @@ export default class LocationPicker extends PureComponent {
                     options={{ congress, instance }}
                     id={value}
                     locale={{}}>
-                    {data => editing ? (
+                    {data => (editing || disabled) ? (
                         <div class="picker-selected-inner">
-                            <FIELDS.icon.component value={data.icon} />
+                            {data.type === 'external' ? (
+                                <FIELDS.icon.component value={data.icon} />
+                            ) : null}
                             <FIELDS.name.component value={data.name} />
                         </div>
                     ) : (
                         <LinkButton
                             target={`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${value}`}
                             class="picker-selected-inner">
-                            <FIELDS.icon.component value={data.icon} />
+                            {data.type === 'external' ? (
+                                <FIELDS.icon.component value={data.icon} />
+                            ) : null}
                             <FIELDS.name.component value={data.name} />
                         </LinkButton>
                     )}
@@ -55,13 +59,15 @@ export default class LocationPicker extends PureComponent {
 
         return (
             <div
-                class={'congress-location-picker' + (editing ? ' is-editing' : '')}
+                class={'congress-location-picker'
+                    + (editing ? ' is-editing' : '')
+                    + (disabled ? ' is-disabled' : '')}
                 tabIndex={editing ? 0 : undefined}
-                onClick={() => editing && this.setState({ pickerOpen: true })}>
+                onClick={() => !disabled && editing && this.setState({ pickerOpen: true })}>
                 <div class="picker-selected">
                     {preview}
                 </div>
-                {(editing && canClear && value) ? (
+                {(editing && value) ? (
                     <div class="clear-button" onClick={e => {
                         e.stopPropagation();
                         onChange(null);

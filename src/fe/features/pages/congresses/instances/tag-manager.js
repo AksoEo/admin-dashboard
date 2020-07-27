@@ -1,7 +1,7 @@
 import { h } from 'preact';
-import { PureComponent, useState } from 'preact/compat';
+import { PureComponent, useRef, useState } from 'preact/compat';
 import { Button, CircularProgress, Dialog, TextField } from '@cpsdqs/yamdl';
-import AddIcon from '@material-ui/icons/Add';
+import DeleteIcon from '@material-ui/icons/Delete';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from '@material-ui/icons/Edit';
@@ -11,6 +11,8 @@ import TinyProgress from '../../../../components/tiny-progress';
 import { connect, coreContext } from '../../../../core/connection';
 import { data as locale } from '../../../../locale';
 import './tag-manager.less';
+
+// TODO: error handling
 
 /// Lets you manage and attach tags to a node.
 ///
@@ -69,6 +71,7 @@ export default class TagManager extends PureComponent {
             ...this.props.taskOptions,
             id,
         }).runOnceAndDrop();
+        this.load();
     };
     #onAttach = async (id) => {
         await this.context.createTask(this.props.attachTask, {
@@ -125,6 +128,7 @@ export default class TagManager extends PureComponent {
                     <PopoutContents
                         all={all}
                         view={view}
+                        loading={loading}
                         viewOptions={viewOptions}
                         selected={selected}
                         onCreate={this.#onCreate}
@@ -178,27 +182,41 @@ const Tag = connect(({ view, viewOptions, id }) =>
 });
 
 function PopoutContents ({
-    all, selected, onCreate, onUpdate, onDelete, onAttach, onRemove, view, viewOptions,
+    all, selected, onCreate, onUpdate, onDelete, onAttach, onRemove, view, viewOptions, loading,
 }) {
     const [editing, setEditing] = useState(null);
+
+    const items = [];
+    for (let i = 0; i < all.length; i++) {
+        const id = all[i];
+        const isSelected = selected.includes(id) && (editing !== id);
+        const prevSelected = selected.includes(all[i - 1]) && (editing !== all[i - 1]);
+        const nextSelected = selected.includes(all[i + 1]) && (editing !== all[i + 1]);
+
+        items.push(
+            <PopoutTag
+                key={id}
+                id={id}
+                view={view}
+                editing={editing === id}
+                onEdit={() => setEditing(id)}
+                onEndEdit={() => setEditing(null)}
+                options={viewOptions}
+                selected={isSelected}
+                prevSelected={prevSelected}
+                nextSelected={nextSelected}
+                onUpdate={onUpdate}
+                onDelete={onDelete}
+                onAttach={onAttach}
+                onRemove={onRemove} />
+        );
+    }
 
     return (
         <div class="congress-tags-list">
             <div class="list-inner">
-                {all.map(id => (
-                    <PopoutTag
-                        key={id}
-                        id={id}
-                        view={view}
-                        editing={editing === id}
-                        onEdit={() => setEditing(id)}
-                        onEndEdit={() => setEditing(null)}
-                        options={viewOptions}
-                        selected={selected.includes(id)}
-                        onUpdate={onUpdate}
-                        onAttach={onAttach}
-                        onRemove={onRemove} />
-                ))}
+                {items}
+                {loading ? <div class="list-loading"><CircularProgress indeterminate /></div> : null}
                 <AddTag onCreate={onCreate} />
             </div>
         </div>
@@ -207,16 +225,37 @@ function PopoutContents ({
 
 const PopoutTag = connect(({ id, view, options }) =>
     [view, { ...options, id, noFetch: true }])(data => ({ data }))(function PopoutTag ({
-    id, selected, editing, onEdit, onEndEdit, data, onUpdate, onAttach, onRemove,
+    id,
+    selected,
+    prevSelected,
+    nextSelected,
+    editing,
+    onEdit,
+    onEndEdit,
+    data,
+    onUpdate,
+    onDelete,
+    onAttach,
+    onRemove,
 }) {
     const [editedName, setEditedName] = useState('');
     const [loadingAttachment, setLoadingAttachment] = useState(false);
     const [updating, setUpdating] = useState(false);
-    const [didError, setDidError] = useState(false);
+    const [reallyDelete, setReallyDelete] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [deleted, setDeleted] = useState(false);
+    const [error, setError] = useState(null);
+    const nameRef = useRef(null);
 
     return (
         <div
-            class={'congress-tag' + (selected ? ' is-selected' : '')}
+            class={'congress-tag'
+                + (editing ? ' is-editing' : '')
+                + (reallyDelete ? ' really-delete' : '')
+                + (deleted ? ' is-deleted' : '')
+                + (selected ? ' is-selected' : '')
+                + (prevSelected ? ' prev-selected' : '')
+                + (nextSelected ? ' next-selected' : '')}
             onClick={e => {
                 if (loadingAttachment || editing) return;
                 if (e.target.tagName === 'BUTTON') return;
@@ -229,9 +268,44 @@ const PopoutTag = connect(({ id, view, options }) =>
                     setLoadingAttachment(false);
                 });
             }}>
+            {(editing || deleting) ? (
+                <div class={'tag-really-delete' + ((deleting || deleted) ? ' is-deleting' : '')}>
+                    <Button class="cancel-button" icon small onClick={e => {
+                        e.stopPropagation();
+                        setReallyDelete(false);
+                    }}>
+                        <CancelIcon />
+                    </Button>
+                    <span>
+                        {(deleting || deleted)
+                            ? locale.tagManager.deleting
+                            : locale.tagManager.deleteYouSure}
+                    </span>
+                    <Button class="delete-button" small disabled={updating} onClick={e => {
+                        e.stopPropagation(); // prevent this click from modifying attachment
+                        setReallyDelete(true);
+                        setDeleting(true);
+                        setError(null);
+                        onDelete(id).then(() => {
+                            setDeleted(true);
+                        }).catch(error => {
+                            console.error(error); // eslint-disable-line no-console
+                            setError(error);
+                        }).then(() => {
+                            setDeleting(false);
+                        });
+                    }}>
+                        <CircularProgress
+                            class={'loading-indicator' + (deleting ? ' is-loading' : '')}
+                            indeterminate={deleting}
+                            small />
+                        <span>{locale.tagManager.delete}</span>
+                    </Button>
+                </div>
+            ) : null}
             {editing ? (
                 <div class="tag-edit-cancel">
-                    <Button icon small onClick={e => {
+                    <Button icon small disabled={updating} onClick={e => {
                         e.stopPropagation(); // prevent this click from modifying attachment
                         onEndEdit();
                     }}>
@@ -239,44 +313,61 @@ const PopoutTag = connect(({ id, view, options }) =>
                     </Button>
                 </div>
             ) : null}
+            {editing ? (
+                <div class="tag-edit-delete">
+                    <Button icon small disabled={updating} onClick={e => {
+                        e.stopPropagation(); // prevent this click from modifying attachment
+                        setReallyDelete(true);
+                    }}>
+                        <DeleteIcon />
+                    </Button>
+                </div>
+            ) : null}
             <div class="tag-name">
                 {editing ? (
                     <TextField
+                        ref={nameRef}
                         outline
                         maxLength="50"
                         value={editedName}
                         onChange={e => setEditedName(e.target.value)} />
                 ) : data ? data.name : <TinyProgress />}
             </div>
-            <div class="tag-check">
-                {loadingAttachment ? (
-                    <CircularProgress indeterminate small />
-                ) : (
-                    <div class="check-icon">
-                        <CheckIcon style={{ verticalAlign: 'middle' }} />
-                    </div>
-                )}
+            <div class={'tag-check' + (loadingAttachment ? ' is-loading' : '')}>
+                <div class="check-icon">
+                    <CheckIcon style={{ verticalAlign: 'middle' }} />
+                </div>
+                <CircularProgress class="check-loading" indeterminate={loadingAttachment} small />
             </div>
-            <div class={'tag-edit-container' + (didError ? ' did-error' : '')}>
+            <div class={'tag-edit-container' + (error ? ' did-error' : '')}>
                 {editing ? (
-                    <Button icon small onClick={() => {
+                    <Button icon small disabled={updating} onClick={() => {
                         setUpdating(true);
-                        setDidError(false);
+                        setError(null);
                         onUpdate(id, editedName).catch(error => {
                             console.error(error); // eslint-disable-line no-console
-                            setDidError(true);
+                            setError(error);
                         }).then(() => {
                             setUpdating(false);
                             onEndEdit();
                         });
                     }}>
-                        <CheckIcon style={{ verticalAlign: 'middle' }} />
+                        {updating ? (
+                            <CircularProgress class="save-loading" indeterminate={updating} small />
+                        ) : (
+                            <CheckIcon style={{ verticalAlign: 'middle' }} />
+                        )}
                     </Button>
                 ) : (
                     <Button disabled={!data} icon small onClick={() => {
                         if (!data) return;
                         setEditedName(data.name);
+                        setReallyDelete(false);
+                        setError(null);
                         onEdit();
+                        setTimeout(() => {
+                            nameRef.current && nameRef.current.focus();
+                        }, 50);
                     }}>
                         <EditIcon style={{ verticalAlign: 'middle' }} />
                     </Button>
@@ -291,38 +382,52 @@ function AddTag ({ onCreate }) {
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const nameRef = useRef(null);
 
     return (
-        <div class="add-tag">
-            <Button icon small onClick={() => {
-                if (adding) {
-                    setAdding(false);
-                } else {
+        <div class={'add-tag' + (adding ? ' is-adding' : '')}>
+            <div class="add-button-container">
+                <Button class="add-button" onClick={() => {
                     setAdding(true);
-                    setName('');
-                }
-            }}>
-                {adding ? (
+                    setName(null);
+                    setLoading(false);
+                    setError(null);
+                    setTimeout(() => {
+                        nameRef.current && nameRef.current.focus();
+                    }, 50);
+                }}>
+                    {locale.tagManager.addTag}
+                </Button>
+            </div>
+            <div class={'add-contents' + (error ? ' did-error' : '')}>
+                <Button icon small disabled={loading} onClick={() => {
+                    setAdding(false);
+                }}>
                     <CancelIcon style={{ verticalAlign: 'middle' }} />
-                ) : (
-                    <AddIcon style={{ verticalAlign: 'middle' }} />
-                )}
-            </Button>
-            <TextField
-                disabled={loading}
-                outline
-                maxLength="50"
-                value={name}
-                onChange={e => setName(e.target.value)} />
-            <Button icon small onClick={() => {
-                onCreate(name).then(() => {
-                    setName('');
-                }).catch(error => {
-                    setError(error);
-                }).then(() => setLoading(false));
-            }}>
-                <CheckIcon style={{ verticalAlign: 'middle' }} />
-            </Button>
+                </Button>
+                <TextField
+                    class="name-field"
+                    disabled={loading}
+                    outline
+                    maxLength="50"
+                    value={name}
+                    onChange={e => setName(e.target.value)} />
+                <Button icon small onClick={() => {
+                    setLoading(true);
+                    onCreate(name).then(() => {
+                        setName('');
+                        setAdding(false);
+                    }).catch(error => {
+                        setError(error);
+                    }).then(() => setLoading(false));
+                }} disabled={loading || !name}>
+                    {loading ? (
+                        <CircularProgress indeterminate small />
+                    ) : (
+                        <CheckIcon style={{ verticalAlign: 'middle' }} />
+                    )}
+                </Button>
+            </div>
         </div>
     );
 }
