@@ -116,8 +116,8 @@ export default connectPerms(class LocationPage extends Page {
 function InnerField ({ field, item, editing, onItemChange, ...extra }) {
     const Component = FIELDS[field].component;
     return <Component
-        {...extra}
         slot="detail"
+        {...extra}
         value={item[field]}
         editing={editing}
         onChange={v => onItemChange({ ...item, [field]: v })}
@@ -131,7 +131,7 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
     const markers = [
         {
             location: ll,
-            icon: <InnerField field="icon" item={item} />,
+            icon: <InnerField field="icon" item={item} slot="marker" />,
             onDragEnd: editing && (e => {
                 const newPos = e.target.getLatLng();
                 onItemChange({ ...item, ll: [newPos.lat, newPos.lng] });

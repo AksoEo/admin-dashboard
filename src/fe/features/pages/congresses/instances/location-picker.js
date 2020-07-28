@@ -89,6 +89,7 @@ export default class LocationPicker extends PureComponent {
                     title={locale.locationPicker.pick}>
                     <Picker
                         onChange={onChange}
+                        onClose={() => this.setState({ pickerOpen: false })}
                         externalOnly={externalOnly}
                         congress={congress}
                         instance={instance} />
@@ -100,7 +101,7 @@ export default class LocationPicker extends PureComponent {
 
 const REDUCED_FIELDS = Object.fromEntries(['name', 'icon', 'description'].map(id => [id, FIELDS[id]]));
 
-function Picker ({ onChange, externalOnly, congress, instance }) {
+function Picker ({ onChange, onClose, externalOnly, congress, instance }) {
     const [search, setSearch] = useState('');
     const [offset, setOffset] = useState(0);
 
@@ -127,7 +128,10 @@ function Picker ({ onChange, externalOnly, congress, instance }) {
                 sorting={{ name: 'asc' }}
                 offset={offset}
                 onSetOffset={setOffset}
-                onItemClick={onChange}
+                onItemClick={id => {
+                    onChange(id);
+                    onClose();
+                }}
                 limit={10}
                 locale={locale.fields} />
         </div>

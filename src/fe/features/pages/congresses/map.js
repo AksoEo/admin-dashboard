@@ -1,27 +1,10 @@
 import { h } from 'preact';
+import { createPortal, PureComponent } from 'preact/compat';
+import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 import L from 'leaflet';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.less';
-
-// TODO: use proper DOM elements for these
-const hlIcon = L.icon({
-    iconUrl: '/assets/maps/pin.svg',
-    iconSize: [128, 128],
-    iconAnchor: [64, 120],
-    shadowUrl: '/assets/maps/pin-shadow.svg',
-    shadowSize: [180, 128],
-    shadowAnchor: [64, 120],
-});
-
-const lIcon = L.icon({
-    iconUrl: '/assets/maps/pin.svg',
-    iconSize: [64, 64],
-    iconAnchor: [32, 60],
-    shadowUrl: '/assets/maps/pin-shadow.svg',
-    shadowSize: [90, 64],
-    shadowAnchor: [32, 60],
-});
 
 /// Renders a map.
 ///
@@ -44,14 +27,121 @@ export default function AMap ({
     );
 }
 
-function MarkerRenderer ({ location, icon, highlighted, onDragEnd }) {
-    // TODO: render icon
-    void icon;
-    return (
-        <Marker
-            position={location}
-            icon={highlighted ? hlIcon : lIcon}
-            draggable={!!onDragEnd}
-            onDragEnd={onDragEnd} />
-    );
+function pinShape (midY = 16, bottomY = 52) {
+    // One half of the shape:
+    //
+    // midX    +circleCtrl
+    //  x------o
+    //    ...
+    //       .. o
+    //         .|
+    //          |
+    //          x midY
+    //          |
+    //         .|
+    //        . o +circleCtrlDown
+    //   o   .
+    //   | +pinCtrlDX/pinCtrlDY
+    //   |.
+    //   |
+    //   x bottomY +pinDX
+    //   |
+    //   o +pinCtrlDown
+    //
+
+    const midX = 18;
+    const circleSize = 16;
+
+    const circleCtrl = 7.84 / 16 * circleSize;
+    const circleCtrlDown = 13.5 / 16 * circleSize;
+    const pinDX = 1; // from center x
+    const pinCtrlDX = 5; // from center x
+    const pinCtrlDY = 14; // from circle center y
+    const pinCtrlDown = 1.5;
+
+    const topEdge = midY - circleSize;
+    const rightEdge = midX + circleSize;
+    const leftEdge = midX - circleSize;
+
+    return [
+        `M${midX},${topEdge}`,
+        `C${midX + circleCtrl},${topEdge} ${rightEdge},${midY - circleCtrl} ${rightEdge},${midY}`,
+        `C${rightEdge},${midY + circleCtrlDown} ${midX + pinCtrlDX},${midY + pinCtrlDY} ${midX + pinDX},${bottomY}`,
+        `C${midX + pinDX},${bottomY + pinCtrlDown} ${midX - pinDX},${bottomY + pinCtrlDown} ${midX - pinDX},${bottomY}`,
+        `C${midX - pinCtrlDX},${midY + pinCtrlDY} ${leftEdge},${midY + circleCtrlDown} ${leftEdge},${midY}`,
+        `C${leftEdge},${midY - circleCtrl} ${midX - circleCtrl},${topEdge} ${midX},${topEdge}`,
+    ].join(' ');
+}
+
+class MarkerRenderer extends PureComponent {
+    #portalContainer = document.createElement('div');
+    #portalIcon = L.divIcon({
+        className: 'a-map-pin-icon',
+        html: this.#portalContainer,
+    });
+
+    #highlight = new Spring(0.5, 0.3);
+    #iconSize = new Spring(0.8, 0.3);
+
+    update (dt) {
+        this.#highlight.target = this.props.highlighted ? 1 : 0;
+        this.#iconSize.target = this.props.icon ? 1 : 0;
+        this.#highlight.update(dt);
+        this.#iconSize.update(dt);
+
+        const wantsUpdate = this.#highlight.wantsUpdate()
+            || this.#iconSize.wantsUpdate();
+
+        if (!wantsUpdate) {
+            globalAnimator.deregister(this);
+        }
+
+        this.forceUpdate();
+    }
+
+    componentDidMount () {
+        globalAnimator.register(this);
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.highlighted !== this.props.highlighted) {
+            globalAnimator.register(this);
+        }
+        if (!!prevProps.icon !== !!this.props.icon) {
+            globalAnimator.register(this);
+        }
+    }
+
+    componentWillUnmount () {
+        globalAnimator.deregister(this);
+    }
+
+    render ({ location, icon, highlighted, onDragEnd }) {
+        const shapeBottomY = 80;
+        const shapeCircleY = shapeBottomY - 36 - (this.#highlight.value * 12);
+        const iconScale = 0.4 + this.#iconSize.value * 0.6;
+
+        const contents = (
+            <div class={'map-pin-inner' + (highlighted ? ' is-highlighted' : '')}>
+                <svg class="pin-shape" width="36" height="82">
+                    <path class="pin-shape-path" d={pinShape(shapeCircleY, shapeBottomY)} />
+                </svg>
+                <div class={'pin-icon-container' + (!icon ? ' is-empty' : '')} style={{
+                    transform: `translateY(${shapeCircleY}px) scale(${iconScale})`,
+                }}>
+                    {icon}
+                </div>
+            </div>
+        );
+
+        return (
+            <Marker
+                position={location}
+                icon={this.#portalIcon}
+                draggable={!!onDragEnd}
+                onDragEnd={onDragEnd}>
+                {createPortal(contents, this.#portalContainer)}
+            </Marker>
+        );
+    }
 }

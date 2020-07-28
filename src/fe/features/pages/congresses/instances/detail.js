@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
+import BusinessIcon from '@material-ui/icons/Business';
 import Page from '../../../../components/page';
 import DetailShell from '../../../../components/detail-shell';
 import DynamicHeightDiv from '../../../../components/dynamic-height-div';
@@ -265,6 +266,7 @@ function LocationEditor ({ item, onItemChange }) {
                 </div>
             </div>
             <MapPicker
+                icon={<BusinessIcon />}
                 nullable value={item.locationCoords}
                 onChange={locationCoords => onItemChange({ ...item, locationCoords })} />
         </div>

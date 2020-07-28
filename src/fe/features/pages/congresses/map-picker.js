@@ -9,6 +9,7 @@ import './map-picker.less';
 ///
 /// - value/onChange: lat/lon tuple (number[2])
 /// - nullable: if true, will allow clearing
+/// - icon: optional marker icon
 export default class MapPicker extends PureComponent {
     constructor (props) {
         super(props);
@@ -22,16 +23,23 @@ export default class MapPicker extends PureComponent {
         }
     }
 
+    #map = null;
+
+    get map () {
+        return this.#map;
+    }
+
     #onMapClick = e => {
         if (!this.props.onChange) return;
         this.props.onChange([e.latlng.lat, e.latlng.lng]);
     };
 
-    render ({ value, onChange, nullable }) {
+    render ({ value, onChange, nullable, icon }) {
         const markers = [];
 
         if (value) {
             markers.push({
+                icon,
                 location: value,
                 onDragEnd: e => {
                     const loc = e.target.getLatLng();
@@ -53,6 +61,7 @@ export default class MapPicker extends PureComponent {
                     center={this.initialCenter}
                     zoom={this.initialZoom}
                     markers={markers}
+                    whenReady={map => this.#map = map.target}
                     onClick={this.#onMapClick} />
                 <LatLonEditor
                     value={value}

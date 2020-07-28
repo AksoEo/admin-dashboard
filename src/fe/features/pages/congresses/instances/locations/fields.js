@@ -95,14 +95,18 @@ export const FIELDS = {
     },
     icon: {
         slot: 'icon',
-        component ({ value, editing, onChange }) {
+        component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <IconPicker value={value} onChange={onChange} />;
             }
 
             const Icon = ICON_LUT[value];
-            if (!Icon) return <span class="congress-location-icon is-empty" />;
-            return <span class="congress-location-icon"><Icon style={{ verticalAlign: 'middle' }} /></span>;
+            if (!Icon) return <span class="congress-location-icon is-empty" data-slot={slot} />;
+            return (
+                <span class="congress-location-icon" data-slot={slot}>
+                    <Icon style={{ verticalAlign: 'middle' }} />
+                </span>
+            );
         },
     },
     name: {

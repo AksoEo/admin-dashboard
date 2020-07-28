@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useEffect } from 'preact/compat';
+import { useEffect, useRef } from 'preact/compat';
 import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import { Field, Validator } from '../../../components/form';
@@ -132,6 +132,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="congresses-task-create-instance"
                         open={open}
                         onClose={() => task.drop()}
                         title={instanceLocale.create.title}
@@ -174,12 +175,15 @@ export default {
 
     createLocation ({ open, task }) {
         const { congress, instance } = task.options;
+        const mapPickerRef = useRef(null);
 
         return (
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
                         class="congresses-task-create-location"
+                        data-type={task.parameters.type}
+                        fullScreen={width => width < 600}
                         open={open}
                         onClose={() => task.drop()}
                         title={locationLocale.create.title}
@@ -194,7 +198,15 @@ export default {
                                     if (!task.parameters.type) throw { error: dataLocale.requiredField };
                                 }}
                                 selected={task.parameters.type}
-                                onSelect={type => task.update({ type })}>
+                                onSelect={type => {
+                                    task.update({ type });
+                                    // we need to update the map size after the animation
+                                    setTimeout(() => {
+                                        if (mapPickerRef.current) {
+                                            mapPickerRef.current.map.invalidateSize();
+                                        }
+                                    }, 300);
+                                }}>
                                 {Object.entries(locationLocale.fields.types).map(([k, v]) => ({
                                     id: k,
                                     label: v,
@@ -203,6 +215,7 @@ export default {
                         </Field>
                         <Field>
                             <Validator
+                                class="name-field"
                                 component={TextField}
                                 outline
                                 label={locationLocale.fields.name}
@@ -215,6 +228,7 @@ export default {
                         <DynamicHeightDiv>
                             {(task.parameters.type === 'external') && (
                                 <MapPicker
+                                    ref={mapPickerRef}
                                     value={task.parameters.ll}
                                     onChange={ll => task.update({ ll })} />
                             )}
@@ -258,6 +272,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="congresses-task-create-program"
                         open={open}
                         onClose={() => task.drop()}
                         title={programLocale.create.title}
@@ -267,6 +282,7 @@ export default {
                         })}>
                         <Field>
                             <Validator
+                                class="name-field"
                                 component={TextField}
                                 outline
                                 label={programLocale.fields.title}
@@ -278,6 +294,7 @@ export default {
                         </Field>
                         <Field>
                             <Validator
+                                class="date-field"
                                 component={timestamp.editor}
                                 outline
                                 label={programLocale.fields.timeFrom}
@@ -289,6 +306,7 @@ export default {
                         </Field>
                         <Field>
                             <Validator
+                                class="date-field"
                                 component={timestamp.editor}
                                 outline
                                 label={programLocale.fields.timeTo}

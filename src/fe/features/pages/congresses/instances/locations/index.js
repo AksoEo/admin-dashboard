@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
+import BusinessIcon from '@material-ui/icons/Business';
 import OverviewListItem from '../../../../../components/overview-list-item';
 import { congressLocations as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
@@ -19,9 +20,11 @@ export default class LocationsView extends PureComponent {
         if (congressLocation) {
             markers.push({
                 location: congressLocation,
-                icon: 'TEMPORARY',
+                icon: <BusinessIcon />,
             });
         }
+
+        const IconField = FIELDS.icon.component;
 
         return (
             <div class="congresses-instance-locations">
@@ -35,7 +38,7 @@ export default class LocationsView extends PureComponent {
                     itemToMarker={item => item.type === 'internal' ? null : ({
                         key: item.id,
                         location: item.ll,
-                        icon: 'meow',
+                        icon: item.icon === 'GENERIC' ? null : <IconField value={item.icon} />,
                     })}
                     onItemClick={id => {
                         this.props.push('lokoj/' + id);
