@@ -28,6 +28,10 @@ export const congresses = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la kongreson? Ne eblas malfari tiun ĉi agon.',
     },
+    misc: {
+        llLat: '[[Lat]]',
+        llLon: '[[Lon]]',
+    },
 };
 
 export const congressInstances = {
@@ -49,6 +53,8 @@ export const congressInstances = {
         locationCoords: 'Koordinatoj de loko',
         locationAddress: 'Adreso de loko',
         tz: 'Horzono',
+
+        locationPrefix: '[[in]]',
     },
     tabs: {
         locations: 'Lokoj',
@@ -61,7 +67,7 @@ export const congressInstances = {
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Alŝuti okazigon',
+        title: 'Redakti okazigon',
         button: 'Alŝuti',
     },
     delete: {
@@ -95,9 +101,6 @@ export const congressLocations = {
         nameRequired: 'Necesas nomo',
 
         location: '[[location]]',
-
-        llLat: '[[Lat]]',
-        llLon: '[[Lon]]',
 
         types: {
             external: '[[external]]',
@@ -159,7 +162,7 @@ export const congressLocations = {
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Alŝuti lokon',
+        title: 'Redakti lokon',
         button: 'Alŝuti',
     },
     delete: {
@@ -193,7 +196,7 @@ export const congressPrograms = {
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Alŝuti programeron',
+        title: 'Redakti programeron',
         button: 'Alŝuti',
     },
     delete: {

@@ -12,7 +12,7 @@ const string100Editor = label => ({
                 label={label}
                 value={value}
                 maxLength={100}
-                onChange={e => onChange(e.target.value)} />;
+                onChange={e => onChange(e.target.value || null)} />;
         }
         return value;
     },

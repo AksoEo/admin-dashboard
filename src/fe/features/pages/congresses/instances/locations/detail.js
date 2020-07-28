@@ -3,11 +3,13 @@ import EditIcon from '@material-ui/icons/Edit';
 import Meta from '../../../../meta';
 import Page from '../../../../../components/page';
 import DetailShell from '../../../../../components/detail-shell';
+import DynamicHeightDiv from '../../../../../components/dynamic-height-div';
 import { coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';
 import { congressLocations as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
 import Map from '../../map';
+import MapPicker from '../../map-picker';
 import LocationPicker from '../location-picker';
 import TagManager from '../tag-manager';
 import './detail.less';
@@ -158,7 +160,7 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
 
     return (
         <div class="location-inner">
-            <div class="inner-header">
+            <DynamicHeightDiv class="inner-header" useFirstHeight>
                 <div class="header-title">
                     {external ? (
                         <InnerField field="icon" item={item} editing={editing} onItemChange={onItemChange} />
@@ -178,13 +180,19 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
                     deleteTask="congresses/deleteLocationTag"
                     attachTask="congresses/addTagToLocation"
                     removeTask="congresses/removeTagFromLocation" />
-            </div>
-            <div class="inner-desc">
+            </DynamicHeightDiv>
+            <DynamicHeightDiv class="inner-desc" useFirstHeight>
                 {external ? (
-                    <InnerField field="rating" item={item} editing={editing} onItemChange={onItemChange} />
+                    <div class="inner-field">
+                        {editing ? <label>{locale.fields.rating}</label> : null}
+                        <InnerField field="rating" item={item} editing={editing} onItemChange={onItemChange} />
+                    </div>
                 ) : null}
-                <InnerField field="description" item={item} editing={editing} onItemChange={onItemChange} />
-            </div>
+                <div class="inner-field">
+                    {editing ? <label>{locale.fields.description}</label> : null}
+                    <InnerField field="description" item={item} editing={editing} onItemChange={onItemChange} />
+                </div>
+            </DynamicHeightDiv>
             {external ? (
                 <div class="inner-map-title">
                     {locale.fields.location}
@@ -192,13 +200,22 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
             ) : null}
             {external ? (
                 <div class="inner-map-container">
-                    <div class="inner-address">
-                        <InnerField field="address" item={item} editing={editing} onItemChange={onItemChange} />
-                    </div>
-                    {ll ? <Map class="inner-map" center={ll} zoom={13} markers={markers} /> : null}
-                    <div class="inner-ll">
-                        <InnerField field="ll" item={item} editing={editing} onItemChange={onItemChange} />
-                    </div>
+                    {(editing || item.address) && (
+                        <div class="inner-address inner-field">
+                            {editing ? <label>{locale.fields.address}</label> : null}
+                            <InnerField field="address" item={item} editing={editing} onItemChange={onItemChange} />
+                        </div>
+                    )}
+                    {editing ? (
+                        <MapPicker value={ll} onChange={ll => onItemChange({ ...item, ll })} />
+                    ) : ll ? (
+                        <Map class="inner-map" center={ll} zoom={13} markers={markers} />
+                    ) : null}
+                    {!editing && (
+                        <div class="inner-ll">
+                            <InnerField field="ll" item={item} editing={editing} onItemChange={onItemChange} />
+                        </div>
+                    )}
                 </div>
             ) : null}
         </div>

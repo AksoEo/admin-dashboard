@@ -8,6 +8,14 @@
             .header-title {
                 font-size: 1.4em;
                 font-weight: bold;
+
+                .congress-location-icon-picker {
+                    display: flex;
+                    margin-bottom: 16px;
+                }
+                .form-validator, .paper-text-field {
+                    width: 100%;
+                }
             }
 
             .header-external-loc {
@@ -30,6 +38,21 @@
                         height: 16px;
                     }
                 }
+            }
+        }
+        .inner-field {
+            padding: 8px 0;
+
+            &:empty {
+                display: none;
+            }
+
+            label {
+                display: block;
+                margin-bottom: 4px;
+                font-size: small;
+                text-transform: uppercase;
+                font-weight: 600;
             }
         }
         .inner-desc {

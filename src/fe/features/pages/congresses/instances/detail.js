@@ -20,7 +20,7 @@ import {
 import { FIELDS } from './fields';
 import Locations from './locations';
 import Programs from './programs';
-import Map from '../map';
+import MapPicker from '../map-picker';
 import './detail.less';
 
 export default connectPerms(class CongressInstancePage extends Page {
@@ -146,6 +146,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 onItemChange={edit => this.setState({ edit })}/>}
                             {!editing && (tab === 'locations') && <Locations
                                 congress={congress}
+                                congressLocation={data.locationCoords}
                                 org={org}
                                 instance={id}
                                 push={this.props.push} />}
@@ -199,6 +200,22 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
                             onChange={e => onItemChange({ ...item, name: e.target.value })} />
                     ) : item.name}
                 </div>
+                <div class={'header-id' + (editing ? ' is-editing' : '')}>
+                    {editing ? (
+                        <TextField
+                            class="id-editor"
+                            outline
+                            label={locale.fields.humanId}
+                            value={item.humanId}
+                            onChange={e => onItemChange({ ...item, humanId: e.target.value })} />
+                    ) : (
+                        <div>
+                            {locale.fields.humanId}
+                            {': '}
+                            {item.humanId}
+                        </div>
+                    )}
+                </div>
                 {editing ? (
                     <div class="header-timespan is-editing">
                         <FieldWrapper field="dateFrom" item={item} onItemChange={onItemChange} />
@@ -211,9 +228,12 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
                         <date.renderer value={item.dateTo} />
                     </div>
                 )}
-                {!editing && (
+                {(!editing && (item.locationName || item.locationNameLocal)) && (
                     <div class="header-location">
-                        {item.locationName}
+                        {locale.fields.locationPrefix}
+                        {' '}
+                        {item.locationName || item.locationNameLocal}
+                        {item.locationName && item.locationNameLocal && ` (${item.locationNameLocal})`}
                     </div>
                 )}
                 {!editing && (
@@ -233,18 +253,20 @@ function LocationEditor ({ item, onItemChange }) {
     return (
         <div class="instance-location-editor">
             <div class="location-editor-top">
-                <FieldWrapper field="locationName" item={item} onItemChange={onItemChange} />
-                <FieldWrapper field="locationNameLocal" item={item} onItemChange={onItemChange} />
-                <FieldWrapper field="locationAddress" item={item} onItemChange={onItemChange} />
+                <div class="address-field">
+                    <FieldWrapper field="locationName" item={item} onItemChange={onItemChange} />
+                </div>
+                <div class="address-field">
+                    <FieldWrapper field="locationNameLocal" item={item} onItemChange={onItemChange} />
+                </div>
+                <div class="address-field">
+                    <label>{locale.fields.locationAddress}</label>
+                    <FieldWrapper field="locationAddress" item={item} onItemChange={onItemChange} />
+                </div>
             </div>
-            <Map
-                center={item.locationCoords || [0, 0]}
-                zoom={10}
-                markers={[
-                    item.locationCoords && {
-                        location: item.locationCoords,
-                    },
-                ].filter(x => x)} />
+            <MapPicker
+                nullable value={item.locationCoords}
+                onChange={locationCoords => onItemChange({ ...item, locationCoords })} />
         </div>
     );
 }

@@ -106,6 +106,7 @@ export const data = {
     },
     mapPicker: {
         pickPrompt: '[[click to pick a location]]',
+        movePrompt: '[[click on the map or drag the pin]]',
     },
     tagManager: {
         noTags: '[[no tags]]',

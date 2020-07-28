@@ -12,6 +12,29 @@
         position: relative;
 
         .inner-list {
+            .list-search {
+                display: flex;
+                align-items: center;
+
+                .search-icon-container {
+                    padding-left: 16px;
+                }
+
+                .list-search-input {
+                    font: inherit;
+                    color: inherit;
+                    padding: 16px;
+                    margin: 0;
+                    margin-left: 8px;
+                    border: none;
+                    background: none;
+                    flex: 1;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+            }
 
             .list-items {
                 overflow: auto;
@@ -30,10 +53,11 @@
                     }
                 }
 
-                .list-items-loading {
+                .list-items-loading, .list-items-empty {
                     text-align: center;
                     padding-top: 8px;
                     padding-bottom: 16px;
+                    color: @text-fade-60;
                 }
             }
         }

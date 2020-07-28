@@ -1,8 +1,14 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import Map from './map';
+import LatLonEditor from './ll-editor';
 import { data as locale } from '../../../locale';
+import './map-picker.less';
 
+/// Picks a location on a map.
+///
+/// - value/onChange: lat/lon tuple (number[2])
+/// - nullable: if true, will allow clearing
 export default class MapPicker extends PureComponent {
     constructor (props) {
         super(props);
@@ -21,7 +27,7 @@ export default class MapPicker extends PureComponent {
         this.props.onChange([e.latlng.lat, e.latlng.lng]);
     };
 
-    render ({ value, onChange }) {
+    render ({ value, onChange, nullable }) {
         const markers = [];
 
         if (value) {
@@ -39,11 +45,20 @@ export default class MapPicker extends PureComponent {
                 <div class={'map-picker-pick-banner' + (value ? ' is-hidden' : '')}>
                     {locale.mapPicker.pickPrompt}
                 </div>
+                <div class={'map-picker-pick-banner' + (!value ? ' is-hidden' : '')}>
+                    {locale.mapPicker.movePrompt}
+                </div>
                 <Map
+                    class="a-map-picker-map"
                     center={this.initialCenter}
                     zoom={this.initialZoom}
                     markers={markers}
                     onClick={this.#onMapClick} />
+                <LatLonEditor
+                    value={value}
+                    editing={true}
+                    onChange={onChange}
+                    onDelete={nullable && (() => onChange(null))} />
             </div>
         );
     }

@@ -82,6 +82,7 @@ class DataLoader {
 /// - searchFields: array of fields to use for searching
 /// - itemParent: (item_data) => id or null. Use to create sub-items. Only supports one level.
 /// - onItemClick: (id) => void
+/// - markers: additional markers
 export default class MapList extends PureComponent {
     state = {
         /// If not null, then this is an instanceof DataLoader, loading data.
@@ -214,6 +215,7 @@ export default class MapList extends PureComponent {
                 markers.push(m);
             }
         }
+        if (this.props.markers) markers.push(...this.props.markers);
 
         return (
             <div class="map-list">
@@ -320,8 +322,11 @@ function InnerList ({
         <div class="inner-list">
             {searchFields ? (
                 <div class="list-search">
-                    <SearchIcon />
+                    <div class="search-icon-container">
+                        <SearchIcon />
+                    </div>
                     <input
+                        class="list-search-input"
                         value={search}
                         placeholder={locale.mapList.searchPlaceholder}
                         onChange={e => setSearch(e.target.value)} />

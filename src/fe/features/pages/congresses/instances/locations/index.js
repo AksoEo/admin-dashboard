@@ -10,10 +10,19 @@ import './index.less';
 ///
 /// # Props
 /// - congress: congress id
+/// - congressLocation: optional congress location
 /// - instance: instance id
 /// - push: proxy for navigation API
 export default class LocationsView extends PureComponent {
-    render ({ congress, instance }) {
+    render ({ congress, instance, congressLocation }) {
+        const markers = [];
+        if (congressLocation) {
+            markers.push({
+                location: congressLocation,
+                icon: 'TEMPORARY',
+            });
+        }
+
         return (
             <div class="congresses-instance-locations">
                 <MapList
@@ -32,7 +41,8 @@ export default class LocationsView extends PureComponent {
                         this.props.push('lokoj/' + id);
                     }}
                     itemParent={item => item.type === 'internal' ? item.externalLoc : null}
-                    searchFields={['name', 'description']} />
+                    searchFields={['name', 'description']}
+                    markers={markers} />
             </div>
         );
     }

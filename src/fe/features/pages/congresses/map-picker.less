@@ -1,0 +1,38 @@
+@import '../../../prelude';
+
+.a-map-picker {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+
+    .map-picker-pick-banner {
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        z-index: 9999;
+        background: @card-background;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-size: small;
+        .elevation(6);
+        transform: translateX(-50%);
+        transition: transform 0.7s @easing;
+        pointer-events: none;
+
+        &.is-hidden {
+            transform: translate(-50%, -200%);
+        }
+    }
+
+    .a-map-picker-map {
+        margin: 0;
+    }
+
+    .congress-ll-field {
+        margin-top: 16px;
+        padding-bottom: 8px;
+        display: block;
+        text-align: right;
+        font-size: small;
+    }
+}

@@ -42,8 +42,10 @@ import LocalHotelIcon from '@material-ui/icons/LocalHotel';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CheckIcon from '@material-ui/icons/Check';
 import TextArea from '../../../../../components/text-area';
+import MdField from '../../../../../components/md-field';
 import { Validator } from '../../../../../components/form';
 import { congressLocations as locale } from '../../../../../locale';
+import LatLonEditor from '../../ll-editor';
 import './fields.less';
 
 const ICON_LUT = {
@@ -123,10 +125,15 @@ export const FIELDS = {
     description: {
         skipLabel: true,
         component ({ value, editing, onChange, slot }) {
-            if (editing) {
-                return <TextArea value={value} onChange={onChange} />;
-            }
-            return <div class="congress-location-description" data-slot={slot}>{value}</div>;
+            if (!editing && !value) return null;
+            return <MdField
+                class="congress-location-description"
+                value={value}
+                editing={editing}
+                onChange={onChange}
+                inline={slot === 'body'}
+                data-slot={slot}
+                rules={['emphasis', 'strikethrough', 'link', 'list', 'table']} />;
         },
     },
     address: {
@@ -144,38 +151,7 @@ export const FIELDS = {
     },
     ll: {
         component ({ value, editing, onChange }) {
-            if (editing) {
-                const lat = value ? value[0] : 0;
-                const lon = value ? value[1] : 0;
-                return (
-                    <span class="congress-location-ll is-editing">
-                        <TextField
-                            outline
-                            label={locale.fields.llLat}
-                            inputmode="numeric"
-                            value={'' + lat}
-                            onChange={e => e.target.value
-                                ? onChange([+e.target.value, lon])
-                                : onChange(null)} />
-                        {' '}
-                        <TextField
-                            outline
-                            label={locale.fields.llLon}
-                            inputmode="numeric"
-                            value={'' + lon}
-                            onChange={e => e.target.value
-                                ? onChange([lat, +e.target.value])
-                                : onChange(null)} />
-                    </span>
-                );
-            }
-            if (!value) return null;
-            return (
-                <span class="congress-location-ll">
-                    {locale.fields.llLat} {value[0]}{', '}
-                    {locale.fields.llLon} {value[1]}
-                </span>
-            );
+            return <LatLonEditor value={value} editing={editing} onChange={onChange} />;
         },
     },
     rating: {
@@ -252,7 +228,7 @@ export const FIELDS = {
                             onChange={e => e.target.value
                                 ? onChange({ type, rating: +e.target.value, max })
                                 : onChange(null)} />
-                        {locale.fields.ratingInfixOf}
+                        <span class="editor-infix">{locale.fields.ratingInfixOf}</span>
                         <Validator
                             component={TextField}
                             validate={value => {

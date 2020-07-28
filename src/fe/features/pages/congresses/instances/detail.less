@@ -9,7 +9,7 @@
                 font-size: 1.4em;
                 font-weight: 600;
                 padding: 24px;
-                padding-bottom: 8px;
+                padding-bottom: 0;
 
                 .org-icon {
                     display: inline-block;
@@ -33,6 +33,16 @@
             }
 
             @lpad: calc(2.1em + 32px);
+
+            .header-id {
+                padding-left: @lpad;
+                padding-bottom: 8px;
+                font-weight: bold;
+
+                &.is-editing {
+                    padding: 16px 24px;
+                }
+            }
 
             .header-timespan {
                 font-style: italic;
@@ -58,7 +68,27 @@
         }
 
         .instance-location-editor {
-            padding: 24px 0;
+            padding: 24px;
+
+            .location-editor-top {
+                margin-bottom: 16px;
+
+                .address-field {
+                    margin-top: 16px;
+
+                    .paper-text-field {
+                        width: 100%;
+                    }
+
+                    & > label {
+                        display: block;
+                        margin-bottom: 4px;
+                        font-size: small;
+                        text-transform: uppercase;
+                        font-weight: 600;
+                    }
+                }
+            }
         }
     }
 }
