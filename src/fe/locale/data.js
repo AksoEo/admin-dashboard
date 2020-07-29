@@ -101,20 +101,20 @@ export const data = {
         previewOff: 'Fermi antaŭvidon',
     },
     mapList: {
-        empty: '[[empty]]',
+        empty: 'Neniuj lokoj',
         searchPlaceholder: 'Serĉi…',
     },
     mapPicker: {
-        pickPrompt: '[[click to pick a location]]',
-        movePrompt: '[[click on the map or drag the pin]]',
+        pickPrompt: 'Alklaku por elekti lokon',
+        movePrompt: 'Alklaku sur la mapo aŭ tiru la indikilon',
     },
     tagManager: {
-        noTags: '[[no tags]]',
+        noTags: 'Neniuj etikedoj',
         searchPlaceholder: 'Serĉi…',
-        dialogTitle: '[[Manage tags]]',
-        addTag: '[[add tag]]',
-        deleteYouSure: '[[Are you sure?]]', // keep this short
-        deleting: '[[Deleting tag]]',
+        dialogTitle: 'Mastrumi etikedojn',
+        addTag: 'Aldoni etikedon',
+        deleteYouSure: 'Ĉu vi certas?', // keep this short
+        deleting: 'Forigas etikedon …',
         delete: 'Forigi',
     },
 };
