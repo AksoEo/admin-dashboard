@@ -125,7 +125,8 @@ function InnerField ({ field, item, editing, onItemChange, ...extra }) {
         onItemChange={onItemChange} />;
 }
 
-function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
+export function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
+    const showTags = id !== null;
     const external = item.type === 'external';
     const ll = item.ll;
     const markers = [
@@ -159,7 +160,7 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
     }
 
     return (
-        <div class="location-inner">
+        <div class="congress-location-detail-inner">
             <DynamicHeightDiv class="inner-header" useFirstHeight>
                 <div class="header-title">
                     {external ? (
@@ -168,18 +169,20 @@ function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
                     <InnerField field="name" item={item} editing={editing} onItemChange={onItemChange} />
                 </div>
                 {locatedWithin}
-                <TagManager
-                    list="congresses/listLocationTags"
-                    selected="congresses/listTagsOfLocation"
-                    options={{ congress, instance, location: id }}
-                    view="congresses/locationTag"
-                    viewOptions={{ congress, instance }}
-                    taskOptions={{ congress, instance, location: id }}
-                    addTask="congresses/createLocationTag"
-                    updateTask="congresses/updateLocationTag"
-                    deleteTask="congresses/deleteLocationTag"
-                    attachTask="congresses/addTagToLocation"
-                    removeTask="congresses/removeTagFromLocation" />
+                {showTags && (
+                    <TagManager
+                        list="congresses/listLocationTags"
+                        selected="congresses/listTagsOfLocation"
+                        options={{ congress, instance, location: id }}
+                        view="congresses/locationTag"
+                        viewOptions={{ congress, instance }}
+                        taskOptions={{ congress, instance, location: id }}
+                        addTask="congresses/createLocationTag"
+                        updateTask="congresses/updateLocationTag"
+                        deleteTask="congresses/deleteLocationTag"
+                        attachTask="congresses/addTagToLocation"
+                        removeTask="congresses/removeTagFromLocation" />
+                )}
             </DynamicHeightDiv>
             <DynamicHeightDiv class="inner-desc" useFirstHeight>
                 {external ? (

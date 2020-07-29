@@ -11,6 +11,16 @@ import { congressLocations as locale } from '../../../../locale';
 import { FIELDS } from './locations/fields';
 import './location-picker.less';
 
+const portalContainer = document.createElement('div');
+portalContainer.id = 'congress-location-picker-portal-container';
+document.body.appendChild(portalContainer);
+
+function orderPortalContainerFront () {
+    document.body.removeChild(portalContainer);
+    document.body.appendChild(portalContainer);
+}
+
+
 /// Location picker.
 ///
 /// # Props
@@ -63,7 +73,12 @@ export default class LocationPicker extends PureComponent {
                     + (editing ? ' is-editing' : '')
                     + (disabled ? ' is-disabled' : '')}
                 tabIndex={editing ? 0 : undefined}
-                onClick={() => !disabled && editing && this.setState({ pickerOpen: true })}>
+                onClick={() => {
+                    if (!disabled && editing) {
+                        orderPortalContainerFront();
+                        this.setState({ pickerOpen: true });
+                    }
+                }}>
                 <div class="picker-selected">
                     {preview}
                 </div>
@@ -82,6 +97,7 @@ export default class LocationPicker extends PureComponent {
 
                 <Dialog
                     class="congress-location-picker-dialog"
+                    container={portalContainer}
                     backdrop
                     open={pickerOpen}
                     onClose={() => this.setState({ pickerOpen: false })}

@@ -7,7 +7,6 @@ import ChangedFields from '../../../components/changed-fields';
 import Segmented from '../../../components/segmented';
 import TejoIcon from '../../../components/tejo-icon';
 import UeaIcon from '../../../components/uea-icon';
-import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import { timestamp } from '../../../components/data';
 import {
     congresses as locale,
@@ -19,7 +18,7 @@ import {
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import { FIELDS as INSTANCE_FIELDS } from './instances/fields';
-import MapPicker from './map-picker';
+import { DetailInner as LocationEditor } from './instances/locations/detail';
 import './tasks.less';
 
 const CREATE_INSTANCE_FIELDS = ['name', 'humanId', 'dateFrom', 'dateTo'];
@@ -213,26 +212,13 @@ export default {
                                 }))}
                             </Validator>
                         </Field>
-                        <Field>
-                            <Validator
-                                class="name-field"
-                                component={TextField}
-                                outline
-                                label={locationLocale.fields.name}
-                                validate={value => {
-                                    if (!value) throw { error: dataLocale.requiredField };
-                                }}
-                                value={task.parameters.name || ''}
-                                onChange={e => task.update({ name: e.target.value })} />
-                        </Field>
-                        <DynamicHeightDiv>
-                            {(task.parameters.type === 'external') && (
-                                <MapPicker
-                                    ref={mapPickerRef}
-                                    value={task.parameters.ll}
-                                    onChange={ll => task.update({ ll })} />
-                            )}
-                        </DynamicHeightDiv>
+                        <LocationEditor
+                            congress={task.options.congress}
+                            instance={task.options.instance}
+                            id={null}
+                            item={task.parameters}
+                            editing={true}
+                            onItemChange={data => task.update(data)} />
                     </TaskDialog>
                 )}
             </routerContext.Consumer>
