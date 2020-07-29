@@ -82,8 +82,8 @@ export const congressLocations = {
     detailTitle: 'Kongresa loko',
     search: {
         placeholders: {
-            name: 'Nomo',
-            description: 'Priskribo',
+            name: 'Serĉi nomon',
+            description: 'Serĉi priskribon',
         },
     },
     fields: {

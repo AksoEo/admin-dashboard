@@ -90,7 +90,7 @@ const ICON_LUT = {
 export const FIELDS = {
     type: {
         component ({ value }) {
-            return value;
+            return locale.fields.types[value];
         },
     },
     icon: {
@@ -134,7 +134,7 @@ export const FIELDS = {
                 class="congress-location-description"
                 value={value}
                 editing={editing}
-                onChange={onChange}
+                onChange={value => onChange(value || null)}
                 inline={slot === 'body'}
                 data-slot={slot}
                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table']} />;

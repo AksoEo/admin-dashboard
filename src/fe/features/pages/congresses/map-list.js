@@ -1,7 +1,8 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import SearchIcon from '@material-ui/icons/Search';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import L from 'leaflet';
 import fuzzaldrin from 'fuzzaldrin';
 import DisplayError from '../../../components/error';
@@ -83,6 +84,8 @@ class DataLoader {
 /// - itemParent: (item_data) => id or null. Use to create sub-items. Only supports one level.
 /// - onItemClick: (id) => void
 /// - markers: additional markers
+/// - onCloseMap: if set, will show a close button on the map
+/// - listContainerRef
 export default class MapList extends PureComponent {
     state = {
         /// If not null, then this is an instanceof DataLoader, loading data.
@@ -204,7 +207,8 @@ export default class MapList extends PureComponent {
         this.setState({ highlighted: null });
     };
 
-    render ({ item, itemToMarker, itemParent, searchFields, detail }, { items, loading, error }) {
+    render ({ item, itemToMarker, itemParent, searchFields, detail, onCloseMap, listContainerRef },
+        { items, loading, error }) {
         const markers = [];
         for (const [id, item] of this.#itemData) {
             const m = itemToMarker(item);
@@ -219,7 +223,7 @@ export default class MapList extends PureComponent {
 
         return (
             <div class="map-list">
-                <div class="inner-list-container">
+                <div class="inner-list-container" ref={listContainerRef}>
                     <InnerList
                         item={item}
                         itemData={this.#itemData}
@@ -230,7 +234,8 @@ export default class MapList extends PureComponent {
                         onItemClick={this.#onItemClick}
                         onItemHover={this.#onItemHover}
                         onItemOut={this.#onItemOut}
-                        searchFields={searchFields} />
+                        searchFields={searchFields}
+                        onCloseMap={onCloseMap} />
                     {detail ? (
                         <div class="inner-list-detail-overlay">
                             {detail}
@@ -269,6 +274,7 @@ function InnerList ({
     onItemClick,
     onItemHover,
     onItemOut,
+    onCloseMap,
 }) {
     const [search, setSearch] = useState('');
 
@@ -330,6 +336,13 @@ function InnerList ({
                         value={search}
                         placeholder={locale.mapList.searchPlaceholder}
                         onChange={e => setSearch(e.target.value)} />
+                    {onCloseMap ? (
+                        <div class="close-map-container">
+                            <Button small icon class="close-map-button" onClick={onCloseMap}>
+                                <ChevronRightIcon />
+                            </Button>
+                        </div>
+                    ) : null}
                 </div>
             ) : null}
             <div class="list-items">
