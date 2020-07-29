@@ -15,9 +15,11 @@ function TextLen100 ({ value, editing, onChange }) {
     return value;
 }
 
-function TimeBoundEditor ({ value, editing, onChange }) {
-    if (editing) return <timestamp.editor outline value={value} onChange={onChange} />;
-    return <timestamp.renderer value={value * 1000} onChange={onChange} />;
+function TimeBoundEditor ({ value, editing, onChange, userData }) {
+    const { tz } = userData;
+
+    if (editing) return <timestamp.editor outline value={value} onChange={onChange} zone={tz} />;
+    return <timestamp.renderer value={value * 1000} onChange={onChange} zone={tz} />;
 }
 
 export const FIELDS = {

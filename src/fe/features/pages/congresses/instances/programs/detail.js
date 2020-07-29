@@ -14,6 +14,7 @@ export default connectPerms(class ProgramPage extends Page {
     state = {
         edit: null,
         org: 'meow', // nonsense default value
+        tz: null,
     };
 
     static contextType = coreContext;
@@ -51,7 +52,7 @@ export default connectPerms(class ProgramPage extends Page {
         return +this.props.match[1];
     }
 
-    render ({ perms, push, editing }, { org }) {
+    render ({ perms, push, editing }, { org, tz }) {
         const { congress, instance, id } = this;
 
         const actions = [];
@@ -98,7 +99,7 @@ export default connectPerms(class ProgramPage extends Page {
                     onCommit={this.onCommit}
                     locale={locale}
                     onDelete={() => this.props.pop()}
-                    userData={{ congress, instance }}
+                    userData={{ congress, instance, tz }}
                     fields={FIELDS} />
                 <DetailShell
                     /* this is kind of a hack to get the org field */
@@ -107,6 +108,14 @@ export default connectPerms(class ProgramPage extends Page {
                     fields={{}}
                     locale={{}}
                     onData={data => data && this.setState({ org: data.org })} />
+                <DetailShell
+                    /* a hack to get the tz field */
+                    view="congresses/instance"
+                    options={{ congress }}
+                    id={instance}
+                    fields={{}}
+                    locale={{}}
+                    onData={data => data && this.setState({ tz: data.tz })} />
             </div>
         );
     }

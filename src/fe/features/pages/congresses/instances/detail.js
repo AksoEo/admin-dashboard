@@ -237,6 +237,19 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
                         {item.locationName && item.locationNameLocal && ` (${item.locationNameLocal})`}
                     </div>
                 )}
+                {editing ? (
+                    <div class="header-time-zone">
+                        {locale.fields.tz}
+                        {': '}
+                        <FieldWrapper field="tz" item={item} onItemChange={onItemChange} />
+                    </div>
+                ) : item.tz ? (
+                    <div class="header-time-zone">
+                        {locale.fields.tz}
+                        {': '}
+                        {item.tz}
+                    </div>
+                ) : null}
                 {!editing && (
                     <Tabs
                         value={tab}

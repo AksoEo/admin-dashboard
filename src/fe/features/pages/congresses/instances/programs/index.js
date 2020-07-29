@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import SearchFilters from '../../../../../components/search-filters';
 import OverviewList from '../../../../../components/overview-list';
+import DetailShell from '../../../../../components/detail-shell';
 import { congressPrograms as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
 
@@ -27,11 +28,12 @@ export default class ProgramsView extends PureComponent {
             offset: 0,
             limit: 10,
         },
+        tz: null,
     };
 
     #searchInput;
 
-    render ({ congress, instance }, { parameters }) {
+    render ({ congress, instance }, { parameters, tz }) {
         return (
             <div class="congresses-instance-programs">
                 <SearchFilters
@@ -59,7 +61,15 @@ export default class ProgramsView extends PureComponent {
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields}
-                    userData={{ congress, instance }} />
+                    userData={{ congress, instance, tz }} />
+                <DetailShell
+                    /* a hack to get the tz field */
+                    view="congresses/instance"
+                    options={{ congress }}
+                    id={instance}
+                    fields={{}}
+                    locale={{}}
+                    onData={data => data && this.setState({ tz: data.tz })} />
             </div>
         );
     }

@@ -5,8 +5,10 @@ const thisYear = new Date(config.buildTime).getUTCFullYear();
 const copyrightYear = `${startYear}–${thisYear}`;
 
 export const timestampFormat = 'LLL [UTC]';
+export const timestampTzFormat = 'LLL';
 // for dates that are today
 export const timestampFormatToday = '[hodiaŭ] LT [UTC]';
+export const timestampTzFormatToday = '[hodiaŭ] LT';
 
 export const insecureContext = 'La paĝo ne estas sekura (http)!';
 
