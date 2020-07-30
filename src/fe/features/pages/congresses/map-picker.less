@@ -24,6 +24,19 @@
         }
     }
 
+    .map-picker-from-address {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 9998;
+        font-size: small;
+        transition: transform 0.7s @easing;
+
+        &.is-hidden {
+            transform: translateY(-200%);
+        }
+    }
+
     .a-map-picker-map {
         margin: 0;
     }
@@ -34,5 +47,28 @@
         display: block;
         text-align: right;
         font-size: small;
+    }
+}
+
+.congress-map-picker-address-search {
+    width: 100%;
+    max-width: 800px;
+
+    .address-search-query {
+        margin: 8px;
+        border-radius: 4px;
+        padding: 8px;
+        background: @text-fade-10;
+
+        label {
+            font-weight: 600;
+            font-size: small;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+    }
+
+    .address-search-item {
+        padding: 16px;
     }
 }

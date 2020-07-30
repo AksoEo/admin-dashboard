@@ -86,6 +86,14 @@ class DataLoader {
 /// - markers: additional markers
 /// - onCloseMap: if set, will show a close button on the map
 /// - listContainerRef
+/// - header
+///
+/// # Alternate Props
+/// For small lists which do not use tasks and views:
+///
+/// - items: object { [id]: {data} }
+/// - loading/error: for display only
+/// - item: item component will also be passed { item } in this mode
 export default class MapList extends PureComponent {
     state = {
         /// If not null, then this is an instanceof DataLoader, loading data.
@@ -120,7 +128,7 @@ export default class MapList extends PureComponent {
                 this.#itemData.set(id, data);
                 this.setState({ coalescedForceUpdate: this.state.coalescedForceUpdate + 1 });
                 if (isFirstLoad) {
-                    this.#frameMarkers();
+                    this.frameMarkers();
                     isFirstLoad = false;
                 }
             });
@@ -143,19 +151,28 @@ export default class MapList extends PureComponent {
     #isFirstLoad = true;
 
     /// update the map viewport to frame all markers, if this is the first load
-    #frameMarkers = () => {
+    frameMarkers = () => {
         if (!this.#map) return;
-        const markers = [...this.#itemData.values()]
+        let markers;
+        if (this.props.items) {
+            markers = Object.values(this.props.items);
+        } else {
+            markers = [...this.#itemData.values()];
+        }
+
+        markers = markers
             .map(this.props.itemToMarker)
             .filter(x => x && x.location)
             .map(x => x.location);
 
-
-        this.#map.fitBounds(L.latLngBounds(markers).pad(0.4));
+        if (markers.length) {
+            this.#map.fitBounds(L.latLngBounds(markers).pad(0.4));
+        }
     };
 
     load () {
         if (this.state.loading) this.state.loading.drop();
+        if (this.props.items) return;
 
         const loader = new DataLoader(
             this.context,
@@ -207,10 +224,13 @@ export default class MapList extends PureComponent {
         this.setState({ highlighted: null });
     };
 
-    render ({ item, itemToMarker, itemParent, searchFields, detail, onCloseMap, listContainerRef },
-        { items, loading, error }) {
+    render ({ item, itemToMarker, itemParent, searchFields, detail, onCloseMap, listContainerRef }) {
+        const items = this.props.items ? this.props.items : this.state.items;
+        const loading = this.props.items ? this.props.loading : this.state.loading;
+        const error = this.props.items ? this.props.error : this.state.error;
+
         const markers = [];
-        for (const [id, item] of this.#itemData) {
+        for (const [id, item] of (this.props.items ? Object.entries(this.props.items) : this.#itemData)) {
             const m = itemToMarker(item);
             if (m) {
                 if (this.state.highlighted === id) {
@@ -225,9 +245,11 @@ export default class MapList extends PureComponent {
             <div class="map-list">
                 <div class="inner-list-container" ref={listContainerRef}>
                     <InnerList
+                        header={this.props.header}
                         item={item}
                         itemData={this.#itemData}
                         items={items}
+                        usingObjectItems={!!this.props.items}
                         loading={loading}
                         error={error}
                         itemParent={itemParent}
@@ -264,6 +286,8 @@ export default class MapList extends PureComponent {
 }
 
 function InnerList ({
+    header,
+    usingObjectItems,
     items,
     itemData,
     item,
@@ -284,8 +308,8 @@ function InnerList ({
         // TODO: extract this somewhere
         filteredIds = [];
         const scores = new Map();
-        for (const id of items) {
-            const data = itemData.get(id);
+        for (const id of (usingObjectItems ? Object.keys(items) : items)) {
+            const data = usingObjectItems ? items[id] : itemData.get(id);
             if (!data) {
                 if (!loading) loading = true;
                 continue;
@@ -301,12 +325,14 @@ function InnerList ({
         }
         filteredIds.sort((a, b) => scores.get(b) - scores.get(a));
     } else {
-        filteredIds = items;
+        filteredIds = usingObjectItems ? Object.keys(items) : items;
     }
 
+    let hasItems = false;
     const topIds = new Map();
     for (const id of filteredIds) {
-        const data = itemData.get(id);
+        hasItems = true;
+        const data = usingObjectItems ? items[id] : itemData.get(id);
         if (!data) {
             if (!loading) loading = true;
             topIds.set(id, { id, children: [] });
@@ -326,6 +352,7 @@ function InnerList ({
 
     return (
         <div class="inner-list">
+            {header}
             {searchFields ? (
                 <div class="list-search">
                     <div class="search-icon-container">
@@ -352,6 +379,7 @@ function InnerList ({
                         id={node.id}
                         subnodes={node.children}
                         item={item}
+                        objectItems={usingObjectItems ? items : null}
                         onItemClick={onItemClick}
                         onItemHover={onItemHover}
                         onItemOut={onItemOut} />
@@ -364,7 +392,7 @@ function InnerList ({
                     <div key="loading" class="list-items-loading">
                         <CircularProgress indeterminate />
                     </div>
-                ) : !items.length ? (
+                ) : !hasItems ? (
                     <div class="list-items-empty">
                         {locale.mapList.empty}
                     </div>
@@ -374,7 +402,7 @@ function InnerList ({
     );
 }
 
-function Item ({ item, id, subnodes, onItemClick, onItemHover, onItemOut }) {
+function Item ({ item, id, subnodes, objectItems, onItemClick, onItemHover, onItemOut }) {
     const ItemComponent = item;
 
     const li = (
@@ -383,7 +411,7 @@ function Item ({ item, id, subnodes, onItemClick, onItemHover, onItemOut }) {
             onClick={e => onItemClick(id, e)}
             onpointerover={e => onItemHover(id, e)}
             onpointerout={e => onItemOut(id, e)}>
-            <ItemComponent id={id} />
+            <ItemComponent id={id} item={objectItems ? objectItems[id] : undefined} />
         </div>
     );
 

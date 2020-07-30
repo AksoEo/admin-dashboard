@@ -10,6 +10,8 @@ export const timestampTzFormat = 'LLL';
 export const timestampFormatToday = '[hodiaŭ] LT [UTC]';
 export const timestampTzFormatToday = '[hodiaŭ] LT';
 
+export const osmAddressSearchEndpoint = 'https://nominatim.openstreetmap.org/search?';
+
 export const insecureContext = 'La paĝo ne estas sekura (http)!';
 
 export const meta = {

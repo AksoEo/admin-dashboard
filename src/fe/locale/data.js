@@ -107,6 +107,8 @@ export const data = {
     mapPicker: {
         pickPrompt: 'Alklaku por elekti lokon',
         movePrompt: 'Alklaku sur la mapo aŭ tiru la indikilon',
+        fromAddress: '[[search by address]]',
+        searchingForAddr: '[[Searching for]]',
     },
     tagManager: {
         noTags: 'Neniuj etikedoj',

@@ -210,7 +210,11 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                         </div>
                     )}
                     {editing ? (
-                        <MapPicker value={ll} onChange={ll => onItemChange({ ...item, ll })} />
+                        <MapPicker
+                            value={ll}
+                            onChange={ll => onItemChange({ ...item, ll })}
+                            address={item.address}
+                            onAddressChange={address => onItemChange({ ...item, address })} />
                     ) : ll ? (
                         <Map class="inner-map" center={ll} zoom={13} markers={markers} />
                     ) : null}
