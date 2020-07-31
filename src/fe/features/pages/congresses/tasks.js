@@ -7,7 +7,8 @@ import ChangedFields from '../../../components/changed-fields';
 import Segmented from '../../../components/segmented';
 import TejoIcon from '../../../components/tejo-icon';
 import UeaIcon from '../../../components/uea-icon';
-import { timestamp } from '../../../components/data';
+import MdField from '../../../components/md-field';
+import { Required, timestamp } from '../../../components/data';
 import {
     congresses as locale,
     congressInstances as instanceLocale,
@@ -19,6 +20,7 @@ import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import { FIELDS as INSTANCE_FIELDS } from './instances/fields';
 import { DetailInner as LocationEditor } from './instances/locations/detail';
+import LocationPicker from './instances/location-picker';
 import './tasks.less';
 
 const CREATE_INSTANCE_FIELDS = ['name', 'humanId', 'dateFrom', 'dateTo'];
@@ -271,7 +273,7 @@ export default {
                                 class="name-field"
                                 component={TextField}
                                 outline
-                                label={programLocale.fields.title}
+                                label={<Required>{programLocale.fields.title}</Required>}
                                 validate={value => {
                                     if (!value) throw { error: dataLocale.requiredField };
                                 }}
@@ -279,11 +281,25 @@ export default {
                                 onChange={e => task.update({ title: e.target.value })} />
                         </Field>
                         <Field>
+                            <label class="field-label">{programLocale.fields.description}</label>
+                            <MdField
+                                editing value={task.parameters.description || null}
+                                onChange={value => task.update({ description: value || null })}
+                                rules={['emphasis', 'strikethrough', 'link', 'list', 'table', 'image']} />
+                        </Field>
+                        <Field>
+                            <TextField
+                                class="name-field"
+                                outline label={programLocale.fields.owner}
+                                value={task.parameters.owner || ''}
+                                onChange={e => task.update({ owner: e.target.value || null })} />
+                        </Field>
+                        <Field>
                             <Validator
                                 class="date-field"
                                 component={timestamp.editor}
                                 outline
-                                label={programLocale.fields.timeFrom}
+                                label={<Required>{programLocale.fields.timeFrom}</Required>}
                                 validate={value => {
                                     if (!value) throw { error: dataLocale.requiredField };
                                 }}
@@ -295,12 +311,19 @@ export default {
                                 class="date-field"
                                 component={timestamp.editor}
                                 outline
-                                label={programLocale.fields.timeTo}
+                                label={<Required>{programLocale.fields.timeTo}</Required>}
                                 validate={value => {
                                     if (!value) throw { error: dataLocale.requiredField };
                                 }}
                                 value={task.parameters.timeTo || null}
                                 onChange={timeTo => task.update({ timeTo })} />
+                        </Field>
+                        <Field>
+                            <LocationPicker
+                                congress={congress}
+                                instance={instance}
+                                editing value={task.parameters.location || null}
+                                onChange={location => task.update({ location })} />
                         </Field>
                     </TaskDialog>
                 )}

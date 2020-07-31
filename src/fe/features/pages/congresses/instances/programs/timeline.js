@@ -340,6 +340,10 @@ class TimelineDayView extends PureComponent {
     }
 
     renderContents () {
+        if (!this.state.items.length) {
+            return <div class="day-view-status">{locale.timeline.empty}</div>;
+        }
+
         const { congress, instance, tz } = this.props;
 
         const contents = [];
@@ -398,11 +402,13 @@ class TimelineDayView extends PureComponent {
         return (
             <div class="timeline-day-view">
                 {loading ? (
-                    <div class="day-view-loading">
+                    <div class="day-view-status">
                         <CircularProgress indeterminate />
                     </div>
                 ) : error ? (
-                    <DisplayError error={error} />
+                    <div class="day-view-status">
+                        <DisplayError error={error} />
+                    </div>
                 ) : items ? (
                     <div class="day-view-contents">
                         {this.renderContents()}

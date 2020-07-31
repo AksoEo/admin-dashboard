@@ -113,6 +113,7 @@ export const congressLocations = {
         pick: 'Elekti lokon',
         search: 'Serĉi…',
     },
+    congressAddress: '[[Congress location]]',
     iconPicker: {
         empty: 'Neniu bildeto',
         pick: 'Elekti bildeton',
@@ -188,6 +189,9 @@ export const congressPrograms = {
         timeFrom: 'Ekde',
         timeTo: 'Ĝis',
         location: 'Loko',
+    },
+    timeline: {
+        empty: '[[no program items on this day]]',
     },
     create: {
         menuItem: 'Krei',

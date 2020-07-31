@@ -28,6 +28,7 @@ export const FIELDS = {
     title: {
         sortable: true,
         slot: 'title',
+        shouldHide: (_, editing) => !editing,
         component ({ value, editing, onChange }) {
             return <MdField
                 value={value}
@@ -81,12 +82,13 @@ export const OVERVIEW_FIELDS = {
     timeLoc: {
         slot: 'body',
         skipLabel: true,
-        component ({ item, ...extra }) {
+        component ({ item, userData, ...extra }) {
             const Location = FIELDS.location.component;
 
             const { timeFrom, timeTo, location } = item;
+            const { tz } = userData;
 
-            const day = moment(timeFrom * 1000).startOf('d');
+            const day = moment(timeFrom * 1000).tz(tz).startOf('d');
             const secondsFrom = moment(timeFrom * 1000).diff(day, 's');
             const secondsTo = moment(timeTo * 1000).diff(day, 's');
 
@@ -98,7 +100,7 @@ export const OVERVIEW_FIELDS = {
                         <time.renderer value={secondsTo} />
                     </div>
                     <div class="ptl-location">
-                        <Location {...extra} value={location} item={item} />
+                        <Location {...extra} value={location} item={item} userData={userData} />
                     </div>
                 </div>
             );

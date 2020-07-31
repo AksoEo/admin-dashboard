@@ -28,6 +28,7 @@ export default connectPerms(class CongressInstancePage extends Page {
     state = {
         edit: null,
         org: 'meow', // dummy placeholder
+        tz: null,
     };
 
     static contextType = coreContext;
@@ -99,7 +100,11 @@ export default connectPerms(class CongressInstancePage extends Page {
                     key: 'programs',
                     icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                     label: programLocale.create.menuItem,
-                    action: () => this.context.createTask('congresses/createProgram', { congress, instance: id }),
+                    action: () => this.context.createTask('congresses/createProgram', {
+                        congress,
+                        instance: id,
+                        tz: this.state.tz,
+                    }),
                 });
             }
             actions.push({
@@ -132,6 +137,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
                     locale={locale}
+                    onData={data => data && this.setState({ tz: data.tz })}
                     onDelete={() => this.props.pop()}>
                     {data => (
                         <div class="instance-inner">
@@ -147,6 +153,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 onItemChange={edit => this.setState({ edit })}/>}
                             {!editing && (tab === 'locations') && <Locations
                                 congress={congress}
+                                congressAddress={data.locationAddress}
                                 congressLocation={data.locationCoords}
                                 org={org}
                                 instance={id}

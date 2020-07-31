@@ -15,6 +15,7 @@ import './index.less';
 ///
 /// # Props
 /// - congress: congress id
+/// - congressAddress: optional congress address
 /// - congressLocation: optional congress location
 /// - instance: instance id
 /// - push: proxy for navigation API
@@ -73,8 +74,19 @@ export default class LocationsView extends PureComponent {
         }, 1000);
     };
 
-    render ({ congress, instance, congressLocation }, { parameters, listView }) {
+    render ({ congress, instance, congressAddress, congressLocation }, { parameters, listView }) {
+        let header;
         const markers = [];
+        if (congressAddress) {
+            header = (
+                <div class="congress-address">
+                    <label>{locale.congressAddress}</label>
+                    <div>
+                        {congressAddress.split('\n').map((l, i) => <div key={i}>{l}</div>)}
+                    </div>
+                </div>
+            );
+        }
         if (congressLocation) {
             markers.push({
                 location: congressLocation,
@@ -137,6 +149,7 @@ export default class LocationsView extends PureComponent {
                     onItemClick={id => {
                         this.props.push('lokoj/' + id);
                     }}
+                    header={header}
                     itemParent={item => item.type === 'internal' ? item.externalLoc : null}
                     searchFields={['name', 'description']}
                     markers={markers}

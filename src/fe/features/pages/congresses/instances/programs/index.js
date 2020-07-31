@@ -1,11 +1,15 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
+import { Button } from '@cpsdqs/yamdl';
+import ListIcon from '@material-ui/icons/List';
+import TimelineIcon from '@material-ui/icons/Timeline';
 import SearchFilters from '../../../../../components/search-filters';
 import OverviewList from '../../../../../components/overview-list';
 import DetailShell from '../../../../../components/detail-shell';
 import { congressPrograms as locale } from '../../../../../locale';
 import ProgramTimeline from './timeline';
 import { FIELDS } from './fields';
+import './index.less';
 
 /// Shows an overview over programs, with a map
 ///
@@ -32,20 +36,15 @@ export default class ProgramsView extends PureComponent {
         dateFrom: null,
         dateTo: null,
         tz: null,
+        listView: false,
     };
 
     #searchInput;
 
-    render ({ congress, instance }, { parameters, dateFrom, dateTo, tz }) {
-        return (
-            <div class="congresses-instance-programs">
-                <ProgramTimeline
-                    congress={congress}
-                    instance={instance}
-                    dateFrom={dateFrom}
-                    dateTo={dateTo}
-                    tz={tz} />
-
+    render ({ congress, instance }, { parameters, dateFrom, dateTo, tz, listView }) {
+        const contents = [];
+        if (listView) {
+            contents.push(
                 <SearchFilters
                     value={parameters}
                     searchFields={[
@@ -57,7 +56,7 @@ export default class ProgramsView extends PureComponent {
                         searchPlaceholders: locale.search.placeholders,
                         searchFields: locale.fields,
                     }}
-                    inputRef={view => this.#searchInput = view} />
+                    inputRef={view => this.#searchInput = view} />,
                 <OverviewList
                     useDeepCmp options={{ congress, instance }}
                     viewOptions={{ congress, instance }}
@@ -71,9 +70,30 @@ export default class ProgramsView extends PureComponent {
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields}
-                    userData={{ congress, instance, tz }} />
+                    userData={{ congress, instance, tz }} />,
+            );
+        } else {
+            contents.push(
+                <ProgramTimeline
+                    key="timeline"
+                    congress={congress}
+                    instance={instance}
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
+                    tz={tz} />
+            );
+        }
+
+        return (
+            <div class="congresses-instance-programs">
+                <div class="switch-button-container">
+                    <Button icon small onClick={() => this.setState({ listView: !listView })}>
+                        {listView ? <TimelineIcon /> : <ListIcon />}
+                    </Button>
+                </div>
+                {contents}
                 <DetailShell
-                    /* a hack to get the tz field */
+                    /* hack for getting some fields about the instance */
                     view="congresses/instance"
                     options={{ congress }}
                     id={instance}
