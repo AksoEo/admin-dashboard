@@ -405,7 +405,7 @@ export const tasks = {
 
     // MARK - programs
 
-    listPrograms: async ({ congress, instance }, { offset, limit, fields, search }) => {
+    listPrograms: async ({ congress, instance }, { offset, limit, fields, jsonFilter, search }) => {
         const client = await asyncClient;
         const opts = {
             offset,
@@ -413,6 +413,10 @@ export const tasks = {
             fields: ['id', 'title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
             order: fieldsToOrder(fields),
         };
+        if (jsonFilter && jsonFilter.filter) {
+            // simple interface
+            opts.filter = jsonFilter.filter;
+        }
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
             if (!util.isValidSearch(transformedQuery)) {

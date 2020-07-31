@@ -4,6 +4,7 @@ import SearchFilters from '../../../../../components/search-filters';
 import OverviewList from '../../../../../components/overview-list';
 import DetailShell from '../../../../../components/detail-shell';
 import { congressPrograms as locale } from '../../../../../locale';
+import ProgramTimeline from './timeline';
 import { FIELDS } from './fields';
 
 /// Shows an overview over programs, with a map
@@ -28,14 +29,23 @@ export default class ProgramsView extends PureComponent {
             offset: 0,
             limit: 10,
         },
+        dateFrom: null,
+        dateTo: null,
         tz: null,
     };
 
     #searchInput;
 
-    render ({ congress, instance }, { parameters, tz }) {
+    render ({ congress, instance }, { parameters, dateFrom, dateTo, tz }) {
         return (
             <div class="congresses-instance-programs">
+                <ProgramTimeline
+                    congress={congress}
+                    instance={instance}
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
+                    tz={tz} />
+
                 <SearchFilters
                     value={parameters}
                     searchFields={[
@@ -69,7 +79,11 @@ export default class ProgramsView extends PureComponent {
                     id={instance}
                     fields={{}}
                     locale={{}}
-                    onData={data => data && this.setState({ tz: data.tz })} />
+                    onData={data => data && this.setState({
+                        dateFrom: data.dateFrom,
+                        dateTo: data.dateTo,
+                        tz: data.tz,
+                    })} />
             </div>
         );
     }
