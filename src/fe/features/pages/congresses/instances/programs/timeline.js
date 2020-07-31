@@ -6,7 +6,7 @@ import DisplayError from '../../../../../components/error';
 import OverviewListItem from '../../../../../components/overview-list-item';
 import { connect, coreContext } from '../../../../../core/connection';
 import { congressPrograms as locale } from '../../../../../locale';
-import { FIELDS } from './fields';
+import { OVERVIEW_FIELDS } from './fields';
 import './timeline.less';
 
 /// Renders a timeline of program items.
@@ -38,13 +38,28 @@ export default class ProgramTimeline extends PureComponent {
                 <TimelineDayView
                     congress={congress}
                     instance={instance}
-                    date={date} />
+                    date={date}
+                    tz={tz} />
             </div>
         );
     }
 }
 
 class TimelineDatePicker extends PureComponent {
+    loadIfNull () {
+        if (!this.props.value && this.props.dateFrom) {
+            this.props.onChange(this.props.dateFrom);
+        }
+    }
+
+    componentDidMount () {
+        this.loadIfNull();
+    }
+
+    componentDidUpdate () {
+        this.loadIfNull();
+    }
+
     render ({ value, onChange, dateFrom, dateTo }) {
         const dates = [];
         const index = moment(dateFrom);
@@ -92,6 +107,17 @@ class TimelineDayView extends PureComponent {
     };
 
     static contextType = coreContext;
+
+    #updateView;
+
+    createUpdateView () {
+        if (this.#updateView) this.#updateView.drop();
+        this.#updateView = this.context.createDataView('congresses/sigPrograms', {
+            congress: this.props.congress,
+            instance: this.props.instance,
+        });
+        this.#updateView.on('update', () => this.load());
+    }
 
     load () {
         this.setState({ loading: true });
@@ -147,12 +173,18 @@ class TimelineDayView extends PureComponent {
 
     componentDidMount () {
         this.load();
+        this.createUpdateView();
     }
 
     componentDidUpdate (prevProps) {
         if (prevProps.date !== this.props.date) {
             this.load();
+            this.createUpdateView();
         }
+    }
+
+    componentWillUnmount () {
+        if (this.#updateView) this.#updateView.drop();
     }
 
     // item id -> item time bounds
@@ -176,10 +208,9 @@ class TimelineDayView extends PureComponent {
     }
 
     layout () {
-        const { date, tz } = this.props;
         const { items } = this.state;
 
-        const refDate = moment.tz(date, tz);
+        // const refDate = moment.tz(this.props.date, this.props.tz);
 
         // lay out items in columns, such that overlapping items are simply put beside existing
         // ones.
@@ -212,6 +243,24 @@ class TimelineDayView extends PureComponent {
         }
         splits.sort((a, b) => a - b); // sort ascending
 
+        const itemHeight = 96;
+        const minHourHeight = 20;
+
+        let y = 0;
+        const splitsY = new Map(); // mapping from split to Y offset
+        let lastT = null;
+        for (const t of splits) {
+            const deltaHours = (lastT !== null) ? (t - lastT) / 3600 : 0;
+            lastT = t;
+            const splitHasItem = (lastT !== null) ? !!eventsEndingAtSplit.get(t).length : false;
+            if (splitHasItem) {
+                y += Math.max(minHourHeight * deltaHours, itemHeight);
+            } else {
+                y += minHourHeight * deltaHours;
+            }
+            splitsY.set(t, y);
+        }
+
         const regions = [[]];
         const occupiedColumns = [];
         for (const t of splits) {
@@ -238,13 +287,19 @@ class TimelineDayView extends PureComponent {
                 // find a free column and occupy it
                 const freeCol = occupiedColumns.indexOf(null);
                 const bounds = this.getItemBounds(id);
-                const startTime = moment(bounds.start * 1000);
-                const endTime = moment(bounds.end * 1000);
+                // const startTime = moment(bounds.start * 1000);
+                // const endTime = moment(bounds.end * 1000);
+
+                // const startHour = startTime.diff(refDate) / 3600000;
+                // const endHour = endTime.diff(refDate) / 3600000;
+
+                const start = splitsY.get(bounds.start);
+                const end = splitsY.get(bounds.end);
 
                 const item = {
                     id,
-                    start: startTime.diff(refDate) / 3600000,
-                    end: endTime.diff(refDate) / 3600000,
+                    start,
+                    end,
                 };
 
                 const occupy = bounds.start < bounds.end;
@@ -285,14 +340,9 @@ class TimelineDayView extends PureComponent {
     }
 
     renderContents () {
-        const { congress, instance } = this.props;
+        const { congress, instance, tz } = this.props;
 
         const contents = [];
-
-        const minStart = 0;
-        const maxEnd = 24;
-
-        const hourHeight = 60;
 
         const { regions, missingItems } = this.layout();
         for (const region of regions) {
@@ -302,19 +352,17 @@ class TimelineDayView extends PureComponent {
             let colIndex = 0;
             for (const col of region.items) {
                 for (const item of col) {
-                    const yStart = hourHeight * Math.max(minStart, item.start - region.start);
-                    const yEnd = hourHeight * Math.min(maxEnd, item.end - region.start);
-
                     regionNodes.push(
                         <DayViewItem
                             col={colIndex}
                             cols={cols}
-                            start={yStart}
-                            end={yEnd}
+                            start={item.start}
+                            end={item.end}
                             congress={congress}
                             instance={instance}
                             key={item.id}
                             id={item.id}
+                            tz={tz}
                             onLoadBounds={bounds => this.onLoadItemBounds(item.id, bounds)}
                             onGetItemLink={(id) => {
                                 return `/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`;
@@ -324,8 +372,7 @@ class TimelineDayView extends PureComponent {
                 colIndex++;
             }
 
-            const height = (Math.min(maxEnd, region.end) - Math.max(minStart, region.start)) * hourHeight;
-
+            const height = region.end - region.start;
             contents.push(
                 <div class="day-view-region" style={{ height }}>
                     {regionNodes}
@@ -381,7 +428,7 @@ const DayViewItem = connect(({ congress, instance, id }) =>
         }
     }
 
-    render ({ congress, instance, id, col, cols, start, end, data, onGetItemLink }) {
+    render ({ congress, instance, id, tz, col, cols, start, end, data, onGetItemLink }) {
         if (!data || !cols) return null;
 
         return (
@@ -389,7 +436,7 @@ const DayViewItem = connect(({ congress, instance, id }) =>
                 width: `${100 / cols}%`,
                 left: `${(col / cols) * 100}%`,
                 top: start,
-                minHeight: end - start,
+                height: end - start,
             }}>
                 <OverviewListItem
                     compact view="congresses/program"
@@ -397,14 +444,14 @@ const DayViewItem = connect(({ congress, instance, id }) =>
                     id={id}
                     options={{ congress, instance }}
                     selectedFields={SELECTED_FIELDS}
-                    fields={FIELDS}
+                    fields={OVERVIEW_FIELDS}
                     index={0}
                     locale={locale.fields}
-                    userData={{ congress, instance }}
+                    userData={{ congress, instance, tz }}
                     onGetItemLink={onGetItemLink} />
             </div>
         );
     }
 });
 
-const SELECTED_FIELDS = ['title', 'description', 'timeFrom', 'timeTo'].map(x => ({ id: x, sorting: 'none' }));
+const SELECTED_FIELDS = ['title', 'timeLoc', 'description'].map(x => ({ id: x, sorting: 'none' }));

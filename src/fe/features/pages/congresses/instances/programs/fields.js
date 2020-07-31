@@ -1,8 +1,10 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
-import { timestamp } from '../../../../../components/data';
+import moment from 'moment';
+import { time, timestamp } from '../../../../../components/data';
 import MdField from '../../../../../components/md-field';
 import LocationPicker from '../location-picker';
+import './fields.less';
 
 function TextLen100 ({ value, editing, onChange }) {
     if (editing) {
@@ -25,6 +27,7 @@ function TimeBoundEditor ({ value, editing, onChange, userData }) {
 export const FIELDS = {
     title: {
         sortable: true,
+        slot: 'title',
         component ({ value, editing, onChange }) {
             return <MdField
                 value={value}
@@ -35,8 +38,12 @@ export const FIELDS = {
         },
     },
     description: {
-        component ({ value, editing, onChange }) {
+        slot: 'body',
+        skipLabel: true,
+        component ({ value, editing, onChange, slot }) {
             return <MdField
+                class="congress-program-description"
+                data-slot={slot}
                 value={value}
                 onChange={onChange}
                 editing={editing}
@@ -65,6 +72,36 @@ export const FIELDS = {
                 value={value}
                 editing={editing}
                 onChange={onChange} />;
+        },
+    },
+};
+
+export const OVERVIEW_FIELDS = {
+    ...FIELDS,
+    timeLoc: {
+        slot: 'body',
+        skipLabel: true,
+        component ({ item, ...extra }) {
+            const Location = FIELDS.location.component;
+
+            const { timeFrom, timeTo, location } = item;
+
+            const day = moment(timeFrom * 1000).startOf('d');
+            const secondsFrom = moment(timeFrom * 1000).diff(day, 's');
+            const secondsTo = moment(timeTo * 1000).diff(day, 's');
+
+            return (
+                <div class="congress-program-time-loc">
+                    <div class="ptl-time">
+                        <time.renderer value={secondsFrom} />
+                        {'–'}
+                        <time.renderer value={secondsTo} />
+                    </div>
+                    <div class="ptl-location">
+                        <Location {...extra} value={location} item={item} />
+                    </div>
+                </div>
+            );
         },
     },
 };

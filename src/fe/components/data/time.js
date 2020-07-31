@@ -27,7 +27,7 @@ function formatTime (n) {
 /// # Props
 /// - value: number of seconds
 function TimeRenderer ({ value }) {
-    if (!value) return null;
+    if (!Number.isFinite(value)) return null;
     return formatTime(value);
 }
 
