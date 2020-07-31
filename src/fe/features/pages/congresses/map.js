@@ -116,7 +116,7 @@ class MarkerRenderer extends PureComponent {
         globalAnimator.deregister(this);
     }
 
-    render ({ location, icon, highlighted, onDragEnd }) {
+    render ({ location, icon, highlighted, onDragEnd, ...extra }) {
         const shapeBottomY = 80;
         const shapeCircleY = shapeBottomY - 36 - (this.#highlight.value * 12);
         const iconScale = 0.4 + this.#iconSize.value * 0.6;
@@ -139,7 +139,8 @@ class MarkerRenderer extends PureComponent {
                 position={location}
                 icon={this.#portalIcon}
                 draggable={!!onDragEnd}
-                onDragEnd={onDragEnd}>
+                onDragEnd={onDragEnd}
+                {...extra}>
                 {createPortal(contents, this.#portalContainer)}
             </Marker>
         );

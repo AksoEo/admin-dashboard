@@ -7,6 +7,7 @@ import SearchFilters from '../../../../../components/search-filters';
 import OverviewList from '../../../../../components/overview-list';
 import OverviewListItem from '../../../../../components/overview-list-item';
 import { congressLocations as locale } from '../../../../../locale';
+import { routerContext } from '../../../../../router';
 import { FIELDS } from './fields';
 import MapList from '../../map-list';
 import './index.less';
@@ -38,6 +39,8 @@ export default class LocationsView extends PureComponent {
         tToListView: false, // transition to list view
         tFromListView: false,
     };
+
+    static contextType = routerContext;
 
     #node = null;
     #mapListLeft = null;
@@ -145,6 +148,9 @@ export default class LocationsView extends PureComponent {
                         key: item.id,
                         location: item.ll,
                         icon: item.icon === 'GENERIC' ? null : <IconField value={item.icon} />,
+                        onClick: () => {
+                            this.context.navigate(`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${item.id}`);
+                        },
                     })}
                     onItemClick={id => {
                         this.props.push('lokoj/' + id);

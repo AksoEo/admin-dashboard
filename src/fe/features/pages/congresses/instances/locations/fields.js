@@ -24,7 +24,6 @@ import LocalMallIcon from '@material-ui/icons/LocalMall';
 import LocalLaundryServiceIcon from '@material-ui/icons/LocalLaundryService';
 import LocalPostOfficeIcon from '@material-ui/icons/LocalPostOffice';
 import InfoIcon from '@material-ui/icons/Info';
-import GavelIcon from '@material-ui/icons/Gavel';
 import RestaurantIcon from '@material-ui/icons/Restaurant';
 import FastfoodIcon from '@material-ui/icons/Fastfood';
 import LocalCafeIcon from '@material-ui/icons/LocalCafe';
@@ -34,15 +33,17 @@ import LocalConvenienceStoreIcon from '@material-ui/icons/LocalConvenienceStore'
 import StoreIcon from '@material-ui/icons/Store';
 import MuseumIcon from '@material-ui/icons/Museum';
 import LocalMoviesIcon from '@material-ui/icons/LocalMovies';
-import AccountBalanceIcon from '@material-ui/icons/AccountBalance';
+import LocalPlayIcon from '@material-ui/icons/LocalPlay';
 import CenterFocusStrongIcon from '@material-ui/icons/CenterFocusStrong';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import ExploreIcon from '@material-ui/icons/Explore';
 import LocalHotelIcon from '@material-ui/icons/LocalHotel';
+import SingleBedIcon from '@material-ui/icons/SingleBed';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CheckIcon from '@material-ui/icons/Check';
 import TextArea from '../../../../../components/text-area';
 import MdField from '../../../../../components/md-field';
+import SvgIcon from '../../../../../components/svg-icon';
 import { Validator } from '../../../../../components/form';
 import { congressLocations as locale } from '../../../../../locale';
 import LatLonEditor from '../../ll-editor';
@@ -69,7 +70,11 @@ const ICON_LUT = {
     LAUNDRY_SERVICE: LocalLaundryServiceIcon,
     POST_OFFICE: LocalPostOfficeIcon,
     TOURIST_INFORMATION: InfoIcon,
-    POLICE: GavelIcon,
+    POLICE: props => (
+        <SvgIcon {...props}>
+            <path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm2.5 11.59l.9 3.88-3.4-2.05-3.4 2.05.9-3.87-3-2.59 3.96-.34L12 6.02l1.54 3.64 3.96.34-3 2.59z" />
+        </SvgIcon>
+    ),
     RESTAURANT: RestaurantIcon,
     FAST_FOOD: FastfoodIcon,
     CAFE: LocalCafeIcon,
@@ -79,12 +84,12 @@ const ICON_LUT = {
     STORE: StoreIcon,
     MUSEUM: MuseumIcon,
     MOVIE_THEATER: LocalMoviesIcon,
-    THEATER: AccountBalanceIcon,
+    THEATER: LocalPlayIcon,
     CULTURAL_CENTER: CenterFocusStrongIcon,
     LIBRARY: LocalLibraryIcon,
     POINT_OF_INTEREST: ExploreIcon,
     HOTEL: LocalHotelIcon,
-    HOSTEL: LocalHotelIcon,
+    HOSTEL: SingleBedIcon,
 };
 
 export const FIELDS = {

@@ -236,6 +236,10 @@ export default class MapList extends PureComponent {
                 if (this.state.highlighted === id) {
                     m.highlighted = true;
                 }
+                if (!m.onMouseOver && !m.onMouseOut) {
+                    m.onMouseOut = () => this.setState({ highlighted: null });
+                    m.onMouseOver = () => this.setState({ highlighted: id });
+                }
                 markers.push(m);
             }
         }
@@ -249,6 +253,7 @@ export default class MapList extends PureComponent {
                         item={item}
                         itemData={this.#itemData}
                         items={items}
+                        highlighted={this.state.highlighted}
                         usingObjectItems={!!this.props.items}
                         loading={loading}
                         error={error}
@@ -293,6 +298,7 @@ function InnerList ({
     item,
     loading,
     error,
+    highlighted,
     itemParent,
     searchFields,
     onItemClick,
@@ -377,6 +383,7 @@ function InnerList ({
                     <Item
                         key={node.id}
                         id={node.id}
+                        highlighted={highlighted}
                         subnodes={node.children}
                         item={item}
                         objectItems={usingObjectItems ? items : null}
@@ -402,12 +409,12 @@ function InnerList ({
     );
 }
 
-function Item ({ item, id, subnodes, objectItems, onItemClick, onItemHover, onItemOut }) {
+function Item ({ item, id, highlighted, subnodes, objectItems, onItemClick, onItemHover, onItemOut }) {
     const ItemComponent = item;
 
     const li = (
         <div
-            class="list-item"
+            class={'list-item' + (highlighted === id ? ' is-highlighted' : '')}
             onClick={e => onItemClick(id, e)}
             onpointerover={e => onItemHover(id, e)}
             onpointerout={e => onItemOut(id, e)}>

@@ -298,6 +298,7 @@ export default {
                             <Validator
                                 class="date-field"
                                 component={timestamp.editor}
+                                zone={task.options.tz}
                                 outline
                                 label={<Required>{programLocale.fields.timeFrom}</Required>}
                                 validate={value => {
@@ -310,6 +311,7 @@ export default {
                             <Validator
                                 class="date-field"
                                 component={timestamp.editor}
+                                zone={task.options.tz}
                                 outline
                                 label={<Required>{programLocale.fields.timeTo}</Required>}
                                 validate={value => {
