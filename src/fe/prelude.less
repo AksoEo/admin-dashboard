@@ -85,7 +85,7 @@
 
 }
 
-.editor-light() {
+.editor-text() {
     --editor-background: #fff;
     --editor-selection: @secondary-fade-50;
     --editor-line-number: #333;
@@ -102,6 +102,18 @@
 
     --editor-template-background: fade(#75f, 40%);
     --editor-template-delimiter: #77f;
+
+    @media (prefers-color-scheme: dark) {
+        --editor-background: #222;
+        --editor-text: #ddd;
+        --editor-text-fade-10: fade(#ddd, 10%);
+        --editor-syntax-string: @secondary;
+        --editor-syntax-atom: #e95;
+        --editor-syntax-number: #e95;
+        --editor-syntax-property: #f5a;
+        --editor-syntax-comment: #999;
+        --editor-match: #fac;
+    }
 }
 
 @primary: var(--primary);

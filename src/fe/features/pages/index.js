@@ -76,6 +76,12 @@ export default [
                 paths: [
                     {
                         type: 'stack',
+                        path: 'components',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "debug-tools" */ './debug/components')),
+                    },
+                    {
+                        type: 'stack',
                         path: 'launchpad_mcquack.jpg',
                         component: elazy(() =>
                             import(/* webpackChunkName: "debug-tools" */ './debug/crash')),

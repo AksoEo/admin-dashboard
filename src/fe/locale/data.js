@@ -97,8 +97,13 @@ export const data = {
     },
     mdEditor: {
         previewOn: 'Antaŭvidi formatigon',
-        previewTitle: 'Antaŭvidi',
+        previewTitle: 'Antaŭvido',
         previewOff: 'Fermi antaŭvidon',
+
+        urlLabel: '[[Label]]',
+        url: '[[URL]]', // when inserting links or images
+        urlPlaceholder: '[[https://example.com/thing.jpg]]',
+        insertUrl: '[[Insert]]',
     },
     mapList: {
         empty: 'Neniuj lokoj',

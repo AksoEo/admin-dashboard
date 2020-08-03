@@ -24,6 +24,8 @@ export default class DebugPage extends Page {
                 <TaskRunner />
                 <br />
                 <Link target="/debug/launchpad_mcquack.jpg">open launchpad_mcquack.jpg</Link>
+                <br />
+                <Link target="/debug/components">open components</Link>
             </div>
         );
     }
