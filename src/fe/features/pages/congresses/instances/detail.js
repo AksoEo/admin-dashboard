@@ -82,7 +82,7 @@ export default connectPerms(class CongressInstancePage extends Page {
         }
     }
 
-    render ({ perms, editing }, { org }) {
+    render ({ perms, editing, query, onQueryChange }, { org }) {
         const { congress, id, tab } = this;
 
         const actions = [];
@@ -152,16 +152,22 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 item={this.state.edit || data}
                                 onItemChange={edit => this.setState({ edit })}/>}
                             {!editing && (tab === 'locations') && <Locations
+                                key="locations"
                                 congress={congress}
                                 congressAddress={data.locationAddress}
                                 congressLocation={data.locationCoords}
                                 org={org}
                                 instance={id}
+                                query={query}
+                                onQueryChange={onQueryChange}
                                 push={this.props.push} />}
                             {!editing && (tab === 'programs') && <Programs
+                                key="programs"
                                 congress={congress}
                                 org={org}
                                 instance={id}
+                                query={query}
+                                onQueryChange={onQueryChange}
                                 push={this.props.push} />}
                         </div>
                     )}

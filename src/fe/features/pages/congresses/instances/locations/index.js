@@ -6,6 +6,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import SearchFilters from '../../../../../components/search-filters';
 import OverviewList from '../../../../../components/overview-list';
 import OverviewListItem from '../../../../../components/overview-list-item';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../../components/list-url-coding';
 import { congressLocations as locale } from '../../../../../locale';
 import { routerContext } from '../../../../../router';
 import { FIELDS } from './fields';
@@ -19,6 +20,7 @@ import './index.less';
 /// - congressAddress: optional congress address
 /// - congressLocation: optional congress location
 /// - instance: instance id
+/// - query/onQueryChange: query
 /// - push: proxy for navigation API
 export default class LocationsView extends PureComponent {
     state = {
@@ -41,6 +43,45 @@ export default class LocationsView extends PureComponent {
     };
 
     static contextType = routerContext;
+
+    #searchInput;
+    #currentQuery = '';
+
+    decodeURLQuery () {
+        if (!this.props.query) {
+            this.setState({ listView: false });
+        } else {
+            this.setState({
+                listView: true,
+                parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
+            });
+        }
+        this.#currentQuery = this.props.query;
+    }
+
+    encodeURLQuery () {
+        const encoded = this.state.listView
+            ? encodeURLQuery(this.state.parameters, {})
+            : '';
+        if (encoded === this.#currentQuery) return;
+        this.#currentQuery = encoded;
+        this.props.onQueryChange(encoded);
+    }
+
+    componentDidMount () {
+        this.decodeURLQuery();
+        if (this.#searchInput) this.#searchInput.focus(500);
+    }
+
+    componentDidUpdate (prevProps, prevState) {
+        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
+            this.decodeURLQuery();
+        }
+        if (prevState.parameters !== this.state.parameters
+            || prevState.listView !== this.state.listView) {
+            this.encodeURLQuery();
+        }
+    }
 
     #node = null;
     #mapListLeft = null;
@@ -118,7 +159,8 @@ export default class LocationsView extends PureComponent {
                         locale={{
                             searchPlaceholders: locale.search.placeholders,
                             searchFields: locale.fields,
-                        }} />
+                        }}
+                        inputRef={node => this.#searchInput = node} />
                     <OverviewList
                         useDeepCmp options={{ congress, instance }}
                         viewOptions={{ congress, instance }}

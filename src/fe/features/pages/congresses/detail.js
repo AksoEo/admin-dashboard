@@ -86,16 +86,23 @@ export default connectPerms(class CongressDetailPage extends Page {
                     footer={Footer}
                     onData={data => data && this.setState({ org: data.org })}
                     locale={locale}
-                    onDelete={() => this.props.pop()} />
+                    onDelete={() => this.props.pop()}
+                    userData={{
+                        query: this.props.query,
+                        onQueryChange: this.props.onQueryChange,
+                    }} />
             </div>
         );
     }
 });
 
-function Footer ({ item, editing }) {
+function Footer ({ item, editing, userData }) {
     if (!item || editing) return;
 
     return (
-        <InstancesView congress={item.id} />
+        <InstancesView
+            congress={item.id}
+            query={userData.query}
+            onQueryChange={userData.onQueryChange} />
     );
 }
