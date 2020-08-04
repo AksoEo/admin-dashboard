@@ -5,8 +5,13 @@ import EventProxy from './event-proxy';
 
 export const layoutContext = createContext();
 
-/// Assumes all children will be laid out vertically without overlapping. Does not support
-/// margins.
+/// Animates changes in height to fit children.
+///
+/// # Caveats
+/// Assumes all children will be laid out vertically without overlapping.
+/// Does not support children with margins.
+/// Does not always detect children resizing (especially 2nd-order children). Use the layoutContext
+/// to signal changes if necessary.
 ///
 /// # Props
 /// - useCooldown: bool

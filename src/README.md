@@ -89,9 +89,15 @@ Many AKSO pages follow a very similar design:
     + a detail page (type `stack`) within, linked to by the overview list items
         * an “editing” state thereof (type `state`)
         * other miscellaneous sub-pages of the detail view
-    + other miscellaneous sub-pages of he overview
+    + other miscellaneous sub-pages of the overview
 
 This overview page will usually be a top-level path (e.g. `/membroj`). A detail page will simply add an ID to the path (e.g. `/membroj/36`). Detail page URLs should not use mutable identifiers (such as names, UEA codes, etc.) to identify an item.
+
+Usually, the file structure is as follows:
+
+- `index.js` (overview page)
+- `detail.js` (detail page)
+- `fields.js` (field renderers)
 
 ### Searchable List Views
 AKSO contains a lot of searchable lists. In the interest of DRY, these have been abstracted to the One True List View:
@@ -113,3 +119,42 @@ On large screens, the results will usually be presented as a table, while on sma
 
 ### Task Views
 Tasks views are a special kind of component that are indexed in `fe/index.js` and are made to mirror tasks in the core, essentially providing users with an interface to modify task parameters and see the results. Task views will exist for as long as the task exists (plus some animation buffer time) and are usually dialogs. For example, a “crop profile picture” task would be accompanied by a dialog showing the crop interface and allowing for adjustment of the position and scale of the picture before running (and dropping) the task.
+
+## Implementation Details
+### Springs and the Global Animator
+Almost all JS-driven animation is performed by springs and the global animator (yamdl).
+To use springs, simply call `globalAnimator.register(this)`, make sure to have an instance method `update(deltaTime)`, and call `globalAnimator.deregister(this)` when done (especially in `componentWillUnmount`).
+In `update(dt)`, call `spring.update(dt)` to update the spring, and `spring.wantsUpdate()` to check if the animation can be stopped.
+
+### Portal Containers
+Many dialog-like views in `components` have associated `portalContainer` variables, which, in essence, contain the dialog container div. These exist because preact glitches weirdly if you have a portal inside another portal in the same container ([preact issue](https://github.com/preactjs/preact/issues/2613)).
+
+Feel free to remove these if that bug is ever fixed.
+
+### Useful Components
+#### Data Fields
+There should probably be more of these (refactor!). Located in `components/data`. These are renderers and editors for various kinds of data.
+
+#### DynamicHeightDiv
+This component will dynamically animate its height when its children change, with a few caveats (see docs for details).
+
+#### RearrangingList
+This component will animate a list of same-height elements, and allow the user to drag-and-drop to reorder them.
+
+#### OverviewList
+Renders an overview list.
+
+##### StaticOverviewList
+A simplified version of OverviewList that manages its own state, intended for picker dialogs.
+
+##### OverviewListItem
+This component will render a core data view.
+
+#### Form
+A submittable form. Use with `Validator`.
+
+##### Validator
+A field validator. This is very old and should probably be refactored (e.g. it uses `throw` to pass state which is generally a bad idea), but it's used in a lot of places. A `Form` will refuse to submit if a validator throws, and the validator will play a shaking animation.
+
+#### Segmented, Select
+Various kinds of selection fields.

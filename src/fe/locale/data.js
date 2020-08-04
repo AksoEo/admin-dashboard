@@ -100,10 +100,69 @@ export const data = {
         previewTitle: 'Antaŭvido',
         previewOff: 'Fermi antaŭvidon',
 
+        formatButtons: {
+            title: '[[Heading]]',
+            bold: '[[Bold]]',
+            italic: '[[Italic]]',
+            strike: '[[Strike]]',
+            link: '[[Link]]',
+            image: '[[Image]]',
+            code: '[[Code]]',
+            table: '[[Table]]',
+            ul: '[[Ul]]',
+            ol: '[[Ol]]',
+        },
+
         urlLabel: '[[Label]]',
         url: '[[URL]]', // when inserting links or images
         urlPlaceholder: '[[https://example.com/thing.jpg]]',
         insertUrl: '[[Insert]]',
+
+        help: {
+            title: '[[Markdown Help]]',
+            rules: {
+                newline: `
+[[write text normally. Use two new lines to create a paragraph.]]
+                `,
+                heading: `
+## How to use titles
+\`\`\`
+# hello
+## world
+\`\`\`
+
+[[todo]]
+                `,
+                emphasis: `
+## How to use emphasis
+[[todo]]
+                `,
+                strikethrough: `
+## How to use strikethrough
+[[todo]]
+                `,
+                backticks: `
+## How to use back ticks
+[[todo]]
+                `,
+                table: `
+## how to use tables
+[[todo]]
+                `,
+                link: `
+## how to use links
+[[todo]]
+                `,
+                image: `
+## how to use images
+[[todo]]
+                `,
+                list: `
+## How to use lists
+[[todo]]
+                `,
+            },
+        },
     },
     mapList: {
         empty: 'Neniuj lokoj',

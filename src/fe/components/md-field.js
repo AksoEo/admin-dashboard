@@ -1,7 +1,7 @@
 import Markdown from 'markdown-it';
 import { h } from 'preact';
 import { createPortal, createRef, PureComponent, useState } from 'preact/compat';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { globalAnimator, Button, Dialog, TextField } from '@cpsdqs/yamdl';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
 import FormatStrikethroughIcon from '@material-ui/icons/FormatStrikethrough';
@@ -11,7 +11,7 @@ import InsertPhotoIcon from '@material-ui/icons/InsertPhoto';
 import CodeIcon from '@material-ui/icons/Code';
 import TableChartIcon from '@material-ui/icons/TableChart';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
-import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
+// import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 import HelpIcon from '@material-ui/icons/Help';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import CloseIcon from '@material-ui/icons/Close';
@@ -47,6 +47,7 @@ export default class MarkdownTextField extends PureComponent {
         preview: false,
         focused: false,
         editorBarPopout: null,
+        helpOpen: false,
     };
 
     #node = createRef();
@@ -55,7 +56,7 @@ export default class MarkdownTextField extends PureComponent {
 
     updateCache () {
         const md = new Markdown('zero');
-        md.enable('newline');
+        if (!this.props.singleLine) md.enable('newline');
         if (this.props.rules) md.enable(this.props.rules);
         this.#cachedHtml = md.render(this.props.value || '');
         this.forceUpdate();
@@ -114,7 +115,7 @@ export default class MarkdownTextField extends PureComponent {
 
     render ({
         value, editing, onChange, inline, disabled, rules, singleLine, ...extra
-    }, { focused, preview, editorBarPopout }) {
+    }, { focused, preview, editorBarPopout, helpOpen }) {
         let editorBar;
 
         if (editing) {
@@ -173,7 +174,11 @@ export default class MarkdownTextField extends PureComponent {
                         rules={rules}
                         doc={this.#document}
                         onChange={onChange}
-                        onPopout={this.#onEditorBarPopout} />
+                        onPopout={this.#onEditorBarPopout}
+                        onOpenHelp={() => {
+                            this.setState({ helpOpen: true });
+                            document.activeElement.blur();
+                        }} />
                 </EditorBarPortal>
             );
         }
@@ -214,6 +219,17 @@ export default class MarkdownTextField extends PureComponent {
                         })}>
                         {preview ? <CloseIcon /> : <VisibilityIcon />}
                     </Button>
+
+                    <Dialog
+                        class="markdown-text-field-help-dialog"
+                        backdrop
+                        container={portalContainer}
+                        fullScreen={width => width < 900}
+                        open={helpOpen}
+                        onClose={() => this.setState({ helpOpen: false })}
+                        title={locale.mdEditor.help.title}>
+                        <AllHelp rules={singleLine ? rules : ['newline'].concat(rules)} />
+                    </Dialog>
                 </div>
             );
         } else {
@@ -240,6 +256,7 @@ class EditorBarPortal extends PureComponent {
         width: 0,
     };
 
+    #updates = 0;
     update () {
         if (!this.props.owner.current) return;
         const rect = this.props.owner.current.getBoundingClientRect();
@@ -249,20 +266,31 @@ class EditorBarPortal extends PureComponent {
         const width = rect.width;
 
         this.setState({ posX, posY, width });
+
+        if (this.#updates > 12) {
+            globalAnimator.deregister(this);
+            this.#updates = 0;
+        }
     }
 
-    #onMutate = () => requestAnimationFrame(() => this.update(0));
+    #onMutate = () => {
+        globalAnimator.register(this);
+        this.#updates = 0;
+    }
 
     componentDidMount () {
         this.#onMutate();
         window.addEventListener('resize', this.#onMutate);
         window.addEventListener('pointermove', this.#onMutate);
+        window.addEventListener('wheel', this.#onMutate);
         window.addEventListener('keydown', this.#onMutate);
         window.addEventListener('keyup', this.#onMutate);
     }
     componentWillUnmount () {
+        globalAnimator.deregister(this);
         window.removeEventListener('resize', this.#onMutate);
         window.removeEventListener('pointermove', this.#onMutate);
+        window.removeEventListener('wheel', this.#onMutate);
         window.removeEventListener('keydown', this.#onMutate);
         window.removeEventListener('keyup', this.#onMutate);
     }
@@ -372,25 +400,29 @@ function applyHeadings (doc) {
     doc.replaceRange(newPrefix, { line: ln, ch: 0 }, { line: ln, ch: prevLen });
 }
 
-const makeURLInputRequest = apply => function URLInputRequest ({ onComplete }) {
-    const [label, setLabel] = useState('');
+const makeURLInputRequest = apply => function URLInputRequest ({ selection, onComplete }) {
+    const [label, setLabel] = useState(selection);
     const [url, setUrl] = useState('');
     const complete = () => onComplete(apply(label, url));
 
     return (
         <div class="url-input-request">
             <TextField
-                autofocus outline label={locale.mdEditor.urlLabel}
+                class="label-field"
+                outline label={locale.mdEditor.urlLabel}
                 value={label}
                 onChange={e => setLabel(e.target.value)} />
             <TextField
-                autofocus outline label={locale.mdEditor.url}
+                class="url-field"
+                outline label={locale.mdEditor.url}
                 placeholder={locale.mdEditor.urlPlaceholder}
                 value={url}
                 onChange={e => setUrl(e.target.value)} />
-            <Button onClick={complete} disabled={!url}>
-                {locale.mdEditor.insertUrl}
-            </Button>
+            <div class="req-footer">
+                <Button outline class="insert-button" onClick={complete} disabled={!url}>
+                    {locale.mdEditor.insertUrl}
+                </Button>
+            </div>
         </div>
     );
 };
@@ -438,31 +470,22 @@ const FORMAT_BUTTONS = {
     table: {
         icon: <TableChartIcon />,
         rule: 'table',
-        request: () => {
-            // TODO: 'how to use markdown tables'
-            // use a component so it can be re-used in the help dialog
-            return 'todo';
-        },
+        request: () => <HelpSection rule="table" />,
     },
     ul: {
         icon: <FormatListBulletedIcon />,
         rule: 'list',
-        request: () => {
-            // TODO: 'how to use markdown lists'
-            return 'todo';
-        },
+        request: () => <HelpSection rule="list" />,
     },
-    ol: {
+    // since we don't actually use these buttons, we can omit this for now
+    /* ol: {
         icon: <FormatListNumberedIcon />,
         rule: 'list',
-        request: () => {
-            // TODO
-            return 'todo';
-        },
-    },
+        request: () => <HelpSection rule="list" />,
+    }, */
 };
 
-function EditorBar ({ visible, rules, doc, onChange, onPopout }) {
+function EditorBar ({ visible, rules, doc, onChange, onPopout, onOpenHelp }) {
     const buttons = [];
 
     const applyAction = apply => {
@@ -483,6 +506,7 @@ function EditorBar ({ visible, rules, doc, onChange, onPopout }) {
         buttons.push(
             <Button
                 class="format-button"
+                title={locale.mdEditor.formatButtons[id]}
                 // prevent focus stealing
                 onTouchStart={e => e.preventDefault()}
                 onMouseDown={e => e.preventDefault()}
@@ -493,10 +517,12 @@ function EditorBar ({ visible, rules, doc, onChange, onPopout }) {
                             <div class={'format-button-request-container'
                                 + (closing ? ' is-closing' : '')}>
                                 <div class="format-button-request">
-                                    <Request onComplete={apply => {
-                                        onClose();
-                                        applyAction(apply);
-                                    }} />
+                                    <Request
+                                        selection={doc.current.getSelection()}
+                                        onComplete={apply => {
+                                            onClose();
+                                            applyAction(apply);
+                                        }} />
                                 </div>
                             </div>
                         ));
@@ -512,10 +538,45 @@ function EditorBar ({ visible, rules, doc, onChange, onPopout }) {
             <div class="editor-bar-contents">
                 {buttons}
                 <div class="editor-bar-spacer" />
-                <Button class="help-button">
+                <Button
+                    title={locale.mdEditor.help.title}
+                    class="help-button"
+                    // prevent focus stealing
+                    onTouchStart={e => e.preventDefault()}
+                    onMouseDown={e => e.preventDefault()}
+                    onClick={onOpenHelp}>
                     <HelpIcon />
                 </Button>
             </div>
         </div>
+    );
+}
+
+/// Renders all help.
+function AllHelp ({ rules }) {
+    const sections = [];
+    for (const rule in locale.mdEditor.help.rules) {
+        if (rules.includes(rule)) sections.push(<HelpSection key={rule} rule={rule} />);
+    }
+
+    return (
+        <div class="markdown-text-field-help">
+            {sections}
+        </div>
+    );
+}
+
+const cachedHelpSections = {};
+function HelpSection ({ rule }) {
+    if (!cachedHelpSections[rule]) {
+        const md = new Markdown();
+        cachedHelpSections[rule] = md.render(locale.mdEditor.help.rules[rule]);
+    }
+
+    return (
+        <div
+            class="markdown-text-field-help-section"
+            data-rule={rule}
+            dangerouslySetInnerHTML={{ __html: cachedHelpSections[rule] }} />
     );
 }
