@@ -164,7 +164,7 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
         <div class="congress-location-detail-inner">
             <div class="header-top">
                 <TaskImage
-                    class="header-cover-image"
+                    lightbox class="header-cover-image"
                     task="congresses/locationThumbnail"
                     options={{ congress, instance, id }}
                     sizes={[32, 64, 128, 256, 512, 1024, 2048]}

@@ -5,6 +5,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { coreContext } from '../core/connection';
 import pickFile from './pick-file';
+import Lightbox from './lightbox';
 import './task-image.less';
 
 // TODO: add a crop dialog or something
@@ -19,6 +20,7 @@ import './task-image.less';
 /// - `hash`: if not none, will re-fetch when this changes
 /// - `onUpdate`: (Blob, core) => Promise<void, any>
 /// - `contain`: bool - if true, image will use object-fit: contain instead of cover
+/// - `lightbox`: bool - if true, will allow tapping to open a lightbox
 export default class TaskImage extends PureComponent {
     state = {
         loading: false,
@@ -26,6 +28,7 @@ export default class TaskImage extends PureComponent {
         image: null,
         prevImage: null,
         imageSeqId: 0,
+        lightboxOpen: false,
     }
 
     #size = null;
@@ -149,6 +152,14 @@ export default class TaskImage extends PureComponent {
         });
     };
 
+    #lightbox = null;
+    #onImageClick = (e) => {
+        if (this.#lightbox) {
+            this.#lightbox.setOpenFromImage(e.currentTarget);
+            this.setState({ lightboxOpen: true });
+        }
+    };
+
     render ({
         sizes,
         task,
@@ -156,6 +167,7 @@ export default class TaskImage extends PureComponent {
         hash,
         onUpdate,
         editing,
+        lightbox,
         contain,
         ...extra
     }, { loading, image, prevImage, imageSeqId }) {
@@ -164,6 +176,7 @@ export default class TaskImage extends PureComponent {
 
         extra.class = (extra.class || '') + ' task-image';
         if (contain) extra.class += ' p-contain';
+        if (lightbox) extra.class += ' p-lightbox';
 
         return (
             <div {...extra} ref={this.#onNodeRef}>
@@ -178,6 +191,7 @@ export default class TaskImage extends PureComponent {
                     <img
                         class="inner-image"
                         key={'i' + imageSeqId}
+                        onClick={this.#onImageClick}
                         src={image} />
                 ) : null}
 
@@ -189,6 +203,14 @@ export default class TaskImage extends PureComponent {
                         onClick={this.#edit}>
                         <AddAPhotoIcon />
                     </Button>
+                ) : null}
+
+                {lightbox ? (
+                    <Lightbox
+                        ref={view => this.#lightbox = view}
+                        src={image}
+                        open={this.state.lightboxOpen}
+                        onClose={() => this.setState({ lightboxOpen: false })} />
                 ) : null}
             </div>
         );
