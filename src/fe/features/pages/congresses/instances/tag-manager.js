@@ -7,6 +7,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from '@material-ui/icons/Edit';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import DisplayError from '../../../../components/error';
+import { layoutContext } from '../../../../components/dynamic-height-div';
 import TinyProgress from '../../../../components/tiny-progress';
 import { connect, coreContext } from '../../../../core/connection';
 import { data as locale } from '../../../../locale';
@@ -47,6 +48,8 @@ export default class TagManager extends PureComponent {
         }).catch(error => {
             console.error(error); // eslint-disable-line no-console
             this.setState({ loading: false, error });
+        }).then(() => {
+            if (this.layoutContext) this.layoutContext();
         });
     }
 
@@ -114,6 +117,10 @@ export default class TagManager extends PureComponent {
 
         return (
             <div class="congress-tag-manager">
+                <layoutContext.Consumer>{ctx => {
+                    this.layoutContext = ctx;
+                    return null;
+                }}</layoutContext.Consumer>
                 {contents}
                 <Button
                     icon small class="manage-button"

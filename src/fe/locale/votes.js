@@ -14,7 +14,7 @@ export const votes = {
         },
     },
     fields: {
-        org: 'AKSO-Organizo',
+        org: 'Organizo',
         type: 'Speco',
         name: 'Nomo',
         state: 'Ŝtato',

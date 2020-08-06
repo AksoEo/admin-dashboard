@@ -4,6 +4,7 @@ import Meta from '../../../../meta';
 import Page from '../../../../../components/page';
 import DetailShell from '../../../../../components/detail-shell';
 import DynamicHeightDiv from '../../../../../components/dynamic-height-div';
+import TaskImage from '../../../../../components/task-image';
 import { coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';
 import { congressLocations as locale } from '../../../../../locale';
@@ -161,29 +162,49 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
 
     return (
         <div class="congress-location-detail-inner">
-            <DynamicHeightDiv class="inner-header" useFirstHeight>
-                <div class="header-title">
-                    {external ? (
-                        <InnerField field="icon" item={item} editing={editing} onItemChange={onItemChange} />
-                    ) : null}
-                    <InnerField field="name" item={item} editing={editing} onItemChange={onItemChange} />
+            <div class="header-top">
+                <TaskImage
+                    class="header-cover-image"
+                    task="congresses/locationThumbnail"
+                    options={{ congress, instance, id }}
+                    sizes={[32, 64, 128, 256, 512, 1024, 2048]}
+                    id={id}
+                    editing={editing}
+                    onUpdate={(thumbnail, core) => {
+                        const task = core.createTask('congresses/updateLocationThumbnail', {
+                            congress, instance, id,
+                        }, {
+                            thumbnail,
+                        });
+                        return new Promise(resolve => task.on('drop', resolve));
+                    }} />
+                <div class="header-text-protection" />
+                <div class={'inner-header-container' + (editing ? ' is-editing' : '')}>
+                    <DynamicHeightDiv class="inner-header" useFirstHeight>
+                        <div class="header-title">
+                            {external ? (
+                                <InnerField field="icon" item={item} editing={editing} onItemChange={onItemChange} />
+                            ) : null}
+                            <InnerField field="name" item={item} editing={editing} onItemChange={onItemChange} />
+                        </div>
+                        {locatedWithin}
+                        {showTags && (
+                            <TagManager
+                                list="congresses/listLocationTags"
+                                selected="congresses/listTagsOfLocation"
+                                options={{ congress, instance, location: id }}
+                                view="congresses/locationTag"
+                                viewOptions={{ congress, instance }}
+                                taskOptions={{ congress, instance, location: id }}
+                                addTask="congresses/createLocationTag"
+                                updateTask="congresses/updateLocationTag"
+                                deleteTask="congresses/deleteLocationTag"
+                                attachTask="congresses/addTagToLocation"
+                                removeTask="congresses/removeTagFromLocation" />
+                        )}
+                    </DynamicHeightDiv>
                 </div>
-                {locatedWithin}
-                {showTags && (
-                    <TagManager
-                        list="congresses/listLocationTags"
-                        selected="congresses/listTagsOfLocation"
-                        options={{ congress, instance, location: id }}
-                        view="congresses/locationTag"
-                        viewOptions={{ congress, instance }}
-                        taskOptions={{ congress, instance, location: id }}
-                        addTask="congresses/createLocationTag"
-                        updateTask="congresses/updateLocationTag"
-                        deleteTask="congresses/deleteLocationTag"
-                        attachTask="congresses/addTagToLocation"
-                        removeTask="congresses/removeTagFromLocation" />
-                )}
-            </DynamicHeightDiv>
+            </div>
             <DynamicHeightDiv class="inner-desc" useFirstHeight>
                 {external ? (
                     <div class="inner-field">
@@ -228,3 +249,4 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
         </div>
     );
 }
+

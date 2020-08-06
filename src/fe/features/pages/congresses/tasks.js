@@ -252,6 +252,18 @@ export default {
             </TaskDialog>
         );
     },
+    updateLocationThumbnail ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locationLocale.updateThumbnail.title}
+                actionLabel={locationLocale.updateThumbnail.button}
+                run={() => task.runOnce()}>
+                {/* TODO */}
+            </TaskDialog>
+        );
+    },
 
     createProgram ({ open, task }) {
         const { congress, instance } = task.options;

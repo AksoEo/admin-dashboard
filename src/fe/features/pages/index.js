@@ -246,29 +246,6 @@ export default [
                 hasPerm: () => true,
             },
             {
-                id: 'lists',
-                icon: ListsIcon,
-                path: 'listoj',
-                component: elazy(() =>
-                    import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists')),
-                paths: [
-                    {
-                        match: /^(\d+)$/,
-                        component: elazy(() =>
-                            import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists/detail')),
-                        type: 'stack',
-                        paths: [
-                            {
-                                path: 'redakti',
-                                type: 'state',
-                                state: 'editing',
-                            },
-                        ],
-                    },
-                ],
-                hasPerm: perms => perms.hasPerm('lists.read'),
-            },
-            {
                 id: 'reports',
                 icon: AssignmentIcon,
                 path: 'raportoj',
@@ -408,6 +385,29 @@ export default [
                         ],
                     },
                 ],
+            },
+            {
+                id: 'lists',
+                icon: ListsIcon,
+                path: 'listoj',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists')),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
+                hasPerm: perms => perms.hasPerm('lists.read'),
             },
             {
                 id: 'statistics',

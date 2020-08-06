@@ -1,35 +1,53 @@
 @import '../../node_modules/@cpsdqs/yamdl/src/prelude';
 
+@__primary--internal: #004c3f;
+@__secondary--internal: #31a64f;
+@__warning--internal: #ffe330;
+@__danger--internal: #f44336;
+
+.__gen-text(@text--internal, @text-on-primary--internal) {
+    --text: @text--internal;
+    --text-fade-10: fade(@text--internal, 10%);
+    --text-fade-20: fade(@text--internal, 20%);
+    --text-fade-40: fade(@text--internal, 40%);
+    --text-fade-50: fade(@text--internal, 50%);
+    --text-fade-60: fade(@text--internal, 60%);
+    --text-fade-80: fade(@text--internal, 80%);
+    --text-on-primary: @text-on-primary--internal;
+    --text-on-primary-fade-60: fade(@text-on-primary--internal, 60%);
+}
+
+.force-dark-theme() {
+    .md-dark-theme(@__primary--internal, @__secondary--internal, @__danger--internal);
+
+    .__gen-text(white, white);
+    color: var(--text);
+
+    --warning-text: @__warning--internal;
+
+    --page-background: #1a1a1a;
+    --card-background: #222;
+    --card1-background: #2a2a2a;
+    --card2-background: #333;
+    --sidebar-background: #222;
+    --sidebar-border: #333;
+
+    --gray-button-color: var(--text-fade-60);
+}
+
 :root, html, body {
     // this selector also targets html and body because FOR SOME REASON yamdl’s default styles are
     // *appended* to this stylesheet, meaning they get higher priority
 
-    @primary--internal: #004c3f;
-    @secondary--internal: #31a64f;
-    @warning--internal: #ffe330;
-    @danger--internal: #f44336;
-
-    --primary: @primary--internal;
-    --secondary: @secondary--internal;
-    --secondary-lighten-10: lighten(@secondary--internal, 10%);
-    --secondary-fade-50: fade(@secondary--internal, 50%);
-    --warning: @warning--internal;
+    --primary: @__primary--internal;
+    --secondary: @__secondary--internal;
+    --secondary-lighten-10: lighten(@__secondary--internal, 10%);
+    --secondary-fade-50: fade(@__secondary--internal, 50%);
+    --warning: @__warning--internal;
     --warning-text: #cfad20;
-    --danger: @danger--internal;
-    --danger-fade-20: fade(@danger--internal, 20%);
-
-    .gen-text(@text--internal, @text-on-primary--internal) {
-        --text: @text--internal;
-        --text-fade-10: fade(@text--internal, 10%);
-        --text-fade-20: fade(@text--internal, 20%);
-        --text-fade-40: fade(@text--internal, 40%);
-        --text-fade-50: fade(@text--internal, 50%);
-        --text-fade-60: fade(@text--internal, 60%);
-        --text-fade-80: fade(@text--internal, 80%);
-        --text-on-primary: @text-on-primary--internal;
-        --text-on-primary-fade-60: fade(@text-on-primary--internal, 60%);
-    }
-    .gen-text(black, white);
+    --danger: @__danger--internal;
+    --danger-fade-20: fade(@__danger--internal, 20%);
+    .__gen-text(black, white);
 
     --page-background: #eee;
     --card-background: #fff;
@@ -47,23 +65,10 @@
     --rating-stars: #faaa44;
     --rating-hearts: #fe3a43;
 
-    .md-light-theme(@primary--internal, @secondary--internal, @danger--internal);
+    .md-light-theme(@__primary--internal, @__secondary--internal, @__danger--internal);
 
     @media (prefers-color-scheme: dark) {
-        .md-dark-theme(@primary--internal, @secondary--internal, @danger--internal);
-
-        .gen-text(white, white);
-
-        --warning-text: @warning--internal;
-
-        --page-background: #1a1a1a;
-        --card-background: #222;
-        --card1-background: #2a2a2a;
-        --card2-background: #333;
-        --sidebar-background: #222;
-        --sidebar-border: #333;
-
-        --gray-button-color: var(--text-fade-60);
+        .force-dark-theme();
     }
 
     --editor-background: #222;
@@ -82,7 +87,6 @@
 
     --editor-template-background: fade(#75f, 40%);
     --editor-template-delimiter: #77f;
-
 }
 
 .editor-text() {

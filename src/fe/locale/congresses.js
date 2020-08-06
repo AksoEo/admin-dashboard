@@ -172,6 +172,10 @@ export const congressLocations = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la lokon? Ne eblas malfari tiun ĉi agon.',
     },
+    updateThumbnail: {
+        title: '[[Upload thumbnail]]',
+        button: '[[Upload]]',
+    },
 };
 
 export const congressPrograms = {

@@ -292,6 +292,16 @@ export const tasks = {
         await client.patch(`/congresses/${congress}/instances/${instance}/locations/${id}`, fieldDiff(existing, params));
         store.insert([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA], deepMerge(existing, params));
     },
+    locationThumbnail: async ({ congress, instance, id }, { size }) => {
+        const client = await asyncClient;
+        const res = await fetch(client.client.createURL(`/congresses/${congress}/instances/${instance}/locations/${id}/thumbnail/${size}`), {
+            credentials: 'include',
+            mode: 'cors',
+        });
+        if (res.status === 404) return null;
+        if (!res.ok) throw { statusCode: res.status };
+        return await res.blob();
+    },
     updateLocationThumbnail: async ({ congress, instance, id }, { thumbnail }) => {
         const client = await asyncClient;
         await client.put(`/congresses/${congress}/instances/${instance}/locations/${id}/thumbnail`, null, {}, [{
