@@ -10,6 +10,7 @@ import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../../com
 import { congressLocations as locale } from '../../../../../locale';
 import { routerContext } from '../../../../../router';
 import { FIELDS } from './fields';
+import { FILTERS } from './filters';
 import MapList from '../../map-list';
 import './index.less';
 
@@ -29,6 +30,11 @@ export default class LocationsView extends PureComponent {
                 field: 'name',
                 query: '',
             },
+            filters: {},
+            jsonFilter: {
+                _disabled: true,
+                filter: {},
+            },
             fields: [
                 { id: 'type', sorting: 'none', fixed: true },
                 { id: 'name', sorting: 'asc', fixed: true },
@@ -37,6 +43,7 @@ export default class LocationsView extends PureComponent {
             offset: 0,
             limit: 10,
         },
+        expanded: false,
         listView: false,
         tToListView: false, // transition to list view
         tFromListView: false,
@@ -53,7 +60,7 @@ export default class LocationsView extends PureComponent {
         } else {
             this.setState({
                 listView: true,
-                parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
+                parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
             });
         }
         this.#currentQuery = this.props.query;
@@ -61,7 +68,7 @@ export default class LocationsView extends PureComponent {
 
     encodeURLQuery () {
         const encoded = this.state.listView
-            ? encodeURLQuery(this.state.parameters, {})
+            ? encodeURLQuery(this.state.parameters, FILTERS)
             : '';
         if (encoded === this.#currentQuery) return;
         this.#currentQuery = encoded;
@@ -118,7 +125,7 @@ export default class LocationsView extends PureComponent {
         }, 1000);
     };
 
-    render ({ congress, instance, congressAddress, congressLocation }, { parameters, listView }) {
+    render ({ congress, instance, congressAddress, congressLocation }, { parameters, listView, expanded }) {
         let header;
         const markers = [];
         if (congressAddress) {
@@ -155,13 +162,18 @@ export default class LocationsView extends PureComponent {
                             'name',
                             'description',
                         ]}
+                        filters={FILTERS}
                         onChange={parameters => this.setState({ parameters })}
                         locale={{
                             searchPlaceholders: locale.search.placeholders,
                             searchFields: locale.fields,
+                            filters: locale.search.filters,
                         }}
+                        expanded={expanded}
+                        onExpandedChange={expanded => this.setState({ expanded })}
                         inputRef={node => this.#searchInput = node} />
                     <OverviewList
+                        expanded={expanded}
                         useDeepCmp options={{ congress, instance }}
                         viewOptions={{ congress, instance }}
                         task="congresses/listLocations"

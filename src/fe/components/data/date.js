@@ -115,6 +115,9 @@ class DateEditor extends Component {
         if (prevProps.value !== this.props.value && !this.state.focused) {
             this.setState({ inputText: stringifyDate(this.getDateValue()) });
         }
+        if (this.props.disabled && this.state.focused) {
+            this.setState({ focused: false });
+        }
     }
 
     componentWillUnmount () {

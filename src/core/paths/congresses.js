@@ -2,7 +2,7 @@ import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import * as store from '../store';
-import { fieldsToOrder, fieldDiff } from '../list';
+import { fieldsToOrder, fieldDiff, filtersToAPI, addJSONFilter } from '../list';
 import { deepMerge } from '../../util';
 
 export const CONGRESSES = 'congresses';
@@ -19,6 +19,33 @@ export const SIG_LOC_TAGS = '!location_tags';
 export const SIG_LOCATIONS = '!locations';
 export const SIG_PROG_TAGS = '!program_tags';
 export const SIG_PROGRAMS = '!programs';
+
+const locClientFilters = {
+    type: {
+        toAPI: type => ({ type }),
+    },
+    externalLoc: {
+        toAPI: locations => ({ externalLoc: { $in: locations } }),
+    },
+};
+const progClientFilters = {
+    timeSlice: {
+        toAPI: ([from, to]) => (from && to) ? ({
+            $and: [
+                { timeTo: { $gt: from } },
+                { timeFrom: { $lt: to } },
+            ],
+        }) : from ? ({
+            timeTo: { $gt: from },
+        }) : to ? ({
+            timeFrom: { $lt: to },
+        }) : ({}),
+    },
+    location: {
+        toAPI: locations => ({ location: { $in: locations } }),
+    },
+};
+
 
 // FIXME: needs a lot more DRY
 
@@ -233,7 +260,7 @@ export const tasks = {
 
     // MARK - locations
 
-    listLocations: async ({ congress, instance, externalOnly }, { offset, limit, fields, search }) => {
+    listLocations: async ({ congress, instance, externalOnly }, { offset, limit, fields, filters, search }) => {
         const client = await asyncClient;
         const opts = {
             offset,
@@ -241,7 +268,12 @@ export const tasks = {
             fields: ['id', 'name', 'description', 'll', 'icon', 'address', 'type', 'externalLoc'],
             order: fieldsToOrder(fields),
         };
-        if (externalOnly) opts.filter = { type: 'external' };
+        const apiFilter = filtersToAPI(locClientFilters, filters);
+        if (apiFilter) opts.filter = apiFilter;
+        if (externalOnly) {
+            if (opts.filter) opts.filter = { $and: [opts.filter, { type: 'external' }] };
+            else opts.filter = { type: 'external' };
+        }
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
             if (!util.isValidSearch(transformedQuery)) {
@@ -415,7 +447,7 @@ export const tasks = {
 
     // MARK - programs
 
-    listPrograms: async ({ congress, instance }, { offset, limit, fields, jsonFilter, search }) => {
+    listPrograms: async ({ congress, instance }, { offset, limit, fields, filters, jsonFilter, search }) => {
         const client = await asyncClient;
         const opts = {
             offset,
@@ -423,10 +455,8 @@ export const tasks = {
             fields: ['id', 'title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
             order: fieldsToOrder(fields),
         };
-        if (jsonFilter && jsonFilter.filter) {
-            // simple interface
-            opts.filter = jsonFilter.filter;
-        }
+        const apiFilter = addJSONFilter(filtersToAPI(progClientFilters, filters), jsonFilter);
+        if (apiFilter) opts.filter = apiFilter;
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
             if (!util.isValidSearch(transformedQuery)) {

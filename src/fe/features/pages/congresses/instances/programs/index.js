@@ -10,6 +10,7 @@ import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../../com
 import { congressPrograms as locale } from '../../../../../locale';
 import ProgramTimeline from './timeline';
 import { FIELDS } from './fields';
+import { FILTERS } from './filters';
 import './index.less';
 
 /// Shows an overview over programs, with a map
@@ -25,6 +26,11 @@ export default class ProgramsView extends PureComponent {
                 field: 'title',
                 query: '',
             },
+            filters: {},
+            jsonFilter: {
+                _disabled: true,
+                filter: {},
+            },
             fields: [
                 { id: 'title', sorting: 'none', fixed: true },
                 { id: 'description', sorting: 'none', fixed: true },
@@ -34,6 +40,7 @@ export default class ProgramsView extends PureComponent {
             offset: 0,
             limit: 10,
         },
+        expanded: false,
         dateFrom: null,
         dateTo: null,
         tz: null,
@@ -49,7 +56,7 @@ export default class ProgramsView extends PureComponent {
         } else {
             this.setState({
                 listView: true,
-                parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
+                parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
             });
         }
         this.#currentQuery = this.props.query;
@@ -57,7 +64,7 @@ export default class ProgramsView extends PureComponent {
 
     encodeURLQuery () {
         const encoded = this.state.listView
-            ? encodeURLQuery(this.state.parameters, {})
+            ? encodeURLQuery(this.state.parameters, FILTERS)
             : '';
         if (encoded === this.#currentQuery) return;
         this.#currentQuery = encoded;
@@ -80,7 +87,7 @@ export default class ProgramsView extends PureComponent {
     }
 
 
-    render ({ congress, instance }, { parameters, dateFrom, dateTo, tz, listView }) {
+    render ({ congress, instance }, { parameters, dateFrom, dateTo, tz, listView, expanded }) {
         const contents = [];
         if (listView) {
             contents.push(
@@ -90,13 +97,19 @@ export default class ProgramsView extends PureComponent {
                         'title',
                         'description',
                     ]}
+                    filters={FILTERS}
                     onChange={parameters => this.setState({ parameters })}
                     locale={{
                         searchPlaceholders: locale.search.placeholders,
                         searchFields: locale.fields,
+                        filters: locale.search.filters,
                     }}
-                    inputRef={view => this.#searchInput = view} />,
+                    expanded={expanded}
+                    onExpandedChange={expanded => this.setState({ expanded })}
+                    inputRef={view => this.#searchInput = view}
+                    userData={{ tz }} />,
                 <OverviewList
+                    expanded={expanded}
                     useDeepCmp options={{ congress, instance }}
                     viewOptions={{ congress, instance }}
                     task="congresses/listPrograms"

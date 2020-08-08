@@ -73,6 +73,7 @@ export default connectPerms(class CongressInstancePage extends Page {
     }
     set tab (tab) {
         if (tab === this.tab) return;
+        this.props.onQueryChange(''); // to prevent crosstalk between the two pages
         if (this.props.locations) this.props.locations.pop(true);
         if (this.props.programs) this.props.programs.pop(true);
         if (tab === 'locations') {

@@ -72,6 +72,18 @@ export function filtersToAPI (clientFilters, pfilters) {
     return null;
 }
 
+/// Returns the given JSON filter added to the given filter parameter.
+export function addJSONFilter (filter, jsonFilter) {
+    if (jsonFilter && !jsonFilter._disabled) {
+        if (jsonFilter.error) throw jsonFilter.error;
+        if (filter) {
+            if (filter.$and) return { $and: [...filter.$and, jsonFilter.filter] };
+            else return { $and: [filter, jsonFilter.filter] };
+        } else return jsonFilter.filter;
+    }
+    return filter;
+}
+
 /// Converts params to request options. See e.g. task codeholders/list for details.
 export const makeParametersToRequestData = ({
     searchFieldToTransientFields,
@@ -144,13 +156,8 @@ export const makeParametersToRequestData = ({
     const apiFilter = filtersToAPI(clientFilters, params.filters);
     if (apiFilter) options.filter = apiFilter;
 
-    if (params.jsonFilter && !params.jsonFilter._disabled) {
-        if (params.jsonFilter.error) throw params.jsonFilter.error;
-        if (options.filter) {
-            if (options.filter.$and) options.filter.$and.push(params.jsonFilter.filter);
-            else options.filter = { $and: [options.filter, params.jsonFilter.filter] };
-        } else options.filter = params.jsonFilter.filter;
-    }
+    options.filter = addJSONFilter(options.filter, params.jsonFilter);
+
     const usedFilters = 'filter' in options && !!Object.keys(options.filter).length;
 
     return {

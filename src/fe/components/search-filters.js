@@ -42,6 +42,7 @@ import './search-filters.less';
 /// - category: category id for saved filters
 /// - filtersToAPI: name of a task that will convert client filters to an api filter
 /// - compact: if true, forces compact view
+/// - userData: will be passed to filters
 export default function SearchFilters ({
     value,
     onChange,
@@ -53,6 +54,7 @@ export default function SearchFilters ({
     category,
     inputRef,
     filtersToAPI,
+    userData,
     compact: _compact,
 }) {
     const items = [];
@@ -158,7 +160,8 @@ export default function SearchFilters ({
                     offset: 0,
                 })}
                 hidden={filterIsHidden}
-                locale={searchLocale} />,
+                locale={searchLocale}
+                userData={userData} />,
             paper: true,
             hidden: filterIsHidden,
             staticHeight: true,
@@ -249,10 +252,10 @@ const FiltersBar = connectPerms(function FiltersBar ({
         );
     }
 
-    const canReadFilters = perms.hasPerm('queries.read');
-    const canSaveFilters = loadedFilter
+    const canReadFilters = category && perms.hasPerm('queries.read');
+    const canSaveFilters = category && (loadedFilter
         ? perms.hasPerm('queries.update')
-        : perms.hasPerm('queries.create');
+        : perms.hasPerm('queries.create'));
 
     const viewJSON = core => async () => {
         const filter = await core.createTask(filtersToAPITask, {
@@ -419,7 +422,7 @@ const FilterPicker = connectPerms(function FilterPicker ({ category, open, onClo
     );
 });
 
-function Filter ({ id, spec, filter, onFilterChange, hidden, locale }) {
+function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData }) {
     const FilterEditor = spec.editor;
 
     let filterSwitch;
@@ -456,7 +459,8 @@ function Filter ({ id, spec, filter, onFilterChange, hidden, locale }) {
                 onChange={value => onFilterChange(filter = { ...filter, value })}
                 enabled={filter.enabled}
                 hidden={hidden}
-                onEnabledChange={enabled => onFilterChange(filter = { ...filter, enabled })} />
+                onEnabledChange={enabled => onFilterChange(filter = { ...filter, enabled })}
+                userData={userData} />
         </div>
     );
 }

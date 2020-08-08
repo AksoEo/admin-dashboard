@@ -85,6 +85,10 @@ export const congressLocations = {
             name: 'Serĉi nomon',
             description: 'Serĉi priskribon',
         },
+        filters: {
+            type: 'Tipo',
+            externalLoc: 'Ekstera loko',
+        },
     },
     fields: {
         name: 'Nomo',
@@ -105,6 +109,7 @@ export const congressLocations = {
         types: {
             external: 'Ekstera loko',
             internal: 'Interna loko',
+            none: 'ne gravas',
         },
     },
     locatedWithinExternalLoc: 'situas ene de', // prefix
@@ -184,6 +189,13 @@ export const congressPrograms = {
         placeholders: {
             title: 'Programa titolo',
             description: 'Priskribo',
+        },
+        filters: {
+            location: 'Loko',
+
+            timeSlice: '[[Time Intersection]]',
+            timeSliceFrom: '[[lower bound]]',
+            timeSliceTo: '[[upper bound]]',
         },
     },
     fields: {
