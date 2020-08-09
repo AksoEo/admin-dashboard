@@ -126,14 +126,15 @@ function InnerField ({ field, item, editing, onItemChange, ...extra }) {
         onItemChange={onItemChange} />;
 }
 
-export function DetailInner ({ congress, instance, id, item, editing, onItemChange }) {
+export function DetailInner ({ congress, instance, id, item, editing, onItemChange, isCreation }) {
+    if (!item) return null;
     const showTags = id !== null;
     const external = item.type === 'external';
     const ll = item.ll;
     const markers = [
         {
             location: ll,
-            icon: <InnerField field="icon" item={item} slot="marker" />,
+            icon: item.icon !== 'GENERIC' && <InnerField field="icon" item={item} slot="marker" />,
             onDragEnd: editing && (e => {
                 const newPos = e.target.getLatLng();
                 onItemChange({ ...item, ll: [newPos.lat, newPos.lng] });
@@ -162,8 +163,8 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
 
     return (
         <div class="congress-location-detail-inner">
-            <div class="header-top">
-                <TaskImage
+            <div class={'header-top' + (isCreation ? ' is-creation' : '')}>
+                {!isCreation && <TaskImage
                     lightbox class="header-cover-image"
                     task="congresses/locationThumbnail"
                     options={{ congress, instance, id }}
@@ -177,7 +178,7 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                             thumbnail,
                         });
                         return new Promise(resolve => task.on('drop', resolve));
-                    }} />
+                    }} />}
                 <div class="header-text-protection" />
                 <div class={'inner-header-container' + (editing ? ' is-editing' : '')}>
                     <DynamicHeightDiv class="inner-header" useFirstHeight>

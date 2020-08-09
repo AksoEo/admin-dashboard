@@ -7,20 +7,20 @@
 
     .map-picker-pick-banner {
         position: absolute;
-        top: 8px;
-        left: 50%;
+        bottom: 8px;
+        left: 8px;
         z-index: 9999;
         background: @card-background;
         border-radius: 4px;
         padding: 8px 16px;
         font-size: small;
         .elevation(6);
-        transform: translateX(-50%);
+        transform: none;
         transition: transform 0.7s @easing;
         pointer-events: none;
 
         &.is-hidden {
-            transform: translate(-50%, -200%);
+            transform: translateY(200%);
         }
     }
 
@@ -35,6 +35,12 @@
         &.is-hidden {
             transform: translateY(-200%);
         }
+    }
+
+    .a-map-picker-map-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
     }
 
     .a-map-picker-map {
@@ -52,6 +58,7 @@
 
 .congress-map-picker-address-search {
     width: 100%;
+    height: 100%;
     max-width: 800px;
 
     .address-search-query {
@@ -70,5 +77,22 @@
 
     .address-search-item {
         padding: 16px;
+    }
+
+    .paper-dialog-contents {
+        display: flex;
+        align-items: stretch;
+        padding: 0 !important;
+
+        .address-search-inner {
+            display: flex;
+            flex: 1;
+            align-items: stretch;
+
+            .map-list {
+                flex: 1;
+                min-height: 0;
+            }
+        }
     }
 }

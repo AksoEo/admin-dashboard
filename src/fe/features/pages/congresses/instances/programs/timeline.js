@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import moment from 'moment';
 import { CircularProgress } from '@cpsdqs/yamdl';
+import DynamicHeightDiv from '../../../../../components/dynamic-height-div';
 import DisplayError from '../../../../../components/error';
 import OverviewListItem from '../../../../../components/overview-list-item';
 import { connect, coreContext } from '../../../../../core/connection';
@@ -400,7 +401,7 @@ class TimelineDayView extends PureComponent {
 
     render (_, { loading, error, items }) {
         return (
-            <div class="timeline-day-view">
+            <DynamicHeightDiv class="timeline-day-view">
                 {loading ? (
                     <div class="day-view-status">
                         <CircularProgress indeterminate />
@@ -414,7 +415,8 @@ class TimelineDayView extends PureComponent {
                         {this.renderContents()}
                     </div>
                 ) : null}
-            </div>
+                <div class="day-view-bottom-padding" />
+            </DynamicHeightDiv>
         );
     }
 }

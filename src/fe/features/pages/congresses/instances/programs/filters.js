@@ -7,7 +7,7 @@ export const FILTERS = {
         default: () => ({ enabled: false, value: [null, null] }),
         serialize: ({ value }) => value.map(x => x === null ? '' : x).join('$'),
         deserialize: value => ({ enabled: true, value: value.split('$').map(x => x ? +x : null) }),
-        editor ({ value, onChange, enabled, onEnabledChange, hidden, userData }) {
+        editor ({ value, onChange, onEnabledChange, hidden, userData }) {
             return (
                 <div class="congress-programs-time-slice-filter">
                     <timestamp.editor

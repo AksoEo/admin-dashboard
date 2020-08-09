@@ -45,7 +45,7 @@ class DataLoader {
             // bad server
             this.dropped = true;
         }
-        this.push(result.items);
+        await this.push(result.items);
 
         if (this.loadedItems < this.totalItems) {
             await this.loadLoop();
@@ -77,7 +77,7 @@ class DataLoader {
 /// - view: item view
 /// - viewOptions: view options
 /// - updateView: update view parameters
-/// - item: item component. Will be passed the following props: { id }
+/// - item: item component. Will be passed the following props: { id, item }
 /// - detail: if not none, will display an overlay over the list
 /// - itemToMarker: should either turn an item into a marker or return something falsy
 /// - searchFields: array of fields to use for searching
@@ -93,7 +93,6 @@ class DataLoader {
 ///
 /// - items: object { [id]: {data} }
 /// - loading/error: for display only
-/// - item: item component will also be passed { item } in this mode
 export default class MapList extends PureComponent {
     state = {
         /// If not null, then this is an instanceof DataLoader, loading data.
@@ -166,7 +165,7 @@ export default class MapList extends PureComponent {
             .map(x => x.location);
 
         if (markers.length) {
-            this.#map.fitBounds(L.latLngBounds(markers).pad(0.4));
+            this.#map.fitBounds(L.latLngBounds(markers).pad(0.2));
         }
     };
 
@@ -174,17 +173,28 @@ export default class MapList extends PureComponent {
         if (this.state.loading) this.state.loading.drop();
         if (this.props.items) return;
 
+        let index = 0;
+
         const loader = new DataLoader(
             this.context,
             this.props.task,
             this.props.options || {},
-            newItems => {
-                this.setState({ items: this.state.items.concat(newItems) });
+            newItems => new Promise(resolve => {
+                const items = this.state.items.slice();
+                items.splice(index, newItems.length, ...newItems);
+                this.setState({ items }, resolve);
+                index += newItems.length;
                 for (const id of newItems) this.#addItemViewForId(id);
-            },
+            }),
             () => {
+                let items = this.state.items;
+                if (items.length > index) {
+                    items = items.slice();
+                    items.splice(index);
+                }
+
                 // done
-                this.setState({ loading: null }, () => {
+                this.setState({ items, loading: null }, () => {
                     // we need to delay flushing until after state has been set
                     this.#flushItemViews();
 
@@ -418,7 +428,7 @@ function Item ({ item, id, highlighted, subnodes, objectItems, onItemClick, onIt
             onClick={e => onItemClick(id, e)}
             onpointerover={e => onItemHover(id, e)}
             onpointerout={e => onItemOut(id, e)}>
-            <ItemComponent id={id} item={objectItems ? objectItems[id] : undefined} />
+            <ItemComponent id={id} item={objectItems ? objectItems[id] : item} />
         </div>
     );
 

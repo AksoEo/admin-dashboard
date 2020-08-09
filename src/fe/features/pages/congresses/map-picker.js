@@ -64,12 +64,6 @@ export default class MapPicker extends PureComponent {
 
         return (
             <div class="a-map-picker">
-                <div class={'map-picker-pick-banner' + (value ? ' is-hidden' : '')}>
-                    {locale.mapPicker.pickPrompt}
-                </div>
-                <div class={'map-picker-pick-banner' + (!value ? ' is-hidden' : '')}>
-                    {locale.mapPicker.movePrompt}
-                </div>
                 <Button
                     raised
                     class={'map-picker-from-address' + (!address ? ' is-hidden' : '')}
@@ -79,13 +73,21 @@ export default class MapPicker extends PureComponent {
                     }}>
                     {locale.mapPicker.fromAddress}
                 </Button>
-                <Map
-                    class="a-map-picker-map"
-                    center={this.initialCenter}
-                    zoom={this.initialZoom}
-                    markers={markers}
-                    whenReady={map => this.#map = map.target}
-                    onClick={this.#onMapClick} />
+                <div class="a-map-picker-map-container">
+                    <Map
+                        class="a-map-picker-map"
+                        center={this.initialCenter}
+                        zoom={this.initialZoom}
+                        markers={markers}
+                        whenReady={map => this.#map = map.target}
+                        onClick={this.#onMapClick} />
+                    <div class={'map-picker-pick-banner' + (value ? ' is-hidden' : '')}>
+                        {locale.mapPicker.pickPrompt}
+                    </div>
+                    <div class={'map-picker-pick-banner' + (!value ? ' is-hidden' : '')}>
+                        {locale.mapPicker.movePrompt}
+                    </div>
+                </div>
                 <LatLonEditor
                     value={value}
                     editing={true}
@@ -170,6 +172,10 @@ class AddressSearch extends PureComponent {
                     itemToMarker={item => ({
                         key: item.id,
                         location: item.location,
+                        onClick: () => {
+                            onChange(item.location, item.address);
+                            onClose();
+                        },
                     })}
                     onItemClick={id => {
                         const item = items[id];

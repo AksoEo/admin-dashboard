@@ -75,6 +75,16 @@ export default class LocationsView extends PureComponent {
         this.props.onQueryChange(encoded);
     }
 
+    constructListItem () {
+        const { congress, instance } = this.props;
+        this.listItem = listItemConstructor({ congress, instance });
+    }
+
+    constructor (props) {
+        super(props);
+        this.constructListItem();
+    }
+
     componentDidMount () {
         this.decodeURLQuery();
         if (this.#searchInput) this.#searchInput.focus(500);
@@ -87,6 +97,9 @@ export default class LocationsView extends PureComponent {
         if (prevState.parameters !== this.state.parameters
             || prevState.listView !== this.state.listView) {
             this.encodeURLQuery();
+        }
+        if (prevProps.congress !== this.props.congress || prevProps.instance !== this.props.instance) {
+            this.constructListItem();
         }
     }
 
@@ -197,8 +210,8 @@ export default class LocationsView extends PureComponent {
                     view="congresses/location"
                     viewOptions={{ congress, instance, noFetch: true }}
                     updateView={['congresses/sigLocations', { congress, instance }]}
-                    item={listItemConstructor({ congress, instance })}
-                    itemToMarker={item => item.type === 'internal' ? null : ({
+                    item={this.listItem}
+                    itemToMarker={item => (!item || item.type === 'internal') ? null : ({
                         key: item.id,
                         location: item.ll,
                         icon: item.icon === 'GENERIC' ? null : <IconField value={item.icon} />,

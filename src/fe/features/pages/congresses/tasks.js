@@ -208,13 +208,14 @@ export default {
                                         }
                                     }, 300);
                                 }}>
-                                {Object.entries(locationLocale.fields.types).map(([k, v]) => ({
+                                {['external', 'internal'].map(k => ({
                                     id: k,
-                                    label: v,
+                                    label: locationLocale.fields.types[k],
                                 }))}
                             </Validator>
                         </Field>
                         <LocationEditor
+                            isCreation
                             congress={task.options.congress}
                             instance={task.options.instance}
                             id={null}
