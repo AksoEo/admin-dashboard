@@ -158,7 +158,7 @@ export const makeParametersToRequestData = ({
 
     options.filter = addJSONFilter(options.filter, params.jsonFilter);
 
-    const usedFilters = 'filter' in options && !!Object.keys(options.filter).length;
+    const usedFilters = options.filter && !!Object.keys(options.filter).length;
 
     return {
         options,
