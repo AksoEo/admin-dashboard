@@ -101,34 +101,34 @@ export const data = {
         previewOff: 'Fermi antaŭvidon',
 
         formatButtons: {
-            title: '[[Heading]]',
-            bold: '[[Bold]]',
-            italic: '[[Italic]]',
-            strike: '[[Strike]]',
-            link: '[[Link]]',
-            image: '[[Image]]',
-            code: '[[Code]]',
-            table: '[[Table]]',
-            ul: '[[Ul]]',
-            ol: '[[Ol]]',
+            title: 'Titolo',
+            bold: 'Grasa',
+            italic: 'Kursiva',
+            strike: 'Trastreko',
+            link: 'Ligilo',
+            image: 'Bildo',
+            code: 'Kodo',
+            table: 'Tabelo',
+            ul: 'Neordigita listo',
+            ol: 'Ordigita listo',
         },
 
-        urlLabel: '[[Label]]',
-        url: '[[URL]]', // when inserting links or images
-        urlPlaceholder: '[[https://example.com/thing.jpg]]',
-        insertUrl: '[[Insert]]',
+        urlLabel: 'Teksto',
+        url: 'Ligilo', // when inserting links or images
+        urlPlaceholder: 'https://ekzemplo.eo/bildo.jpg',
+        insertUrl: 'Enmeti',
 
         help: {
-            title: '[[Markdown Help]]',
+            title: 'Helpo pri Markdown',
             rules: {
                 newline: `
-[[write text normally. Use two new lines to create a paragraph.]]
+Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
                 `,
                 heading: `
-## How to use titles
+## Kiel uzi titolojn
 \`\`\`
-# hello
-## world
+# saluton
+## mondo
 \`\`\`
 
 [[todo]]
@@ -171,8 +171,8 @@ export const data = {
     mapPicker: {
         pickPrompt: 'Alklaku por elekti lokon',
         movePrompt: 'Alklaku sur la mapo aŭ tiru la indikilon',
-        fromAddress: '[[search by address]]',
-        searchingForAddr: '[[Searching for]]',
+        fromAddress: 'Serĉi laŭ adreso',
+        searchingForAddr: 'Serĉas',
     },
     tagManager: {
         noTags: 'Neniuj etikedoj',

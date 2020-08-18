@@ -118,7 +118,7 @@ export const congressLocations = {
         pick: 'Elekti lokon',
         search: 'Serĉi…',
     },
-    congressAddress: '[[Congress location]]',
+    congressAddress: 'Adreso de la kongreso',
     iconPicker: {
         empty: 'Neniu bildeto',
         pick: 'Elekti bildeton',
@@ -178,8 +178,8 @@ export const congressLocations = {
         description: 'Ĉu vi certas, ke vi volas forigi la lokon? Ne eblas malfari tiun ĉi agon.',
     },
     updateThumbnail: {
-        title: '[[Upload thumbnail]]',
-        button: '[[Upload]]',
+        title: 'Alŝuti bildon',
+        button: 'Alŝuti',
     },
 };
 
@@ -193,9 +193,9 @@ export const congressPrograms = {
         filters: {
             location: 'Loko',
 
-            timeSlice: '[[Time Intersection]]',
-            timeSliceFrom: '[[lower bound]]',
-            timeSliceTo: '[[upper bound]]',
+            timeSlice: 'Tempointervalo',
+            timeSliceFrom: 'ekde',
+            timeSliceTo: 'ĝis',
         },
     },
     fields: {
@@ -207,7 +207,7 @@ export const congressPrograms = {
         location: 'Loko',
     },
     timeline: {
-        empty: '[[no program items on this day]]',
+        empty: 'Okazas neniuj programeroj en tiu ĉi tago',
     },
     create: {
         menuItem: 'Krei',
