@@ -2,45 +2,71 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import DragHandleIcon from '@material-ui/icons/DragHandle';
 import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import ResizeObserver from 'resize-observer-polyfill';
 import './rearranging-list.less';
 
-// constant li height
-const LI_HEIGHT = 56;
-
-/// Material list with drag controls, for the field picker.
+/// Material list with drag controls.
 ///
 /// # Props
 /// - children: array of elements
 /// - isItemDraggable: fn(index) -> bool
 /// - canMove: fn(toPos) -> bool
 /// - onMove: fn(fromPos, toPos)
-/// - itemHeight: item height override
+/// - itemHeight: item height override. If not set, will use dynamic height. This prop is expected
+///   to be constant, and weird things may happen if it changes between dynamic/non-dynamic height.
 export default class RearrangingList extends PureComponent {
     itemData = new Map();
+    observer = new ResizeObserver(entries => {
+        const keysByNode = new Map();
+        for (const [k, v] of this.itemData) {
+            if (v.node) keysByNode.set(v.node, k);
+        }
+        for (const entry of entries) {
+            if (keysByNode.has(entry.target)) {
+                let height = 0;
+                if (entry.contentBoxSize) {
+                    height = entry.contentBoxSize.blockSize;
+                } else {
+                    height = entry.contentRect.height;
+                }
+                this.itemData.get(keysByNode.get(entry.target)).height = height;
+            }
+        }
+        this.beginAnimating();
+    });
 
     createItemData (node, index) {
         const spring = new Spring(1, 0.5);
-        spring.value = spring.target = index;
-        this.itemData[node.key] = {
+        spring.value = spring.target = this.indexToYOffset(index);
+        let domNode = null;
+        const self = this;
+        this.itemData.set(node.key, {
             index,
+            height: 0,
             spring,
             vnode: node,
-            node: null,
-        };
+            get node () {
+                return domNode;
+            },
+            set node (n) {
+                if (domNode) self.observer.unobserve(domNode);
+                domNode = n;
+                if (domNode && !self.props.itemHeight) self.observer.observe(domNode);
+            }
+        });
     }
 
     /** Called by the global animator. */
     update (dt) {
         let wantsUpdate = false;
-        for (const key in this.itemData) {
-            const item = this.itemData[key];
+        for (const [key, item] of this.itemData) {
             item.spring.locked = this.state.draggingKey === key;
             if (this.state.draggingKey === key) {
                 if (dt > 0) item.spring.velocity = (this.dragTarget - item.spring.value) / dt;
                 item.spring.value = item.spring.target = this.dragTarget;
             } else if (item.index >= this.indexPush.from && item.index < this.indexPush.to) {
-                item.spring.target = item.index + this.indexPush.dir;
-            } else item.spring.target = item.index;
+                item.spring.target = this.indexToYOffset(item.index) + this.indexPush.amount;
+            } else item.spring.target = this.indexToYOffset(item.index);
 
             if (item.spring.wantsUpdate()) wantsUpdate = true;
             item.spring.update(dt);
@@ -54,6 +80,7 @@ export default class RearrangingList extends PureComponent {
     }
 
     componentDidUpdate (prevProps) {
+        if (prevProps.itemHeight !== this.props.itemHeight) this.beginAnimating();
         if (prevProps.children !== this.props.children) this.beginAnimating();
     }
 
@@ -79,22 +106,66 @@ export default class RearrangingList extends PureComponent {
     indexPush = {
         from: 0,
         to: 0,
-        dir: 1,
+        amount: 1,
     };
 
-    get itemHeight () {
-        return this.props.itemHeight || LI_HEIGHT;
+    /// Returns the height of the item at the given index. Ignores drag state.
+    /// If the index is out of bounds, will approximate something that seems reasonable.
+    getItemHeight (index) {
+        if (this.props.itemHeight) return this.props.itemHeight;
+
+        if (index < 0) index = 0;
+        if (index >= this.props.children.length) index = this.props.children.length - 1;
+        const child = this.props.children[index];
+        if (child) {
+            const data = this.itemData.get(child.key);
+            if (data) return data.height;
+        }
+        return 0;
+    }
+
+    /// Converts a (possibly float) index to a y offset. Ignores drag state.
+    indexToYOffset (index) {
+        let offset = 0;
+        for (let i = 0; i < index; i++) {
+            offset += this.getItemHeight(i);
+        }
+        const fractionalPart = index - Math.floor(index);
+        if (fractionalPart > 0) {
+            offset += fractionalPart * this.getItemHeight(index);
+        }
+        return offset;
+    }
+
+    /// Returns a (float) index for a y offset. Ignores drag state.
+    indexFromYOffset (offset) {
+        if (offset < 0) return 0;
+        let o = 0, p = 0;
+        let index = 0;
+        for (let i = 0; i < this.props.children.length; i++) {
+            if (o < offset) {
+                index = i;
+                p = o;
+            } else break;
+            o += this.getItemHeight(i);
+        }
+        const remainingPart = offset - p;
+        if (remainingPart > 0) {
+            index += remainingPart / (o - p);
+        }
+        return index;
     }
 
     onPointerDown (clientX, clientY, key) {
         if (!this.node) return;
         const listRect = this.node.getBoundingClientRect();
         const y = clientY - listRect.top;
-        const itemIndex = this.itemData[key].index;
+        const itemIndex = this.itemData.get(key).index;
 
-        this.dragOffset = y - itemIndex * this.itemHeight;
-        this.dragTarget = this.dragEndIndex = itemIndex;
-        this.indexPush.dir = 0;
+        this.dragOffset = y - this.indexToYOffset(itemIndex);
+        this.dragTarget = this.indexToYOffset(itemIndex);
+        this.dragEndIndex = itemIndex;
+        this.indexPush.amount = 0;
 
         this.lastDraggingKey = key;
         this.setState({ draggingKey: key });
@@ -104,30 +175,30 @@ export default class RearrangingList extends PureComponent {
         const listRect = this.node.getBoundingClientRect();
         const y = clientY - listRect.top;
 
-        const item = this.itemData[this.state.draggingKey];
-        const newItemIndex = Math.floor(y / this.itemHeight);
+        const item = this.itemData.get(this.state.draggingKey);
+        const newItemIndex = Math.floor(this.indexFromYOffset(y));
 
         if (this.props.canMove(newItemIndex)) {
             if (newItemIndex < item.index) {
                 this.indexPush.from = newItemIndex;
                 this.indexPush.to = item.index;
-                this.indexPush.dir = 1;
+                this.indexPush.amount = this.getItemHeight(item.index);
             } else if (newItemIndex > item.index) {
                 this.indexPush.from = item.index;
                 this.indexPush.to = newItemIndex + 1;
-                this.indexPush.dir = -1;
-            } else this.indexPush.dir = 0;
+                this.indexPush.amount = -this.getItemHeight(item.index);
+            } else this.indexPush.amount = 0;
 
             this.dragEndIndex = newItemIndex;
         }
 
-        this.dragTarget = (y - this.dragOffset) / this.itemHeight;
+        this.dragTarget = y - this.dragOffset;
         this.beginAnimating();
     }
 
     onPointerUp () {
-        this.indexPush.dir = 0;
-        const item = this.itemData[this.state.draggingKey];
+        this.indexPush.amount = 0;
+        const item = this.itemData.get(this.state.draggingKey);
         // this fixes a minor glitch where the item will momentarily render with
         // spring value = spring target
         item.spring.target = item.index;
@@ -169,31 +240,30 @@ export default class RearrangingList extends PureComponent {
         for (const item of this.props.children) {
             if (!item.key) throw new Error('RearrangingList: child has no key prop');
             itemKeys.add(item.key);
-            if (!this.itemData[item.key]) {
+            if (!this.itemData.has(item.key)) {
                 this.createItemData(item, index);
             } else {
-                const data = this.itemData[item.key];
+                const data = this.itemData.get(item.key);
                 data.index = index;
                 data.vnode = item;
             }
             index++;
         }
 
-        for (const key in this.itemData) {
-            if (!itemKeys.has(key)) delete this.itemData[key];
+        for (const key of this.itemData.keys()) {
+            if (!itemKeys.has(key)) this.itemData.delete(key);
         }
 
         const items = [];
 
-        for (const key in this.itemData) {
-            const item = this.itemData[key];
-            const posY = item.spring.value * this.itemHeight;
+        for (const [key, item] of this.itemData) {
+            const posY = item.spring.value;
             const draggable = this.props.isItemDraggable(item.index);
 
             let className = 'rearranging-list-item';
             if (this.state.draggingKey === key) className += ' dragging';
             else if (this.lastDraggingKey === key) {
-                if (Math.abs(item.spring.value - item.spring.target) > 0.1) {
+                if (Math.abs(item.spring.value - item.spring.target) > 8) {
                     // item that was being dragged has not reached its resting position yet
                     className += ' dragging';
                 } else {
@@ -205,7 +275,7 @@ export default class RearrangingList extends PureComponent {
                 <div
                     key={key}
                     className={className}
-                    ref={node => (this.itemData[key] && (this.itemData[key].node = node))}
+                    ref={node => (this.itemData.get(key) && (this.itemData.get(key).node = node))}
                     style={{
                         transform: `translateY(${posY}px)`,
                     }}>
@@ -230,7 +300,7 @@ export default class RearrangingList extends PureComponent {
                 ref={node => this.node = node}>
                 <div
                     className="rearranging-list-scroll-height"
-                    style={{ height: this.props.children.length * this.itemHeight }} />
+                    style={{ height: this.indexToYOffset(this.props.children.length) }} />
                 {items}
             </div>
         );

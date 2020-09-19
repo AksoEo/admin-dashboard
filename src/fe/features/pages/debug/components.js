@@ -2,15 +2,52 @@ import { h } from 'preact';
 import { useState } from 'preact/compat';
 import Page from '../../../components/page';
 import MdField from '../../../components/md-field';
+import FormEditor from '../../../components/form-editor';
 
 export default class Components extends Page {
     render () {
         return (
             <div>
+                <FormEditorTest />
                 <MdFieldTest />
             </div>
         );
     }
+}
+
+function FormEditorTest () {
+    const [value, setValue] = useState({
+        form: [
+            {
+                el: 'input',
+                name: 'hewwo',
+                label: 'Hewwo®',
+                description: 'horse',
+                type: 'boolean',
+            },
+            {
+                el: 'text',
+                text: 'text text *text* **text**',
+            },
+            {
+                el: 'script',
+                script: {
+                    meow: { t: 'n', v: 2 },
+                    meow2: { t: 'n', v: 3 },
+                    horse: { t: 'c', f: '+', a: ['meow', 'meow2'] },
+                },
+            },
+        ],
+    });
+
+    return (
+        <div>
+            <h2>Form Editor</h2>
+            <FormEditor
+                value={value}
+                onChange={setValue} />
+        </div>
+    );
 }
 
 function MdFieldTest () {
@@ -64,6 +101,7 @@ function MdFieldTest () {
 
     return (
         <div>
+            <h2>MD Field Editor</h2>
             <div>
                 {availableRules.map(rule => (
                     <span style={{ display: 'inline-block', padding: '2px' }} key={rule}>

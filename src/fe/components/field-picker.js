@@ -155,13 +155,14 @@ export default class FieldPicker extends PureComponent {
                 </DynamicHeightDiv>
                 <RearrangingList
                     onMove={(fromIndex, toIndex) => this.onMoveField(fromIndex, toIndex)}
+                    itemHeight={56}
                     isItemDraggable={index => {
                         if (index >= this.props.selected.length) return false;
                         if (this.props.selected[index].fixed) return false;
                         return true;
                     }}
                     canMove={index => {
-                        if (index > this.props.selected.length) return false;
+                        if (index >= this.props.selected.length) return false;
                         if (this.props.selected[index].fixed) return false;
                         return true;
                     }}>

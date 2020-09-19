@@ -149,6 +149,7 @@ const Footer = connect('countries/countries')(countries => ({
             </div>
             <RearrangingList
                 class="countries-list"
+                itemHeight={56}
                 isItemDraggable={() => false}
                 canMove={() => false}>
                 {countryItems}

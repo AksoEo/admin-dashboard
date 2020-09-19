@@ -35,3 +35,4 @@ export * from './payments';
 export * from './admin';
 export * from './lists';
 export * from './votes';
+export * from './form-editor';
