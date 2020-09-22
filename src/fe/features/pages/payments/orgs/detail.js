@@ -86,7 +86,7 @@ export default connectPerms(class Org extends Page {
         } else if (tab === 'addons') {
             if (this.props.addons) return;
             if (this.props.methods) this.props.methods.pop(true);
-            this.props.push('donacebloj', true);
+            this.props.push('aldonebloj', true);
         } else if (tab === 'methods') {
             if (this.props.methods) return;
             if (this.props.addons) this.props.addons.pop(true);

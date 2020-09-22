@@ -93,7 +93,7 @@ export default {
                         title={addonLocale.create.title}
                         actionLabel={addonLocale.create.button}
                         run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/aksopago/organizoj/${org}/donacebloj/${id}`);
+                            routerContext.navigate(`/aksopago/organizoj/${org}/aldonebloj/${id}`);
                         })}>
                         <Field>
                             <Validator

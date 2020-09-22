@@ -475,7 +475,7 @@ export default [
                                 state: 'editing',
                             },
                             {
-                                path: 'donacebloj',
+                                path: 'aldonebloj',
                                 type: 'state',
                                 state: 'addons',
                                 paths: [

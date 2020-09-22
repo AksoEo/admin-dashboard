@@ -27,7 +27,7 @@ export const paymentOrgs = {
     },
     detailTabs: {
         org: 'Pri la pagorganizo',
-        addons: 'Donacebloj',
+        addons: 'Aldonebloj',
         methods: 'Pagmetodoj',
     },
     create: {
@@ -39,7 +39,7 @@ export const paymentOrgs = {
             uea: 'UEA',
         },
     },
-    createAddon: 'Krei donaceblon',
+    createAddon: 'Krei aldoneblon',
     createMethod: 'Krei pagmetodon',
     update: {
         menuItem: 'Redakti',
@@ -55,13 +55,13 @@ export const paymentOrgs = {
     },
 };
 export const paymentAddons = {
-    detailTitle: 'Donacebloj',
+    detailTitle: 'Aldonebloj',
     fields: {
         name: 'Nomo',
         description: 'Priskribo',
     },
     create: {
-        title: 'Krei donaceblon',
+        title: 'Krei aldoneblon',
         button: 'Krei',
     },
     update: {
@@ -72,8 +72,8 @@ export const paymentAddons = {
     },
     delete: {
         menuItem: 'Forigi',
-        title: 'Forigi donaceblon',
-        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi donaceblon?',
+        title: 'Forigi aldoneblon',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi aldoneblon?',
         button: 'Forigi',
     },
 };
@@ -312,7 +312,7 @@ export const paymentIntents = {
         addPurposeButton: 'Aldoni pagcelon',
         types: {
             manual: 'Permana',
-            addon: 'Donaceblo',
+            addon: 'Aldoneblo',
         },
         manual: {
             title: 'Titolo',
