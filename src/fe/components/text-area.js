@@ -2,11 +2,11 @@ import { h, Component } from 'preact';
 import './text-area.less';
 
 export default class TextArea extends Component {
-    render ({ value, onChange }) {
+    render ({ onChange, ...props }) {
         return (
             <textarea
-                class="a-text-area"
-                value={value}
+                {...props}
+                class={'a-text-area ' + (props.class || '')}
                 onChange={e => onChange(e.target.value)} />
         );
     }

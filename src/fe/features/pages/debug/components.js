@@ -23,7 +23,11 @@ function FormEditorTest () {
                 name: 'hewwo',
                 label: 'Hewwo®',
                 description: 'horse',
-                type: 'boolean',
+                type: 'country',
+                default: true,
+                editable: true,
+                disabled: false,
+                required: false,
             },
             {
                 el: 'text',

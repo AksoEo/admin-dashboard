@@ -12,6 +12,7 @@ import './rearranging-list.less';
 /// - isItemDraggable: fn(index) -> bool
 /// - canMove: fn(toPos) -> bool
 /// - onMove: fn(fromPos, toPos)
+/// - spacing: vertical spacing between items
 /// - itemHeight: item height override. If not set, will use dynamic height. This prop is expected
 ///   to be constant, and weird things may happen if it changes between dynamic/non-dynamic height.
 export default class RearrangingList extends PureComponent {
@@ -52,7 +53,7 @@ export default class RearrangingList extends PureComponent {
                 if (domNode) self.observer.unobserve(domNode);
                 domNode = n;
                 if (domNode && !self.props.itemHeight) self.observer.observe(domNode);
-            }
+            },
         });
     }
 
@@ -124,11 +125,15 @@ export default class RearrangingList extends PureComponent {
         return 0;
     }
 
+    get spacing () {
+        return this.props.spacing || 0;
+    }
+
     /// Converts a (possibly float) index to a y offset. Ignores drag state.
     indexToYOffset (index) {
         let offset = 0;
         for (let i = 0; i < index; i++) {
-            offset += this.getItemHeight(i);
+            offset += this.getItemHeight(i) + this.spacing;
         }
         const fractionalPart = index - Math.floor(index);
         if (fractionalPart > 0) {
@@ -147,7 +152,7 @@ export default class RearrangingList extends PureComponent {
                 index = i;
                 p = o;
             } else break;
-            o += this.getItemHeight(i);
+            o += this.getItemHeight(i) + this.spacing;
         }
         const remainingPart = offset - p;
         if (remainingPart > 0) {
@@ -263,7 +268,7 @@ export default class RearrangingList extends PureComponent {
             let className = 'rearranging-list-item';
             if (this.state.draggingKey === key) className += ' dragging';
             else if (this.lastDraggingKey === key) {
-                if (Math.abs(item.spring.value - item.spring.target) > 8) {
+                if (Math.abs(item.spring.value - item.spring.target) > 4) {
                     // item that was being dragged has not reached its resting position yet
                     className += ' dragging';
                 } else {

@@ -2,12 +2,12 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import Segmented from '../segmented';
 import MdField from '../md-field';
-import ScriptExpr from './script-expr';
+import { ScriptableString } from './script-expr';
 import { formEditor as locale } from '../../locale';
 
 export default class TextItem extends PureComponent {
     changeType = type => {
-        const currentType = typeof this.props.item.text === 'string' ? 'text' : 'string';
+        const currentType = (typeof this.props.item.text === 'string') ? 'text' : 'script';
         if (type === currentType) return;
         if (type === 'text') {
             let string = '';
@@ -25,23 +25,11 @@ export default class TextItem extends PureComponent {
     };
 
     render ({ item, onChange, editing }) {
+        let typeSwitch = null;
         let contents = null;
 
-        if (typeof item.text === 'string') {
-            // markdown!
-            contents = <MdField
-                editing={editing}
-                rules={['blockquote', 'code', 'heading', 'hr', 'table', 'emphasis', 'image', 'link', 'list', 'strikethrough']}
-                value={item.text}
-                onChange={text => onChange({ ...item, text })} />;
-        } else {
-            contents = <ScriptExpr
-                value={item.text}
-                onChange={text => onChange({ ...item, text })} />;
-        }
-
-        return (
-            <div class="form-editor-text-item">
+        if (editing) {
+            typeSwitch = (
                 <Segmented
                     class="small"
                     selected={typeof item.text === 'string' ? 'text' : 'script'}
@@ -51,6 +39,25 @@ export default class TextItem extends PureComponent {
                         { id: 'script', label: locale.textItemTypes.script },
                     ]}
                 </Segmented>
+            );
+        }
+
+        if (typeof item.text === 'string') {
+            // markdown!
+            contents = <MdField
+                editing={editing}
+                rules={['blockquote', 'code', 'heading', 'hr', 'table', 'emphasis', 'image', 'link', 'list', 'strikethrough']}
+                value={item.text}
+                onChange={text => onChange({ ...item, text })} />;
+        } else {
+            contents = <ScriptableString
+                value={item.text}
+                onChange={text => onChange({ ...item, text })} />;
+        }
+
+        return (
+            <div class="form-editor-text-item">
+                {typeSwitch}
                 {contents}
             </div>
         );

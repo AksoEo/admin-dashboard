@@ -1,12 +1,17 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Button, Menu } from '@cpsdqs/yamdl';
+import AKSOScriptEditor from '@tejo/akso-script-editor';
 import InputIcon from '@material-ui/icons/Input';
 import TextIcon from '@material-ui/icons/Subject';
 import ScriptIcon from '@material-ui/icons/Code';
 import RearrangingList from '../rearranging-list';
 import FormEditorItem from './item';
+import ScriptContext from './script-context';
 import { formEditor as locale } from '../../locale';
+import './index.less';
+
+// TODO: add Reset button to reset to default values etc
 
 /// The Form Editor is the component used to edit e.g. registration forms.
 ///
@@ -14,19 +19,77 @@ import { formEditor as locale } from '../../locale';
 /// - value: { allowUse, allowGuests, ..., form } object (see API docs)
 /// - onChange: (value) => void callback
 export default class FormEditor extends PureComponent {
-    // TODO: hold form var state for asc testing
+    state = {
+        /// Form input name -> form input value
+        values: {},
+    };
 
-    render ({ value, onChange }) {
+    openScriptEditor = (defs) => {
+        // TODO
+    };
+
+    openScriptExprEditor = (expr) => new Promise(resolve => {
+        const editor = new AKSOScriptEditor();
+        // TODO: set up form vars and references
+        editor.loadInRawExprMode(expr, () => {
+            resolve(editor.saveRawExpr());
+            this.detachScriptEditor();
+        });
+        this.attachScriptEditor(editor);
+    });
+
+
+    scriptContext = {
+        openDefs: this.openScriptEditor,
+        openExpr: this.openScriptExprEditor,
+    };
+
+    scriptEditor = null;
+    attachScriptEditor (editor) {
+        if (this.scriptEditor) this.detachScriptEditor();
+        this.scriptEditor = editor;
+        const editorNode = document.createElement('div');
+        editorNode.className = 'form-editor-script-node-root';
+        editorNode.appendChild(editor.node);
+        document.body.appendChild(editorNode);
+        this.onResize();
+    }
+
+    detachScriptEditor () {
+        if (!this.scriptEditor) return;
+        document.body.removeChild(this.scriptEditor.node.parentNode);
+        this.scriptEditor.destroy();
+        this.scriptEditor = null;
+    }
+
+    onResize = () => {
+        if (!this.scriptEditor) return;
+        this.scriptEditor.width = window.innerWidth;
+        this.scriptEditor.height = window.innerHeight;
+    };
+
+    componentDidMount () {
+        window.addEventListener('resize', this.onResize);
+    }
+    componentWillUnmount () {
+        window.removeEventListener('resize', this.onResize);
+    }
+
+    render ({ value, onChange }, { values }) {
         if (!value) return null;
 
         return (
             <div class="form-editor">
-                <FormEditorSettings
-                    value={value}
-                    onChange={onChange} />
-                <FormEditorItems
-                    items={value.form}
-                    onItemsChange={form => onChange({ ...value, form })} />
+                <ScriptContext.Provider value={this.scriptContext}>
+                    <FormEditorSettings
+                        value={value}
+                        onChange={onChange} />
+                    <FormEditorItems
+                        items={value.form}
+                        onItemsChange={form => onChange({ ...value, form })}
+                        values={values}
+                        onValuesChange={values => this.setState({ values })} />
+                </ScriptContext.Provider>
             </div>
         );
     }
@@ -65,11 +128,12 @@ class FormEditorItems extends PureComponent {
         this.props.onItemsChange(items);
     };
 
-    render ({ items, onItemsChange }, { editingItem }) {
+    render ({ items, onItemsChange, values, onValuesChange }, { editingItem }) {
         const listItems = [];
         for (let i = 0; i < items.length; i++) {
             const index = i;
             const key = this.getItemKey(index);
+            const name = items[i].name || '???';
             listItems.push(
                 <FormEditorItem
                     key={key}
@@ -83,6 +147,13 @@ class FormEditorItems extends PureComponent {
                         const newItems = items.slice();
                         newItems[index] = item;
                         onItemsChange(newItems);
+                    }}
+                    value={values[name]}
+                    onValueChange={value => {
+                        onValuesChange({
+                            ...values,
+                            [name]: value,
+                        });
                     }} />
             );
         }
@@ -98,6 +169,7 @@ class FormEditorItems extends PureComponent {
 
         return (
             <RearrangingList
+                spacing={16}
                 isItemDraggable={index => index < items.length}
                 canMove={toPos => toPos < items.length}
                 onMove={this.onMoveItem}>

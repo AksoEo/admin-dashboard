@@ -1,0 +1,3 @@
+[submodule "node_modules/@tejo/akso-script-editor"]
+	path = node_modules/@tejo/akso-script-editor
+	url = https://github.com/AksoEo/akso-script-editor
