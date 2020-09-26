@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { createRef, PureComponent } from 'preact/compat';
-import { Window, ExprView, DefsView, RenderViewRoot, model } from '@tejo/akso-script-editor';
+import { Window, ExprView, DefsView, RenderViewRoot, viewPool, model } from '@tejo/akso-script-editor';
+import ResizeObserver from 'resize-observer-polyfill';
+import './script-views.less';
 
 /// Mounts an ASCE view root in a react component.
 /// - init: () => ViewRoot
@@ -57,8 +59,13 @@ export class RawExprView extends PureComponent {
         this.root = new RenderViewRoot();
         this.root.setOverflow('visible');
         this.modelCtx = model.createContext();
+        this.modelCtx.onMutation(node => {
+            const view = viewPool.get(node);
+            if (view) view.needsLayout = true;
+        });
         this.exprView = new ExprView(this.getEditorExpr());
         this.exprView.needsLayout = true;
+        this.updateExtRefs();
         this.root.pushWindow(this.exprView);
         if (this.props.init) this.props.init(this.exprView, this.root);
         return this.root;
@@ -70,6 +77,34 @@ export class RawExprView extends PureComponent {
 
     invalidateEditorExpr () {
         this.exprView.expr = this.getEditorExpr();
+        this.updateExtRefs();
+        this.exprView.needsLayout = true;
+    }
+
+    updateExtRefs () {
+        const previousNodes = this.props.previousNodes;
+        if (previousNodes) {
+            const previousDefs = previousNodes
+                .filter(x => x)
+                .map(node => node.defs)
+                .filter(x => Object.keys(x).length);
+            const formVars = previousNodes
+                .filter(x => x)
+                .flatMap(node => node.formVars);
+            this.modelCtx.externalDefs = previousDefs;
+            this.modelCtx.formVars = formVars;
+        }
+        this.modelCtx.notifyExternalDefsMutation();
+        this.modelCtx.notifyFormVarsMutation();
+        const defs = {
+            type: 'd',
+            defs: new Set(),
+            floatingExpr: new Set(),
+            ctx: this.modelCtx,
+        };
+        const def = { type: 'ds', name: '___', expr: this.exprView.expr, ctx: this.modelCtx };
+        defs.defs.add(def);
+        model.resolveRefs(defs);
         this.exprView.needsLayout = true;
     }
 
@@ -78,10 +113,13 @@ export class RawExprView extends PureComponent {
             this.exprView.expr = this.getEditorExpr();
             this.exprView.needsLayout = true;
         }
+        if (prevProps.previousNodes !== this.props.previousNodes) {
+            this.updateExtRefs();
+        }
     }
 
-    render ({ init, deinit, expr, ...props }) {
-        void init, deinit, expr;
+    render ({ init, deinit, expr, previousNodes, ...props }) {
+        void init, deinit, expr, previousNodes;
         return (
             <MountedViewRoot
                 {...props}
@@ -95,10 +133,12 @@ export class RawExprView extends PureComponent {
 /// Shows the name of a ref.
 ///
 /// - name: string
+/// - def: bool
 export class RefNameView extends PureComponent {
     init = (exprView) => {
         this.exprView = exprView;
-        exprView.isDef = true;
+        exprView._isDemo = true;
+        if (this.props.def) exprView.isDef = true;
     };
     rawExprView = createRef();
     componentDidUpdate (prevProps) {
@@ -106,10 +146,12 @@ export class RefNameView extends PureComponent {
             this.rawExprView.current.invalidateEditorExpr();
         }
     }
-    render ({ name }) {
+    render ({ name, def, ...props }) {
+        void def;
         // use a fake editor expr
         return (
             <RawExprView
+                {...props}
                 init={this.init}
                 ref={this.rawExprView}
                 editorExpr={ctx => ({ type: 'r', name, ctx })} />
@@ -121,40 +163,93 @@ export class RefNameView extends PureComponent {
 ///
 /// # Props
 /// - script: raw script object
+/// - previousNodes: previous nodes
 export class DefsPreview extends PureComponent {
     init = () => {
         this.root = new RenderViewRoot();
         this.modelCtx = model.createContext();
+        this.modelCtx.onMutation(node => {
+            const view = viewPool.get(node);
+            if (view) view.needsLayout = true;
+        });
         this.defs = model.fromRawDefs(this.props.script, this.modelCtx);
+        this.updateExtRefs();
         model.resolveRefs(this.defs, true);
         this.defsView = new DefsView(this.defs);
         this.window = new Window();
-        this.window.size = [300, 100];
         this.window.addSubview(this.defsView);
+        this.updateWindowSize();
         this.root.pushWindow(this.window);
         return this.root;
     };
 
+    updateExtRefs () {
+        const previousNodes = this.props.previousNodes;
+        if (previousNodes) {
+            const previousDefs = previousNodes
+                .filter(x => x)
+                .map(node => node.defs)
+                .filter(x => Object.keys(x).length);
+            const formVars = previousNodes
+                .filter(x => x)
+                .flatMap(node => node.formVars);
+            this.modelCtx.externalDefs = previousDefs;
+            this.modelCtx.formVars = formVars;
+        }
+        model.resolveRefs(this.defs);
+        this.modelCtx.notifyExternalDefsMutation();
+        this.modelCtx.notifyFormVarsMutation();
+        if (this.defsView) {
+            this.defsView.needsValueUpdate = true;
+            this.defsView.needsLayout = true;
+        }
+    }
+
     deinit = () => {
         this.root.destroy();
     };
+
+    node = createRef();
+
+    componentDidMount () {
+        this.resizeObserver = new ResizeObserver(() => this.updateWindowSize());
+        this.resizeObserver.observe(this.node.current);
+        this.updateWindowSize();
+    }
+
+    updateWindowSize () {
+        if (!this.node.current || !this.window) return;
+        this.window.size = [
+            this.node.current.offsetWidth,
+            this.node.current.offsetHeight,
+        ];
+    }
 
     componentDidUpdate (prevProps) {
         if (prevProps.script !== this.props.script) {
             this.defs = model.fromRawDefs(this.props.script, this.modelCtx);
             model.resolveRefs(this.defs, true);
             this.defsView.defs = this.defs;
+            this.defsView.needsValueUpdate = true;
             this.defsView.needsLayout = true;
+        }
+        if (prevProps.previousNodes !== this.props.previousNodes) {
+            // FIXME: this is probably way too often
+            this.updateExtRefs();
         }
     }
 
     render ({ ...props }) {
         return (
-            <MountedViewRoot
+            <div
                 {...props}
-                class={'form-editor-defs-preview ' + (props.class || '')}
-                init={this.init}
-                deinit={this.deinit} />
+                class={'form-editor-defs-preview-container ' + (props.class || '')}
+                ref={this.node}>
+                <MountedViewRoot
+                    class="form-editor-defs-preview"
+                    init={this.init}
+                    deinit={this.deinit} />
+            </div>
         );
     }
 }

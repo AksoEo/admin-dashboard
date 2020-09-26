@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { createRef, PureComponent } from 'preact/compat';
 import { Button } from '@cpsdqs/yamdl';
 import CodeIcon from '@material-ui/icons/Code';
 import { RawExprView } from './script-views';
@@ -13,6 +13,8 @@ function isProbablyExpr (value) {
 /// representation. Will try to stick to normal JS values instead of AKSO Script if possible.
 export class ScriptableValue extends PureComponent {
     static contextType = ScriptContext;
+
+    node = createRef(null);
 
     castValue (v) {
         // override in subclasses
@@ -58,19 +60,30 @@ export class ScriptableValue extends PureComponent {
     async beginEditing (value) {
         if (value === null) return value;
         else if (typeof value === 'boolean') return !value;
-        // TODO
+        this.openEditor();
+        return value;
     }
 
     openEditor = () => {
-        this.context.openExpr(this.getValue() || ({ t: 'null' })).then(value => {
+        const previousNodes = this.props.ctx && this.props.ctx.previousNodes;
+
+        const nodeRect = this.node.current.getBoundingClientRect();
+        const location = [nodeRect.left, nodeRect.top];
+        this.context.openExpr(this.getValue() || ({ t: 'null' }), {
+            location,
+            previousNodes,
+        }).then(value => {
             this.props.onChange(this.castValue(this.simplifyValue(value)));
         });
     };
 
-    render () {
+    render ({ ctx }) {
         return (
-            <div class="form-editor-scriptable-value">
-                <RawExprView onClick={this.onClick} expr={this.getValue()} />
+            <div class="form-editor-scriptable-value" ref={this.node}>
+                <RawExprView
+                    onClick={this.onClick}
+                    expr={this.getValue()}
+                    previousNodes={ctx && ctx.previousNodes} />
                 <Button class="edit-script-button" icon small onClick={this.openEditor}>
                     <CodeIcon style={{ verticalAlign: 'middle' }} />
                 </Button>

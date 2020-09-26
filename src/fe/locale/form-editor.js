@@ -1,4 +1,32 @@
 export const formEditor = {
+    settings: {
+        flags: {
+            allowUse: '[[AllowUse]]',
+            allowUseDesc: '[[Whether the form is enabled and registrations are open]]',
+            allowGuests: '[[AllowGuests]]',
+            allowGuestsDesc: '[[Whether guests can sign up]]',
+            editable: '[[Editable]]',
+            editableDesc: '[[Whether participants can go back and edit their registration]]',
+            cancellable: '[[Cancellable]]',
+            cancellableDesc: '[[Whether participants can cancel their registration]]',
+            manualApproval: '[[ManualApproval]]',
+            manualApprovalDesc: '[[Whether registrations must be manually approved by an admin before they are valid]]',
+        },
+        price: {
+            enabled: '[[Registration is paid]]',
+            variable: '[[Script Variable]]',
+            noVariableSelected: '[[no variable selected]]',
+            minUpfront: '[[MinUpfront]]',
+            pricePreview: '[[Current price value:]]',
+            notANumber: '[[not a number]]',
+        },
+        sequenceIds: {
+            enabled: '[[Assign sequence ids]]',
+            startAt: '[[StartAt]]',
+            requireValid: '[[RequireValid]]',
+            requireValidDesc: '[[Whether to require a valid registration (price.minUpFront paid, manually approved if required etc.) to assign an ID]]'
+        },
+    },
     itemTypes: {
         input: '[[Input]]',
         text: '[[Text]]',

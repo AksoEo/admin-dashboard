@@ -9,6 +9,7 @@ import Select from '../select';
 import TextArea from '../text-area';
 import { currencyAmount } from '../data';
 import { ScriptableValue, ScriptableBool } from './script-expr';
+import { evalExpr } from './model';
 import { data as dataLocale, formEditor as locale, currencies } from '../../locale';
 import './input-item.less';
 
@@ -31,31 +32,26 @@ function Desc ({ value }) {
 // TODO: resolve required state (run ASC code!), etc.
 const TYPES = {
     boolean: {
-        render ({ disabled, item, value, onChange }) {
+        render ({ disabled, value, onChange }) {
             return (
                 <div class="form-input-boolean">
                     <Checkbox
                         checked={value}
                         onChange={onChange}
                         disabled={disabled} />
-                    {' '}
-                    <Label required={item.required}>{item.label}</Label>
-                    <Desc value={item.description} />
                 </div>
             );
         },
         settings: {},
     },
     number: {
-        render ({ item, value, onChange }) {
-            const label = <Label required={item.required}>{item.label}</Label>;
+        render ({ disabled, item, value, onChange }) {
             const input = (
                 <div class="number-input">
                     <TextField
                         outline
                         placeholder={item.placeholder}
-                        disabled={item.disabled}
-                        label={item.variant === 'slider' ? null : label}
+                        disabled={disabled}
                         type="number"
                         step={item.step}
                         min={item.min}
@@ -65,10 +61,9 @@ const TYPES = {
             if (item.variant === 'slider') {
                 return (
                     <div class="form-input-number with-slider">
-                        {label}
                         <div class="number-input-slider">
                             <Slider
-                                disabled={item.disabled}
+                                disabled={disabled}
                                 min={item.min}
                                 max={item.max}
                                 value={value}
@@ -78,14 +73,12 @@ const TYPES = {
                                 }} />
                         </div>
                         {input}
-                        <Desc value={item.description} />
                     </div>
                 );
             } else {
                 return (
                     <div class="form-input-number">
                         {input}
-                        <Desc value={item.description} />
                     </div>
                 );
             }
@@ -99,7 +92,7 @@ const TYPES = {
         },
     },
     text: {
-        render ({ item, value, onChange }) {
+        render ({ disabled, item, value, onChange }) {
             let error = null;
             const compiledPattern = new RegExp(item.pattern);
             if (!compiledPattern.test(value)) {
@@ -124,9 +117,8 @@ const TYPES = {
                 <div class="form-input-text">
                     <Component
                         outline
-                        label={<Label required={item.required}>{item.label}</Label>}
                         type={type}
-                        disabled={item.disabled}
+                        disabled={disabled}
                         placeholder={item.placeholder}
                         value={value}
                         pattern={item.pattern}
@@ -135,7 +127,6 @@ const TYPES = {
                         onChange={e => onChange(e.target.value)}
                         error={error} />
                     {extra}
-                    <Desc value={item.description} />
                 </div>
             );
         },
@@ -159,7 +150,6 @@ const TYPES = {
                         value={value}
                         onChange={onChange}
                         currency={item.currency} />
-                    <Desc value={item.description} />
                 </div>
             );
         },
@@ -214,7 +204,6 @@ const TYPES = {
             return (
                 <div class="form-input-enum">
                     {editor}
-                    <Desc value={item.description} />
                 </div>
             );
         },
@@ -264,13 +253,52 @@ const TYPES = {
 };
 
 export default class InputItem extends PureComponent {
-    render ({ editing, item, onChange, value, onValueChange }) {
+    /// Evaluates any AKSO Script exprs in the item value.
+    resolveValues () {
+        // TODO: cache?
+        const item = this.props.item;
+
+        // only these properties can be AKSO Script expressions
+        const props = ['default', 'required', 'disabled'];
+        const resolved = {};
+        for (const prop of props) {
+            if (item[prop] && typeof item[prop] === 'object') {
+                // this is an AKSO Script expression (probably)
+                resolved[prop] = evalExpr(item[prop], this.props.previousNodes);
+            } else {
+                resolved[prop] = item[prop];
+            }
+        }
+        return resolved;
+    }
+
+    render ({ editing, item, onChange, value, onValueChange, previousNodes }) {
         let contents = null;
         if (editing) {
-            contents = <InputSettings item={item} onChange={onChange} key="settings" />;
+            contents = <InputSettings
+                item={item}
+                onChange={onChange}
+                scriptCtx={{ previousNodes }}
+                key="settings" />;
         } else {
+            const resolved = this.resolveValues();
             const Renderer = TYPES[item.type].render;
-            contents = <Renderer item={item} value={value} onChange={onValueChange} />;
+            // TODO: show more details about the field
+            contents = (
+                <div class="input-rendered">
+                    <div class="input-details">
+                        <Label required={resolved.required}>{item.label}</Label>
+                        <Desc value={item.description} />
+                    </div>
+                    <Renderer
+                        required={resolved.required}
+                        disabled={resolved.disabled}
+                        default={resolved.default}
+                        item={item}
+                        value={value}
+                        onChange={onValueChange} />
+                </div>
+            );
         }
 
         return (
@@ -293,7 +321,7 @@ const DEFAULT_SETTINGS = [
 ];
 
 class InputSettings extends PureComponent {
-    render ({ item, onChange }) {
+    render ({ item, onChange, scriptCtx }) {
         const type = TYPES[item.type];
         if (!type) return null;
 
@@ -302,6 +330,7 @@ class InputSettings extends PureComponent {
             controls.push(
                 <InputSetting
                     key={k}
+                    scriptCtx={scriptCtx}
                     setting={k}
                     options={type.settings[k]}
                     item={item}
@@ -353,25 +382,11 @@ function Setting ({ label, stack, desc, children }) {
 
 const SETTINGS = {
     name ({ value, onChange }) {
+        // TODO: use oldName
         return (
-            <Setting desc={locale.inputFields.nameDesc}>
+            <Setting label={locale.inputFields.name} desc={locale.inputFields.nameDesc}>
                 <TextField
                     outline
-                    label={locale.inputFields.name}
-                    value={value}
-                    pattern={NAME_PATTERN}
-                    error={!NAME_REGEX.test(value) && locale.inputFields.namePatternError}
-                    maxLength={20}
-                    onChange={e => onChange(e.target.value)} />
-            </Setting>
-        );
-    },
-    oldName ({ value, onChange }) {
-        return (
-            <Setting desc={locale.inputFields.oldNameDesc}>
-                <TextField
-                    outline
-                    label={locale.inputFields.oldName}
                     value={value}
                     pattern={NAME_PATTERN}
                     error={!NAME_REGEX.test(value) && locale.inputFields.namePatternError}
@@ -382,10 +397,9 @@ const SETTINGS = {
     },
     label ({ value, onChange }) {
         return (
-            <Setting desc={locale.inputFields.labelDesc}>
+            <Setting label={locale.inputFields.label} desc={locale.inputFields.labelDesc}>
                 <TextField
                     outline
-                    label={locale.inputFields.label}
                     value={value}
                     onChange={e => onChange(e.target.value)} />
             </Setting>
@@ -402,28 +416,31 @@ const SETTINGS = {
             </Setting>
         );
     },
-    default ({ value, onChange }) {
+    default ({ value, onChange, scriptCtx }) {
         return (
             <Setting label={locale.inputFields.default}>
                 <ScriptableValue
+                    ctx={scriptCtx}
                     value={value}
                     onChange={onChange} />
             </Setting>
         );
     },
-    required ({ value, onChange }) {
+    required ({ value, onChange, scriptCtx }) {
         return (
             <Setting label={locale.inputFields.required}>
                 <ScriptableBool
+                    ctx={scriptCtx}
                     value={value}
                     onChange={onChange} />
             </Setting>
         );
     },
-    disabled ({ value, onChange }) {
+    disabled ({ value, onChange, scriptCtx }) {
         return (
             <Setting label={locale.inputFields.disabled}>
                 <ScriptableBool
+                    ctx={scriptCtx}
                     value={value}
                     onChange={onChange} />
             </Setting>
@@ -432,8 +449,8 @@ const SETTINGS = {
     editable ({ value, onChange }) {
         return (
             <Setting label={locale.inputFields.editable} desc={locale.inputFields.editableDesc}>
-                <ScriptableBool
-                    value={value}
+                <Checkbox
+                    checked={value}
                     onChange={onChange} />
             </Setting>
         );
@@ -594,10 +611,10 @@ const SETTINGS = {
     },
 };
 
-function InputSetting ({ setting, options, item, value, onChange }) {
+function InputSetting ({ setting, scriptCtx, options, item, value, onChange }) {
     const Renderer = SETTINGS[setting];
     if (!Renderer) return null;
-    return <Renderer options={options} item={item} value={value} onChange={onChange} />;
+    return <Renderer options={options} item={item} value={value} onChange={onChange} scriptCtx={scriptCtx} />;
 }
 
 class OptionsEditor extends PureComponent {

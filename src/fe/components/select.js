@@ -17,6 +17,7 @@ document.body.appendChild(selectPortalContainer);
 /// - `items`: select items { value, label, shortLabel?, disabled? }
 /// - `outline`: pass true for outline style
 /// - `multi`: pass true for multi-select. Value must be an array
+/// - `rendered`: pass true for rendered select (i.e. not the native element)
 /// - `emptyLabel`: label to use in multi-select mode when empty
 export default class Select extends Component {
     state = {
@@ -30,7 +31,7 @@ export default class Select extends Component {
         this.setState({ focused: false });
     };
 
-    render ({ value, outline, multi, onChange, emptyLabel, items, disabled, ...extra }, { focused }) {
+    render ({ value, outline, multi, rendered, onChange, emptyLabel, items, disabled, ...extra }, { focused }) {
         const props = extra;
         props.class = (props.class || '') + ' paper-select';
         if (focused) props.class += ' is-focused';
@@ -43,16 +44,17 @@ export default class Select extends Component {
             </svg>
         );
 
-        if (multi) {
+        if (multi || rendered) {
             return (
                 <span {...props}>
                     <MultiSelect
                         disabled={disabled}
-                        value={value}
+                        multi={multi}
+                        value={multi ? value : (value ? [value] : [])}
                         items={items}
                         onFocus={this.onFocus}
                         onBlur={this.onBlur}
-                        onChange={onChange}
+                        onChange={multi ? onChange : (v => onChange(v[0] || null))}
                         emptyLabel={emptyLabel} />
                     {selectIcon}
                 </span>
@@ -114,15 +116,21 @@ class MultiSelect extends Component {
         });
     }
 
-    render ({ value, onChange, items, emptyLabel, disabled }, { open, clientX, clientY }) {
+    render ({ multi, value, onChange, items, emptyLabel, disabled }, { open, clientX, clientY }) {
         const keyedItems = {};
         for (const item of items) {
             keyedItems[item.value] = item;
         }
 
-        const label = value.length
-            ? value.map(v => keyedItems[v].shortLabel || keyedItems[v].label).join(', ')
-            : emptyLabel || '';
+        let label;
+        if (multi) {
+            label = value.length
+                ? value.map(v => keyedItems[v].shortLabel || keyedItems[v].label).join(', ')
+                : emptyLabel || '';
+        } else {
+            const v = value[0];
+            label = value.length ? keyedItems[v].shortLabel || keyedItems[v].label : emptyLabel;
+        }
 
         return (
             <span
@@ -134,7 +142,7 @@ class MultiSelect extends Component {
 
                 <Menu
                     open={open}
-                    persistent
+                    persistent={multi}
                     onClose={this.#close}
                     container={selectPortalContainer}
                     selectionIcon={<CheckIcon style={{ verticalAlign: 'middle' }} />}
@@ -143,10 +151,14 @@ class MultiSelect extends Component {
                         ...item,
                         selected: value.includes(item.value),
                         action: () => {
-                            const v = new Set(value);
-                            if (v.has(item.value)) v.delete(item.value);
-                            else v.add(item.value);
-                            onChange([...v]);
+                            if (multi) {
+                                const v = new Set(value);
+                                if (v.has(item.value)) v.delete(item.value);
+                                else v.add(item.value);
+                                onChange([...v]);
+                            } else {
+                                onChange([item.value]);
+                            }
                         },
                     }))} />
             </span>

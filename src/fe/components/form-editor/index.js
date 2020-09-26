@@ -5,9 +5,11 @@ import AKSOScriptEditor from '@tejo/akso-script-editor';
 import InputIcon from '@material-ui/icons/Input';
 import TextIcon from '@material-ui/icons/Subject';
 import ScriptIcon from '@material-ui/icons/Code';
+import FormEditorSettings from './settings';
 import RearrangingList from '../rearranging-list';
 import FormEditorItem from './item';
 import ScriptContext from './script-context';
+import { createInput, getAscDefs } from './model';
 import { formEditor as locale } from '../../locale';
 import './index.less';
 
@@ -24,20 +26,55 @@ export default class FormEditor extends PureComponent {
         values: {},
     };
 
-    openScriptEditor = (defs) => {
-        // TODO
-    };
-
-    openScriptExprEditor = (expr) => new Promise(resolve => {
+    openScriptEditor = (defs, options = {}) => new Promise(resolve => {
         const editor = new AKSOScriptEditor();
-        // TODO: set up form vars and references
-        editor.loadInRawExprMode(expr, () => {
-            resolve(editor.saveRawExpr());
+
+        const previousNodes = options.previousNodes;
+        if (previousNodes) {
+            const previousDefs = previousNodes
+                .filter(x => x)
+                .map(node => node.defs)
+                .filter(x => Object.keys(x).length);
+            const formVars = previousNodes
+                .filter(x => x)
+                .flatMap(node => node.formVars);
+            editor.loadExternalDefs(previousDefs);
+            editor.setFormVars(formVars);
+        }
+
+        editor.load(defs);
+        editor.onSave = () => {
+            resolve(editor.save());
             this.detachScriptEditor();
-        });
+        };
         this.attachScriptEditor(editor);
     });
 
+    openScriptExprEditor = (expr, options) => new Promise(resolve => {
+        const editor = new AKSOScriptEditor();
+
+        const previousNodes = options.previousNodes;
+        if (previousNodes) {
+            const previousDefs = previousNodes
+                .filter(x => x)
+                .map(node => node.defs)
+                .filter(x => Object.keys(x).length);
+            const formVars = previousNodes
+                .filter(x => x)
+                .flatMap(node => node.formVars);
+            editor.loadExternalDefs(previousDefs);
+            editor.setFormVars(formVars);
+        }
+
+        editor.loadInRawExprMode(expr, {
+            location: options.location,
+            onClose: () => {
+                resolve(editor.saveRawExpr());
+                this.detachScriptEditor();
+            },
+        });
+        this.attachScriptEditor(editor);
+    });
 
     scriptContext = {
         openDefs: this.openScriptEditor,
@@ -81,10 +118,9 @@ export default class FormEditor extends PureComponent {
         return (
             <div class="form-editor">
                 <ScriptContext.Provider value={this.scriptContext}>
-                    <FormEditorSettings
-                        value={value}
-                        onChange={onChange} />
                     <FormEditorItems
+                        settings={value}
+                        onSettingsChange={onChange}
                         items={value.form}
                         onItemsChange={form => onChange({ ...value, form })}
                         values={values}
@@ -95,22 +131,31 @@ export default class FormEditor extends PureComponent {
     }
 }
 
-class FormEditorSettings extends PureComponent {
-    render () {
-        // TODO
-        return 'meow';
-    }
-}
-
 class FormEditorItems extends PureComponent {
     state = {
         /// Item key that is currently being edited
         editingItem: null,
     };
 
-    addInput = () => {}; // TODO
-    addText = () => {}; // TODO
-    addScript = () => {}; // TODO
+    addItem (item, skipEditing) {
+        const itemIndex = this.props.items.length;
+        if (!skipEditing) this.setState({ editingItem: this.getItemKey(itemIndex) });
+        this.props.onItemsChange(this.props.items.concat([item]));
+    }
+
+    addInput = (type) => this.addItem(createInput(type));
+    addText = () => {
+        this.addItem({
+            el: 'text',
+            text: '',
+        });
+    };
+    addScript = () => {
+        this.addItem({
+            el: 'script',
+            script: {},
+        }, true);
+    };
 
     #itemKeys = [];
     /// >> which item is at which index?
@@ -127,9 +172,18 @@ class FormEditorItems extends PureComponent {
         this.#itemKeys.splice(toPos, 0, this.#itemKeys.splice(fromPos, 1)[0]);
         this.props.onItemsChange(items);
     };
+    removeItem (i) {
+        const items = this.props.items.slice();
+        items.splice(i, 1);
+        this.#itemKeys.splice(i, 1);
+        this.props.onItemsChange(items);
+    }
 
-    render ({ items, onItemsChange, values, onValuesChange }, { editingItem }) {
+    render ({
+        settings, onSettingsChange, items, onItemsChange, values, onValuesChange,
+    }, { editingItem }) {
         const listItems = [];
+        const previousNodes = [];
         for (let i = 0; i < items.length; i++) {
             const index = i;
             const key = this.getItemKey(index);
@@ -137,6 +191,7 @@ class FormEditorItems extends PureComponent {
             listItems.push(
                 <FormEditorItem
                     key={key}
+                    previousNodes={previousNodes.slice()}
                     editing={editingItem === key}
                     onEditingChange={editing => {
                         if (editing) this.setState({ editingItem: key });
@@ -154,8 +209,10 @@ class FormEditorItems extends PureComponent {
                             ...values,
                             [name]: value,
                         });
-                    }} />
+                    }}
+                    onRemove={() => this.removeItem(i)} />
             );
+            previousNodes.push(getAscDefs(items[i], values[name]));
         }
 
         listItems.push(
@@ -168,13 +225,19 @@ class FormEditorItems extends PureComponent {
         );
 
         return (
-            <RearrangingList
-                spacing={16}
-                isItemDraggable={index => index < items.length}
-                canMove={toPos => toPos < items.length}
-                onMove={this.onMoveItem}>
-                {listItems}
-            </RearrangingList>
+            <div class="form-editor-items">
+                <FormEditorSettings
+                    value={settings}
+                    onChange={onSettingsChange}
+                    previousNodes={previousNodes} />
+                <RearrangingList
+                    spacing={16}
+                    isItemDraggable={index => index < items.length}
+                    canMove={toPos => toPos < items.length}
+                    onMove={this.onMoveItem}>
+                    {listItems}
+                </RearrangingList>
+            </div>
         );
     }
 }

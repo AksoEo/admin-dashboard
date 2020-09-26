@@ -17,21 +17,49 @@ export default class Components extends Page {
 
 function FormEditorTest () {
     const [value, setValue] = useState({
+        allowUse: true,
+        allowGuests: false,
+        editable: true,
+        cancellable: true,
+        manualApproval: false,
+        price: {
+            currency: 'AUD',
+            var: 'aaaaa',
+            minUpfront: null,
+        },
         form: [
             {
+                el: 'script',
+                script: {
+                    aaaaa: { t: 's', v: 'cats' },
+                },
+            },
+            {
                 el: 'input',
-                name: 'hewwo',
-                label: 'Hewwo®',
-                description: 'horse',
-                type: 'country',
-                default: true,
+                name: 'disable_hewwo',
+                label: 'Disable hewwo',
+                description: '',
+                type: 'boolean',
+                default: false,
                 editable: true,
                 disabled: false,
                 required: false,
             },
             {
+                el: 'input',
+                name: 'hewwo',
+                label: 'Hewwo®',
+                description: 'horse',
+                type: 'text',
+                default: { t: 'c', f: 'id', a: ['aaaaa'] },
+                editable: true,
+                disabled: { t: 'c', f: 'id', a: ['@disable_hewwo'] },
+                required: false,
+            },
+            {
                 el: 'text',
-                text: 'text text *text* **text**',
+                // text: 'text text *text* **text**',
+                text: { t: 'c', f: '++', a: ['aaaaa', '@hewwo'] },
             },
             {
                 el: 'script',
@@ -39,6 +67,7 @@ function FormEditorTest () {
                     meow: { t: 'n', v: 2 },
                     meow2: { t: 'n', v: 3 },
                     horse: { t: 'c', f: '+', a: ['meow', 'meow2'] },
+                    ext_ref: { t: 'c', f: 'aaaaa' },
                 },
             },
         ],
