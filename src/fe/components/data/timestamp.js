@@ -59,7 +59,7 @@ function TimestampEditor ({ label, value, onChange, disabled, error, outline, zo
                 if (Number.isFinite(newValue)) onChange(newValue);
             }} error={error} />
             {outline ? ' ' : ''}
-            <time.editor outline={outline} disabled={disabled} value={timeValue} onChange={v => {
+            <time.editor nullable outline={outline} disabled={disabled} value={timeValue} onChange={v => {
                 if (v === null) {
                     onChange(null);
                     return;

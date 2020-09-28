@@ -17,6 +17,7 @@
     "@material-ui/icons": "^4.9.1",
     "@tejo/akso-client": "^0.1.14",
     "@tejo/akso-script": "^0.2.1",
+    "@tejo/akso-script-editor": "git+https://github.com/AksoEo/akso-script-editor.git",
     "@wessberg/pointer-events": "^1.0.9",
     "codemirror": "^5.52.0",
     "core-js": "^3.6.4",

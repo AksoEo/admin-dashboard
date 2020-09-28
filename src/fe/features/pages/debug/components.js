@@ -29,6 +29,24 @@ function FormEditorTest () {
         },
         form: [
             {
+                el: 'input',
+                name: 'test',
+                label: 'Test',
+                description: 'test',
+                type: 'boolean_table',
+                default: false,
+                editable: true,
+                disabled: false,
+                required: false,
+                cols: 6,
+                rows: 6,
+                minSelect: 2,
+                maxSelect: 2,
+                headerTop: ['a', 'b', 'c', 'd', 'e', 'f'],
+                headerLeft: ['1', '2', '3', '4', '5', '6'],
+                excludeCells: [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]],
+            },
+            {
                 el: 'script',
                 script: {
                     aaaaa: { t: 's', v: 'cats' },

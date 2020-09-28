@@ -24,7 +24,7 @@ export const formEditor = {
             enabled: '[[Assign sequence ids]]',
             startAt: '[[StartAt]]',
             requireValid: '[[RequireValid]]',
-            requireValidDesc: '[[Whether to require a valid registration (price.minUpFront paid, manually approved if required etc.) to assign an ID]]'
+            requireValidDesc: '[[Whether to require a valid registration (price.minUpFront paid, manually approved if required etc.) to assign an ID]]',
         },
     },
     itemTypes: {
@@ -122,6 +122,12 @@ export const formEditor = {
             false: '[[Not disabled]]',
         },
         optionsOnlyExisting: '[[Let users pick this but only if they’d already selected it]]',
+        rows: '[[Rows]]',
+        cols: '[[Cols]]',
+        minSelect: '[[MinSelect]]',
+        minSelectEmpty: '[[no minimum]]',
+        maxSelect: '[[MaxSelect]]',
+        maxSelectEmpty: '[[no maximum]]',
 
         namePatternError: '[[name must match ^[\\w\\-:ĥŝĝĉĵŭ]+$]]',
     },

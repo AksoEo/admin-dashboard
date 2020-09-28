@@ -35,6 +35,7 @@ function TimeRenderer ({ value }) {
 ///
 /// # Props
 /// - value/onChange: number of seconds
+/// - nullable: if true, will return null for empty input
 class TimeEditor extends PureComponent {
     state = {
         editingValue: '',
@@ -51,6 +52,14 @@ class TimeEditor extends PureComponent {
         const input = this.state.editingValue;
 
         if (!input) {
+            if (this.props.nullable) {
+                this.setState({
+                    editingValue: '',
+                }, () => {
+                    this.props.onChange(null);
+                });
+                return;
+            }
             // assume unchanged
             this.deriveEditingValue();
             return;

@@ -7,7 +7,8 @@ import RearrangingList from '../rearranging-list';
 import MdField from '../md-field';
 import Select from '../select';
 import TextArea from '../text-area';
-import { currencyAmount } from '../data';
+import { WithCountries } from '../data/country';
+import { date, time, timestamp, currencyAmount } from '../data';
 import { ScriptableValue, ScriptableBool } from './script-expr';
 import { evalExpr } from './model';
 import { data as dataLocale, formEditor as locale, currencies } from '../../locale';
@@ -29,7 +30,7 @@ function Desc ({ value }) {
     );
 }
 
-// TODO: resolve required state (run ASC code!), etc.
+// TODO: better rendering (show/respect more fields)
 const TYPES = {
     boolean: {
         render ({ disabled, value, onChange }) {
@@ -212,8 +213,35 @@ const TYPES = {
             variant: ['select', 'radio'],
         },
     },
-    // TODO: all of these
     country: {
+        render ({ value, onChange, item }) {
+            return (
+                <WithCountries>
+                    {countries => {
+                        const options = [];
+                        if (!item.required || !value) options.push({ value: null, label: '—' });
+
+                        for (const c in countries) {
+                            const country = countries[c];
+                            if (item.exclude && item.exclude.includes(country.code)) continue;
+                            options.push({ value: country.code, label: `${country.name_eo} (${country.code})` });
+                        }
+
+                        for (const add of (item.add || [])) {
+                            options.push({ value: add, label: add });
+                        }
+
+                        return (
+                            <Select
+                                outline
+                                value={value}
+                                onChange={onChange}
+                                items={options} />
+                        );
+                    }}
+                </WithCountries>
+            );
+        },
         settings: {
             add: true,
             exclude: true,
@@ -221,6 +249,16 @@ const TYPES = {
         },
     },
     date: {
+        render ({ value, onChange }) {
+            return (
+                <div class="form-input-date">
+                    <date.editor
+                        outline
+                        value={value}
+                        onChange={onChange} />
+                </div>
+            );
+        },
         settings: {
             min: 'date',
             max: 'date',
@@ -228,18 +266,101 @@ const TYPES = {
         },
     },
     time: {
+        render ({ value, onChange }) {
+            return (
+                <div class="form-input-time">
+                    <time.editor
+                        outline
+                        value={value}
+                        onChange={onChange} />
+                </div>
+            );
+        },
         settings: {
             min: 'time',
             max: 'time',
         },
     },
     datetime: {
+        render ({ value, onChange }) {
+            return (
+                <div class="form-input-datetime">
+                    <timestamp.editor
+                        outline
+                        value={value}
+                        onChange={onChange} />
+                </div>
+            );
+        },
         settings: {
             min: 'datetime',
             max: 'datetime',
         },
     },
     boolean_table: {
+        render ({ item, value, onChange }) {
+            const resizeValue = (value, rows, cols) => {
+                if (!value) value = [];
+                else value = value.slice();
+                while (value.length < rows) value.push([]);
+                while (value.length > rows) value.pop();
+                for (let y = 0; y < rows; y++) {
+                    const row = value[y].slice();
+                    while (row.length < cols) row.push(false);
+                    while (row.length > cols) row.pop();
+                    value[y] = row;
+                }
+                return value;
+            };
+
+            const rows = [];
+            if (item.headerTop) {
+                const headerRow = [];
+                if (item.headerLeft) headerRow.push(<th key="x"></th>);
+                for (let x = 0; x < item.cols; x++) {
+                    headerRow.push(<th key={x}>{item.headerTop[x]}</th>);
+                }
+                rows.push(<tr key="header">{headerRow}</tr>);
+            }
+            const excludedCells = (item.excludeCells || [])
+                .map(([x, y]) => `${x},${y}`);
+            for (let y = 0; y < item.rows; y++) {
+                const row = [];
+                if (item.headerLeft) {
+                    row.push(<th key="x">{item.headerLeft[y]}</th>);
+                }
+                for (let x = 0; x < item.cols; x++) {
+                    const isExcluded = excludedCells.includes(`${x},${y}`);
+                    const cellValue = !isExcluded && value && value[y] && value[y][x];
+                    const cellY = y;
+                    const cellX = x;
+                    const onCellChange = v => {
+                        const newValue = resizeValue(value, item.rows, item.cols);
+                        newValue[cellY][cellX] = v;
+                        onChange(newValue);
+                    };
+                    row.push(
+                        <td key={x}>
+                            <Checkbox
+                                disabled={isExcluded}
+                                checked={cellValue}
+                                onChange={onCellChange} />
+                        </td>
+                    );
+                }
+                rows.push(<tr key={y}>{row}</tr>);
+            }
+
+            return (
+                <div class="form-input-boolean-table">
+                    <table>
+                        <tbody>
+                            {rows}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        },
         settings: {
             cols: true,
             rows: true,
@@ -380,6 +501,7 @@ function Setting ({ label, stack, desc, children }) {
     );
 }
 
+// TODO: DRY
 const SETTINGS = {
     name ({ value, onChange }) {
         // TODO: use oldName
@@ -481,9 +603,34 @@ const SETTINGS = {
             </Setting>
         );
     },
-    min ({ value, onChange, item }) {
-        return (
-            <Setting label={locale.inputFields.min}>
+    min ({ value, onChange, item, options }) {
+        let editor;
+        if (options === 'date') {
+            editor = (
+                <date.editor
+                    outline
+                    placeholder={locale.inputFields.minEmpty}
+                    value={value || null}
+                    onChange={v => onChange(v || null)}/>
+            );
+        } else if (options === 'time') {
+            editor = (
+                <time.editor
+                    outline nullable
+                    placeholder={locale.inputFields.minEmpty}
+                    value={value}
+                    onChange={onChange} />
+            );
+        } else if (options === 'datetime') {
+            editor = (
+                <timestamp.editor
+                    outline
+                    placeholder={locale.inputFields.minEmpty}
+                    value={value || null}
+                    onChange={onChange} />
+            );
+        } else {
+            editor = (
                 <TextField
                     outline
                     placeholder={locale.inputFields.minEmpty}
@@ -494,12 +641,43 @@ const SETTINGS = {
                     step={item.step}
                     max={item.max}
                     onChange={e => onChange(+e.target.value || null)} />
+            );
+        }
+
+        return (
+            <Setting label={locale.inputFields.min}>
+                {editor}
             </Setting>
         );
     },
-    max ({ value, onChange, item }) {
-        return (
-            <Setting label={locale.inputFields.min}>
+    max ({ value, onChange, item, options }) {
+        let editor;
+        if (options === 'date') {
+            editor = (
+                <date.editor
+                    outline
+                    placeholder={locale.inputFields.maxEmpty}
+                    value={value || null}
+                    onChange={v => onChange(v || null)}/>
+            );
+        } else if (options === 'time') {
+            editor = (
+                <time.editor
+                    outline nullable
+                    placeholder={locale.inputFields.minEmpty}
+                    value={value}
+                    onChange={onChange} />
+            );
+        } else if (options === 'datetime') {
+            editor = (
+                <timestamp.editor
+                    outline
+                    placeholder={locale.inputFields.maxEmpty}
+                    value={value || null}
+                    onChange={onChange} />
+            );
+        } else {
+            editor = (
                 <TextField
                     outline
                     placeholder={locale.inputFields.maxEmpty}
@@ -510,6 +688,11 @@ const SETTINGS = {
                     step={item.step}
                     min={item.min}
                     onChange={e => onChange(Number.isFinite(+e.target.value) ? +e.target.value : null)} />
+            );
+        }
+        return (
+            <Setting label={locale.inputFields.max}>
+                {editor}
             </Setting>
         );
     },
@@ -606,6 +789,56 @@ const SETTINGS = {
         return (
             <Setting stack label={locale.inputFields.options}>
                 <OptionsEditor value={value} onChange={onChange} />
+            </Setting>
+        );
+    },
+    rows ({ value, onChange }) {
+        return (
+            <Setting label={locale.inputFields.rows}>
+                <TextField
+                    type="number"
+                    outline
+                    value={value | 0}
+                    onChange={e => onChange(+e.target.value | 0)} />
+            </Setting>
+        );
+    },
+    cols ({ value, onChange }) {
+        return (
+            <Setting label={locale.inputFields.cols}>
+                <TextField
+                    type="number"
+                    outline
+                    value={value | 0}
+                    onChange={e => onChange(+e.target.value | 0)} />
+            </Setting>
+        );
+    },
+    minSelect ({ value, onChange, item }) {
+        return (
+            <Setting label={locale.inputFields.minSelect}>
+                <TextField
+                    type="number"
+                    placeholder={locale.inputFields.minSelectEmpty}
+                    outline
+                    min={0}
+                    max={item.maxSelect || (item.rows * item.cols)}
+                    value={value || ''}
+                    onChange={e => onChange(+e.target.value || null)} />
+            </Setting>
+        );
+    },
+    maxSelect ({ value, onChange, item }) {
+        return (
+            <Setting label={locale.inputFields.maxSelect}>
+                <TextField
+                    type="number"
+                    placeholder={locale.inputFields.maxSelectEmpty}
+                    outline
+                    min={item.minSelect | 0}
+                    max={item.rows * item.cols}
+                    value={value || ''}
+                    onChange={e => onChange(+e.target.value || null)} />
             </Setting>
         );
     },
