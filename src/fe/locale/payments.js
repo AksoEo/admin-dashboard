@@ -7,14 +7,14 @@ export const currencies = {
     EUR: 'Eŭroj (EUR)',
     GBP: 'Britaj Pundoj (GBP)',
     HKD: 'Honkonga Dolaro (HKD)',
-    JPY: 'Japana eno (JPY)',
-    MXN: 'Meksika peso (MXN)',
-    MYR: 'Malajzia ringito (MYR)',
-    NOK: 'Norvega krono (NOK)',
-    NZD: 'Nov-Zelanda dolaro (NZD)',
-    PLN: 'Polaj zlotoj (PLN)',
-    SEK: 'Svedaj kronoj (SEK)',
-    SGD: 'Singapuraj dolaroj (SGD)',
+    JPY: 'Japana Eno (JPY)',
+    MXN: 'Meksika Peso (MXN)',
+    MYR: 'Malajzia Ringito (MYR)',
+    NOK: 'Norvega Krono (NOK)',
+    NZD: 'Nov-Zelanda Dolaro (NZD)',
+    PLN: 'Polaj Zlotoj (PLN)',
+    SEK: 'Svedaj Kronoj (SEK)',
+    SGD: 'Singapuraj Dolaroj (SGD)',
 };
 
 export const paymentOrgs = {
@@ -346,9 +346,16 @@ export const paymentIntents = {
         totalEarned: '[[earned]]', // suffix
         totalRefunded: '[[refunded]]', // suffix
 
-        byMethodAndCurrency: '[[By method/currency]]',
-        methodHeader: '[[method]]', // table header
-        totalHeader: '[[total]]', // bottom
+        byCurrency: '[[By Currency]]',
+
+        paymentOrg: '[[Payment Org]]',
+        paymentMethod: '[[Payment Method]]',
+        paymentAddon: '[[Payment Addon]]',
+
+        currencyHeader: '[[Currency]]', // table header
+        totalHeader: '[[Total]]', // table header
+
+        addonsNote: '[[Note that for payment addons, refunds cannot be tracked for addons. Invalidated addons are not included.]]',
 
         totals: {
             // prefixes

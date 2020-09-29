@@ -19,8 +19,8 @@ export const congresses = {
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Alŝuti kongreson',
-        button: 'Alŝuti',
+        title: 'Redakti kongreson',
+        button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
@@ -68,7 +68,7 @@ export const congressInstances = {
     update: {
         menuItem: 'Redakti',
         title: 'Redakti okazigon',
-        button: 'Alŝuti',
+        button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
@@ -169,7 +169,7 @@ export const congressLocations = {
     update: {
         menuItem: 'Redakti',
         title: 'Redakti lokon',
-        button: 'Alŝuti',
+        button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
@@ -217,7 +217,7 @@ export const congressPrograms = {
     update: {
         menuItem: 'Redakti',
         title: 'Redakti programeron',
-        button: 'Alŝuti',
+        button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',

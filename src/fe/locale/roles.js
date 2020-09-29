@@ -21,8 +21,8 @@ export const roles = {
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Alŝuti rolon',
-        button: 'Alŝuti',
+        title: 'Redakti rolon',
+        button: 'Aktualigi',
 
         nameRequired: 'Necesas nomo',
     },

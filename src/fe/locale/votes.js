@@ -161,9 +161,9 @@ export const votes = {
     numberRequired: 'Bv. enmeti nombron',
     optionsRequired: 'Bv. enmeti voĉdonopciojn',
     update: {
-        menuItem: 'Aktualigi',
-        title: 'Aktualigi voĉdonon',
-        templateTitle: 'Aktualigi ŝablonon',
+        menuItem: 'Redakti',
+        title: 'Redakti voĉdonon',
+        templateTitle: 'Redakti ŝablonon',
         button: 'Aktualigi',
     },
     delete: {

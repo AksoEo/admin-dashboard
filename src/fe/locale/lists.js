@@ -29,7 +29,7 @@ export const lists = {
     update: {
         menuItem: 'Redakti',
         title: 'Redakti liston',
-        button: 'Redakti',
+        button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',

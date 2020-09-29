@@ -17,8 +17,8 @@ export const memberships = {
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Alŝuti membrecon',
-        button: 'Alŝuti',
+        title: 'Redakti membrecon',
+        button: 'Aktualigi',
 
         nameRequired: 'Necesas nomo',
     },

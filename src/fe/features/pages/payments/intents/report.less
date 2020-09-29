@@ -32,7 +32,7 @@
         margin: 24px;
 
         .report-section {
-            margin-bottom: 16px;
+            margin-top: 16px;
 
             .section-title {
                 font-size: small;
@@ -49,19 +49,21 @@
             }
         }
 
-        .report-total-total {
-            font-size: 24px;
-        }
-        .report-total-sub {
-            .report-total-earned, .report-total-refunded {
-                display: inline-block;
+        .converted-totals {
+            .converted-total-total {
+                font-size: 24px;
             }
-            .report-total-earned, {
-                margin-right: 32px;
+            .converted-total-sub {
+                .converted-total-earned, .converted-total-refunded {
+                    display: inline-block;
+                }
+                .converted-total-earned, {
+                    margin-right: 32px;
+                }
             }
         }
 
-        .currency-table {
+        table {
             min-width: 100%;
             border-spacing: 0;
 
@@ -92,10 +94,10 @@
                     }
                 }
             }
+        }
 
-            .method-id {
-                color: inherit;
-            }
+        .object-id {
+            color: inherit;
         }
     }
 }

@@ -1,5 +1,5 @@
 import { h, render } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { PureComponent, useState } from 'preact/compat';
 import moment from 'moment';
 import { CircularProgress } from '@cpsdqs/yamdl';
 import PrintIcon from '@material-ui/icons/Print';
@@ -17,7 +17,7 @@ import reportPrintStyles from './report-print.noextract.css';
 
 export default class Report extends Page {
     state = {
-        rangeStart: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+        rangeStart: moment().subtract(1, 'month').add(1, 'day').format('YYYY-MM-DD'),
         rangeEnd: moment().format('YYYY-MM-DD'),
         loading: false,
         data: null,
@@ -179,127 +179,160 @@ function ReportRender ({ data, currency, print }) {
     return (
         <div class="payments-report">
             <div class="report-section">
-                <div class="section-title">{locale.report.total}</div>
                 <div class="section-contents">
-                    <div class="report-total-total">
-                        <currencyAmount.renderer
-                            value={data.converted.total}
-                            currency={currency} />
-                    </div>
-                    <div class="report-total-sub">
-                        <div class="report-total-earned">
-                            <currencyAmount.renderer
-                                value={data.converted.earned}
-                                currency={currency} />
-                            {' '}
-                            {locale.report.totalEarned}
-                        </div>
-                        <div class="report-total-refunded">
-                            <currencyAmount.renderer
-                                value={data.converted.refunded}
-                                currency={currency} />
-                            {' '}
-                            {locale.report.totalRefunded}
-                        </div>
-                    </div>
+                    {locale.report.addonsNote}
                 </div>
             </div>
             <div class="report-section">
-                <div class="section-title">{locale.report.byMethodAndCurrency}</div>
+                <div class="section-title">{locale.report.total}</div>
                 <div class="section-contents">
-                    <CurrencyTable totals={data.totals} print={print} />
+                    <Totals data={data} currency={currency} print={print} />
+                </div>
+            </div>
+            <PaymentOrgs data={data} currency={currency} print={print} />
+        </div>
+    );
+}
+
+function ConvertedTotals ({ converted, currency }) {
+    return (
+        <div class="converted-totals">
+            <div class="converted-total-total">
+                <currencyAmount.renderer
+                    value={converted.total}
+                    currency={currency} />
+            </div>
+            <div class="converted-total-sub">
+                <div class="converted-total-subfield converted-total-earned">
+                    <currencyAmount.renderer
+                        value={converted.earned}
+                        currency={currency} />
+                    {' '}
+                    {locale.report.totalEarned}
+                </div>
+                <div class="converted-total-subfield converted-total-refunded">
+                    <currencyAmount.renderer
+                        value={converted.refunded}
+                        currency={currency} />
+                    {' '}
+                    {locale.report.totalRefunded}
                 </div>
             </div>
         </div>
     );
 }
 
-function CurrencyTable ({ totals, print }) {
-    const currencyKeys = Object.keys(totals.currency);
-
+function CurrencyTable ({ byCurrency, print }) {
+    const currencyKeys = Object.keys(byCurrency);
     const table = {};
-    const tableIndex1 = {};
-    const tableIndex2 = {};
-
-    for (const c of currencyKeys) tableIndex2[c] = currencies[c];
-
-    {
-        const k = 'sum';
-        const sumTotals = totals.currency;
-        table[k] = {};
-        tableIndex1[k] = locale.report.totalHeader;
-        for (const c of currencyKeys) {
-            table[k][c] = sumTotals[c];
-        }
-    }
-
-    for (const org in totals.paymentMethod) {
-        for (const method in totals.paymentMethod[org]) {
-            const k = `${org}-${method}`;
-
-            table[k] = {};
-            if (print) {
-                tableIndex1[k] = <MethodName
-                    org={org}
-                    method={method}
-                    useCache />;
-            } else {
-                tableIndex1[k] = <MethodName org={org} method={method} />;
-            }
-
-            const methodTotals = totals.paymentMethod[org][method].totals;
-
-            for (const c of currencyKeys) {
-                table[k][c] = methodTotals[c];
-            }
-        }
-    }
-
-    if (print) {
-        return (
-            <div class="currency-table-unrolled">
-                {Object.keys(tableIndex1).map(i => (
-                    <div class="unrolled-method" key={i}>
-                        <div class="unrolled-title">{tableIndex1[i]}</div>
-                        <table class="unrolled-contents">
-                            <tbody>
-                                {Object.keys(tableIndex2).map(j => (
-                                    <tr key={j}>
-                                        <th>{tableIndex2[j]}</th>
-                                        <td>
-                                            <ReportCell value={table[i][j]} currency={j} />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ))}
-            </div>
-        );
-    }
 
     return (
         <table class="currency-table">
             <thead>
                 <tr>
-                    <th key="method">{locale.report.methodHeader}</th>
-                    {Object.entries(tableIndex1).map(([i, j]) => <th key={i}>{j}</th>)}
+                    <th>{locale.report.currencyHeader}</th>
+                    <th>{locale.report.totalHeader}</th>
                 </tr>
             </thead>
             <tbody>
-                {Object.keys(tableIndex2).map(i => (
-                    <tr key={i}>
-                        <th>{tableIndex2[i]}</th>
-                        {Object.keys(tableIndex1).map(j => (
-                            <td key={j}>
-                                <ReportCell value={table[j][i]} currency={i} />
-                            </td>
-                        ))}
+                {currencyKeys.map(c => (
+                    <tr key={c}>
+                        <th>{currencies[c]}</th>
+                        <td><ReportCell value={byCurrency[c]} currency={c} /></td>
                     </tr>
                 ))}
             </tbody>
         </table>
+    );
+}
+
+function Totals ({ data, currency, print }) {
+    return (
+        <div class="report-item-totals">
+            <ConvertedTotals converted={data.converted} currency={currency} print={print} />
+            <div class="report-section">
+                <div class="section-title">{locale.report.byCurrency}</div>
+                <div class="section-contents">
+                    <CurrencyTable byCurrency={data.byCurrency} print={print} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
+function PaymentOrgs ({ data, currency, print }) {
+    const items = [];
+    for (const org in data.byPaymentOrg) {
+        const orgItems = [];
+        for (const method in data.byPaymentOrg[org].byPaymentMethod) {
+            orgItems.push(
+                <PaymentMethod
+                    org={org}
+                    method={method}
+                    data={data.byPaymentOrg[org].byPaymentMethod[method]}
+                    currency={currency}
+                    print={print} />
+            );
+        }
+        for (const addon in data.byPaymentOrg[org].byPaymentAddon) {
+            orgItems.push(
+                <PaymentAddon
+                    org={org}
+                    addon={addon}
+                    data={data.byPaymentOrg[org].byPaymentAddon[addon]}
+                    currency={currency}
+                    print={print} />
+            );
+        }
+        items.push(
+            <div class="report-section">
+                <div class="section-title">
+                    {locale.report.paymentOrg}
+                    {' '}
+                    <PaymentOrgName org={org} useCache={print} />
+                </div>
+                <div class="section-contents">
+                    <Totals data={data.byPaymentOrg[org]} currency={currency} print={print} />
+                    {orgItems}
+                </div>
+            </div>
+        );
+    }
+    return (
+        <div>
+            {items}
+        </div>
+    );
+}
+
+function PaymentMethod ({ org, method, data, currency }) {
+    return (
+        <div class="report-section">
+            <div class="section-title">
+                {locale.report.paymentMethod}
+                {' '}
+                <PaymentMethodName org={org} method={method} useCache={print} />
+            </div>
+            <div class="section-contents">
+                <Totals data={data} currency={currency} print={print} />
+            </div>
+        </div>
+    );
+}
+
+function PaymentAddon ({ org, addon, data, currency }) {
+    return (
+        <div class="report-section">
+            <div class="section-title">
+                {locale.report.paymentAddon}
+                {' '}
+                <PaymentAddonName org={org} addon={addon} useCache={print} />
+            </div>
+            <div class="section-contents">
+                <Totals data={data} currency={currency} print={print} />
+            </div>
+        </div>
     );
 }
 
@@ -330,15 +363,49 @@ function ReportCell ({ value, currency }) {
 }
 
 let batchLoadCore = null;
+
 const batchLoadOrgs = new Map();
-function batchFlushOrg (org) {
-    if (!batchLoadOrgs.has(org)) return;
-    const methods = [...batchLoadOrgs.get(org)];
-    batchLoadOrgs.delete(org);
+function batchFlushOrgs () {
+    if (!batchLoadOrgs.size) return;
+    const orgs = [...batchLoadOrgs.keys()];
+    const blOrgs = [...batchLoadOrgs.entries()];
+    batchLoadOrgs.clear();
+    batchLoadCore.createTask('payments/listOrgs', {}, {
+        offset: 0,
+        limit: orgs.length,
+        fields: [{ id: 'id', sorting: 'none' }, { id: 'name', sorting: 'none' }],
+        jsonFilter: { filter: { id: { $in: orgs } } },
+        _skipMapHack: true,
+    }).runOnceAndDrop().then(res => {
+        const namesById = {};
+        for (const item of res.items) namesById[item.id] = item.name;
+        for (const [org, listeners] of blOrgs) {
+            for (const listener of listeners) {
+                listener(null, namesById[org]);
+            }
+        }
+    }).catch(err => {
+        for (const [_, l] of blOrgs) for (const li of l) li(err);
+    });
+}
+function batchLoadOrgName (org) {
+    return new Promise((resolve, reject) => {
+        if (!batchLoadOrgs.has(org)) batchLoadOrgs.set(org, new Set());
+        batchLoadOrgs.get(org).add((error, data) => error ? reject(error) : resolve(data));
+        if (batchLoadOrgs.size > 50) batchFlushOrgs();
+        else setTimeout(() => batchFlushOrgs(), 100);
+    });
+}
+
+const batchLoadMethodOrgs = new Map();
+function batchFlushMethodOrg (org) {
+    if (!batchLoadMethodOrgs.has(org)) return;
+    const methods = [...batchLoadMethodOrgs.get(org)];
+    batchLoadMethodOrgs.delete(org);
 
     batchLoadCore.createTask('payments/listMethods', { org }, {
         offset: 0,
-        limit: methods.size,
+        limit: methods.length,
         jsonFilter: { filter: { id: { $in: methods.map(x => x.method) } } },
         _skipMapHack: true,
     }).runOnceAndDrop().then(res => {
@@ -352,32 +419,106 @@ function batchFlushOrg (org) {
     });
 }
 function batchLoadMethodName (org, method) {
-    let schedule = false;
-    if (batchLoadOrgs.has(org)) {
-        if (batchLoadOrgs.get(org).size > 50) batchFlushOrg(org);
-        batchLoadOrgs.set(org, new Set());
-        schedule = true;
-    } else {
-        batchLoadOrgs.set(org, new Set());
-        schedule = true;
-    }
-
     return new Promise((resolve, reject) => {
-        batchLoadOrgs.get(org).add({
+        let schedule = false;
+        if (batchLoadMethodOrgs.has(org)) {
+            if (batchLoadMethodOrgs.get(org).size > 50) batchFlushMethodOrg(org);
+            batchLoadMethodOrgs.set(org, new Set());
+            schedule = true;
+        } else {
+            batchLoadMethodOrgs.set(org, new Set());
+            schedule = true;
+        }
+
+        batchLoadMethodOrgs.get(org).add({
             method,
             listener: (error, data) => {
                 if (error) reject(error);
                 else resolve(data);
             },
         });
-        if (schedule) setTimeout(() => batchFlushOrg(org), 100);
+        if (schedule) setTimeout(() => batchFlushMethodOrg(org), 100);
+    });
+}
+
+const batchLoadAddonOrgs = new Map();
+function batchFlushAddonOrg (org) {
+    if (!batchLoadAddonOrgs.has(org)) return;
+    const addons = [...batchLoadAddonOrgs.get(org)];
+    batchLoadAddonOrgs.delete(org);
+
+    batchLoadCore.createTask('payments/listAddons', { org }, {
+        offset: 0,
+        limit: addons.length,
+        jsonFilter: { filter: { id: { $in: addons.map(x => x.addon) } } },
+        _skipMapHack: true,
+    }).runOnceAndDrop().then(res => {
+        const namesById = {};
+        for (const item of res.items) namesById[item.id] = item.name;
+        for (const { addon, listener } of addons) {
+            listener(null, namesById[addon]);
+        }
+    }).catch(err => {
+        for (const { listener } of addons) listener(err);
+    });
+}
+function batchLoadAddonName (org, addon) {
+    return new Promise((resolve, reject) => {
+        let schedule = false;
+        if (batchLoadAddonOrgs.has(org)) {
+            if (batchLoadAddonOrgs.get(org).size > 50) batchFlushAddonOrg(org);
+            batchLoadAddonOrgs.set(org, new Set());
+            schedule = true;
+        } else {
+            batchLoadAddonOrgs.set(org, new Set());
+            schedule = true;
+        }
+
+        batchLoadAddonOrgs.get(org).add({
+            addon,
+            listener: (error, data) => {
+                if (error) reject(error);
+                else resolve(data);
+            },
+        });
+        if (schedule) setTimeout(() => batchFlushAddonOrg(org), 100);
     });
 }
 
 // used to instantly determine names in printing dialog
-const globalMethodNameCache = {};
+const globalObjectNameCache = {};
 
-class MethodName extends PureComponent {
+function PaymentOrgName ({ org, useCache }) {
+    return (
+        <ObjectName
+            id={`org-${org}`}
+            load={() => batchLoadOrgName(org)}
+            useCache={useCache}
+            link={`/aksopago/organizoj/${org}`} />
+    );
+}
+
+function PaymentMethodName ({ org, method, useCache }) {
+    return (
+        <ObjectName
+            id={`method-${org}-${method}`}
+            load={() => batchLoadMethodName(org, method)}
+            useCache={useCache}
+            link={`/aksopago/organizoj/${org}/metodoj/${method}`} />
+    );
+}
+
+function PaymentAddonName ({ org, addon, useCache }) {
+    return (
+        <ObjectName
+            id={`addon-${org}-${addon}`}
+            load={() => batchLoadAddonName(org, addon)}
+            useCache={useCache}
+            link={`/aksopago/organizoj/${org}/aldonebloj/${addon}`} />
+    );
+}
+
+class ObjectName extends PureComponent {
     state = {
         name: null,
         error: null,
@@ -391,11 +532,11 @@ class MethodName extends PureComponent {
         this.setState({ name: null });
 
         batchLoadCore = this.context;
-        batchLoadMethodName(this.props.org, this.props.method).then(name => {
+        this.props.load().then(name => {
             if (this.loadLock !== lock) return;
             this.setState({ name, error: null });
 
-            globalMethodNameCache[`${this.props.org}-${this.props.method}`] = name;
+            globalObjectNameCache[this.props.id] = name;
         }).catch(error => {
             if (this.loadLock !== lock) return;
             this.setState({ name: null, error });
@@ -407,13 +548,11 @@ class MethodName extends PureComponent {
     }
 
     componentDidUpdate (prevProps) {
-        if (prevProps.org !== this.props.org || prevProps.method !== this.props.method) {
-            this.load();
-        }
+        if (prevProps.id !== this.props.id) this.load();
     }
 
-    render ({ org, method, useCache }, { name, error }) {
-        if (useCache) name = globalMethodNameCache[`${org}-${method}`];
+    render ({ id, link, useCache }, { name, error }) {
+        if (useCache) name = globalObjectNameCache[id];
 
         let contents = null;
         if (error) contents = '?';
@@ -421,7 +560,7 @@ class MethodName extends PureComponent {
         else contents = name;
 
         return (
-            <Link class="method-id" target={`/aksopago/organizoj/${org}/metodoj/${method}`}>
+            <Link class="object-id" target={link}>
                 {contents}
             </Link>
         );

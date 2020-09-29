@@ -157,7 +157,7 @@ export const countries = {
     },
     update: {
         title: 'Redakti landojn',
-        button: 'Redakti',
+        button: 'Aktualigi',
     },
     csvFilename: 'landoj',
     enabled: {
@@ -185,7 +185,7 @@ export const countryGroups = {
     },
     update: {
         title: 'Redakti landaron',
-        button: 'Redakti',
+        button: 'Aktualigi',
     },
     delete: {
         title: 'Forigi landaron',

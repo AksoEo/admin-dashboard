@@ -135,20 +135,22 @@ const INTENT_ALLOWED_PATCH_FIELDS = [
 ];
 
 export const tasks = {
-    listOrgs: async (_, { offset, limit, fields }) => {
+    listOrgs: async (_, { offset, limit, fields, jsonFilter, _skipMapHack }) => {
         const client = await asyncClient;
-        const res = await client.get('/aksopay/payment_orgs', {
+        const options = {
             offset,
             limit,
             fields: ['id', 'org', 'name', 'description'],
             order: fieldsToOrder(fields),
-        });
+        };
+        if (jsonFilter) options.filter = jsonFilter.filter;
+        const res = await client.get('/aksopay/payment_orgs', options);
         for (const item of res.body) {
             const existing = store.get([PAYMENT_ORGS, item.id, PO_DATA]);
             store.insert([PAYMENT_ORGS, item.id, PO_DATA], deepMerge(existing, item));
         }
         return {
-            items: res.body.map(x => x.id),
+            items: _skipMapHack ? res.body : res.body.map(x => x.id),
             total: +res.res.headers.get('x-total-items'),
             stats: { time: res.resTime, filtered: false },
         };
@@ -193,20 +195,22 @@ export const tasks = {
         store.remove([PAYMENT_ORGS, id]);
         store.signal([PAYMENT_ORGS, SIG_PAYMENT_ORGS]);
     },
-    listAddons: async ({ org }, { offset, limit, fields }) => {
+    listAddons: async ({ org }, { offset, limit, fields, jsonFilter, _skipMapHack }) => {
         const client = await asyncClient;
-        const res = await client.get(`/aksopay/payment_orgs/${org}/addons`, {
+        const opts = {
             offset,
             limit,
             fields: ['id', 'name', 'description'],
             order: fieldsToOrder(fields),
-        });
+        };
+        if (jsonFilter) opts.filter = jsonFilter.filter;
+        const res = await client.get(`/aksopay/payment_orgs/${org}/addons`, opts);
         for (const item of res.body) {
             const path = [PAYMENT_ORGS, org, PO_ADDONS, item.id];
             store.insert(path, item);
         }
         return {
-            items: res.body.map(x => x.id),
+            items: _skipMapHack ? res.body : res.body.map(x => x.id),
             total: +res.res.headers.get('x-total-items'),
             stats: { time: res.resTime, filtered: false },
         };
@@ -437,20 +441,12 @@ export const tasks = {
         tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
     },
 
-    report: async (_, { time, currency, filters, jsonFilter }) => {
+    report: async (_, { time, currency }) => {
         const client = await asyncClient;
-
-        let filter = {};
-        if (jsonFilter && !jsonFilter._disabled) {
-            filter = jsonFilter.filter;
-        } else if (filters) {
-            filter = filtersToAPI(iClientFilters, filters);
-        }
 
         const res = await client.get('/aksopay/payment_intents/balance_report', {
             time: time.join('-'),
             currency,
-            filter,
         });
 
         return res.body;
