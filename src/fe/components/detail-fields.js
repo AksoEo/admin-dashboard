@@ -14,7 +14,8 @@ import './detail-fields.less';
 /// - edit/onEditChange: editing copy. Is not necessarily synchronized with `editing`
 /// - fields: object { [client field id]: field spec }, with field spec being an object:
 ///    - component: field editor component { value, onChange, editing, item }
-///    - isEmpty: field value => bool
+///    - isEmpty: (optional) (field value, item) => bool
+///    - virtual: (optional) list of actual fields this virtual field corresponds to
 /// - header: like a field editor component, but without value, and with onItemChange
 /// - footer: like header
 /// - locale: object { fields: { field names... } }
@@ -72,9 +73,11 @@ export default function DetailFields ({
 
         if (field.shouldHide && field.shouldHide(itemData, editing)) continue;
 
-        const isNotLoaded = itemData[fieldId] === undefined;
+        const isNotLoaded = field.virtual
+            ? field.virtual.map(x => itemData[x] === undefined).reduce((a, b) => a || b, false)
+            : itemData[fieldId] === undefined;
         const isEmpty = !isNotLoaded && !editing
-            && (field.isEmpty ? field.isEmpty(itemData[fieldId]) : !itemData[fieldId]);
+            && (field.isEmpty ? field.isEmpty(itemData[fieldId], itemData) : !itemData[fieldId]);
         const hasDiff = edit && data
             && !deepEq(data[fieldId], edit[fieldId]);
 

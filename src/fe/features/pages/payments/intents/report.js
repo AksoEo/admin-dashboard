@@ -1,5 +1,5 @@
 import { h, render } from 'preact';
-import { PureComponent, useState } from 'preact/compat';
+import { PureComponent } from 'preact/compat';
 import moment from 'moment';
 import { CircularProgress } from '@cpsdqs/yamdl';
 import PrintIcon from '@material-ui/icons/Print';
@@ -222,7 +222,7 @@ function ConvertedTotals ({ converted, currency }) {
     );
 }
 
-function CurrencyTable ({ byCurrency, print }) {
+function CurrencyTable ({ byCurrency }) {
     const currencyKeys = Object.keys(byCurrency);
     const table = {};
 
@@ -385,7 +385,7 @@ function batchFlushOrgs () {
             }
         }
     }).catch(err => {
-        for (const [_, l] of blOrgs) for (const li of l) li(err);
+        for (const [, l] of blOrgs) for (const li of l) li(err);
     });
 }
 function batchLoadOrgName (org) {

@@ -90,6 +90,14 @@ export const paymentMethods = {
         isRecommended: 'Rekomendita',
         stripeSecretKey: 'Sekreta ŝlosilo de Stripe',
         stripePublishableKey: 'Publika ŝlosilo de Stripe',
+        fee: '[[Fee]]',
+        feeFixed: '[[Fixed fee]]',
+        feePercent: '[[Percent fee]]',
+        fees: {
+            fixed: '[[Fixed fee]]',
+            percent: '[[Percent fee]]',
+            description: '[[Fixed and percent fees will be added together.]]',
+        },
 
         types: {
             manual: 'Permana',

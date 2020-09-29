@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Checkbox, TextField } from '@cpsdqs/yamdl';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 import { Validator } from '../../../../../components/form';
@@ -6,7 +7,7 @@ import Segmented from '../../../../../components/segmented';
 import Select from '../../../../../components/select';
 import StripeIcon from '../../../../../components/stripe-icon';
 import MdField from '../../../../../components/md-field';
-import { timespan } from '../../../../../components/data';
+import { currencyAmount, timespan } from '../../../../../components/data';
 import { paymentMethods as locale, currencies } from '../../../../../locale';
 import './fields.less';
 
@@ -200,6 +201,40 @@ export const FIELDS = {
             return value && value.toString();
         },
     },
+    fee: {
+        virtual: ['feePercent', 'feeFixed'],
+        isEmpty: (_, item) => !item.feePercent && !item.feeFixed,
+        component ({ item, editing, onItemChange }) {
+            if (editing) {
+                return (
+                    <FeesEditor
+                        value={{ feeFixed: item.feeFixed, feePercent: item.feePercent }}
+                        onChange={value => {
+                            onItemChange({
+                                ...item,
+                                feeFixed: value.feeFixed,
+                                feePercent: value.feePercent,
+                            });
+                        }}/>
+                );
+            }
+            let feePercent = null;
+            let feeFixed = null;
+            if (Number.isFinite(item.feePercent)) {
+                const v = +(item.feePercent * 100).toFixed(2);
+                feePercent =  `${v} %`;
+            }
+            if (item.feeFixed) {
+                feeFixed = <currencyAmount.renderer
+                    value={item.feeFixed.val}
+                    currency={item.feeFixed.cur} />;
+            }
+            if (feePercent && feeFixed) {
+                return <span>{feePercent}{' + '}{feeFixed}</span>;
+            } else if (feePercent) return feePercent;
+            else return feeFixed;
+        },
+    },
     stripePublishableKey: {
         component ({ value, editing, onChange }) {
             if (editing) {
@@ -215,6 +250,124 @@ export const FIELDS = {
         shouldHide: item => item.type !== 'stripe',
     },
 };
+
+function FeesEditor ({ value, onChange }) {
+    const onPercentChange = feePercent => onChange({ feePercent, feeFixed: value.feeFixed });
+    const onFixedChange = feeFixed => onChange({ feePercent: value.feePercent, feeFixed });
+
+    const hasFixed = !!value.feeFixed;
+    const hasPercent = Number.isFinite(value.feePercent);
+    const enableFixed = enabled => {
+        if (enabled) onFixedChange({ val: 1, cur: 'USD' });
+        else onFixedChange(null);
+    };
+    const enablePercent = enabled => {
+        if (enabled) onPercentChange(0.1);
+        else onPercentChange(null);
+    };
+
+    const percent = value.feePercent;
+    const fixed = value.feeFixed;
+
+    const fSwitchId = Math.random().toString(36);
+    const pSwitchId = Math.random().toString(36);
+
+    return (
+        <div class="payment-method-fees-editor">
+            <div class="fees-switch">
+                <Checkbox
+                    id={fSwitchId}
+                    checked={hasFixed}
+                    onChange={enableFixed} />
+                {' '}
+                <label for={fSwitchId}>{locale.fields.fees.fixed}</label>
+            </div>
+            {hasFixed && (
+                <div class="fixed-fee-editor">
+                    <currencyAmount.editor
+                        outline
+                        currency={fixed.cur}
+                        value={fixed.val}
+                        onChange={val => onFixedChange({ ...fixed, val })} />
+                    <Select
+                        outline
+                        value={fixed.cur}
+                        onChange={cur => onFixedChange({ ...fixed, cur })}
+                        items={Object.keys(currencies).map(c => ({
+                            value: c,
+                            label: currencies[c],
+                        }))} />
+                </div>
+            )}
+            <div class="fees-switch">
+                <Checkbox
+                    id={pSwitchId}
+                    checked={hasPercent}
+                    onChange={enablePercent} />
+                {' '}
+                <label for={pSwitchId}>{locale.fields.fees.percent}</label>
+            </div>
+            {hasPercent && (
+                <div class="fees-editor">
+                    <PercentEditor
+                        value={percent}
+                        onChange={onPercentChange} />
+                </div>
+            )}
+            {hasFixed && hasPercent && (
+                <div class="fees-description">
+                    {locale.fields.fees.description}
+                </div>
+            )}
+        </div>
+    );
+}
+
+class PercentEditor extends PureComponent {
+    state = {
+        editing: false,
+        editingValue: '',
+    };
+
+    formatValue () {
+        return +(this.props.value * 100).toFixed(2);
+    }
+
+    #onFocus = () => {
+        this.setState({ editing: true, editingValue: this.formatValue() });
+    };
+    #onChange = e => {
+        if (!this.state.editing) return;
+        this.setState({ editingValue: e.target.value });
+        this.commitValue(e.target.value);
+    };
+    #onBlur = () => {
+        this.commitValue(this.state.editingValue);
+        this.setState({ editing: false });
+    };
+
+    commitValue (value) {
+        const parsed = Number.parseFloat(value);
+        if (Number.isFinite(parsed)) {
+            const fixedPrecision = +parsed.toFixed(2);
+            this.props.onChange(Math.max(0, Math.min(fixedPrecision / 100, 1)));
+        }
+    }
+
+    render (_, { editing, editingValue }) {
+        return (
+            <TextField
+                outline
+                type="number"
+                step="0.01"
+                trailing="%"
+                value={editing ? editingValue : this.formatValue()}
+                onChange={this.#onChange}
+                onFocus={this.#onFocus}
+                onBlur={this.#onBlur} />
+        );
+    }
+}
 
 export const CREATION_FIELDS = {
     ...FIELDS,
