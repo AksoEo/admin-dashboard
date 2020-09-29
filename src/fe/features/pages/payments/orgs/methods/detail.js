@@ -2,12 +2,14 @@ import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../../components/page';
 import DetailView from '../../../../../components/detail';
+import TaskImage from '../../../../../components/task-image';
 import Meta from '../../../../meta';
 import { connectPerms } from '../../../../../perms';
 import { coreContext } from '../../../../../core/connection';
 import { paymentMethods as locale } from '../../../../../locale';
 import PaymentOrgOrg from '../org-org';
 import { FIELDS } from './fields';
+import './detail.less';
 
 export default connectPerms(class MethodPage extends Page {
     state = {
@@ -85,6 +87,7 @@ export default connectPerms(class MethodPage extends Page {
                     view="payments/method"
                     id={id}
                     options={{ org }}
+                    header={Header}
                     fields={FIELDS}
                     locale={locale}
                     edit={edit}
@@ -92,8 +95,33 @@ export default connectPerms(class MethodPage extends Page {
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    onDelete={() => this.props.pop()} />
+                    onDelete={() => this.props.pop()}
+                    userData={{ org, id }} />
             </div>
         );
     }
 });
+
+function Header ({ item, editing, userData }) {
+    return (
+        <div class="payment-method-detail-header">
+            <TaskImage
+                editing={editing}
+                class="method-thumbnail"
+                contain lightbox
+                sizes={[32, 64, 128, 256, 512]}
+                task="payments/methodThumbnail"
+                options={{ org: userData.org, id: userData.id }}
+                onUpdate={(thumbnail, core) => {
+                    const task = core.createTask('payments/updateMethodThumbnail', {
+                        org: userData.org,
+                        id: userData.id,
+                    }, {
+                        thumbnail,
+                    });
+                    return task.runOnceAndDrop();
+                }} />
+            {editing ? null : <div class="method-name">{item.name}</div>}
+        </div>
+    );
+}

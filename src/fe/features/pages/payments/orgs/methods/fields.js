@@ -56,6 +56,7 @@ export const FIELDS = {
     name: {
         sortable: true,
         slot: 'title',
+        shouldHide: (_, editing) => !editing,
         component ({ value, editing, onChange, isCreation, slot }) {
             if (editing) {
                 return <Validator

@@ -148,7 +148,10 @@ export default class TaskImage extends PureComponent {
             if (!file) return;
             this.props.onUpdate(file, this.context).then(() => {
                 this.load();
-            }).catch(() => {});
+            }).catch((err) => {
+                console.error(err); // eslint-disable-line no-console
+                // TODO: proper error handling
+            });
         });
     };
 
