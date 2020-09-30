@@ -129,6 +129,7 @@ export const formEditor = {
         maxSelectEmpty: '[[no maximum]]',
         headerTop: '[[HeaderTop]]',
         headerLeft: '[[HeaderLeft]]',
+        excludeCells: '[[ExcludeCells]]',
 
         namePatternError: '[[name must match ^[\\w\\-:ĥŝĝĉĵŭ]+$]]',
     },

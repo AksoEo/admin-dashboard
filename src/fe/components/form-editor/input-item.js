@@ -892,6 +892,45 @@ const SETTINGS = {
             }
         }
 
+        const excludedCells = item.excludeCells
+            ? item.excludeCells.map(([x, y]) => `${x},${y}`)
+            : [];
+        const excludeCellsRows = [];
+        for (let y = 0; y < item.rows; y++) {
+            const row = [];
+            for (let x = 0; x < item.cols; x++) {
+                const pos = [x, y];
+                const isExcluded = excludedCells.includes(`${x},${y}`);
+                const setExcluded = () => {
+                    if (isExcluded) {
+                        const i = excludedCells.indexOf(`${pos[0]},${pos[1]}`);
+                        const excludeCells = item.excludeCells.slice();
+                        excludeCells.splice(i, 1);
+                        onItemChange({ ...item, excludeCells });
+                    } else {
+                        const excludeCells = item.excludeCells ? item.excludeCells.slice() : [];
+                        excludeCells.push(pos);
+                        onItemChange({ ...item, excludeCells });
+                    }
+                };
+                row.push(
+                    <td key={x}>
+                        <Checkbox
+                            checked={isExcluded}
+                            onChange={setExcluded} />
+                    </td>
+                );
+            }
+            excludeCellsRows.push(<tr key={y}>{row}</tr>);
+        }
+        const excludeCells = (
+            <table>
+                <tbody>
+                    {excludeCellsRows}
+                </tbody>
+            </table>
+        );
+
         return (
             <div>
                 <Setting label={locale.inputFields.rows}>
@@ -944,6 +983,9 @@ const SETTINGS = {
                 <DynamicHeightDiv useFirstHeight>
                     {headerLeftItems}
                 </DynamicHeightDiv>
+                <Setting stack label={locale.inputFields.excludeCells}>
+                    {excludeCells}
+                </Setting>
             </div>
         );
     },
