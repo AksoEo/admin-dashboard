@@ -77,7 +77,7 @@ export const data = {
         m: 'm',
         s: 's',
     },
-    invalidCurrencyAmount: 'Nealida valutokvanto', // this will only happen very rarely
+    invalidCurrencyAmount: 'Nevalida valutokvanto', // this will only happen very rarely
     permsEditor: {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',
         requires: 'Bezonas',

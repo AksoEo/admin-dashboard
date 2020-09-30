@@ -143,11 +143,13 @@ const TYPES = {
     },
     money: {
         render ({ item, value, onChange }) {
-            // TODO: min, step, etc.
             return (
                 <div class="form-input-money">
                     <currencyAmount.editor
                         outline
+                        min={item.min}
+                        max={item.max}
+                        step={item.step}
                         value={value}
                         onChange={onChange}
                         currency={item.currency} />
