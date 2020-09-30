@@ -52,7 +52,6 @@ export const formEditor = {
         name: '[[Name]]',
         nameDesc: '[[The internal name of the field. must be unique]]',
         oldName: '[[Oldname]]',
-        oldNameDesc: '[[The old name of the field. use when migrating or soemthing]]',
         label: '[[Label]]',
         labelDesc: '[[Label as presented to the user]]',
         description: '[[Description]]',
@@ -128,6 +127,8 @@ export const formEditor = {
         minSelectEmpty: '[[no minimum]]',
         maxSelect: '[[MaxSelect]]',
         maxSelectEmpty: '[[no maximum]]',
+        headerTop: '[[HeaderTop]]',
+        headerLeft: '[[HeaderLeft]]',
 
         namePatternError: '[[name must match ^[\\w\\-:ĥŝĝĉĵŭ]+$]]',
     },

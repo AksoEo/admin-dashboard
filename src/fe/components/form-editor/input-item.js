@@ -4,6 +4,7 @@ import { Button, Checkbox, Slider, TextField } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import RearrangingList from '../rearranging-list';
+import DynamicHeightDiv from '../dynamic-height-div';
 import MdField from '../md-field';
 import Select from '../select';
 import TextArea from '../text-area';
@@ -364,6 +365,7 @@ const TYPES = {
             );
         },
         settings: {
+            booleanTable: true,
             cols: true,
             rows: true,
             minSelect: true,
@@ -376,6 +378,12 @@ const TYPES = {
 };
 
 export default class InputItem extends PureComponent {
+    oldName = null;
+
+    componentDidMount () {
+        this.oldName = this.props.item.name;
+    }
+
     /// Evaluates any AKSO Script exprs in the item value.
     resolveValues () {
         // TODO: cache?
@@ -399,6 +407,7 @@ export default class InputItem extends PureComponent {
         let contents = null;
         if (editing) {
             contents = <InputSettings
+                oldName={this.oldName}
                 item={item}
                 onChange={onChange}
                 scriptCtx={{ previousNodes }}
@@ -444,7 +453,7 @@ const DEFAULT_SETTINGS = [
 ];
 
 class InputSettings extends PureComponent {
-    render ({ item, onChange, scriptCtx }) {
+    render ({ item, onChange, scriptCtx, oldName }) {
         const type = TYPES[item.type];
         if (!type) return null;
 
@@ -453,10 +462,12 @@ class InputSettings extends PureComponent {
             controls.push(
                 <InputSetting
                     key={k}
+                    oldName={oldName}
                     scriptCtx={scriptCtx}
                     setting={k}
                     options={type.settings[k]}
                     item={item}
+                    onItemChange={onChange}
                     value={item[k]}
                     onChange={v => onChange({ ...item, [k]: v })}/>
             );
@@ -505,14 +516,19 @@ function Setting ({ label, stack, desc, children }) {
 
 // TODO: DRY
 const SETTINGS = {
-    name ({ value, onChange }) {
-        // TODO: use oldName
+    name ({ value, onChange, oldName }) {
+        let helperLabel = null;
+        if (oldName !== value) {
+            helperLabel = `${locale.inputFields.oldName}: ${oldName}`;
+        }
+
         return (
             <Setting label={locale.inputFields.name} desc={locale.inputFields.nameDesc}>
                 <TextField
                     outline
                     value={value}
                     pattern={NAME_PATTERN}
+                    helperLabel={helperLabel}
                     error={!NAME_REGEX.test(value) && locale.inputFields.namePatternError}
                     maxLength={20}
                     onChange={e => onChange(e.target.value)} />
@@ -794,62 +810,149 @@ const SETTINGS = {
             </Setting>
         );
     },
-    rows ({ value, onChange }) {
+    booleanTable ({ item, onItemChange }) {
+        const resizeHeader = (header, size) => {
+            if (!header || header.length === size) return header;
+            if (header.length > size) return header.slice(0, size);
+            return header.concat([...new Array(size - header.length)].map(() => ''));
+        };
+
+        const resizeItem = (rows, cols) => {
+            const headerTop = resizeHeader(item.headerTop, cols);
+            const headerLeft = resizeHeader(item.headerLeft, rows);
+            let excludeCells = null;
+            if (item.excludeCells) {
+                excludeCells = [];
+                for (const cell of item.excludeCells) {
+                    if (cell[0] < cols && cell[1] < rows) excludeCells.push(cell);
+                }
+            }
+
+            return {
+                ...item,
+                rows,
+                cols,
+                minSelect: Math.max(0, Math.min(item.minSelect, rows * cols)),
+                maxSelect: Math.max(0, Math.min(item.maxSelect, rows * cols)),
+                headerTop,
+                headerLeft,
+                excludeCells,
+            };
+        };
+
+        const setRows = v => onItemChange(resizeItem(v, item.cols));
+        const setCols = v => onItemChange(resizeItem(item.rows, v));
+        const setMinSelect = v => onItemChange({ ...item, minSelect: v });
+        const setMaxSelect = v => onItemChange({ ...item, maxSelect: v });
+
+        const enableHeaderTop = enabled => {
+            if (enabled) {
+                onItemChange({ ...item, headerTop: [...new Array(item.cols)].map(() => '') });
+            } else onItemChange({ ...item, headerTop: null });
+        };
+        const enableHeaderLeft = enabled => {
+            if (enabled) {
+                onItemChange({ ...item, headerLeft: [...new Array(item.rows)].map(() => '') });
+            } else onItemChange({ ...item, headerLeft: null });
+        };
+
+        const headerTopItems = [];
+        const headerLeftItems = [];
+
+        if (item.headerTop) {
+            for (let i = 0; i < item.headerTop.length; i++) {
+                const index = i;
+                headerTopItems.push(
+                    <div key={index} class="boolean-table-header-item">
+                        <TextField
+                            value={item.headerTop[i]}
+                            onChange={e => {
+                                const headerTop = item.headerTop.slice();
+                                headerTop[index] = e.target.value;
+                                onItemChange({ ...item, headerTop });
+                            }} />
+                    </div>
+                );
+            }
+        }
+        if (item.headerLeft) {
+            for (let i = 0; i < item.headerLeft.length; i++) {
+                const index = i;
+                headerLeftItems.push(
+                    <div key={index} class="boolean-table-header-item">
+                        <TextField
+                            value={item.headerLeft[i]}
+                            onChange={e => {
+                                const headerLeft = item.headerLeft.slice();
+                                headerLeft[index] = e.target.value;
+                                onItemChange({ ...item, headerLeft });
+                            }} />
+                    </div>
+                );
+            }
+        }
+
         return (
-            <Setting label={locale.inputFields.rows}>
-                <TextField
-                    type="number"
-                    outline
-                    value={value | 0}
-                    onChange={e => onChange(+e.target.value | 0)} />
-            </Setting>
-        );
-    },
-    cols ({ value, onChange }) {
-        return (
-            <Setting label={locale.inputFields.cols}>
-                <TextField
-                    type="number"
-                    outline
-                    value={value | 0}
-                    onChange={e => onChange(+e.target.value | 0)} />
-            </Setting>
-        );
-    },
-    minSelect ({ value, onChange, item }) {
-        return (
-            <Setting label={locale.inputFields.minSelect}>
-                <TextField
-                    type="number"
-                    placeholder={locale.inputFields.minSelectEmpty}
-                    outline
-                    min={0}
-                    max={item.maxSelect || (item.rows * item.cols)}
-                    value={value || ''}
-                    onChange={e => onChange(+e.target.value || null)} />
-            </Setting>
-        );
-    },
-    maxSelect ({ value, onChange, item }) {
-        return (
-            <Setting label={locale.inputFields.maxSelect}>
-                <TextField
-                    type="number"
-                    placeholder={locale.inputFields.maxSelectEmpty}
-                    outline
-                    min={item.minSelect | 0}
-                    max={item.rows * item.cols}
-                    value={value || ''}
-                    onChange={e => onChange(+e.target.value || null)} />
-            </Setting>
+            <div>
+                <Setting label={locale.inputFields.rows}>
+                    <TextField
+                        type="number"
+                        outline
+                        value={item.rows | 0}
+                        onChange={e => setRows(+e.target.value | 0)} />
+                </Setting>
+                <Setting label={locale.inputFields.cols}>
+                    <TextField
+                        type="number"
+                        outline
+                        value={item.cols | 0}
+                        onChange={e => setCols(+e.target.value | 0)} />
+                </Setting>
+                <Setting label={locale.inputFields.minSelect}>
+                    <TextField
+                        type="number"
+                        placeholder={locale.inputFields.minSelectEmpty}
+                        outline
+                        min={0}
+                        max={item.maxSelect || (item.rows * item.cols)}
+                        value={item.minSelect || ''}
+                        onChange={e => setMinSelect(+e.target.value || null)} />
+                </Setting>
+                <Setting label={locale.inputFields.maxSelect}>
+                    <TextField
+                        type="number"
+                        placeholder={locale.inputFields.maxSelectEmpty}
+                        outline
+                        min={item.minSelect | 0}
+                        max={item.rows * item.cols}
+                        value={item.maxSelect || ''}
+                        onChange={e => setMaxSelect(+e.target.value || null)} />
+                </Setting>
+                <Setting label={locale.inputFields.headerTop}>
+                    <Checkbox
+                        checked={!!item.headerTop}
+                        onChange={enableHeaderTop} />
+                </Setting>
+                <DynamicHeightDiv useFirstHeight>
+                    {headerTopItems}
+                </DynamicHeightDiv>
+                <Setting label={locale.inputFields.headerLeft}>
+                    <Checkbox
+                        checked={!!item.headerLeft}
+                        onChange={enableHeaderLeft} />
+                </Setting>
+                <DynamicHeightDiv useFirstHeight>
+                    {headerLeftItems}
+                </DynamicHeightDiv>
+            </div>
         );
     },
 };
 
-function InputSetting ({ setting, scriptCtx, options, item, value, onChange }) {
+function InputSetting ({ setting, ...extra }) {
     const Renderer = SETTINGS[setting];
     if (!Renderer) return null;
-    return <Renderer options={options} item={item} value={value} onChange={onChange} scriptCtx={scriptCtx} />;
+    return <Renderer {...extra} />;
 }
 
 class OptionsEditor extends PureComponent {
