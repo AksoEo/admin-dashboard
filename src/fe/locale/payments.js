@@ -318,13 +318,21 @@ export const paymentIntents = {
         selectMethodFirst: 'Unue necesas elekti pagmetodon',
         selectCurrencyFirst: 'Unue necesas elekti valuton',
         addPurposeButton: 'Aldoni pagcelon',
+        useOriginalAmount: '[[Amount is discounted]]',
+        originalAmount: '[[Original amount]]',
+        useTriggerAmount: '[[Different trigger amount]]',
         types: {
             manual: 'Permana',
             addon: 'Aldoneblo',
+            trigger: 'AKSO-ago',
         },
         manual: {
             title: 'Titolo',
             description: 'Priskribo',
+        },
+        noAddons: '[[This org has no addons]]',
+        triggers: {
+            congress_registration: '[[Congress registration]]',
         },
     },
     create: {

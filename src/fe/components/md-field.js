@@ -214,9 +214,13 @@ export default class MarkdownTextField extends PureComponent {
                         title={preview
                             ? locale.mdEditor.previewOff
                             : locale.mdEditor.previewOn}
-                        onClick={() => this.setState({ preview: !preview }, () => {
-                            if (!this.state.preview) this.editor.focus();
-                        })}>
+                        onClick={e => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            this.setState({ preview: !preview }, () => {
+                                    if (!this.state.preview) this.editor.focus();
+                            });
+                        }}>
                         {preview ? <CloseIcon /> : <VisibilityIcon />}
                     </Button>
 

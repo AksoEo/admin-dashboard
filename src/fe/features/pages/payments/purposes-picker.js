@@ -1,7 +1,8 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
-import { Button, Dialog, MenuIcon, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, Dialog, MenuIcon, TextField } from '@cpsdqs/yamdl';
+import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
 import Form, { Validator, Field } from '../../../components/form';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
@@ -13,6 +14,7 @@ import {
     paymentIntents as locale,
     paymentAddons as addonLocale,
     data as dataLocale,
+    currencies,
 } from '../../../locale';
 import { FIELDS as ADDON_FIELDS } from './orgs/addons/fields';
 import './purposes-picker.less';
@@ -102,6 +104,41 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
         </span>
     );
 
+    const setOriginalAmountEnabled = enabled => {
+        if (enabled) {
+            onChange({ ...value, originalAmount: value.amount });
+        } else {
+            onChange({ ...value, originalAmount: null });
+        }
+    };
+
+    const discountSwitchId = Math.random().toString(36);
+    const isDiscounted = ('originalAmount' in value) && value.originalAmount !== null;
+    const discountEditor = currency ? (
+        <div class="discount">
+            <div class="discount-switch">
+                <Checkbox
+                    class="switch-box"
+                    id={discountSwitchId}
+                    checked={isDiscounted}
+                    onChange={setOriginalAmountEnabled} />
+                <label for={discountSwitchId}>
+                    {locale.purposesPicker.useOriginalAmount}
+                </label>
+            </div>
+            {isDiscounted ? (
+                <div class="discount-editor">
+                    <currencyAmount.editor
+                        label={locale.purposesPicker.originalAmount}
+                        outline
+                        currency={currency}
+                        value={value.originalAmount}
+                        onChange={originalAmount => onChange({ ...value, originalAmount })} />
+                </div>
+            ) : null}
+        </div>
+    ) : null;
+
     const removeButton = (
         <Button class="remove-button" onClick={e => {
             e.preventDefault();
@@ -125,6 +162,7 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
                     </div>
                     <div class="purpose-amount-container">
                         {amountEditor}
+                        {discountEditor}
                     </div>
                 </div>
                 {removeButton}
@@ -145,6 +183,89 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
                         locale={addonLocale.fields} />
                     <div class="purpose-amount-container">
                         {amountEditor}
+                        {discountEditor}
+                    </div>
+                </div>
+                {removeButton}
+            </div>
+        );
+    } else if (type === 'trigger') {
+        const triggerSwitchId = Math.random().toString(36);
+        const setTriggerAmountEnabled = enabled => {
+            if (enabled) {
+                onChange({
+                    ...value,
+                    triggerAmount: {
+                        amount: value.amount,
+                        currency,
+                    },
+                });
+            } else onChange({ ...value, triggerAmount: null });
+        };
+
+        return (
+            <div class="payment-purpose is-trigger">
+                <div class="purpose-inner">
+                    <div class="purpose-details">
+                        <div class="trigger-details">
+                            <span class="purpose-type">
+                                {locale.purposesPicker.types.trigger}
+                            </span>
+                            <span class="trigger-type">
+                                {locale.purposesPicker.triggers[value.triggers]}
+                            </span>
+                        </div>
+                        <div class="purpose-title">{value.title}</div>
+                        <MdField
+                            class="purpose-description"
+                            rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
+                            value={value.description} />
+                    </div>
+                    <div class="purpose-amount-container">
+                        {amountEditor}
+                        {discountEditor}
+                        <div class="trigger-amount">
+                            <div class="trigger-amount-switch">
+                                <Checkbox
+                                    class="switch-box"
+                                    checked={!!value.triggerAmount}
+                                    onChange={setTriggerAmountEnabled}
+                                    id={triggerSwitchId} />
+                                <label for={triggerSwitchId}>
+                                    {locale.purposesPicker.useTriggerAmount}
+                                </label>
+                            </div>
+                            {value.triggerAmount ? (
+                                <div class="trigger-amount-editor">
+                                    <Select
+                                        class="trigger-amount-editor-currency"
+                                        items={Object.keys(currencies).map(c => ({
+                                            value: c,
+                                            label: currencies[c],
+                                        }))}
+                                        value={value.triggerAmount.currency}
+                                        onChange={currency => onChange({
+                                            ...value,
+                                            triggerAmount: {
+                                                ...value.triggerAmount,
+                                                currency,
+                                            },
+                                        })} />
+                                    <currencyAmount.editor
+                                        class="trigger-amount-editor-inner"
+                                        outline
+                                        value={value.triggerAmount.amount}
+                                        onChange={amount => onChange({
+                                            ...value,
+                                            triggerAmount: {
+                                                ...value.triggerAmount,
+                                                amount,
+                                            },
+                                        })}
+                                        currency={value.triggerAmount.currency} />
+                                </div>
+                            ) : null}
+                        </div>
                     </div>
                 </div>
                 {removeButton}
@@ -159,6 +280,8 @@ class AddPurposeDialog extends PureComponent {
         addonOffset: 0,
         manualTitle: '',
         manualDescription: null,
+        triggerType: Object.keys(locale.purposesPicker.triggers)[0],
+        triggerDataId: null,
     };
 
     #add = (id) => {
@@ -175,35 +298,52 @@ class AddPurposeDialog extends PureComponent {
                 paymentAddonId: id,
                 amount: 0,
             });
+        } else if (this.state.type === 'trigger') {
+            this.props.onAdd({
+                type: 'trigger',
+                title: this.state.manualTitle,
+                description: this.state.manualDescription,
+                triggers: this.state.triggerType,
+                amount: 0,
+            });
         }
         this.props.onClose();
     };
 
     render ({ org, open, onClose }, { type, addonOffset, manualTitle, manualDescription }) {
         let contents = '';
+
+        const nameField = () => (
+            <Field>
+                <Validator
+                    component={TextField}
+                    autocomplete="off"
+                    label={locale.purposesPicker.manual.title}
+                    outline
+                    value={manualTitle}
+                    validate={value => {
+                        if (!value) {
+                            throw { error: dataLocale.requiredField };
+                        }
+                    }}
+                    onChange={e => this.setState({ manualTitle: e.target.value })}/>
+            </Field>
+        );
+        const descField = () => (
+            <Field>
+                <label>{locale.purposesPicker.manual.description}</label>
+                <MdField
+                    rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
+                    editing value={manualDescription || ''}
+                    onChange={value => this.setState({ manualDescription: value || null })}/>
+            </Field>
+        );
+
         if (type === 'manual') {
             contents = (
                 <Form onSubmit={this.#add} class="manual-purpose">
-                    <Field>
-                        <Validator
-                            component={TextField}
-                            label={locale.purposesPicker.manual.title}
-                            outline
-                            value={manualTitle}
-                            validate={value => {
-                                if (!value) {
-                                    throw { error: dataLocale.requiredField };
-                                }
-                            }}
-                            onChange={e => this.setState({ manualTitle: e.target.value })}/>
-                    </Field>
-                    <Field>
-                        <label>{locale.purposesPicker.manual.description}</label>
-                        <MdField
-                            rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
-                            editing value={manualDescription || ''}
-                            onChange={value => this.setState({ manualDescription: value || null })}/>
-                    </Field>
+                    {nameField()}
+                    {descField()}
                     <div class="form-footer">
                         <Button raised>
                             {locale.purposesPicker.addPurposeButton}
@@ -222,6 +362,7 @@ class AddPurposeDialog extends PureComponent {
                 contents = (
                     <StaticOverviewList
                         compact
+                        emptyLabel={locale.purposesPicker.noAddons}
                         task="payments/listAddons"
                         view="payments/addon"
                         options={{ org }}
@@ -235,6 +376,30 @@ class AddPurposeDialog extends PureComponent {
                         locale={addonLocale.fields}/>
                 );
             }
+        } else if (type === 'trigger') {
+            contents = (
+                <Form onSubmit={this.#add} class="trigger-purpose">
+                    <Field>
+                        <Select
+                            value={this.state.triggerType}
+                            onChange={triggerType => this.setState({ triggerType })}
+                            items={Object.keys(locale.purposesPicker.triggers).map(v => ({
+                                value: v,
+                                label: locale.purposesPicker.triggers[v],
+                            }))} />
+                    </Field>
+                    {nameField()}
+                    {descField()}
+                    <Field>
+                        todo: dataId
+                    </Field>
+                    <div class="form-footer">
+                        <Button raised>
+                            {locale.purposesPicker.addPurposeButton}
+                        </Button>
+                    </div>
+                </Form>
+            );
         }
 
         return (
