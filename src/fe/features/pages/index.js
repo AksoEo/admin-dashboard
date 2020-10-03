@@ -181,6 +181,18 @@ export default [
                                                     },
                                                 ],
                                             },
+                                            {
+                                                path: 'alighilo',
+                                                type: 'stack',
+                                                component: elazy(() => import(/* webpackChunkName: "congresses-registration" */ './congresses/instances/registration-form')),
+                                                paths: [
+                                                    {
+                                                        path: 'redakti',
+                                                        type: 'state',
+                                                        state: 'editing',
+                                                    },
+                                                ],
+                                            },
                                         ],
                                     },
                                 ],

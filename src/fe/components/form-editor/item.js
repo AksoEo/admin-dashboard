@@ -15,13 +15,15 @@ import './item.less';
 ///
 /// - item/onChange: the item
 /// - editing/onEditingChange: bool
+/// - editable: bool
 /// - onRemove: fn
 /// - previousNodes: previous nodes' asc definitions (see getAscDefs in model)
 export default class FormEditorItem extends PureComponent {
-    render ({ item, onChange, editing, onEditingChange, value, onValueChange, onRemove }) {
+    render ({ item, editable, onChange, editing, onEditingChange, value, onValueChange, onRemove }) {
         if (!item) return null;
 
         const props = {
+            editable,
             editing,
             item,
             onChange,
@@ -41,6 +43,7 @@ export default class FormEditorItem extends PureComponent {
             <div class="form-editor-item">
                 <ItemBar
                     el={item.el}
+                    editable={editable}
                     name={item.name}
                     editing={editing}
                     onStartEditing={() => onEditingChange(true)}
@@ -54,9 +57,11 @@ export default class FormEditorItem extends PureComponent {
 
 /// The bottom bar on a form editor item.
 class ItemBar extends PureComponent {
-    render ({ el, name, editing, onStartEditing, onClose, onRemove }) {
+    render ({ editable, el, name, editing, onStartEditing, onClose, onRemove }) {
         let button;
-        if (editing) {
+        if (!editable) {
+            button = <span />;
+        } else if (editing) {
             button = (
                 <Button small icon onClick={onClose}>
                     <DoneIcon style={{ verticalAlign: 'middle' }} />
@@ -79,9 +84,11 @@ class ItemBar extends PureComponent {
 
         return (
             <div class={'form-editor-item-bar' + (editing ? ' is-editing' : '')}>
-                <Button class="remove-button" small icon onClick={onRemove}>
-                    <RemoveIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
+                {editable ? (
+                    <Button class="remove-button" small icon onClick={onRemove}>
+                        <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                    </Button>
+                ) : <span />}
                 {nameNode}
                 {button}
             </div>

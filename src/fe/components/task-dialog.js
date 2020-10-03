@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { Button, Dialog, CircularProgress } from '@cpsdqs/yamdl';
 import Form, { Validator } from './form';
+import DisplayError from './error';
 import './task-dialog.less';
 
 /// A dialog that performs a failable action.
@@ -10,7 +11,6 @@ import './task-dialog.less';
 /// - open/onClose
 /// - title
 /// - actionLabel: label string for the action button
-/// - mapError: function to map an error to a (human-readable?) string (optional)
 /// - run: run closure; must return a promise. success will not be handled
 /// - running: if true, will consider the task to be running
 /// - container: will be passed to Dialog
@@ -79,7 +79,7 @@ export default class TaskDialog extends Component {
                     </footer>
                     {error ? (
                         <div class="task-dialog-error">
-                            {mapError ? mapError(error) : ('' + error)}
+                            <DisplayError error={error} />
                         </div>
                     ) : null}
                 </Form>

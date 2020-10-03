@@ -536,6 +536,7 @@ export default class Navigation extends PureComponent {
             }
 
             const index = i;
+            const isTop = i === this.state.stack.length - 1;
             const isBottom = i === 0;
             const PageComponent = stackItem.component;
             const itemContents = (
@@ -550,6 +551,7 @@ export default class Navigation extends PureComponent {
                         </div>
                     }>
                         <PageComponent
+                            isTopPage={isTop}
                             query={stackItem.query}
                             onQueryChange={query => this.onQueryChange(i, query)}
                             match={stackItem.pathMatch}

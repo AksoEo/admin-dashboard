@@ -8,6 +8,7 @@ export default class ScriptItem extends PureComponent {
     static contextType = ScriptContext;
 
     openEditor = () => {
+        if (!this.props.editable) return;
         this.props.onEditingChange(true);
     };
 

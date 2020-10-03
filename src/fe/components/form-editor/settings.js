@@ -18,28 +18,32 @@ const FLAGS = [
 ];
 
 export default class FormEditorSettings extends PureComponent {
-    render ({ value, onChange, previousNodes }) {
+    render ({ value, editing, onChange, previousNodes }) {
         return (
             <div class="form-editor-settings">
                 <Flags
                     value={value}
+                    editing={editing}
                     onChange={onChange} />
                 <Price
                     previousNodes={previousNodes}
+                    editing={editing}
                     value={value.price}
                     onChange={price => onChange({ ...value, price })} />
                 <SequenceIds
                     value={value.sequenceIds}
+                    editing={editing}
                     onChange={sequenceIds => onChange({ ...value, sequenceIds })} />
             </div>
         );
     }
 }
 
-function Flags ({ value, onChange }) {
+function Flags ({ value, editing, onChange }) {
     const flags = FLAGS.map(flag => (
         <Flag
             key={flag}
+            editing={editing}
             flag={flag}
             value={value[flag]}
             onChange={v => onChange({ ...value, [flag]: v })} />
@@ -52,13 +56,14 @@ function Flags ({ value, onChange }) {
     );
 }
 
-function Flag ({ flag, value, onChange }) {
+function Flag ({ flag, editing, value, onChange }) {
     const labelId = 'flag' + Math.random().toString(36);
 
     return (
         <div class="settings-flag">
             <Checkbox
                 class="flag-checkbox"
+                disabled={!editing}
                 id={labelId}
                 checked={value}
                 onChange={onChange} />
@@ -70,7 +75,7 @@ function Flag ({ flag, value, onChange }) {
     );
 }
 
-function Price ({ value, onChange, previousNodes }) {
+function Price ({ value, editing, onChange, previousNodes }) {
     const labelId = 'price' + Math.random().toString(36);
     const onChangeEnabled = enabled => {
         if (enabled) onChange({ currency: 'USD', var: null, minUpfront: null });
@@ -101,6 +106,7 @@ function Price ({ value, onChange, previousNodes }) {
                 </label>
                 <Select
                     rendered
+                    disabled={!editing}
                     emptyLabel={locale.settings.price.noVariableSelected}
                     outline
                     items={ascVariables}
@@ -108,6 +114,7 @@ function Price ({ value, onChange, previousNodes }) {
                     onChange={v => onChange({ ...value, var: v })} />
                 <Select
                     class="currency-select"
+                    disabled={!editing}
                     outline
                     items={Object.keys(currencies).map(c => ({ value: c, label: currencies[c] }))}
                     value={value.currency}
@@ -126,6 +133,7 @@ function Price ({ value, onChange, previousNodes }) {
                 {' '}
                 {(typeof priceValue === 'number') ? (
                     <currencyAmount.renderer
+                        disabled={!editing}
                         currency={value.currency}
                         value={priceValue} />
                 ) : (
@@ -137,6 +145,7 @@ function Price ({ value, onChange, previousNodes }) {
             <div key="min" class="settings-item">
                 <currencyAmount.editor
                     outline
+                    disabled={!editing}
                     currency={value.currency}
                     label={locale.settings.price.minUpfront}
                     value={value.minUpfront || 0}
@@ -150,6 +159,7 @@ function Price ({ value, onChange, previousNodes }) {
             <div class="settings-flag">
                 <Checkbox
                     id={labelId}
+                    disabled={!editing}
                     class="flag-checkbox"
                     checked={!!value}
                     onChange={onChangeEnabled} />
@@ -162,7 +172,7 @@ function Price ({ value, onChange, previousNodes }) {
     );
 }
 
-function SequenceIds ({ value, onChange }) {
+function SequenceIds ({ value, editing, onChange }) {
     const labelId = 'seqids' + Math.random().toString(36);
     const onChangeEnabled = enabled => {
         if (enabled) onChange({ startAt: 1, requireValid: true });
@@ -175,6 +185,7 @@ function SequenceIds ({ value, onChange }) {
             <div key="startat" class="settings-item">
                 <TextField
                     outline
+                    disabled={!editing}
                     label={locale.settings.sequenceIds.startAt}
                     value={value.startAt | 0}
                     onChange={e => onChange({ ...value, startAt: +e.target.value | 0 })} />
@@ -185,6 +196,7 @@ function SequenceIds ({ value, onChange }) {
             <div key="reqvalid" class="settings-flag">
                 <Checkbox
                     id={validId}
+                    disabled={!editing}
                     class="flag-checkbox"
                     checked={value.requireValid}
                     onChange={requireValid => onChange({ ...value, requireValid })} />
@@ -201,6 +213,7 @@ function SequenceIds ({ value, onChange }) {
             <div class="settings-flag">
                 <Checkbox
                     id={labelId}
+                    disabled={!editing}
                     class="flag-checkbox"
                     checked={!!value}
                     onChange={onChangeEnabled} />

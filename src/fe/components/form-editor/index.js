@@ -18,6 +18,7 @@ import './index.less';
 /// The Form Editor is the component used to edit e.g. registration forms.
 ///
 /// # Props
+/// - editing: bool
 /// - value: { allowUse, allowGuests, ..., form } object (see API docs)
 /// - onChange: (value) => void callback
 export default class FormEditor extends PureComponent {
@@ -112,13 +113,14 @@ export default class FormEditor extends PureComponent {
         window.removeEventListener('resize', this.onResize);
     }
 
-    render ({ value, onChange }, { values }) {
+    render ({ value, editing, onChange }, { values }) {
         if (!value) return null;
 
         return (
             <div class="form-editor">
                 <ScriptContext.Provider value={this.scriptContext}>
                     <FormEditorItems
+                        editing={editing}
                         settings={value}
                         onSettingsChange={onChange}
                         items={value.form}
@@ -180,7 +182,7 @@ class FormEditorItems extends PureComponent {
     }
 
     render ({
-        settings, onSettingsChange, items, onItemsChange, values, onValuesChange,
+        editing, settings, onSettingsChange, items, onItemsChange, values, onValuesChange,
     }, { editingItem }) {
         const listItems = [];
         const previousNodes = [];
@@ -191,6 +193,7 @@ class FormEditorItems extends PureComponent {
             listItems.push(
                 <FormEditorItem
                     key={key}
+                    editable={editing}
                     previousNodes={previousNodes.slice()}
                     editing={editingItem === key}
                     onEditingChange={editing => {
@@ -215,24 +218,27 @@ class FormEditorItems extends PureComponent {
             previousNodes.push(getAscDefs(items[i], values[name]));
         }
 
-        listItems.push(
-            <FormEditorAddItem
-                key="~add"
-                canAdd={items.length < 255}
-                addInput={this.addInput}
-                addText={this.addText}
-                addScript={this.addScript} />
-        );
+        if (editing) {
+            listItems.push(
+                <FormEditorAddItem
+                    key="~add"
+                    canAdd={items.length < 255}
+                    addInput={this.addInput}
+                    addText={this.addText}
+                    addScript={this.addScript} />
+            );
+        }
 
         return (
             <div class="form-editor-items">
                 <FormEditorSettings
+                    editing={editing}
                     value={settings}
                     onChange={onSettingsChange}
                     previousNodes={previousNodes} />
                 <RearrangingList
                     spacing={16}
-                    isItemDraggable={index => index < items.length}
+                    isItemDraggable={index => editing && index < items.length}
                     canMove={toPos => toPos < items.length}
                     onMove={this.onMoveItem}>
                     {listItems}

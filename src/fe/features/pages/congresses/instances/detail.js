@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { Button, TextField } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import BusinessIcon from '@material-ui/icons/Business';
@@ -66,10 +66,9 @@ export default connectPerms(class CongressInstancePage extends Page {
         if (this.props.editing) return null;
         if (this.props.locations) return 'locations';
         if (this.props.programs) return 'programs';
-        else {
-            this.props.push('lokoj', true);
-            return 'locations';
-        }
+
+        if (this.props.isTopPage) this.props.push('lokoj', true);
+        return 'locations';
     }
     set tab (tab) {
         if (tab === this.tab) return;
@@ -147,6 +146,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 onItemChange={edit => this.setState({ edit })}
                                 item={this.state.edit || data}
                                 org={org}
+                                push={this.props.push}
                                 tab={tab}
                                 onTabChange={tab => this.tab = tab} />
                             {!!editing && <LocationEditor
@@ -196,7 +196,7 @@ function FieldWrapper ({ field, item, onItemChange }) {
         editing={true} />;
 }
 
-function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
+function Header ({ item, editing, onItemChange, org, tab, onTabChange, push }) {
     let orgIcon;
     if (org === 'tejo') orgIcon = <TejoIcon />;
     else if (org === 'uea') orgIcon = <UeaIcon />;
@@ -264,6 +264,15 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange }) {
                         {item.tz}
                     </div>
                 ) : null}
+                {!editing && (
+                    <div class="header-links">
+                        <Button
+                            onClick={() => push('alighilo')}
+                            class="registration-link">
+                            {locale.registrationFormLink}
+                        </Button>
+                    </div>
+                )}
                 {!editing && (
                     <Tabs
                         value={tab}

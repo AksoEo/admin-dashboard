@@ -15,7 +15,7 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
     class InnerConnection extends Component {
         static contextType = coreContext;
 
-        state = { data: null, error: null };
+        state = { data: null, error: null, loaded: false };
 
         componentDidMount () {
             if (typeof viewArgs[0] === 'function') {
@@ -42,7 +42,7 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
             }
         }
 
-        #onUpdate = data => this.setState({ data, error: null });
+        #onUpdate = data => this.setState({ data, loaded: true, error: null });
         #onError = error => this.setState({ error });
 
         componentWillUnmount () {
@@ -50,7 +50,7 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
         }
 
         render () {
-            const props = { ...this.props, ...map(this.state.data, this.context, this.state.error) };
+            const props = { ...this.props, ...map(this.state.data, this.context, this.state.error, this.state.loaded) };
             props.ref = props.coreConnForwardedRef;
             delete props.coreConnForwardedRef;
             return <Comp {...props} />;

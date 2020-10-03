@@ -13,6 +13,7 @@ export const LOC_TAGS = 'location_tags';
 export const LOCATIONS = 'locations';
 export const PROG_TAGS = 'program_tags';
 export const PROGRAMS = 'programs';
+export const REG_FORM = 'registration_form';
 export const SIG_CONGRESSES = '!congresses';
 export const SIG_INSTANCES = '!instances';
 export const SIG_LOC_TAGS = '!location_tags';
@@ -545,6 +546,32 @@ export const tasks = {
         await client.delete(`/congresses/${congress}/instances/${instance}/programs/${program}/tags/${id}`);
         store.signal([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, program, SIG_PROG_TAGS]);
     },
+
+    // MARK - registration
+    registrationForm: async ({ congress, instance }) => {
+        const client = await asyncClient;
+        let res;
+        try {
+            res = await client.get(`/congresses/${congress}/instances/${instance}/registration_form`);
+        } catch (err) {
+            if (err.statusCode === 404) {
+                store.insert([CONGRESSES, congress, INSTANCES, instance, REG_FORM], null);
+                return null;
+            }
+        }
+        store.insert([CONGRESSES, congress, INSTANCES, instance, REG_FORM], res.body);
+        return res.body;
+    },
+    deleteRegistrationForm: async ({ congress, instance }) => {
+        const client = await asyncClient;
+        await client.delete(`/congresses/${congress}/instances/${instance}/registration_form`);
+        store.delete([CONGRESSES, congress, INSTANCES, instance, REG_FORM]);
+    },
+    setRegistrationForm: async ({ congress, instance }, { data }) => {
+        const client = await asyncClient;
+        await client.put(`/congresses/${congress}/instances/${instance}/registration_form`, data);
+        store.insert([CONGRESSES, congress, INSTANCES, instance, REG_FORM], data);
+    },
 };
 
 export const views = {
@@ -696,6 +723,31 @@ export const views = {
                     congress: this.congress,
                     instance: this.instance,
                     id: this.id,
+                }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) this.emit('update', store.get(this.path), 'delete');
+            else this.emit('update', store.get(this.path));
+        };
+        drop () {
+            store.unsubscribe(this.path, this.#onUpdate);
+        }
+    },
+
+    registrationForm: class ProgramView extends AbstractDataView {
+        constructor (options) {
+            super();
+            this.congress = options.congress;
+            this.instance = options.instance;
+            this.path = [CONGRESSES, this.congress, INSTANCES, this.instance, REG_FORM];
+            store.subscribe(this.path, this.#onUpdate);
+            const current = store.get(this.path);
+            if (current) setImmediate(this.#onUpdate);
+            if (!options.noFetch) {
+                tasks.registrationForm({
+                    congress: this.congress,
+                    instance: this.instance,
                 }).catch(err => this.emit('error', err));
             }
         }

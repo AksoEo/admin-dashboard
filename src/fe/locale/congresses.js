@@ -36,6 +36,7 @@ export const congresses = {
 
 export const congressInstances = {
     detailTitle: 'Kongresa okazigo',
+    registrationFormLink: '[[Registration form]]',
     search: {
         placeholders: {
             name: 'Serĉi nomon de kongresa okazigo',
@@ -227,3 +228,19 @@ export const congressPrograms = {
     },
 };
 
+
+export const congressRegistrationForm = {
+    title: 'Aliĝilo',
+    editingTitle: 'Redakti aliĝilo',
+    create: 'Krei',
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti aliĝilo',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi aliĝilo',
+        button: 'Forigi',
+    },
+};

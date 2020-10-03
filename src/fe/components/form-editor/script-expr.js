@@ -77,16 +77,18 @@ export class ScriptableValue extends PureComponent {
         });
     };
 
-    render ({ ctx }) {
+    render ({ ctx, disabled }) {
         return (
             <div class="form-editor-scriptable-value" ref={this.node}>
                 <RawExprView
                     onClick={this.onClick}
                     expr={this.getValue()}
                     previousNodes={ctx && ctx.previousNodes} />
-                <Button class="edit-script-button" icon small onClick={this.openEditor}>
-                    <CodeIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
+                {!disabled && (
+                    <Button class="edit-script-button" icon small onClick={this.openEditor}>
+                        <CodeIcon style={{ verticalAlign: 'middle' }} />
+                    </Button>
+                )}
             </div>
         );
     }

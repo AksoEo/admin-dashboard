@@ -30,7 +30,7 @@ export default class TextItem extends PureComponent {
         }
     };
 
-    render ({ item, onChange, editing }) {
+    render ({ item, onChange, editing, editable }) {
         let typeSwitch = null;
         let contents = null;
 
@@ -60,6 +60,7 @@ export default class TextItem extends PureComponent {
             contents.push(
                 <ScriptableString
                     key="expr"
+                    disabled={!editable}
                     ctx={{ previousNodes: this.props.previousNodes }}
                     value={item.text}
                     onChange={text => onChange({ ...item, text })} />
