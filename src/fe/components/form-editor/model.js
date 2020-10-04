@@ -108,6 +108,25 @@ export function evalExpr (expr, previousNodes) {
     return result;
 }
 
+export function getGlobalDefs (additionalVars) {
+    return {
+        defs: {},
+        formVars: [
+            {
+                name: '@created_time',
+                type: 'timestamp',
+                value: new Date(),
+            },
+            {
+                name: '@edited_time',
+                type: 'timestamp',
+                value: new Date(),
+            },
+            ...(additionalVars || [])
+        ],
+    };
+}
+
 /// Returns all AKSO Script definitions in the given item and its value (if applicable).
 ///
 /// Will return { defs: script defs, formVars: form vars object { [name]: { type, value } } }
@@ -117,8 +136,8 @@ export function getAscDefs (item, value) {
     if (item.el === 'script') {
         return { defs: item.script, formVars: [] };
     } else if (item.el === 'input') {
-        let type = 'n';
-        if (value === null) type = 'null';
+        let type = 'u';
+        if (value === null || value === undefined) type = 'u';
         else if (item.type === 'boolean') {
             type = 'b';
         } else if (item.type === 'number') {

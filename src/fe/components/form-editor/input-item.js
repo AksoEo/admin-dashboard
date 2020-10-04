@@ -516,9 +516,9 @@ function Setting ({ label, stack, desc, children }) {
 
 // TODO: DRY
 const SETTINGS = {
-    name ({ value, onChange, oldName }) {
+    name ({ value, item, onItemChange, oldName }) {
         let helperLabel = null;
-        if (oldName !== value) {
+        if (oldName && oldName !== value) {
             helperLabel = `${locale.inputFields.oldName}: ${oldName}`;
         }
 
@@ -531,7 +531,11 @@ const SETTINGS = {
                     helperLabel={helperLabel}
                     error={!NAME_REGEX.test(value) && locale.inputFields.namePatternError}
                     maxLength={20}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={e => onItemChange({
+                        ...item,
+                        name: e.target.value,
+                        oldName,
+                    })} />
             </Setting>
         );
     },

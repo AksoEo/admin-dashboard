@@ -9,7 +9,7 @@ import FormEditorSettings from './settings';
 import RearrangingList from '../rearranging-list';
 import FormEditorItem from './item';
 import ScriptContext from './script-context';
-import { createInput, getAscDefs } from './model';
+import { createInput, getGlobalDefs, getAscDefs } from './model';
 import { formEditor as locale } from '../../locale';
 import './index.less';
 
@@ -113,7 +113,7 @@ export default class FormEditor extends PureComponent {
         window.removeEventListener('resize', this.onResize);
     }
 
-    render ({ value, editing, onChange }, { values }) {
+    render ({ value, editing, onChange, additionalVars }, { values }) {
         if (!value) return null;
 
         return (
@@ -126,7 +126,8 @@ export default class FormEditor extends PureComponent {
                         items={value.form}
                         onItemsChange={form => onChange({ ...value, form })}
                         values={values}
-                        onValuesChange={values => this.setState({ values })} />
+                        onValuesChange={values => this.setState({ values })}
+                        additionalVars={additionalVars} />
                 </ScriptContext.Provider>
             </div>
         );
@@ -183,9 +184,10 @@ class FormEditorItems extends PureComponent {
 
     render ({
         editing, settings, onSettingsChange, items, onItemsChange, values, onValuesChange,
+        additionalVars,
     }, { editingItem }) {
         const listItems = [];
-        const previousNodes = [];
+        const previousNodes = [getGlobalDefs(additionalVars)];
         for (let i = 0; i < items.length; i++) {
             const index = i;
             const key = this.getItemKey(index);

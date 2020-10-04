@@ -12,6 +12,11 @@ import { connectPerms } from '../../../../../perms';
 import { congressRegistrationForm as locale } from '../../../../../locale';
 import './index.less';
 
+const ADDITIONAL_VARS = [
+    { name: '@upfront_time', type: 'u', value: null },
+    { name: '@is_member', type: 'b', value: true },
+];
+
 export default connectPerms(class RegistrationFormPage extends Page {
     state = {
         org: '',
@@ -162,7 +167,8 @@ const InnerEditor = connect(({ congress, instance }) => [
                 <FormEditor
                     editing={!!edit}
                     value={edit || data}
-                    onChange={edit => this.setState({ edit })} />
+                    onChange={edit => this.setState({ edit })}
+                    additionalVars={ADDITIONAL_VARS} />
             </div>
         );
     }
