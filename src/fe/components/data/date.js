@@ -80,9 +80,20 @@ class DateEditor extends Component {
         this.setState({ pointerInPopout: false });
     };
 
+    bindDate (date) {
+        if (!date) return date;
+        if (this.props.min) {
+            date = date < this.props.min ? this.props.min : date;
+        }
+        if (this.props.max) {
+            date = date > this.props.max ? this.props.max : date;
+        }
+        return date;
+    }
+
     onInputTextChange = e => {
         this.setState({ inputText: e.target.value });
-        const date = tryParseDate(e.target.value);
+        const date = this.bindDate(tryParseDate(e.target.value));
 
         if (date !== undefined) {
             this.props.onChange(date ? moment(date).format('YYYY-MM-DD') : date);
@@ -124,7 +135,7 @@ class DateEditor extends Component {
         globalAnimator.deregister(this);
     }
 
-    render ({ onChange, disabled, ...props }, {
+    render ({ onChange, disabled, min, max, ...props }, {
         popoutX,
         popoutY,
         anchorBottom,
@@ -157,12 +168,12 @@ class DateEditor extends Component {
                         months={locale.months}
                         weekdays={locale.weekdays}
                         weekStart={locale.weekStart}
-                        min={MIN_DATE}
-                        max={MAX_DATE}
+                        min={min || MIN_DATE}
+                        max={max || MAX_DATE}
                         today={fakeUTCToday}
                         value={fakeUTCValue}
                         onChange={date => {
-                            const newDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                            const newDate = this.bindDate(new Date(date.getTime() - date.getTimezoneOffset() * 60000));
                             onChange(moment(newDate).format('YYYY-MM-DD'));
                             this.setState({ inputText: stringifyDate(newDate) });
                         }} />

@@ -666,7 +666,14 @@ const fields = {
     },
     birthdate: {
         component: permsEditable('birthdate', ({ value, editing, onChange, item }) => {
-            if (editing) return <date.editor value={value} onChange={onChange} />;
+            if (editing) {
+                return (
+                    <date.editor
+                        value={value}
+                        max={new Date()} // today
+                        onChange={onChange} />
+                );
+            }
 
             const age = item.age && item.age.now !== null
                 ? locale.fields.ageFormat(item.age.now, item.age.atStartOfYear)

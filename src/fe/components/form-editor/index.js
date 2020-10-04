@@ -195,7 +195,7 @@ class FormEditorItems extends PureComponent {
                     key={key}
                     editable={editing}
                     previousNodes={previousNodes.slice()}
-                    editing={editingItem === key}
+                    editing={editing && (editingItem === key)}
                     onEditingChange={editing => {
                         if (editing) this.setState({ editingItem: key });
                         else if (editingItem === key) this.setState({ editingItem: null });
