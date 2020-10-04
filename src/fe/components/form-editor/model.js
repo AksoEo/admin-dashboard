@@ -122,7 +122,7 @@ export function getGlobalDefs (additionalVars) {
                 type: 'timestamp',
                 value: new Date(),
             },
-            ...(additionalVars || [])
+            ...(additionalVars || []),
         ],
     };
 }

@@ -39,7 +39,6 @@ export default class TaskDialog extends Component {
         open,
         onClose,
         actionLabel,
-        mapError,
         running,
         container,
         ...extra

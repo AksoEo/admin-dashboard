@@ -184,7 +184,8 @@ export default class LocationsView extends PureComponent {
                         }}
                         expanded={expanded}
                         onExpandedChange={expanded => this.setState({ expanded })}
-                        inputRef={node => this.#searchInput = node} />
+                        inputRef={node => this.#searchInput = node}
+                        userData={{ congress, instance }} />
                     <OverviewList
                         expanded={expanded}
                         useDeepCmp options={{ congress, instance }}

@@ -107,7 +107,7 @@ export default class ProgramsView extends PureComponent {
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     inputRef={view => this.#searchInput = view}
-                    userData={{ tz }} />,
+                    userData={{ congress, instance, tz }} />,
                 <OverviewList
                     expanded={expanded}
                     useDeepCmp options={{ congress, instance }}

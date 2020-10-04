@@ -218,7 +218,7 @@ export default class MarkdownTextField extends PureComponent {
                             e.stopPropagation();
                             e.preventDefault();
                             this.setState({ preview: !preview }, () => {
-                                    if (!this.state.preview) this.editor.focus();
+                                if (!this.state.preview) this.editor.focus();
                             });
                         }}>
                         {preview ? <CloseIcon /> : <VisibilityIcon />}

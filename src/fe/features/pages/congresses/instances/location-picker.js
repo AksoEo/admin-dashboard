@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
 import { Dialog } from '@cpsdqs/yamdl';
+import AddIcon from '@material-ui/icons/Add';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CloseIcon from '@material-ui/icons/Close';
 import SearchIcon from '@material-ui/icons/Search';
@@ -29,12 +30,14 @@ function orderPortalContainerFront () {
 /// - value/onChange: id
 /// - editing: editing state
 /// - disabled: will disable interaction
+/// - adding: if true, will show + instead of "nowhere v" if empty, and the value cannot
+///   be edited without removing it first.
 export default class LocationPicker extends PureComponent {
     state = {
         pickerOpen: false,
     };
 
-    render ({ congress, instance, value, editing, onChange, externalOnly, disabled }, { pickerOpen }) {
+    render ({ congress, instance, value, editing, onChange, externalOnly, disabled, adding }, { pickerOpen }) {
         let preview;
         if (value) {
             preview = (
@@ -63,6 +66,10 @@ export default class LocationPicker extends PureComponent {
                     )}
                 </DetailShell>
             );
+        } else if (adding) {
+            preview = (
+                <AddIcon style={{ verticalAlign: 'middle' }} />
+            );
         } else {
             preview = locale.locatedWithinNowhere;
         }
@@ -74,7 +81,7 @@ export default class LocationPicker extends PureComponent {
                     + (disabled ? ' is-disabled' : '')}
                 tabIndex={editing ? 0 : undefined}
                 onClick={() => {
-                    if (!disabled && editing) {
+                    if (!disabled && editing && (!value || !adding)) {
                         orderPortalContainerFront();
                         this.setState({ pickerOpen: true });
                     }
@@ -89,7 +96,7 @@ export default class LocationPicker extends PureComponent {
                     }}>
                         <CloseIcon />
                     </div>
-                ) : editing ? (
+                ) : (editing && !adding) ? (
                     <div class="editable-indicator">
                         <ExpandMoreIcon />
                     </div>
