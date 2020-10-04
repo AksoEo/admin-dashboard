@@ -32,22 +32,15 @@ function orderPortalContainerFront () {
 /// - disabled
 export default class CodeholderPicker extends Component {
     state = {
-        search: '',
         addDialogOpen: false,
-
         // cached id -> uea code mappings
         codeCache: {},
     };
 
     static contextType = coreContext;
 
-    itemHeight = 48;
-
-    scheduledLoads = new Set();
-
     componentDidMount () {
         for (const id of this.props.value) this.loadCodeForId(id);
-        this.onSearchChange('');
     }
 
     componentDidUpdate (prevProps) {
@@ -79,54 +72,12 @@ export default class CodeholderPicker extends Component {
         });
     }
 
-    getChunk = async (offset, limit) => {
-        const idFilter = { $nin: this.props.value };
-
-        const res = await this.context.createTask('codeholders/list', {}, {
-            search: {
-                field: 'nameOrCode',
-                query: this.state.search,
-            },
-            fields: [{ id: 'id', sorting: 'asc' }, { id: 'code', sorting: 'none' }],
-            jsonFilter: { filter: { id: idFilter } },
-            offset,
-            limit,
-        }).runOnceAndDrop();
-
-        for (const id of res.items) {
-            await this.loadCodeForId(id);
-        }
-
-        return res.items;
-    };
-
-    _searchReqId = 0;
-
-    onSearchChange = search => {
-        this.setState({ search }, () => {
-            const reqId = ++this._searchReqId;
-            this.getChunk(0, 7).then(items => {
-                if (this._searchReqId !== reqId) return;
-                this.setState({
-                    suggestions: items.filter(id => !this.props.value.includes(id)).map(id => ({
-                        id,
-                        toString: () => '' + this.state.codeCache[id],
-                    })),
-                });
-            }).catch(err => {
-                console.error(err); // eslint-disable-line no-console
-            });
-        });
-    };
-
     render ({ value, onChange, limit, disabled }, { addDialogOpen }) {
         const canAddMore = !this.props.limit || value.length < this.props.limit;
 
         return (
             <div class={'codeholder-picker' + (disabled ? ' is-disabled' : '')} data-limit={limit}>
-                <div
-                    class="selected-codeholders"
-                    onClick={() => this.setState({ dialogOpen: true })}>
+                <div class="selected-codeholders">
                     {value.map(id => (
                         <div class="codeholder-item" key={id}>
                             <Button
@@ -134,7 +85,9 @@ export default class CodeholderPicker extends Component {
                                 class="remove-button"
                                 icon
                                 small
-                                onClick={() => {
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
                                     const value = this.props.value.slice();
                                     value.splice(value.indexOf(id), 1);
                                     onChange(value);
@@ -158,7 +111,9 @@ export default class CodeholderPicker extends Component {
                             class="add-button"
                             small
                             icon
-                            onClick={() => {
+                            onClick={e => {
+                                e.stopPropagation();
+                                e.preventDefault();
                                 this.setState({ addDialogOpen: true });
                                 orderPortalContainerFront();
                             }}>
@@ -177,6 +132,7 @@ export default class CodeholderPicker extends Component {
                         <AddDialogInner
                             value={value}
                             onChange={onChange}
+                            onClose={() => this.setState({ addDialogOpen: false })}
                             limit={this.props.limit} />
                     </Dialog>
                 </div>
@@ -185,7 +141,7 @@ export default class CodeholderPicker extends Component {
     }
 }
 
-function AddDialogInner ({ value, onChange, limit }) {
+function AddDialogInner ({ value, onChange, limit, onClose }) {
     const [offset, setOffset] = useState(0);
     const [search, setSearch] = useState('');
 
@@ -193,6 +149,7 @@ function AddDialogInner ({ value, onChange, limit }) {
         add: id => {
             if (value.includes('' + id)) return;
             onChange(value.concat(['' + id]));
+            if (value.length + 1 >= limit) onClose();
         },
         has: id => value.includes('' + id),
         delete: id => {
