@@ -5,8 +5,9 @@ import Meta from '../../../../meta';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
 import Page from '../../../../../components/page';
+import DetailShell from '../../../../../components/detail-shell';
 import FormEditor from '../../../../../components/form-editor';
-import { connect } from '../../../../../core/connection';
+import { connect, coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';
 import { congressRegistrationForm as locale } from '../../../../../locale';
 import './index.less';
@@ -14,9 +15,14 @@ import './index.less';
 export default connectPerms(class RegistrationFormPage extends Page {
     state = {
         org: '',
+        editorLoaded: false,
     };
 
+    static contextType = coreContext;
+
     editor = createRef();
+
+    onEditorLoad = loaded => this.setState({ editorLoaded: loaded });
 
     get congress () {
         return +this.props.matches[this.props.matches.length - 4][1];
@@ -25,12 +31,11 @@ export default connectPerms(class RegistrationFormPage extends Page {
         return +this.props.matches[this.props.matches.length - 2][1];
     }
 
-    render ({ perms }, { org }) {
+    render ({ perms }, { org, editorLoaded }) {
         const actions = [];
 
-        // TODO: load org
-
-        if (perms.hasPerm(`congress_instances.update.${org}`)) {
+        const canEdit = perms.hasPerm(`congress_instances.update.${org}`);
+        if (canEdit && editorLoaded) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
@@ -39,8 +44,10 @@ export default connectPerms(class RegistrationFormPage extends Page {
                 overflow: true,
                 label: locale.delete.menuItem,
                 action: () => {
-                    // TODO: delete only if there is an item?
-                    // TODO: delete
+                    this.context.createTask('congresses/deleteRegistrationForm', {
+                        congress: this.congress,
+                        instance: this.instance,
+                    });
                 },
             });
         }
@@ -52,8 +59,17 @@ export default connectPerms(class RegistrationFormPage extends Page {
                     actions={actions} />
                 <InnerEditor
                     ref={this.editor}
+                    canEdit={canEdit}
+                    onLoad={this.onEditorLoad}
                     congress={this.congress}
                     instance={this.instance} />
+                <DetailShell
+                    /* this is kind of a hack to get the org field */
+                    view="congresses/congress"
+                    id={this.congress}
+                    fields={{}}
+                    locale={{}}
+                    onData={data => data && this.setState({ org: data.org })} />
             </div>
         );
     }
@@ -92,7 +108,11 @@ const InnerEditor = connect(({ congress, instance }) => [
         });
     };
 
-    render ({ data, loaded }, { edit }) {
+    componentDidUpdate () {
+        this.props.onLoad(this.props.loaded && !!this.props.data);
+    }
+
+    render ({ data, loaded, canEdit }, { edit }) {
         if (!loaded) {
             return (
                 <div class="form-editor-loading">
@@ -102,13 +122,21 @@ const InnerEditor = connect(({ congress, instance }) => [
         }
 
         if ((edit || data) === null) {
-            return (
-                <div class="form-editor-create">
-                    <Button raised onClick={this.createForm}>
-                        {locale.create}
-                    </Button>
-                </div>
-            );
+            if (canEdit) {
+                return (
+                    <div class="form-editor-create">
+                        <Button raised onClick={this.createForm}>
+                            {locale.create}
+                        </Button>
+                    </div>
+                );
+            } else {
+                return (
+                    <div class="form-editor-create">
+                        {locale.noForm}
+                    </div>
+                );
+            }
         }
 
         return (

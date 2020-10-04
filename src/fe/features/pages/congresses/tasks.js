@@ -386,4 +386,16 @@ export default {
             </TaskDialog>
         );
     },
+    deleteRegistrationForm ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={regFormLocale.delete.title}
+                actionLabel={regFormLocale.delete.button}
+                run={() => task.runOnce()}>
+                {regFormLocale.delete.description}
+            </TaskDialog>
+        );
+    },
 };

@@ -658,7 +658,7 @@ const SETTINGS = {
                     value={Number.isFinite(value) ? value : ''}
                     step={item.step}
                     max={item.max}
-                    onChange={e => onChange(+e.target.value || null)} />
+                    onChange={e => Number.isFinite(parseFloat(e.target.value)) ? onChange(parseFloat(e.target.value)) : onChange(null)} />
             );
         }
 
@@ -705,7 +705,7 @@ const SETTINGS = {
                     value={Number.isFinite(value) ? value : ''}
                     step={item.step}
                     min={item.min}
-                    onChange={e => onChange(Number.isFinite(+e.target.value) ? +e.target.value : null)} />
+                    onChange={e => Number.isFinite(parseFloat(e.target.value)) ? onChange(parseFloat(e.target.value)) : onChange(null)} />
             );
         }
         return (

@@ -233,6 +233,7 @@ export const congressRegistrationForm = {
     title: 'Aliĝilo',
     editingTitle: 'Redakti aliĝilo',
     create: 'Krei',
+    noForm: '[[No registration form]]', // when user doesn't have permissions to create
     update: {
         menuItem: 'Redakti',
         title: 'Redakti aliĝilo',
@@ -242,5 +243,6 @@ export const congressRegistrationForm = {
         menuItem: 'Forigi',
         title: 'Forigi aliĝilo',
         button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la aliĝilon? Ne eblas malfari tiun ĉi agon.',
     },
 };
