@@ -152,6 +152,17 @@ export const tasks = {
             throw { code: err.statusCode, message: err.toString() };
         }
     },
+
+    // this is not really related to login but used on the login screen
+    apiVersion: async () => {
+        const client = await asyncClient;
+        const res = await fetch(client.client.createURL('/'));
+        if (!res.ok) throw { statusCode: res.status };
+        const text = await res.text();
+        const version = text.match(/version:\s*([^\n]+)/i);
+        if (!version) throw { code: 'no-version', message: 'Could not find version string' };
+        return version[1];
+    },
 };
 
 /// login: observes the entire login data store (it’s constant-sized that so this is fine)

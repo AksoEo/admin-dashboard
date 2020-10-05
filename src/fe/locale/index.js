@@ -21,6 +21,10 @@ export const meta = {
     license: 'MIT-Permesilo',
     sourceHref: 'https://github.com/AksoEo',
     source: 'GitHub',
+
+    feVersion: '[[FE version]]',
+    feVersionBuilt: '[[built]]',
+    apiVersion: '[[API version]]',
 };
 
 export * from './data';

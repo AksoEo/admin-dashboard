@@ -7,6 +7,7 @@ import AutosizingPageView from '../../components/autosizing-page-view';
 import DetailsPage from './details';
 import TotpPage from './totp';
 import { Mode, getPageMode } from './is-special-page';
+import config from '../../../config.val';
 import './style';
 
 const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
@@ -28,6 +29,8 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
 
         /// Password creation token taken from the URL (if it exists)
         token: null,
+
+        apiVersion: null,
     };
 
     // record the last n keypresses and store them here
@@ -79,6 +82,8 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
         // set tab title
         document.title = appLocale.title(locale.title);
 
+        this.loadApiVersion();
+
         this.setState(getPageMode());
 
         setTimeout(() => {
@@ -86,7 +91,15 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
         }, 200);
     }
 
-    render ({ core, authState, isAdmin, totpSetupRequired, ueaCode }, { mode, login, token, allowsNonAdmin }) {
+    loadApiVersion () {
+        this.props.core.createTask('login/apiVersion').runOnceAndDrop().then(version => {
+            this.setState({ apiVersion: version });
+        }).catch(err => {
+            console.error('Could not fetch API version', err); // eslint-disable-line no-console
+        });
+    }
+
+    render ({ core, authState, isAdmin, totpSetupRequired, ueaCode }, { mode, login, token, allowsNonAdmin, apiVersion }) {
         const selectedPageIndex = this.#getSelectedPageIndex();
 
         let className = 'login';
@@ -130,6 +143,8 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
                     </AutosizingPageView>
                     <LoginMeta />
                 </div>
+                <LoginVersion
+                    api={apiVersion} />
                 <LoginMeta />
             </div>
         );
@@ -175,6 +190,27 @@ function LoginHeader ({ authenticated, core, mode, selectedPageIndex, showTotp }
                 <span />
             </ProgressIndicator>
         </header>
+    );
+}
+
+function LoginVersion ({ api }) {
+    return (
+        <div class="login-version">
+            <div>
+                {localeMeta.apiVersion}
+                {' '}
+                {api || '?'}
+            </div>
+            <div>
+                {localeMeta.feVersion}
+                {' '}
+                {config.version}
+                {', '}
+                {localeMeta.feVersionBuilt}
+                {' '}
+                {config.buildTime}
+            </div>
+        </div>
     );
 }
 

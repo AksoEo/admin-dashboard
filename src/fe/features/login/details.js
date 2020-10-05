@@ -164,6 +164,7 @@ export default class DetailsPage extends Component {
                     outline
                     label={locale.login}
                     type={this.props.login.includes('@') ? 'email' : 'text'}
+                    autocomplete="off"
                     autocapitalize="none"
                     spellcheck="false"
                     value={this.props.login}
