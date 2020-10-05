@@ -134,7 +134,7 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
                     <GroupList
                         tab={tab}
                         id={this.id}
-                        editing={editing}
+                        editing={canEditItems && editing}
                         perms={perms} />
                 )}
             </div>
@@ -303,7 +303,7 @@ function ClientsList ({ perms, id, editing }) {
     const [offset, setOffset] = useState(0);
     const [parameters, setParameters] = useState({
         limit: 10,
-        fields: [{ id: 'name', sorting: 'none' }, { id: 'apiKey', sorting: 'asc' }, { id: 'ownerName', sorting: 'none' }]
+        fields: [{ id: 'name', sorting: 'none' }, { id: 'apiKey', sorting: 'asc' }, { id: 'ownerName', sorting: 'none' }],
     });
 
     return (

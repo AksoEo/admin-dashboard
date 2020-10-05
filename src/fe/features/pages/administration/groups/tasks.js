@@ -1,15 +1,11 @@
-import { h, Component } from 'preact';
-import { TextField, AppBarProxy, Button, MenuIcon } from '@cpsdqs/yamdl';
-import DoneIcon from '@material-ui/icons/Done';
+import { h } from 'preact';
+import { TextField } from '@cpsdqs/yamdl';
 import SavePerms from '../perms-editor/save';
 import { adminGroups as locale } from '../../../../locale';
 import { Field, Validator } from '../../../../components/form';
 import TaskDialog from '../../../../components/task-dialog';
 import ChangedFields from '../../../../components/changed-fields';
-import { IdUEACode } from '../../../../components/data/uea-code';
-import { apiKey } from '../../../../components/data';
 import { routerContext } from '../../../../router';
-import { ContextualAction } from '../../../../context-action';
 
 export default {
     create ({ open, task }) {
