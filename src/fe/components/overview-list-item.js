@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, Checkbox, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, Checkbox, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import { connect } from '../core/connection';
 import { LinkButton } from '../router';
 import { layoutContext } from './dynamic-height-div';
@@ -179,6 +179,7 @@ export default connect(props => ([props.view, {
         }
 
         if (selection) {
+            const hasItem = selection.has(id);
             const boxCell = (
                 <div key="selection" class="list-item-cell selection-cell" onClick={e => {
                     // FIXME: hacky because we need to prevent the link from doing stuff
@@ -187,8 +188,10 @@ export default connect(props => ([props.view, {
                     if (selection.has(id)) selection.delete(id);
                     else selection.add(id);
                 }}>
-                    <Checkbox
-                        checked={selection.has(id)} />
+                    {hasItem === null ? <CircularProgress small indeterminate /> : (
+                        <Checkbox
+                            checked={selection.has(id)} />
+                    )}
                 </div>
             );
             if (compact) {

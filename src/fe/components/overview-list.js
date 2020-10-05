@@ -177,7 +177,8 @@ export default class OverviewList extends PureComponent {
             ? !deepEq(prevProps.options, this.props.options) || !deepEq(prevProps.parameters, this.props.parameters)
             : prevProps.options !== this.props.options || prevProps.parameters !== this.props.parameters;
 
-        if (paramsDidChange) {
+
+        if (paramsDidChange || (prevProps.task !== this.props.task)) {
             this.#stale = true;
             this.setState({ stale: true });
         }

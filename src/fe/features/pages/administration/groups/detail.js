@@ -1,7 +1,7 @@
 import { h } from 'preact';
-import AddIcon from '@material-ui/icons/Add';
+import { useState, PureComponent } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { LinearProgress, TextField } from '@cpsdqs/yamdl';
 import Tabs from '../../../../components/tabs';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
@@ -18,17 +18,9 @@ import './detail.less';
 
 export default connectPerms(class AdminGroupDetailPage extends Page {
     state = {
-        tab: 'codeholders',
-        // TODO: store these in navigation data because users might move to/from other pages a lot (e.g. codeholders)
-        codeholdersOffset: 0,
-        clientsOffset: 0,
-        parameters: {
-            limit: 10,
-        },
-        codeholdersSelection: new Set(),
-        clientsSelection: new Set(),
-
         edit: null,
+        editing: false,
+        tab: 'codeholders',
     };
 
     static contextType = coreContext;
@@ -77,96 +69,13 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
         if (this.#commitTask) this.#commitTask.drop();
     }
 
-    render ({ match, perms, editing }, { tab, parameters, edit }) {
-        const id = match[1];
+    get id () {
+        return this.props.match[1];
+    }
 
-        const itemsTask = tab === 'clients' ? 'adminGroups/listClients' : 'adminGroups/listCodeholders';
-        const itemsView = tab === 'clients' ? 'clients/client' : 'codeholders/codeholder';
-        const offsetKey = tab === 'clients' ? 'clientsOffset' : 'codeholdersOffset';
-        const itemsOffset = this.state[offsetKey];
-        const itemFields = tab === 'clients'
-            ? [{ id: 'name', sorting: 'none' }, { id: 'apiKey', sorting: 'asc' }, { id: 'ownerName', sorting: 'none' }]
-            : [{ id: 'code', sorting: 'asc' }, { id: 'name', sorting: 'asc' }];
-        const itemFieldSpecs = tab === 'clients'
-            ? CLIENT_FIELDS
-            : CODEHOLDER_FIELDS;
-        const itemsLocale = tab === 'clients'
-            ? clientsLocale.fields
-            : codeholdersLocale.fields;
-        const onGetItemLink = tab === 'clients'
-            ? id => `/administrado/klientoj/${id}`
-            : id => `/membroj/${id}`;
-        const itemsNotice = tab === 'clients'
-            ? null
-            : <GlobalFilterNotice perms={perms} />;
-
-        const addItem = tab === 'clients'
-            ? () => this.context.createTask('adminGroups/addClientsBatchTask', { group: id })
-            : () => this.context.createTask('adminGroups/addCodeholdersBatchTask', { group: id });
-
-        const canAddItem = perms.hasPerm('admin_groups.update') && (tab === 'clients'
-            ? perms.hasPerm('clients.read')
-            : perms.hasPerm('codeholders.read'));
-
-        const showTable = perms.hasPerm('clients.read') || perms.hasPerm('codeholders.read');
-
-        // we still show the other tab items to imply that they exist, but we disable the
-        // ability to switch to them
-        const canChangeTabs = perms.hasPerm('clients.read') && perms.hasPerm('codeholders.read');
-
-        const updateView = ['adminGroups/group', { id }];
-
-        const removeItemsTask = tab === 'clients'
-            ? 'adminGroups/removeClientsBatchTask'
-            : 'adminGroups/removeCodeholdersBatchTask';
-
-        const selectionSet = tab === 'clients'
-            ? this.state.clientsSelection
-            : this.state.codeholdersSelection;
-        const selection = perms.hasPerm('admin_groups.update') ? {
-            add: item => {
-                selectionSet.add(item);
-                this.forceUpdate();
-            },
-            delete: item => {
-                selectionSet.delete(item);
-                this.forceUpdate();
-            },
-            has: item => selectionSet.has(item),
-        } : null;
-
-        let selectionActionButton;
-        if (selectionSet.size) {
-            selectionActionButton = (
-                <Button class="selection-action-button" onClick={() => {
-                    const task = this.context.createTask(removeItemsTask, { group: id }, { items: [...selectionSet] });
-                    task.on('success', () => {
-                        // reset selection
-                        this.setState({
-                            clientsSelection: new Set(),
-                            codeholdersSelection: new Set(),
-                        });
-                    });
-                }}>
-                    {locale.deleteSelection}
-                </Button>
-            );
-        } else if (canAddItem) {
-            selectionActionButton = (
-                <Button class="selection-action-button" icon small onClick={addItem}>
-                    <AddIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
-            );
-        }
-
+    render ({ perms, editing }, { tab, edit }) {
         const actions = [];
-        if (perms.hasPerm('admin_groups.delete')) {
-            actions.push({
-                overflow: true,
-                label: locale.delete,
-                action: () => this.context.createTask('adminGroups/delete', {}, { id }),
-            });
-        }
+        const permsTarget = `/administrado/grupoj/${this.id}/permesoj`;
 
         if (perms.hasPerm('admin_groups.update')) {
             actions.push({
@@ -176,7 +85,22 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
             });
         }
 
-        const permsTarget = `/administrado/grupoj/${id}/permesoj`;
+        if (perms.hasPerm('admin_groups.delete')) {
+            actions.push({
+                overflow: true,
+                label: locale.delete,
+                action: () => this.context.createTask('adminGroups/delete', {}, { id: this.id }),
+            });
+        }
+
+        const showList = perms.hasPerm('clients.read') || perms.hasPerm('codeholders.read');
+
+        // still show the other tab items to imply that they exist, but disable the ability to
+        // switch to them
+        const canChangeTabs = perms.hasPerm('clients.read') && perms.hasPerm('codeholders.read');
+        const canEditItems = perms.hasPerm('admin_groups.update') && (tab === 'clients'
+            ? perms.hasPerm('clients.read')
+            : perms.hasPerm('codeholders.read'));
 
         return (
             <div class="admin-group-detail-page">
@@ -185,7 +109,7 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
                     actions={actions} />
                 <DetailView
                     view="adminGroups/group"
-                    id={id}
+                    id={this.id}
                     header={Header}
                     fields={fields}
                     locale={locale}
@@ -195,7 +119,7 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit} />
-                {!editing && showTable && (
+                {showList && (
                     <Tabs
                         class="tab-switcher"
                         value={tab}
@@ -206,35 +130,214 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
                             clients: locale.tabs.clients,
                         }} />
                 )}
-                {!editing && showTable && selectionActionButton}
-                {!editing && showTable && (
-                    <OverviewList
-                        task={itemsTask}
-                        notice={itemsNotice}
-                        view={itemsView}
-                        selection={selection}
-                        options={{
-                            group: id,
-                        }}
-                        fields={itemFieldSpecs}
-                        useDeepCmp
-                        parameters={{
-                            ...parameters,
-                            fields: itemFields,
-                            offset: itemsOffset,
-                        }}
-                        onGetItemLink={onGetItemLink}
-                        onSetOffset={offset => this.setState({ [offsetKey]: offset })}
-                        onSetLimit={limit => this.setState({
-                            parameters: { ...this.state.parameters, limit },
-                        })}
-                        updateView={updateView}
-                        locale={itemsLocale} />
+                {showList && (
+                    <GroupList
+                        tab={tab}
+                        id={this.id}
+                        editing={editing}
+                        perms={perms} />
                 )}
             </div>
         );
     }
 });
+
+function GroupList ({ tab, id, editing, perms }) {
+    if (tab === 'codeholders') {
+        return <CodeholdersList perms={perms} id={id} editing={editing} />;
+    } else if (tab === 'clients') {
+        return <ClientsList perms={perms} id={id} editing={editing} />;
+    }
+}
+
+/// Handles item list during editing.
+///
+/// - task: list task
+/// - addTask/deleteTask
+/// - type: type used in add/delete tasks
+/// - id: group id
+/// - editing
+class WithItems extends PureComponent {
+    state = {
+        data: [],
+        loading: false,
+        addingItems: [],
+        deletingItems: [],
+    };
+
+    static contextType = coreContext;
+
+    componentDidMount () {
+        if (this.props.editing) this.load();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (this.props.editing && !prevProps.editing) {
+            this.setState({ loading: true });
+            this.load();
+        }
+    }
+
+    componentWillUnmount () {
+        this.dead = true;
+    }
+
+    load () {
+        if (this.dead) return;
+        this.setState({ loading: true });
+        this.context.createTask(this.props.task, {
+            group: this.props.id,
+        }, {
+            offset: this.state.data.length,
+            fields: [],
+            limit: 100,
+        }).runOnceAndDrop().then(res => {
+            if (!res.items.length) {
+                this.setState({ loading: false });
+                return;
+            }
+            this.setState({
+                data: this.state.data.slice().concat(res.items),
+            }, () => this.load());
+        }).catch(err => {
+            console.error(err); // eslint-disable-line
+            setTimeout(() => this.load(), 1000);
+        });
+    }
+
+    addItem = id => {
+        this.setState({
+            addingItems: this.state.addingItems.slice().concat([id]),
+        });
+        this.context.createTask(this.props.addTask, {
+            group: this.props.id,
+        }, { [this.props.type]: id }).runOnceAndDrop().then(() => {
+            this.setState({
+                data: this.state.data.concat([id]),
+            });
+        }).catch(err => {
+            console.error(err); // eslint-disable-line no-console
+        }).then(() => {
+            const addingItems = this.state.addingItems.slice();
+            addingItems.splice(addingItems.indexOf(id), 1);
+            this.setState({ addingItems });
+        });
+    };
+    deleteItem = id => {
+        this.setState({
+            deletingItems: this.state.deletingItems.slice().concat([id]),
+        });
+        this.context.createTask(this.props.deleteTask, {
+            group: this.props.id,
+        }, { [this.props.type]: id }).runOnceAndDrop().then(() => {
+            const data = this.state.data.slice();
+            data.splice(data.indexOf(id), 1);
+            this.setState({ data });
+        }).catch(err => {
+            console.error(err); // eslint-disable-line no-console
+        }).then(() => {
+            const deletingItems = this.state.deletingItems.slice();
+            deletingItems.splice(deletingItems.indexOf(id), 1);
+            this.setState({ deletingItems });
+        });
+    };
+
+    hasItem = id => {
+        if (this.state.addingItems.includes(id)) return null;
+        if (this.state.deletingItems.includes(id)) return null;
+        return this.state.data.includes(id);
+    };
+
+    selection = {
+        add: this.addItem,
+        delete: this.deleteItem,
+        has: this.hasItem,
+    };
+
+    render ({ children }) {
+        return children(this.selection, this.state.loading);
+    }
+}
+
+function CodeholdersList ({ perms, id, editing }) {
+    const [offset, setOffset] = useState(0);
+    const [parameters, setParameters] = useState({
+        limit: 10,
+        fields: [{ id: 'code', sorting: 'asc' }, { id: 'name', sorting: 'asc' }],
+    });
+
+    return (
+        <WithItems
+            id={id}
+            type="codeholder"
+            task="adminGroups/listCodeholders"
+            addTask="adminGroups/addCodeholder"
+            deleteTask="adminGroups/removeCodeholder"
+            editing={editing}>
+            {(selection, loading) => (
+                <div>
+                    <LinearProgress hideIfNone class="edit-loading" indeterminate={loading} />
+                    <OverviewList
+                        task={editing ? 'codeholders/list' : 'adminGroups/listCodeholders'}
+                        notice={<GlobalFilterNotice perms={perms} />}
+                        view="codeholders/codeholder"
+                        selection={editing && selection}
+                        options={{
+                            group: id,
+                        }}
+                        fields={CODEHOLDER_FIELDS}
+                        useDeepCmp
+                        parameters={{ ...parameters, offset }}
+                        onGetItemLink={editing ? null : (id => `/membroj/${id}`)}
+                        onSetOffset={setOffset}
+                        onSetLimit={limit => setParameters({ ...parameters, limit })}
+                        updateView={editing ? null : ['adminGroups/group', { id }]}
+                        locale={codeholdersLocale.fields} />
+                </div>
+            )}
+        </WithItems>
+    );
+}
+
+function ClientsList ({ perms, id, editing }) {
+    const [offset, setOffset] = useState(0);
+    const [parameters, setParameters] = useState({
+        limit: 10,
+        fields: [{ id: 'name', sorting: 'none' }, { id: 'apiKey', sorting: 'asc' }, { id: 'ownerName', sorting: 'none' }]
+    });
+
+    return (
+        <WithItems
+            id={id}
+            type="client"
+            task="adminGroups/listClients"
+            addTask="adminGroups/addClient"
+            deleteTask="adminGroups/removeClient"
+            editing={editing}>
+            {(selection, loading) => (
+                <div>
+                    <LinearProgress hideIfNone class="edit-loading" indeterminate={loading} />
+                    <OverviewList
+                        task={editing ? 'clients/list' : 'adminGroups/listClients'}
+                        notice={<GlobalFilterNotice perms={perms} />}
+                        view="clients/client"
+                        selection={editing && selection}
+                        options={{
+                            group: id,
+                        }}
+                        fields={CLIENT_FIELDS}
+                        useDeepCmp
+                        parameters={{ ...parameters, offset }}
+                        onGetItemLink={editing ? null : (id => `/administrado/klientoj/${id}`)}
+                        onSetOffset={setOffset}
+                        onSetLimit={limit => setParameters({ ...parameters, limit })}
+                        updateView={editing ? null : ['adminGroups/group', { id }]}
+                        locale={clientsLocale.fields} />
+                </div>
+            )}
+        </WithItems>
+    );
+}
 
 function Header ({ item, userData, editing }) {
     if (editing) return null;

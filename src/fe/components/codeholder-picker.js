@@ -23,7 +23,6 @@ function orderPortalContainerFront () {
     document.body.appendChild(portalContainer);
 }
 
-
 /// Picks a codeholder and displays their UEA code.
 ///
 /// # Props
@@ -121,24 +120,34 @@ export default class CodeholderPicker extends Component {
                         </Button>
                     ) : null}
 
-                    <Dialog
-                        class="codeholder-picker-add-dialog"
-                        backdrop
-                        fullScreen={width => width < 600}
-                        title={this.props.limit === 1 ? locale.picker.addOne : locale.picker.add}
-                        container={portalContainer}
+                    <PickerDialog
+                        limit={this.props.limit}
                         open={canAddMore && addDialogOpen}
-                        onClose={() => this.setState({ addDialogOpen: false })}>
-                        <AddDialogInner
-                            value={value}
-                            onChange={onChange}
-                            onClose={() => this.setState({ addDialogOpen: false })}
-                            limit={this.props.limit} />
-                    </Dialog>
+                        container={portalContainer}
+                        onClose={() => this.setState({ addDialogOpen: false })} />
                 </div>
             </div>
         );
     }
+}
+
+export function PickerDialog ({ value, onChange, limit, container, open, onClose }) {
+    return (
+        <Dialog
+            class="codeholder-picker-add-dialog"
+            backdrop
+            fullScreen={width => width < 600}
+            title={limit === 1 ? locale.picker.addOne : locale.picker.add}
+            container={container}
+            open={open}
+            onClose={onClose}>
+            <AddDialogInner
+                value={value}
+                onChange={onChange}
+                onClose={onClose}
+                limit={this.props.limit} />
+        </Dialog>
+    );
 }
 
 function AddDialogInner ({ value, onChange, limit, onClose }) {
