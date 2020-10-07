@@ -100,7 +100,25 @@ export default [
                 id: 'email',
                 icon: EmailIcon,
                 path: 'amasmesaghoj',
-                hasPerm: () => true,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "notif-templates" */ './notif-templates')),
+                hasPerm: perms => perms.hasPerm('notif_templates.read.uea') || perms.hasPerm('notif_templates.read.tejo'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "notif-templates" */ './notif-templates/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: 'magazines',

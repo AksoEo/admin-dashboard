@@ -1,0 +1,38 @@
+@import '../../../prelude';
+
+.notif-template-base {
+    font-size: small;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid @separator;
+}
+
+.notif-template-domain-email-editor {
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    border: 1px solid @separator;
+
+    &:focus-within {
+        border-color: @secondary;
+    }
+
+    .domain-email-editor-address {
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: none;
+        padding: 0 8px;
+        flex: 1;
+        margin: 0;
+        align-self: stretch;
+        outline: none;
+        text-align: right;
+    }
+
+    .domain-email-editor-domain {
+        flex: 1;
+    }
+}

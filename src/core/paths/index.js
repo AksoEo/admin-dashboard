@@ -23,21 +23,22 @@ const lazyPath = (f, map) => {
 const mapTasks = res => res.tasks;
 const mapViews = res => res.views;
 
-const clients = () => import(/* webpackChunkName: 'core-clients', webpackPrefetch: true */ './clients');
+const clients = () => import(/* webpackChunkName: 'core-clients' */ './clients');
 const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './codeholders');
-const congresses = () => import(/* webpackChunkName: 'core-congresses', webpackPrefetch: true */ './congresses');
+const congresses = () => import(/* webpackChunkName: 'core-congresses' */ './congresses');
 const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
-const adminGroups = () => import(/* webpackChunkName: 'core-admin', webpackPrefetch: true */ './admin-groups');
-const httpLog = () => import(/* webpackChunkName: 'core-admin', webpackPrefetch: true */ './http-log');
+const adminGroups = () => import(/* webpackChunkName: 'core-admin' */ './admin-groups');
+const httpLog = () => import(/* webpackChunkName: 'core-admin' */ './http-log');
 const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './login');
-const lists = () => import(/* webpackChunkName: 'core-lists', webpackPrefetch: true */ './lists');
+const lists = () => import(/* webpackChunkName: 'core-lists' */ './lists');
 const perms = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './perms');
-const memberships = () => import(/* webpackChunkName: 'core-memberships', webpackPrefetch: true */ './memberships');
-const payments = () => import(/* webpackChunkName: 'core-payments', webpackPrefetch: true */ './payments');
-const roles = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './roles');
-const queries = () => import(/* webpackChunkName: 'core-queries', webpackPrefetch: true */ './queries');
-const tasks_ = () => import(/* webpackChunkName: 'core-tasks', webpackPrefetch: true */ './tasks');
-const votes = () => import(/* webpackChunkName: 'core-votes', webpackPrefetch: true */ './votes');
+const memberships = () => import(/* webpackChunkName: 'core-memberships' */ './memberships');
+const notifTemplates = () => import(/* webpackChunkName: 'core-notif-templates' */ './notif-templates');
+const payments = () => import(/* webpackChunkName: 'core-payments' */ './payments');
+const roles = () => import(/* webpackChunkName: 'core-codeholders' */ './roles');
+const queries = () => import(/* webpackChunkName: 'core-queries' */ './queries');
+const tasks_ = () => import(/* webpackChunkName: 'core-tasks' */ './tasks');
+const votes = () => import(/* webpackChunkName: 'core-votes' */ './votes');
 const debug = () => import(/* webpackChunkName: 'core-debug' */ './debug');
 
 /// Task definitions.
@@ -55,6 +56,7 @@ export const tasks = {
     login: lazyPath(login, mapTasks),
     lists: lazyPath(lists, mapTasks),
     memberships: lazyPath(memberships, mapTasks),
+    notifTemplates: lazyPath(notifTemplates, mapTasks),
     roles: lazyPath(roles, mapTasks),
     queries: lazyPath(queries, mapTasks),
     perms: lazyPath(perms, mapTasks),
@@ -75,6 +77,7 @@ export const views = {
     login: lazyPath(login, mapViews),
     lists: lazyPath(lists, mapViews),
     memberships: lazyPath(memberships, mapViews),
+    notifTemplates: lazyPath(notifTemplates, mapViews),
     roles: lazyPath(roles, mapViews),
     perms: lazyPath(perms, mapViews),
     payments: lazyPath(payments, mapViews),
