@@ -42,6 +42,7 @@ export const FIELDS = {
         },
     },
     name: {
+        sortable: true,
         slot: 'title',
         component ({ value, editing, onChange }) {
             if (editing) {

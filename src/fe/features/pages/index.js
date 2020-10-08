@@ -116,6 +116,12 @@ export default [
                                 type: 'state',
                                 state: 'editing',
                             },
+                            {
+                                path: 'antauhvido',
+                                type: 'stack',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "notif-templates" */ './notif-templates/preview')),
+                            },
                         ],
                     },
                 ],

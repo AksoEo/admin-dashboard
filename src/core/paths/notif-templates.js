@@ -103,7 +103,8 @@ export const tasks = {
 
     preview: async ({ id }) => {
         const client = await asyncClient;
-        return await client.get(`/notif_templates/${id}/render`);
+        const res = await client.get(`/notif_templates/${id}/render`);
+        return res.body;
     },
     emailDomains: async () => {
         const client = await asyncClient;

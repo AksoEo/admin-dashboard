@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { Button } from '@cpsdqs/yamdl';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
 import AKSOScriptEditor from '@tejo/akso-script-editor';
 import Page from '../../../components/page';
@@ -8,15 +9,18 @@ import DetailShell from '../../../components/detail-shell';
 import { DefsPreview } from '../../../components/form-editor/script-views';
 import Meta from '../../meta';
 import { connectPerms } from '../../../perms';
+import { LinkButton } from '../../../router';
 import { coreContext } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
 import { FIELDS } from './fields';
+import { getFormVarsForIntent } from './intents';
 import './detail.less';
 
 export default connectPerms(class NotifTemplate extends Page {
     state = {
         edit: null,
         org: null,
+        intent: null,
     };
 
     static contextType = coreContext;
@@ -44,7 +48,7 @@ export default connectPerms(class NotifTemplate extends Page {
     };
 
     onData = data => {
-        if (data) this.setState({ org: data.org });
+        if (data) this.setState({ org: data.org, intent: data.intent });
     };
 
     componentDidMount () {
@@ -64,6 +68,7 @@ export default connectPerms(class NotifTemplate extends Page {
     openScriptEditor = (defs) => new Promise(resolve => {
         // TODO: form variables
         const editor = new AKSOScriptEditor();
+        editor.setFormVars(getFormVarsForIntent(this.state.intent));
         editor.load(defs);
         editor.onSave = () => {
             resolve(editor.save());
@@ -137,6 +142,7 @@ export default connectPerms(class NotifTemplate extends Page {
                     onDelete={() => this.props.pop()}>
                     {data => (
                         <DetailContents
+                            id={id}
                             item={this.state.edit || data}
                             editing={editing}
                             onItemChange={edit => this.setState({ edit })}
@@ -158,7 +164,7 @@ function DetailField ({ field, item, editing, onItemChange }) {
         onItemChange={onItemChange} />;
 }
 
-function DetailContents ({ item, editing, onItemChange, openScriptEditor }) {
+function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) {
     const org = <DetailField field="org" item={item} />;
 
     const editScript = () => {
@@ -185,6 +191,15 @@ function DetailContents ({ item, editing, onItemChange, openScriptEditor }) {
                         {editing ? <div class="description-label">{locale.fields.description}</div> : null}
                         <DetailField field="description" editing={editing} item={item} onItemChange={onItemChange} />
                     </div>
+                    {!editing ? (
+                        <div class="detail-preview-link">
+                            <LinkButton target={`/amasmesaghoj/${id}/antauhvido`}>
+                                <VisibilityIcon style={{ verticalAlign: 'middle' }} />
+                                {' '}
+                                {locale.preview.button}
+                            </LinkButton>
+                        </div>
+                    ) : null}
                 </div>
             </DynamicHeightDiv>
             <div class="template-script">
@@ -194,6 +209,10 @@ function DetailContents ({ item, editing, onItemChange, openScriptEditor }) {
                     </Button>
                 ) : null}
                 <DefsPreview
+                    previousNodes={[{
+                        defs: {},
+                        formVars: getFormVarsForIntent(item.intent),
+                    }]}
                     script={item.script || {}} />
             </div>
             <div class="mail-contents">
@@ -232,3 +251,4 @@ function DetailContents ({ item, editing, onItemChange, openScriptEditor }) {
         </div>
     );
 }
+

@@ -41,6 +41,14 @@ export const notifTemplates = {
     intents: {
         codeholder: 'Membro',
     },
+    preview: {
+        title: 'Antaŭvido',
+        button: 'Antaŭvidi',
+        tabs: {
+            html: '[[HTML]]',
+            text: '[[Text]]',
+        },
+    },
 
     create: {
         title: '[[Create template]]',
@@ -55,5 +63,34 @@ export const notifTemplates = {
         menuItem: 'Forigi',
         title: '[[Delete template]]',
         button: 'Forigi',
+    },
+};
+
+export const notifTemplateIntentExamples = {
+    codeholder: {
+        id: 1234,
+        name: '[[Max Mustermann]]',
+        oldCode: 'abcd', // [[hello]] does this use abcd-e or abcd?
+        newCode: 'abcdef',
+        codeholderType: 'human',
+        hasPassword: true,
+        addressFormatted: '[[Insert some example address please]]',
+        addressLatin: {
+            country: '[[Also]]',
+            countryArea: '[[all]]',
+            city: '[[this]]',
+            cityArea: '[[stuff]]',
+            streetAddress: '[[please]]',
+            postalCode: '[[thank]]',
+            sortingCode: '[[you]]',
+        },
+        feeCountry: 'nl',
+        email: 'ekzemplo@akso.org',
+        birthdate: '1990-01-01', // this is not 1970 so it's not unix 0
+        age: 30,
+        agePrimo: 30,
+        cellphone: '+15551234',
+        officePhone: '+15552345',
+        landlinePhone: '+15555678',
     },
 };
