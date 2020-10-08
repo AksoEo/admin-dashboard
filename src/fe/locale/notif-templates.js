@@ -15,6 +15,7 @@ export const notifTemplates = {
         description: 'Priskribo',
         intent: '[[Intent]]',
         subject: '[[Subject]]',
+        script: '[[Script]]',
         from: '[[From]]',
         fromName: '[[FromName]]',
         replyTo: '[[ReplyTo]]',
@@ -29,6 +30,13 @@ export const notifTemplates = {
     raw: {
         noHtmlVersion: '[[Missing html version]]',
         noTextVersion: '[[Missing text version]]',
+    },
+    modules: {
+        textButton: '[[Button]]',
+        textButtonHref: '[[Link]]',
+        textButtonLabel: '[[Label]]',
+        imageUrl: '[[URL]]',
+        imageAlt: '[[Image Description]]',
     },
     intents: {
         codeholder: 'Membro',

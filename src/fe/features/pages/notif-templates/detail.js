@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { Button } from '@cpsdqs/yamdl';
 import EditIcon from '@material-ui/icons/Edit';
+import AKSOScriptEditor from '@tejo/akso-script-editor';
 import Page from '../../../components/page';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import DetailShell from '../../../components/detail-shell';
@@ -46,13 +47,55 @@ export default connectPerms(class NotifTemplate extends Page {
         if (data) this.setState({ org: data.org });
     };
 
+    componentDidMount () {
+        window.addEventListener('resize', this.onResize);
+    }
+
     componentWillUnmount () {
         if (this.#commitTask) this.#commitTask.drop();
+        this.detachScriptEditor();
+        window.removeEventListener('resize', this.onResize);
     }
 
     get id () {
         return +this.props.match[1];
     }
+
+    openScriptEditor = (defs) => new Promise(resolve => {
+        // TODO: form variables
+        const editor = new AKSOScriptEditor();
+        editor.load(defs);
+        editor.onSave = () => {
+            resolve(editor.save());
+            this.detachScriptEditor();
+        };
+        this.attachScriptEditor(editor);
+    });
+
+    // TODO: dedup code with form editor
+    scriptEditor = null;
+    attachScriptEditor (editor) {
+        if (this.scriptEditor) this.detachScriptEditor();
+        this.scriptEditor = editor;
+        const editorNode = document.createElement('div');
+        editorNode.className = 'notif-template-script-node-root';
+        editorNode.appendChild(editor.node);
+        document.body.appendChild(editorNode);
+        this.onResize();
+    }
+
+    detachScriptEditor () {
+        if (!this.scriptEditor) return;
+        document.body.removeChild(this.scriptEditor.node.parentNode);
+        this.scriptEditor.destroy();
+        this.scriptEditor = null;
+    }
+
+    onResize = () => {
+        if (!this.scriptEditor) return;
+        this.scriptEditor.width = window.innerWidth;
+        this.scriptEditor.height = window.innerHeight;
+    };
 
     render ({ perms, editing }, { edit, org }) {
         const actions = [];
@@ -96,7 +139,8 @@ export default connectPerms(class NotifTemplate extends Page {
                         <DetailContents
                             item={this.state.edit || data}
                             editing={editing}
-                            onItemChange={edit => this.setState({ edit })} />
+                            onItemChange={edit => this.setState({ edit })}
+                            openScriptEditor={this.openScriptEditor} />
                     )}
                 </DetailShell>
             </div>
@@ -114,8 +158,14 @@ function DetailField ({ field, item, editing, onItemChange }) {
         onItemChange={onItemChange} />;
 }
 
-function DetailContents ({ item, editing, onItemChange }) {
+function DetailContents ({ item, editing, onItemChange, openScriptEditor }) {
     const org = <DetailField field="org" item={item} />;
+
+    const editScript = () => {
+        openScriptEditor(item.script || {}).then(script => {
+            onItemChange({ ...item, script });
+        });
+    };
 
     return (
         <div class="notif-template-detail">
@@ -139,7 +189,7 @@ function DetailContents ({ item, editing, onItemChange }) {
             </DynamicHeightDiv>
             <div class="template-script">
                 {editing ? (
-                    <Button icon fab class="template-script-edit-button">
+                    <Button icon fab class="template-script-edit-button" onClick={editScript}>
                         <EditIcon style={{ verticalAlign: 'middle' }} />
                     </Button>
                 ) : null}
