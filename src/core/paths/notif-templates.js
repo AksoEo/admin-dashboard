@@ -1,9 +1,8 @@
 import asyncClient from '../client';
 import * as store from '../store';
-import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
-import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
+import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
 
 const NOTIF_TEMPLATES = 'notifTemplates';
 const NOTIF_EMAIL_DOMAINS = 'notifEmailDomains';

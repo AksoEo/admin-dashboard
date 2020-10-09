@@ -565,7 +565,7 @@ export const tasks = {
     deleteRegistrationForm: async ({ congress, instance }) => {
         const client = await asyncClient;
         await client.delete(`/congresses/${congress}/instances/${instance}/registration_form`);
-        store.delete([CONGRESSES, congress, INSTANCES, instance, REG_FORM]);
+        store.remove([CONGRESSES, congress, INSTANCES, instance, REG_FORM]);
     },
     setRegistrationForm: async ({ congress, instance }, { data }) => {
         const client = await asyncClient;

@@ -324,7 +324,7 @@ export const tasks = {
     },
     updateMethodThumbnail: async ({ org, id }, { thumbnail }) => {
         const client = await asyncClient;
-        const res = await client.put(`/aksopay/payment_orgs/${org}/methods/${id}/thumbnail`, null, {}, [{
+        await client.put(`/aksopay/payment_orgs/${org}/methods/${id}/thumbnail`, null, {}, [{
             name: 'thumbnail',
             type: thumbnail.type,
             value: thumbnail,
