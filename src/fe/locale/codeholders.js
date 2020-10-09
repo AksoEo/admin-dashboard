@@ -319,6 +319,24 @@ export const codeholders = {
             },
         },
     },
+    notifTemplates: {
+        cursedNotice: '[[Golden results will not receive a notification.]]',
+        menuItem: '[[Send notif]]',
+        title: '[[Send notif]]',
+        empty: '[[No templates for intent codeholder]]',
+        deleteOnComplete: '[[Delete on completion]]',
+        send: {
+            button: '[[Send]]',
+
+            title: '[[Send notif]]',
+            confirm: '[[Send]]',
+
+            messagePre: '[[Send a notification to]]',
+            messagePost: n => `${n} membro${n === 1 ? '' : 'j'}`,
+            messagePostIndeterminate: 'membroj',
+            messagePostUnknown: '[[??? membroj]]',
+        },
+    },
     publicity: {
         private: 'Privata',
         members: 'Nur membroj',

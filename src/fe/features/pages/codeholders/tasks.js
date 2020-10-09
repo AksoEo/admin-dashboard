@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import { useEffect } from 'preact/compat';
-import { TextField } from '@cpsdqs/yamdl';
+import { useEffect, PureComponent } from 'preact/compat';
+import { CircularProgress, TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import SavePerms from '../administration/perms-editor/save';
 import { UEACode } from '@tejo/akso-client';
@@ -385,7 +385,82 @@ export default {
             </TaskDialog>
         );
     },
+
+    sendNotifTemplate ({ open, core, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.notifTemplates.send.title}
+                actionLabel={locale.notifTemplates.send.confirm}
+                run={() => task.runOnce()}>
+                <NotifTemplateMessage
+                    core={core}
+                    options={task.options} />
+            </TaskDialog>
+        );
+    },
 };
+
+class NotifTemplateMessage extends PureComponent {
+    state = {
+        total: null,
+        loading: false,
+    };
+
+    load () {
+        this.setState({ loading: true });
+
+        const notifFilter = { email: { $neq: null } };
+
+        const options = { ...this.props.options };
+        const jsonFilter = { ...(options.jsonFilter && options.jsonFilter.filter || {}) };
+        options.jsonFilter = {
+            filter: options.jsonFilter && !options.jsonFilter._disabled
+                ? { $and: [jsonFilter, notifFilter] }
+                : notifFilter,
+        };
+
+        this.props.core.createTask('codeholders/list', {}, {
+            ...options,
+            fields: [],
+            offset: 0,
+            limit: 1,
+            skipCursed: true,
+        }).runOnceAndDrop().then(res => {
+            this.setState({ loading: false, total: res.total });
+        }).catch(err => {
+            console.error('Could not fetch count for sendNotifTemplate', err); // eslint-disable-line no-console
+            this.setState({ loading: false });
+        });
+    }
+
+    componentDidMount () {
+        this.load();
+    }
+
+    render (_, { total, loading }) {
+        let contents = null;
+        if (loading) {
+            contents = [
+                <CircularProgress key={0} small indeterminate />,
+                <span key={1}> {locale.notifTemplates.send.messagePostIndeterminate}</span>
+            ];
+        } else if (total !== null) {
+            contents = locale.notifTemplates.send.messagePost(total);
+        } else {
+            contents = locale.notifTemplates.send.messagePostUnknown;
+        }
+
+        return (
+            <div>
+                {locale.notifTemplates.send.messagePre}
+                {' '}
+                {contents}
+            </div>
+        );
+    }
+}
 
 function makeRoleEditor (type) {
     return connect('roles/roles')(roles => ({ roles }))(function ({ open, task, roles }) {

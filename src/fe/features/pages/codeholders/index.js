@@ -3,6 +3,7 @@ import AddIcon from '@material-ui/icons/Add';
 import SortIcon from '@material-ui/icons/Sort';
 import SaveIcon from '@material-ui/icons/Save';
 import ContactMailIcon from '@material-ui/icons/ContactMail';
+import EmailIcon from '@material-ui/icons/Email';
 import SearchFilters from '../../../components/search-filters';
 import OverviewList from '../../../components/overview-list';
 import FieldPicker from '../../../components/field-picker';
@@ -17,6 +18,7 @@ import Meta from '../../meta';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
 import AddrLabelGen from './addr-label-gen';
+import NotifTemplates from './notif-templates';
 import GlobalFilterNotice from './global-filter-notice';
 import './style';
 
@@ -42,6 +44,7 @@ const connectToEverything = a => connect('codeholders/fields')(fields => ({
 /// # Props
 /// - query/onQueryChange: url query handling
 /// - addrLabelGen: label gen state (see navigation)
+/// - sendNotifTemplates: notif templates state (see navigation)
 export default connectToEverything(class CodeholdersPage extends Page {
     state = {
         options: {
@@ -196,6 +199,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
 
     render ({
         addrLabelGen,
+        sendNotifTemplates,
         perms,
         contextualAction,
         fields: availableFields,
@@ -237,6 +241,14 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     icon: <ContactMailIcon style={{ verticalAlign: 'middle' }} />,
                     label: locale.addrLabelGen.menuItem,
                     action: () => this.props.onNavigate(`/membroj/etikedoj?${this.props.query}`),
+                    overflow: true,
+                });
+            }
+            if (!sendNotifTemplates) {
+                menu.push({
+                    icon: <EmailIcon style={{ verticalAlign: 'middle' }} />,
+                    label: locale.notifTemplates.menuItem,
+                    action: () => this.props.onNavigate(`/membroj/amasmesaghoj?${this.props.query}`),
                     overflow: true,
                 });
             }
@@ -318,6 +330,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     onSetLimit={limit => this.setState({ options: { ...options, limit }})}
                     onResult={result => this.setState({ currentResultIsCursed: result.cursed })}
                     locale={locale.fields} />
+
                 <CSVExport
                     open={this.state.csvExportOpen}
                     onClose={() => this.setState({ csvExportOpen: false })}
@@ -338,11 +351,17 @@ export default connectToEverything(class CodeholdersPage extends Page {
                             default: 'eo',
                         },
                     }} />
+
                 <AddrLabelGen
                     open={addrLabelGen}
                     lvIsCursed={this.state.currentResultIsCursed}
                     options={this.state.options}
                     onClose={() => addrLabelGen.pop()} />
+                <NotifTemplates
+                    open={sendNotifTemplates}
+                    lvIsCursed={this.state.currentResultIsCursed}
+                    options={this.state.options}
+                    onClose={() => sendNotifTemplates.pop()} />
             </div>
         );
     }

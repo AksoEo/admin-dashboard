@@ -373,6 +373,11 @@ export default [
                         type: 'state',
                         state: 'addrLabelGen',
                     },
+                    {
+                        path: 'amasmesaghoj',
+                        type: 'state',
+                        state: 'sendNotifTemplates',
+                    },
                 ],
                 hasPerm: perms => perms.hasPerm('codeholders.read'),
             },

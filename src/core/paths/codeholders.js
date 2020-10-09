@@ -566,6 +566,7 @@ export const tasks = {
     ///    - fields: [{ id: string, sorting: 'asc' | 'desc' | 'none' }]
     ///    - offset: number
     ///    - limit: number
+    ///    - skipCursed: bool - if true, will not add cursed items
     /// returns:
     ///    - items: [data store id list]
     ///    - transientFields: [string]
@@ -590,7 +591,7 @@ export const tasks = {
         }
 
         let itemToPrepend = null;
-        if (prependedUeaCodeSearch) {
+        if (!parameters.skipCursed && prependedUeaCodeSearch) {
             itemToPrepend = (await client.get('/codeholders', {
                 filter: prependedUeaCodeSearch,
                 // only need to know about its existence on later pages
@@ -1335,6 +1336,19 @@ export const tasks = {
     deleteAddrLabelPreset: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/address_label_templates/${id}`);
+    },
+
+    sendNotifTemplate: async ({ search, filters, jsonFilter, fields }, { template, deleteOnComplete }) => {
+        const client = await asyncClient;
+        const { options } = parametersToRequestData({ search, filters, jsonFilter, fields });
+        delete options.fields;
+        delete options.offset;
+        delete options.limit;
+
+        await client.post('/codeholders/!send_notif_template', {
+            notifTemplateId: template,
+            deleteTemplateOnComplete: deleteOnComplete,
+        }, options);
     },
 };
 
