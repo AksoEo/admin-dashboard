@@ -67,7 +67,7 @@ function TemplatePicker ({ onChange }) {
     const [offset, setOffset] = useState(0);
 
     return (
-        <div class="notif-template-picker">
+        <div class="notif-template-picker-inner">
             <StaticOverviewList
                 task="notifTemplates/list"
                 view="notifTemplates/template"

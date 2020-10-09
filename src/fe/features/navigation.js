@@ -315,7 +315,7 @@ export default class Navigation extends PureComponent {
         const newStack = this.state.stack.slice(0, stack.length);
         for (let i = 0; i < stack.length; i++) {
             // check if the stack item is still the same thing
-            if (newStack[i] && stack[i].source === newStack[i].source) {
+            if (newStack[i] && stack[i].source === newStack[i].source && stack[i].path === newStack[i].path) {
                 if (stack[i].data) {
                     // if data was decoded; load it
                     // (otherwise just keep current state)
@@ -551,6 +551,11 @@ export default class Navigation extends PureComponent {
                         </div>
                     }>
                         <PageComponent
+                            // the page component' key is its path, such that if the
+                            // path changes the page component will be re-created.
+                            // A lot of detail views aren't equipped to handle the ID of their
+                            // item changing.
+                            key={stackItem.path}
                             isTopPage={isTop}
                             query={stackItem.query}
                             onQueryChange={query => this.onQueryChange(i, query)}

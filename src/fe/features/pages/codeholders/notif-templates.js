@@ -5,6 +5,7 @@ import { CardStackItem } from '../../../components/card-stack';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
+import './notif-templates.less';
 
 const NotifTemplatePicker = lazy(() => import('./notif-template-picker'));
 
@@ -58,6 +59,7 @@ const Contents = connectPerms(class Contents extends PureComponent {
             contents.push(
                 <div class="send-option" key="deleteOnComplete">
                     <Checkbox
+                        class="option-switch"
                         id={checkboxId}
                         checked={this.state.deleteOnComplete}
                         onChange={deleteOnComplete => this.setState({ deleteOnComplete })} />
@@ -70,11 +72,13 @@ const Contents = connectPerms(class Contents extends PureComponent {
 
         if (template && templateOrg) {
             contents.push(
-                <div class="send-submit" key="submit">
-                    <Button raised onClick={this.onSubmit}>
-                        {locale.notifTemplates.send.button}
-                    </Button>
-                </div>
+                <footer class="send-footer">
+                    <div class="send-submit" key="submit">
+                        <Button raised onClick={this.onSubmit}>
+                            {locale.notifTemplates.send.button}
+                        </Button>
+                    </div>
+                </footer>
             );
         }
 

@@ -324,7 +324,7 @@ export const codeholders = {
         menuItem: '[[Send notif]]',
         title: '[[Send notif]]',
         empty: '[[No templates for intent codeholder]]',
-        deleteOnComplete: '[[Delete on completion]]',
+        deleteOnComplete: '[[Delete notif template on completion]]',
         send: {
             button: '[[Send]]',
 

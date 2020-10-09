@@ -23,6 +23,21 @@ const clientFields = {
     text: 'text',
     modules: 'modules',
 };
+// fields that will be copied when duplicating a template
+const DUPLICATE_FIELDS = [
+    'org',
+    'base',
+    'name',
+    'description',
+    'intent',
+    'script',
+    'subject',
+    'from',
+    'fromName',
+    'replyTo',
+];
+const DUPLICATE_FIELDS_RAW = ['html', 'text'];
+const DUPLICATE_FIELDS_INHERIT = ['modules'];
 const parametersToRequestData = makeParametersToRequestData({
     clientFields,
     clientFilters: {
@@ -80,6 +95,24 @@ export const tasks = {
         store.insert([NOTIF_TEMPLATES, id], deepMerge(existing, clientFromAPI(res.body)));
 
         return +id;
+    },
+    duplicate: async ({ id }) => {
+        const client = await asyncClient;
+        const allFields = DUPLICATE_FIELDS.concat(DUPLICATE_FIELDS_RAW).concat(DUPLICATE_FIELDS_INHERIT);
+        const source = await client.get(`/notif_templates/${id}`, { fields: allFields });
+
+        const fields = DUPLICATE_FIELDS.concat(source.body.base === 'raw'
+            ? DUPLICATE_FIELDS_RAW
+            : DUPLICATE_FIELDS_INHERIT);
+
+        const data = {};
+        for (const f of fields) data[f] = source.body[f];
+
+        const res = await client.post('/notif_templates', data);
+        const newId = res.res.headers.get('x-identifier');
+        store.insert([NOTIF_TEMPLATES, newId], clientFromAPI(data));
+        store.signal([NOTIF_TEMPLATES, SIG_NOTIF_TEMPLATES]);
+        return newId;
     },
     update: async ({ id }, parameters) => {
         const client = await asyncClient;

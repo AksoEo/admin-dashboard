@@ -1,0 +1,37 @@
+@import '../../../prelude';
+
+.codeholders-send-notif-template {
+    .notif-template-picker-loading {
+        padding: 24px;
+        text-align: center;
+    }
+
+    .notif-template-picker {
+        margin: 24px;
+        border-radius: 4px;
+        border: 1px solid @separator;
+
+        .notif-template-picked {
+            display: flex;
+            align-items: stretch;
+
+            .remove-picked {
+                flex-shrink: 0;
+            }
+        }
+    }
+
+    .send-option {
+        margin: 0 24px;
+
+        .option-switch {
+            margin-right: 8px;
+        }
+    }
+
+    .send-footer {
+        margin: 0 24px;
+        margin-top: 16px;
+        text-align: right;
+    }
+}

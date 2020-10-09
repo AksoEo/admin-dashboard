@@ -3,6 +3,7 @@ import { Button } from '@cpsdqs/yamdl';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
 import AKSOScriptEditor from '@tejo/akso-script-editor';
+import CopyIcon from '../../../components/copy-icon';
 import Page from '../../../components/page';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import DetailShell from '../../../components/detail-shell';
@@ -106,6 +107,14 @@ export default connectPerms(class NotifTemplate extends Page {
         const actions = [];
 
         const id = this.id;
+
+        if (perms.hasPerm(`notif_templates.create.${org}`)) {
+            actions.push({
+                icon: <CopyIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.duplicate.menuItem,
+                action: () => this.context.createTask('notifTemplates/duplicate', { id }),
+            });
+        }
 
         if (perms.hasPerm(`notif_templates.update.${org}`)) {
             actions.push({

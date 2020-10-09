@@ -54,6 +54,12 @@ export const notifTemplates = {
         title: '[[Create template]]',
         button: 'Krei',
     },
+    duplicate: {
+        title: '[[Duplicate template]]',
+        menuItem: '[[Duplicate]]',
+        description: '[[This will create a new template with identical data.]]',
+        button: '[[Duplicate]]',
+    },
     update: {
         menuItem: 'Redakti',
         title: '[[Edit template]]',
@@ -62,6 +68,7 @@ export const notifTemplates = {
     delete: {
         menuItem: 'Forigi',
         title: '[[Delete template]]',
+        description: '[[Ĉu vi certas, ke vi volas forigi tiun ĉi x?]]',
         button: 'Forigi',
     },
 };

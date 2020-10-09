@@ -106,6 +106,24 @@ export default {
             </routerContext.Consumer>
         );
     }),
+    duplicate ({ open, task }) {
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        open={open}
+                        onClose={() => task.drop()}
+                        title={locale.duplicate.title}
+                        actionLabel={locale.duplicate.button}
+                        run={() => task.runOnce().then(id => {
+                            routerContext.navigate(`/amasmesaghoj/${id}/redakti`);
+                        })}>
+                        {locale.duplicate.description}
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
     update ({ open, task }) {
         return (
             <TaskDialog
