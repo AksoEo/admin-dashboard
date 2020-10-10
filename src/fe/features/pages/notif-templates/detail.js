@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { Button } from '@cpsdqs/yamdl';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
+import SendIcon from '@material-ui/icons/Send';
 import AKSOScriptEditor from '@tejo/akso-script-editor';
 import CopyIcon from '../../../components/copy-icon';
 import Page from '../../../components/page';
@@ -182,6 +183,16 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
         });
     };
 
+    let intentLink;
+    let onSendIntent;
+
+    if (item.intent === 'codeholder') {
+        intentLink = `/membroj`;
+        onSendIntent = (core) => {
+            core.createTask('notifTemplates/_sendCodeholderInfo');
+        };
+    }
+
     return (
         <div class="notif-template-detail">
             <DynamicHeightDiv useFirstHeight>
@@ -207,6 +218,19 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
                                 {' '}
                                 {locale.preview.button}
                             </LinkButton>
+                            {intentLink && (
+                                <coreContext.Consumer>
+                                    {core => (
+                                        <LinkButton target={intentLink} onClick={() => {
+                                                if (onSendIntent) onSendIntent(core);
+                                            }}>
+                                            <SendIcon style={{ verticalAlign: 'middle' }} />
+                                            {' '}
+                                            {locale.sendIntent}
+                                        </LinkButton>
+                                    )}
+                                </coreContext.Consumer>
+                            )}
                         </div>
                     ) : null}
                 </div>

@@ -41,6 +41,7 @@ export const notifTemplates = {
     intents: {
         codeholder: 'Membro',
     },
+    sendIntent: '[[Send notif]]',
     preview: {
         title: 'Antaŭvido',
         button: 'Antaŭvidi',
@@ -70,6 +71,12 @@ export const notifTemplates = {
         title: '[[Delete template]]',
         description: '[[Ĉu vi certas, ke vi volas forigi tiun ĉi x?]]',
         button: 'Forigi',
+    },
+
+    sendCodeholder: {
+        title: '[[Send codeholder notif]]', // should be short
+        description: '[[To send a codeholder notification, first pick the target codeholders using search and filters, then select "send notification" from the menu in the top right corner.]]',
+        ok: '[[OK]]',
     },
 };
 

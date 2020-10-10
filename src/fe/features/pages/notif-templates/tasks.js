@@ -10,6 +10,7 @@ import { notifTemplates as locale } from '../../../locale';
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import { FIELDS } from './fields';
+import './tasks.less';
 
 const CREATE_FIELDS = ['name', 'subject', 'from'];
 
@@ -147,6 +148,20 @@ export default {
                 actionLabel={locale.delete.button}
                 run={() => task.runOnce()}>
                 {locale.delete.description}
+            </TaskDialog>
+        );
+    },
+
+    _sendCodeholderInfo ({ open, task }) {
+        return (
+            <TaskDialog
+                class="notif-templates-task-send-codeholder-info"
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.sendCodeholder.title}
+                actionLabel={locale.sendCodeholder.ok}
+                run={() => task.drop()}>
+                {locale.sendCodeholder.description}
             </TaskDialog>
         );
     },
