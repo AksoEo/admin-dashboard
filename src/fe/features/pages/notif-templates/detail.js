@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { useState } from 'preact/compat';
 import { Button } from '@cpsdqs/yamdl';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
@@ -16,6 +17,7 @@ import { coreContext } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
 import { FIELDS } from './fields';
 import { getFormVarsForIntent } from './intents';
+import TemplatingPopup, { TemplatingContext } from './templating-popup';
 import './detail.less';
 
 export default connectPerms(class NotifTemplate extends Page {
@@ -175,6 +177,8 @@ function DetailField ({ field, item, editing, onItemChange }) {
 }
 
 function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) {
+    const [templatingContext] = useState(TemplatingContext.create());
+
     const org = <DetailField field="org" item={item} />;
 
     const editScript = () => {
@@ -248,39 +252,46 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
                     }]}
                     script={item.script || {}} />
             </div>
-            <div class="mail-contents">
-                <div class="mail-header">
-                    <div class="mail-sender">
-                        <div class="sender-name">
-                            <DetailField field="fromName" editing={editing} item={item} onItemChange={onItemChange} />
+            <TemplatingContext.Provider value={templatingContext}>
+                <div class="mail-contents">
+                    <DynamicHeightDiv useFirstHeight>
+                        <div class="mail-header">
+                            <div class="mail-sender">
+                                <div class="sender-name">
+                                    <DetailField field="fromName" editing={editing} item={item} onItemChange={onItemChange} />
+                                </div>
+                                <div class="sender-address">
+                                    <DetailField field="from" editing={editing} item={item} onItemChange={onItemChange} />
+                                </div>
+                            </div>
+                            <div class="mail-subject">
+                                <DetailField field="subject" editing={editing} item={item} onItemChange={onItemChange} />
+                            </div>
+                            <div class="mail-reply-to">
+                                {editing ? <div class="reply-to-label">{locale.fields.replyTo}</div> : null}
+                                <DetailField field="replyTo" editing={editing} item={item} onItemChange={onItemChange} />
+                            </div>
                         </div>
-                        <div class="sender-address">
-                            <DetailField field="from" editing={editing} item={item} onItemChange={onItemChange} />
-                        </div>
-                    </div>
-                    <div class="mail-subject">
-                        <DetailField field="subject" editing={editing} item={item} onItemChange={onItemChange} />
-                    </div>
-                    <div class="mail-reply-to">
-                        {editing ? <div class="reply-to-label">{locale.fields.replyTo}</div> : null}
-                        <DetailField field="replyTo" editing={editing} item={item} onItemChange={onItemChange} />
+                    </DynamicHeightDiv>
+                    <div class="mail-body">
+                        {item.base === 'raw' ? (
+                            <div class="mail-body-raw">
+                                <div class="body-type-banner">{locale.fields.html}</div>
+                                <DetailField field="html" editing={editing} item={item} onItemChange={onItemChange} />
+                                <div class="body-type-banner">{locale.fields.text}</div>
+                                <DetailField field="text" editing={editing} item={item} onItemChange={onItemChange} />
+                            </div>
+                        ) : (
+                            <div class="mail-body-modules">
+                                <DetailField field="modules" editing={editing} item={item} onItemChange={onItemChange} />
+                            </div>
+                        )}
                     </div>
                 </div>
-                <div class="mail-body">
-                    {item.base === 'raw' ? (
-                        <div class="mail-body-raw">
-                            <div class="body-type-banner">{locale.fields.html}</div>
-                            <DetailField field="html" editing={editing} item={item} onItemChange={onItemChange} />
-                            <div class="body-type-banner">{locale.fields.text}</div>
-                            <DetailField field="text" editing={editing} item={item} onItemChange={onItemChange} />
-                        </div>
-                    ) : (
-                        <div class="mail-body-modules">
-                            <DetailField field="modules" editing={editing} item={item} onItemChange={onItemChange} />
-                        </div>
-                    )}
-                </div>
-            </div>
+                <TemplatingPopup
+                    item={item}
+                    editing={editing} />
+            </TemplatingContext.Provider>
         </div>
     );
 }

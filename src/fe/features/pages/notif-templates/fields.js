@@ -1,8 +1,9 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Button, TextField } from '@cpsdqs/yamdl';
-import SubjectIcon from '@material-ui/icons/Subject';
-import InsertPhotoIcon from '@material-ui/icons/InsertPhoto';
+import PostAddIcon from '@material-ui/icons/PostAdd';
+import PhotoIcon from '@material-ui/icons/Photo';
+import AddPhotoIcon from '@material-ui/icons/AddPhotoAlternate';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CodeMirror from 'codemirror';
 import { Controlled as RCodeMirror } from 'react-codemirror2';
@@ -18,6 +19,7 @@ import RearrangingList from '../../../components/rearranging-list';
 import { connect } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
 import { getFormVarsForIntent } from './intents';
+import { TemplatingContext } from './templating-popup';
 import './fields.less';
 
 CodeMirror.defineMode('akso-notif-template', () => ({
@@ -111,6 +113,7 @@ export const FIELDS = {
         },
     },
     from: {
+        wantsCreationLabel: true,
         component ({ value, editing, onChange, item }) {
             if (editing) {
                 return <DomainEmailEditor
@@ -151,22 +154,11 @@ export const FIELDS = {
         shouldHide: item => item.base !== 'raw',
         component ({ value, editing, onChange, item }) {
             if (editing) {
-                return <RCodeMirror
+                return <TemplatedCodeMirror
+                    mode="text/html"
+                    item={item}
                     value={value}
-                    editorDidMount={editor => {
-                        editor.addOverlay('akso-notif-template');
-                    }}
-                    options={{
-                        mode: 'text/html',
-                        theme: 'akso',
-                        lineNumbers: true,
-                        indentWithTabs: true,
-                        indentUnit: 4,
-                        matchBrackets: true,
-                        lineWrapping: true,
-                    }}
-                    onChange={cmValidateTemplate(item)}
-                    onBeforeChange={(editor, data, value) => onChange(value)} />;
+                    onChange={onChange} />;
             }
 
             if (!value) return <div class="mail-body-html is-empty">{locale.raw.noHtmlVersion}</div>;
@@ -181,22 +173,11 @@ export const FIELDS = {
         shouldHide: item => item.base !== 'raw',
         component ({ value, editing, onChange, item }) {
             if (editing) {
-                return <RCodeMirror
+                return <TemplatedCodeMirror
+                    mode="text/plain"
+                    item={item}
                     value={value}
-                    editorDidMount={editor => {
-                        editor.addOverlay('akso-notif-template');
-                    }}
-                    options={{
-                        mode: 'text/plain',
-                        theme: 'akso',
-                        lineNumbers: true,
-                        indentWithTabs: true,
-                        indentUnit: 4,
-                        matchBrackets: true,
-                        lineWrapping: true,
-                    }}
-                    onChange={cmValidateTemplate(item)}
-                    onBeforeChange={(editor, data, value) => onChange(value)} />;
+                    onChange={onChange} />;
             }
             if (!value) return <div class="mail-body-text is-empty">{locale.raw.noTextVersion}</div>;
             return (
@@ -361,10 +342,10 @@ class ModulesEditor extends PureComponent {
             items.push(
                 <div key="~add" class="add-template-module">
                     <Button icon onClick={this.addTextItem}>
-                        <SubjectIcon style={{ verticalAlign: 'middle' }} />
+                        <PostAddIcon style={{ verticalAlign: 'middle' }} />
                     </Button>
                     <Button icon onClick={this.addImageItem}>
-                        <InsertPhotoIcon style={{ verticalAlign: 'middle' }} />
+                        <AddPhotoIcon style={{ verticalAlign: 'middle' }} />
                     </Button>
                 </div>
             );
@@ -544,7 +525,7 @@ class ImageModule extends PureComponent {
                                 <RemoveIcon style={{ verticalAlign: 'middle' }} />
                             </Button>
                         ) : <span />}
-                        <InsertPhotoIcon style={{ verticalAlign: 'middle' }} />
+                        <PhotoIcon style={{ verticalAlign: 'middle' }} />
                     </div>
                     <TextField
                         class="image-field"
@@ -565,7 +546,7 @@ class ImageModule extends PureComponent {
         return (
             <div class="image-module">
                 <div class="image-details">
-                    <InsertPhotoIcon style={{ verticalAlign: 'middle' }} />
+                    <PhotoIcon style={{ verticalAlign: 'middle' }} />
                     <span class="image-alt">{value.alt}</span>
                 </div>
                 <div class="image-source">
@@ -646,3 +627,44 @@ const cmValidateTemplate = item => editor => {
 
     editor.notifTemplatesData = data;
 };
+
+class TemplatedCodeMirror extends PureComponent {
+    static contextType = TemplatingContext;
+
+    editor = null;
+
+    onFocus = () => {
+        this.context.didFocus(this);
+    };
+    onBlur = () => {
+        this.context.didBlur(this);
+    };
+
+    insertString (str) {
+        this.editor.replaceSelection(str);
+    }
+
+    render ({ item, value, onChange, mode }) {
+        return (
+            <RCodeMirror
+                value={value}
+                editorDidMount={editor => {
+                    this.editor = editor;
+                    editor.addOverlay('akso-notif-template');
+                }}
+                onFocus={this.onFocus}
+                onBlur={this.onBlur}
+                options={{
+                    mode,
+                    theme: 'akso',
+                    lineNumbers: true,
+                    indentWithTabs: true,
+                    indentUnit: 4,
+                    matchBrackets: true,
+                    lineWrapping: true,
+                }}
+                onChange={cmValidateTemplate(item)}
+                onBeforeChange={(editor, data, value) => onChange(value)} />
+        );
+    }
+}

@@ -52,6 +52,10 @@ export const notifTemplates = {
         },
     },
 
+    templating: {
+        insertTitle: '[[Insert template construct]]',
+    },
+
     create: {
         title: '[[Create template]]',
         button: 'Krei',

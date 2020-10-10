@@ -22,7 +22,7 @@ export default {
         const createUea = perms.hasPerm('notif_templates.create.uea');
         if (createTejo && createUea) {
             fields.push(
-                <Field key="org">
+                <Field class="org-field" key="org">
                     <Segmented
                         selected={task.parameters.org}
                         onSelect={org => task.update({ org })}>
@@ -38,7 +38,7 @@ export default {
         }
 
         fields.push(
-            <Field key="base">
+            <Field class="base-field" key="base">
                 <Segmented
                     selected={task.parameters.base}
                     onSelect={base => {
@@ -67,6 +67,7 @@ export default {
         fields.push(
             <Field key="intent">
                 <Select
+                    class="intent-picker"
                     value={task.parameters.intent}
                     onChange={intent => task.update({ intent })}
                     items={Object.keys(locale.intents).map(intent => ({
@@ -78,8 +79,13 @@ export default {
 
         for (const id of CREATE_FIELDS) {
             const Component = FIELDS[id].component;
+            let label = null;
+            if (FIELDS[id].wantsCreationLabel) {
+                label = <label class="field-label">{locale.fields[id]}</label>;
+            }
             fields.push(
                 <Field key={id}>
+                    {label}
                     <Component
                         editing slot="create"
                         item={task.parameters}
@@ -94,6 +100,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="notif-templates-task-create"
                         open={open}
                         onClose={() => task.drop()}
                         title={locale.create.title}
