@@ -4,7 +4,7 @@ import { Button, TextField } from '@cpsdqs/yamdl';
 import SubjectIcon from '@material-ui/icons/Subject';
 import InsertPhotoIcon from '@material-ui/icons/InsertPhoto';
 import RemoveIcon from '@material-ui/icons/Remove';
-import 'codemirror';
+import CodeMirror from 'codemirror';
 import { Controlled as RCodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/xml/xml';
@@ -17,7 +17,28 @@ import UeaIcon from '../../../components/uea-icon';
 import RearrangingList from '../../../components/rearranging-list';
 import { connect } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
+import { getFormVarsForIntent } from './intents';
 import './fields.less';
+
+CodeMirror.defineMode('akso-notif-template', () => ({
+    token: stream => {
+        if (stream.match('{{', true)) {
+            // eat template
+            while (true) { // eslint-disable-line no-constant-condition
+                if (stream.match('}}', true)) break;
+                if (!stream.next()) return null;
+            }
+            return 'akso-template';
+        } else {
+            // eat garbage
+            while (true) { // eslint-disable-line no-constant-condition
+                if (stream.match('{{', false)) break;
+                if (!stream.next()) break;
+            }
+            return null;
+        }
+    },
+}));
 
 // TODO: edit templating
 
@@ -58,6 +79,7 @@ export const FIELDS = {
         },
     },
     description: {
+        skipLabel: true,
         component ({ value, editing, onChange }) {
             if (editing) {
                 return <TextArea
@@ -127,13 +149,15 @@ export const FIELDS = {
     },
     html: {
         shouldHide: item => item.base !== 'raw',
-        component ({ value, editing, onChange }) {
+        component ({ value, editing, onChange, item }) {
             if (editing) {
                 return <RCodeMirror
                     value={value}
+                    editorDidMount={editor => {
+                        editor.addOverlay('akso-notif-template');
+                    }}
                     options={{
-                        mode: 'xml',
-                        htmlMode: true,
+                        mode: 'text/html',
                         theme: 'akso',
                         lineNumbers: true,
                         indentWithTabs: true,
@@ -141,6 +165,7 @@ export const FIELDS = {
                         matchBrackets: true,
                         lineWrapping: true,
                     }}
+                    onChange={cmValidateTemplate(item)}
                     onBeforeChange={(editor, data, value) => onChange(value)} />;
             }
 
@@ -154,10 +179,13 @@ export const FIELDS = {
     },
     text: {
         shouldHide: item => item.base !== 'raw',
-        component ({ value, editing, onChange }) {
+        component ({ value, editing, onChange, item }) {
             if (editing) {
                 return <RCodeMirror
                     value={value}
+                    editorDidMount={editor => {
+                        editor.addOverlay('akso-notif-template');
+                    }}
                     options={{
                         mode: 'text/plain',
                         theme: 'akso',
@@ -167,6 +195,7 @@ export const FIELDS = {
                         matchBrackets: true,
                         lineWrapping: true,
                     }}
+                    onChange={cmValidateTemplate(item)}
                     onBeforeChange={(editor, data, value) => onChange(value)} />;
             }
             if (!value) return <div class="mail-body-text is-empty">{locale.raw.noTextVersion}</div>;
@@ -179,8 +208,8 @@ export const FIELDS = {
     },
     modules: {
         shouldHide: item => item.base !== 'inherit',
-        component ({ value, editing, onChange }) {
-            return <ModulesEditor value={value} editing={editing} onChange={onChange} />;
+        component ({ value, editing, onChange, item }) {
+            return <ModulesEditor item={item} value={value} editing={editing} onChange={onChange} />;
         },
     },
 };
@@ -297,7 +326,7 @@ class ModulesEditor extends PureComponent {
         this.props.onChange(value);
     };
 
-    render ({ value, editing, onChange }) {
+    render ({ item: topLevelItem, value, editing, onChange }) {
         if (!value) return null;
         const items = [];
 
@@ -319,6 +348,7 @@ class ModulesEditor extends PureComponent {
             items.push(
                 <div class="template-module" key={key}>
                     <Module
+                        item={topLevelItem}
                         value={item}
                         editing={editing}
                         onChange={onModuleChange}
@@ -385,7 +415,7 @@ function AddButtonIcon (props) {
 }
 
 class TextModule extends PureComponent {
-    render ({ value, editing, onChange, onRemove }) {
+    render ({ item, value, editing, onChange, onRemove }) {
         const columns = [];
         const valueColumns = value.columns || [''];
         for (let i = 0; i < valueColumns.length; i++) {
@@ -393,6 +423,10 @@ class TextModule extends PureComponent {
             columns.push(
                 <MdField
                     key={index}
+                    editorDidMount={editor => {
+                        editor.addOverlay('akso-notif-template');
+                    }}
+                    onCMChange={cmValidateTemplate(item)}
                     rules={['blockquote', 'heading', 'emphasis', 'strikethrough', 'link', 'list', 'table', 'image']}
                     value={valueColumns[index]}
                     editing={editing}
@@ -541,3 +575,74 @@ class ImageModule extends PureComponent {
         );
     }
 }
+
+const HANDLEBARS_CHARACTERS = '#/';
+
+const cmValidateTemplate = item => editor => {
+    const knownVars = new Set();
+    for (const fv of getFormVarsForIntent(item.intent)) knownVars.add('@' + fv.name);
+    if (item.script) for (const k in item.script) knownVars.add(k);
+
+    let data = editor.notifTemplatesData;
+    if (!data) {
+        data = { lineErrors: {} };
+    }
+
+    for (let ln = 0; ln < editor.lineCount(); ln++) {
+        const line = editor.getLine(ln);
+
+        let error = null;
+        let errorRange = null;
+
+        let remaining = line;
+        let ch = 0;
+        while (remaining) {
+            const m = remaining.match(/\{\{(.*?)\}\}/);
+            if (m) {
+                ch += m.index;
+
+                const contents = m[1];
+                if (!HANDLEBARS_CHARACTERS.includes(contents[0])) {
+                    if (!knownVars.has(contents)) {
+                        error = locale.raw.unknownVar(contents);
+                        errorRange = [{ line: ln, ch }, { line: ln, ch: ch + m[0].length }];
+                        break;
+                    }
+                }
+
+                remaining = remaining.substr(m.index + m[0].length);
+                ch += m[0].length;
+            } else {
+                break;
+            }
+        }
+
+        if (data.lineErrors[ln] && data.lineErrors[ln].marking) {
+            data.lineErrors[ln].marking.clear();
+            data.lineErrors[ln].marking = null;
+        }
+
+        if (error && !data.lineErrors[ln]) {
+            const node = document.createElement('div');
+            node.classList.add('json-error-message');
+            const widget = editor.doc.addLineWidget(ln, node);
+            editor.doc.addLineClass(ln, 'background', 'json-error-line');
+
+            data.lineErrors[ln] = { widget, node };
+        } else if (data.lineErrors[ln] && !error) {
+            editor.doc.removeLineClass(ln, 'background', 'json-error-line');
+            data.lineErrors[ln].widget.clear();
+            data.lineErrors[ln] = null;
+        }
+
+
+        if (error) {
+            data.lineErrors[ln].marking = editor.doc.markText(errorRange[0], errorRange[1], {
+                className: 'cm-akso-error',
+            });
+            data.lineErrors[ln].node.textContent = error;
+        }
+    }
+
+    editor.notifTemplatesData = data;
+};

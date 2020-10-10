@@ -30,6 +30,7 @@ export const notifTemplates = {
     raw: {
         noHtmlVersion: '[[Missing html version]]',
         noTextVersion: '[[Missing text version]]',
+        unknownVar: v => `[[Unknown variable “${v}”]]`,
     },
     modules: {
         textButton: '[[Button]]',
@@ -84,7 +85,7 @@ export const notifTemplateIntentExamples = {
     codeholder: {
         id: 1234,
         name: '[[Max Mustermann]]',
-        oldCode: 'abcd', // [[hello]] does this use abcd-e or abcd?
+        oldCode: 'abcd-l',
         newCode: 'abcdef',
         codeholderType: 'human',
         hasPassword: true,

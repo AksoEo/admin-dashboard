@@ -222,8 +222,8 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
                                 <coreContext.Consumer>
                                     {core => (
                                         <LinkButton target={intentLink} onClick={() => {
-                                                if (onSendIntent) onSendIntent(core);
-                                            }}>
+                                            if (onSendIntent) onSendIntent(core);
+                                        }}>
                                             <SendIcon style={{ verticalAlign: 'middle' }} />
                                             {' '}
                                             {locale.sendIntent}

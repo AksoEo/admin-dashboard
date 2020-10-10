@@ -40,6 +40,7 @@ function orderPortalContainerFront () {
 /// - rules: list of enabled rules
 /// - inline: if true, will try to style it without line breaks
 /// - singleLine: if true, will not allow line breaks
+/// - editorDidMount, onCMChange: forwarded to codeMirror
 export default class MarkdownTextField extends PureComponent {
     static contextType = layoutContext;
 
@@ -81,6 +82,7 @@ export default class MarkdownTextField extends PureComponent {
     #onEditorMount = editor => {
         this.editor = editor;
         this.#document.current = this.editor.doc;
+        if (this.props.editorDidMount) this.props.editorDidMount(editor);
     };
 
     #onFocus = () => {
@@ -199,6 +201,7 @@ export default class MarkdownTextField extends PureComponent {
                         onChange={onChange}
                         singleLine={singleLine}
                         disabled={disabled}
+                        onCMChange={this.props.onCMChange}
                         onMount={this.#onEditorMount}
                         onFocus={this.#onFocus}
                         onBlur={this.#onBlur} />
@@ -319,7 +322,7 @@ class EditorBarPortal extends PureComponent {
     }
 }
 
-function InnerEditor ({ value, onChange, disabled, singleLine, onMount, onFocus, onBlur }) {
+function InnerEditor ({ value, onChange, disabled, singleLine, onMount, onFocus, onBlur, onCMChange }) {
     return (
         <RCodeMirror
             value={value}
@@ -336,6 +339,7 @@ function InnerEditor ({ value, onChange, disabled, singleLine, onMount, onFocus,
             editorDidMount={onMount}
             onFocus={onFocus}
             onBlur={onBlur}
+            onChange={onCMChange}
             onBeforeChange={(editor, data, value) => singleLine
                 ? onChange(value.replace(/\n/g, ''))
                 : onChange(value)} />

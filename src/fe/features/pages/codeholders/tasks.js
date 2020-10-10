@@ -444,7 +444,7 @@ class NotifTemplateMessage extends PureComponent {
         if (loading) {
             contents = [
                 <CircularProgress key={0} small indeterminate />,
-                <span key={1}> {locale.notifTemplates.send.messagePostIndeterminate}</span>
+                <span key={1}> {locale.notifTemplates.send.messagePostIndeterminate}</span>,
             ];
         } else if (total !== null) {
             contents = locale.notifTemplates.send.messagePost(total);

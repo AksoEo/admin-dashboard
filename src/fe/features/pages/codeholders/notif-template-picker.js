@@ -10,10 +10,12 @@ import { notifTemplates, codeholders as locale } from '../../../locale';
 const SELECTED_FIELDS = [
     { id: 'org', sorting: 'none' },
     { id: 'name', sorting: 'asc' },
+    { id: 'description', sorting: 'none' },
 ];
 const REDUCED_FIELDS = {
     org: FIELDS.org,
     name: FIELDS.name,
+    description: FIELDS.description,
 };
 
 // TODO: maybe refactor this into a generic component if this is used elsewhere?
