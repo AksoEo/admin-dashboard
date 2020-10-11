@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { createRef, PureComponent } from 'preact/compat';
 import { Button, TextField } from '@cpsdqs/yamdl';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import PhotoIcon from '@material-ui/icons/Photo';
@@ -402,12 +402,9 @@ class TextModule extends PureComponent {
         for (let i = 0; i < valueColumns.length; i++) {
             const index = i;
             columns.push(
-                <MdField
+                <TemplatedMdField
                     key={index}
-                    editorDidMount={editor => {
-                        editor.addOverlay('akso-notif-template');
-                    }}
-                    onCMChange={cmValidateTemplate(item)}
+                    item={item}
                     rules={['blockquote', 'heading', 'emphasis', 'strikethrough', 'link', 'list', 'table', 'image']}
                     value={valueColumns[index]}
                     editing={editing}
@@ -473,24 +470,24 @@ class TextModule extends PureComponent {
                                     {locale.modules.textButton}
                                 </span>
                             </div>
-                            <TextField
+                            <TemplatedTextField
                                 class="button-field"
                                 outline
                                 label={locale.modules.textButtonHref}
                                 type="url"
                                 maxLength={200}
                                 value={value.button.href}
-                                onChange={e => {
-                                    onChange({ ...value, button: { ...value.button, href: e.target.value } });
+                                onChange={href => {
+                                    onChange({ ...value, button: { ...value.button, href } });
                                 }}/>
-                            <TextField
+                            <TemplatedTextField
                                 class="button-field"
                                 outline
                                 label={locale.modules.textButtonLabel}
                                 value={value.button.text}
                                 maxLength={200}
-                                onChange={e => {
-                                    onChange({ ...value, button: { ...value.button, text: e.target.value } });
+                                onChange={text => {
+                                    onChange({ ...value, button: { ...value.button, text } });
                                 }}/>
                         </div>
                     ) : (
@@ -527,18 +524,18 @@ class ImageModule extends PureComponent {
                         ) : <span />}
                         <PhotoIcon style={{ verticalAlign: 'middle' }} />
                     </div>
-                    <TextField
+                    <TemplatedTextField
                         class="image-field"
                         outline
                         label={locale.modules.imageUrl}
                         value={value.url}
-                        onChange={e => onChange({ ...value, url: e.target.value })} />
-                    <TextField
+                        onChange={url => onChange({ ...value, url })} />
+                    <TemplatedTextField
                         class="image-field"
                         outline
                         label={locale.modules.imageAlt}
                         value={value.alt}
-                        onChange={e => onChange({ ...value, alt: e.target.value })} />
+                        onChange={alt => onChange({ ...value, alt })} />
                 </div>
             );
         }
@@ -562,7 +559,9 @@ const HANDLEBARS_CHARACTERS = '#/';
 const cmValidateTemplate = item => editor => {
     const knownVars = new Set();
     for (const fv of getFormVarsForIntent(item.intent)) knownVars.add('@' + fv.name);
-    if (item.script) for (const k in item.script) knownVars.add(k);
+    if (item.script) for (const k in item.script) {
+        if (typeof k === 'string' && !k.startsWith('_')) knownVars.add(k);
+    }
 
     let data = editor.notifTemplatesData;
     if (!data) {
@@ -628,6 +627,36 @@ const cmValidateTemplate = item => editor => {
     editor.notifTemplatesData = data;
 };
 
+class TemplatedTextField extends PureComponent {
+    static contextType = TemplatingContext;
+
+    onFocus = () => {
+        this.context.didFocus(this);
+    };
+    onBlur = () => {
+        this.context.didBlur(this);
+    };
+
+    textField = createRef();
+    insertString (str) {
+        const input = this.textField.current.inputNode;
+
+        this.props.onChange(this.props.value.substr(0, input.selectionStart)
+            + str + this.props.value.substr(input.selectionEnd));
+    }
+
+    render ({ ...props }) {
+        return (
+            <TextField
+                ref={this.textField}
+                onFocus={this.onFocus}
+                onBlur={this.onBlur}
+                {...props}
+                onChange={e => this.props.onChange(e.target.value)} />
+        );
+    }
+}
+
 class TemplatedCodeMirror extends PureComponent {
     static contextType = TemplatingContext;
 
@@ -665,6 +694,37 @@ class TemplatedCodeMirror extends PureComponent {
                 }}
                 onChange={cmValidateTemplate(item)}
                 onBeforeChange={(editor, data, value) => onChange(value)} />
+        );
+    }
+}
+
+class TemplatedMdField extends PureComponent {
+    static contextType = TemplatingContext;
+
+    editor = null;
+
+    onFocus = () => {
+        this.context.didFocus(this);
+    };
+    onBlur = () => {
+        this.context.didBlur(this);
+    };
+
+    insertString (str) {
+        this.editor.replaceSelection(str);
+    }
+
+    render ({ item, ...props }) {
+        return (
+            <MdField
+                editorDidMount={editor => {
+                    editor.addOverlay('akso-notif-template');
+                    this.editor = editor;
+                }}
+                onCMChange={cmValidateTemplate(item)}
+                onFocus={this.onFocus}
+                onBlur={this.onBlur}
+                {...props} />
         );
     }
 }

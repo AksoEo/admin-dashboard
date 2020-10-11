@@ -88,10 +88,12 @@ export default class MarkdownTextField extends PureComponent {
     #onFocus = () => {
         this.setState({ focused: true });
         orderPortalContainerFront();
+        if (this.props.onFocus) this.props.onFocus();
     };
 
     #onBlur = () => {
         this.setState({ focused: false });
+        if (this.props.onBlur) this.props.onBlur();
     };
 
     #onEditorBarPopout = popout => {

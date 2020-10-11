@@ -173,7 +173,9 @@ class ItemsSheet extends PureComponent {
 function Items ({ item, onInsert }) {
     const knownItems = new Set();
     for (const fv of getFormVarsForIntent(item.intent)) knownItems.add(`{{@${fv.name}}}`);
-    if (item.script) for (const k in item.script) knownItems.add(`{{${k}}}`);
+    if (item.script) for (const k in item.script) {
+        if (typeof k === 'string' && !k.startsWith('_')) knownItems.add(`{{${k}}}`);
+    }
 
     const items = [];
     for (const v of knownItems) {
