@@ -2,7 +2,15 @@ import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import * as store from '../store';
-import { fieldsToOrder, fieldDiff, filtersToAPI, addJSONFilter } from '../list';
+import {
+    makeParametersToRequestData,
+    fieldsToOrder,
+    fieldDiff,
+    filtersToAPI,
+    addJSONFilter,
+    makeClientFromAPI,
+    makeClientToAPI,
+} from '../list';
 import { deepMerge } from '../../util';
 
 export const CONGRESSES = 'congresses';
@@ -14,12 +22,14 @@ export const LOCATIONS = 'locations';
 export const PROG_TAGS = 'program_tags';
 export const PROGRAMS = 'programs';
 export const REG_FORM = 'registration_form';
+export const CONGRESS_PARTICIPANTS = 'congress_participants';
 export const SIG_CONGRESSES = '!congresses';
 export const SIG_INSTANCES = '!instances';
 export const SIG_LOC_TAGS = '!location_tags';
 export const SIG_LOCATIONS = '!locations';
 export const SIG_PROG_TAGS = '!program_tags';
 export const SIG_PROGRAMS = '!programs';
+export const SIG_CONGRESS_PARTICIPANTS = '!participants';
 
 const locClientFilters = {
     type: {
@@ -47,6 +57,64 @@ const progClientFilters = {
     },
 };
 
+/// Reads a congress participant's dataId into a string.
+function pReadId (idBuffer) {
+    return Buffer.from(idBuffer).toString('hex');
+}
+// congress participants
+const pClientFields = {
+    dataId: {
+        apiFields: ['dataId'],
+        fromAPI: part => pReadId(part.dataId),
+        toAPI: () => ({}),
+    },
+    codeholderId: 'codeholderId',
+    approved: 'approved',
+    notes: 'notes',
+    price: {
+        apiFields: ['price'],
+        fromAPI: part => part.price,
+        toAPI: () => ({}),
+    },
+    amountPaid: {
+        apiFields: ['amountPaid'],
+        fromAPI: part => part.amountPaid,
+        toAPI: () => ({}),
+    },
+    hasPaidMinimum: {
+        apiFields: ['hasPaidMinimum'],
+        fromAPI: part => part.hasPaidMinimum,
+        toAPI: () => ({}),
+    },
+    isValid: {
+        apiFields: ['isValid'],
+        fromAPI: part => part.isValid,
+        toAPI: () => ({}),
+    },
+    sequenceId: 'sequenceId',
+    cancelledTime: 'cancelledTime',
+    createdTime: {
+        apiFields: ['createdTime'],
+        fromAPI: part => part.createdTime,
+        toAPI: () => ({}),
+    },
+    editedTime: {
+        apiFields: ['editedTime'],
+        fromAPI: part => part.editedTime,
+        toAPI: () => ({}),
+    },
+    data: 'data',
+};
+const pClientFilters = {
+    // TODO
+};
+const pParametersToRequestData = makeParametersToRequestData({
+    clientFields: pClientFields,
+    clientFilters: pClientFilters,
+    idFieldName: 'dataId',
+});
+const pClientFromAPI = makeClientFromAPI(pClientFields);
+const pClientToAPI = makeClientToAPI(pClientFields);
 
 // FIXME: needs a lot more DRY
 
@@ -547,7 +615,7 @@ export const tasks = {
         store.signal([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, program, SIG_PROG_TAGS]);
     },
 
-    // MARK - registration
+    // MARK - registration form
     registrationForm: async ({ congress, instance }) => {
         const client = await asyncClient;
         let res;
@@ -571,6 +639,75 @@ export const tasks = {
         const client = await asyncClient;
         await client.put(`/congresses/${congress}/instances/${instance}/registration_form`, data);
         store.insert([CONGRESSES, congress, INSTANCES, instance, REG_FORM], data);
+    },
+
+    // MARK - participants
+    listParticipants: async ({ congress, instance }, parameters) => {
+        const client = await asyncClient;
+        const { options, usedFilters, transientFields } = pParametersToRequestData(parameters);
+        const result = await client.get(`/congresses/${congress}/instances/${instance}/participants`, options);
+        const list = result.body;
+        const totalItems = +result.res.headers.get('x-total-items');
+
+        const items = [];
+
+        for (const item of list) {
+            const id = pReadId(item.dataId);
+            const existing = store.get([CONGRESS_PARTICIPANTS, id]);
+            store.insert([CONGRESS_PARTICIPANTS, id], deepMerge(existing, pClientFromAPI(item)));
+            items.push(id);
+        }
+
+        return {
+            items,
+            total: totalItems,
+            transientFields,
+            stats: {
+                time: result.resTime,
+                filtered: usedFilters,
+            },
+        };
+    },
+    createParticipant: async ({ congress, instance }, params) => {
+        const client = await asyncClient;
+        let res;
+        try {
+            res = await client.post(`/congresses/${congress}/instances/${instance}/participants`, pClientToAPI(params));
+        } catch (err) {
+            if (err.statusCode === 409) {
+                throw { code: 'already-registered', message: 'Codeholder already registered' };
+            } else throw err;
+        }
+        const id = res.res.headers.get('x-identifier');
+        store.insert([CONGRESS_PARTICIPANTS, id], params);
+        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_CONGRESS_PARTICIPANTS]);
+        return id;
+    },
+    participant: async ({ congress, instance, id }, { fields }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/congresses/${congress}/instances/${instance}/participants/${id}`, {
+            fields: ['dataId'].concat(fields.flatMap(id => typeof pClientFields[id] === 'string'
+                ? [pClientFields[id]]
+                : pClientFields[id].apiFields)),
+        });
+
+        const existing = store.get([CONGRESS_PARTICIPANTS, id]);
+        store.insert([CONGRESS_PARTICIPANTS, id], deepMerge(existing, pClientFromAPI(res.body)));
+
+        return +id;
+    },
+    updateParticipant: async ({ congress, instance, id }, params) => {
+        const client = await asyncClient;
+        const existing = store.get([CONGRESS_PARTICIPANTS, id]);
+        const diff = fieldDiff(pClientToAPI(existing), pClientToAPI(params));
+        await client.patch(`/congresses/${congress}/instances/${instance}/participants/${id}`, diff);
+        store.insert([CONGRESS_PARTICIPANTS, id], deepMerge(existing, params));
+    },
+    deleteParticipant: async ({ congress, instance, id }) => {
+        const client = await asyncClient;
+        await client.delete(`/congresses/${congress}/instances/${instance}/${id}`);
+        store.remove([CONGRESS_PARTICIPANTS, id]);
+        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_CONGRESS_PARTICIPANTS]);
     },
 };
 
@@ -757,6 +894,46 @@ export const views = {
         };
         drop () {
             store.unsubscribe(this.path, this.#onUpdate);
+        }
+    },
+
+    participant: class Participant extends AbstractDataView {
+        constructor (options) {
+            super();
+            const { id, fields } = options;
+            this.id = id;
+            this.fields = fields;
+
+            store.subscribe([CONGRESS_PARTICIPANTS, this.id], this.#onUpdate);
+            const current = store.get([CONGRESS_PARTICIPANTS, this.id]);
+            if (current) setImmediate(this.#onUpdate);
+
+            let shouldFetch = !options.noFetch;
+            if (options.lazyFetch) {
+                shouldFetch = false;
+                for (const field of options.fields) {
+                    if (!current || current[field] === undefined) {
+                        shouldFetch = true;
+                        break;
+                    }
+                }
+            }
+
+            if (shouldFetch) {
+                tasks.participant({ id }, { fields }).catch(err => this.emit('error', err));
+            }
+        }
+
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([CONGRESS_PARTICIPANTS, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([CONGRESS_PARTICIPANTS, this.id]));
+            }
+        };
+
+        drop () {
+            store.unsubscribe([CONGRESS_PARTICIPANTS, this.id], this.#onUpdate);
         }
     },
 

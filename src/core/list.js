@@ -91,6 +91,7 @@ export const makeParametersToRequestData = ({
     handleSearchFields,
     clientFields,
     clientFilters,
+    idFieldName,
 }) => params => {
     const options = {};
     const transientFields = [];
@@ -148,7 +149,8 @@ export const makeParametersToRequestData = ({
     options.fields = fields.flatMap(({ id }) => typeof clientFields[id] === 'string'
         ? clientFields[id]
         : clientFields[id].apiFields);
-    options.fields.push('id'); // also select the ID field
+
+    options.fields.push(idFieldName || 'id'); // also select the ID field
 
     options.offset = params.offset | 0;
     options.limit = params.limit | 0;
