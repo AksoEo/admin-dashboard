@@ -27,7 +27,7 @@ import './detail.less';
 export default connectPerms(class CongressInstancePage extends Page {
     state = {
         edit: null,
-        org: 'meow', // dummy placeholder
+        org: '',
         tz: null,
     };
 
@@ -66,6 +66,7 @@ export default connectPerms(class CongressInstancePage extends Page {
         if (this.props.editing) return null;
         if (this.props.locations) return 'locations';
         if (this.props.programs) return 'programs';
+        if (this.props.participants) return 'participants';
 
         if (this.props.isTopPage) this.props.push('lokoj', true);
         return 'locations';
@@ -75,10 +76,13 @@ export default connectPerms(class CongressInstancePage extends Page {
         this.props.onQueryChange(''); // to prevent crosstalk between the two pages
         if (this.props.locations) this.props.locations.pop(true);
         if (this.props.programs) this.props.programs.pop(true);
+        if (this.props.participants) this.props.participants.pop(true);
         if (tab === 'locations') {
             this.props.push('lokoj', true);
         } else if (tab === 'programs') {
             this.props.push('programeroj', true);
+        } else if (tab === 'participants') {
+            this.props.push('alighintoj', true);
         }
     }
 

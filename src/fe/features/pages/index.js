@@ -206,6 +206,18 @@ export default [
                                                 ],
                                             },
                                             {
+                                                path: 'alighintoj',
+                                                type: 'state',
+                                                state: 'participants',
+                                                paths: [
+                                                    {
+                                                        match: /^([\da-fA-F]+)$/,
+                                                        type: 'stack',
+                                                        component: elazy(() => import(/* webpackChunkName: "congresses-participants" */ './congresses/instances/participants/detail')),
+                                                    },
+                                                ],
+                                            },
+                                            {
                                                 path: 'alighilo',
                                                 type: 'stack',
                                                 component: elazy(() => import(/* webpackChunkName: "congresses-registration" */ './congresses/instances/registration-form')),

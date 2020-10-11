@@ -321,12 +321,13 @@ export const codeholders = {
     },
     notifTemplates: {
         cursedNotice: '[[Golden results will not receive a notification.]]',
+        description: '[[Notifications will be sent to all codeholders according to your current filter, or something.]]',
         menuItem: '[[Send notif]]',
         title: '[[Send notif]]',
         empty: '[[No templates for intent codeholder]]',
         deleteOnComplete: '[[Delete notif template on completion]]',
         send: {
-            button: '[[Send]]',
+            button: '[[Confirmation Step]]',
 
             title: '[[Send notif]]',
             confirm: '[[Send]]',

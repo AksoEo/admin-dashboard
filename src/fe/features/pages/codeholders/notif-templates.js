@@ -87,6 +87,9 @@ const Contents = connectPerms(class Contents extends PureComponent {
                 {lvIsCursed ? <div class="cursed-notice">
                     {locale.notifTemplates.cursedNotice}
                 </div> : null}
+                <p class="templates-description">
+                    {locale.notifTemplates.description}
+                </p>
                 <Suspense fallback={(
                     <div class="notif-template-picker-loading">
                         <CircularProgress indeterminate />

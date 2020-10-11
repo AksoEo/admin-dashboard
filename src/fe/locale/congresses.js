@@ -60,6 +60,7 @@ export const congressInstances = {
     tabs: {
         locations: 'Lokoj',
         programs: 'Programeroj',
+        participants: '[[Participants]]',
     },
     create: {
         menuItem: 'Krei',
