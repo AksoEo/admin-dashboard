@@ -229,6 +229,51 @@ export const congressPrograms = {
     },
 };
 
+export const congressParticipants = {
+    title: 'Aliĝintoj',
+    detailTitle: 'Aliĝinto',
+    search: {
+        placeholders: {
+            notes: 'Serĉi notoj',
+        },
+        filters: {
+            // TODO
+        },
+    },
+    fields: {
+        dataId: '[[DataId]]',
+        codeholderId: 'Membro',
+        approved: '[[Approved]]',
+        notes: 'Notoj',
+        price: '[[Price]]',
+        paid: '[[Paid]]', // amountPaid + hasPaidMinimum
+        isValid: '[[Valid]]',
+        sequenceId: '[[SeqId]]',
+        cancelledTime: '[[Cancelled]]',
+        createdTime: '[[Created]]',
+        editedTime: '[[Last Edited]]',
+        data: '[[Data]]',
+
+        codeholderIdViewCodeholder: 'Vidi membron',
+        hasPaidMinimumDescription: '[[Participant has paid minimum]]',
+    },
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei aliĝinton',
+        button: 'Krei',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti aliĝinton',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi aliĝinton',
+        button: 'Forigi',
+        description: '[[Are you sure you don’t want to cancel the registration instead? ]] kaj vi certas, ke vi volas forigi la aliĝinton? Ne eblas malfari tiun ĉi agon.',
+    },
+};
 
 export const congressRegistrationForm = {
     title: 'Aliĝilo',
@@ -247,3 +292,4 @@ export const congressRegistrationForm = {
         description: 'Ĉu vi certas, ke vi volas forigi la aliĝilon? Ne eblas malfari tiun ĉi agon.',
     },
 };
+

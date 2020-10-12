@@ -293,7 +293,7 @@ export default class OverviewList extends PureComponent {
             // finally, push user fields
             for (const field of selectedFields) if (!field.fixed) compiledFields.push(field);
 
-            compiledFields = compiledFields.filter(({ id }) => !fields[id].hide);
+            compiledFields = compiledFields.filter(({ id }) => fields[id] && !fields[id].hide);
 
             const setFieldSorting = !!onSetFields && ((id, sorting) => {
                 const newFields = selectedFields.slice();

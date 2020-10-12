@@ -76,14 +76,9 @@ const pClientFields = {
         fromAPI: part => part.price,
         toAPI: () => ({}),
     },
-    amountPaid: {
-        apiFields: ['amountPaid'],
-        fromAPI: part => part.amountPaid,
-        toAPI: () => ({}),
-    },
-    hasPaidMinimum: {
-        apiFields: ['hasPaidMinimum'],
-        fromAPI: part => part.hasPaidMinimum,
+    paid: {
+        apiFields: ['amountPaid', 'hasPaidMinimum'],
+        fromAPI: part => ({ amount: part.amountPaid, hasPaidMinimum: part.hasPaidMinimum }),
         toAPI: () => ({}),
     },
     isValid: {
@@ -620,12 +615,27 @@ export const tasks = {
         const client = await asyncClient;
         let res;
         try {
-            res = await client.get(`/congresses/${congress}/instances/${instance}/registration_form`);
+            res = await client.get(`/congresses/${congress}/instances/${instance}/registration_form`, {
+                fields: [
+                    'allowUse',
+                    'allowGuests',
+                    'editable',
+                    'cancellable',
+                    'manualApproval',
+                    'sequenceIds.startAt',
+                    'sequenceIds.requireValid',
+                    'price.var',
+                    'price.currency',
+                    'price.minUpfront',
+                    'form',
+                ],
+            });
         } catch (err) {
             if (err.statusCode === 404) {
                 store.insert([CONGRESSES, congress, INSTANCES, instance, REG_FORM], null);
                 return null;
             }
+            throw err;
         }
         store.insert([CONGRESSES, congress, INSTANCES, instance, REG_FORM], res.body);
         return res.body;
@@ -900,7 +910,7 @@ export const views = {
     participant: class Participant extends AbstractDataView {
         constructor (options) {
             super();
-            const { id, fields } = options;
+            const { congress, instance, id, fields } = options;
             this.id = id;
             this.fields = fields;
 
@@ -920,7 +930,7 @@ export const views = {
             }
 
             if (shouldFetch) {
-                tasks.participant({ id }, { fields }).catch(err => this.emit('error', err));
+                tasks.participant({ congress, instance, id }, { fields }).catch(err => this.emit('error', err));
             }
         }
 
@@ -945,4 +955,5 @@ export const views = {
     sigProgramTags: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROG_TAGS]),
     sigPrograms: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS]),
     sigTagsOfProgram: createStoreObserver(({ congress, instance, program }) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, program, SIG_PROG_TAGS]),
+    sigParticipants: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_CONGRESS_PARTICIPANTS]),
 };

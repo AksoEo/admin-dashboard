@@ -214,6 +214,13 @@ export default [
                                                         match: /^([\da-fA-F]+)$/,
                                                         type: 'stack',
                                                         component: elazy(() => import(/* webpackChunkName: "congresses-participants" */ './congresses/instances/participants/detail')),
+                                                        paths: [
+                                                            {
+                                                                path: 'redakti',
+                                                                type: 'state',
+                                                                state: 'editing',
+                                                            },
+                                                        ],
                                                     },
                                                 ],
                                             },

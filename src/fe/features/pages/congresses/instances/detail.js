@@ -17,10 +17,12 @@ import {
     congressInstances as locale,
     congressLocations as locationLocale,
     congressPrograms as programLocale,
+    congressParticipants as participantLocale,
 } from '../../../../locale';
 import { FIELDS } from './fields';
 import Locations from './locations';
 import Programs from './programs';
+import Participants from './participants';
 import MapPicker from '../map-picker';
 import './detail.less';
 
@@ -99,7 +101,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                     label: locationLocale.create.menuItem,
                     action: () => this.context.createTask('congresses/createLocation', { congress, instance: id }),
                 });
-            } else {
+            } else if (tab === 'programs') {
                 actions.push({
                     key: 'programs',
                     icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
@@ -109,6 +111,13 @@ export default connectPerms(class CongressInstancePage extends Page {
                         instance: id,
                         tz: this.state.tz,
                     }),
+                });
+            } else if (tab === 'participants') {
+                actions.push({
+                    key: 'participants',
+                    icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                    label: participantLocale.create.menuItem,
+                    action: () => this.context.createTask('congresses/createParticipant', { congress, instance: id }),
                 });
             }
             actions.push({
@@ -168,6 +177,14 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 push={this.props.push} />}
                             {!editing && (tab === 'programs') && <Programs
                                 key="programs"
+                                congress={congress}
+                                org={org}
+                                instance={id}
+                                query={query}
+                                onQueryChange={onQueryChange}
+                                push={this.props.push} />}
+                            {!editing && (tab === 'participants') && <Participants
+                                key="participants"
                                 congress={congress}
                                 org={org}
                                 instance={id}
