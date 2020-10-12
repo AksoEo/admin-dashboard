@@ -1,6 +1,8 @@
 import { h } from 'preact';
+import { Button } from '@cpsdqs/yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import CopyIcon from '../../../../../components/copy-icon';
 import { IdUEACode } from '../../../../../components/data/uea-code';
 import { LinkButton } from '../../../../../router';
 import { currencyAmount, timestamp } from '../../../../../components/data';
@@ -10,7 +12,20 @@ import './fields.less';
 export const FIELDS = {
     dataId: {
         component ({ value }) {
-            return <span class="congress-participant-data-id">{value}</span>;
+            return (
+                <span class="congress-participant-data-id">
+                    <span class="inner-data-id">{value}</span>
+
+                    {navigator.clipboard && navigator.clipboard.writeText ? (
+                        <Button class="id-copy-button" icon small onClick={() => {
+                            navigator.clipboard.writeText(value).catch(console.error); // eslint-disable-line no-console
+                            // TODO: create toast
+                        }}>
+                            <CopyIcon style={{ verticalAlign: 'middle' }} />
+                        </Button>
+                    ) : null}
+                </span>
+            );
         },
     },
     codeholderId: {

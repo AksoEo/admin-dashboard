@@ -77,7 +77,35 @@ const iClientFields = {
     customerNotes: 'customerNotes',
     foreignId: 'foreignId',
     stripePaymentIntentId: 'stripePaymentIntentId',
-    purposes: 'purposes',
+    purposes: {
+        apiFields: ['purposes'],
+        fromAPI: intent => {
+            if (!intent.purposes) return undefined;
+            const purposes = [];
+            for (const apiPurpose of intent.purposes) {
+                let purpose = apiPurpose;
+                if (purpose.type === 'trigger') {
+                    purpose = {
+                        ...apiPurpose,
+                        dataId: Buffer.from(purpose.dataId).toString('hex'),
+                    };
+                }
+                purposes.push(purpose);
+            }
+            return purposes;
+        },
+        toAPI: purposes => {
+            const apiPurposes = [];
+            for (const purpose of purposes) {
+                let apiPurpose = purpose;
+                if (purpose.type === 'trigger') {
+                    apiPurpose = { ...purpose, dataId: Buffer.from(purpose.dataId, 'hex') };
+                }
+                apiPurposes.push(apiPurpose);
+            }
+            return { purposes: apiPurposes };
+        },
+    },
     totalAmount: {
         apiFields: ['totalAmount'],
         fromAPI: intent => intent.totalAmount,

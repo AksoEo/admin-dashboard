@@ -331,9 +331,11 @@ export const paymentIntents = {
             description: 'Priskribo',
         },
         noAddons: '[[This org has no addons]]',
-        triggers: {
-            congress_registration: '[[Congress registration]]',
-        },
+        dataId: '[[DataId]]',
+        invalidDataId: '[[Invalid data id]]',
+    },
+    triggers: {
+        congress_registration: '[[Congress registration]]',
     },
     create: {
         menuItem: 'Krei',

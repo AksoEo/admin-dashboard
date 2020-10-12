@@ -237,6 +237,7 @@ const PaymentOrgName = connect(({ id }) => ['payments/org', {
 function Purpose ({ purpose, item }) {
     let title = '';
     let description = '';
+    let trigger = null;
 
     if (purpose.type === 'trigger' || purpose.type === 'manual') {
         title = purpose.title;
@@ -245,6 +246,10 @@ function Purpose ({ purpose, item }) {
         if (!purpose.paymentAddon) return null;
         title = purpose.paymentAddon.name;
         description = purpose.paymentAddon.description;
+    }
+
+    if (purpose.type === 'trigger') {
+        trigger = <PurposeTriggerInfo purpose={purpose} />;
     }
 
     return (
@@ -259,6 +264,7 @@ function Purpose ({ purpose, item }) {
                     {title}
                 </div>
                 <div class="card-description">
+                    {trigger}
                     <MdField
                         rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
                         value={description} />
@@ -269,6 +275,19 @@ function Purpose ({ purpose, item }) {
                     <currencyAmount.renderer value={purpose.amount} currency={item.currency} />
                 </div>
             </div>
+        </div>
+    );
+}
+
+function PurposeTriggerInfo ({ purpose }) {
+    return (
+        <div class="purpose-trigger-info">
+            <span class="purpose-triggers">
+                {locale.triggers[purpose.triggers]}
+            </span>
+            <span class="purpose-data-id">
+                {purpose.dataId}
+            </span>
         </div>
     );
 }

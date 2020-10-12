@@ -212,7 +212,7 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
                                 {locale.purposesPicker.types.trigger}
                             </span>
                             <span class="trigger-type">
-                                {locale.purposesPicker.triggers[value.triggers]}
+                                {locale.triggers[value.triggers]}
                             </span>
                         </div>
                         <div class="purpose-title">{value.title}</div>
@@ -220,6 +220,9 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
                             class="purpose-description"
                             rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
                             value={value.description} />
+                        <div class="purpose-data-id-container">
+                            <span class="purpose-data-id">{value.dataId}</span>
+                        </div>
                     </div>
                     <div class="purpose-amount-container">
                         {amountEditor}
@@ -280,8 +283,8 @@ class AddPurposeDialog extends PureComponent {
         addonOffset: 0,
         manualTitle: '',
         manualDescription: null,
-        triggerType: Object.keys(locale.purposesPicker.triggers)[0],
-        triggerDataId: null,
+        triggerType: Object.keys(locale.triggers)[0],
+        triggerDataId: Buffer.alloc(0),
     };
 
     #add = (id) => {
@@ -305,6 +308,7 @@ class AddPurposeDialog extends PureComponent {
                 description: this.state.manualDescription,
                 triggers: this.state.triggerType,
                 amount: 0,
+                dataId: this.state.triggerDataId.toString('hex'),
             });
         }
         this.props.onClose();
@@ -383,15 +387,35 @@ class AddPurposeDialog extends PureComponent {
                         <Select
                             value={this.state.triggerType}
                             onChange={triggerType => this.setState({ triggerType })}
-                            items={Object.keys(locale.purposesPicker.triggers).map(v => ({
+                            items={Object.keys(locale.triggers).map(v => ({
                                 value: v,
-                                label: locale.purposesPicker.triggers[v],
+                                label: locale.triggers[v],
                             }))} />
                     </Field>
                     {nameField()}
                     {descField()}
                     <Field>
-                        todo: dataId
+                        <Validator
+                            outline
+                            label={locale.purposesPicker.dataId}
+                            component={TextField}
+                            validate={value => {
+                                // 12 bytes = 24 hex chars
+                                if (!value.match(/[0-9a-f]{24}/i)) throw {
+                                    error: locale.purposesPicker.invalidDataId,
+                                };
+                            }}
+                            class="trigger-data-id-field"
+                            value={this.state.triggerDataId.toString('hex')}
+                            onChange={e => {
+                                try {
+                                    const hex = e.target.value;
+                                    this.setState({ triggerDataId: Buffer.from(hex, 'hex') });
+                                } catch {
+                                    // no change
+                                    this.setState({ triggerDataId: this.state.triggerDataId });
+                                }
+                            }} />
                     </Field>
                     <div class="form-footer">
                         <Button raised>
