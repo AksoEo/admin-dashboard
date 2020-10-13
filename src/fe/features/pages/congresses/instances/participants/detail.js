@@ -13,6 +13,7 @@ export default connectPerms(class ParticipantsPage extends Page {
     state = {
         edit: null,
         org: null,
+        registrationForm: null,
     };
 
     static contextType = coreContext;
@@ -32,7 +33,9 @@ export default connectPerms(class ParticipantsPage extends Page {
         }
 
         this.#commitTask = this.context.createTask('congresses/updateParticipant', {
-            id: this.getId(),
+            congress: this.congress,
+            instance: this.instance,
+            id: this.id,
             _changedFields: changedFields,
         }, this.state.edit);
         this.#commitTask.on('success', this.onEndEdit);
@@ -53,7 +56,7 @@ export default connectPerms(class ParticipantsPage extends Page {
         return this.props.match[1];
     }
 
-    render ({ perms, editing }, { org, edit, currency }) {
+    render ({ perms, editing }, { org, edit, registrationForm }) {
         const { congress, instance, id } = this;
 
         const actions = [];
@@ -78,6 +81,9 @@ export default connectPerms(class ParticipantsPage extends Page {
             });
         }
 
+        const currency = registrationForm && registrationForm.price
+            ? registrationForm.price.currency : null;
+
         return (
             <div class="role-page">
                 <Meta
@@ -100,7 +106,7 @@ export default connectPerms(class ParticipantsPage extends Page {
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
                     onDelete={() => this.props.pop()}
-                    userData={{ congress, instance, currency }} />
+                    userData={{ congress, instance, currency, registrationForm }} />
                 <DetailShell
                     /* this is kind of a hack to get the org field */
                     view="congresses/congress"
@@ -115,9 +121,7 @@ export default connectPerms(class ParticipantsPage extends Page {
                     id="irrelevant" // detail shell won't work without one
                     fields={{}}
                     locale={{}}
-                    onData={data => data && this.setState({
-                        currency: data.price ? data.price.currency : null,
-                    })} />
+                    onData={data => this.setState({ registrationForm: data })} />
             </div>
         );
     }

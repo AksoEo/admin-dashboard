@@ -54,6 +54,11 @@ const TYPES = {
                         outline
                         placeholder={item.placeholder}
                         disabled={disabled}
+                        value={value}
+                        onChange={e => {
+                            if (e.target.value) onChange(+e.target.value);
+                            else onChange(null);
+                        }}
                         type="number"
                         step={item.step}
                         min={item.min}
@@ -790,6 +795,9 @@ const SETTINGS = {
                         value: option,
                         label: locale.inputFields.chAutofillFields[option],
                     })))} />
+                <div class="ch-autofill-description">
+                    {locale.inputFields.chAutofillDesc}
+                </div>
             </Setting>
         );
     },

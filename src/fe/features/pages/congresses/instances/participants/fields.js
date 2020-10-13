@@ -1,8 +1,11 @@
 import { h } from 'preact';
-import { Button } from '@cpsdqs/yamdl';
+import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CopyIcon from '../../../../../components/copy-icon';
+import CodeholderPicker from '../../../../../components/codeholder-picker';
+import TextArea from '../../../../../components/text-area';
+import FormEditor from '../../../../../components/form-editor';
 import { IdUEACode } from '../../../../../components/data/uea-code';
 import { LinkButton } from '../../../../../router';
 import { currencyAmount, timestamp } from '../../../../../components/data';
@@ -30,21 +33,42 @@ export const FIELDS = {
     },
     codeholderId: {
         isEmpty: () => false,
-        component ({ value }) {
+        component ({ value, editing, onChange, slot }) {
+            if (editing) {
+                return (
+                    <CodeholderPicker
+                        limit={1}
+                        value={value ? [value] : []}
+                        onChange={value => {
+                            if (value.length) onChange(+value[0]);
+                            else onChange(null);
+                        }} />
+                );
+            }
+
             if (!value) return '—';
             return (
                 <span class="congress-participant-codeholder">
                     <IdUEACode id={value} />
-                    <LinkButton target={`/membroj/${value}`}>
-                        {locale.fields.codeholderIdViewCodeholder}
-                    </LinkButton>
+                    {slot === 'detail' && (
+                        <LinkButton target={`/membroj/${value}`}>
+                            {locale.fields.codeholderIdViewCodeholder}
+                        </LinkButton>
+                    )}
                 </span>
             );
         },
     },
     approved: {
         isEmpty: () => false,
-        component ({ value }) {
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return (
+                    <Checkbox
+                        checked={value}
+                        onChange={onChange} />
+                );
+            }
             if (value) return <CheckIcon style={{ verticalAlign: 'middle' }} />;
             return '—';
         },
@@ -57,7 +81,13 @@ export const FIELDS = {
         },
     },
     notes: {
-        component ({ value }) {
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return (
+                    <TextArea value={value} onChange={onChange} />
+                );
+            }
+
             if (!value) return;
             return (
                 <div>
@@ -87,7 +117,19 @@ export const FIELDS = {
         },
     },
     sequenceId: {
-        component ({ value }) {
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return (
+                    <TextField
+                        type="number"
+                        outline
+                        value={value}
+                        onChange={e => {
+                            if (e.target.value) onChange(+e.target.value);
+                            else onChange(null);
+                        }} />
+                );
+            }
             return value;
         },
     },
@@ -103,9 +145,32 @@ export const FIELDS = {
         },
     },
     cancelledTime: {
-        component ({ value }) {
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return (
+                    <timestamp.editor
+                        outline
+                        value={value}
+                        onChange={onChange} />
+                );
+            }
             if (!value) return '—';
             return <timestamp.renderer value={value * 1000} />;
+        },
+    },
+    data: {
+        component ({ value, editing, onChange, userData }) {
+            return (
+                <div class="participant-form-data">
+                    <FormEditor
+                        skipSettings
+                        skipNonInputs
+                        value={userData.registrationForm}
+                        formData={value}
+                        editingFormData={editing}
+                        onFormDataChange={onChange} />
+                </div>
+            );
         },
     },
 };

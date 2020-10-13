@@ -124,6 +124,8 @@ export default class CodeholderPicker extends Component {
                         limit={this.props.limit}
                         open={canAddMore && addDialogOpen}
                         container={portalContainer}
+                        value={value}
+                        onChange={onChange}
                         onClose={() => this.setState({ addDialogOpen: false })} />
                 </div>
             </div>

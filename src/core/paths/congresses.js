@@ -694,11 +694,25 @@ export const tasks = {
         return id;
     },
     participant: async ({ congress, instance, id }, { fields }) => {
+        const apiFields = ['dataId'];
+        for (const field of fields) {
+            if (field === 'data') {
+                // this is the data field, but it can't be fetched directly
+                // instead, get the registration form and enumerate all subfields
+                let formData = store.get([CONGRESSES, congress, INSTANCES, instance, REG_FORM]);
+                if (!formData) {
+                    formData = await tasks.registrationForm({ congress, instance });
+                }
+                apiFields.push(...formData.form
+                    .filter(item => item.el === 'input')
+                    .map(item => 'data.' + item.name));
+            } else if (typeof pClientFields[field] === 'string') apiFields.push(pClientFields[field]);
+            else apiFields.push(pClientFields[field].apiFields);
+        }
+
         const client = await asyncClient;
         const res = await client.get(`/congresses/${congress}/instances/${instance}/participants/${id}`, {
-            fields: ['dataId'].concat(fields.flatMap(id => typeof pClientFields[id] === 'string'
-                ? [pClientFields[id]]
-                : pClientFields[id].apiFields)),
+            fields: apiFields,
         });
 
         const existing = store.get([CONGRESS_PARTICIPANTS, id]);

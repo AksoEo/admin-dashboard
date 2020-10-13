@@ -15,6 +15,7 @@ import {
     congressLocations as locationLocale,
     congressPrograms as programLocale,
     congressRegistrationForm as regFormLocale,
+    congressParticipants as participantLocale,
     data as dataLocale,
 } from '../../../locale';
 import { connectPerms } from '../../../perms';
@@ -395,6 +396,33 @@ export default {
                 actionLabel={regFormLocale.delete.button}
                 run={() => task.runOnce()}>
                 {regFormLocale.delete.description}
+            </TaskDialog>
+        );
+    },
+
+    updateParticipant ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={participantLocale.update.title}
+                actionLabel={participantLocale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={participantLocale.fields} />
+            </TaskDialog>
+        );
+    },
+    deleteParticipant ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={participantLocale.delete.title}
+                actionLabel={participantLocale.delete.button}
+                run={() => task.runOnce()}>
+                {participantLocale.delete.description}
             </TaskDialog>
         );
     },

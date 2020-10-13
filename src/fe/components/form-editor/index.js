@@ -21,10 +21,14 @@ import './index.less';
 /// - editing: bool
 /// - value: { allowUse, allowGuests, ..., form } object (see API docs)
 /// - onChange: (value) => void callback
+/// - formData/onFormDataChange: optional form data
+/// - editingFormData: set to false to disable
+/// - skipSettings: TEMPORARY for not rendering settings
+/// - skipNonInputs: will not render modules that aren't inputs
 export default class FormEditor extends PureComponent {
     state = {
         /// Form input name -> form input value
-        values: {},
+        formData: {},
     };
 
     openScriptEditor = (defs, options = {}) => new Promise(resolve => {
@@ -113,20 +117,31 @@ export default class FormEditor extends PureComponent {
         window.removeEventListener('resize', this.onResize);
     }
 
-    render ({ value, editing, onChange, additionalVars }, { values }) {
+    render ({ skipSettings, skipNonInputs, value, editing, onChange, additionalVars, editingFormData }) {
         if (!value) return null;
+
+        // TODO: properly disable inputs if not editingFormData
+
+        const formData = this.props.formData || this.state.formData;
 
         return (
             <div class="form-editor">
                 <ScriptContext.Provider value={this.scriptContext}>
                     <FormEditorItems
+                        skipSettings={skipSettings}
+                        skipNonInputs={skipNonInputs}
                         editing={editing}
                         settings={value}
                         onSettingsChange={onChange}
                         items={value.form}
                         onItemsChange={form => onChange({ ...value, form })}
-                        values={values}
-                        onValuesChange={values => this.setState({ values })}
+                        values={formData}
+                        onValuesChange={values => {
+                            if (this.props.onFormDataChange) {
+                                if (!editingFormData) return;
+                                this.props.onFormDataChange(values);
+                            } else this.setState({ formData });
+                        }}
                         additionalVars={additionalVars} />
                 </ScriptContext.Provider>
             </div>
@@ -184,7 +199,7 @@ class FormEditorItems extends PureComponent {
 
     render ({
         editing, settings, onSettingsChange, items, onItemsChange, values, onValuesChange,
-        additionalVars,
+        additionalVars, skipSettings, skipNonInputs,
     }, { editingItem }) {
         const listItems = [];
         const previousNodes = [getGlobalDefs(additionalVars)];
@@ -192,31 +207,33 @@ class FormEditorItems extends PureComponent {
             const index = i;
             const key = this.getItemKey(index);
             const name = items[i].name || '???';
-            listItems.push(
-                <FormEditorItem
-                    key={key}
-                    editable={editing}
-                    previousNodes={previousNodes.slice()}
-                    editing={editing && (editingItem === key)}
-                    onEditingChange={editing => {
-                        if (editing) this.setState({ editingItem: key });
-                        else if (editingItem === key) this.setState({ editingItem: null });
-                    }}
-                    item={items[index]}
-                    onChange={item => {
-                        const newItems = items.slice();
-                        newItems[index] = item;
-                        onItemsChange(newItems);
-                    }}
-                    value={values[name]}
-                    onValueChange={value => {
-                        onValuesChange({
-                            ...values,
-                            [name]: value,
-                        });
-                    }}
-                    onRemove={() => this.removeItem(i)} />
-            );
+            if (!skipNonInputs || items[i].el === 'input') {
+                listItems.push(
+                    <FormEditorItem
+                        key={key}
+                        editable={editing}
+                        previousNodes={previousNodes.slice()}
+                        editing={editing && (editingItem === key)}
+                        onEditingChange={editing => {
+                            if (editing) this.setState({ editingItem: key });
+                            else if (editingItem === key) this.setState({ editingItem: null });
+                        }}
+                        item={items[index]}
+                        onChange={item => {
+                            const newItems = items.slice();
+                            newItems[index] = item;
+                            onItemsChange(newItems);
+                        }}
+                        value={values[name]}
+                        onValueChange={value => {
+                            onValuesChange({
+                                ...values,
+                                [name]: value,
+                            });
+                        }}
+                        onRemove={() => this.removeItem(i)} />
+                );
+            }
             previousNodes.push(getAscDefs(items[i], values[name]));
         }
 
@@ -233,11 +250,13 @@ class FormEditorItems extends PureComponent {
 
         return (
             <div class="form-editor-items">
-                <FormEditorSettings
-                    editing={editing}
-                    value={settings}
-                    onChange={onSettingsChange}
-                    previousNodes={previousNodes} />
+                {!skipSettings && (
+                    <FormEditorSettings
+                        editing={editing}
+                        value={settings}
+                        onChange={onSettingsChange}
+                        previousNodes={previousNodes} />
+                )}
                 <RearrangingList
                     spacing={16}
                     isItemDraggable={index => editing && index < items.length}
