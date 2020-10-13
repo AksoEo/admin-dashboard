@@ -101,7 +101,24 @@ const pClientFields = {
     data: 'data',
 };
 const pClientFilters = {
-    // TODO
+    approval: {
+        toAPI: approval => ({ approved: approval === 'true' ? true : false }),
+    },
+    createdTime: {
+        toAPI: range => ({ createdTime: { $range: range } }),
+    },
+    amountPaid: {
+        toAPI: range => ({ amountPaid: { $range: range } }),
+    },
+    hasPaidMinimum: {
+        toAPI: hasPaid => ({ hasPaidMinimum: hasPaid }),
+    },
+    validity: {
+        toAPI: validity => ({ isValid: validity === 'true' ? true : false }),
+    },
+    data: {
+        toAPI: data => data,
+    },
 };
 const pParametersToRequestData = makeParametersToRequestData({
     clientFields: pClientFields,

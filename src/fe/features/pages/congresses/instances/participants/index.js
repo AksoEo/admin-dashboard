@@ -6,8 +6,7 @@ import OverviewList from '../../../../../components/overview-list';
 import DetailShell from '../../../../../components/detail-shell';
 import { congressParticipants as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
-
-const FILTERS = {}; // TODO
+import { FILTERS } from './filters';
 
 export default class ParticipantsView extends PureComponent {
     state = {
@@ -40,21 +39,14 @@ export default class ParticipantsView extends PureComponent {
     #currentQuery = '';
 
     decodeURLQuery () {
-        if (!this.props.query) {
-            this.setState({ listView: false });
-        } else {
-            this.setState({
-                listView: true,
-                parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
-            });
-        }
+        this.setState({
+            parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
+        });
         this.#currentQuery = this.props.query;
     }
 
     encodeURLQuery () {
-        const encoded = this.state.listView
-            ? encodeURLQuery(this.state.parameters, FILTERS)
-            : '';
+        const encoded = encodeURLQuery(this.state.parameters, FILTERS);
         if (encoded === this.#currentQuery) return;
         this.#currentQuery = encoded;
         this.props.onQueryChange(encoded);
@@ -69,8 +61,7 @@ export default class ParticipantsView extends PureComponent {
         if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
             this.decodeURLQuery();
         }
-        if (prevState.parameters !== this.state.parameters
-            || prevState.listView !== this.state.listView) {
+        if (prevState.parameters !== this.state.parameters) {
             this.encodeURLQuery();
         }
     }
@@ -94,7 +85,7 @@ export default class ParticipantsView extends PureComponent {
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     inputRef={view => this.#searchInput = view}
-                    userData={{ congress, instance }} />
+                    userData={{ congress, instance, currency }} />
                 <OverviewList
                     expanded={expanded}
                     useDeepCmp options={{ congress, instance }}

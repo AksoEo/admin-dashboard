@@ -237,7 +237,29 @@ export const congressParticipants = {
             notes: 'Serĉi notoj',
         },
         filters: {
-            // TODO
+            approval: '[[Approval]]',
+            approvalTypes: {
+                true: '[[approved]]',
+                false: '[[not approved]]',
+                none: 'ne gravas',
+            },
+            validity: '[[Validity]]',
+            validityTypes: {
+                true: '[[valid]]',
+                false: '[[not valid]]',
+                none: 'ne gravas',
+            },
+            createdTime: '[[Creation Time]]',
+            timeRangeStart: '[[Start Time]]',
+            timeRangeEnd: '[[End Time]]',
+            amountPaid: '[[Amount Paid]]',
+            hasPaidMinimum: '[[Has Paid Minimum]]',
+            paidMinimumTypes: {
+                true: '[[did pay]]',
+                false: '[[did not]]',
+                none: 'ne gravas',
+            },
+            data: '[[Data]]',
         },
     },
     fields: {
