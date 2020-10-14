@@ -100,6 +100,7 @@ const pClientFields = {
     },
     data: 'data',
 };
+const DERIVED_PARTICIPANT_FIELDS = ['isValid', 'editedTime'];
 const pClientFilters = {
     approval: {
         toAPI: approval => ({ approved: approval === 'true' ? true : false }),
@@ -743,6 +744,11 @@ export const tasks = {
         const diff = fieldDiff(pClientToAPI(existing), pClientToAPI(params));
         await client.patch(`/congresses/${congress}/instances/${instance}/participants/${id}`, diff);
         store.insert([CONGRESS_PARTICIPANTS, id], deepMerge(existing, params));
+
+        // reload properties with values calculated on the server
+        tasks.participant({ congress, instance, id }, { fields: DERIVED_PARTICIPANT_FIELDS }).catch(() => {
+            // but if it fails that's not really an issue
+        });
     },
     deleteParticipant: async ({ congress, instance, id }) => {
         const client = await asyncClient;

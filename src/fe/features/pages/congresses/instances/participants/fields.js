@@ -109,7 +109,9 @@ export const FIELDS = {
                     <currencyAmount.renderer value={value.amount} currency={userData.currency} />
                     {value.hasPaidMinimum && (
                         <span class="has-paid-minimum" title={locale.fields.hasPaidMinimumDescription}>
-                            <CheckCircleOutlineIcon style={{ verticalAlign: 'middle' }} />
+                            {locale.fields.hasPaidMinimumShort}
+                            {' '}
+                            <CheckIcon className="check-icon" />
                         </span>
                     )}
                 </span>

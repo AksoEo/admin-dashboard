@@ -1,13 +1,13 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../../components/page';
-import DetailView from '../../../../../components/detail';
 import DetailShell from '../../../../../components/detail-shell';
 import Meta from '../../../../meta';
 import { connectPerms } from '../../../../../perms';
 import { coreContext } from '../../../../../core/connection';
 import { congressParticipants as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
+import './detail.less';
 
 export default connectPerms(class ParticipantsPage extends Page {
     state = {
@@ -83,14 +83,15 @@ export default connectPerms(class ParticipantsPage extends Page {
 
         const currency = registrationForm && registrationForm.price
             ? registrationForm.price.currency : null;
+        const userData = { congress, instance, currency, registrationForm };
 
         return (
-            <div class="role-page">
+            <div class="congress-participant-detail-page">
                 <Meta
                     title={locale.detailTitle}
                     actions={actions} />
 
-                <DetailView
+                <DetailShell
                     view="congresses/participant"
                     options={{
                         congress,
@@ -98,15 +99,21 @@ export default connectPerms(class ParticipantsPage extends Page {
                         fields: Object.keys(FIELDS),
                     }}
                     id={id}
-                    fields={FIELDS}
                     locale={locale}
                     edit={edit}
                     onEditChange={edit => this.setState({ edit })}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    onDelete={() => this.props.pop()}
-                    userData={{ congress, instance, currency, registrationForm }} />
+                    onDelete={() => this.props.pop()}>
+                    {data => (
+                        <DetailContents
+                            editing={editing}
+                            onItemChange={edit => this.setState({ edit })}
+                            item={this.state.edit || data}
+                            userData={userData} />
+                    )}
+                </DetailShell>
                 <DetailShell
                     /* this is kind of a hack to get the org field */
                     view="congresses/congress"
@@ -126,3 +133,134 @@ export default connectPerms(class ParticipantsPage extends Page {
         );
     }
 });
+
+function DetailField ({ field, item, editing, onItemChange, userData }) {
+    const Cmp = FIELDS[field].component;
+    return <Cmp
+        slot="detail"
+        value={item[field]}
+        onChange={v => onItemChange({ ...item, [field]: v })}
+        editing={editing}
+        item={item}
+        onItemChange={onItemChange}
+        userData={userData} />;
+}
+
+function DetailContents ({ item, editing, onItemChange, userData }) {
+    const statusType = item.isValid ? 'valid' : item.cancelledTime ? 'canceled' : 'pending';
+
+    return (
+        <div class="congress-participant-detail">
+            <div class="participant-header">
+                <div class="header-status">
+                    <span class="participation-status" data-status={statusType}>
+                        {locale.fields.statuses[statusType]}
+                    </span>
+                </div>
+                <div class="header-title">
+                    TODO: Participant ID goes here
+                </div>
+                <div class="header-id">
+                    <div class="header-data-id">
+                        <span class="field-label">
+                            {locale.fields.dataId}
+                            {':'}
+                        </span>
+                        {' '}
+                        <DetailField
+                            field="dataId"
+                            item={item}
+                            editing={editing}
+                            onItemChange={onItemChange}
+                            userData={userData} />
+                    </div>
+                    <div class="field-codeholder">
+                        <span class="field-label">
+                            {locale.fields.codeholderId}
+                            {':'}
+                        </span>
+                        {' '}
+                        <DetailField
+                            field="codeholderId"
+                            item={item}
+                            editing={editing}
+                            onItemChange={onItemChange}
+                            userData={userData} />
+                    </div>
+                </div>
+            </div>
+            <div class="participant-payment">
+                <div class="payment-price">
+                    <DetailField
+                        field="price"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+                <div class="payment-details">
+                    <span class="field-label">
+                        {locale.fields.paid}
+                        {': '}
+                    </span>
+                    {' '}
+                    <DetailField
+                        field="paid"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+            </div>
+            <div class="participant-details">
+                <div class="detail-field">
+                    <span class="field-label">{locale.fields.approved}</span>
+                    <DetailField
+                        field="approved"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">{locale.fields.createdTime}</span>
+                    <DetailField
+                        field="createdTime"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">{locale.fields.editedTime}</span>
+                    <DetailField
+                        field="editedTime"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">{locale.fields.cancelledTime}</span>
+                    <DetailField
+                        field="cancelledTime"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+            </div>
+            <div class="participant-data">
+                <div class="data-title">
+                    {locale.fields.data}
+                </div>
+                <DetailField
+                    field="data"
+                    item={item}
+                    editing={editing}
+                    onItemChange={onItemChange}
+                    userData={userData} />
+            </div>
+        </div>
+    );
+}

@@ -276,7 +276,14 @@ export const congressParticipants = {
         editedTime: '[[Last Edited]]',
         data: '[[Data]]',
 
+        statuses: {
+            pending: '[[Pending]]',
+            canceled: '[[Canceled]]',
+            valid: '[[Valid]]',
+        },
+
         codeholderIdViewCodeholder: 'Vidi membron',
+        hasPaidMinimumShort: 'min',
         hasPaidMinimumDescription: '[[Participant has paid minimum]]',
     },
     create: {
