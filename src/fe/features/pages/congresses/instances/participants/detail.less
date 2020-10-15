@@ -1,92 +1,92 @@
 @import '../../../../../prelude';
 
 .congress-participant-detail-page {
-    .congress-participant-detail {
-        padding: 24px;
+    padding: 24px;
+}
 
-        .field-label {
-            font-size: small;
-            font-weight: 600;
+.congress-participant-detail {
+    .field-label {
+        font-size: small;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .participant-header {
+        .participation-status {
             text-transform: uppercase;
-        }
+            font-size: 1.125em;
+            font-weight: 500;
+            letter-spacing: 0.06em;
 
-        .participant-header {
-            .participation-status {
-                text-transform: uppercase;
-                font-size: 1.125em;
-                font-weight: 500;
-                letter-spacing: 0.06em;
-
-                &[data-status="valid"] {
-                    color: @positive;
-                }
-                &[data-status="pending"] {
-                    color: @warning;
-                }
-                &[data-status="canceled"] {
-                    color: @danger;
-                }
+            &[data-status="valid"] {
+                color: @positive;
             }
-
-            .header-title {
-                margin-top: 8px;
-                font-size: 1.5em;
-                font-weight: bold;
+            &[data-status="pending"] {
+                color: @warning;
             }
-
-            .header-id {
-                margin-top: 16px;
-                border-radius: 8px;
-                padding: 8px 16px;
-                background: @text-fade-10;
+            &[data-status="canceled"] {
+                color: @danger;
             }
         }
 
-        .participant-payment, .participant-details {
+        .header-title {
+            margin-top: 8px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .header-id {
             margin-top: 16px;
             border-radius: 8px;
             padding: 8px 16px;
             background: @text-fade-10;
         }
+    }
 
-        .participant-payment {
-            .payment-price {
-                font-size: 1.2em;
-                font-weight: 600;
+    .participant-payment, .participant-details {
+        margin-top: 16px;
+        border-radius: 8px;
+        padding: 8px 16px;
+        background: @text-fade-10;
+    }
+
+    .participant-payment {
+        .payment-price {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+    }
+
+    .participant-details {
+        .detail-field {
+            margin-top: 8px;
+            &:first-of-type {
+                margin-top: 0;
+            }
+
+            .field-label {
+                display: inline-block;
+                min-width: 8em;
+
+                &::after {
+                    content: ': ';
+                }
             }
         }
+    }
 
-        .participant-details {
-            .detail-field {
-                margin-top: 8px;
-                &:first-of-type {
-                    margin-top: 0;
-                }
+    .participant-data {
+        margin-top: 24px;
 
-                .field-label {
-                    display: inline-block;
-                    min-width: 8em;
-
-                    &::after {
-                        content: ': ';
-                    }
-                }
-            }
+        .data-title {
+            padding-left: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
         }
 
-        .participant-data {
-            margin-top: 24px;
-
-            .data-title {
-                padding-left: 16px;
-                font-weight: 600;
-                text-transform: uppercase;
-                margin-bottom: 8px;
-            }
-
-            .form-editor {
-                padding: 0;
-            }
+        .form-editor {
+            padding: 0;
         }
     }
 }

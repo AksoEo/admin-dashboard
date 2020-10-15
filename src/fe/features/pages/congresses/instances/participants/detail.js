@@ -107,7 +107,7 @@ export default connectPerms(class ParticipantsPage extends Page {
                     onCommit={this.onCommit}
                     onDelete={() => this.props.pop()}>
                     {data => (
-                        <DetailContents
+                        <Detail
                             editing={editing}
                             onItemChange={edit => this.setState({ edit })}
                             item={this.state.edit || data}
@@ -146,34 +146,38 @@ function DetailField ({ field, item, editing, onItemChange, userData }) {
         userData={userData} />;
 }
 
-function DetailContents ({ item, editing, onItemChange, userData }) {
+export function Detail ({ item, creating, editing, onItemChange, userData }) {
     const statusType = item.isValid ? 'valid' : item.cancelledTime ? 'canceled' : 'pending';
 
     return (
         <div class="congress-participant-detail">
             <div class="participant-header">
-                <div class="header-status">
-                    <span class="participation-status" data-status={statusType}>
-                        {locale.fields.statuses[statusType]}
-                    </span>
-                </div>
+                {!creating && (
+                    <div class="header-status">
+                        <span class="participation-status" data-status={statusType}>
+                            {locale.fields.statuses[statusType]}
+                        </span>
+                    </div>
+                )}
                 <div class="header-title">
                     TODO: Participant ID goes here
                 </div>
                 <div class="header-id">
-                    <div class="header-data-id">
-                        <span class="field-label">
-                            {locale.fields.dataId}
-                            {':'}
-                        </span>
-                        {' '}
-                        <DetailField
-                            field="dataId"
-                            item={item}
-                            editing={editing}
-                            onItemChange={onItemChange}
-                            userData={userData} />
-                    </div>
+                    {!creating && (
+                        <div class="header-data-id">
+                            <span class="field-label">
+                                {locale.fields.dataId}
+                                {':'}
+                            </span>
+                            {' '}
+                            <DetailField
+                                field="dataId"
+                                item={item}
+                                editing={editing}
+                                onItemChange={onItemChange}
+                                userData={userData} />
+                        </div>
+                    )}
                     <div class="field-codeholder">
                         <span class="field-label">
                             {locale.fields.codeholderId}
@@ -189,29 +193,31 @@ function DetailContents ({ item, editing, onItemChange, userData }) {
                     </div>
                 </div>
             </div>
-            <div class="participant-payment">
-                <div class="payment-price">
-                    <DetailField
-                        field="price"
-                        item={item}
-                        editing={editing}
-                        onItemChange={onItemChange}
-                        userData={userData} />
+            {!creating && (
+                <div class="participant-payment">
+                    <div class="payment-price">
+                        <DetailField
+                            field="price"
+                            item={item}
+                            editing={editing}
+                            onItemChange={onItemChange}
+                            userData={userData} />
+                    </div>
+                    <div class="payment-details">
+                        <span class="field-label">
+                            {locale.fields.paid}
+                            {': '}
+                        </span>
+                        {' '}
+                        <DetailField
+                            field="paid"
+                            item={item}
+                            editing={editing}
+                            onItemChange={onItemChange}
+                            userData={userData} />
+                    </div>
                 </div>
-                <div class="payment-details">
-                    <span class="field-label">
-                        {locale.fields.paid}
-                        {': '}
-                    </span>
-                    {' '}
-                    <DetailField
-                        field="paid"
-                        item={item}
-                        editing={editing}
-                        onItemChange={onItemChange}
-                        userData={userData} />
-                </div>
-            </div>
+            )}
             <div class="participant-details">
                 <div class="detail-field">
                     <span class="field-label">{locale.fields.approved}</span>
@@ -222,28 +228,41 @@ function DetailContents ({ item, editing, onItemChange, userData }) {
                         onItemChange={onItemChange}
                         userData={userData} />
                 </div>
-                <div class="detail-field">
-                    <span class="field-label">{locale.fields.createdTime}</span>
-                    <DetailField
-                        field="createdTime"
-                        item={item}
-                        editing={editing}
-                        onItemChange={onItemChange}
-                        userData={userData} />
-                </div>
-                <div class="detail-field">
-                    <span class="field-label">{locale.fields.editedTime}</span>
-                    <DetailField
-                        field="editedTime"
-                        item={item}
-                        editing={editing}
-                        onItemChange={onItemChange}
-                        userData={userData} />
-                </div>
+                {!creating && (
+                    <div class="detail-field">
+                        <span class="field-label">{locale.fields.createdTime}</span>
+                        <DetailField
+                            field="createdTime"
+                            item={item}
+                            editing={editing}
+                            onItemChange={onItemChange}
+                            userData={userData} />
+                    </div>
+                )}
+                {!creating && (
+                    <div class="detail-field">
+                        <span class="field-label">{locale.fields.editedTime}</span>
+                        <DetailField
+                            field="editedTime"
+                            item={item}
+                            editing={editing}
+                            onItemChange={onItemChange}
+                            userData={userData} />
+                    </div>
+                )}
                 <div class="detail-field">
                     <span class="field-label">{locale.fields.cancelledTime}</span>
                     <DetailField
                         field="cancelledTime"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">{locale.fields.notes}</span>
+                    <DetailField
+                        field="notes"
                         item={item}
                         editing={editing}
                         onItemChange={onItemChange}

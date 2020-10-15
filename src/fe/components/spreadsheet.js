@@ -191,11 +191,13 @@ class RowCell extends PureComponent {
             <div
                 class="spreadsheet-cell"
                 style={{ width: size }}>
-                <CellView
-                    row={row}
-                    column={column}
-                    size={size}
-                    data={data} />
+                <div class="cell-contents">
+                    <CellView
+                        row={row}
+                        column={column}
+                        size={size}
+                        data={data} />
+                </div>
             </div>
         );
     }

@@ -41,10 +41,12 @@ function TimestampEditor ({ label, value, onChange, disabled, error, outline, zo
         return moment.utc(value, format);
     };
 
+    const valueIsNullish = value === null || value === undefined;
+
     const m = applyZone(moment(Number.isFinite(value) ? value * 1000 : value));
 
-    const dateValue = value === null ? null : m.format('YYYY-MM-DD');
-    const timeValue = m.hour() * 3600 + m.minute() * 60 + m.second();
+    const dateValue = valueIsNullish ? null : m.format('YYYY-MM-DD');
+    const timeValue = valueIsNullish ? null : m.hour() * 3600 + m.minute() * 60 + m.second();
 
     return (
         <span class="timestamp-editor">

@@ -81,23 +81,34 @@ export default class SpreadsheetView extends Page {
         }
         return locale.fields[field];
     };
-    cellView = i => {
-        const { congress, instance } = this;
-        const { currency, registrationForm } = this.state;
 
-        const field = this.state.fields[i];
-        if (field.startsWith('data.')) {
-            const dataField = field.substr(5);
-            return ({ data }) => '' + data.data[dataField];
+    cellViewsByField = {};
+    getCellViewForField (field) {
+        if (!this.cellViewsByField[field]) {
+            let view;
+            if (field.startsWith('data.')) {
+                const dataField = field.substr(5);
+                // TODO: better rendering
+                view = ({ data }) => '' + data.data[dataField];
+            } else {
+                const Component = FIELDS[field].component;
+                view = ({ data }) => {
+                    const { congress, instance } = this;
+                    const { currency, registrationForm } = this.state;
+
+                    return <Component
+                        slot="table"
+                        item={data}
+                        value={data[field]}
+                        userData={{ congress, instance, currency, registrationForm }} />;
+                };
+            }
+            this.cellViewsByField[field] = view;
         }
+        return this.cellViewsByField[field];
+    }
 
-        const Component = FIELDS[field].component;
-        return ({ data }) => <Component
-            slot="table"
-            item={data}
-            value={data[field]}
-            userData={{ congress, instance, currency, registrationForm }} />;
-    };
+    cellView = i => this.getCellViewForField(this.state.fields[i]);
 
     initialColumnSize = i => {
         const field = this.state.fields[i];

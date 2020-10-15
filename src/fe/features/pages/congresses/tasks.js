@@ -1,8 +1,9 @@
 import { h } from 'preact';
 import { useEffect, useRef } from 'preact/compat';
-import { TextField } from '@cpsdqs/yamdl';
+import { CircularProgress, TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import { Field, Validator } from '../../../components/form';
+import DetailShell from '../../../components/detail-shell';
 import ChangedFields from '../../../components/changed-fields';
 import Segmented from '../../../components/segmented';
 import TejoIcon from '../../../components/tejo-icon';
@@ -22,6 +23,7 @@ import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import { FIELDS as INSTANCE_FIELDS } from './instances/fields';
 import { DetailInner as LocationEditor } from './instances/locations/detail';
+import { Detail as ParticipantEditor } from './instances/participants/detail';
 import LocationPicker from './instances/location-picker';
 import './tasks.less';
 
@@ -400,6 +402,40 @@ export default {
         );
     },
 
+    createParticipant ({ open, task }) {
+        const { congress, instance } = task.options;
+
+        return (
+            <TaskDialog
+                class="congresses-task-create-participant"
+                open={open}
+                onClose={() => task.drop()}
+                title={participantLocale.create.title}
+                actionLabel={participantLocale.create.button}
+                run={() => task.runOnce()}>
+                <DetailShell
+                    view="congresses/registrationForm"
+                    options={{ congress, instance }}
+                    id="irrelevant" // detail shell won't work without one
+                    fields={{}}
+                    locale={{}}>
+                    {registrationForm => registrationForm ? (
+                        <ParticipantEditor
+                            editing
+                            creating
+                            item={task.parameters}
+                            onItemChange={item => task.update(item)}
+                            userData={{
+                                congress,
+                                instance,
+                                currency: registrationForm.price && registrationForm.currency,
+                                registrationForm,
+                            }} />
+                    ) : <CircularProgress indeterminate />}
+                </DetailShell>
+            </TaskDialog>
+        );
+    },
     updateParticipant ({ open, task }) {
         return (
             <TaskDialog
