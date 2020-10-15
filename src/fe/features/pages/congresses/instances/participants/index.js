@@ -1,5 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
+import { Button } from '@cpsdqs/yamdl';
+import TableIcon from '@material-ui/icons/TableChart';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../../components/list-url-coding';
 import SearchFilters from '../../../../../components/search-filters';
 import OverviewList from '../../../../../components/overview-list';
@@ -7,6 +9,7 @@ import DetailShell from '../../../../../components/detail-shell';
 import { congressParticipants as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
+import './index.less';
 
 export default class ParticipantsView extends PureComponent {
     state = {
@@ -66,10 +69,15 @@ export default class ParticipantsView extends PureComponent {
         }
     }
 
-    render ({ congress, instance }, { parameters, expanded, currency }) {
+    render ({ congress, instance, push }, { parameters, expanded, currency }) {
         // TODO: hide this page if the user does not have permission?
         return (
             <div class="participants-view">
+                <div class="participants-table-view-link">
+                    <Button icon small onClick={() => push('alighintoj/tabelo')}>
+                        <TableIcon />
+                    </Button>
+                </div>
                 <SearchFilters
                     value={parameters}
                     searchFields={[

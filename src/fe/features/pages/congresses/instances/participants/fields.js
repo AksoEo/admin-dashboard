@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
 import CheckIcon from '@material-ui/icons/Check';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CopyIcon from '../../../../../components/copy-icon';
 import CodeholderPicker from '../../../../../components/codeholder-picker';
 import TextArea from '../../../../../components/text-area';
@@ -14,12 +13,13 @@ import './fields.less';
 
 export const FIELDS = {
     dataId: {
-        component ({ value }) {
+        weight: 2,
+        component ({ value, slot }) {
             return (
                 <span class="congress-participant-data-id">
                     <span class="inner-data-id">{value}</span>
 
-                    {navigator.clipboard && navigator.clipboard.writeText ? (
+                    {slot === 'detail' && navigator.clipboard && navigator.clipboard.writeText ? (
                         <Button class="id-copy-button" icon small onClick={() => {
                             navigator.clipboard.writeText(value).catch(console.error); // eslint-disable-line no-console
                             // TODO: create toast
@@ -60,6 +60,7 @@ export const FIELDS = {
         },
     },
     approved: {
+        weight: 0.5,
         isEmpty: () => false,
         component ({ value, editing, onChange }) {
             if (editing) {
@@ -74,6 +75,7 @@ export const FIELDS = {
         },
     },
     isValid: {
+        weight: 0.5,
         isEmpty: () => false,
         component ({ value }) {
             if (value) return <CheckIcon style={{ verticalAlign: 'middle' }} />;
@@ -81,6 +83,7 @@ export const FIELDS = {
         },
     },
     notes: {
+        weight: 2,
         component ({ value, editing, onChange }) {
             if (editing) {
                 return (
@@ -119,6 +122,7 @@ export const FIELDS = {
         },
     },
     sequenceId: {
+        weight: 0.5,
         component ({ value, editing, onChange }) {
             if (editing) {
                 return (
@@ -136,17 +140,20 @@ export const FIELDS = {
         },
     },
     createdTime: {
+        weight: 1.5,
         component ({ value }) {
             return <timestamp.renderer value={value * 1000} />;
         },
     },
     editedTime: {
+        weight: 1.5,
         component ({ value }) {
             if (!value) return '—';
             return <timestamp.renderer value={value * 1000} />;
         },
     },
     cancelledTime: {
+        weight: 1.5,
         component ({ value, editing, onChange }) {
             if (editing) {
                 return (

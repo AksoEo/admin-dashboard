@@ -672,7 +672,24 @@ export const tasks = {
     // MARK - participants
     listParticipants: async ({ congress, instance }, parameters) => {
         const client = await asyncClient;
-        const { options, usedFilters, transientFields } = pParametersToRequestData(parameters);
+
+        // need to remove data.* from fields because these aren't handled client-side
+        const originalFields = parameters.fields;
+        const pFields = [];
+        const dataFields = [];
+        for (const field of originalFields) {
+            if (!field.id.startsWith('data.')) pFields.push(field);
+            else dataFields.push(field.id);
+        }
+
+        const { options, usedFilters, transientFields } = pParametersToRequestData({
+            ...parameters,
+            fields: pFields,
+        });
+
+        // now add them back
+        options.fields.push(...dataFields);
+
         const result = await client.get(`/congresses/${congress}/instances/${instance}/participants`, options);
         const list = result.body;
         const totalItems = +result.res.headers.get('x-total-items');

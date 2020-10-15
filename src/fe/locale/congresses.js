@@ -286,6 +286,9 @@ export const congressParticipants = {
         hasPaidMinimumShort: 'min',
         hasPaidMinimumDescription: '[[Participant has paid minimum]]',
     },
+    spreadsheet: {
+        title: 'Aliĝintoj',
+    },
     create: {
         menuItem: 'Krei',
         title: 'Krei aliĝinton',
