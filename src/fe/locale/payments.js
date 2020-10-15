@@ -148,6 +148,8 @@ export const paymentIntents = {
         org: 'AKSO-Organizo',
         currencies: 'Valutoj',
         status: 'Stato',
+        purposeTrigger: '[[Has Trigger]]',
+        purposeDataId: '[[Triggers DataId]]',
 
         orgs: {
             tejo: 'TEJO',
@@ -165,6 +167,7 @@ export const paymentIntents = {
             disputed: 'disputita',
             refunded: 'mono redonita',
         },
+        purposeTriggerNone: 'ne gravas',
     },
     fields: {
         customer: 'Kliento',

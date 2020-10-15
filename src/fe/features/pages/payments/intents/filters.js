@@ -79,4 +79,41 @@ export const FILTERS = {
                 }))} />;
         },
     },
+    purposeTrigger: {
+        default: () => ({ enabled: false, value: null }),
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            return <Select
+                disabled={hidden}
+                value={value || ''}
+                onChange={value => {
+                    onEnabledChange(!!value);
+                    onChange(value);
+                }}
+                items={[{
+                    value: '',
+                    label: locale.filters.purposeTriggerNone,
+                }].concat(Object.keys(locale.triggers).map(id => ({
+                    value: id,
+                    label: locale.triggers[id],
+                })))} />;
+        },
+    },
+    purposeDataId: {
+        default: () => ({ enabled: false, value: null }),
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            return <TextField
+                outline
+                disabled={hidden}
+                value={value || ''}
+                onChange={e => {
+                    const value = e.target.value;
+                    onEnabledChange(!!value);
+                    onChange(value);
+                }} />;
+        },
+    },
 };

@@ -136,6 +136,12 @@ const iClientFilters = {
     status: {
         toAPI: value => ({ status: value }),
     },
+    purposeTrigger: {
+        toAPI: value => ({ $purposes: { triggers: value } }),
+    },
+    purposeDataId: {
+        toAPI: value => ({ $purposes: { dataId: value } }),
+    },
 };
 
 const iSearchFieldToTransientFields = {
