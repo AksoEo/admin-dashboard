@@ -30,6 +30,7 @@ export const FIELDS = {
                 </span>
             );
         },
+        stringify: v => v,
     },
     codeholderId: {
         isEmpty: () => false,
@@ -58,6 +59,25 @@ export const FIELDS = {
                 </span>
             );
         },
+        stringify (value, item, fields, options, core) {
+            if (!value) return '';
+            return new Promise((resolve, reject) => {
+                const view = core.createDataView('codeholders/codeholder', {
+                    id: value,
+                    fields: ['code'],
+                    lazyFetch: true,
+                });
+                view.on('update', data => {
+                    if (data === null) return;
+                    resolve(data.code.new);
+                    view.drop();
+                });
+                view.on('error', err => {
+                    reject(err);
+                    view.drop();
+                });
+            });
+        },
     },
     approved: {
         weight: 0.5,
@@ -73,6 +93,7 @@ export const FIELDS = {
             if (value) return <CheckIcon style={{ verticalAlign: 'middle' }} />;
             return '—';
         },
+        stringify: v => v,
     },
     isValid: {
         weight: 0.5,
@@ -81,6 +102,7 @@ export const FIELDS = {
             if (value) return <CheckIcon style={{ verticalAlign: 'middle' }} />;
             return '—';
         },
+        stringify: v => v,
     },
     notes: {
         weight: 2,
@@ -98,11 +120,13 @@ export const FIELDS = {
                 </div>
             );
         },
+        stringify: v => v,
     },
     price: {
         component ({ value, userData }) {
             return <currencyAmount.renderer value={value} currency={userData.currency} />;
         },
+        stringify: v => v,
     },
     paid: {
         component ({ value, userData }) {
@@ -119,6 +143,10 @@ export const FIELDS = {
                     )}
                 </span>
             );
+        },
+        stringify: v => {
+            if (!v) return '';
+            return v.amount + (v.hasPaidMinimum ? ` (${locale.fields.hasPaidMinimumShort})` : '');
         },
     },
     sequenceId: {
@@ -138,12 +166,14 @@ export const FIELDS = {
             }
             return value;
         },
+        stringify: v => v,
     },
     createdTime: {
         weight: 1.5,
         component ({ value }) {
             return <timestamp.renderer value={value * 1000} />;
         },
+        stringify: v => v,
     },
     editedTime: {
         weight: 1.5,
@@ -151,6 +181,7 @@ export const FIELDS = {
             if (!value) return '—';
             return <timestamp.renderer value={value * 1000} />;
         },
+        stringify: v => v,
     },
     cancelledTime: {
         weight: 1.5,
@@ -166,6 +197,7 @@ export const FIELDS = {
             if (!value) return '—';
             return <timestamp.renderer value={value * 1000} />;
         },
+        stringify: v => v,
     },
     data: {
         component ({ value, editing, onChange, userData }) {

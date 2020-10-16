@@ -3,6 +3,7 @@ import { PureComponent, Fragment } from 'preact/compat';
 import { Dialog, Button, LinearProgress } from '@cpsdqs/yamdl';
 import stringify from 'csv-stringify';
 import { coreContext } from '../core/connection';
+import DisplayError from './error';
 import Select from './select';
 import Segmented from './segmented';
 import { csvExport as locale } from '../locale';
@@ -17,6 +18,8 @@ const LIMIT = 100;
 /// - task: task name
 /// - options: current task options
 /// - parameters: current task parameters. Is expected to confirm
+/// - detailView: view name
+/// - detailViewOptions: id => options
 /// - filenamePrefix: file name prefix for the csv
 /// - locale: object like { fields: { ... } }
 /// - fields: field renderers (mainly, stringify)
@@ -25,6 +28,13 @@ const LIMIT = 100;
 ///   Should be an object of `id => spec`, where spec is an object with a `type` field. Types:
 ///   - `select`: will render a select with options given by the `options` field in the spec.
 ///     Each option should be an (array) tuple like `[id, label]`.
+///
+/// # Strictly Optional Props
+/// - compileFields: (parameters, transientFields) => string[]
+/// - localizeFieldName: id => string?
+///     - if used, `locale` is no longer required
+/// - getFieldStringifier: id => Function
+///     - if used, `fields` is no longer required
 export default class CSVExport extends PureComponent {
     static contextType = coreContext;
 
@@ -81,13 +91,49 @@ export default class CSVExport extends PureComponent {
     }
 
     resumeExport = () => {
-        if (this.state.error) this.load();
+        if (this.state.error) this.loadOne();
         else this.beginExport();
     };
 
     abortExport = () => {
         this.setState({ exporting: false, error: null });
     };
+
+    /// Compiles selected fields
+    compileFields () {
+        if (this.props.compileFields) {
+            return this.props.compileFields(this.props.parameters, this.state.transientFields);
+        }
+
+        const { parameters } = this.props;
+        const compiledFields = [];
+        // first, push fixed fields
+        for (const field of parameters.fields) if (field.fixed) compiledFields.push(field.id);
+        // then transient fields
+        for (const id of this.state.transientFields) {
+            if (!compiledFields.includes(id)) compiledFields.push(id);
+        }
+        // finally, push user fields
+        for (const field of parameters.fields) {
+            if (!field.fixed) {
+                if (!compiledFields.includes(field.id)) compiledFields.push(field.id);
+            }
+        }
+        return compiledFields;
+    }
+
+    localizeFieldName (id) {
+        if (this.props.localizeFieldName) return this.props.localizeFieldName(id);
+        return this.props.locale.fields[id];
+    }
+
+    getFieldStringifier (id) {
+        if (this.props.getFieldStringifier) return this.props.getFieldStringifier(id);
+        const fieldSpec = this.props.fields[id];
+        if (!fieldSpec) throw new Error(`missing field spec for ${id}`);
+        if (!fieldSpec.stringify) throw new Error(`missing stringify for ${id}`);
+        return fieldSpec.stringify;
+    }
 
     async endExport () {
         try {
@@ -115,26 +161,11 @@ export default class CSVExport extends PureComponent {
                 this.setState({ objectURL, filename, exporting: false });
             });
 
-            const { parameters } = this.props;
-
-            // compile selected fields
-            const compiledFields = [];
-            // first, push fixed fields
-            for (const field of parameters.fields) if (field.fixed) compiledFields.push(field.id);
-            // then transient fields
-            for (const id of this.state.transientFields) {
-                if (!compiledFields.includes(id)) compiledFields.push(id);
-            }
-            // finally, push user fields
-            for (const field of parameters.fields) {
-                if (!field.fixed) {
-                    if (!compiledFields.includes(field.id)) compiledFields.push(field.id);
-                }
-            }
+            const compiledFields = this.compileFields();
 
             // write header
             stringifier.write(compiledFields.map(id => {
-                const localized = this.props.locale.fields[id];
+                const localized = this.localizeFieldName(id);
                 if (!localized) throw new Error(`missing field name for ${id}`);
                 return localized;
             }));
@@ -166,10 +197,8 @@ export default class CSVExport extends PureComponent {
                 });
 
                 for (const id of compiledFields) {
-                    const fieldSpec = this.props.fields[id];
-                    if (!fieldSpec) throw new Error(`missing field spec for ${id}`);
-                    if (!fieldSpec.stringify) throw new Error(`missing stringify for ${id}`);
-                    const stringified = fieldSpec.stringify(
+                    const stringifyField = this.getFieldStringifier(id);
+                    const stringified = stringifyField(
                         itemData[id],
                         itemData,
                         compiledFields,
@@ -207,7 +236,7 @@ export default class CSVExport extends PureComponent {
                     this.state.error ? (
                         <Fragment>
                             <div className="export-error">
-                                {this.state.error.toString()}
+                                <DisplayError error={this.state.error} />
                             </div>
                             <div class="action-button-container">
                                 <Button

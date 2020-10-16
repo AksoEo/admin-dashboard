@@ -1,6 +1,8 @@
 import { h } from 'preact';
+import SaveIcon from '@material-ui/icons/SaveAlt';
 import Meta from '../../../../meta';
 import Page from '../../../../../components/page';
+import CSVExport from '../../../../../components/csv-export';
 import Spreadsheet from '../../../../../components/spreadsheet';
 import { coreContext } from '../../../../../core/connection';
 import { congressParticipants as locale } from '../../../../../locale';
@@ -19,7 +21,18 @@ export default class SpreadsheetView extends Page {
         // for field rendering
         currency: null,
         registrationForm: [],
+
+        exportOpen: false,
     };
+
+    getListOptions () {
+        return { congress: this.congress, instance: this.instance };
+    }
+    getListParameters () {
+        return {
+            fields: this.state.fields.map(id => ({ id, sorting: 'none' })),
+        };
+    }
 
     loadFields () {
         const { congress, instance } = this;
@@ -45,11 +58,10 @@ export default class SpreadsheetView extends Page {
     }
 
     load () {
-        const { congress, instance } = this;
-        this.context.createTask('congresses/listParticipants', { congress, instance }, {
+        this.context.createTask('congresses/listParticipants', this.getListOptions(), {
+            ...this.getListParameters(),
             offset: this.state.rows.length,
             limit: 100,
-            fields: this.state.fields.map(id => ({ id, sorting: 'none' })),
         }).runOnceAndDrop().then(res => {
             if (!res.items.length) return;
             this.setState({
@@ -73,8 +85,7 @@ export default class SpreadsheetView extends Page {
         return +this.props.matches[this.props.matches.length - 3][1];
     }
 
-    columnName = i => {
-        const field = this.state.fields[i];
+    columnNameForField = field => {
         if (field.startsWith('data.')) {
             const dataField = field.substr(5);
             return '@' + dataField;
@@ -118,12 +129,34 @@ export default class SpreadsheetView extends Page {
         return 100;
     };
 
+    getFieldStringifier = field => {
+        if (field.startsWith('data.')) {
+            const dataField = field.substr(5);
+            // TODO: better rendering
+            return (_, item) => '' + item.data[dataField];
+        } else {
+            const stringify = FIELDS[field].stringify;
+            if (!stringify) throw new Error('no stringifier for ' + field);
+            return stringify;
+        }
+    };
+
     render (_, { fields, rows, total }) {
         const { congress, instance } = this;
 
+        const actions = [];
+        actions.push({
+            icon: <SaveIcon style={{ verticalAlign: 'middle' }} />,
+            action: () => {
+                this.setState({ exportOpen: true });
+            },
+        });
+
         return (
             <div class="congress-participants-spreadsheet-page">
-                <Meta title={locale.spreadsheet.title} />
+                <Meta
+                    title={locale.spreadsheet.title}
+                    actions={actions} />
                 <Spreadsheet
                     columnCount={fields.length}
                     rowCount={total}
@@ -137,7 +170,26 @@ export default class SpreadsheetView extends Page {
                     loadedRowCount={rows.length}
                     initialColumnSize={this.initialColumnSize}
                     cellView={this.cellView}
-                    columnName={this.columnName} />
+                    columnName={i => this.columnNameForField(this.state.fields[i])} />
+
+                <CSVExport
+                    open={this.state.exportOpen}
+                    onClose={() => this.setState({ exportOpen: false })}
+                    task="congresses/listParticipants"
+                    options={this.getListOptions()}
+                    parameters={this.getListParameters()}
+                    detailView="congresses/participant"
+                    detailViewOptions={id => ({
+                        congress,
+                        instance,
+                        id,
+                        fields: this.state.viewFields,
+                        noFetch: true,
+                    })}
+                    compileFields={() => fields}
+                    localizeFieldName={this.columnNameForField}
+                    getFieldStringifier={this.getFieldStringifier}
+                    filenamePrefix={locale.csvFilename} />
             </div>
         );
     }

@@ -305,6 +305,7 @@ export const congressParticipants = {
         button: 'Forigi',
         description: '[[Are you sure you don’t want to cancel the registration instead? ]] kaj vi certas, ke vi volas forigi la aliĝinton? Ne eblas malfari tiun ĉi agon.',
     },
+    csvFilename: 'alighintoj',
 };
 
 export const congressRegistrationForm = {

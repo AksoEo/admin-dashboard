@@ -125,7 +125,7 @@ class HeaderColumn extends PureComponent {
             <div
                 class="spreadsheet-cell spreadsheet-header-cell"
                 style={{ width: size }}>
-                <div class="cell-contents">{name}</div>
+                <div class="cell-contents" title={name}>{name}</div>
                 <div
                     class="cell-resizing-handle"
                     ref={this.handle}
