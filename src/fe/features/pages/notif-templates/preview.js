@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { Fragment, PureComponent } from 'preact/compat';
+import { CircularProgress, Dialog } from '@cpsdqs/yamdl';
 import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';
 import Page from '../../../components/page';
@@ -71,14 +71,66 @@ export default class NotifTemplatePreviewPage extends Page {
 }
 
 class HTMLPreviewRender extends PureComponent {
-    render ({ html }) {
+    state = {
+        openLinkPrompt: false,
+        linkToOpen: '',
+    };
+
+    load () {
+        const doc = this.frame.contentWindow.document;
+
+        // document.write may be antiquated but it actually works well for this use case, because
+        // it lets you overwrite the <html> and <head> elements
+        doc.write(this.props.html);
+
+        // prevent links from navigating the iframe
+        for (const anchor of doc.querySelectorAll('a')) {
+            anchor.addEventListener('click', e => {
+                e.preventDefault();
+                if (e.target.getAttribute('href')) {
+                    this.setState({ linkToOpen: e.target.href, openLinkPrompt: true });
+                }
+            });
+        }
+    }
+
+    onFrameLoad = () => this.load();
+
+    render () {
         return (
-            <iframe
-                class="html-preview"
-                allow=""
-                referrerpolicy="no-referrer"
-                sandbox=""
-                srcDoc={html} />
+            <Fragment>
+                <iframe
+                    ref={frame => this.frame = frame}
+                    onLoad={this.onFrameLoad}
+                    class="html-preview"
+                    allow=""
+                    referrerpolicy="no-referrer"
+                    sandbox="allow-same-origin"
+                    src="/assets/insecure-content/html-preview.html" />
+
+                <Dialog
+                    class="notif-template-html-preview-link-prompt"
+                    open={this.state.openLinkPrompt}
+                    onClose={() => this.setState({ openLinkPrompt: false })}
+                    actions={[
+                        {
+                            label: locale.preview.htmlNavigationCancel,
+                            action: () => this.setState({ openLinkPrompt: false }),
+                        },
+                        {
+                            label: locale.preview.htmlNavigationConfirm,
+                            action: () => {
+                                const feats = 'noopener,noreferrer';
+                                window.open(this.state.linkToOpen, '_blank', feats);
+                                this.setState({ openLinkPrompt: false });
+                            },
+                        },
+                    ]}>
+                    {locale.preview.htmlNavigationPrompt(this.state.linkToOpen.length > 100
+                        ? this.state.linkToOpen.substr(0, 100) + '…'
+                        : this.state.linkToOpen)}
+                </Dialog>
+            </Fragment>
         );
     }
 }

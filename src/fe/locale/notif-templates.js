@@ -50,6 +50,9 @@ export const notifTemplates = {
             html: '[[HTML]]',
             text: '[[Text]]',
         },
+        htmlNavigationPrompt: href => `[[You clicked on a link to ${href} in the preview. Would you like to open it in a new tab?]]`,
+        htmlNavigationCancel: 'Nuligi',
+        htmlNavigationConfirm: '[[Open]]',
     },
 
     templating: {
