@@ -199,14 +199,25 @@ export const FIELDS = {
                 blendMin = 7 / 24;
                 blendMax = 17 / 24;
             }
+
+            const setRatingOnClick = index => () => {
+                onChange({ ...value, rating: index + 1 });
+            };
+
             const items = [];
             for (let i = 0; i < max; i++) {
+                const index = i;
                 const isFilled = i < Math.floor(rating);
                 const isEmpty = i >= rating;
                 const blend = (blendMax - blendMin) * (rating - Math.floor(rating)) + blendMin;
 
                 items.push(
-                    <span class="rating-cell" data-type={type} data-null={!value} key={i}>
+                    <span
+                        class="rating-cell"
+                        data-type={type}
+                        data-null={!value}
+                        onClick={setRatingOnClick(index)}
+                        key={i}>
                         {isFilled ? <Icon /> : isEmpty ? <EmptyIcon /> : (
                             <span class="rating-cell-blend">
                                 <span class="blend-top" style={{ width: `${blend * 100}%` }}>
