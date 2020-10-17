@@ -190,7 +190,7 @@ export const FILTERS = {
         },
         editor ({ value, onChange, onEnabledChange, userData }) {
             if (!userData.registrationForm) return null;
-            let contents = [];
+            const contents = [];
 
             for (let i = 0; i < value.length; i++) {
                 const index = i;
@@ -247,7 +247,7 @@ function DataPredicate ({ form, predicate, onChange, onRemove, currency }) {
     const variableOptions = [];
     for (const item of form) {
         if (item.el === 'input') {
-            if (item.type === 'text' || item.type === 'boolean_table') continue; 
+            if (item.type === 'text' || item.type === 'boolean_table') continue;
             if (item.name === predicate.var) selectedItem = item;
             variableOptions.push({ value: item.name, label: item.name });
         }

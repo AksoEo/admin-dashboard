@@ -9,7 +9,6 @@ import Meta from '../../../meta';
 import { clients as locale, search as searchLocale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
-import { connectContextualActions } from '../../../../context-action';
 import { apiKey } from '../../../../components/data';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import './style';
@@ -48,7 +47,7 @@ export const FIELDS = {
     },
 };
 
-export default connectContextualActions(connectPerms(class Clients extends Page {
+export default connectPerms(class Clients extends Page {
     state = {
         parameters: {
             search: {
@@ -101,7 +100,7 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
         }
     }
 
-    render ({ contextualAction, perms }, { parameters }) {
+    render ({ perms }, { parameters }) {
         const actions = [];
         if (perms.hasPerm('clients.create')) {
             actions.push({
@@ -116,11 +115,6 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
             action: () => this.setState({ csvExportOpen: true }),
             overflow: true,
         });
-
-        let selection = null;
-        if (contextualAction && contextualAction.action === 'select-clients') {
-            selection = contextualAction.selected;
-        }
 
         return (
             <div class="clients-page">
@@ -145,7 +139,6 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
                     task="clients/list"
                     view="clients/client"
                     parameters={parameters}
-                    selection={selection}
                     fields={FIELDS}
                     onGetItemLink={id => `/administrado/klientoj/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
@@ -167,4 +160,4 @@ export default connectContextualActions(connectPerms(class Clients extends Page 
             </div>
         );
     }
-}));
+});

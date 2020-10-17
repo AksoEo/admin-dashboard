@@ -12,7 +12,6 @@ import Page from '../../../components/page';
 import { codeholders as locale, search as searchLocale } from '../../../locale';
 import { connect, coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
-import { connectContextualActions } from '../../../context-action';
 import CSVExport from '../../../components/csv-export';
 import Meta from '../../meta';
 import FILTERS from './filters';
@@ -37,7 +36,7 @@ const connectToEverything = a => connect('codeholders/fields')(fields => ({
     fields,
 }))(connect('codeholders/filters')(filters => ({
     filters,
-}))(connectPerms(connectContextualActions(a))));
+}))(connectPerms(a)));
 
 /// The codeholders list page.
 ///
@@ -201,7 +200,6 @@ export default connectToEverything(class CodeholdersPage extends Page {
         addrLabelGen,
         sendNotifTemplates,
         perms,
-        contextualAction,
         fields: availableFields,
         filters: availableFilters,
     }) {
@@ -275,11 +273,6 @@ export default connectToEverything(class CodeholdersPage extends Page {
 
         const { options, expanded } = this.state;
 
-        let listSelection;
-        if (contextualAction && contextualAction.action === 'select-codeholders') {
-            listSelection = contextualAction.selected;
-        }
-
         return (
             <div class="codeholders-page" ref={node => this.node = node}>
                 <Meta title={locale.title} actions={menu} />
@@ -317,14 +310,13 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     locale={locale.fields} />
                 <OverviewList
                     notice={globalFilterNotice}
-                    selection={listSelection}
                     task="codeholders/list"
                     view="codeholders/codeholder"
                     updateView={['codeholders/sigCodeholders']}
                     parameters={options}
                     expanded={expanded}
                     fields={FIELDS}
-                    onGetItemLink={listSelection ? null : id => `/membroj/${id}`}
+                    onGetItemLink={id => `/membroj/${id}`}
                     onSetFields={fields => this.setState({ options: { ...options, fields }})}
                     onSetOffset={offset => this.setState({ options: { ...options, offset }})}
                     onSetLimit={limit => this.setState({ options: { ...options, limit }})}

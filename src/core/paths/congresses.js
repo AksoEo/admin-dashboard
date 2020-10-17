@@ -124,7 +124,7 @@ const pClientFilters = {
                 const { var: varName, op, value } = predicate;
                 const name = `data.${varName}`;
                 if (op === 'is') out.push({ [name]: value });
-                else if (op === 'isnt') out.push({ [name]: { $not: value } });
+                else if (op === 'isnt') out.push({ $not: { [name]: value } });
                 else if (op === 'lt') out.push({ [name]: { $lt: value } });
                 else if (op === 'gt') out.push({ [name]: { $gt: value } });
                 else if (op === 'in') out.push({ [name]: { $in: value.split(',') } });
