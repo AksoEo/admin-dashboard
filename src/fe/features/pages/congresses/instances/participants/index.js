@@ -36,6 +36,7 @@ export default class ParticipantsView extends PureComponent {
         expanded: false,
 
         currency: null,
+        registrationForm: null,
     };
 
     #searchInput;
@@ -69,7 +70,7 @@ export default class ParticipantsView extends PureComponent {
         }
     }
 
-    render ({ congress, instance, push }, { parameters, expanded, currency }) {
+    render ({ congress, instance, push }, { parameters, expanded, currency, registrationForm }) {
         // TODO: hide this page if the user does not have permission?
         return (
             <div class="participants-view">
@@ -93,7 +94,7 @@ export default class ParticipantsView extends PureComponent {
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     inputRef={view => this.#searchInput = view}
-                    userData={{ congress, instance, currency }} />
+                    userData={{ congress, instance, currency, registrationForm }} />
                 <OverviewList
                     expanded={expanded}
                     useDeepCmp options={{ congress, instance }}
@@ -117,6 +118,7 @@ export default class ParticipantsView extends PureComponent {
                     fields={{}}
                     locale={{}}
                     onData={data => data && this.setState({
+                        registrationForm: data.form,
                         currency: data.price ? data.price.currency : null,
                     })} />
             </div>

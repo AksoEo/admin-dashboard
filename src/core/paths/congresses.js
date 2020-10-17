@@ -118,7 +118,20 @@ const pClientFilters = {
         toAPI: validity => ({ isValid: validity === 'true' ? true : false }),
     },
     data: {
-        toAPI: data => data,
+        toAPI: predicates => {
+            const out = [];
+            for (const predicate of predicates) {
+                const { var: varName, op, value } = predicate;
+                const name = `data.${varName}`;
+                if (op === 'is') out.push({ [name]: value });
+                else if (op === 'isnt') out.push({ [name]: { $not: value } });
+                else if (op === 'lt') out.push({ [name]: { $lt: value } });
+                else if (op === 'gt') out.push({ [name]: { $gt: value } });
+                else if (op === 'in') out.push({ [name]: { $in: value.split(',') } });
+                else if (op === 'nin') out.push({ [name]: { $nin: value.split(',') } });
+            }
+            return { $and: out };
+        },
     },
 };
 const pParametersToRequestData = makeParametersToRequestData({

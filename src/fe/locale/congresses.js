@@ -260,6 +260,17 @@ export const congressParticipants = {
                 none: 'ne gravas',
             },
             data: '[[Data]]',
+
+            dataVerbs: {
+                eq: { is: '[[is]]', isnt: '[[isnt]]' },
+                ord: {
+                    is: '[[is]]',
+                    isnt: '[[isnt]]',
+                    lt: '[[is less than]]',
+                    gt: '[[is greater than]]',
+                },
+                set: { in: '[[is in set]]', nin: '[[is not in set]]' },
+            },
         },
     },
     fields: {

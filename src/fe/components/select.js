@@ -94,6 +94,7 @@ class MultiSelect extends Component {
     };
 
     #open = () => {
+        if (this.props.disabled) return;
         this.setState({ open: true });
         this.update(0);
         globalAnimator.register(this);
