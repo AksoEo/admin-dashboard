@@ -69,9 +69,9 @@ export default class Task extends EventEmitter {
         return this.runOnce();
     }
 
-    onError ({ code, message }) {
+    onError ({ code, message, extra }) {
         this.state = TaskState.IDLE;
-        const error = { code, message, valueOf: () => `Error (${code}): ${message}` };
+        const error = { code, message, ...extra, valueOf: () => `Error (${code}): ${message}` };
         this.emit('failure', error);
         this.emit('result', 'failure', error);
     }

@@ -733,7 +733,7 @@ export const tasks = {
             res = await client.post(`/congresses/${congress}/instances/${instance}/participants`, pClientToAPI(params));
         } catch (err) {
             if (err.statusCode === 409) {
-                throw { code: 'already-registered', message: 'Codeholder already registered' };
+                throw { code: 'congresses-already-registered', message: 'Codeholder already registered' };
             } else throw err;
         }
         const id = res.res.headers.get('x-identifier');

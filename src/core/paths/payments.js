@@ -406,7 +406,15 @@ export const tasks = {
     },
     createIntent: async (_, params) => {
         const client = await asyncClient;
-        const res = await client.post('/aksopay/payment_intents', iClientToAPI(params));
+        let res;
+        try {
+            res = await client.post('/aksopay/payment_intents', iClientToAPI(params));
+        } catch (err) {
+            if (err.statusCode === 417) {
+                throw { code: 'payment-exceeds-max', message: 'Exceeds max allowed transaction amount' };
+            }
+            throw err;
+        }
         const id = res.res.headers.get('x-identifier');
         store.insert([PAYMENT_INTENTS, id], params);
         store.signal([PAYMENT_INTENTS, SIG_PAYMENT_INTENTS]);

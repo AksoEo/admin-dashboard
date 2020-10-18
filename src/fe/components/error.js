@@ -17,9 +17,19 @@ export default function DisplayError ({ error }) {
     }
 
     let errorString = locale.unknown('' + error);
-    if (error.code && locale[error.code]) {
+
+    if (error.code === 'bad-request') {
+        errorString = (
+            <details>
+                <summary>{locale[error.code]}</summary>
+                <pre>
+                    {error.message}
+                </pre>
+            </details>
+        );
+    } else if (error.code && locale[error.code]) {
         if (typeof locale[error.code] === 'function') {
-            errorString = locale[error.code](error.message);
+            errorString = locale[error.code](error);
         } else {
             errorString = locale[error.code];
         }

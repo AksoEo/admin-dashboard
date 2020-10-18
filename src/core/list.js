@@ -14,6 +14,7 @@ export function transformError (err) {
     return {
         code: code || err.code || '?',
         message: err.message || err.toString(),
+        extra: err.extra || {},
     };
 }
 
@@ -40,7 +41,7 @@ export function filtersToAPI (clientFilters, pfilters) {
         for (const filter in pfilters) {
             if (filter === '_disabled') continue;
             if (!(filter in clientFilters)) {
-                throw { code: 'unknown-filter', message: `unknown filter ${filter}` };
+                throw { code: 'unknown-filter', message: `unknown filter ${filter}`, extra: { filter } };
             }
             if (pfilters[filter].enabled) {
                 filters.push(clientFilters[filter].toAPI(pfilters[filter].value));
@@ -127,7 +128,7 @@ export const makeParametersToRequestData = ({
 
     for (const field of fields) {
         if (!(field.id in clientFields)) {
-            throw { code: 'unknown-field', message: `unknown field ${field.id}` };
+            throw { code: 'unknown-field', message: `unknown field ${field.id}`, extra: { field: field.id } };
         }
         for (const required of (clientFields[field.id].requires || [])) {
             fields.push({ id: required, sorting: 'none' });

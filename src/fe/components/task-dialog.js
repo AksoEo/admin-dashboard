@@ -22,11 +22,14 @@ export default class TaskDialog extends Component {
 
     // button ref; for shaking on error
     #buttonValidator;
+    #errorAnchor;
 
     #run = () => {
         this.setState({ loading: true, error: null });
         this.props.run().catch(error => {
-            this.setState({ error });
+            this.setState({ error }, () => {
+                this.#errorAnchor.scrollIntoView && this.#errorAnchor.scrollIntoView({ behavior: 'smooth' });
+            });
             console.error(error); // eslint-disable-line no-console
             this.#buttonValidator.shake();
         }).then(() => {
@@ -81,6 +84,7 @@ export default class TaskDialog extends Component {
                             <DisplayError error={error} />
                         </div>
                     ) : null}
+                    <span ref={view => this.#errorAnchor = view} />
                 </Form>
             </Dialog>
         );

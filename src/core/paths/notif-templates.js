@@ -84,7 +84,7 @@ export const tasks = {
     },
     template: async ({ id }, { fields }) => {
         const client = await asyncClient;
-        for (const id of fields) if (!clientFields[id]) throw { code: 'unknown-field', message: `Unknown field ${id}` };
+        for (const id of fields) if (!clientFields[id]) throw { code: 'unknown-field', message: `unknown field ${id}`, extra: { field: id } };
         const res = await client.get(`/notif_templates/${id}`, {
             fields: ['id'].concat(fields.flatMap(id => typeof clientFields[id] === 'string'
                 ? [clientFields[id]]

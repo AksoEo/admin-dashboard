@@ -13,11 +13,18 @@ export const errors = {
         ],
         post: ['Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.'],
     },
-    'bad-request': err => `Nevalida peto: ${err}`,
+    'unknown-field': err => `[[Unknown field]] ${err.field}`,
+    'unknown-filter': err => `[[Unknown filter]] ${err.filter}`,
+    'bad-request': 'Nevalida peto',
     'unauthorized': 'Mankas aŭtentiko',
     'forbidden': 'Mankas permeso',
     'not-found': 'La paĝo ne estis trovita',
     'conflict': 'Okazis interna konflikto, bonvolu reprovi',
     'internal-server-error': 'Okazis interna eraro',
+
+    // see payments/createIntent
+    'payment-exceeds-max': '[[Amount exceeds 500k USD]]',
+    // see congresses/createParticipant
+    'congresses-already-registered': '[[Codeholder is already registered]]',
 };
 

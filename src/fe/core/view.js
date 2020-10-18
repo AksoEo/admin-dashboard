@@ -24,8 +24,8 @@ export default class DataView extends EventEmitter {
         this.emit('update', data, extra);
     }
 
-    onError ({ code, message }) {
-        this.emit('error', { code, message, valueOf: () => `Error (${code}): ${message}` });
+    onError ({ code, message, extra }) {
+        this.emit('error', { code, message, ...extra, valueOf: () => `Error (${code}): ${message}` });
     }
 
     drop () {
