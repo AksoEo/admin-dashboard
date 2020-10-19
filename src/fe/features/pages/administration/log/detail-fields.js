@@ -18,7 +18,7 @@ DETAIL_FIELDS.identity.component = function Identity ({ value }) {
 
     const linkTarget = value.type === 'codeholder'
         ? `/membroj/${value.id}`
-        : `/administrado/klientoj/${value.id}`;
+        : `/administrado/klientoj/${Buffer.from(value.id).toString('hex')}`;
     const linkLabel = value.type === 'codeholder'
         ? locale.viewCodeholder
         : locale.viewClient;
