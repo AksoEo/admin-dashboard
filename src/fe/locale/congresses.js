@@ -273,6 +273,7 @@ export const congressParticipants = {
             },
         },
     },
+    noParticipation: '[[No registration form]]',
     fields: {
         dataId: '[[DataId]]',
         codeholderId: 'Membro',

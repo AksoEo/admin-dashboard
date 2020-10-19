@@ -24,6 +24,7 @@ import './detail-shell.less';
 /// - options: additional view options; will *not* cause a reload on update
 /// - onDelete: called when the item is deleted
 /// - onData: will be called with data when it loads
+/// - onError: will be called with data when it fails
 /// - children: (data) => Node
 /// - inline: if true, will use a smaller inline style
 export default class DetailShell extends PureComponent {
