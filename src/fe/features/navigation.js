@@ -418,10 +418,7 @@ export default class Navigation extends PureComponent {
         this.navigate(pathname, replace);
     }
 
-    /// Removes all stack items at and above the given index.
-    popStackAt (stackIndex, replace) {
-        const stack = this.state.stack.slice();
-        stack.splice(stackIndex);
+    restoreURLWithNewStack (stack, replace) {
         const pathname = '/' + stack.map(x => x.path).join('/');
         let query = '';
         // find topmost view item and use its query
@@ -432,6 +429,24 @@ export default class Navigation extends PureComponent {
             }
         }
         this.navigate(pathname + (query ? '?' + query : ''), replace);
+    }
+
+    /// Removes all stack items at and above the given index.
+    popStackAt (stackIndex, replace) {
+        const stack = this.state.stack.slice();
+        stack.splice(stackIndex);
+        this.restoreURLWithNewStack(stack, replace);
+    }
+
+    /// Removes all stack items, starting from the top, until an item fulfills the predicate,
+    /// *after* which it stops.
+    popStackUntilIncluding (predicate, replace) {
+        const stack = this.state.stack.slice();
+        for (let i = stack.length - 1; i >= 0; i--) {
+            const item = stack.pop();
+            if (predicate(item)) break;
+        }
+        this.restoreURLWithNewStack(stack, replace);
     }
 
     // - state saving
@@ -591,9 +606,8 @@ export default class Navigation extends PureComponent {
 
         const onAppBarMenuClick = () => {
             if (stackItems.length) {
-                // note that we’re popping the last item; but since stackItems is one shorter than
-                // the stack length; this *is* the last stack index
-                this.popStackAt(stackItems.length);
+                // pop all items up to and including the top component
+                this.popStackUntilIncluding(item => !!item.component);
             } else this.props.onOpenMenu();
         };
 
