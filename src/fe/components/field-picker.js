@@ -139,7 +139,13 @@ export default class FieldPicker extends PureComponent {
                 fullScreen={width => width <= FULLSCREEN_WIDTH}
                 open={this.props.open}
                 onClose={this.props.onClose}
-                title={locale.fieldPicker.title}>
+                title={locale.fieldPicker.title}
+                actions={[
+                    {
+                        label: locale.fieldPicker.ok,
+                        action: this.props.onClose,
+                    },
+                ]}>
                 <div class="field-search">
                     <input
                         value={this.state.search}

@@ -131,7 +131,13 @@ export default class TagManager extends PureComponent {
                     class="congress-tag-manager-popout"
                     title={locale.tagManager.dialogTitle}
                     open={managerOpen}
-                    onClose={() => this.setState({ managerOpen: false })}>
+                    onClose={() => this.setState({ managerOpen: false })}
+                    actions={[
+                        {
+                            label: locale.tagManager.ok,
+                            action: () => this.setState({ managerOpen: false }),
+                        },
+                    ]}>
                     <PopoutContents
                         all={all}
                         view={view}

@@ -755,7 +755,13 @@ export default {
                         backdrop
                         fullScreen={width => width < 600}
                         open={pickerOpen}
-                        onClose={() => setPickerOpen(false)}>
+                        onClose={() => setPickerOpen(false)}
+                        actions={[
+                            {
+                                label: locale.search.codeList.ok,
+                                action: () => setPickerOpen(false),
+                            },
+                        ]}>
                         <p>
                             {locale.search.codeList.description}
                         </p>

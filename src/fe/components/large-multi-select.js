@@ -180,13 +180,20 @@ export default class LargeMultiSelect extends PureComponent {
                         itemHeight={LI_HEIGHT}>
                         {selectedItems.concat(availableItems)}
                     </MulticolList>
-                    <div class="lms-selection-controls">
-                        <Button onClick={this.selectAll} class="lms-selection-button">
-                            {locale.largeMultiSelect.selectAll}
-                        </Button>
-                        <Button onClick={this.deselectAll} class="lms-selection-button">
-                            {locale.largeMultiSelect.deselectAll}
-                        </Button>
+                    <div class="lms-footer">
+                        <div class="lms-selection-controls">
+                            <Button onClick={this.selectAll} class="lms-selection-button">
+                                {locale.largeMultiSelect.selectAll}
+                            </Button>
+                            <Button onClick={this.deselectAll} class="lms-selection-button">
+                                {locale.largeMultiSelect.deselectAll}
+                            </Button>
+                        </div>
+                        <div class="lms-confirmation">
+                            <Button raised onClick={() => this.setState({ dialogOpen: false })}>
+                                {locale.largeMultiSelect.ok}
+                            </Button>
+                        </div>
                     </div>
                 </Dialog>
             </div>
