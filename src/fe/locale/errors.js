@@ -1,5 +1,5 @@
 export const errors = {
-    unknown: err => `Okazis nekonata eraro: ${err}`,
+    unknown: 'Okazis nekonata eraro',
     invalidSearchQuery: {
         pre: [
             'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj.',

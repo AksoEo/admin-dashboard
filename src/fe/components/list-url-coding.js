@@ -7,8 +7,7 @@
 // If the string begins with a ( itself, then a * is prepended. The first * after the opening
 // parentheses is always ignored.
 //
-// Also, # is encoded as %23 and % as %25. All percent-encoding should be resolved when decoding
-// to account for automatic encoding in browsers.
+// The inner string will be URL-encoded.
 //
 // # Examples
 // ```
@@ -26,7 +25,7 @@ function encodeParens (str) {
         str = '*' + str;
     }
 
-    str = encodePercent(str);
+    str = encodeURIComponent(str);
 
     let streak = 0;
     for (const c of str) {
@@ -36,18 +35,6 @@ function encodeParens (str) {
     }
 
     return '('.repeat(parens) + str + ')'.repeat(parens);
-}
-
-function encodePercent (s) {
-    return s
-        .replace(/%/g, '%25')
-        .replace(/#/g, '%23')
-        .replace(/\n/g, '%0A')
-        .replace(/\t/g, '%09');
-}
-
-function decodePercent (s) {
-    return s.replace(/%[0-9a-f]{2}/ig, m => String.fromCharCode(parseInt(m.substr(1), 16)));
 }
 
 // Returns an array: [string, length of parentheses encoding]. Ignores the rest
@@ -70,7 +57,7 @@ function decodeParens (str) {
             break;
         }
     }
-    const decoded = decodePercent(str.substring(headerSize, cursor - parens));
+    const decoded = decodeURIComponent(str.substring(headerSize, cursor - parens));
     return [decoded, cursor];
 }
 
@@ -79,7 +66,7 @@ function decodeParens (str) {
 function maybeEncodeParens (str, unsafeChars) {
     if (str.startsWith('(')) return encodeParens(str);
     for (const c of unsafeChars) if (str.includes(c)) return encodeParens(str);
-    return encodePercent(str);
+    return encodeURIComponent(str);
 }
 function maybeDecodeParens (str, unsafeChars) {
     if (str.startsWith('(')) {
@@ -92,7 +79,7 @@ function maybeDecodeParens (str, unsafeChars) {
             }
             s += c;
         }
-        return [decodePercent(s), s.length];
+        return [decodeURIComponent(s), s.length];
     }
 }
 

@@ -16,7 +16,14 @@ export default function DisplayError ({ error }) {
         );
     }
 
-    let errorString = locale.unknown('' + error);
+    let errorString = (
+        <details>
+            <summary>{locale.unknown}</summary>
+            <pre>
+                {'' + error}
+            </pre>
+        </details>
+    );
 
     if (error.code === 'bad-request') {
         errorString = (
