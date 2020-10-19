@@ -101,6 +101,7 @@ export const congressLocations = {
         rating: 'Taksa valoro',
         icon: 'Bildeto',
         externalLoc: 'Ekstera loko',
+        openHours: '[[Open hours]]',
 
         ratingInfixOf: 'el',
         ratingInvalid: 'Nevalida taksa valoro',

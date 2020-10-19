@@ -217,6 +217,15 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                     {editing ? <label>{locale.fields.description}</label> : null}
                     <InnerField field="description" item={item} editing={editing} onItemChange={onItemChange} />
                 </div>
+                <div class="inner-field">
+                    {(editing || item.openHours) ? <label>{locale.fields.openHours}</label> : null}
+                    <InnerField
+                        field="openHours"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={{ congress, instance }} />
+                </div>
             </DynamicHeightDiv>
             {external ? (
                 <div class="inner-map-title">

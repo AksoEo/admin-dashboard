@@ -47,8 +47,25 @@ class TimeEditor extends PureComponent {
         });
     };
 
-    commitEditing = () => {
+    getValue () {
         let value = 0;
+        const input = this.state.editingValue;
+        const inputParts = input.split(/[.:;]/g).map(part => parseInt(part));
+        if (Number.isFinite(inputParts[0])) value += inputParts[0] * 3600;
+        if (Number.isFinite(inputParts[1])) value += inputParts[1] * 60;
+        if (Number.isFinite(inputParts[2])) value += inputParts[2];
+
+        // mod 86400
+        value = mod(value, 86400);
+        return value;
+    }
+
+    tentativeCommit = () => {
+        const value = this.getValue();
+        this.props.onChange && this.props.onChange(value);
+    };
+
+    commitEditing = () => {
         const input = this.state.editingValue;
 
         if (!input) {
@@ -65,13 +82,7 @@ class TimeEditor extends PureComponent {
             return;
         }
 
-        const inputParts = input.split(/[.:;]/g).map(part => parseInt(part));
-        if (Number.isFinite(inputParts[0])) value += inputParts[0] * 3600;
-        if (Number.isFinite(inputParts[1])) value += inputParts[1] * 60;
-        if (Number.isFinite(inputParts[2])) value += inputParts[2];
-
-        // mod 86400
-        value = mod(value, 86400);
+        const value = this.getValue();
 
         this.setState({
             editingValue: formatTime(value),
@@ -119,6 +130,7 @@ class TimeEditor extends PureComponent {
             this.setState({ editingValue: s }, () => {
                 this.input.inputNode.selectionStart = numberStart;
                 this.input.inputNode.selectionEnd = numberStart + number.length;
+                this.tentativeCommit();
             });
         }
     };

@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { Button, Dialog, TextField } from '@cpsdqs/yamdl';
+import { Button, Dialog, Slider, TextField } from '@cpsdqs/yamdl';
 import Brightness1Icon from '@material-ui/icons/Brightness1';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
@@ -44,7 +44,9 @@ import CheckIcon from '@material-ui/icons/Check';
 import TextArea from '../../../../../components/text-area';
 import MdField from '../../../../../components/md-field';
 import SvgIcon from '../../../../../components/svg-icon';
+import { date, time } from '../../../../../components/data';
 import { Validator } from '../../../../../components/form';
+import { connect } from '../../../../../core/connection';
 import { congressLocations as locale } from '../../../../../locale';
 import LatLonEditor from '../../ll-editor';
 import './fields.less';
@@ -287,6 +289,11 @@ export const FIELDS = {
             return <span class="congress-location-rating">{items}</span>;
         },
     },
+    openHours: {
+        component (props) {
+            return <OpenHoursField {...props} />;
+        },
+    },
     externalLoc: {
         component () {
             throw new Error('illegal invocation');
@@ -360,5 +367,130 @@ function IconPicker ({ value, onChange }) {
                 })}
             </Dialog>
         </Button>
+    );
+}
+
+function* enumerateDateRange (dateFrom, dateTo) {
+    if (!dateFrom || !dateTo) return;
+    let date = new Date(dateFrom);
+    const endDate = new Date(dateTo);
+    while (date < endDate) {
+        yield date.toISOString().split('T')[0]; // yield the date part
+        date = new Date(+date + 86400 * 1000);
+    }
+    yield endDate.toISOString().split('T')[0];
+}
+// this is a silly hack because of the way for..of works
+function dateRange (dateFrom, dateTo) {
+    return { [Symbol.iterator]: () => enumerateDateRange(dateFrom, dateTo) };
+}
+
+const OpenHoursField = connect(({ userData }) => (
+    ['congresses/instance', { congress: userData.congress, id: userData.instance }]
+))(data => ({
+    dateFrom: data ? data.dateFrom : null,
+    dateTo: data ? data.dateTo : null,
+}))(({ value, editing, onChange, dateFrom, dateTo }) => {
+    if (!editing && !value) return null;
+    const items = [];
+    for (const date of dateRange(dateFrom, dateTo)) {
+        items.push(
+            <OpenHoursDay
+                key={date}
+                date={date}
+                value={value && value[date] || ''}
+                onChange={day => {
+                    const newValue = value ? { ...value } :  {};
+                    if (day === null) delete newValue[date];
+                    else newValue[date] = day;
+                    if (Object.keys(newValue).length) onChange(newValue);
+                    else onChange(null);
+                }}
+                editing={editing} />
+        );
+    }
+
+    return (
+        <div class="congress-location-open-hours">
+            {items}
+        </div>
+    );
+});
+
+function timeToSeconds (time) {
+    const parts = time.split(':');
+    return (+parts[0]) * 3600 + (+parts[1]) * 60;
+}
+function secondsToTime (secs) {
+    secs = Math.max(0, Math.min(secs, 86400 - 1)); // can't be 24:00
+    const pad2 = x => ('00' + x).substr(-2);
+    const hours = Math.floor(secs / 3600);
+    const mins = Math.floor((secs % 3600) / 60);
+    return pad2(hours) + ':' + pad2(mins);
+}
+
+function OpenHoursDay ({ date: pDate, value, editing, onChange }) {
+    let startSecs = 0;
+    let endSecs = 0;
+    if (value) {
+        const parts = value.split('-');
+        startSecs = timeToSeconds(parts[0]);
+        endSecs = timeToSeconds(parts[1]);
+    }
+
+    const commit = (startSecs, endSecs) => {
+        if (endSecs < startSecs) {
+            // swap around to fix order
+            const tmp = endSecs;
+            endSecs = startSecs;
+            startSecs = tmp;
+        }
+        if (startSecs === endSecs) onChange(null);
+        else onChange(secondsToTime(startSecs) + '-' + secondsToTime(endSecs));
+    };
+
+    if (editing) {
+        return (
+            <div class={'open-hours-day is-editing' + (startSecs === endSecs ? ' is-empty' : '')}>
+                <span class="day-date">
+                    <date.renderer value={pDate} />
+                </span>
+                <span class="day-hours">
+                    <time.editor
+                        outline
+                        value={startSecs}
+                        onChange={secs => {
+                            commit(secs, endSecs);
+                        }} />
+                    <Slider
+                        class="hours-slider"
+                        value={[startSecs, endSecs]}
+                        onChange={([a, b]) => {
+                            commit(a, b);
+                        }}
+                        min={0}
+                        max={86400 - 1} />
+                    <time.editor
+                        outline
+                        value={endSecs}
+                        onChange={secs => {
+                            commit(startSecs, secs);
+                        }} />
+                </span>
+            </div>
+        );
+    }
+
+    if (!value) return;
+
+    return (
+        <div class="open-hours-day">
+            <span class="day-date">
+                <date.renderer value={pDate} />
+            </span>
+            <span class="day-hours">
+                {secondsToTime(startSecs)}–{secondsToTime(endSecs)}
+            </span>
+        </div>
     );
 }

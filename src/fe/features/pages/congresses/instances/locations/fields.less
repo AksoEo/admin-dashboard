@@ -137,3 +137,40 @@
         }
     }
 }
+
+.congress-location-open-hours {
+    .open-hours-day {
+        .day-date {
+            display: inline-block;
+            width: 10em;
+        }
+
+        &.is-editing {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+
+            .day-date {
+                flex-shrink: 0;
+            }
+
+            .day-hours {
+                flex: 1;
+                display: flex;
+                align-items: center;
+
+                .hours-slider {
+                    margin-left: 16px;
+                    margin-right: 16px;
+                    flex: 1;
+                }
+            }
+
+            &.is-empty:not(:focus-within) {
+                .day-hours {
+                    opacity: 0.5;
+                }
+            }
+        }
+    }
+}
