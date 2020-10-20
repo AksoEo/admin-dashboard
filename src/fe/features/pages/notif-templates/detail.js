@@ -1,15 +1,13 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
+import { lazy, Suspense, useState } from 'preact/compat';
+import { Button, CircularProgress } from '@cpsdqs/yamdl';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
 import SendIcon from '@material-ui/icons/Send';
-import AKSOScriptEditor from '@tejo/akso-script-editor';
 import CopyIcon from '../../../components/copy-icon';
 import Page from '../../../components/page';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import DetailShell from '../../../components/detail-shell';
-import { DefsPreview } from '../../../components/form-editor/script-views';
 import Meta from '../../meta';
 import { connectPerms } from '../../../perms';
 import { LinkButton } from '../../../router';
@@ -19,6 +17,17 @@ import { FIELDS } from './fields';
 import { getFormVarsForIntent } from './intents';
 import TemplatingPopup, { TemplatingContext } from './templating-popup';
 import './detail.less';
+
+let cachedAKSOScriptEditor = null;
+const AKSOScriptEditor = () => {
+    if (!cachedAKSOScriptEditor) {
+        cachedAKSOScriptEditor = import('@tejo/akso-script-editor').then(r => r.default);
+    }
+    return cachedAKSOScriptEditor;
+};
+const DefsPreview = lazy(async () => ({
+    default: (await import('../../../components/form-editor/script-views')).DefsPreview,
+}));
 
 export default connectPerms(class NotifTemplate extends Page {
     state = {
@@ -69,9 +78,10 @@ export default connectPerms(class NotifTemplate extends Page {
         return +this.props.match[1];
     }
 
-    openScriptEditor = (defs) => new Promise(resolve => {
-        // TODO: form variables
-        const editor = new AKSOScriptEditor();
+    openScriptEditor = (defs) => AKSOScriptEditor().then(Editor => new Promise(resolve => {
+        // it's fine for this to be a potentially delayed action, because if the AKSO script editor
+        // hasn't loaded yet, then the def preview hasn't either
+        const editor = new Editor();
         editor.setFormVars(getFormVarsForIntent(this.state.intent));
         editor.load(defs);
         editor.onSave = () => {
@@ -79,7 +89,7 @@ export default connectPerms(class NotifTemplate extends Page {
             this.detachScriptEditor();
         };
         this.attachScriptEditor(editor);
-    });
+    }));
 
     // TODO: dedup code with form editor
     scriptEditor = null;
@@ -245,12 +255,14 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
                         <EditIcon style={{ verticalAlign: 'middle' }} />
                     </Button>
                 ) : null}
-                <DefsPreview
-                    previousNodes={[{
-                        defs: {},
-                        formVars: getFormVarsForIntent(item.intent),
-                    }]}
-                    script={item.script || {}} />
+                <Suspense fallback={<CircularProgress indeterminate />}>
+                    <DefsPreview
+                        previousNodes={[{
+                            defs: {},
+                            formVars: getFormVarsForIntent(item.intent),
+                        }]}
+                        script={item.script || {}} />
+                </Suspense>
             </div>
             <TemplatingContext.Provider value={templatingContext}>
                 <div class="mail-contents">

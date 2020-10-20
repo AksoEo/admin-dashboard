@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useEffect, useRef } from 'preact/compat';
+import { lazy, Suspense, useEffect, useRef } from 'preact/compat';
 import { CircularProgress, TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import { Field, Validator } from '../../../components/form';
@@ -23,9 +23,12 @@ import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import { FIELDS as INSTANCE_FIELDS } from './instances/fields';
 import { DetailInner as LocationEditor } from './instances/locations/detail';
-import { Detail as ParticipantEditor } from './instances/participants/detail';
 import LocationPicker from './instances/location-picker';
 import './tasks.less';
+
+const ParticipantEditor = lazy(async () => ({
+    default: (await import('./instances/participants/detail')).Detail,
+}));
 
 const CREATE_INSTANCE_FIELDS = ['name', 'humanId', 'dateFrom', 'dateTo'];
 
@@ -420,17 +423,20 @@ export default {
                     fields={{}}
                     locale={{}}>
                     {registrationForm => registrationForm ? (
-                        <ParticipantEditor
-                            editing
-                            creating
-                            item={task.parameters}
-                            onItemChange={item => task.update(item)}
-                            userData={{
-                                congress,
-                                instance,
-                                currency: registrationForm.price && registrationForm.currency,
-                                registrationForm,
-                            }} />
+                        <Suspense
+                            fallback={<CircularProgress indeterminate />}>
+                            <ParticipantEditor
+                                editing
+                                creating
+                                item={task.parameters}
+                                onItemChange={item => task.update(item)}
+                                userData={{
+                                    congress,
+                                    instance,
+                                    currency: registrationForm.price && registrationForm.currency,
+                                    registrationForm,
+                                }} />
+                        </Suspense>
                     ) : <CircularProgress indeterminate />}
                 </DetailShell>
             </TaskDialog>

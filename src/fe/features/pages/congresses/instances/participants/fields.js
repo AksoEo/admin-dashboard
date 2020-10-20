@@ -1,15 +1,17 @@
 import { h } from 'preact';
-import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
+import { lazy, Suspense } from 'preact/compat';
+import { Button, CircularProgress, Checkbox, TextField } from '@cpsdqs/yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import CopyIcon from '../../../../../components/copy-icon';
 import CodeholderPicker from '../../../../../components/codeholder-picker';
 import TextArea from '../../../../../components/text-area';
-import FormEditor from '../../../../../components/form-editor';
 import { IdUEACode } from '../../../../../components/data/uea-code';
 import { LinkButton } from '../../../../../router';
 import { currencyAmount, timestamp } from '../../../../../components/data';
 import { congressParticipants as locale } from '../../../../../locale';
 import './fields.less';
+
+const FormEditor = lazy(() => import('../../../../../components/form-editor'));
 
 export const FIELDS = {
     dataId: {
@@ -203,13 +205,15 @@ export const FIELDS = {
         component ({ value, editing, onChange, userData }) {
             return (
                 <div class="participant-form-data">
-                    <FormEditor
-                        skipSettings
-                        skipNonInputs
-                        value={userData.registrationForm}
-                        formData={value}
-                        editingFormData={editing}
-                        onFormDataChange={onChange} />
+                    <Suspense fallback={<CircularProgress indeterminate />}>
+                        <FormEditor
+                            skipSettings
+                            skipNonInputs
+                            value={userData.registrationForm}
+                            formData={value}
+                            editingFormData={editing}
+                            onFormDataChange={onChange} />
+                    </Suspense>
                 </div>
             );
         },
