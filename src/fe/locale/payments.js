@@ -149,7 +149,7 @@ export const paymentIntents = {
         currencies: 'Valutoj',
         status: 'Stato',
         purposeTrigger: 'Enhavas AKSO-agon',
-        purposeDataId: '[[Triggers DataId]]',
+        purposeDataId: 'Aktivigas aliĝidentigilon',
 
         orgs: {
             tejo: 'TEJO',
@@ -383,8 +383,8 @@ export const paymentIntents = {
             earned: 'Enspezis',
             refunded: 'Redonis',
             // suffixes
-            count: n => `${n} [[pago${n === 1 ? '' : 'j'}n]]`,
-            refunds: n => `${n} [[redono${n === 1 ? '' : 'j'}n]]`,
+            count: n => `${n} pago${n === 1 ? '' : 'j'}n`,
+            refunds: n => `${n} redono${n === 1 ? '' : 'j'}n`,
         },
 
         print: 'Presi',
