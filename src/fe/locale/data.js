@@ -64,7 +64,7 @@ export const data = {
         search: 'Serĉi…',
         selectAll: 'Elekti ĉiujn',
         deselectAll: 'Malelekti ĉiujn',
-        ok: '[[OK]]',
+        ok: 'Bone',
     },
     weekdays: 'DLMMJVS',
     weekStart: 1, // Monday
@@ -183,7 +183,7 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
         deleteYouSure: 'Ĉu vi certas?', // keep this short
         deleting: 'Forigas etikedon …',
         delete: 'Forigi',
-        ok: '[[OK]]',
+        ok: 'Bone',
     },
 };
 
@@ -237,7 +237,7 @@ export const search = {
         searchPlaceholder: 'Serĉi kampon',
         noFieldsAvailable: 'Neniuj kampoj estas elekteblaj',
         sortingDescription: 'La rezultoj estas ordigitaj laŭ la ordo de la kampoj, de supro al malsupro',
-        ok: '[[OK]]',
+        ok: 'Bone',
     },
 };
 

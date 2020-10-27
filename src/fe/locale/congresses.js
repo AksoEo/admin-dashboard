@@ -36,7 +36,7 @@ export const congresses = {
 
 export const congressInstances = {
     detailTitle: 'Kongresa okazigo',
-    registrationFormLink: '[[Registration form]]',
+    registrationFormLink: 'Vidi aliĝilon',
     search: {
         placeholders: {
             name: 'Serĉi nomon de kongresa okazigo',
@@ -60,7 +60,7 @@ export const congressInstances = {
     tabs: {
         locations: 'Lokoj',
         programs: 'Programeroj',
-        participants: '[[Participants]]',
+        participants: 'Aliĝintoj',
     },
     create: {
         menuItem: 'Krei',
@@ -101,7 +101,7 @@ export const congressLocations = {
         rating: 'Taksa valoro',
         icon: 'Bildeto',
         externalLoc: 'Ekstera loko',
-        openHours: '[[Open hours]]',
+        openHours: 'Malfermaj horoj',
 
         ratingInfixOf: 'el',
         ratingInvalid: 'Nevalida taksa valoro',
@@ -238,66 +238,66 @@ export const congressParticipants = {
             notes: 'Serĉi notoj',
         },
         filters: {
-            approval: '[[Approval]]',
+            approval: 'Permana aprobo',
             approvalTypes: {
-                true: '[[approved]]',
-                false: '[[not approved]]',
+                true: 'aprobita',
+                false: 'ne aprobita',
                 none: 'ne gravas',
             },
-            validity: '[[Validity]]',
+            validity: 'Valideco',
             validityTypes: {
-                true: '[[valid]]',
-                false: '[[not valid]]',
+                true: 'valida',
+                false: 'ne valida',
                 none: 'ne gravas',
             },
-            createdTime: '[[Creation Time]]',
-            timeRangeStart: '[[Start Time]]',
-            timeRangeEnd: '[[End Time]]',
-            amountPaid: '[[Amount Paid]]',
-            hasPaidMinimum: '[[Has Paid Minimum]]',
+            createdTime: 'Kreita je',
+            timeRangeStart: 'Komenciĝhoro',
+            timeRangeEnd: 'Finiĝhoro',
+            amountPaid: 'Monsumo pagita',
+            hasPaidMinimum: 'Antaŭpagis',
             paidMinimumTypes: {
-                true: '[[did pay]]',
-                false: '[[did not]]',
+                true: 'jes',
+                false: 'ne',
                 none: 'ne gravas',
             },
-            data: '[[Data]]',
+            data: 'Aliĝdatumoj',
 
             dataVerbs: {
-                eq: { is: '[[is]]', isnt: '[[isnt]]' },
+                eq: { is: 'estas', isnt: 'ne estas' },
                 ord: {
-                    is: '[[is]]',
-                    isnt: '[[isnt]]',
-                    lt: '[[is less than]]',
-                    gt: '[[is greater than]]',
+                    is: 'estas',
+                    isnt: 'ne estas',
+                    lt: 'estas malpli ol',
+                    gt: 'estas pli ol',
                 },
-                set: { in: '[[is in set]]', nin: '[[is not in set]]' },
+                set: { in: 'enestas', nin: 'ne enestas' },
             },
         },
     },
-    noParticipation: '[[No registration form]]',
+    noParticipation: 'Estas neniu aliĝilo',
     fields: {
-        dataId: '[[DataId]]',
+        dataId: 'Aliĝidentigilo',
         codeholderId: 'Membro',
-        approved: '[[Approved]]',
+        approved: 'Aprobita',
         notes: 'Notoj',
-        price: '[[Price]]',
-        paid: '[[Paid]]', // amountPaid + hasPaidMinimum
-        isValid: '[[Valid]]',
-        sequenceId: '[[SeqId]]',
-        cancelledTime: '[[Cancelled]]',
-        createdTime: '[[Created]]',
-        editedTime: '[[Last Edited]]',
-        data: '[[Data]]',
+        price: 'Aliĝkotizo',
+        paid: 'Sumo pagita', // amountPaid + hasPaidMinimum
+        isValid: 'Valideco de aliĝo',
+        sequenceId: 'Kongresa numero',
+        cancelledTime: 'Nuligita',
+        createdTime: 'Kreita je',
+        editedTime: 'Laste redaktita je',
+        data: 'Datumoj',
 
         statuses: {
-            pending: '[[Pending]]',
-            canceled: '[[Canceled]]',
-            valid: '[[Valid]]',
+            pending: 'Atendanta',
+            canceled: 'Nuligita',
+            valid: 'Valida',
         },
 
         codeholderIdViewCodeholder: 'Vidi membron',
         hasPaidMinimumShort: 'min',
-        hasPaidMinimumDescription: '[[Participant has paid minimum]]',
+        hasPaidMinimumDescription: 'Aliĝinto antaŭpagis',
     },
     spreadsheet: {
         title: 'Aliĝintoj',
@@ -316,24 +316,24 @@ export const congressParticipants = {
         menuItem: 'Forigi',
         title: 'Forigi aliĝinton',
         button: 'Forigi',
-        description: '[[Are you sure you don’t want to cancel the registration instead? ]] kaj vi certas, ke vi volas forigi la aliĝinton? Ne eblas malfari tiun ĉi agon.',
+        description: 'Ĉu vi certas, ke vi ne volas anstataŭe nuligi la aliĝon, kaj ke vi volas nepre forigi la aliĝon? Ne eblas malfari tiun ĉi agon.',
     },
     csvFilename: 'alighintoj',
 };
 
 export const congressRegistrationForm = {
     title: 'Aliĝilo',
-    editingTitle: 'Redakti aliĝilo',
+    editingTitle: 'Redakti aliĝilon',
     create: 'Krei',
-    noForm: '[[No registration form]]', // when user doesn't have permissions to create
+    noForm: 'Estas neniu aliĝilo', // when user doesn't have permissions to create
     update: {
         menuItem: 'Redakti',
-        title: 'Redakti aliĝilo',
+        title: 'Redakti aliĝilon',
         button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
-        title: 'Forigi aliĝilo',
+        title: 'Forigi aliĝilon',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la aliĝilon? Ne eblas malfari tiun ĉi agon.',
     },

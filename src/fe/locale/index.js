@@ -22,9 +22,9 @@ export const meta = {
     sourceHref: 'https://github.com/AksoEo',
     source: 'GitHub',
 
-    feVersion: '[[FE version]]',
-    feVersionBuilt: '[[built]]',
-    apiVersion: '[[API version]]',
+    feVersion: 'AKSO-Admin versio',
+    feVersionBuilt: 'kompilita',
+    apiVersion: 'API versio',
 };
 
 export * from './data';

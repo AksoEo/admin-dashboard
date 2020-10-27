@@ -89,7 +89,7 @@ export const codeholders = {
         codeList: {
             pickCodes: 'Listo de kodoj',
             description: 'Enmetu UEA-kodojn en la ĉi-suban liston; po unu en unu vico.',
-            ok: '[[OK]]',
+            ok: 'Bone',
         },
     },
     globalFilterTitle: 'La rezultoj estas filtritaj',
@@ -321,22 +321,22 @@ export const codeholders = {
         },
     },
     notifTemplates: {
-        cursedNotice: '[[Golden results will not receive a notification.]]',
-        description: '[[Notifications will be sent to all codeholders according to your current filter, or something.]]',
-        menuItem: '[[Send notif]]',
-        title: '[[Send notif]]',
-        empty: '[[No templates for intent codeholder]]',
-        deleteOnComplete: '[[Delete notif template on completion]]',
+        cursedNotice: 'Oraj rezultoj ne ricevos mesaĝon.',
+        description: 'Mesaĝoj estos senditaj al ĉiuj membroj laŭ via nuna filtrilo.',
+        menuItem: 'Sendi amasmesaĝon',
+        title: 'Sendi amasmesaĝon',
+            empty: 'Estas neniuj ŝablonoj kun la celo “membro”',
+        deleteOnComplete: 'Forigi la ŝablonon post sendado',
         send: {
-            button: '[[Confirmation Step]]',
+            button: 'Al konfirma paŝo',
 
-            title: '[[Send notif]]',
-            confirm: '[[Send]]',
+            title: 'Sendi amasmesaĝon',
+            confirm: 'Sendi',
 
-            messagePre: '[[Send a notification to]]',
+            messagePre: 'Sendas mesaĝon al',
             messagePost: n => `${n} membro${n === 1 ? '' : 'j'}`,
             messagePostIndeterminate: 'membroj',
-            messagePostUnknown: '[[??? membroj]]',
+            messagePostUnknown: '... kalkulas',
         },
     },
     publicity: {

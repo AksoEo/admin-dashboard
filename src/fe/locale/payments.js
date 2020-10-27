@@ -90,13 +90,13 @@ export const paymentMethods = {
         isRecommended: 'Rekomendita',
         stripeSecretKey: 'Sekreta ŝlosilo de Stripe',
         stripePublishableKey: 'Publika ŝlosilo de Stripe',
-        fee: '[[Fee]]',
-        feeFixed: '[[Fixed fee]]',
-        feePercent: '[[Percent fee]]',
+        fee: 'Kotizo',
+        feeFixed: 'Fiksa kotizo',
+        feePercent: 'Elcenta kotizo',
         fees: {
-            fixed: '[[Fixed fee]]',
-            percent: '[[Percent fee]]',
-            description: '[[Fixed and percent fees will be added together.]]',
+            fixed: 'Fiksa kotizo',
+            percent: 'Elcenta kotizo',
+            description: 'La fiksaj kaj elcentaj kotizoj estos kunaldonitaj',
         },
 
         types: {
@@ -148,7 +148,7 @@ export const paymentIntents = {
         org: 'AKSO-Organizo',
         currencies: 'Valutoj',
         status: 'Stato',
-        purposeTrigger: '[[Has Trigger]]',
+        purposeTrigger: 'Enhavas AKSO-agon',
         purposeDataId: '[[Triggers DataId]]',
 
         orgs: {
@@ -224,7 +224,7 @@ export const paymentIntents = {
             button: 'Krei disputon',
 
             stripeTitle: 'Tio ĉi eblas nur en la retejo de Stripe',
-            stripeDescription: '[[kreado de disputo nur eblas etc etc]]',
+            stripeDescription: 'Nur eblas krei disputojn en la retejo de Stripe. AKSO aŭtomate ĝisdatiĝas surbaze de la informoj de Stripe.',
             stripeButton: 'Iri al Stripe',
         },
         markRefunded: {
@@ -295,10 +295,10 @@ export const paymentIntents = {
             refunded: '', // allowed
         },
         refunded: {
-            submitted: '[[nope]]',
-            canceled: '[[nope]]',
-            succeeded: '[[nope]]',
-            disputed: '[[nope]]',
+            submitted: 'La pago estis redonita; kaj do ne plu eblas indiki sendadon de la mono.',
+            canceled: 'La pago estis redonita; kaj do ne eblas nun ĝin nuligi.',
+            succeeded: 'La pago estis redonita; kaj do ne plu eblas indiki sukcesan ricevon de la mono.',
+            disputed: 'La pago estis redonita; kaj do ne plu eblas krei disputon.',
             refunded: '', // allowed
         },
     },
@@ -322,7 +322,7 @@ export const paymentIntents = {
         selectCurrencyFirst: 'Unue necesas elekti valuton',
         addPurposeButton: 'Aldoni pagcelon',
         useOriginalAmount: '[[Amount is discounted]]',
-        originalAmount: '[[Original amount]]',
+        originalAmount: 'Nerabatita prezo',
         useTriggerAmount: '[[Different trigger amount]]',
         types: {
             manual: 'Permana',
@@ -333,12 +333,12 @@ export const paymentIntents = {
             title: 'Titolo',
             description: 'Priskribo',
         },
-        noAddons: '[[This org has no addons]]',
-        dataId: '[[DataId]]',
-        invalidDataId: '[[Invalid data id]]',
+        noAddons: 'Tiu ĉi pagorganizo havas neniujn aldoneblojn',
+        dataId: 'Aliĝidentigilo',
+        invalidDataId: 'Nevalida aliĝidentigilo',
     },
     triggers: {
-        congress_registration: '[[Congress registration]]',
+        congress_registration: 'Kongresa aliĝo',
     },
     create: {
         menuItem: 'Krei',
@@ -358,37 +358,37 @@ export const paymentIntents = {
     },
 
     report: {
-        title: '[[report]]',
+        title: 'Raporto',
 
-        startTime: '[[range start]]',
-        endTime: '[[range end]]',
+        startTime: 'Komenciĝhoro',
+        endTime: 'Finiĝhoro',
 
-        total: '[[total]]',
-        totalEarned: '[[earned]]', // suffix
-        totalRefunded: '[[refunded]]', // suffix
+        total: 'Sume',
+        totalEarned: 'enspezita', // suffix
+        totalRefunded: 'redonita', // suffix
 
-        byCurrency: '[[By Currency]]',
+        byCurrency: 'Laŭ valuto',
 
-        paymentOrg: '[[Payment Org]]',
-        paymentMethod: '[[Payment Method]]',
-        paymentAddon: '[[Payment Addon]]',
+        paymentOrg: 'Pagorganizo',
+        paymentMethod: 'Pagmetodo',
+        paymentAddon: 'Aldoneblo',
 
-        currencyHeader: '[[Currency]]', // table header
-        totalHeader: '[[Total]]', // table header
+        currencyHeader: 'Valuto', // table header
+        totalHeader: 'Sume', // table header
 
-        addonsNote: '[[Note that for payment addons, refunds cannot be tracked for addons. Invalidated addons are not included.]]',
+        addonsNote: 'Ne eblas ŝpuri redonojn de aldonebloj; tial nevalidigitaj aldonebloj ne estas inkluzivitaj.',
 
         totals: {
             // prefixes
-            earned: '[[earned]]',
-            refunded: '[[refunded]]',
+            earned: 'Enspezis',
+            refunded: 'Redonis',
             // suffixes
-            count: n => `${n} [[payment${n === 1 ? '' : 's'}]]`,
-            refunds: n => `${n} [[refund${n === 1 ? '' : 's'}]]`,
+            count: n => `${n} [[pago${n === 1 ? '' : 'j'}n]]`,
+            refunds: n => `${n} [[redono${n === 1 ? '' : 'j'}n]]`,
         },
 
-        print: '[[print]]',
-        failedToOpenPrintWindow: '[[failed to open print window]]',
+        print: 'Presi',
+        failedToOpenPrintWindow: 'Ne sukcesis malfermi la presilan fenestron',
     },
 };
 
