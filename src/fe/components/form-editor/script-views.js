@@ -239,7 +239,8 @@ export class DefsPreview extends PureComponent {
         }
     }
 
-    render ({ ...props }) {
+    render ({ script, previousNodes, ...props }) {
+        void script, previousNodes;
         return (
             <div
                 {...props}

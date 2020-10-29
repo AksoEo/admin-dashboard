@@ -5,6 +5,7 @@ import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import RearrangingList from '../rearranging-list';
 import DynamicHeightDiv from '../dynamic-height-div';
+import CountryPicker from '../country-picker';
 import MdField from '../md-field';
 import Select from '../select';
 import TextArea from '../text-area';
@@ -251,7 +252,6 @@ const TYPES = {
             );
         },
         settings: {
-            add: true,
             exclude: true,
             chAutofill: ['country', 'feeCountry'],
         },
@@ -386,7 +386,7 @@ export default class InputItem extends PureComponent {
     oldName = null;
 
     componentDidMount () {
-        this.oldName = this.props.item.name;
+        this.oldName = this.props.item.name || null;
     }
 
     /// Evaluates any AKSO Script exprs in the item value.
@@ -536,11 +536,11 @@ const SETTINGS = {
                     helperLabel={helperLabel}
                     error={!NAME_REGEX.test(value) && locale.inputFields.namePatternError}
                     maxLength={20}
-                    onChange={e => onItemChange({
-                        ...item,
-                        name: e.target.value,
-                        oldName,
-                    })} />
+                    onChange={e => {
+                        const newItem = { ...item, name: e.target.value };
+                        if (oldName) newItem.oldName = oldName;
+                        onItemChange(newItem);
+                    }} />
             </Setting>
         );
     },
@@ -819,6 +819,13 @@ const SETTINGS = {
         return (
             <Setting stack label={locale.inputFields.options}>
                 <OptionsEditor value={value} onChange={onChange} />
+            </Setting>
+        );
+    },
+    exclude ({ value, onChange }) {
+        return (
+            <Setting stack label={locale.inputFields.exclude}>
+                <CountryPicker value={value} onChange={onChange} hideGroups />
             </Setting>
         );
     },

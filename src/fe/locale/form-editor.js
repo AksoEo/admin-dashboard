@@ -121,6 +121,7 @@ export const formEditor = {
             false: 'Elektebla',
         },
         optionsOnlyExisting: 'Nur aliĝintoj kiuj jam antaŭe elektis tiun ĉi opcion rajtas elekti ĝin',
+        exclude: 'Malŝaltitaj landoj',
         rows: 'Vicoj',
         cols: 'Kolumnoj',
         minSelect: 'Minimuma elekto',

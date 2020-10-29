@@ -9,7 +9,12 @@ import './object-viewer.less';
 /// # Props
 /// - value: the JSON object
 export default function ObjectViewer ({ value }) {
-    return <div class="object-viewer"><InnerObjectViewer value={value} /></div>;
+    return <div class="object-viewer">
+        <button onClick={() => {
+            navigator.clipboard.writeText(JSON.stringify(value, undefined, 4)).catch(console.error); // eslint-disable-line no-console
+        }}>COPY THE WHOLE THING</button>
+        <InnerObjectViewer value={value} />
+    </div>;
 }
 
 const PREVIEW_LEN = 3;

@@ -65,7 +65,7 @@ export function createInput (type) {
         type,
         name: '',
         label: '',
-        description: '',
+        description: null,
         default: null,
         required: false,
         disabled: false,

@@ -104,17 +104,26 @@ const InnerEditor = connect(({ congress, instance }) => [
         });
     };
 
+    #commitTask = null;
     beginCommit = () => {
-        this.props.core.createTask('congresses/setRegistrationForm', {
+        this.#commitTask = this.props.core.createTask('congresses/setRegistrationForm', {
             congress: this.props.congress,
             instance: this.props.instance,
         }, {
             data: this.state.edit,
         });
+        this.#commitTask.on('success', () => {
+            this.setState({ edit: null });
+        });
+        this.#commitTask.on('drop', () => this.#commitTask = null);
     };
 
     componentDidUpdate () {
         this.props.onLoad(this.props.loaded && !!this.props.data);
+    }
+
+    componentWillUnmount () {
+        if (this.#commitTask) this.#commitTask.drop();
     }
 
     render ({ data, loaded, canEdit }, { edit }) {
