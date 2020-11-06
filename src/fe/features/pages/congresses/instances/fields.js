@@ -1,12 +1,9 @@
 import { h } from 'preact';
-import moment from 'moment';
 import { TextField } from '@cpsdqs/yamdl';
-import Select from '../../../../components/select';
+import TimeZoneEditor from '../../../../components/time-zone';
 import TextArea from '../../../../components/text-area';
 import { date } from '../../../../components/data';
 import { congressInstances as locale } from '../../../../locale';
-
-const ALL_ZONES = moment.tz.names();
 
 const string100Editor = label => ({
     component ({ value, editing, onChange }) {
@@ -66,16 +63,7 @@ export const FIELDS = {
     },
     tz: {
         component ({ value, editing, onChange }) {
-            if (editing) {
-                return <Select
-                    value={value}
-                    onChange={onChange}
-                    items={ALL_ZONES.map(zone => ({
-                        value: zone,
-                        label: zone,
-                    }))} />;
-            }
-            return value;
+            return <TimeZoneEditor value={value} onChange={onChange} editing={editing} />;
         },
     },
 };

@@ -6,6 +6,7 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import RearrangingList from '../rearranging-list';
 import DynamicHeightDiv from '../dynamic-height-div';
 import CountryPicker from '../country-picker';
+import TimeZoneEditor from '../time-zone';
 import MdField from '../md-field';
 import Select from '../select';
 import TextArea from '../text-area';
@@ -303,6 +304,7 @@ const TYPES = {
         settings: {
             min: 'datetime',
             max: 'datetime',
+            tz: true,
         },
     },
     boolean_table: {
@@ -826,6 +828,13 @@ const SETTINGS = {
         return (
             <Setting stack label={locale.inputFields.exclude}>
                 <CountryPicker value={value} onChange={onChange} hideGroups />
+            </Setting>
+        );
+    },
+    tz ({ value, onChange }) {
+        return (
+            <Setting label={locale.inputFields.tz}>
+                <TimeZoneEditor value={value} onChange={onChange} editing />
             </Setting>
         );
     },

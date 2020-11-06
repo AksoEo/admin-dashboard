@@ -122,6 +122,7 @@ export const formEditor = {
         },
         optionsOnlyExisting: 'Nur aliĝintoj kiuj jam antaŭe elektis tiun ĉi opcion rajtas elekti ĝin',
         exclude: 'Malŝaltitaj landoj',
+        tz: 'Horzono',
         rows: 'Vicoj',
         cols: 'Kolumnoj',
         minSelect: 'Minimuma elekto',

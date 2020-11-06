@@ -325,7 +325,7 @@ export const codeholders = {
         description: 'Mesaĝoj estos senditaj al ĉiuj membroj laŭ via nuna filtrilo.',
         menuItem: 'Sendi amasmesaĝon',
         title: 'Sendi amasmesaĝon',
-            empty: 'Estas neniuj ŝablonoj kun la celo “membro”',
+        empty: 'Estas neniuj ŝablonoj kun la celo “membro”',
         deleteOnComplete: 'Forigi la ŝablonon post sendado',
         send: {
             button: 'Al konfirma paŝo',

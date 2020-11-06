@@ -1,5 +1,6 @@
 import { h } from 'preact';
-import { useRef } from 'preact/compat';
+import { PureComponent, useRef } from 'preact/compat';
+import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 import { data as locale } from '../../locale';
 
 function TimespanRenderer ({ value }) {
@@ -19,19 +20,87 @@ function TimespanRenderer ({ value }) {
     return out.join(', ');
 }
 
-function TimespanUnitEditor ({ value, onChange, fac, mod, unit }) {
-    const inputNode = useRef(null);
-    const editingValue = Math.floor((mod ? (value | 0) % mod : (value | 0)) / fac);
-
-    const onInputChange = e => {
-        const stringValue = e.target.value;
-        const extraFloored = (value | 0) - editingValue * fac;
-        const baseValue = (stringValue | 0) * fac;
-        const newValue = baseValue + extraFloored;
-        onChange(newValue);
+class TimespanUnitEditor extends PureComponent {
+    state = {
+        editing: false,
+        editingValue: null,
     };
 
-    const onKeyDown = e => {
+    inputNode = useRef(null);
+    bounceY = new Spring(0.5, 0.4);
+
+    update (dt) {
+        this.bounceY.update(dt);
+        if (!this.bounceY.wantsUpdate()) {
+            this.bounceY.finish();
+            globalAnimator.deregister(this);
+        }
+        this.forceUpdate();
+    }
+
+    onFocus = () => {
+        this.setState({ editing: true, editingValue: this.getValue() }, () => {
+            this.inputNode.current.selectionStart = 0;
+            this.inputNode.current.selectionEnd = this.inputNode.current.value.length;
+        });
+    };
+    onBlur = () => {
+        if (this.commit()) this.committing = true;
+    };
+
+    componentDidUpdate (prevProps) {
+        if (this.props.value !== prevProps.value) {
+            if (this.state.editing) {
+                this.setState({ editingValue: this.getValue() });
+            }
+
+            const oldVal = this.committing ? this.committedValue : this.getValue(prevProps.value);
+            const newVal = this.getValue();
+            if (!this.committing || (newVal !== this.committedValue)) {
+                if (newVal < oldVal) {
+                    this.bounceY.velocity += 200;
+                    globalAnimator.register(this);
+                } else if (newVal > oldVal) {
+                    this.bounceY.velocity -= 200;
+                    globalAnimator.register(this);
+                }
+            }
+        }
+
+
+        if (this.committing) {
+            this.committing = false;
+            this.setState({ editing: false });
+        }
+    }
+
+    getValue (value = this.props.value) {
+        const { fac, mod } = this.props;
+        return Math.floor((mod ? ((value | 0) % mod) : (value | 0)) / fac);
+    }
+
+    commit () {
+        const { fac } = this.props;
+        const currentValue = this.getValue();
+        const stringValue = this.state.editingValue;
+
+        const intValue = parseInt(stringValue, 10);
+        if (!Number.isFinite(intValue)) return false;
+        this.committedValue = intValue;
+
+        const extraFloored = (this.props.value | 0) - currentValue * fac;
+        const baseValue = intValue * fac;
+        const newValue = baseValue + extraFloored;
+
+        this.props.onChange(newValue);
+        return true;
+    }
+
+    onInputChange = e => {
+        this.setState({ editingValue: e.target.value });
+    };
+
+    onKeyDown = e => {
         if (!e.metaKey && !e.ctrlKey && !e.altKey) {
             // technically not spec-compliant to have selection in type number but it works in some
             // browsers
@@ -47,7 +116,7 @@ function TimespanUnitEditor ({ value, onChange, fac, mod, unit }) {
                     ps.setSelectionRange(ps.value.length, ps.value.length);
                     e.preventDefault();
                 }
-            } else if (e.key === 'ArrowRight' && sa === end && sb === end) {
+            } else if ((e.key === 'ArrowRight' || e.key === this.props.unit) && sa === end && sb === end) {
                 // focus next input
                 let ns = e.target.parentNode.nextElementSibling;
                 if (ns) ns = ns.querySelector('input');
@@ -59,27 +128,30 @@ function TimespanUnitEditor ({ value, onChange, fac, mod, unit }) {
             }
         }
     };
-    const onClick = () => {
-        inputNode.current.focus();
-    };
 
-    const max = mod ? mod : Math.floor(2147483647 / fac);
+    render ({ mod, fac, unit }, { editing, editingValue }) {
+        const inputValue = (editing || this.committing) ? editingValue : this.getValue();
 
-    return (
-        <span class="te-field" onClick={onClick}>
-            <input
-                ref={inputNode}
-                class="te-field-input"
-                type="number"
-                min="0"
-                step="1"
-                max={max}
-                value={editingValue.toString()}
-                onKeyDown={onKeyDown}
-                onChange={onInputChange} />
-            <span class="te-field-unit">{unit}</span>
-        </span>
-    );
+        const max = mod ? mod : Math.floor(2147483647 / fac);
+
+        return (
+            <span class="te-field" style={{ transform: `scale(${1 - this.bounceY.value / 30})` }}>
+                <input
+                    ref={this.inputNode}
+                    class="te-field-input"
+                    type="number"
+                    min="0"
+                    step="1"
+                    max={max}
+                    value={inputValue.toString()}
+                    onKeyDown={this.onKeyDown}
+                    onFocus={this.onFocus}
+                    onBlur={this.onBlur}
+                    onChange={this.onInputChange} />
+                <span class="te-field-unit">{unit}</span>
+            </span>
+        );
+    }
 }
 
 function TimespanEditor ({ value, onChange }) {

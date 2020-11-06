@@ -96,7 +96,7 @@ export const notifTemplateIntentExamples = {
         newCode: 'zamlud',
         codeholderType: 'human',
         hasPassword: true,
-        addressFormatted: "Esperantostrato 42\n2020 Bjalistoko\nPOLLANDO",
+        addressFormatted: 'Esperantostrato 42\n2020 Bjalistoko\nPOLLANDO',
         addressLatin: {
             country: 'pl',
             countryArea: null,
