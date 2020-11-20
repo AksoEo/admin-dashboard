@@ -174,6 +174,8 @@ export default {
         const method = task.parameters.method || {};
         const [availableCurrencies, setCurrencies] = useState([]);
 
+        const [shouldImmediatelySubmit, setShouldImmediatelySubmit] = useState(false);
+
         fields.push(
             <div key="customer" class="create-intent-subtitle">
                 {intentLocale.fields.customer}
@@ -276,9 +278,13 @@ export default {
                     onChange={id => {
                         if (id) task.update({ method: { id } });
                         else task.update({ method: null, currency: null });
+                    }}
+                    onItemData={data => {
+                        if (data) setShouldImmediatelySubmit(data.type === 'manual');
                     }} />
             </Field>
         );
+
         if (method.id) {
             fields.push(
                 <div key="currency-title" class="create-intent-subtitle">
@@ -353,7 +359,9 @@ export default {
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/aksopago/pagoj/${id}`);
                             // immediately submit
-                            core.createTask('payments/submitIntent', { id }).run();
+                            if (shouldImmediatelySubmit) {
+                                core.createTask('payments/submitIntent', { id }).run();
+                            }
                         })}>
                         <DynamicHeightDiv useFirstHeight>
                             {fields}

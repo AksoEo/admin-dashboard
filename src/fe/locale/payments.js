@@ -206,6 +206,14 @@ export const paymentIntents = {
             manual: 'Permana',
             addon: 'Donaco',
         },
+        purpose: {
+            triggerAmount: '[[Trigger amount]]',
+            triggerStatuses: {
+                awaiting: '[[Awaiting payment]]',
+                processing: '[[Processing trigger]]',
+                triggered: '[[Triggered]]',
+            },
+        },
     },
     detailTo: 'al', // X currency >to< org
     detailViewCodeholder: 'Montri membron',

@@ -43,6 +43,7 @@
     --secondary: @__secondary--internal;
     --secondary-lighten-10: lighten(@__secondary--internal, 10%);
     --secondary-fade-50: fade(@__secondary--internal, 50%);
+    --secondary-fade-20: fade(@__secondary--internal, 20%);
     --warning: @__warning--internal;
     --warning-text: #cfad20;
     --danger: @__danger--internal;
@@ -131,6 +132,8 @@
 @danger-fade-20: var(--danger-fade-20);
 @error-fade-20: @danger-fade-20;
 @positive: @secondary;
+@positive-fade-20: var(--secondary-fade-20);
+@positive-fade-50: var(--secondary-fade-50);
 @text: var(--text);
 @text-fade-10: var(--text-fade-10);
 @text-fade-40: var(--text-fade-40);

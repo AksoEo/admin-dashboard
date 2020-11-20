@@ -24,7 +24,7 @@ const METHOD_FIELD_IDS = [{ id: 'type' }, { id: 'name' }, { id: 'internalDescrip
 const REDUCED_METHOD_FIELDS = Object.fromEntries(METHOD_FIELD_IDS
     .map(({ id }) => [id, METHOD_FIELDS[id]]));
 
-/// Picker for manual payment methods.
+/// Picker for payment methods.
 ///
 /// # Props
 /// - value/onChange
@@ -77,6 +77,7 @@ export default class PaymentMethodPicker extends PureComponent {
                             if (method.currencies) {
                                 onGetCurrencies && onGetCurrencies(method.currencies);
                             }
+                            if (this.props.onItemData) this.props.onItemData(method);
                         }} />
                     <Button
                         class="remove-button"
@@ -148,9 +149,6 @@ export default class PaymentMethodPicker extends PureComponent {
                         viewOptions={org ? { org } : null}
                         fields={org ? REDUCED_METHOD_FIELDS : ORG_FIELDS}
                         sorting={{ name: 'asc' }}
-                        jsonFilter={org ? {
-                            type: 'manual',
-                        } : null}
                         offset={org ? methodOffset : orgOffset}
                         onSetOffset={offset => {
                             if (org) this.setState({ methodOffset: offset });

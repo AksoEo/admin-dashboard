@@ -37,7 +37,7 @@
 
                 .method-stripe {
                     color: #32325d;
-                    text-decoration: none;
+                    text-decoration: underline;
 
                     &:hover {
                         opacity: 0.8;
@@ -107,6 +107,7 @@
                 padding: 2px 4px;
                 border: 1px solid @separator;
                 border-radius: 4px;
+                white-space: nowrap;
             }
         }
 
@@ -211,18 +212,50 @@
         .purpose-trigger-info {
             margin-bottom: 4px;
 
-            .purpose-triggers, .purpose-data-id {
-                padding: 2px 4px;
-                font-size: small;
-                border-radius: 4px;
+            .purpose-trigger-type {
+                .purpose-triggers, .purpose-data-id {
+                    padding: 2px 4px;
+                    font-size: small;
+                    border-radius: 4px;
+                }
+                .purpose-triggers {
+                    border: 1px solid @separator;
+                }
+                .purpose-data-id {
+                    font-family: @monospace;
+                    background: @text-fade-10;
+                    margin-left: 4px;
+                }
             }
-            .purpose-triggers {
-                border: 1px solid @separator;
-            }
-            .purpose-data-id {
-                font-family: @monospace;
-                background: @text-fade-10;
-                margin-left: 4px;
+
+            .purpose-trigger-status {
+                margin: 4px 0;
+
+                .inner-trigger-status {
+                    display: inline-flex;
+                    align-items: center;
+                    background: @text-fade-10;
+                    border-radius: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    font-weight: 500;
+                    font-size: small;
+                    padding: 0 4px;
+
+                    &[data-status="triggered"] {
+                        background: none;
+                        color: @positive;
+
+                        @media (prefers-color-scheme: dark) {
+                            background: @positive-fade-50;
+                            color: inherit;
+                        }
+                    }
+
+                    .icon-container:not(:empty) {
+                        margin-right: 4px;
+                    }
+                }
             }
         }
 

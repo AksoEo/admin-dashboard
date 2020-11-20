@@ -5,6 +5,9 @@ import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import AnnouncementIcon from '@material-ui/icons/Announcement';
 import SendIcon from '@material-ui/icons/Send';
+import DoneIcon from '@material-ui/icons/Done';
+import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
+import HourglassFullIcon from '@material-ui/icons/HourglassFull';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
 import Page from '../../../../components/page';
@@ -249,7 +252,7 @@ function Purpose ({ purpose, item }) {
     }
 
     if (purpose.type === 'trigger') {
-        trigger = <PurposeTriggerInfo purpose={purpose} />;
+        trigger = <PurposeTriggerInfo purpose={purpose} currency={item.currency} />;
     }
 
     return (
@@ -279,15 +282,60 @@ function Purpose ({ purpose, item }) {
     );
 }
 
-function PurposeTriggerInfo ({ purpose }) {
+function PurposeTriggerInfo ({ purpose, currency }) {
+    let triggerAmount = null;
+    if (purpose.triggerAmount) {
+        triggerAmount = (
+            <div class="purpose-trigger-amount">
+                <label>
+                    {locale.fields.purpose.triggerAmount}:
+                </label>
+                {' '}
+                <currencyAmount.renderer
+                    value={purpose.triggerAmount.amount}
+                    currency={purpose.triggerAmount.currency} />
+            </div>
+        );
+    }
+
+    let statusIcon = null;
+    if (purpose.triggerStatus === 'awaiting') statusIcon = <HourglassEmptyIcon style={{ verticalAlign: 'middle' }} />;
+    else if (purpose.triggerStatus === 'processing') statusIcon = <HourglassFullIcon style={{ verticalAlign: 'middle' }} />;
+    else if (purpose.triggerStatus === 'triggered') statusIcon = <DoneIcon style={{ verticalAlign: 'middle' }} />;
+
+    let originalAmount = null;
+    if (purpose.originalAmount) {
+        originalAmount = (
+            <div class="purpose-trigger-original-amount">
+                <label>
+                    {locale.fields.purpose.originalAmount}:
+                </label>
+                {' '}
+                <currencyAmount.renderer
+                    value={purpose.originalAmount}
+                    currency={currency} />
+            </div>
+        );
+    }
+
     return (
         <div class="purpose-trigger-info">
-            <span class="purpose-triggers">
-                {locale.triggers[purpose.triggers]}
-            </span>
-            <span class="purpose-data-id">
-                {purpose.dataId}
-            </span>
+            <div class="purpose-trigger-type">
+                <span class="purpose-triggers">
+                    {locale.triggers[purpose.triggers]}
+                </span>
+                <span class="purpose-data-id">
+                    {purpose.dataId}
+                </span>
+            </div>
+            <div class="purpose-trigger-status">
+                <div class="inner-trigger-status" data-status={purpose.triggerStatus}>
+                    <span class="icon-container">{statusIcon}</span>
+                    {locale.fields.purpose.triggerStatuses[purpose.triggerStatus]}
+                </div>
+            </div>
+            {triggerAmount}
+            {originalAmount}
         </div>
     );
 }
