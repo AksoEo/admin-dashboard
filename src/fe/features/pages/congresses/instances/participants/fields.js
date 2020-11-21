@@ -35,6 +35,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     codeholderId: {
+        weight: 0.5,
         isEmpty: () => false,
         component ({ value, editing, onChange, slot }) {
             if (editing) {
@@ -82,6 +83,7 @@ export const FIELDS = {
         },
     },
     approved: {
+        sortable: true,
         weight: 0.5,
         isEmpty: () => false,
         component ({ value, editing, onChange }) {
@@ -98,6 +100,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     isValid: {
+        sortable: true,
         weight: 0.5,
         isEmpty: () => false,
         component ({ value }) {
@@ -152,6 +155,7 @@ export const FIELDS = {
         },
     },
     sequenceId: {
+        sortable: true,
         weight: 0.5,
         component ({ value, editing, onChange }) {
             if (editing) {
@@ -171,6 +175,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     createdTime: {
+        sortable: true,
         weight: 1.5,
         component ({ value }) {
             return <timestamp.renderer value={value * 1000} />;
@@ -178,6 +183,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     editedTime: {
+        sortable: true,
         weight: 1.5,
         component ({ value }) {
             if (!value) return '—';
@@ -186,6 +192,7 @@ export const FIELDS = {
         stringify: v => v,
     },
     cancelledTime: {
+        sortable: true,
         weight: 1.5,
         component ({ value, editing, onChange }) {
             if (editing) {

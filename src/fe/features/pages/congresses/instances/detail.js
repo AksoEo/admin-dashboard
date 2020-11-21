@@ -64,14 +64,26 @@ export default connectPerms(class CongressInstancePage extends Page {
         return +this.props.match[1];
     }
 
+    previousTabState = null;
     get tab () {
-        if (this.props.editing) return null;
-        if (this.props.locations) return 'locations';
-        if (this.props.programs) return 'programs';
-        if (this.props.participants) return 'participants';
+        let tab;
+        if (this.props.editing) tab = null;
+        else if (this.props.locations) tab = 'locations';
+        else if (this.props.programs) tab = 'programs';
+        else if (this.props.participants) tab = 'participants';
+        else {
+            tab = null;
+            if (this.props.isTopPage) {
+                this.props.push('lokoj', true);
+                tab = 'locations';
+            }
+        }
 
-        if (this.props.isTopPage) this.props.push('lokoj', true);
-        return 'locations';
+        if (tab !== null) {
+            this.previousTabState = tab;
+        }
+
+        return this.previousTabState;
     }
     set tab (tab) {
         if (tab === this.tab) return;
@@ -123,7 +135,11 @@ export default connectPerms(class CongressInstancePage extends Page {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
-                action: () => this.props.push('redakti', true),
+                action: () => {
+                    // editing breaks the current tab state, so just empty the query
+                    this.props.onQueryChange('');
+                    this.props.push('redakti', true);
+                },
             });
         }
 
