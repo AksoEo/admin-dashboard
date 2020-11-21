@@ -30,6 +30,7 @@ export function fieldDiff (existing, changed) {
     const keySet = new Set(Object.keys(existing));
     for (const k in changed) keySet.add(k);
     for (const k of keySet) {
+        if (!(k in changed)) continue; // field is not in the PATCH data so don't touch it
         if (!deepEq(existing[k], changed[k])) delta[k] = changed[k];
     }
     return delta;
@@ -192,6 +193,7 @@ export function coerceToNull (value) {
 /// converts from client repr to api repr
 export const makeClientToAPI = clientFields => (clientRepr) => {
     const apiRepr = {};
+    if (!clientRepr) return apiRepr;
     for (const field in clientFields) {
         const spec = clientFields[field];
         if (clientRepr[field] === undefined) {

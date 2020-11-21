@@ -31,6 +31,21 @@ export default class WorkerInterface extends EventEmitter {
         return new Task(this, ...args);
     }
 
+    /// Creates a data view and destroys it after receiving either data or an error.
+    viewData (...args) {
+        return new Promise((resolve, reject) => {
+            const view = new DataView(this, ...args);
+            view.on('update', data => {
+                resolve(data);
+                view.drop();
+            });
+            view.on('error', error => {
+                reject(error);
+                view.drop();
+            });
+        });
+    }
+
     registerDataView (view) {
         this.views.set(view.id, view);
         this.worker.postMessage({

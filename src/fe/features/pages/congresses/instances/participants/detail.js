@@ -1,11 +1,14 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
+import SearchIcon from '@material-ui/icons/Search';
 import Page from '../../../../../components/page';
 import DetailShell from '../../../../../components/detail-shell';
+import TaskButton from '../../../../../components/task-button';
 import Meta from '../../../../meta';
 import { connectPerms } from '../../../../../perms';
 import { coreContext } from '../../../../../core/connection';
 import { congressParticipants as locale } from '../../../../../locale';
+import { LinkButton } from '../../../../../router';
 import { FIELDS } from './fields';
 import './detail.less';
 
@@ -83,7 +86,7 @@ export default connectPerms(class ParticipantsPage extends Page {
 
         const currency = registrationForm && registrationForm.price
             ? registrationForm.price.currency : null;
-        const userData = { congress, instance, currency, registrationForm };
+        const userData = { org, congress, instance, currency, registrationForm };
 
         return (
             <div class="congress-participant-detail-page">
@@ -108,6 +111,7 @@ export default connectPerms(class ParticipantsPage extends Page {
                     onDelete={() => this.props.pop()}>
                     {data => (
                         <Detail
+                            core={this.context}
                             editing={editing}
                             onItemChange={edit => this.setState({ edit })}
                             item={this.state.edit || data}
@@ -146,7 +150,7 @@ function DetailField ({ field, item, editing, onItemChange, userData }) {
         userData={userData} />;
 }
 
-export function Detail ({ item, creating, editing, onItemChange, userData }) {
+export function Detail ({ core, item, creating, editing, onItemChange, userData }) {
     const statusType = item.isValid ? 'valid' : item.cancelledTime ? 'canceled' : 'pending';
 
     return (
@@ -195,29 +199,33 @@ export function Detail ({ item, creating, editing, onItemChange, userData }) {
             </div>
             {!creating && (
                 <div class="participant-payment">
-                    <div class="payment-price">
-                        <DetailField
-                            field="price"
-                            item={item}
-                            editing={editing}
-                            onItemChange={onItemChange}
-                            userData={userData} />
+                    <div class="participant-payment-inner">
+                        <div class="payment-price">
+                            <DetailField
+                                field="price"
+                                item={item}
+                                editing={editing}
+                                onItemChange={onItemChange}
+                                userData={userData} />
+                        </div>
+                        <div class="payment-details">
+                            <span class="field-label">
+                                {locale.fields.paid}
+                                {': '}
+                            </span>
+                            {' '}
+                            <DetailField
+                                field="paid"
+                                item={item}
+                                editing={editing}
+                                onItemChange={onItemChange}
+                                userData={userData} />
+                        </div>
                     </div>
-                    <div class="payment-details">
-                        <span class="field-label">
-                            {locale.fields.paid}
-                            {': '}
-                        </span>
-                        {' '}
-                        <DetailField
-                            field="paid"
-                            item={item}
-                            editing={editing}
-                            onItemChange={onItemChange}
-                            userData={userData} />
-                    </div>
+                    <ViewPaymentsButton item={item} />
                 </div>
             )}
+            {!creating && !editing && <ParticipantActions core={core} item={item} userData={userData} />}
             <div class="participant-details">
                 <div class="detail-field">
                     <span class="field-label">{locale.fields.approved}</span>
@@ -283,3 +291,95 @@ export function Detail ({ item, creating, editing, onItemChange, userData }) {
         </div>
     );
 }
+
+const ViewPaymentsButton = connectPerms(function ViewPaymentsButton ({ perms, item }) {
+    // don't know which org the payments may be in because there's nothing stopping you from using
+    // a payment method from one org to pay for a participant in a congress from a different org
+    if (!perms.hasPerm('pay.payment_intents.read.tejo') && !perms.hasPerm('pay.payment_intents.read.uea')) return null;
+
+    const target = `/aksopago/pagoj?filter(purposeDataId:${item.dataId})`;
+
+    return (
+        <LinkButton target={target}>
+            <SearchIcon style={{ verticalAlign: 'middle' }} />
+            {' '}
+            {locale.fields.viewPayments}
+        </LinkButton>
+    );
+});
+
+const ParticipantActions = connectPerms(function ParticipantActions ({ perms, core, item, userData }) {
+    const actions = [
+        {
+            id: 'createPaymentIntent',
+            hasPerm: () => {
+                return perms.hasPerm('pay.payment_intents.create.tejo')
+                    || perms.hasPerm('pay.payment_intents.create.uea');
+            },
+            action: async () => {
+                const congress = await core.viewData('congresses/instance', {
+                    congress: userData.congress,
+                    id: userData.instance,
+                });
+                core.createTask('payments/createIntent', {}, {
+                    customer: {
+                        // TODO: get actual values
+                        name: 'TODO McTODOFACE',
+                        email: 'todo@akso.org',
+                    },
+                    purposes: [
+                        {
+                            type: 'trigger',
+                            title: locale.fields.actions.createPaymentIntentData.title,
+                            description: congress.name,
+                            triggers: 'congress_registration',
+                            dataId: item.dataId,
+                        },
+                    ],
+                });
+            },
+        },
+        {
+            id: 'approveManually',
+            hasPerm: () => {
+                return !item.approved && perms.hasPerm(`congress_instances.participants.update.${userData.org}`);
+            },
+            action: async () => {
+                core.createTask('congresses/updateParticipant', {
+                    congress: userData.congress,
+                    instance: userData.instance,
+                    id: item.dataId,
+                    _changedFields: ['approved'],
+                }, {
+                    approved: true,
+                });
+            },
+        },
+        {
+            id: 'cancel',
+            hasPerm: () => {
+                return !item.cancelledTime && perms.hasPerm(`congress_instances.participants.update.${userData.org}`);
+            },
+            action: async () => {
+                core.createTask('congresses/updateParticipant', {
+                    congress: userData.congress,
+                    instance: userData.instance,
+                    id: item.dataId,
+                    _changedFields: ['cancelledTime'],
+                }, {
+                    cancelledTime: Math.floor(Date.now() / 1000),
+                });
+            },
+        },
+    ].filter(x => x.hasPerm()).map(x => (
+        <TaskButton key={x.id} run={x.action}>
+            {locale.fields.actions[x.id]}
+        </TaskButton>
+    ));
+
+    return (
+        <div class="participant-actions">
+            {actions}
+        </div>
+    );
+});

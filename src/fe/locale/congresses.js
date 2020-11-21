@@ -298,6 +298,15 @@ export const congressParticipants = {
         codeholderIdViewCodeholder: 'Vidi membron',
         hasPaidMinimumShort: 'min',
         hasPaidMinimumDescription: 'Aliĝinto antaŭpagis',
+        viewPayments: 'Vidi pagoj',
+        actions: {
+            createPaymentIntent: '[[Add intent]]',
+            createPaymentIntentData: {
+                title: 'Kongresa aliĝo',
+            },
+            approveManually: '[[Approve manually]]',
+            cancel: '[[Cancel]]',
+        },
     },
     spreadsheet: {
         title: 'Aliĝintoj',
