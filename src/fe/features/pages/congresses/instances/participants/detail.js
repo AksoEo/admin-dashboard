@@ -151,7 +151,7 @@ function DetailField ({ field, item, editing, onItemChange, userData }) {
 }
 
 export function Detail ({ core, item, creating, editing, onItemChange, userData }) {
-    const statusType = item.isValid ? 'valid' : item.cancelledTime ? 'canceled' : 'pending';
+    const statusType = item.cancelledTime ? 'canceled' : item.isValid ? 'valid' : 'pending';
 
     return (
         <div class="congress-participant-detail">
@@ -313,8 +313,8 @@ const ParticipantActions = connectPerms(function ParticipantActions ({ perms, co
         {
             id: 'createPaymentIntent',
             hasPerm: () => {
-                return perms.hasPerm('pay.payment_intents.create.tejo')
-                    || perms.hasPerm('pay.payment_intents.create.uea');
+                return !item.cancelledTime && (perms.hasPerm('pay.payment_intents.create.tejo')
+                    || perms.hasPerm('pay.payment_intents.create.uea'));
             },
             action: async () => {
                 const congress = await core.viewData('congresses/instance', {
@@ -342,7 +342,8 @@ const ParticipantActions = connectPerms(function ParticipantActions ({ perms, co
         {
             id: 'approveManually',
             hasPerm: () => {
-                return !item.approved && perms.hasPerm(`congress_instances.participants.update.${userData.org}`);
+                return !item.approved && !item.cancelledTime
+                    && perms.hasPerm(`congress_instances.participants.update.${userData.org}`);
             },
             action: async () => {
                 core.createTask('congresses/updateParticipant', {
@@ -358,7 +359,8 @@ const ParticipantActions = connectPerms(function ParticipantActions ({ perms, co
         {
             id: 'cancel',
             hasPerm: () => {
-                return !item.cancelledTime && perms.hasPerm(`congress_instances.participants.update.${userData.org}`);
+                return !item.cancelledTime
+                    && perms.hasPerm(`congress_instances.participants.update.${userData.org}`);
             },
             action: async () => {
                 core.createTask('congresses/updateParticipant', {
@@ -376,6 +378,8 @@ const ParticipantActions = connectPerms(function ParticipantActions ({ perms, co
             {locale.fields.actions[x.id]}
         </TaskButton>
     ));
+
+    if (!actions.length) return null;
 
     return (
         <div class="participant-actions">

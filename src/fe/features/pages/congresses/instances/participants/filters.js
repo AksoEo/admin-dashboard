@@ -13,10 +13,8 @@ import './filters.less';
 export const FILTERS = {
     approval: {
         default: () => ({ enabled: false, value: null }),
-        serialize: ({ value }) => value,
-        deserialize: value => value === 'true'
-            ? ({ enabled: true, value: true })
-            : ({ enabled: true, value: false }),
+        serialize: ({ value }) => '' + value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="approval-filter">
@@ -99,9 +97,7 @@ export const FILTERS = {
     hasPaidMinimum: {
         default: () => ({ enabled: false, value: null }),
         serialize: ({ value }) => value,
-        deserialize: value => value === 'true'
-            ? ({ enabled: true, value: true })
-            : ({ enabled: true, value: false }),
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="paid-minimum-filter">
@@ -125,10 +121,8 @@ export const FILTERS = {
     },
     validity: {
         default: () => ({ enabled: false, value: null }),
-        serialize: ({ value }) => value,
-        deserialize: value => value === 'true'
-            ? ({ enabled: true, value: true })
-            : ({ enabled: true, value: false }),
+        serialize: ({ value }) => '' + value,
+        deserialize: value => ({ enabled: true, value }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="validity-filter">
@@ -143,6 +137,31 @@ export const FILTERS = {
                         {Object.keys(locale.search.filters.validityTypes).map(type => ({
                             id: type,
                             label: locale.search.filters.validityTypes[type],
+                            class: type === 'none' ? 'bordered' : '',
+                        }))}
+                    </Segmented>
+                </div>
+            );
+        },
+    },
+    canceled: {
+        default: () => ({ enabled: false, value: null }),
+        serialize: ({ value }) => '' + value,
+        deserialize: value => ({ enabled: true, value }),
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            return (
+                <div class="canceled-filter">
+                    <Segmented
+                        class="smaller"
+                        disabled={hidden}
+                        selected={value || 'none'}
+                        onSelect={value => {
+                            onChange(value === 'none' ? null : value);
+                            onEnabledChange(value !== 'none');
+                        }}>
+                        {Object.keys(locale.search.filters.canceledTypes).map(type => ({
+                            id: type,
+                            label: locale.search.filters.canceledTypes[type],
                             class: type === 'none' ? 'bordered' : '',
                         }))}
                     </Segmented>

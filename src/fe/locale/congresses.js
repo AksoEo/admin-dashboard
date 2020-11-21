@@ -250,6 +250,12 @@ export const congressParticipants = {
                 false: 'ne valida',
                 none: 'ne gravas',
             },
+            canceled: '[[Canceled]]',
+            canceledTypes: {
+                true: 'nuligita',
+                false: 'ne nuligita',
+                none: 'ne gravas',
+            },
             createdTime: 'Kreita je',
             timeRangeStart: 'Komenciĝhoro',
             timeRangeEnd: 'Finiĝhoro',

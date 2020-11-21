@@ -27,6 +27,7 @@ export default class TaskButton extends PureComponent {
     };
 
     render ({ run, innerRef, children, ...props }, { loading }) {
+        void run;
         props.class = (props.class || '') + ' task-button';
         if (loading) props.class += ' is-loading';
 

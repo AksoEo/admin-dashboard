@@ -105,6 +105,9 @@ const pClientFilters = {
     approval: {
         toAPI: approval => ({ approved: approval === 'true' ? true : false }),
     },
+    canceled: {
+        toAPI: canceled => ({ cancelledTime: canceled === 'true' ? { $neq: null } : null }),
+    },
     createdTime: {
         toAPI: range => ({ createdTime: { $range: range } }),
     },
@@ -112,7 +115,7 @@ const pClientFilters = {
         toAPI: range => ({ amountPaid: { $range: range } }),
     },
     hasPaidMinimum: {
-        toAPI: hasPaid => ({ hasPaidMinimum: hasPaid }),
+        toAPI: hasPaid => ({ hasPaidMinimum: hasPaid === 'true' ? true : false }),
     },
     validity: {
         toAPI: validity => ({ isValid: validity === 'true' ? true : false }),
