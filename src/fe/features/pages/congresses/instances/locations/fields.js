@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
+import { useState, PureComponent } from 'preact/compat';
 import { Button, Dialog, Slider, TextField } from '@cpsdqs/yamdl';
 import Brightness1Icon from '@material-ui/icons/Brightness1';
 import FavoriteIcon from '@material-ui/icons/Favorite';
@@ -44,6 +44,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import TextArea from '../../../../../components/text-area';
 import MdField from '../../../../../components/md-field';
 import SvgIcon from '../../../../../components/svg-icon';
+import { layoutContext } from '../../../../../components/dynamic-height-div';
 import { date, time } from '../../../../../components/data';
 import { Validator } from '../../../../../components/form';
 import { connect } from '../../../../../core/connection';
@@ -390,31 +391,41 @@ const OpenHoursField = connect(({ userData }) => (
 ))(data => ({
     dateFrom: data ? data.dateFrom : null,
     dateTo: data ? data.dateTo : null,
-}))(({ value, editing, onChange, dateFrom, dateTo }) => {
-    if (!editing && !value) return null;
-    const items = [];
-    for (const date of dateRange(dateFrom, dateTo)) {
-        items.push(
-            <OpenHoursDay
-                key={date}
-                date={date}
-                value={value && value[date] || ''}
-                onChange={day => {
-                    const newValue = value ? { ...value } :  {};
-                    if (day === null) delete newValue[date];
-                    else newValue[date] = day;
-                    if (Object.keys(newValue).length) onChange(newValue);
-                    else onChange(null);
-                }}
-                editing={editing} />
-        );
+}))(class OpenHoursField extends PureComponent {
+    static contextType = layoutContext;
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.dateFrom !== this.props.dateFrom || prevProps.dateTo !== this.props.dateTo) {
+            this.context && this.context();
+        }
     }
 
-    return (
-        <div class="congress-location-open-hours">
-            {items}
-        </div>
-    );
+    render ({ value, editing, onChange, dateFrom, dateTo }) {
+        if (!editing && !value) return null;
+        const items = [];
+        for (const date of dateRange(dateFrom, dateTo)) {
+            items.push(
+                <OpenHoursDay
+                    key={date}
+                    date={date}
+                    value={value && value[date] || ''}
+                    onChange={day => {
+                        const newValue = value ? { ...value } :  {};
+                        if (day === null) delete newValue[date];
+                        else newValue[date] = day;
+                        if (Object.keys(newValue).length) onChange(newValue);
+                        else onChange(null);
+                    }}
+                    editing={editing} />
+            );
+        }
+
+        return (
+            <div class="congress-location-open-hours">
+                {items}
+            </div>
+        );
+    }
 });
 
 function timeToSeconds (time) {
