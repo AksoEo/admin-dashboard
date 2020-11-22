@@ -1,5 +1,5 @@
 import EventEmitter from 'events';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 
 /// A data view provides asynchronous access to API objects.
 /// It is initialized with a set of immutable options and will receive updates and errors
