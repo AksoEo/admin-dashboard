@@ -316,6 +316,11 @@ export const congressParticipants = {
     },
     spreadsheet: {
         title: 'Aliĝintoj',
+        bool: {
+            true: 'jes',
+            false: 'ne',
+            null: '-',
+        },
     },
     create: {
         menuItem: 'Krei',

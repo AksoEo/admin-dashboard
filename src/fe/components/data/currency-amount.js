@@ -4,10 +4,14 @@ import { stdlib, currencies } from '@tejo/akso-script';
 import { TextField } from '@cpsdqs/yamdl';
 import { data as locale } from '../../locale';
 
+function stringify (value, currency) {
+    return stdlib.currency_fmt.apply(null, [currency || '?', value | 0]);
+}
+
 /// - value: amount in smallest currecy unit
 /// - currency: currency id
 function CurrencyAmount ({ value, currency }) {
-    return stdlib.currency_fmt.apply(null, [currency || '?', value | 0]);
+    return stringify(value, currency);
 }
 
 /// Edits a currency value.
@@ -105,4 +109,5 @@ export default {
     renderer: CurrencyAmount,
     inlineRenderer: CurrencyAmount,
     editor: CurrencyEditor,
+    stringify,
 };

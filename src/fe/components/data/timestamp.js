@@ -7,11 +7,7 @@ import date from './date';
 import time from './time';
 import './style';
 
-/// Renders a formatted timestamp (not editable). Use prop `value`.
-///
-/// # Additional Props
-/// - zone: time zone
-function TimestampFormatter ({ value, zone }) {
+function stringify (value, zone) {
     if (value) {
         const applyZone = time => {
             if (!zone) return time.utc();
@@ -29,6 +25,14 @@ function TimestampFormatter ({ value, zone }) {
         return m.format(zone ? timestampTzFormat : timestampFormat);
     }
     return null;
+}
+
+/// Renders a formatted timestamp (not editable). Use prop `value`.
+///
+/// # Additional Props
+/// - zone: time zone
+function TimestampFormatter ({ value, zone }) {
+    return stringify(value, zone);
 }
 
 function TimestampEditor ({ label, value, onChange, disabled, error, outline, zone }) {
@@ -79,5 +83,6 @@ export default {
     renderer: TimestampFormatter,
     inlineRenderer: TimestampFormatter,
     editor: TimestampEditor,
+    stringify,
 };
 

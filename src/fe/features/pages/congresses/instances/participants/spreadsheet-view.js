@@ -4,6 +4,7 @@ import Meta from '../../../../meta';
 import Page from '../../../../../components/page';
 import CSVExport from '../../../../../components/csv-export';
 import Spreadsheet from '../../../../../components/spreadsheet';
+import { currencyAmount, date, timestamp } from '../../../../../components/data';
 import { coreContext } from '../../../../../core/connection';
 import { congressParticipants as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
@@ -26,7 +27,10 @@ export default class SpreadsheetView extends Page {
     };
 
     getListOptions () {
-        return { congress: this.congress, instance: this.instance };
+        return {
+            congress: this.congress,
+            instance: this.instance,
+        };
     }
     getListParameters () {
         return {
@@ -99,8 +103,17 @@ export default class SpreadsheetView extends Page {
             let view;
             if (field.startsWith('data.')) {
                 const dataField = field.substr(5);
+
+                let renderData;
+                for (const item of this.state.registrationForm) {
+                    if (item.el === 'input' && item.name === dataField) {
+                        renderData = DATA_RENDERERS[item.type];
+                        if (renderData) renderData = renderData(item);
+                    }
+                }
+
                 // TODO: better rendering
-                view = ({ data }) => '' + data.data[dataField];
+                view = ({ data }) => renderData ? renderData(data.data[dataField]) : '' + data.data[dataField];
             } else {
                 const Component = FIELDS[field].component;
                 view = ({ data }) => {
@@ -132,8 +145,17 @@ export default class SpreadsheetView extends Page {
     getFieldStringifier = field => {
         if (field.startsWith('data.')) {
             const dataField = field.substr(5);
+
+            let stringifyData;
+            for (const item of this.state.registrationForm) {
+                if (item.el === 'input' && item.name === dataField) {
+                    stringifyData = DATA_STRINGIFIERS[item.type];
+                    if (stringifyData) stringifyData = stringifyData(item);
+                }
+            }
+
             // TODO: better rendering
-            return (_, item) => '' + item.data[dataField];
+            return (_, item) => stringifyData ? stringifyData(item.data[dataField]) : '' + item.data[dataField];
         } else {
             const stringify = FIELDS[field].stringify;
             if (!stringify) throw new Error('no stringifier for ' + field);
@@ -167,6 +189,18 @@ export default class SpreadsheetView extends Page {
                         fields: this.state.viewFields,
                         noFetch: true,
                     }]}
+                    onCellClick={(row, col, data, e) => {
+                        const target = `/kongresoj/${congress}/okazigoj/${instance}/alighintoj/${data.dataId}`;
+
+                        if (!e.ctrlKey && !e.metaKey) {
+                            const a = document.createElement('a');
+                            a.href = target;
+                            a.target = '_blank';
+                            a.click();
+                        } else {
+                            this.props.onNavigate(target);
+                        }
+                    }}
                     loadedRowCount={rows.length}
                     initialColumnSize={this.initialColumnSize}
                     cellView={this.cellView}
@@ -177,6 +211,9 @@ export default class SpreadsheetView extends Page {
                     onClose={() => this.setState({ exportOpen: false })}
                     task="congresses/listParticipants"
                     options={this.getListOptions()}
+                    extraOptions={{
+                        currency: this.state.currency,
+                    }}
                     parameters={this.getListParameters()}
                     detailView="congresses/participant"
                     detailViewOptions={id => ({
@@ -194,3 +231,46 @@ export default class SpreadsheetView extends Page {
         );
     }
 }
+
+const DATA_STRINGIFIERS = {
+    boolean: () => value => locale.spreadsheet.bool['' + value],
+    money: item => value => currencyAmount.stringify(value, item.currency),
+    date: () => value => date.stringify(value),
+    datetime: item => value => timestamp.stringify(value * 1000, item.tz),
+    boolean_table: () => value => {
+        return value
+            .map(r => r.map(i => locale.spreadsheet.bool['' + i]).join(','))
+            .join(';');
+    },
+};
+
+const DATA_RENDERERS = {
+    boolean: DATA_STRINGIFIERS.boolean,
+    money: item => value => {
+        return <currencyAmount.renderer value={value} currency={item.currency} />;
+    },
+    enum: item => value => {
+        let label = '?';
+        for (const option of item.options) {
+            if (option.value === value) {
+                label = option.name;
+                break;
+            }
+        }
+
+        return (
+            <span class="enum-value">
+                {label}
+                {' '}
+                (<code>{value}</code>)
+            </span>
+        );
+    },
+    date: () => value => {
+        return <date.renderer value={value} />;
+    },
+    datetime: item => value => {
+        return <timestamp.renderer value={value * 1000} zone={item.tz} />;
+    },
+    boolean_table: DATA_STRINGIFIERS.boolean_table,
+};

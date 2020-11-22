@@ -204,5 +204,6 @@ export default {
     renderer: DateFormatter,
     inlineRenderer: DateFormatter,
     editor: DateEditor,
+    stringify: stringifyDate,
 };
 

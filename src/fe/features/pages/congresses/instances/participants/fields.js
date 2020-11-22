@@ -97,7 +97,7 @@ export const FIELDS = {
             if (value) return <CheckIcon style={{ verticalAlign: 'middle' }} />;
             return '—';
         },
-        stringify: v => v,
+        stringify: v => locale.spreadsheet.bool['' + v],
     },
     isValid: {
         sortable: true,
@@ -107,7 +107,7 @@ export const FIELDS = {
             if (value) return <CheckIcon style={{ verticalAlign: 'middle' }} />;
             return '—';
         },
-        stringify: v => v,
+        stringify: v => locale.spreadsheet.bool['' + v],
     },
     notes: {
         weight: 2,
@@ -131,7 +131,7 @@ export const FIELDS = {
         component ({ value, userData }) {
             return <currencyAmount.renderer value={value} currency={userData.currency} />;
         },
-        stringify: v => v,
+        stringify: (v, item, fields, options) => currencyAmount.stringify(v, options.currency),
     },
     paid: {
         component ({ value, userData }) {
@@ -149,9 +149,10 @@ export const FIELDS = {
                 </span>
             );
         },
-        stringify: v => {
+        stringify: (v, item, fields, options) => {
             if (!v) return '';
-            return v.amount + (v.hasPaidMinimum ? ` (${locale.fields.hasPaidMinimumShort})` : '');
+            return currencyAmount.stringify(v.amount, options.currency)
+                + (v.hasPaidMinimum ? ` (${locale.fields.hasPaidMinimumShort})` : '');
         },
     },
     sequenceId: {
@@ -180,7 +181,7 @@ export const FIELDS = {
         component ({ value }) {
             return <timestamp.renderer value={value * 1000} />;
         },
-        stringify: v => v,
+        stringify: v => timestamp.stringify(v * 1000),
     },
     editedTime: {
         sortable: true,
@@ -189,7 +190,7 @@ export const FIELDS = {
             if (!value) return '—';
             return <timestamp.renderer value={value * 1000} />;
         },
-        stringify: v => v,
+        stringify: v => timestamp.stringify(v * 1000),
     },
     cancelledTime: {
         sortable: true,
@@ -206,7 +207,7 @@ export const FIELDS = {
             if (!value) return '—';
             return <timestamp.renderer value={value * 1000} />;
         },
-        stringify: v => v,
+        stringify: v => timestamp.stringify(v * 1000),
     },
     data: {
         component ({ value, editing, onChange, userData }) {

@@ -28,6 +28,7 @@ const LIMIT = 100;
 ///   Should be an object of `id => spec`, where spec is an object with a `type` field. Types:
 ///   - `select`: will render a select with options given by the `options` field in the spec.
 ///     Each option should be an (array) tuple like `[id, label]`.
+/// - extraOptions: extra options for CSV export, in addition to userOptions
 ///
 /// # Strictly Optional Props
 /// - compileFields: (parameters, transientFields) => string[]
@@ -170,7 +171,7 @@ export default class CSVExport extends PureComponent {
                 return localized;
             }));
 
-            const options = this.state.options;
+            const options = { ...this.state.options, ...(this.props.extraOptions || {}) };
 
             // write data
             for (const itemId of this.state.data) {

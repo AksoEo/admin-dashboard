@@ -14,6 +14,7 @@ import './spreadsheet.less';
 /// - columnName: index => name
 /// - initialColumnSize: index => number (pixels)
 /// - cellView: (column) => Component
+/// - onCellClick: (row, coll, data, event) => void
 /// - rowData: index => any.
 ///   If the result is an array, will load a core data view with [name, opts, params]; otherwise
 ///   it will just be passed to the cells directly.
@@ -44,6 +45,7 @@ export default class Spreadsheet extends PureComponent {
                     columnCount={this.props.columnCount}
                     columnSizes={columnSizes}
                     isLoaded={isLoaded}
+                    onCellClick={this.props.onCellClick}
                     cellViews={cellViews} />
             );
         }
@@ -148,7 +150,7 @@ const CoreRow = connect(({ data }) => data)((data, _, error) => ({ data, error }
         isLoaded={props.isLoaded && props.data} />;
 });
 
-function InnerRow ({ isLoaded, columnCount, index, columnSizes, cellViews, data, error }) {
+function InnerRow ({ isLoaded, columnCount, index, columnSizes, cellViews, onCellClick, data, error }) {
     if (error) {
         return (
             <div class="spreadsheet-row is-error">
@@ -173,6 +175,7 @@ function InnerRow ({ isLoaded, columnCount, index, columnSizes, cellViews, data,
                 column={i}
                 data={data}
                 size={columnSizes[i]}
+                onClick={onCellClick}
                 cellView={cellViews[i]} />
         );
     }
@@ -186,10 +189,15 @@ function InnerRow ({ isLoaded, columnCount, index, columnSizes, cellViews, data,
 }
 
 class RowCell extends PureComponent {
-    render ({ data, size, row, column, cellView: CellView }) {
+    render ({ data, size, row, column, cellView: CellView, onClick }) {
         return (
             <div
                 class="spreadsheet-cell"
+                onClick={e => {
+                    if (onClick) {
+                        onClick(row, column, data, e);
+                    }
+                }}
                 style={{ width: size }}>
                 <div class="cell-contents">
                     <CellView
