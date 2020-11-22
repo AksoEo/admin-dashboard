@@ -163,9 +163,11 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
                         </span>
                     </div>
                 )}
-                <div class="header-title">
-                    TODO: Participant ID goes here
-                </div>
+                {!creating && (
+                    <div class="header-title">
+                        TODO: Participant ID goes here
+                    </div>
+                )}
                 <div class="header-id">
                     {!creating && (
                         <div class="header-data-id">
