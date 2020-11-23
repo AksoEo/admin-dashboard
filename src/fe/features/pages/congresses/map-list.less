@@ -128,4 +128,59 @@
             box-shadow: none;
         }
     }
+
+    .map-switch {
+        display: none;
+    }
+
+    @media (max-width: 700px) {
+        // switchable layout
+
+        display: block;
+        @switch-width: 56px;
+
+        .inner-list-container,
+        .inner-map-container {
+            width: calc(100% - @switch-width);
+            height: 100%;
+        }
+
+        .inner-list-container {
+            transition: opacity 0.3s @easing;
+        }
+
+        .inner-map-container {
+            position: absolute;
+            top: 0;
+            transform: translate(100%);
+            transition: transform 0.3s @easing, opacity 0.3s @easing;
+            z-index: 90;
+            opacity: 0.5;
+        }
+
+        &.map-is-open {
+            .inner-list-container {
+                opacity: 0.5;
+            }
+
+            .inner-map-container {
+                transform: translate(@switch-width);
+                opacity: 1;
+            }
+
+            .map-switch {
+                left: 0;
+            }
+        }
+
+        .map-switch {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: calc(100% - @switch-width);
+            width: @switch-width;
+            height: 100%;
+            z-index: 100;
+        }
+    }
 }

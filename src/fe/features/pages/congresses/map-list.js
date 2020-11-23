@@ -107,6 +107,8 @@ export default class MapList extends PureComponent {
 
         /// hacky way of coalescing force updates by incrementing this variable
         coalescedForceUpdate: 0,
+
+        mapOpen: false,
     };
 
     static contextType = coreContext;
@@ -256,7 +258,7 @@ export default class MapList extends PureComponent {
         if (this.props.markers) markers.push(...this.props.markers);
 
         return (
-            <div class="map-list">
+            <div class={'map-list' + (this.state.mapOpen ? ' map-is-open' : '')}>
                 <div class="inner-list-container" ref={listContainerRef}>
                     <InnerList
                         header={this.props.header}
@@ -295,6 +297,7 @@ export default class MapList extends PureComponent {
                         markers={markers}>
                     </LMap>
                 </div>
+                <div class="map-switch" onClick={() => this.setState({ mapOpen: !this.state.mapOpen })} />
             </div>
         );
     }
