@@ -170,7 +170,7 @@ export const FIELDS = {
         component ({ value, editing, onChange }) {
             if (editing) {
                 return (
-                    <div class="payment-validity">
+                    <div class="payment-method-validity">
                         <Select
                             value={typeof value !== 'number' ? 'forever' : 'limited'}
                             items={Object.entries(locale.fields.paymentValidityTypes)
@@ -183,7 +183,11 @@ export const FIELDS = {
                             <timespan.editor
                                 value={value}
                                 onChange={value => onChange(value)} />
-                        ) : null}
+                        ) : (
+                            <div class="validity-warning">
+                                {locale.fields.paymentValidityWarning}
+                            </div>
+                        )}
                     </div>
                 );
             }

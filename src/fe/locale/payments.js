@@ -111,6 +111,7 @@ export const paymentMethods = {
             limited: 'Validas dum ...',
             forever: 'Neniam ekvalidiĝas',
         },
+        paymentValidityWarning: '[[Eternity is not recommended]]',
     },
     create: {
         title: 'Krei pagmetodon',

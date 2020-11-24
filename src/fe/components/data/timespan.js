@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent, useRef } from 'preact/compat';
+import { PureComponent, createRef } from 'preact/compat';
 import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 import { data as locale } from '../../locale';
 
@@ -26,7 +26,7 @@ class TimespanUnitEditor extends PureComponent {
         editingValue: null,
     };
 
-    inputNode = useRef(null);
+    inputNode = createRef(null);
     bounceY = new Spring(0.5, 0.4);
 
     update (dt) {
