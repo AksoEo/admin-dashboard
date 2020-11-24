@@ -1,6 +1,11 @@
 export const generic = {
     close: 'Fermi',
     cancel: 'Nuligi',
+
+    openExternalLink: {
+        title: '[[Open external link?]]',
+        open: '[[Open]]',
+    },
 };
 
 export const data = {

@@ -19,6 +19,7 @@ import 'codemirror';
 import { Controlled as RCodeMirror } from 'react-codemirror2';
 import { layoutContext } from './dynamic-height-div';
 import { data as locale } from '../locale';
+import { coreContext } from '../core/connection';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown';
 import './md-field.less';
@@ -54,6 +55,7 @@ export default class MarkdownTextField extends PureComponent {
     #node = createRef();
     #cachedHtml = null;
     #document = { current: null };
+    core = null;
 
     updateCache () {
         const md = new Markdown('zero');
@@ -113,7 +115,10 @@ export default class MarkdownTextField extends PureComponent {
     #onContentsClick = e => {
         if (e.target instanceof HTMLAnchorElement) {
             e.preventDefault();
-            // TODO: show dialog: 'do you really want to open this link?'
+
+            this.core.createTask('openExternalLink', {
+                link: e.target.href,
+            });
         }
     };
 
@@ -251,6 +256,10 @@ export default class MarkdownTextField extends PureComponent {
 
         return (
             <div {...extra} ref={this.#node}>
+                <coreContext.Consumer>{ctx => {
+                    this.core = ctx;
+                    return null;
+                }}</coreContext.Consumer>
                 {editorBar}
                 {contents}
             </div>

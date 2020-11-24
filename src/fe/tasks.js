@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { Dialog } from '@cpsdqs/yamdl';
 import { generic as locale } from './locale';
+import './tasks.less';
 
 /// Shows a single info dialog.
 export function info ({ open, task }) {
@@ -20,6 +21,36 @@ export function info ({ open, task }) {
                 },
             ]}>
             {message}
+        </Dialog>
+    );
+}
+
+export function openExternalLink ({ open, task }) {
+    return (
+        <Dialog
+            class="task-open-external-link"
+            backdrop
+            open={open}
+            onClose={() => task.drop()}
+            title={locale.openExternalLink.title}
+            actions={[
+                {
+                    label: locale.cancel,
+                    action: () => task.run(),
+                },
+                {
+                    label: locale.openExternalLink.open,
+                    action: () => {
+                        const a = document.createElement('a');
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        a.href = task.options.link;
+                        a.click();
+                        task.run();
+                    },
+                },
+            ]}>
+            <code>{task.options.link}</code>
         </Dialog>
     );
 }

@@ -30,6 +30,7 @@ const lazyPath = (f, map = (res => res.default)) => {
 const genericTaskViews = () => import(/* webpackChunkName: "generic-tasks" */ './tasks');
 const taskViews = {
     info: lazyPath(genericTaskViews, res => res.info),
+    openExternalLink: lazyPath(genericTaskViews, res => res.openExternalLink),
     login: lazyPath(() => import(/* webpackChunkName: "login-tasks" */ './features/login/tasks')),
     clients: lazyPath(() => import(/* webpackChunkName: "clients-tasks" */ './features/pages/administration/clients/tasks')),
     congresses: lazyPath(() => import(/* webpackChunkName: "congresses-tasks" */ './features/pages/congresses/tasks')),
