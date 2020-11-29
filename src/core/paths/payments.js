@@ -346,9 +346,9 @@ export const tasks = {
         store.remove([PAYMENT_ORGS, org, PO_METHODS, id]);
         store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
     },
-    methodThumbnail: async ({ org, id }) => {
+    methodThumbnail: async ({ org, id }, { size }) => {
         const client = await asyncClient;
-        const res = await fetch(client.client.createURL(`/aksopay/payment_orgs/${org}/methods/${id}/thumbnail`), {
+        const res = await fetch(client.client.createURL(`/aksopay/payment_orgs/${org}/methods/${id}/thumbnail/${size}`), {
             credentials: 'include',
             mode: 'cors',
         });
