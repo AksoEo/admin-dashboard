@@ -20,7 +20,7 @@ export const pages = {
     ch: 'Membroj',
     codeholders: 'Membroj',
     statistics: 'Statistiko',
-    membership: 'Membrecoj',
+    membership: 'Membreco',
     roles: 'Roloj',
     email: 'Amasmesaĝoj',
     magazines: 'Revuoj',

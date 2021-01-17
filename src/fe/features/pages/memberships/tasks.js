@@ -2,14 +2,14 @@ import { h } from 'preact';
 import TaskDialog from '../../../components/task-dialog';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/changed-fields';
-import { memberships as locale } from '../../../locale';
+import { membershipCategories as categoriesLocale } from '../../../locale';
 import { routerContext } from '../../../router';
-import { FIELDS } from './fields';
+import { FIELDS } from './categories/fields';
 
 const CREATE_FIELDS = ['nameAbbrev', 'name'];
 
 export default {
-    create ({ open, task }) {
+    createCategory ({ open, task }) {
         const fields = CREATE_FIELDS.map(id => {
             const Component = FIELDS[id].component;
             return (
@@ -28,10 +28,10 @@ export default {
                     <TaskDialog
                         open={open}
                         onClose={() => task.drop()}
-                        title={locale.create.title}
-                        actionLabel={locale.create.button}
+                        title={categoriesLocale.create.title}
+                        actionLabel={categoriesLocale.create.button}
                         run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/membrecoj/${id}`);
+                            routerContext.navigate(`/membreco/kategorioj/${id}`);
                         })}>
                         {fields}
                     </TaskDialog>
@@ -39,29 +39,29 @@ export default {
             </routerContext.Consumer>
         );
     },
-    update ({ open, task }) {
+    updateCategory ({ open, task }) {
         return (
             <TaskDialog
                 open={open}
                 onClose={() => task.drop()}
-                title={locale.update.title}
-                actionLabel={locale.update.button}
+                title={categoriesLocale.update.title}
+                actionLabel={categoriesLocale.update.button}
                 run={() => task.runOnce()}>
                 <ChangedFields
                     changedFields={task.options._changedFields}
-                    locale={locale.fields} />
+                    locale={categoriesLocale.fields} />
             </TaskDialog>
         );
     },
-    delete ({ open, task }) {
+    deleteCategory ({ open, task }) {
         return (
             <TaskDialog
                 open={open}
                 onClose={() => task.drop()}
-                title={locale.delete.title}
-                actionLabel={locale.delete.button}
+                title={categoriesLocale.delete.title}
+                actionLabel={categoriesLocale.delete.button}
                 run={() => task.runOnce()}>
-                {locale.delete.description}
+                {categoriesLocale.delete.description}
             </TaskDialog>
         );
     },

@@ -1,10 +1,9 @@
 import { h } from 'preact';
-import { Checkbox } from '@cpsdqs/yamdl';
+import { Checkbox, TextField } from '@cpsdqs/yamdl';
 import CheckIcon from '@material-ui/icons/Check';
-import { Validator } from '../../../components/form';
-import { TextField } from '@cpsdqs/yamdl';
-import MdField from '../../../components/md-field';
-import { memberships as locale } from '../../../locale';
+import { Validator } from '../../../../components/form';
+import MdField from '../../../../components/md-field';
+import { membershipCategories as locale } from '../../../../locale';
 
 export const FIELDS = {
     nameAbbrev: {

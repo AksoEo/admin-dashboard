@@ -1,11 +1,11 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
-import Page from '../../../components/page';
-import DetailView from '../../../components/detail';
-import Meta from '../../meta';
-import { connectPerms } from '../../../perms';
-import { coreContext } from '../../../core/connection';
-import { memberships as locale } from '../../../locale';
+import Page from '../../../../components/page';
+import DetailView from '../../../../components/detail';
+import Meta from '../../../meta';
+import { connectPerms } from '../../../../perms';
+import { coreContext } from '../../../../core/connection';
+import { membershipCategories as locale } from '../../../../locale';
 import { FIELDS } from './fields';
 
 export default connectPerms(class Membership extends Page {
@@ -29,7 +29,7 @@ export default connectPerms(class Membership extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('memberships/update', {
+        this.#commitTask = this.context.createTask('memberships/updateCategory', {
             id: this.getId(),
             _changedFields: changedFields,
         }, this.state.edit);
@@ -61,7 +61,7 @@ export default connectPerms(class Membership extends Page {
         if (perms.hasPerm('membership_categories.delete')) {
             actions.push({
                 label: locale.delete.menuItem,
-                action: () => this.context.createTask('memberships/delete', { id }),
+                action: () => this.context.createTask('memberships/deleteCategory', { id }),
                 overflow: true,
             });
         }
@@ -73,7 +73,7 @@ export default connectPerms(class Membership extends Page {
                     actions={actions} />
 
                 <DetailView
-                    view="memberships/membership"
+                    view="memberships/category"
                     id={id}
                     fields={FIELDS}
                     locale={locale}

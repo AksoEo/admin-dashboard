@@ -1,4 +1,8 @@
 export const memberships = {
+    title: 'Membreco',
+};
+
+export const membershipCategories = {
     title: 'Membrecoj',
     detailTitle: 'Membreco',
     fields: {
