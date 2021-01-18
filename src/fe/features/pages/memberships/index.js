@@ -13,7 +13,10 @@ export default connectPerms(class Memberships extends Page {
                     title={locale.title}
                     actions={[]} />
                 <LinkButton target="/membreco/kategorioj">
-                    -&gt; click &lt;-
+                    -&gt; categories &lt;-
+                </LinkButton>
+                <LinkButton target="/membreco/agordoj">
+                    -&gt; options &lt;-
                 </LinkButton>
             </div>
         );

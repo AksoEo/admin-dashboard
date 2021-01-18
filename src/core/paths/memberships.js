@@ -11,6 +11,8 @@ export const MEMBERSHIPS = 'memberships';
 export const MEMBERSHIP_CATEGORIES = [MEMBERSHIPS, 'categories'];
 export const MEMBERSHIP_CATEGORIES_LIST = [MEMBERSHIPS, 'all_categories'];
 export const SIG_CATEGORIES = '!categories';
+export const MEMBERSHIP_OPTIONS = [MEMBERSHIPS, 'options'];
+export const SIG_OPTIONS = '!options';
 
 /// Loads all membership categories because there won’t be too many for this to become a problem
 async function loadAllMembershipCategories () {
@@ -55,7 +57,7 @@ async function loadAllMembershipCategories () {
     store.insert(MEMBERSHIP_CATEGORIES_LIST, categories);
 }
 
-const FIELDS = [
+const CATEGORY_FIELDS = [
     'id',
     'nameAbbrev',
     'name',
@@ -66,6 +68,14 @@ const FIELDS = [
     'availableTo',
 ];
 
+const OPTIONS_FIELDS = [
+    'year',
+    'enabled',
+    'paymentOrgId',
+    'currency',
+    'offers',
+];
+
 export const tasks = {
     listCategories: async (_, { offset, limit, fields, search }) => {
         const client = await asyncClient;
@@ -73,7 +83,7 @@ export const tasks = {
         const opts = {
             offset,
             limit,
-            fields: FIELDS,
+            fields: CATEGORY_FIELDS,
             order: fieldsToOrder(fields),
         };
 
@@ -103,7 +113,7 @@ export const tasks = {
     category: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/membership_categories/${id}`, {
-            fields: FIELDS,
+            fields: CATEGORY_FIELDS,
         });
         return res.body;
     },
@@ -112,7 +122,7 @@ export const tasks = {
         const res = await client.post('/membership_categories', params);
         const id = +res.res.headers.get('x-identifier');
         store.insert([MEMBERSHIP_CATEGORIES, id], params);
-        store.signal([MEMBERSHIP_CATEGORIES, SIG_CATEGORIES]);
+        store.signal(MEMBERSHIP_CATEGORIES.concat([SIG_CATEGORIES]));
         // fetch rest
         tasks.category({ id }).catch(() => {});
         return id;
@@ -128,7 +138,41 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`/membership_categories/${id}`);
         store.remove([MEMBERSHIP_CATEGORIES, id]);
-        store.signal([MEMBERSHIP_CATEGORIES, SIG_CATEGORIES]);
+        store.signal(MEMBERSHIP_CATEGORIES.concat([SIG_CATEGORIES]));
+    },
+
+    listOptions: async (_, { offset, limit, fields }) => {
+        const client = await asyncClient;
+
+        const opts = {
+            offset,
+            limit,
+            fields: OPTIONS_FIELDS,
+            order: fieldsToOrder(fields),
+        };
+
+        const res = await client.get('/registration/options', opts);
+
+        for (const item of res.body) {
+            item.id = item.year;
+            store.insert([MEMBERSHIP_OPTIONS, item.id], item);
+        }
+
+        return {
+            items: res.body.map(item => item.id),
+            total: +res.res.headers.get('x-total-items'),
+            stats: {
+                time: res.resTime,
+                filtered: false,
+            },
+        };
+    },
+    options: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/registration/options/${id}`, {
+            fields: OPTIONS_FIELDS,
+        });
+        return res.body;
     },
 };
 
@@ -174,5 +218,30 @@ export const views = {
             store.unsubscribe([MEMBERSHIP_CATEGORIES, this.id], this.#onUpdate);
         }
     },
-    sigCategories: createStoreObserver([MEMBERSHIP_CATEGORIES, SIG_CATEGORIES]),
+    sigCategories: createStoreObserver(MEMBERSHIP_CATEGORIES.concat([SIG_CATEGORIES])),
+
+    options: class RegistrationOptions extends AbstractDataView {
+        constructor ({ id, noFetch }) {
+            super();
+            this.id = id;
+
+            store.subscribe([MEMBERSHIP_OPTIONS, id], this.#onUpdate);
+            if (store.get([MEMBERSHIP_OPTIONS, id])) setImmediate(this.#onUpdate);
+
+            if (!noFetch) {
+                tasks.options({ id }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get([MEMBERSHIP_OPTIONS, this.id]), 'delete');
+            } else {
+                this.emit('update', store.get([MEMBERSHIP_OPTIONS, this.id]));
+            }
+        }
+        drop () {
+            store.unsubscribe([MEMBERSHIP_OPTIONS, this.id], this.#onUpdate);
+        }
+    },
+    sigOptions: createStoreObserver(MEMBERSHIP_OPTIONS.concat([SIG_OPTIONS])),
 };

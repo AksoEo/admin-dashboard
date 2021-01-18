@@ -35,3 +35,16 @@ export const membershipCategories = {
     csvFilename: 'membrecoj',
 };
 
+export const membershipOptions = {
+    title: 'Agordoj',
+    fields: {
+        year: 'Jaro',
+        enabled: 'Ŝaltita',
+        paymentOrg: 'Pagorganizo',
+        currency: 'Valuto',
+        offers: '[[Offers]]',
+    },
+    create: {
+        menuItem: 'Krei',
+    },
+};

@@ -4,14 +4,14 @@ import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/changed-fields';
 import { membershipCategories as categoriesLocale } from '../../../locale';
 import { routerContext } from '../../../router';
-import { FIELDS } from './categories/fields';
+import { FIELDS as CATEGORY_FIELDS } from './categories/fields';
 
-const CREATE_FIELDS = ['nameAbbrev', 'name'];
+const CATEGORY_CREATE_FIELDS = ['nameAbbrev', 'name'];
 
 export default {
     createCategory ({ open, task }) {
-        const fields = CREATE_FIELDS.map(id => {
-            const Component = FIELDS[id].component;
+        const fields = CATEGORY_CREATE_FIELDS.map(id => {
+            const Component = CATEGORY_FIELDS[id].component;
             return (
                 <Field key={id}>
                     <Component
