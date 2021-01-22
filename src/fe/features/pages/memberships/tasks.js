@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/changed-fields';
@@ -66,6 +67,28 @@ export default {
         );
     },
 
+    createOptions ({ open, task }) {
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        open={open}
+                        onClose={() => task.drop()}
+                        title={optionsLocale.create.title}
+                        actionLabel={optionsLocale.create.button}
+                        run={() => task.runOnce().then(id => {
+                            routerContext.navigate(`/membreco/agordoj/${id}/redakti`);
+                        })}>
+                        <TextField
+                            outline
+                            label={optionsLocale.create.year}
+                            value={task.parameters.year}
+                            onChange={e => task.update({ year: e.target.value })} />
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
     updateOptions ({ open, task }) {
         return (
             <TaskDialog

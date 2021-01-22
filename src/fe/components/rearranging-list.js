@@ -36,6 +36,18 @@ export default class RearrangingList extends PureComponent {
         this.beginAnimating();
     });
 
+    updateItemHeights () {
+        let didUpdate = false;
+        for (const item of this.itemData.values()) {
+            if (!item.node) continue;
+            if (item.height !== item.node.offsetHeight) {
+                item.height = item.node.offsetHeight;
+                didUpdate = true;
+            }
+        }
+        if (didUpdate) this.beginAnimating();
+    }
+
     createItemData (node, index) {
         const spring = new Spring(1, 0.5);
         spring.value = spring.target = this.indexToYOffset(index);
@@ -73,7 +85,7 @@ export default class RearrangingList extends PureComponent {
             item.spring.update(dt);
         }
         if (!wantsUpdate) globalAnimator.deregister(this);
-        else this.forceUpdate();
+        this.forceUpdate();
     }
 
     beginAnimating () {
@@ -240,6 +252,10 @@ export default class RearrangingList extends PureComponent {
     };
 
     render () {
+        // hack to fix incorrect item heights sometimes
+        if (this._hackTimeout) clearTimeout(this._hackTimeout);
+        this._hackTimeout = setTimeout(() => this.updateItemHeights(), 20);
+
         let index = 0;
         const itemKeys = new Set();
         for (const item of this.props.children) {

@@ -171,20 +171,57 @@ export const tasks = {
     },
     options: async ({ id }) => {
         const client = await asyncClient;
+
+        if (store.get([MEMBERSHIP_OPTIONS, id])?._virtual) return store.get([MEMBERSHIP_OPTIONS, id]);
+
         const res = await client.get(`/registration/options/${id}`, {
             fields: OPTIONS_FIELDS,
         });
+        store.insert([MEMBERSHIP_OPTIONS, id], res.body);
         return res.body;
+    },
+    createOptions: async (_, { year }) => {
+        const id = parseInt(year, 10);
+        if (!Number.isFinite(id)) throw { code: 'bad-request', message: 'Bad year number' };
+
+        // check if it exists
+        if (!store.get([MEMBERSHIP_OPTIONS, id])) {
+            await tasks.options({ id: year }).catch(err => {
+                if (err.statusCode === 404) return null;
+                throw err;
+            });
+        }
+
+        if (store.get([MEMBERSHIP_OPTIONS, id])) return year;
+        store.insert([MEMBERSHIP_OPTIONS, id], {
+            _virtual: true,
+            id,
+            year: id,
+            enabled: false,
+            currency: null,
+            paymentOrgId: null,
+            offers: [],
+        });
+        return year;
     },
     updateOptions: async ({ id }, params) => {
         const client = await asyncClient;
         const existing = store.get([MEMBERSHIP_OPTIONS, id]);
+        existing._virtual = false;
         const delta = fieldDiff(existing, params);
         const complete = { ...deepMerge(existing, delta) };
         delete complete.id;
         delete complete.year;
+        delete complete._virtual;
         await client.put(`/registration/options/${id}`, complete);
         store.insert([MEMBERSHIP_OPTIONS, id], deepMerge(existing, params));
+        store.signal(MEMBERSHIP_OPTIONS.concat([SIG_OPTIONS]));
+    },
+    deleteOptions: async ({ id }) => {
+        const client = await asyncClient;
+        await client.delete(`/registration/options/${id}`);
+        store.remove([MEMBERSHIP_OPTIONS, id]);
+        store.signal(MEMBERSHIP_OPTIONS.concat([SIG_OPTIONS]));
     },
 };
 

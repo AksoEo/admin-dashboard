@@ -2,7 +2,6 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
-import EditIcon from '@material-ui/icons/Edit';
 import RemoveIcon from '@material-ui/icons/Remove';
 import UpIcon from '@material-ui/icons/KeyboardArrowUp';
 import DownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -19,8 +18,10 @@ import {
     membershipOptions as locale,
     membershipCategories as categoriesLocale,
     paymentOrgs as paymentOrgsLocale,
+    paymentAddons as paymentAddonsLocale,
     currencies,
 } from '../../../../locale';
+import { FIELDS as PAYMENT_ADDON_FIELDS } from '../../payments/orgs/addons/fields';
 import { FIELDS as PAYMENT_ORG_FIELDS } from '../../payments/orgs/fields';
 import { FIELDS as CATEGORY_FIELDS } from '../categories/fields';
 import { connect } from '../../../../core/connection';
@@ -51,15 +52,17 @@ export const FIELDS = {
     currency: {
         component ({ value, editing, onChange }) {
             if (editing) {
+                const items = Object.keys(currencies).map(currency => ({
+                    value: currency,
+                    label: currencies[currency],
+                }));
+                if (!value) items.push({ value: '', label: '—' });
                 return (
                     <Select
                         outline
-                        value={value}
+                        value={value || ''}
                         onChange={v => onChange(v)}
-                        items={Object.keys(currencies).map(currency => ({
-                            value: currency,
-                            label: currencies[currency],
-                        }))} />
+                        items={items} />
                 );
             }
             return value;
@@ -271,6 +274,7 @@ class OfferGroup extends PureComponent {
                     backdrop
                     onClose={() => this.setState({ adding: false })}>
                     <AddOffer
+                        paymentOrg={paymentOrg}
                         year={year}
                         offers={value.offers}
                         onSelect={addOffer} />
@@ -286,11 +290,12 @@ class AddOffer extends PureComponent {
         type: null,
     };
 
-    render ({ year, offers, onSelect }) {
+    render ({ year, offers, onSelect, paymentOrg }) {
         let picker;
         if (this.state.type === 'membership') {
             picker = (
                 <StaticOverviewList
+                    key="categories"
                     compact
                     task="memberships/listCategories"
                     view="memberships/category"
@@ -307,6 +312,26 @@ class AddOffer extends PureComponent {
                     emptyLabel={locale.offers.add.categoriesEmpty}
                     onItemClick={id => {
                         onSelect({ type: 'membership', id, price: null });
+                    }} />
+            );
+        } else if (this.state.type === 'addon') {
+            picker = (
+                <StaticOverviewList
+                    key="addons"
+                    compact
+                    task="payments/listAddons"
+                    view="payments/addon"
+                    options={{ org: paymentOrg }}
+                    viewOptions={{ org: paymentOrg }}
+                    jsonFilter={{
+                        id: { $nin: offers.filter(x => x.type === 'addon').map(x => x.id) },
+                    }}
+                    fields={PAYMENT_ADDON_FIELDS}
+                    sorting={{ name: 'asc' }}
+                    locale={paymentAddonsLocale.fields}
+                    emptyLabel={locale.offers.add.addonsEmpty}
+                    onItemClick={id => {
+                        onSelect({ type: 'addon', id });
                     }} />
             );
         }
@@ -438,8 +463,10 @@ class PaymentOrgPicker extends PureComponent {
         return (
             <div class="payment-org-picker">
                 <Button onClick={() => this.setState({ open: true })}>
-                    {/* HACK: key by value to force update */}
-                    <PaymentOrgLabel key={value} id={value} />
+                    {value ? (
+                        // HACK: key by value to force update
+                        <PaymentOrgLabel key={value} id={value} />
+                    ) : locale.paymentOrg.pick}
                 </Button>
 
                 <Dialog
@@ -447,6 +474,9 @@ class PaymentOrgPicker extends PureComponent {
                     open={this.state.open}
                     onClose={() => this.setState({ open: false })}
                     backdrop>
+                    <div class="payment-org-picker-note">
+                        {locale.paymentOrg.pickNote}
+                    </div>
                     <StaticOverviewList
                         compact
                         task="payments/listOrgs"

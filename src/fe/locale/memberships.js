@@ -47,6 +47,7 @@ export const membershipOptions = {
     paymentOrg: {
         pick: '[[Pick payment org]]',
         pickEmpty: '[[No payment orgs]]',
+        pickNote: '[[Note that changing this means that any payment addons will become invalid. You’ll probably want to remove them first]]',
     },
     offers: {
         types: {
@@ -56,6 +57,7 @@ export const membershipOptions = {
         add: {
             title: '[[Add offer]]',
             categoriesEmpty: '[[No membership categories available this year that you havent already added]]',
+            addonsEmpty: '[[No payment addons remaining]]',
         },
         price: {
             na: '[[Not available]]',
@@ -63,6 +65,9 @@ export const membershipOptions = {
     },
     create: {
         menuItem: 'Krei',
+        title: 'Krei agordoj',
+        button: 'Krei',
+        year: 'Jaro',
     },
     update: {
         menuItem: 'Redakti',

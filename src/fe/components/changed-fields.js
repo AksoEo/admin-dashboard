@@ -15,7 +15,7 @@ export default function ChangedFields ({ changedFields, locale: localizedFields 
                 {locale.diff}
             </span>
             <ul class="changed-fields">
-                {changedFields.map(field => (
+                {changedFields.filter(field => !field.startsWith('_')).map(field => (
                     <li key={field}>
                         {localizedFields[field]}
                     </li>
