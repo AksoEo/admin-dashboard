@@ -205,7 +205,7 @@ export const paymentIntents = {
         purposeTypes: {
             trigger: 'AKSO-ago',
             manual: 'Permana',
-            addon: 'Donaco',
+            addon: 'Aldoneblo',
         },
         purpose: {
             triggerAmount: '[[Trigger amount]]',

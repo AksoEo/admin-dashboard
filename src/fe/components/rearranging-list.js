@@ -280,6 +280,7 @@ export default class RearrangingList extends PureComponent {
                 <div
                     key={key}
                     className={className}
+                    data-height={item.height}
                     ref={node => (this.itemData.get(key) && (this.itemData.get(key).node = node))}
                     style={{
                         transform: `translateY(${posY}px)`,

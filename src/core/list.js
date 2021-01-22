@@ -13,7 +13,7 @@ export function transformError (err) {
 
     return {
         code: code || err.code || '?',
-        message: err.message || err.toString(),
+        message: (err.message || err.toString()) + (err.stack ? '\n' + err.stack : ''),
         extra: err.extra || {},
     };
 }

@@ -2,7 +2,7 @@ import { h } from 'preact';
 import TaskDialog from '../../../components/task-dialog';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/changed-fields';
-import { membershipCategories as categoriesLocale } from '../../../locale';
+import { membershipCategories as categoriesLocale, membershipOptions as optionsLocale } from '../../../locale';
 import { routerContext } from '../../../router';
 import { FIELDS as CATEGORY_FIELDS } from './categories/fields';
 
@@ -62,6 +62,33 @@ export default {
                 actionLabel={categoriesLocale.delete.button}
                 run={() => task.runOnce()}>
                 {categoriesLocale.delete.description}
+            </TaskDialog>
+        );
+    },
+
+    updateOptions ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={optionsLocale.update.title}
+                actionLabel={optionsLocale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={optionsLocale.fields} />
+            </TaskDialog>
+        );
+    },
+    deleteOptions ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={optionsLocale.delete.title}
+                actionLabel={optionsLocale.delete.button}
+                run={() => task.runOnce()}>
+                {optionsLocale.delete.description}
             </TaskDialog>
         );
     },

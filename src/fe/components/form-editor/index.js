@@ -13,24 +13,7 @@ import { createInput, getGlobalDefs, getAscDefs } from './model';
 import { formEditor as locale } from '../../locale';
 import './index.less';
 
-// TODO: add Reset button to reset to default values etc
-
-/// The Form Editor is the component used to edit e.g. registration forms.
-///
-/// # Props
-/// - editing: bool
-/// - value: { allowUse, allowGuests, ..., form } object (see API docs)
-/// - onChange: (value) => void callback
-/// - formData/onFormDataChange: optional form data
-/// - editingFormData: set to false to disable
-/// - skipSettings: TEMPORARY for not rendering settings
-/// - skipNonInputs: will not render modules that aren't inputs
-export default class FormEditor extends PureComponent {
-    state = {
-        /// Form input name -> form input value
-        formData: {},
-    };
-
+export class ScriptContextProvider extends PureComponent {
     openScriptEditor = (defs, options = {}) => new Promise(resolve => {
         const editor = new AKSOScriptEditor();
 
@@ -117,6 +100,29 @@ export default class FormEditor extends PureComponent {
         window.removeEventListener('resize', this.onResize);
     }
 
+    render ({ children }) {
+        return <ScriptContext.Provider value={this.scriptContext}>{children}</ScriptContext.Provider>;
+    }
+}
+
+// TODO: add Reset button to reset to default values etc
+
+/// The Form Editor is the component used to edit e.g. registration forms.
+///
+/// # Props
+/// - editing: bool
+/// - value: { allowUse, allowGuests, ..., form } object (see API docs)
+/// - onChange: (value) => void callback
+/// - formData/onFormDataChange: optional form data
+/// - editingFormData: set to false to disable
+/// - skipSettings: TEMPORARY for not rendering settings
+/// - skipNonInputs: will not render modules that aren't inputs
+export default class FormEditor extends PureComponent {
+    state = {
+        /// Form input name -> form input value
+        formData: {},
+    };
+
     render ({ skipSettings, skipNonInputs, value, editing, onChange, additionalVars, editingFormData }) {
         if (!value) return null;
 
@@ -126,7 +132,7 @@ export default class FormEditor extends PureComponent {
 
         return (
             <div class="form-editor">
-                <ScriptContext.Provider value={this.scriptContext}>
+                <ScriptContextProvider>
                     <FormEditorItems
                         skipSettings={skipSettings}
                         skipNonInputs={skipNonInputs}
@@ -143,7 +149,7 @@ export default class FormEditor extends PureComponent {
                             } else this.setState({ formData });
                         }}
                         additionalVars={additionalVars} />
-                </ScriptContext.Provider>
+                </ScriptContextProvider>
             </div>
         );
     }

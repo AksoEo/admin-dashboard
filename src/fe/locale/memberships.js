@@ -44,7 +44,35 @@ export const membershipOptions = {
         currency: 'Valuto',
         offers: '[[Offers]]',
     },
+    paymentOrg: {
+        pick: '[[Pick payment org]]',
+        pickEmpty: '[[No payment orgs]]',
+    },
+    offers: {
+        types: {
+            addon: 'Aldoneblo',
+            membership: 'Membreco',
+        },
+        add: {
+            title: '[[Add offer]]',
+            categoriesEmpty: '[[No membership categories available this year that you havent already added]]',
+        },
+        price: {
+            na: '[[Not available]]',
+        },
+    },
     create: {
         menuItem: 'Krei',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti agordoj',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi agordoj',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la agordoj por ĉi tiun jaron? Ne eblas malfari tiun ĉi agon.',
     },
 };

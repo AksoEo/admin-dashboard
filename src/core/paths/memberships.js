@@ -3,7 +3,7 @@ import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
-import { fieldsToOrder } from '../list';
+import { fieldDiff, fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 
 /// Data store path.
@@ -77,7 +77,7 @@ const OPTIONS_FIELDS = [
 ];
 
 export const tasks = {
-    listCategories: async (_, { offset, limit, fields, search }) => {
+    listCategories: async (_, { offset, limit, fields, search, jsonFilter }) => {
         const client = await asyncClient;
 
         const opts = {
@@ -86,6 +86,7 @@ export const tasks = {
             fields: CATEGORY_FIELDS,
             order: fieldsToOrder(fields),
         };
+        if (jsonFilter) opts.filter = jsonFilter.filter;
 
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
@@ -115,6 +116,7 @@ export const tasks = {
         const res = await client.get(`/membership_categories/${id}`, {
             fields: CATEGORY_FIELDS,
         });
+        store.insert([MEMBERSHIP_CATEGORIES, id], res.body);
         return res.body;
     },
     createCategory: async (_, params) => {
@@ -173,6 +175,16 @@ export const tasks = {
             fields: OPTIONS_FIELDS,
         });
         return res.body;
+    },
+    updateOptions: async ({ id }, params) => {
+        const client = await asyncClient;
+        const existing = store.get([MEMBERSHIP_OPTIONS, id]);
+        const delta = fieldDiff(existing, params);
+        const complete = { ...deepMerge(existing, delta) };
+        delete complete.id;
+        delete complete.year;
+        await client.put(`/registration/options/${id}`, complete);
+        store.insert([MEMBERSHIP_OPTIONS, id], deepMerge(existing, params));
     },
 };
 
