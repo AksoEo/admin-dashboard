@@ -50,6 +50,10 @@ export const membershipOptions = {
         pickNote: '[[Note that changing this means that any payment addons will become invalid. You’ll probably want to remove them first]]',
     },
     offers: {
+        group: {
+            title: '[[Group title]]',
+            description: 'Priskribo',
+        },
         types: {
             addon: 'Aldoneblo',
             membership: 'Membreco',
@@ -60,7 +64,9 @@ export const membershipOptions = {
             addonsEmpty: '[[No payment addons remaining]]',
         },
         price: {
-            na: '[[Not available]]',
+            title: '[[Price]]',
+            varLabel: '[[Price variable]]',
+            na: '[[No price/not available]]',
         },
     },
     create: {

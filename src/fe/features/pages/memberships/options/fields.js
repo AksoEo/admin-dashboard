@@ -14,6 +14,7 @@ import StaticOverviewList from '../../../../components/overview-list-static';
 import RearrangingList from '../../../../components/rearranging-list';
 import ScriptItem from '../../../../components/form-editor/script-item';
 import { ScriptContextProvider } from '../../../../components/form-editor';
+import { RefNameView } from '../../../../components/form-editor/script-views';
 import {
     membershipOptions as locale,
     membershipCategories as categoriesLocale,
@@ -160,13 +161,15 @@ class Offers extends PureComponent {
 
         return (
             <ScriptContextProvider>
-                <RearrangingList
-                    class="registration-offers"
-                    isItemDraggable={() => editing}
-                    canMove={() => true}
-                    onMove={moveItem}>
-                    {items}
-                </RearrangingList>
+                {editing ? (
+                    <RearrangingList
+                        class="registration-offers is-editing"
+                        isItemDraggable={() => editing}
+                        canMove={() => true}
+                        onMove={moveItem}>
+                        {items}
+                    </RearrangingList>
+                ) : <div class="registration-offers">{items}</div>}
                 {editing && (
                     <Button icon small onClick={addItem}>
                         <AddIcon />
@@ -223,22 +226,27 @@ class OfferGroup extends PureComponent {
         };
 
         return (
-            <div class="registration-offer-group">
-                {editing && (
-                    <div>
-                        <Button icon small onClick={onRemove}>
+            <div class={'registration-offer-group' + (editing ? ' is-editing' : '')}>
+                <div class="offer-group-title">
+                    {editing && (
+                        <Button class="remove-button" icon small onClick={onRemove}>
                             <RemoveIcon />
                         </Button>
-                    </div>
-                )}
-                <div class="offer-group-title">
+                    )}
                     {editing ? (
                         <TextField
+                            class="inner-input"
+                            label={locale.offers.group.title}
                             outline
                             value={value.title}
                             onChange={e => onChange({ ...value, title: e.target.value })} />
                     ) : value.title}
                 </div>
+                {editing && (
+                    <div class="offer-group-description-label">
+                        {locale.offers.group.description}
+                    </div>
+                )}
                 <MdField
                     editing={editing}
                     class="offer-group-description"
@@ -246,19 +254,23 @@ class OfferGroup extends PureComponent {
                     onChange={description => onChange({ ...value, description })}
                     rules={['emphasis', 'strikethrough', 'link']} />
                 {editing && (
-                    <Button icon small onClick={() => this.setState({ open: !this.state.open })}>
+                    <Button class="offer-group-expand-button" icon small onClick={() => this.setState({ open: !this.state.open })}>
                         {this.state.open ? <UpIcon /> : <DownIcon />}
                     </Button>
                 )}
-                {(this.state.open || !editing) && (
+                {!editing ? (
+                    <div class="offer-group-items">
+                        {items}
+                    </div>
+                ) : (this.state.open && (
                     <RearrangingList
                         isItemDraggable={() => editing}
                         canMove={() => true}
                         onMove={moveItem}
-                        class="offer-group-items">
+                        class="offer-group-items is-editing">
                         {items}
                     </RearrangingList>
-                )}
+                ))}
                 {this.state.open && editing && (
                     <div>
                         <Button icon small onClick={() => this.setState({ adding: true })}>
@@ -364,36 +376,58 @@ class Offer extends PureComponent {
     };
 
     render ({ value, editing, onChange, onRemove, paymentOrg }) {
-        let item, price;
+        let item, price, priceButton;
         if (value.type === 'addon') {
             item = <OfferPaymentAddon id={value.id} paymentOrg={paymentOrg} />;
         } else if (value.type === 'membership') {
             item = <OfferPaymentMembership id={value.id} />;
-            price = (
-                <div class="price-container">
-                    <Button icon small onClick={() => this.setState({ priceOpen: !this.state.priceOpen })}>
-                        {this.state.priceOpen ? <UpIcon /> : <DownIcon />}
-                    </Button>
-                    {this.state.priceOpen && (
-                        <OfferPrice
-                            value={value.price}
-                            editing={editing}
-                            onChange={price => onChange({ ...value, price })} />
-                    )}
-                </div>
+            const hasPrice = !!value.price;
+            priceButton = (
+                <Button
+                    class="price-expand-button"
+                    icon
+                    small
+                    disabled={!editing && !hasPrice}
+                    onClick={() => this.setState({ priceOpen: !this.state.priceOpen })}>
+                    {(!editing && !hasPrice) ? <UpIcon /> : (this.state.priceOpen
+                        ? <UpIcon /> : <DownIcon />)}
+                </Button>
             );
+            if (!editing && !hasPrice) {
+                price = (
+                    <div class="price-not-available">
+                        {locale.offers.price.na}
+                    </div>
+                );
+            } else {
+                price = (
+                    <div class="price-container">
+                        {this.state.priceOpen && (
+                            <OfferPrice
+                                value={value.price}
+                                editing={editing}
+                                onChange={price => onChange({ ...value, price })} />
+                        )}
+                    </div>
+                );
+            }
         }
 
         return (
             <div class="registration-offer">
-                {editing && (
-                    <Button small icon onClick={onRemove}>
-                        <RemoveIcon />
-                    </Button>
-                )}
-                <div class="offer-type">{locale.offers.types[value.type]}</div>
-                <div class="offer-item">
-                    {item}
+                <div class="offer-details">
+                    {editing && (
+                        <Button class="remove-button" small icon onClick={onRemove}>
+                            <RemoveIcon />
+                        </Button>
+                    )}
+                    <div class="offer-details-inner">
+                        <div class="offer-type">{locale.offers.types[value.type]}</div>
+                        <div class="offer-item">
+                            {item}
+                        </div>
+                    </div>
+                    {priceButton}
                 </div>
                 {price}
             </div>
@@ -422,7 +456,24 @@ class OfferPrice extends PureComponent {
     };
 
     render ({ value, editing, onChange }) {
-        if (!value) return locale.offers.price.na;
+        if (!value) {
+            return (
+                <div class="offer-price is-none">
+                    <div class="none-label">
+                        {locale.offers.price.na}
+                    </div>
+                    {editing && (
+                        <Button icon small onClick={() => onChange({
+                            description: '',
+                            script: {},
+                            var: null,
+                        })}>
+                            <AddIcon />
+                        </Button>
+                    )}
+                </div>
+            );
+        }
 
         const variables = [];
         for (const v in value.script) {
@@ -433,22 +484,59 @@ class OfferPrice extends PureComponent {
             });
         }
 
+        const prevNodes = [
+            {
+                defs: {},
+                formVars: [
+                    // TODO: what to do with these values?
+                    { name: 'age', type: 'n', value: 25 },
+                    { name: 'agePrimo', type: 'n', value: 24 },
+                    { name: 'birthdate', type: 's', value: '1999-04-21' },
+                    { name: 'feeCountry', type: 's', value: 'nl' },
+                    { name: 'feeCountryGroups', type: 'm', value: ['x01'] },
+                    { name: 'isActiveMember', type: 'b', value: true },
+                ],
+            },
+        ];
+
         return (
             <div class="offer-price">
+                <div class="offer-price-title">
+                    {editing && (
+                        <Button class="remove-button" icon small onClick={() => onChange(null)}>
+                            <RemoveIcon />
+                        </Button>
+                    )}
+                    <span class="title-contents">
+                        {locale.offers.price.title}
+                    </span>
+                </div>
                 <MdField
+                    class="offer-price-description"
                     value={value.description}
+                    editing={editing}
+                    onChange={description => onChange({ ...value, description })}
                     rules={['emphasis', 'strikethrough']} />
                 <ScriptItem
-                    previousNodes={[ /* TODO */ ]}
+                    previousNodes={prevNodes}
                     editable={editing}
                     editing={this.state.editingScript}
                     onEditingChange={editingScript => this.setState({ editingScript })}
                     item={value}
                     onChange={onChange} />
-                <Select
-                    value={value.var}
-                    onChange={v => onChange({ ...value, var: v })}
-                    items={variables} />
+                <div class="price-variable">
+                    <span class="price-var-label">{locale.offers.price.varLabel}:</span>
+                    <div class="price-var-contents">
+                        {!editing ? (
+                            <RefNameView name={value.var} />
+                        ) : (
+                            <Select
+                                value={value.var}
+                                onChange={v => onChange({ ...value, var: v })}
+                                items={variables} />
+                        )}
+                    </div>
+                </div>
             </div>
         );
     }
@@ -470,6 +558,7 @@ class PaymentOrgPicker extends PureComponent {
                 </Button>
 
                 <Dialog
+                    class="registration-options-payment-org-picker"
                     title={locale.paymentOrg.pick}
                     open={this.state.open}
                     onClose={() => this.setState({ open: false })}
