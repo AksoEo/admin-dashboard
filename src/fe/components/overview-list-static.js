@@ -120,6 +120,7 @@ export default class StaticOverviewList extends PureComponent {
         offset,
         limit,
         selection,
+        userData,
     }, { loading, error, result, animateBackwards }) {
         const selectedFields = Object.keys(fields).map(f => ({ id: f }));
 
@@ -167,7 +168,8 @@ export default class StaticOverviewList extends PureComponent {
                         fields={fields}
                         index={animateBackwards ? result.items.length - 1 - i : i}
                         animateBackwards={animateBackwards}
-                        locale={locale} />
+                        locale={locale}
+                        userData={userData} />
                 );
                 i++;
             }

@@ -112,6 +112,7 @@ export default connect(props => ([props.view, {
         userData,
     }) {
         if (!data) return null;
+        if (userData && userData.hideItem && userData.hideItem(data)) return null;
 
         // compact layout
         const iconCells = [];

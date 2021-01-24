@@ -57,7 +57,12 @@ export const FIELDS = {
         weight: 2,
     },
     givesMembership: {
-        component ({ value, editing, onChange }) {
+        skipLabel: true,
+        component ({ value, editing, onChange, slot }) {
+            if (slot === 'body') {
+                if (value) return locale.fields.givesMembership;
+                return null;
+            }
             if (!editing) return value ? <CheckIcon /> : null;
             return <Checkbox
                 checked={value}

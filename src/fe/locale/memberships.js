@@ -60,6 +60,7 @@ export const membershipOptions = {
         },
         add: {
             title: '[[Add offer]]',
+            membershipsNote: '[[Note that memberships that giveMembership can only be added once per offers object]]',
             categoriesEmpty: '[[No membership categories available this year that you havent already added]]',
             addonsEmpty: '[[No payment addons remaining]]',
         },

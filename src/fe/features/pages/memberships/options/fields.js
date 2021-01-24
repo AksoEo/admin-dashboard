@@ -28,9 +28,6 @@ import { FIELDS as CATEGORY_FIELDS } from '../categories/fields';
 import { connect } from '../../../../core/connection';
 import './fields.less';
 
-// TODO: make all of these things nicer
-// TODO: givesMembership items must be unique within the whole offers object
-
 export const FIELDS = {
     year: {
         sortable: true,
@@ -134,6 +131,7 @@ class Offers extends PureComponent {
             items.push(
                 <OfferGroup
                     key={'og' + itemKey}
+                    data={value}
                     year={year}
                     value={group}
                     editing={editing}
@@ -186,7 +184,7 @@ class OfferGroup extends PureComponent {
         adding: false,
     };
 
-    render ({ year, value, editing, onChange, onRemove, paymentOrg }) {
+    render ({ year, value, editing, onChange, onRemove, paymentOrg, data }) {
         const items = [];
         for (let i = 0; i < value.offers.length; i++) {
             const offer = value.offers[i];
@@ -286,6 +284,7 @@ class OfferGroup extends PureComponent {
                     backdrop
                     onClose={() => this.setState({ adding: false })}>
                     <AddOffer
+                        data={data}
                         paymentOrg={paymentOrg}
                         year={year}
                         offers={value.offers}
@@ -296,15 +295,23 @@ class OfferGroup extends PureComponent {
     }
 }
 
-const REDUCED_CATEGORY_FIELDS = Object.fromEntries(['nameAbbrev', 'name'].map(x => [x, CATEGORY_FIELDS[x]]));
+const REDUCED_CATEGORY_FIELDS = Object.fromEntries(['nameAbbrev', 'name', 'givesMembership'].map(x => [x, CATEGORY_FIELDS[x]]));
 class AddOffer extends PureComponent {
     state = {
         type: null,
     };
 
-    render ({ year, offers, onSelect, paymentOrg }) {
-        let picker;
+    render ({ year, offers, onSelect, paymentOrg, data }) {
+        let picker, note;
         if (this.state.type === 'membership') {
+            note = (
+                <div class="add-offer-note">
+                    {locale.offers.add.membershipsNote}
+                </div>
+            );
+
+            const selectedMembershipItems = new Set(data.flatMap(group => group.offers.filter(x => x.type === 'membership').map(x => x.id)));
+
             picker = (
                 <StaticOverviewList
                     key="categories"
@@ -317,13 +324,26 @@ class AddOffer extends PureComponent {
                         $and: [
                             { $or: [{ availableFrom: null }, { availableFrom: { $lte: year } }] },
                             { $or: [{ availableTo: null }, { availableTo: { $gte: year } }] },
-                            { id: { $nin: offers.filter(x => x.type === 'membership').map(x => x.id) } },
+                            {
+                                id: {
+                                    $nin: offers
+                                        .filter(x => x.type === 'membership')
+                                        .map(x => x.id)
+                                },
+                            },
                         ],
                     }}
                     locale={categoriesLocale.fields}
                     emptyLabel={locale.offers.add.categoriesEmpty}
                     onItemClick={id => {
                         onSelect({ type: 'membership', id, price: null });
+                    }}
+                    userData={{
+                        hideItem: data => {
+                            if (data.givesMembership) {
+                                if (selectedMembershipItems.has(data.id)) return true;
+                            }
+                        },
                     }} />
             );
         } else if (this.state.type === 'addon') {
@@ -350,20 +370,23 @@ class AddOffer extends PureComponent {
 
         return (
             <div>
-                <Segmented
-                    selected={this.state.type}
-                    onSelect={type => this.setState({ type })}>
-                    {[
-                        {
-                            id: 'membership',
-                            label: locale.offers.types.membership,
-                        },
-                        {
-                            id: 'addon',
-                            label: locale.offers.types.addon,
-                        },
-                    ]}
-                </Segmented>
+                <div class="offer-type-picker">
+                    <Segmented
+                        selected={this.state.type}
+                        onSelect={type => this.setState({ type })}>
+                        {[
+                            {
+                                id: 'membership',
+                                label: locale.offers.types.membership,
+                            },
+                            {
+                                id: 'addon',
+                                label: locale.offers.types.addon,
+                            },
+                        ]}
+                    </Segmented>
+                </div>
+                {note}
                 {picker}
             </div>
         );
@@ -380,7 +403,7 @@ class Offer extends PureComponent {
         if (value.type === 'addon') {
             item = <OfferPaymentAddon id={value.id} paymentOrg={paymentOrg} />;
         } else if (value.type === 'membership') {
-            item = <OfferPaymentMembership id={value.id} />;
+            item = <OfferMembership id={value.id} />;
             const hasPrice = !!value.price;
             priceButton = (
                 <Button
@@ -443,9 +466,9 @@ const OfferPaymentAddon = connect(({ id, paymentOrg }) => ['payments/addon', {
     return data.name;
 });
 
-const OfferPaymentMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
+const OfferMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
     data,
-}))(function OfferPaymentMembership ({ data }) {
+}))(function OfferMembership ({ data }) {
     if (!data) return <TinyProgress />;
     return data.name;
 });
@@ -549,8 +572,8 @@ class PaymentOrgPicker extends PureComponent {
 
     render ({ value, onChange }) {
         return (
-            <div class="payment-org-picker">
-                <Button onClick={() => this.setState({ open: true })}>
+            <div class="registration-options-payment-org-picker">
+                <Button class="picker-inner-button" onClick={() => this.setState({ open: true })}>
                     {value ? (
                         // HACK: key by value to force update
                         <PaymentOrgLabel key={value} id={value} />
@@ -558,12 +581,12 @@ class PaymentOrgPicker extends PureComponent {
                 </Button>
 
                 <Dialog
-                    class="registration-options-payment-org-picker"
+                    class="registration-options-payment-org-picker-dialog"
                     title={locale.paymentOrg.pick}
                     open={this.state.open}
                     onClose={() => this.setState({ open: false })}
                     backdrop>
-                    <div class="payment-org-picker-note">
+                    <div class="picker-note">
                         {locale.paymentOrg.pickNote}
                     </div>
                     <StaticOverviewList
