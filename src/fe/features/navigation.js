@@ -93,6 +93,7 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                         path: firstPathPart,
                         source: page,
                         component: page.component || NotFoundPage,
+                        isVirtual: !page.component,
                         query: '',
                         state: {},
                     };
@@ -149,8 +150,10 @@ function parseHistoryState (url, state, mkPopStack, perms) {
 
                 if (subpage.type === 'bottom') {
                     const pathParts = [];
+                    let canPop = false;
                     while (stack.length) {
                         const item = stack.pop();
+                        if (item.component && !item.isVirtual) canPop = true;
                         pathParts.unshift(item.path);
                     }
                     pathParts.push(part);
@@ -159,6 +162,7 @@ function parseHistoryState (url, state, mkPopStack, perms) {
                         path: pathParts.join('/'),
                         source: subpage,
                         component: isForbidden ? ForbiddenPage : subpage.component || NotFoundPage,
+                        canPop,
                         pathMatch: match,
                         query: '',
                         state: {},
@@ -534,6 +538,7 @@ export default class Navigation extends PureComponent {
         }
 
         let bottomPage;
+        let canPopBottomPage = false;
         const stackItems = [];
 
         let currentTabTitle = '';
@@ -586,6 +591,11 @@ export default class Navigation extends PureComponent {
 
             if (isBottom) {
                 bottomPage = itemContents;
+                if (stackItem.canPop) {
+                    canPopBottomPage = stackItem.path.split('/');
+                    canPopBottomPage.pop();
+                    canPopBottomPage = canPopBottomPage.join('/');
+                }
             } else {
                 const itemIndex = i;
                 stackItems.push(
@@ -598,8 +608,14 @@ export default class Navigation extends PureComponent {
 
         let appBarMenuType = null;
         if (!stackItems.length) {
-            // bottom page; show menu button if applicable
-            appBarMenuType = this.props.permaSidebar ? null : 'menu';
+            // bottom page
+            if (canPopBottomPage) {
+                // can still be popped off the stack!
+                appBarMenuType = 'back';
+            } else {
+                // show menu button if applicable
+                appBarMenuType = this.props.permaSidebar ? null : 'menu';
+            }
         } else {
             appBarMenuType = 'back';
         }
@@ -608,7 +624,13 @@ export default class Navigation extends PureComponent {
             if (stackItems.length) {
                 // pop all items up to and including the top component
                 this.popStackUntilIncluding(item => !!item.component);
-            } else this.props.onOpenMenu();
+            } else if (canPopBottomPage) {
+                // go back to the previous item
+                // FIXME: this is super hacky
+                this.navigate('/' + canPopBottomPage);
+            } else {
+                this.props.onOpenMenu();
+            }
         };
 
         const appBarMenu = appBarMenuType

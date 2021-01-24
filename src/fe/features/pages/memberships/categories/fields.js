@@ -46,6 +46,7 @@ export const FIELDS = {
         },
     },
     description: {
+        skipLabel: true,
         component ({ value, editing, onChange, slot }) {
             return <MdField
                 inline={slot !== 'detail'}

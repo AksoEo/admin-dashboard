@@ -37,7 +37,7 @@ export const FIELDS = {
         },
     },
     enabled: {
-        slot: 'icon',
+        slot: 'titleAlt',
         skipLabel: true,
         component ({ value, editing, onChange }) {
             if (editing) {

@@ -1,5 +1,9 @@
 export const memberships = {
     title: 'Membreco',
+    pages: {
+        categories: 'Membrecoj',
+        options: 'Agordoj',
+    },
 };
 
 export const membershipCategories = {
