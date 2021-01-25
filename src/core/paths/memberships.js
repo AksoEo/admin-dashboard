@@ -1,9 +1,10 @@
 import { util } from '@tejo/akso-client';
+import { base32 } from 'rfc4648';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
-import { fieldDiff, fieldsToOrder } from '../list';
+import { fieldDiff, fieldsToOrder, makeParametersToRequestData, makeClientToAPI, makeClientFromAPI } from '../list';
 import { deepMerge } from '../../util';
 
 /// Data store path.
@@ -11,8 +12,10 @@ export const MEMBERSHIPS = 'memberships';
 export const MEMBERSHIP_CATEGORIES = [MEMBERSHIPS, 'categories'];
 export const MEMBERSHIP_CATEGORIES_LIST = [MEMBERSHIPS, 'all_categories'];
 export const SIG_CATEGORIES = '!categories';
-export const MEMBERSHIP_OPTIONS = [MEMBERSHIPS, 'options'];
-export const SIG_OPTIONS = '!options';
+export const REGISTRATION_OPTIONS = [MEMBERSHIPS, 'options'];
+export const SIG_OPTIONS = [MEMBERSHIPS, 'options', '!options'];
+export const REGISTRATION_ENTRIES = [MEMBERSHIPS, 'entries'];
+export const SIG_ENTRIES = [MEMBERSHIPS, 'entries', '!entires'];
 
 /// Loads all membership categories because there won’t be too many for this to become a problem
 async function loadAllMembershipCategories () {
@@ -75,6 +78,49 @@ const OPTIONS_FIELDS = [
     'currency',
     'offers',
 ];
+
+function entryReadId (idBuffer) {
+    return base32.stringify(idBuffer);
+}
+
+const eClientFields = {
+    id: {
+        apiFields: ['id'],
+        fromAPI: entry => entryReadId(entry.id),
+        toAPI: () => ({}),
+    },
+    year: 'year',
+    status: {
+        apiFields: ['status', 'timeStatus'],
+        fromAPI: entry => ({ status: entry.status, time: entry.timeStatus }),
+        toAPI: () => ({}),
+    },
+    issue: {
+        apiFields: ['pendingIssue.what', 'pendingIssue.where', 'fishyIsOkay'],
+        fromAPI: entry => ({
+            what: entry.pendingIssue?.what,
+            where: entry.pendingIssue?.where,
+            fishyIsOkay: entry.fishyIsOkay,
+        }),
+        toAPI: data => ({ fishyIsOkay: data.fishyIsOkay }),
+    },
+    newCodeholderId: 'newCodeholderId',
+    timeSubmitted: 'timeSubmitted',
+    internalNotes: 'internalNotes',
+    offers: {
+        apiFields: ['currency', 'offers'],
+        fromAPI: entry => ({ currency: entry.currency, selected: entry.offers }),
+        toAPI: data => ({ currency: data.currency, offers: data.selected }),
+    },
+    codeholderData: 'codeholderData',
+};
+const eClientFilters = {};
+const eParametersToRequestData = makeParametersToRequestData({
+    clientFields: eClientFields,
+    clientFilters: eClientFilters,
+});
+const eClientFromAPI = makeClientFromAPI(eClientFields);
+const eClientToAPI = makeClientToAPI(eClientFields);
 
 export const tasks = {
     listCategories: async (_, { offset, limit, fields, search, jsonFilter }) => {
@@ -157,7 +203,7 @@ export const tasks = {
 
         for (const item of res.body) {
             item.id = item.year;
-            store.insert([MEMBERSHIP_OPTIONS, item.id], item);
+            store.insert(REGISTRATION_OPTIONS.concat([item.id]), item);
         }
 
         return {
@@ -172,12 +218,12 @@ export const tasks = {
     options: async ({ id }) => {
         const client = await asyncClient;
 
-        if (store.get([MEMBERSHIP_OPTIONS, id])?._virtual) return store.get([MEMBERSHIP_OPTIONS, id]);
+        if (store.get(REGISTRATION_OPTIONS.concat([id]))?._virtual) return store.get(REGISTRATION_OPTIONS.concat([id]));
 
         const res = await client.get(`/registration/options/${id}`, {
             fields: OPTIONS_FIELDS,
         });
-        store.insert([MEMBERSHIP_OPTIONS, id], res.body);
+        store.insert(REGISTRATION_OPTIONS.concat([id]), res.body);
         return res.body;
     },
     createOptions: async (_, { year }) => {
@@ -185,15 +231,15 @@ export const tasks = {
         if (!Number.isFinite(id)) throw { code: 'bad-request', message: 'Bad year number' };
 
         // check if it exists
-        if (!store.get([MEMBERSHIP_OPTIONS, id])) {
+        if (!store.get(REGISTRATION_OPTIONS.concat([id]))) {
             await tasks.options({ id: year }).catch(err => {
                 if (err.statusCode === 404) return null;
                 throw err;
             });
         }
 
-        if (store.get([MEMBERSHIP_OPTIONS, id])) return year;
-        store.insert([MEMBERSHIP_OPTIONS, id], {
+        if (store.get(REGISTRATION_OPTIONS.concat([id]))) return year;
+        store.insert(REGISTRATION_OPTIONS.concat([id]), {
             _virtual: true,
             id,
             year: id,
@@ -206,7 +252,7 @@ export const tasks = {
     },
     updateOptions: async ({ id }, params) => {
         const client = await asyncClient;
-        const existing = store.get([MEMBERSHIP_OPTIONS, id]);
+        const existing = store.get(REGISTRATION_OPTIONS.concat([id]));
         existing._virtual = false;
         const delta = fieldDiff(existing, params);
         const complete = { ...deepMerge(existing, delta) };
@@ -214,14 +260,70 @@ export const tasks = {
         delete complete.year;
         delete complete._virtual;
         await client.put(`/registration/options/${id}`, complete);
-        store.insert([MEMBERSHIP_OPTIONS, id], deepMerge(existing, params));
-        store.signal(MEMBERSHIP_OPTIONS.concat([SIG_OPTIONS]));
+        store.insert(REGISTRATION_OPTIONS.concat([id]), deepMerge(existing, params));
+        store.signal(SIG_OPTIONS);
     },
     deleteOptions: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/registration/options/${id}`);
-        store.remove([MEMBERSHIP_OPTIONS, id]);
-        store.signal(MEMBERSHIP_OPTIONS.concat([SIG_OPTIONS]));
+        store.remove(REGISTRATION_OPTIONS.concat([id]));
+        store.signal(SIG_OPTIONS);
+    },
+
+    listEntries: async (_, parameters) => {
+        const client = await asyncClient;
+        const { options, usedFilters, transientFields } = eParametersToRequestData(parameters);
+
+        const res = await client.get('/registration/entries', options);
+
+        for (const item of res.body) {
+            const id = entryReadId(item);
+            store.insert(REGISTRATION_ENTRIES.concat([id]), item);
+        }
+
+        return {
+            items: res.body.map(item => entryReadId(item.id)),
+            total: +res.res.headers.get('x-total-items'),
+            transientFields,
+            stats: {
+                time: res.resTime,
+                filtered: usedFilters,
+            },
+        };
+    },
+    entry: async ({ id }, { fields }) => {
+        const client = await asyncClient;
+
+        const res = await client.get(`/registration/entries/${id}`, {
+            fields: ['id'].concat(fields.flatMap(id => typeof eClientFields[id] === 'string'
+                ? [eClientFields[id]]
+                : eClientFields[id].apiFields)),
+        });
+        const existing = store.get(REGISTRATION_ENTRIES.concat([id]));
+        store.insert(REGISTRATION_ENTRIES.concat([id]), deepMerge(existing, eClientFromAPI(res.body)));
+        return res.body;
+    },
+    createEntry: async (_, params) => {
+        const client = await asyncClient;
+        const res = await client.post('/registration/entries', eClientToAPI(params));
+        const id = +res.res.headers.get('x-identifier');
+        store.insert(REGISTRATION_ENTRIES.concat([id]), params);
+        store.signal(SIG_ENTRIES);
+        return id;
+    },
+    updateEntry: async ({ id }, params) => {
+        const client = await asyncClient;
+        const existing = store.get(REGISTRATION_ENTRIES.concat([id]));
+        const delta = fieldDiff(eClientToAPI(existing), eClientToAPI(params));
+        await client.patch(`/registration/entries/${id}`, delta);
+        store.insert(REGISTRATION_ENTRIES.concat([id]), deepMerge(existing, params));
+        store.signal(SIG_ENTRIES);
+    },
+    deleteEntry: async ({ id }) => {
+        const client = await asyncClient;
+        await client.delete(`/registration/entries/${id}`);
+        store.remove(REGISTRATION_ENTRIES.concat([id]));
+        store.signal(SIG_ENTRIES);
     },
 };
 
@@ -274,8 +376,8 @@ export const views = {
             super();
             this.id = id;
 
-            store.subscribe([MEMBERSHIP_OPTIONS, id], this.#onUpdate);
-            if (store.get([MEMBERSHIP_OPTIONS, id])) setImmediate(this.#onUpdate);
+            store.subscribe(REGISTRATION_OPTIONS.concat([id]), this.#onUpdate);
+            if (store.get(REGISTRATION_OPTIONS.concat([id]))) setImmediate(this.#onUpdate);
 
             if (!noFetch) {
                 tasks.options({ id }).catch(err => this.emit('error', err));
@@ -283,14 +385,59 @@ export const views = {
         }
         #onUpdate = (type) => {
             if (type === store.UpdateType.DELETE) {
-                this.emit('update', store.get([MEMBERSHIP_OPTIONS, this.id]), 'delete');
+                this.emit('update', store.get(REGISTRATION_OPTIONS.concat([this.id])), 'delete');
             } else {
-                this.emit('update', store.get([MEMBERSHIP_OPTIONS, this.id]));
+                this.emit('update', store.get(REGISTRATION_OPTIONS.concat([this.id])));
             }
         }
         drop () {
-            store.unsubscribe([MEMBERSHIP_OPTIONS, this.id], this.#onUpdate);
+            store.unsubscribe(REGISTRATION_OPTIONS.concat([this.id]), this.#onUpdate);
         }
     },
-    sigOptions: createStoreObserver(MEMBERSHIP_OPTIONS.concat([SIG_OPTIONS])),
+    sigOptions: createStoreObserver(SIG_OPTIONS),
+
+    entry: class RegistrationOptions extends AbstractDataView {
+        constructor ({ id, fields, noFetch, lazyFetch }) {
+            super();
+            this.id = id;
+            this.fields = fields;
+
+            store.subscribe(REGISTRATION_OPTIONS.concat([id]), this.#onUpdate);
+            if (store.get(REGISTRATION_OPTIONS.concat([id]))) setImmediate(this.#onUpdate);
+
+            if (!noFetch) {
+                tasks.options({ id }).catch(err => this.emit('error', err));
+            }
+
+            store.subscribe(REGISTRATION_ENTRIES.concat([this.id]), this.#onUpdate);
+            const current = store.get(REGISTRATION_ENTRIES.concat([this.id]));
+            if (current) setImmediate(this.#onUpdate);
+
+            let shouldFetch = !noFetch;
+            if (lazyFetch) {
+                shouldFetch = false;
+                for (const field of fields) {
+                    if (!current || !current[field]) {
+                        shouldFetch = true;
+                        break;
+                    }
+                }
+            }
+
+            if (shouldFetch) {
+                tasks.entry({ id }, { fields }).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get(REGISTRATION_ENTRIES.concat([this.id])), 'delete');
+            } else {
+                this.emit('update', store.get(REGISTRATION_ENTRIES.concat([this.id])));
+            }
+        }
+        drop () {
+            store.unsubscribe(REGISTRATION_ENTRIES.concat([this.id]), this.#onUpdate);
+        }
+    },
+    sigEntries: createStoreObserver(SIG_ENTRIES),
 };
