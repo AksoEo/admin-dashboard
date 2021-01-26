@@ -214,6 +214,8 @@ export default connect(props => ([props.view, {
             opacity: Math.max(0, Math.min(1 - spreadFactor * index / 2, 1)),
         });
 
+        if (userData && userData.itemStyle) Object.assign(style, userData.itemStyle(data));
+
         const itemLink = onGetItemLink ? onGetItemLink(id) : null;
         const ItemComponent = onGetItemLink ? LinkButton : onClick ? Button : 'div';
 

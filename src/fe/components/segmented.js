@@ -63,17 +63,22 @@ export default class Segmented extends PureComponent {
             || newProps.children.length !== this.props.children.length) {
             // set new background target because either the selected item or the number of children
             // changed
-            let targetPos = -1;
-            for (let i = 0; i < newProps.children.length; i++) {
-                if (newProps.children[i].id === newProps.selected) {
-                    targetPos = i;
-                    break;
-                }
+            this.updateBackgroundPos(newProps);
+        }
+    }
+
+    updateBackgroundPos (props = this.props) {
+        if (this.dragging) return;
+        let targetPos = -1;
+        for (let i = 0; i < props.children.length; i++) {
+            if (props.children[i].id === props.selected) {
+                targetPos = i;
+                break;
             }
-            this.backgroundPos.target = targetPos;
-            if (this.backgroundPos.wantsUpdate()) {
-                this.backgroundPos.start();
-            }
+        }
+        this.backgroundPos.target = targetPos;
+        if (this.backgroundPos.wantsUpdate()) {
+            this.backgroundPos.start();
         }
     }
 
@@ -81,8 +86,53 @@ export default class Segmented extends PureComponent {
         this.backgroundPos.stop();
     }
 
+    screenToIndexPos (clientX) {
+        let index = null;
+        let container;
+        for (let i = 0; i < this.childRefs.length; i++) {
+            const rect = this.childRefs[i].getBoundingClientRect();
+            if (rect.left <= clientX && rect.right > clientX) {
+                index = i + (clientX - rect.left) / rect.width - 0.5;
+                container = rect;
+                break;
+            }
+        }
+        return { index, container };
+    }
+
+    onPointerDown = e => {
+        const pos = this.screenToIndexPos(e.clientX);
+        if (pos.index !== null) {
+            this.dragOffset = (e.clientX - (pos.container.left + pos.container.right) / 2) / pos.container.width;
+            this.backgroundPos.target = pos.index - this.dragOffset;
+        }
+        this.backgroundPos.start();
+        this.dragging = true;
+        window.addEventListener('pointermove', this.onPointerMove);
+        window.addEventListener('pointerup', this.onPointerUp);
+    };
+
+    onPointerMove = e => {
+        const pos = this.screenToIndexPos(e.clientX);
+        if (pos.index !== null) this.backgroundPos.target = pos.index - this.dragOffset;
+        this.backgroundPos.start();
+    };
+
+    onPointerUp = e => {
+        const pos = this.screenToIndexPos(e.clientX);
+        this.dragging = false;
+        this.updateBackgroundPos();
+        window.removeEventListener('pointermove', this.onPointerMove);
+        window.removeEventListener('pointerup', this.onPointerUp);
+        if (pos.index !== null) {
+            let index = Math.round(pos.index);
+            index = Math.min(index, this.props.children.length - 1);
+            this.props.onSelect(this.props.children[index].id);
+        }
+    };
+
     render () {
-        const idleBackgroundPos = !(this.backgroundPos.wantsUpdate() && this.node);
+        const idleBackgroundPos = !(this.backgroundPos.wantsUpdate() && this.node) && !this.dragging;
 
         let animatedBackground = null;
         if (!idleBackgroundPos) {
@@ -146,6 +196,7 @@ export default class Segmented extends PureComponent {
                     role="radio"
                     aria-checked={option.id === this.props.selected}
                     disabled={this.props.disabled || option.disabled}
+                    onPointerDown={this.onPointerDown}
                     onClick={() => !option.disabled && this.props.onSelect(option.id)}
                     ref={node => this.childRefs[index] = node}>
                     {option.label}
