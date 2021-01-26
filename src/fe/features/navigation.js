@@ -609,13 +609,8 @@ export default class Navigation extends PureComponent {
         let appBarMenuType = null;
         if (!stackItems.length) {
             // bottom page
-            if (canPopBottomPage) {
-                // can still be popped off the stack!
-                appBarMenuType = 'back';
-            } else {
-                // show menu button if applicable
-                appBarMenuType = this.props.permaSidebar ? null : 'menu';
-            }
+            // show menu button if applicable
+            appBarMenuType = this.props.permaSidebar ? null : 'menu';
         } else {
             appBarMenuType = 'back';
         }

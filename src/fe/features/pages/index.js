@@ -406,59 +406,6 @@ export default [
                 hasPerm: perms => perms.hasPerm('codeholders.read'),
             },
             {
-                id: 'membership',
-                icon: CardMembershipIcon,
-                component: elazy(() =>
-                    import(/* webpackChunkName: "memberships" */ './memberships')),
-                path: 'membreco',
-                hasPerm: perms => perms.hasPerm('membership_categories.read')
-                    || perms.hasPerm('registration.options.read'),
-                paths: [
-                    {
-                        path: 'kategorioj',
-                        type: 'bottom',
-                        component: elazy(() =>
-                            import(/* webpackChunkName: "membership-categories" */ './memberships/categories')),
-                        paths: [
-                            {
-                                match: /^(\d+)$/,
-                                component: elazy(() =>
-                                    import(/* webpackChunkName: "membership-categories" */ './memberships/categories/detail')),
-                                type: 'stack',
-                                paths: [
-                                    {
-                                        path: 'redakti',
-                                        type: 'state',
-                                        state: 'editing',
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                    {
-                        path: 'agordoj',
-                        type: 'bottom',
-                        component: elazy(() =>
-                            import(/* webpackChunkName: "membership-options" */ './memberships/options')),
-                        paths: [
-                            {
-                                match: /^(\d+)$/,
-                                component: elazy(() =>
-                                    import(/* webpackChunkName: "membership-options" */ './memberships/options/detail')),
-                                type: 'stack',
-                                paths: [
-                                    {
-                                        path: 'redakti',
-                                        type: 'state',
-                                        state: 'editing',
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
                 id: 'roles',
                 icon: WorkOutlineIcon,
                 component: elazy(() =>
@@ -509,6 +456,59 @@ export default [
                 icon: AssessmentIcon,
                 path: 'statistiko',
                 hasPerm: () => true,
+            },
+        ],
+    },
+    {
+        id: 'membership',
+        path: 'membreco',
+        contents: [
+            {
+                id: 'membership-categories',
+                path: 'kategorioj',
+                icon: CardMembershipIcon,
+                type: 'bottom',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "membership-categories" */ './memberships/categories')),
+                hasPerm: perms => perms.hasPerm('membership_categories.read'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "membership-categories" */ './memberships/categories/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'membership-registration',
+                path: 'agordoj',
+                type: 'bottom',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "membership-options" */ './memberships/options')),
+                hasPerm: perms => perms.hasPerm('registration.options.read'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "membership-options" */ './memberships/options/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
             },
         ],
     },

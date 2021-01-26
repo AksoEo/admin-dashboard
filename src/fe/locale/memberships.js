@@ -7,8 +7,8 @@ export const memberships = {
 };
 
 export const membershipCategories = {
-    title: 'Membrecoj',
-    detailTitle: 'Membreco',
+    title: 'Membrokategorioj',
+    detailTitle: 'Membrokategorio',
     fields: {
         name: 'Nomo',
         nameAbbrev: 'Mallongigo',
