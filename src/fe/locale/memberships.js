@@ -18,6 +18,10 @@ export const membershipCategories = {
         availableFrom: 'Uzebla ekde',
         availableTo: 'Uzebla ĝis',
     },
+    availability: {
+        always: '[[Always available]]',
+        label: 'Uzebla:',
+    },
     create: {
         menuItem: 'Krei',
         title: 'Krei membrecon',
@@ -60,34 +64,36 @@ export const membershipOptions = {
         },
         types: {
             addon: 'Aldoneblo',
-            membership: 'Membreco',
+            membership: 'Membrokategorio',
         },
         add: {
             title: '[[Add offer]]',
-            membershipsNote: '[[Note that memberships that giveMembership can only be added once per offers object]]',
+            membershipsNote: '',
             categoriesEmpty: '[[No membership categories available this year that you havent already added]]',
             addonsEmpty: '[[No payment addons remaining]]',
         },
         price: {
             title: '[[Price]]',
+            remove: 'Forigi',
+            description: '[[Calculation description]]',
             varLabel: '[[Price variable]]',
             na: '[[No price/not available]]',
         },
     },
     create: {
         menuItem: 'Krei',
-        title: 'Krei agordoj',
+        title: 'Krei agordojn',
         button: 'Krei',
         year: 'Jaro',
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Redakti agordoj',
+        title: 'Redakti agordojn',
         button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
-        title: 'Forigi agordoj',
+        title: 'Forigi agordojn',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la agordoj por ĉi tiun jaron? Ne eblas malfari tiun ĉi agon.',
     },

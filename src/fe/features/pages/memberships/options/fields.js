@@ -249,7 +249,7 @@ class OfferGroup extends PureComponent {
                     editing={editing}
                     class="offer-group-description"
                     value={value.description}
-                    onChange={description => onChange({ ...value, description })}
+                    onChange={description => onChange({ ...value, description: description || null })}
                     rules={['emphasis', 'strikethrough', 'link']} />
                 {editing && (
                     <Button class="offer-group-expand-button" icon small onClick={() => this.setState({ open: !this.state.open })}>
@@ -295,7 +295,10 @@ class OfferGroup extends PureComponent {
     }
 }
 
-const REDUCED_CATEGORY_FIELDS = Object.fromEntries(['nameAbbrev', 'name', 'givesMembership'].map(x => [x, CATEGORY_FIELDS[x]]));
+const REDUCED_CATEGORY_FIELDS = Object.fromEntries([
+    // givesMembership comes before name for sorting order
+    'nameAbbrev', 'givesMembership', 'name', 'availability',
+].map(x => [x, CATEGORY_FIELDS[x]]));
 class AddOffer extends PureComponent {
     state = {
         type: null,
@@ -310,8 +313,6 @@ class AddOffer extends PureComponent {
                 </div>
             );
 
-            const selectedMembershipItems = new Set(data.flatMap(group => group.offers.filter(x => x.type === 'membership').map(x => x.id)));
-
             picker = (
                 <StaticOverviewList
                     key="categories"
@@ -319,19 +320,13 @@ class AddOffer extends PureComponent {
                     task="memberships/listCategories"
                     view="memberships/category"
                     fields={REDUCED_CATEGORY_FIELDS}
-                    sorting={{ name: 'asc' }}
+                    sorting={{ name: 'asc', givesMembership: 'desc' }}
                     jsonFilter={{
-                        $and: [
-                            { $or: [{ availableFrom: null }, { availableFrom: { $lte: year } }] },
-                            { $or: [{ availableTo: null }, { availableTo: { $gte: year } }] },
-                            {
-                                id: {
-                                    $nin: offers
-                                        .filter(x => x.type === 'membership')
-                                        .map(x => x.id)
-                                },
-                            },
-                        ],
+                        id: {
+                            $nin: offers
+                                .filter(x => x.type === 'membership')
+                                .map(x => x.id)
+                        },
                     }}
                     locale={categoriesLocale.fields}
                     emptyLabel={locale.offers.add.categoriesEmpty}
@@ -339,10 +334,11 @@ class AddOffer extends PureComponent {
                         onSelect({ type: 'membership', id, price: null });
                     }}
                     userData={{
-                        hideItem: data => {
-                            if (data.givesMembership) {
-                                if (selectedMembershipItems.has(data.id)) return true;
-                            }
+                        itemStyle: data => {
+                            const unavailable = (data.availableFrom && data.availableFrom > year)
+                                || (data.availableTo && data.availableTo < year);
+                            if (unavailable) return { opacity: 0.5 };
+                            return {};
                         },
                     }} />
             );
@@ -525,21 +521,15 @@ class OfferPrice extends PureComponent {
         return (
             <div class="offer-price">
                 <div class="offer-price-title">
-                    {editing && (
-                        <Button class="remove-button" icon small onClick={() => onChange(null)}>
-                            <RemoveIcon />
-                        </Button>
-                    )}
                     <span class="title-contents">
                         {locale.offers.price.title}
                     </span>
+                    {editing && (
+                        <Button class="remove-button" onClick={() => onChange(null)}>
+                            {locale.offers.price.remove}
+                        </Button>
+                    )}
                 </div>
-                <MdField
-                    class="offer-price-description"
-                    value={value.description}
-                    editing={editing}
-                    onChange={description => onChange({ ...value, description })}
-                    rules={['emphasis', 'strikethrough']} />
                 <ScriptItem
                     previousNodes={prevNodes}
                     editable={editing}
@@ -560,6 +550,15 @@ class OfferPrice extends PureComponent {
                         )}
                     </div>
                 </div>
+                <div class="price-description-label">
+                    {locale.offers.price.description}
+                </div>
+                <MdField
+                    class="offer-price-description"
+                    value={value.description}
+                    editing={editing}
+                    onChange={description => onChange({ ...value, description: description || null })}
+                    rules={['emphasis', 'strikethrough']} />
             </div>
         );
     }

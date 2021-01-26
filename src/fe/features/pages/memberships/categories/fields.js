@@ -4,6 +4,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import { Validator } from '../../../../components/form';
 import MdField from '../../../../components/md-field';
 import { membershipCategories as locale } from '../../../../locale';
+import './fields.less';
 
 export const FIELDS = {
     nameAbbrev: {
@@ -92,6 +93,27 @@ export const FIELDS = {
             return <TextField
                 value={value || ''}
                 onChange={e => onChange(+e.target.value || null)} />;
+        },
+    },
+    availability: {
+        slot: 'body',
+        skipLabel: true,
+        shouldHide: () => true,
+        component ({ item }) {
+            const avFrom = item.availableFrom;
+            const avTo = item.availableTo;
+            if (!avFrom && !avTo) {
+                return <div class="membership-category-availability">{locale.availability.always}</div>;
+            }
+            return (
+                <div class="membership-category-availability">
+                    {locale.availability.label}
+                    {' '}
+                    {avFrom || ''}
+                    {'–'}
+                    {avTo || ''}
+                </div>
+            );
         },
     },
 };
