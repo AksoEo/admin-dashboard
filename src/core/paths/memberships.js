@@ -115,8 +115,11 @@ const eClientFields = {
     },
     codeholderData: {
         apiFields: ['codeholderData'],
-        fromAPI: entry => codeholderFromAPI({ codeholderType: 'human', ...entry.codeholderData }),
+        fromAPI: entry => (typeof entry.codeholderData === 'object' && entry.codeholderData !== null)
+            ? codeholderFromAPI({ codeholderType: 'human', ...entry.codeholderData })
+            : entry.codeholderData,
         toAPI: data => {
+            if (data === null || typeof data !== 'object') return { codeholderData: data };
             const mapped = codeholderToAPI(data);
             return {
                 codeholderData: {
@@ -140,7 +143,7 @@ const eParametersToRequestData = makeParametersToRequestData({
     clientFields: eClientFields,
     clientFilters: eClientFilters,
 });
-const eClientFromAPI = makeClientFromAPI(eClientFields);
+const eClientFromAPI = makeClientFromAPI(eClientFields, true);
 const eClientToAPI = makeClientToAPI(eClientFields);
 
 export const tasks = {

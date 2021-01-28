@@ -73,7 +73,7 @@ export default function DetailFields ({
         const field = fields[fieldId];
         const FieldComponent = field.component;
 
-        if (field.shouldHide && field.shouldHide(itemData, editing)) continue;
+        if (field.shouldHide && field.shouldHide(itemData, editing, userData)) continue;
 
         const isNotLoaded = field.virtual
             ? field.virtual.map(x => itemData[x] === undefined).reduce((a, b) => a || b, false)

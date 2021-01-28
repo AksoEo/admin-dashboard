@@ -9,12 +9,103 @@
 }
 
 .registration-entry-codeholder-data {
-    border: 1px solid @separator;
-    border-radius: 4px;
+    &:not(.is-linked):not(.is-editing) {
+        border: 1px solid @separator;
+        border-radius: 4px;
+    }
+
+    .data-type-switch-container {
+        padding: 8px;
+        text-align: center;
+    }
+
+    .codeholder-card {
+        color: inherit;
+        text-decoration: inherit;
+    }
+
+    .member-name {
+        .editor-line {
+            margin-bottom: 8px;
+        }
+    }
 
     .basic-address {
         .address-pseudoline {
             display: block;
+        }
+    }
+}
+
+.registration-entry-offer-item {
+    border: 1px solid @separator;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+
+    .item-label {
+        flex: 1;
+        padding: 16px;
+
+        .offer-type {
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        a {
+            color: inherit;
+        }
+    }
+    .item-amount {
+        padding: 16px;
+        min-width: 72px;
+    }
+}
+
+.registration-entry-issue {
+    border: 1px solid @warning-text;
+    border-radius: 4px;
+    padding: 8px;
+
+    .issue-title {
+        color: @warning-text;
+        margin-bottom: 8px;
+
+        .inner-title {
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            margin-left: 8px;
+        }
+    }
+
+    &.is-resolved {
+        border-color: @gray-button-color;
+
+        .issue-title {
+            color: @gray-button-color;
+        }
+    }
+
+    .issue-description {
+        .registration-issue-offer-container {
+            margin-top: 8px;
+        }
+    }
+
+    .issue-fishy-check {
+        margin-top: 8px;
+        --md-button-color: @warning-text;
+
+        .fishy-marked-okay {
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        &.is-okay {
+            --md-button-color: @gray-button-color;
         }
     }
 }

@@ -3,7 +3,11 @@ import { TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/changed-fields';
-import { membershipCategories as categoriesLocale, membershipOptions as optionsLocale } from '../../../locale';
+import {
+    membershipCategories as categoriesLocale,
+    membershipOptions as optionsLocale,
+    membershipEntries as entriesLocale,
+} from '../../../locale';
 import { routerContext } from '../../../router';
 import { FIELDS as CATEGORY_FIELDS } from './categories/fields';
 
@@ -115,4 +119,31 @@ export default {
             </TaskDialog>
         );
     },
+
+    updateEntry ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={entriesLocale.update.title}
+                actionLabel={entriesLocale.update.button}
+                run={() => task.runOnce()}>
+                <ChangedFields
+                    changedFields={task.options._changedFields}
+                    locale={entriesLocale.fields} />
+            </TaskDialog>
+        );
+    },
+    deleteEntry ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={entriesLocale.delete.title}
+                actionLabel={entriesLocale.delete.button}
+                run={() => task.runOnce()}>
+                {entriesLocale.delete.description}
+            </TaskDialog>
+        );
+    }
 };

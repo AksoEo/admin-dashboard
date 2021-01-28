@@ -248,9 +248,9 @@ const NameEditor = connectPerms(function NameEditor ({
             key: 'human',
         });
 
-        let lastNamePublicity;
-        if (perms.hasPerm('lastNamePublicity', 'w')) {
-            lastNamePublicity = (
+        let lastNamePublicityNode;
+        if (lastNamePublicity && perms.hasPerm('lastNamePublicity', 'w')) {
+            lastNamePublicityNode = (
                 <div class="last-name-publicity-editor">
                     <label>{locale.fields.lastNamePublicity}</label>
                     <Publicity
@@ -265,7 +265,7 @@ const NameEditor = connectPerms(function NameEditor ({
         return (
             <Fragment>
                 {lotf}
-                {lastNamePublicity}
+                {lastNamePublicityNode}
             </Fragment>
         );
     } else if (itemType === 'org') {
@@ -591,17 +591,19 @@ function permsEditable (field, Component) {
 const fields = {
     // for field history
     name: {
-        component ({ value, item }) {
+        component ({ value, item, editing, onChange }) {
             if (!value) return null;
             return (
                 <NameEditor
                     value={value}
+                    editing={editing}
+                    onChange={onChange}
                     lastNamePublicity={item.lastNamePublicity}
                     item={item}
                     noIcon />
             );
         },
-        shouldHide: () => true,
+        shouldHide: (item, editing, userData) => userData ? !userData.forceShowName : true,
         hasPerm: 'self',
         history: true,
     },

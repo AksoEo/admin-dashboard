@@ -95,7 +95,7 @@ class AddressEditor extends Component {
             items.push(
                 <countryField.editor
                     key="country"
-                    value={country}
+                    value={country && country.toLowerCase()}
                     onChange={onChangeField('country')}
                     disabled={!wmask('country')} />,
             );

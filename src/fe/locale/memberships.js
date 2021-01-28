@@ -114,12 +114,43 @@ export const membershipEntries = {
         offers: '[[Offers]]',
         codeholderData: '[[CodeholderData]]',
 
+        fishyIsOkay: '[[Fishy is okay]]',
+
         statusTypes: {
             submitted: '[[Submitted]]',
             pending: '[[Pending]]',
             canceled: '[[Canceled]]',
             succeeded: '[[Succeeded]]',
         },
+        codeholderDataTypes: {
+            id: '[[Linked]]',
+            object: '[[Local]]',
+        },
+    },
+    offers: {
+        currency: 'Valuto',
+        types: {
+            addon: 'Aldoneblo',
+            membership: 'Membrokategorio',
+        },
+    },
+    issue: {
+        title: '[[Issue]]',
+        what: {
+            duplicate_data: '[[Duplicate data]]',
+            duplicate_offer: '[[Duplicate offer]]',
+            fishy_data: '[[Fishy data]]',
+        },
+        where: {
+            // this is appended directly after the “what” string and should contain
+            // a leading space or puncutation if neccessary
+            'codeholderData.email': ' [[in codeholder email]]',
+            'codeholderData.addressAndName': ' [[in address and name (there is already a codeholder on record)]]',
+            'codeholderData.addressAndFeeCountries': '[[??]]',
+        },
+        fishyMarkedOkay: '[[Fishy was marked okay]]',
+        markFishyOkay: '[[Mark fishy ok]]',
+        markFishyNotOkay: '[[Mark not ok]]',
     },
     create: {
         menuItem: 'Krei',
