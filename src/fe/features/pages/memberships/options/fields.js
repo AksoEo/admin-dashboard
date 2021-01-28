@@ -131,7 +131,6 @@ class Offers extends PureComponent {
             items.push(
                 <OfferGroup
                     key={'og' + itemKey}
-                    data={value}
                     year={year}
                     value={group}
                     editing={editing}
@@ -184,7 +183,7 @@ class OfferGroup extends PureComponent {
         adding: false,
     };
 
-    render ({ year, value, editing, onChange, onRemove, paymentOrg, data }) {
+    render ({ year, value, editing, onChange, onRemove, paymentOrg }) {
         const items = [];
         for (let i = 0; i < value.offers.length; i++) {
             const offer = value.offers[i];
@@ -284,7 +283,6 @@ class OfferGroup extends PureComponent {
                     backdrop
                     onClose={() => this.setState({ adding: false })}>
                     <AddOffer
-                        data={data}
                         paymentOrg={paymentOrg}
                         year={year}
                         offers={value.offers}
@@ -304,7 +302,7 @@ class AddOffer extends PureComponent {
         type: null,
     };
 
-    render ({ year, offers, onSelect, paymentOrg, data }) {
+    render ({ year, offers, onSelect, paymentOrg }) {
         let picker, note;
         if (this.state.type === 'membership') {
             note = (
@@ -325,7 +323,7 @@ class AddOffer extends PureComponent {
                         id: {
                             $nin: offers
                                 .filter(x => x.type === 'membership')
-                                .map(x => x.id)
+                                .map(x => x.id),
                         },
                     }}
                     locale={categoriesLocale.fields}

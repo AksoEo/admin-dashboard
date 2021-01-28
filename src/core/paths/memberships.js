@@ -5,6 +5,7 @@ import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
 import { fieldDiff, fieldsToOrder, makeParametersToRequestData, makeClientToAPI, makeClientFromAPI } from '../list';
+import { clientFromAPI as codeholderFromAPI, clientToAPI as codeholderToAPI } from './codeholders';
 import { deepMerge } from '../../util';
 
 /// Data store path.
@@ -112,7 +113,27 @@ const eClientFields = {
         fromAPI: entry => ({ currency: entry.currency, selected: entry.offers }),
         toAPI: data => ({ currency: data.currency, offers: data.selected }),
     },
-    codeholderData: 'codeholderData',
+    codeholderData: {
+        apiFields: ['codeholderData'],
+        fromAPI: entry => codeholderFromAPI({ codeholderType: 'human', ...entry.codeholderData }),
+        toAPI: data => {
+            const mapped = codeholderToAPI(data);
+            return {
+                codeholderData: {
+                    address: mapped.address,
+                    feeCountry: mapped.feeCountry,
+                    email: mapped.email,
+                    firstName: mapped.firstName,
+                    firstNameLegal: mapped.firstNameLegal,
+                    lastName: mapped.lastName,
+                    lastNameLegal: mapped.lastNameLegal,
+                    honorific: mapped.honorific,
+                    birthdate: mapped.birthdate,
+                    cellphone: mapped.cellphone,
+                },
+            };
+        },
+    },
 };
 const eClientFilters = {};
 const eParametersToRequestData = makeParametersToRequestData({
@@ -277,8 +298,9 @@ export const tasks = {
         const res = await client.get('/registration/entries', options);
 
         for (const item of res.body) {
-            const id = entryReadId(item);
-            store.insert(REGISTRATION_ENTRIES.concat([id]), item);
+            const id = entryReadId(item.id);
+            const existing = store.get(REGISTRATION_ENTRIES.concat([id]));
+            store.insert(REGISTRATION_ENTRIES.concat([id]), deepMerge(existing, eClientFromAPI(item)));
         }
 
         return {
@@ -396,18 +418,14 @@ export const views = {
     },
     sigOptions: createStoreObserver(SIG_OPTIONS),
 
-    entry: class RegistrationOptions extends AbstractDataView {
+    entry: class RegistrationEntry extends AbstractDataView {
         constructor ({ id, fields, noFetch, lazyFetch }) {
             super();
             this.id = id;
             this.fields = fields;
 
-            store.subscribe(REGISTRATION_OPTIONS.concat([id]), this.#onUpdate);
-            if (store.get(REGISTRATION_OPTIONS.concat([id]))) setImmediate(this.#onUpdate);
-
-            if (!noFetch) {
-                tasks.options({ id }).catch(err => this.emit('error', err));
-            }
+            store.subscribe(REGISTRATION_ENTRIES.concat([id]), this.#onUpdate);
+            if (store.get(REGISTRATION_ENTRIES.concat([id]))) setImmediate(this.#onUpdate);
 
             store.subscribe(REGISTRATION_ENTRIES.concat([this.id]), this.#onUpdate);
             const current = store.get(REGISTRATION_ENTRIES.concat([this.id]));

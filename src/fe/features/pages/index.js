@@ -15,6 +15,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
 import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
+import DateRangeIcon from '@material-ui/icons/DateRange';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
@@ -490,6 +491,7 @@ export default [
             {
                 id: 'membership-registration',
                 path: 'agordoj',
+                icon: DateRangeIcon,
                 type: 'bottom',
                 component: elazy(() =>
                     import(/* webpackChunkName: "membership-options" */ './memberships/options')),
@@ -499,6 +501,29 @@ export default [
                         match: /^(\d+)$/,
                         component: elazy(() =>
                             import(/* webpackChunkName: "membership-options" */ './memberships/options/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'membership-entries',
+                path: 'katido',
+                type: 'bottom',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "membership-entries" */ './memberships/entries')),
+                hasPerm: perms => perms.hasPerm('registration.entries.read'),
+                paths: [
+                    {
+                        match: /^(\w+)$/,
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "membership-entries" */ './memberships/entries/detail')),
                         type: 'stack',
                         paths: [
                             {

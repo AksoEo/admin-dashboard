@@ -21,6 +21,7 @@ import './detail-fields.less';
 /// - locale: object { fields: { field names... } }
 /// - makeHistoryLink: if set, should be a callback that returns the url for the given field’s
 ///   history
+/// - compact: force compact
 /// - userData: arbitrary user data passed to fields
 /// - wideExtra: bool, if true will make extra space wider
 export default function DetailFields ({
@@ -33,6 +34,7 @@ export default function DetailFields ({
     footer: Footer,
     locale,
     makeHistoryLink,
+    compact,
     userData,
     wideExtra,
 }) {
@@ -139,7 +141,7 @@ export default function DetailFields ({
     return (
         <Fragment>
             {header}
-            <div class={'detail-fields' + (wideExtra ? ' wide-extra' : '')}>
+            <div class={'detail-fields' + (compact ? ' is-compact' : '') + (wideExtra ? ' wide-extra' : '')}>
                 {items}
                 {emptyItems}
             </div>

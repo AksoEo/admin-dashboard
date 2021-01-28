@@ -715,7 +715,7 @@ const fields = {
         hasPerm: 'self',
     },
     address: {
-        component: connectPerms(({ value, item, editing, onChange, isHistory, perms }) => {
+        component: connectPerms(({ value, item, editing, onChange, isHistory, perms, userData }) => {
             if (isHistory) {
                 return (
                     <Fragment>
@@ -726,6 +726,9 @@ const fields = {
             }
 
             if (!editing) {
+                if (userData && userData.useLocalAddress) {
+                    return <address.renderer value={value} />;
+                }
                 return <CodeholderAddressRenderer id={item.id} />;
             } else {
                 const readableMask = [

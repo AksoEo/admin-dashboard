@@ -98,3 +98,44 @@ export const membershipOptions = {
         description: 'Ĉu vi certas, ke vi volas forigi la agordoj por ĉi tiun jaron? Ne eblas malfari tiun ĉi agon.',
     },
 };
+
+export const membershipEntries = {
+    title: '[[Entries]]',
+    detailTitle: '[[Entry]]',
+    fields: {
+        id: '[[Id]]',
+        year: 'Jaro',
+        status: 'Stato',
+        issue: '[[Issue]]',
+        newCodeholderId: '[[NewCodeholderId]]',
+        timeSubmitted: '[[TimeSubmitted]]',
+        timeSubmittedTime: '[[time changed]]',
+        internalNotes: 'Internaj Notoj',
+        offers: '[[Offers]]',
+        codeholderData: '[[CodeholderData]]',
+
+        statusTypes: {
+            submitted: '[[Submitted]]',
+            pending: '[[Pending]]',
+            canceled: '[[Canceled]]',
+            succeeded: '[[Succeeded]]',
+        },
+    },
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei [[entriesacc]]',
+        button: 'Krei',
+        year: 'Jaro',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti [[entriesacc]]',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi [[entriesacc]]',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la [[entriesacc]]? Ne eblas malfari tiun ĉi agon.',
+    },
+};

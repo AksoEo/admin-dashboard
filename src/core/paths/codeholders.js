@@ -293,7 +293,7 @@ const refetchFields = {
 
 /// converts from API repr to client repr (see above)
 export const clientFromAPI = makeClientFromAPI(clientFields);
-const clientToAPI = makeClientToAPI(clientFields);
+export const clientToAPI = makeClientToAPI(clientFields);
 
 //! # Client-side filter representation
 //! - type: 'human', or 'org'
