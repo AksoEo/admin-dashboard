@@ -75,7 +75,7 @@ export default connectPerms(class RegistrationEntries extends Page {
                     updateView={['memberships/sigEntries']}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/membreco/katido/${id}`}
+                    onGetItemLink={id => `/membreco/alighoj/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}

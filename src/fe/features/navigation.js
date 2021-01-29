@@ -619,10 +619,6 @@ export default class Navigation extends PureComponent {
             if (stackItems.length) {
                 // pop all items up to and including the top component
                 this.popStackUntilIncluding(item => !!item.component);
-            } else if (canPopBottomPage) {
-                // go back to the previous item
-                // FIXME: this is super hacky
-                this.navigate('/' + canPopBottomPage);
             } else {
                 this.props.onOpenMenu();
             }

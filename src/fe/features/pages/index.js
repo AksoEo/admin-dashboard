@@ -15,7 +15,8 @@ import HttpIcon from '@material-ui/icons/Http';
 import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
 import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
-import DateRangeIcon from '@material-ui/icons/DateRange';
+import AddMembershipIcon from '../../components/add-membership-icon';
+import ConfigMembershipIcon from '../../components/config-membership-icon';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
@@ -491,7 +492,7 @@ export default [
             {
                 id: 'membership-registration',
                 path: 'agordoj',
-                icon: DateRangeIcon,
+                icon: ConfigMembershipIcon,
                 type: 'bottom',
                 component: elazy(() =>
                     import(/* webpackChunkName: "membership-options" */ './memberships/options')),
@@ -514,7 +515,8 @@ export default [
             },
             {
                 id: 'membership-entries',
-                path: 'katido',
+                path: 'alighoj',
+                icon: AddMembershipIcon,
                 type: 'bottom',
                 component: elazy(() =>
                     import(/* webpackChunkName: "membership-entries" */ './memberships/entries')),

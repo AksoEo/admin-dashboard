@@ -100,8 +100,8 @@ export const membershipOptions = {
 };
 
 export const membershipEntries = {
-    title: '[[Entries]]',
-    detailTitle: '[[Entry]]',
+    title: 'Aliĝoj',
+    detailTitle: 'Aliĝo',
     fields: {
         id: '[[Id]]',
         year: 'Jaro',
@@ -154,19 +154,19 @@ export const membershipEntries = {
     },
     create: {
         menuItem: 'Krei',
-        title: 'Krei [[entriesacc]]',
+        title: 'Krei aliĝon',
         button: 'Krei',
         year: 'Jaro',
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Redakti [[entriesacc]]',
+        title: 'Redakti aliĝon',
         button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
-        title: 'Forigi [[entriesacc]]',
+        title: 'Forigi aliĝon',
         button: 'Forigi',
-        description: 'Ĉu vi certas, ke vi volas forigi la [[entriesacc]]? Ne eblas malfari tiun ĉi agon.',
+        description: 'Ĉu vi certas, ke vi volas forigi la aliĝon? Ne eblas malfari tiun ĉi agon.',
     },
 };
