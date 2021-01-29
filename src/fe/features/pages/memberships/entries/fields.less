@@ -37,12 +37,78 @@
     }
 }
 
+.registration-entry-offers {
+    .offers-currency {
+        margin-bottom: 16px;
+        text-align: right;
+        font-size: 0.8em;
+    }
+
+    .selected-offers {
+        .add-offer-container {
+            padding: 16px;
+            padding-top: 0;
+        }
+    }
+}
+
+.registration-entry-offers-add-offer-dialog {
+    width: 100%;
+    max-width: 600px;
+
+    .progress-container {
+        padding: 16px;
+        text-align: center;
+    }
+
+    .offer-group {
+        .group-title {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+
+            .disclosure-button {
+                margin: 0 16px;
+            }
+
+            .inner-title {
+                flex: 1;
+            }
+        }
+
+        .group-contents {
+            .contents-empty {
+                text-align: center;
+            }
+        }
+    }
+}
+
 .registration-entry-offer-item {
     border: 1px solid @separator;
     border-radius: 4px;
     margin-bottom: 8px;
     display: flex;
     align-items: center;
+
+    &.is-selectable {
+        transition: background 0.2s @easing, box-shadow 0.2s @easing;
+
+        &:hover {
+            background: @text-fade-10;
+            .elevation(4);
+        }
+
+        &:active {
+            transition: box-shadow 0.2s @easing;
+            background: @text-fade-20;
+        }
+    }
+
+    .item-remove {
+        padding: 16px;
+        padding-right: 0;
+    }
 
     .item-label {
         flex: 1;

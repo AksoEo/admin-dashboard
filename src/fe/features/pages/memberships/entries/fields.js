@@ -1,14 +1,21 @@
 import { h } from 'preact';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { useState } from 'preact/compat';
+import { Button, CircularProgress, Dialog, TextField } from '@cpsdqs/yamdl';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckIcon from '@material-ui/icons/CheckCircleOutline';
+import RemoveIcon from '@material-ui/icons/Remove';
+import UpIcon from '@material-ui/icons/KeyboardArrowUp';
+import DownIcon from '@material-ui/icons/KeyboardArrowDown';
+import AddIcon from '@material-ui/icons/Add';
 import { currencyAmount, timestamp, ueaCode } from '../../../../components/data';
 import TextArea from '../../../../components/text-area';
+import DynamicHeightDiv from '../../../../components/dynamic-height-div';
+import Select from '../../../../components/select';
 import Segmented from '../../../../components/segmented';
 import DetailFields from '../../../../components/detail-fields';
 import TinyProgress from '../../../../components/tiny-progress';
 import CodeholderPicker from '../../../../components/codeholder-picker';
-import { membershipEntries as locale, codeholders as codeholdersLocale } from '../../../../locale';
+import { membershipEntries as locale, codeholders as codeholdersLocale, currencies } from '../../../../locale';
 import { Link } from '../../../../router';
 import { connect, coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
@@ -230,21 +237,78 @@ export const FIELDS = {
             );
         }),
         isEmpty: value => !value || !value.what,
+        shouldHide: (_, editing) => editing,
     },
     offers: {
-        component ({ value, editing, item }) {
+        component ({ value, editing, item, onChange }) {
+            const [addOfferOpen, setAddOfferOpen] = useState(false);
+
             const year = item.year;
+
+            const onAddItem = item => {
+                onChange({ ...value, selected: value.selected.concat([item]) });
+                setAddOfferOpen(false);
+            };
+            const onItemChange = (index, data) => {
+                const selected = value.selected.slice();
+                selected[index] = data;
+                onChange({ ...value, selected });
+            };
+            const removeSelected = i => {
+                const selected = value.selected.slice();
+                selected.splice(i, 1);
+                onChange({ ...value, selected });
+            };
+
             return (
                 <div class="registration-entry-offers">
                     {editing && (
                         <div class="offers-currency">
-                            {locale.offers.currency}: {value.currency}
+                            <Select
+                                outline
+                                value={value.currency}
+                                onChange={currency => onChange({ ...value, currency })}
+                                items={Object.keys(currencies).map(currency => ({
+                                    value: currency,
+                                    label: currencies[currency],
+                                }))} />
                         </div>
                     )}
                     <div class="selected-offers">
                         {value.selected.map((item, i) => (
-                            <OfferItem key={i} value={item} year={year} currency={value.currency} />
+                            <OfferItem
+                                key={i}
+                                value={item}
+                                onChange={item => onItemChange(i, item)}
+                                editing={editing}
+                                year={year}
+                                currency={value.currency}
+                                onRemove={() => removeSelected(i)} />
                         ))}
+                        {editing && (
+                            <div class="add-offer-container">
+                                <Button
+                                    icon
+                                    small
+                                    class="add-offer-button"
+                                    onClick={() => setAddOfferOpen(true)}>
+                                    <AddIcon />
+                                </Button>
+                            </div>
+                        )}
+                        {editing && (
+                            <Dialog
+                                class="registration-entry-offers-add-offer-dialog"
+                                title={locale.offers.add.title}
+                                open={addOfferOpen}
+                                backdrop
+                                onClose={() => setAddOfferOpen(false)}>
+                                <AddOfferDialog
+                                    year={year}
+                                    onAdd={onAddItem}
+                                    currency={item.offers.currency} />
+                            </Dialog>
+                        )}
                     </div>
                 </div>
             );
@@ -252,23 +316,99 @@ export const FIELDS = {
     },
 };
 
-function OfferItem ({ value, year, currency }) {
+const AddOfferDialog = connect(({ year }) => ['memberships/options', { id: year }])(data => ({
+    data,
+}))(function AddOfferDialog ({ data, year, currency, onAdd }) {
+    if (!data) return <div class="progress-container"><CircularProgress indeterminate /></div>;
+
+    return (
+        <div class="add-offer">
+            {data.offers.map((group, i) => (
+                <AddOfferGroup
+                    key={i}
+                    group={group}
+                    year={year}
+                    onAdd={onAdd}
+                    currency={currency} />
+            ))}
+        </div>
+    );
+});
+
+function AddOfferGroup ({ group, year, currency, onAdd }) {
+    const [open, setOpen] = useState(false);
+
+    return (
+        <div class="offer-group">
+            <div class="group-title">
+                <Button class="disclosure-button" icon small onClick={() => setOpen(!open)}>
+                    {open ? <UpIcon /> : <DownIcon />}
+                </Button>
+                <div class="inner-title">
+                    {group.title}
+                </div>
+            </div>
+            <DynamicHeightDiv>
+                {open && (
+                    <div class="group-contents">
+                        {group.offers.map((item, i) => (
+                            <OfferItem
+                                key={i}
+                                onSelect={() => onAdd({
+                                    type: item.type,
+                                    id: item.id,
+                                    amount: 0,
+                                })}
+                                value={{ ...item, amount: 0 }}
+                                year={year}
+                                currency={currency} />
+                        ))}
+                        {!group.offers.length && (
+                            <div class="contents-empty">{locale.offers.add.emptyGroup}</div>
+                        )}
+                    </div>
+                )}
+            </DynamicHeightDiv>
+        </div>
+    );
+}
+
+function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSelect }) {
     let contents;
     if (value.type === 'membership') {
-        contents = <OfferMembership id={value.id} />;
+        contents = <OfferMembership id={value.id} noLink={onSelect} />;
     } else if (value.type === 'addon') {
-        contents = <OfferAddon id={value.id} year={year} />;
+        contents = <OfferAddon id={value.id} year={year} noLink={onSelect} />;
     }
 
     return (
-        <div class="registration-entry-offer-item">
+        <div
+            onClick={onSelect}
+            class={'registration-entry-offer-item' + (onSelect ? ' is-selectable' : '')}>
+            {editing && (
+                <div class="item-remove">
+                    <Button class="item-remove-button" icon small onClick={onRemove}>
+                        <RemoveIcon />
+                    </Button>
+                </div>
+            )}
             <div class="item-label">
                 <div class="offer-type">{locale.offers.types[value.type]}</div>
                 {contents}
             </div>
-            <div class="item-amount">
-                <currencyAmount.renderer value={value.amount} currency={currency} />
-            </div>
+            {!onSelect && (
+                <div class="item-amount">
+                    {editing ? (
+                        <currencyAmount.editor
+                            outline
+                            value={value.amount}
+                            onChange={amount => onChange({ ...value, amount })}
+                            currency={currency} />
+                    ) : (
+                        <currencyAmount.renderer value={value.amount} currency={currency} />
+                    )}
+                </div>
+            )}
         </div>
     );
 }
@@ -294,23 +434,25 @@ const CodeholderCard = connect(({ id }) => ['codeholders/codeholder', {
 
 const OfferMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
     data,
-}))(function OfferMembership ({ data, id }) {
+}))(function OfferMembership ({ data, id, noLink }) {
     if (!data) return <TinyProgress />;
+    if (noLink) return data.name;
     const target = `/membreco/kategorioj/${id}`;
     return <Link target={target}>{data.name}</Link>;
 });
 
 const OfferAddon = connect(({ year }) => ['memberships/options', { id: year }])(data => ({
     data,
-}))(function OfferAddon ({ data, id }) {
+}))(function OfferAddon ({ data, id, noLink }) {
     if (!data) return <TinyProgress />;
-    return <OfferAddonInner org={data.paymentOrgId} id={id} />;
+    return <OfferAddonInner org={data.paymentOrgId} id={id} noLink={noLink} />;
 });
 
 const OfferAddonInner = connect(({ org, id }) => ['payments/addon', { org, id }])(data => ({
     data,
-}))(function OfferAddonInner ({ data, org, id }) {
+}))(function OfferAddonInner ({ data, org, id, noLink }) {
     if (!data) return <TinyProgress />;
+    if (noLink) return data.name;
     const target = `/aksopago/organizoj/${org}/aldonebloj/${id}`;
     return <Link target={target}>{data.name}</Link>;
 });

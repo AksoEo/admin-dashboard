@@ -128,7 +128,10 @@ export const membershipEntries = {
         },
     },
     offers: {
-        currency: 'Valuto',
+        add: {
+            title: '[[Add Offer]]',
+            emptyGroup: '[[No items in this group]]',
+        },
         types: {
             addon: 'Aldoneblo',
             membership: 'Membrokategorio',

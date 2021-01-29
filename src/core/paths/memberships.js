@@ -340,9 +340,14 @@ export const tasks = {
         const client = await asyncClient;
         const existing = store.get(REGISTRATION_ENTRIES.concat([id]));
         const delta = fieldDiff(eClientToAPI(existing), eClientToAPI(params));
+
         await client.patch(`/registration/entries/${id}`, delta);
         store.insert(REGISTRATION_ENTRIES.concat([id]), deepMerge(existing, params));
-        store.signal(SIG_ENTRIES);
+
+        if (delta.fishyIsOkay) {
+            // need to update from server
+            this.entry({ id }, { fields: ['issue'] });
+        }
     },
     deleteEntry: async ({ id }) => {
         const client = await asyncClient;

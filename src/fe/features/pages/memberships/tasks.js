@@ -145,5 +145,5 @@ export default {
                 {entriesLocale.delete.description}
             </TaskDialog>
         );
-    }
+    },
 };
