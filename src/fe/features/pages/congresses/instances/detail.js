@@ -6,8 +6,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import Page from '../../../../components/page';
 import DetailShell from '../../../../components/detail-shell';
 import DynamicHeightDiv from '../../../../components/dynamic-height-div';
-import TejoIcon from '../../../../components/tejo-icon';
-import UeaIcon from '../../../../components/uea-icon';
+import OrgIcon from '../../../../components/org-icon';
 import Tabs from '../../../../components/tabs';
 import { date } from '../../../../components/data';
 import Meta from '../../../meta';
@@ -234,9 +233,7 @@ function FieldWrapper ({ field, item, onItemChange }) {
 }
 
 function Header ({ item, editing, onItemChange, org, tab, onTabChange, push }) {
-    let orgIcon;
-    if (org === 'tejo') orgIcon = <TejoIcon />;
-    else if (org === 'uea') orgIcon = <UeaIcon />;
+    const orgIcon = <OrgIcon org={org} />;
 
     return (
         <div class="instance-header">

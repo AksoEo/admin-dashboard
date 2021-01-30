@@ -12,8 +12,7 @@ import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
 import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail';
-import TejoIcon from '../../../../components/tejo-icon';
-import UeaIcon from '../../../../components/uea-icon';
+import OrgIcon from '../../../../components/org-icon';
 import StripeIcon from '../../../../components/stripe-icon';
 import ProfilePicture from '../../../../components/profile-picture';
 import DynamicHeightDiv from '../../../../components/dynamic-height-div';
@@ -141,9 +140,6 @@ function DetailViewInner ({ item, editing, onItemChange }) {
 
     const fullEditing = editing && status === 'pending';
 
-    let orgIcon = null;
-    if (org === 'tejo') orgIcon = <TejoIcon class="payment-org-icon" />;
-    else if (org === 'uea') orgIcon = <UeaIcon class="payment-org-icon" />;
 
     const currentAmount = totalAmount - amountRefunded;
 
@@ -186,7 +182,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                     <span>{locale.detailTo}</span>
                     {' '}
                     <span class="intent-payment-org">
-                        {orgIcon}
+                        <OrgIcon org={org} class="payment-org-icon" />;
                         {' '}
                         {!!paymentOrg && <PaymentOrgName id={paymentOrg} />}
                     </span>

@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import { TextField } from '@cpsdqs/yamdl';
-import TejoIcon from '../../../components/tejo-icon';
-import UeaIcon from '../../../components/uea-icon';
+import OrgIcon from '../../../components/org-icon';
 
 export const FIELDS = {
     org: {
@@ -9,9 +8,7 @@ export const FIELDS = {
         weight: 0.25,
         sortable: true,
         component ({ value }) {
-            if (value === 'tejo') return <TejoIcon />;
-            if (value === 'uea') return <UeaIcon />;
-            return null;
+            return <OrgIcon org={value} />;
         },
     },
     abbrev: {

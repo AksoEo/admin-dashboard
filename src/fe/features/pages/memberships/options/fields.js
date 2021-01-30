@@ -13,6 +13,7 @@ import Segmented from '../../../../components/segmented';
 import StaticOverviewList from '../../../../components/overview-list-static';
 import RearrangingList from '../../../../components/rearranging-list';
 import ScriptItem from '../../../../components/form-editor/script-item';
+import OrgIcon from '../../../../components/org-icon';
 import { ScriptContextProvider } from '../../../../components/form-editor';
 import { RefNameView } from '../../../../components/form-editor/script-views';
 import {
@@ -101,7 +102,13 @@ const PaymentOrgLabel = connect(({ id }) => (['payments/org', { id }]))(data => 
 }))(class PaymentOrgLabel extends PureComponent {
     render ({ data }) {
         if (!data) return <TinyProgress />;
-        return data.name;
+        return (
+            <span class="payment-org-label">
+                <OrgIcon org={data.org} style={{ verticalAlign: 'middle' }} />
+                {' '}
+                {data.name}
+            </span>
+        );
     }
 });
 

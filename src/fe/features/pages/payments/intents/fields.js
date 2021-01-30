@@ -1,8 +1,7 @@
 import { h } from 'preact';
 import moment from 'moment';
 import { currencyAmount, email, timestamp } from '../../../../components/data';
-import TejoIcon from '../../../../components/tejo-icon';
-import UeaIcon from '../../../../components/uea-icon';
+import OrgIcon from '../../../../components/org-icon';
 import { paymentIntents as locale, timestampFormat } from '../../../../locale';
 import { PaymentMethodType } from '../orgs/methods/fields';
 import './fields.less';
@@ -44,8 +43,7 @@ export const FIELDS = {
     },
     org: {
         component ({ value }) {
-            if (value === 'tejo') return <TejoIcon />;
-            if (value === 'uea') return <UeaIcon />;
+            return <OrgIcon org={value} />;
         },
         stringify (value) {
             return value;

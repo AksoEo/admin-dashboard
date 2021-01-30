@@ -3,8 +3,7 @@ import { PureComponent, useState } from 'preact/compat';
 import { Button, Menu, DrawerItem, DrawerLabel, Spring, globalAnimator } from '@cpsdqs/yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ProfilePicture from '../../components/profile-picture';
-import TEJOIcon from '../../components/tejo-icon';
-import UEAIcon from '../../components/uea-icon';
+import { TejoIcon, UeaIcon } from '../../components/org-icon';
 import { Link, routerContext } from '../../router';
 import permsContext from '../../perms';
 import SidebarLogo from './sidebar-logo';
@@ -200,8 +199,8 @@ export default class SidebarContents extends PureComponent {
                         locked={this.props.locked} />
                     <div class="sidebar-meta-info">
                         <div class="info-logos">
-                            <UEAIcon />
-                            <TEJOIcon />
+                            <UeaIcon />
+                            <TejoIcon />
                         </div>
                         <div class="info-line">
                             {localeMeta.copyright} <a

@@ -1,8 +1,7 @@
 import { h } from 'preact';
 import { Validator } from '../../../../components/form';
 import { TextField } from '@cpsdqs/yamdl';
-import TejoIcon from '../../../../components/tejo-icon';
-import UeaIcon from '../../../../components/uea-icon';
+import OrgIcon from '../../../../components/org-icon';
 import { paymentOrgs as locale } from '../../../../locale';
 
 export const FIELDS = {
@@ -10,7 +9,7 @@ export const FIELDS = {
         sortable: true,
         slot: 'title',
         component ({ value }) {
-            return value === 'tejo' ? <TejoIcon /> : value === 'uea' ? <UeaIcon /> : null;
+            return <OrgIcon org={value} />;
         },
         stringify (value) {
             return value;

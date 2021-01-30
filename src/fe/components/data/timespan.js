@@ -40,8 +40,13 @@ class TimespanUnitEditor extends PureComponent {
 
     onFocus = () => {
         this.setState({ editing: true, editingValue: this.getValue() }, () => {
-            this.inputNode.current.selectionStart = 0;
-            this.inputNode.current.selectionEnd = this.inputNode.current.value.length;
+            try {
+                this.inputNode.current.selectionStart = 0;
+                this.inputNode.current.selectionEnd = this.inputNode.current.value.length;
+            } catch {
+                // sometimes this fails with “attempt to use an object that is no longer usable”
+                // TODO: find out why
+            }
         });
     };
     onBlur = () => {

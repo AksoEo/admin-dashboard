@@ -13,8 +13,7 @@ import TextArea from '../../../components/text-area';
 import SvgIcon from '../../../components/svg-icon';
 import MdField from '../../../components/md-field';
 import Select from '../../../components/select';
-import TejoIcon from '../../../components/tejo-icon';
-import UeaIcon from '../../../components/uea-icon';
+import OrgIcon from '../../../components/org-icon';
 import RearrangingList from '../../../components/rearranging-list';
 import { connect } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
@@ -54,9 +53,7 @@ export const FIELDS = {
         weight: 0.25,
         slot: 'icon',
         component ({ value }) {
-            if (value === 'tejo') return <TejoIcon />;
-            if (value === 'uea') return <UeaIcon />;
-            return null;
+            return <OrgIcon org={value} />;
         },
     },
     intent: {

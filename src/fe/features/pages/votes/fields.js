@@ -2,8 +2,7 @@ import { h } from 'preact';
 import moment from 'moment';
 import { TextField } from '@cpsdqs/yamdl';
 import MdField from '../../../components/md-field';
-import TejoIcon from '../../../components/tejo-icon';
-import UeaIcon from '../../../components/uea-icon';
+import OrgIcon from '../../../components/org-icon';
 import { votes as locale, timestampFormat } from '../../../locale';
 import { timeStart as TimeStart, timeEnd as TimeEnd } from './config';
 
@@ -13,12 +12,7 @@ export default {
         weight: 0.5,
         slot: 'title',
         component ({ value }) {
-            if (value === 'tejo') {
-                return <TejoIcon />;
-            } else if (value === 'uea') {
-                return <UeaIcon />;
-            }
-            return null;
+            return <OrgIcon org={value} />;
         },
         stringify (value) {
             return value;

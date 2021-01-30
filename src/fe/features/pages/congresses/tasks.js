@@ -6,8 +6,7 @@ import { Field, Validator } from '../../../components/form';
 import DetailShell from '../../../components/detail-shell';
 import ChangedFields from '../../../components/changed-fields';
 import Segmented from '../../../components/segmented';
-import TejoIcon from '../../../components/tejo-icon';
-import UeaIcon from '../../../components/uea-icon';
+import { TejoIcon, UeaIcon } from '../../../components/org-icon';
 import MdField from '../../../components/md-field';
 import { Required, timestamp } from '../../../components/data';
 import {

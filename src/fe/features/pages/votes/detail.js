@@ -2,8 +2,7 @@ import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailView from '../../../components/detail';
 import Page from '../../../components/page';
-import TejoIcon from '../../../components/tejo-icon';
-import UeaIcon from '../../../components/uea-icon';
+import OrgIcon from '../../../components/org-icon';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
@@ -137,11 +136,7 @@ const makeHeader = (owner) => function Header ({ item, editing }) {
         <div class="vote-header">
             <h1>
                 <span class="vote-org-icon">
-                    {item.org === 'tejo'
-                        ? <TejoIcon />
-                        : item.org === 'uea'
-                            ? <UeaIcon />
-                            : null}
+                    <OrgIcon org={item.org} />
                 </span>
                 {item.name}
             </h1>

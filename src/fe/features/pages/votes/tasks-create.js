@@ -4,9 +4,7 @@ import { Button, Dialog, TextField } from '@cpsdqs/yamdl';
 import ProgressIndicator from '../../../components/dialog-progress-indicator';
 import AutosizingPageView from '../../../components/autosizing-page-view';
 import Form, { Validator } from '../../../components/form';
-import TejoIcon from '../../../components/tejo-icon';
-import UeaIcon from '../../../components/uea-icon';
-import UeaColorIcon from '../../../components/uea-color-icon';
+import { TejoIcon, UeaIcon, UeaColorIcon } from '../../../components/org-icon';
 import { timestamp } from '../../../components/data';
 import { votes as locale } from '../../../locale';
 import {
