@@ -11,7 +11,10 @@ export default function LatLonEditor ({ value, editing, onChange, onDelete }) {
         let deletion = null;
         if (value && onDelete) {
             deletion = (
-                <Button icon small onClick={onDelete}>
+                <Button icon small onClick={e => {
+                    e.preventDefault();
+                    onDelete();
+                }}>
                     <CloseIcon style={{ verticalAlign: 'middle' }} />
                 </Button>
             );

@@ -67,7 +67,8 @@ export default class MapPicker extends PureComponent {
                 <Button
                     raised
                     class={'map-picker-from-address' + (!address ? ' is-hidden' : '')}
-                    onClick={() => {
+                    onClick={e => {
+                        e.preventDefault();
                         this.setState({ addressSearchOpen: true });
                         orderPortalContainerFront();
                     }}>
