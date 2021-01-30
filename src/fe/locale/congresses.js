@@ -114,6 +114,7 @@ export const congressLocations = {
             internal: 'Interna loko',
             none: 'ne gravas',
         },
+        openHoursClosed: '[[Closed]]',
     },
     locatedWithinExternalLoc: 'situas ene de', // prefix
     locatedWithinNowhere: 'nenie', // if externalLoc is null

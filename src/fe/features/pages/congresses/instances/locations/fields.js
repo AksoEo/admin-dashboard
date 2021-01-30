@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { useState, PureComponent } from 'preact/compat';
 import { Button, Dialog, Slider, TextField } from '@cpsdqs/yamdl';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
 import Brightness1Icon from '@material-ui/icons/Brightness1';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
@@ -408,10 +410,10 @@ const OpenHoursField = connect(({ userData }) => (
                 <OpenHoursDay
                     key={date}
                     date={date}
-                    value={value && value[date] || ''}
+                    value={value && value[date] || []}
                     onChange={day => {
                         const newValue = value ? { ...value } :  {};
-                        if (day === null) delete newValue[date];
+                        if (!day.length) delete newValue[date];
                         else newValue[date] = day;
                         if (Object.keys(newValue).length) onChange(newValue);
                         else onChange(null);
@@ -441,13 +443,56 @@ function secondsToTime (secs) {
 }
 
 function OpenHoursDay ({ date: pDate, value, editing, onChange }) {
-    let startSecs = 0;
-    let endSecs = 0;
-    if (value) {
-        const parts = value.split('-');
-        startSecs = timeToSeconds(parts[0]);
-        endSecs = timeToSeconds(parts[1]);
+    const endTime = 86400 - 60;
+    let latestTime = 0;
+    for (const range of value) {
+        latestTime = Math.max(latestTime, timeToSeconds(range.split('-')[1]));
     }
+
+    const addRange = (e) => {
+        e.preventDefault();
+        onChange(value.concat([secondsToTime(latestTime) + '-' + secondsToTime(endTime)]));
+    };
+    const onRangeChange = index => range => {
+        const newValue = value.slice();
+        newValue[index] = range;
+        onChange(newValue);
+    };
+    const onRemoveRange = index => () => {
+        const newValue = value.slice();
+        newValue.splice(index, 1);
+        onChange(newValue);
+    };
+
+    return (
+        <div class={'open-hours-day' + (editing ? ' is-editing' : '') + (!value.length ? ' is-empty' : '')}>
+            <span class="day-date">
+                <date.renderer value={pDate} />
+            </span>
+            {value.map((range, i) => (
+                <OpenHoursRange
+                    key={i}
+                    value={range}
+                    editing={editing}
+                    onChange={onRangeChange(i)}
+                    onRemove={onRemoveRange(i)} />
+            ))}
+            {!editing && !value.length && locale.fields.openHoursClosed}
+            {editing && (
+                <div class="add-container">
+                    <Button icon small onClick={addRange}>
+                        <AddIcon />
+                    </Button>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function OpenHoursRange ({ value, editing, onChange, onRemove }) {
+    const parts = value.split('-');
+    const startSecs = timeToSeconds(parts[0]);
+    const endSecs = timeToSeconds(parts[1]);
 
     const commit = (startSecs, endSecs) => {
         if (endSecs < startSecs) {
@@ -456,52 +501,45 @@ function OpenHoursDay ({ date: pDate, value, editing, onChange }) {
             endSecs = startSecs;
             startSecs = tmp;
         }
-        if (startSecs === endSecs) onChange(null);
-        else onChange(secondsToTime(startSecs) + '-' + secondsToTime(endSecs));
+        onChange(secondsToTime(startSecs) + '-' + secondsToTime(endSecs));
     };
 
     if (editing) {
         return (
-            <div class={'open-hours-day is-editing' + (startSecs === endSecs ? ' is-empty' : '')}>
-                <span class="day-date">
-                    <date.renderer value={pDate} />
-                </span>
-                <span class="day-hours">
-                    <time.editor
-                        outline
-                        value={startSecs}
-                        onChange={secs => {
-                            commit(secs, endSecs);
-                        }} />
-                    <Slider
-                        class="hours-slider"
-                        value={[startSecs, endSecs]}
-                        onChange={([a, b]) => {
-                            commit(a, b);
-                        }}
-                        min={0}
-                        max={86400 - 1} />
-                    <time.editor
-                        outline
-                        value={endSecs}
-                        onChange={secs => {
-                            commit(startSecs, secs);
-                        }} />
-                </span>
+            <div class="open-hours-range is-editing">
+                <Button class="remove-button" icon small onClick={e => {
+                    e.preventDefault();
+                    onRemove();
+                }}>
+                    <RemoveIcon />
+                </Button>
+                <time.editor
+                    outline
+                    value={startSecs}
+                    onChange={secs => {
+                        commit(secs, endSecs);
+                    }} />
+                <Slider
+                    class="hours-slider"
+                    value={[startSecs, endSecs]}
+                    onChange={([a, b]) => {
+                        commit(a, b);
+                    }}
+                    min={0}
+                    max={86400 - 1} />
+                <time.editor
+                    outline
+                    value={endSecs}
+                    onChange={secs => {
+                        commit(startSecs, secs);
+                    }} />
             </div>
         );
     }
 
-    if (!value) return;
-
     return (
-        <div class="open-hours-day">
-            <span class="day-date">
-                <date.renderer value={pDate} />
-            </span>
-            <span class="day-hours">
-                {secondsToTime(startSecs)}–{secondsToTime(endSecs)}
-            </span>
-        </div>
+        <span class="open-hours-range">
+            {secondsToTime(startSecs)}–{secondsToTime(endSecs)}
+        </span>
     );
 }

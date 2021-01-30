@@ -21,7 +21,7 @@ export const pages = {
     codeholders: 'Membroj',
     statistics: 'Statistiko',
     membership: 'Membreco',
-    'membership-categories': 'Membrokategorioj',
+    'membership-categories': 'Kategorioj',
     'membership-registration': 'Agordoj',
     'membership-entries': 'Aliĝoj',
     roles: 'Roloj',
