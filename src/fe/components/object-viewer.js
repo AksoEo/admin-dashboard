@@ -10,9 +10,9 @@ import './object-viewer.less';
 /// - value: the JSON object
 export default function ObjectViewer ({ value }) {
     return <div class="object-viewer">
-        <button onClick={() => {
+        <button class="obj-copy-button" onClick={() => {
             navigator.clipboard.writeText(JSON.stringify(value, undefined, 4)).catch(console.error); // eslint-disable-line no-console
-        }}>COPY THE WHOLE THING</button>
+        }}>{locale.copy}</button>
         <InnerObjectViewer value={value} />
     </div>;
 }

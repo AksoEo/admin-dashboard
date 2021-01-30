@@ -9,6 +9,7 @@ export const generic = {
 };
 
 export const data = {
+    copy: 'Kopii',
     timeSeparator: ':',
     requiredField: 'Tiu ĉi kampo estas deviga',
     byteSizes: [

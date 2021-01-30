@@ -4,7 +4,7 @@ import * as store from '../store';
 import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
-import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
+import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI, fieldDiff } from '../list';
 
 export const PAYMENT_ORGS = 'paymentOrgs';
 export const SIG_PAYMENT_ORGS = '!paymentOrgs';
@@ -332,12 +332,11 @@ export const tasks = {
     },
     updateMethod: async ({ org, id }, params) => {
         const client = await asyncClient;
-        delete params.id;
-        delete params.type;
-        delete params.thumbnailKey;
-        await client.patch(`/aksopay/payment_orgs/${org}/methods/${id}`, params);
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];
         const existing = store.get(path);
+        const delta = fieldDiff(existing, params);
+        delete params.thumbnailKey;
+        await client.patch(`/aksopay/payment_orgs/${org}/methods/${id}`, delta);
         store.insert(path, deepMerge(existing, params));
     },
     deleteMethod: async ({ org, id }) => {
