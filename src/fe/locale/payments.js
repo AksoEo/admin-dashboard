@@ -111,7 +111,7 @@ export const paymentMethods = {
             limited: 'Validas dum ...',
             forever: 'Neniam ekvalidiĝas',
         },
-        paymentValidityWarning: '[[Eternity is not recommended]]',
+        paymentValidityWarning: 'Ni rekomendas ŝalti eksvalidiĝon',
     },
     create: {
         title: 'Krei pagmetodon',
@@ -208,11 +208,11 @@ export const paymentIntents = {
             addon: 'Aldoneblo',
         },
         purpose: {
-            triggerAmount: '[[Trigger amount]]',
+            triggerAmount: 'Ŝaltota monsumo',
             triggerStatuses: {
-                awaiting: '[[Awaiting payment]]',
-                processing: '[[Processing trigger]]',
-                triggered: '[[Triggered]]',
+                awaiting: 'Atendas sukcesan pagon',
+                processing: 'Traktas AKSO-agon',
+                triggered: 'Fintraktita',
             },
         },
     },
@@ -330,9 +330,9 @@ export const paymentIntents = {
         selectMethodFirst: 'Unue necesas elekti pagmetodon',
         selectCurrencyFirst: 'Unue necesas elekti valuton',
         addPurposeButton: 'Aldoni pagcelon',
-        useOriginalAmount: '[[Amount is discounted]]',
+        useOriginalAmount: 'Sumo estas rabatita',
         originalAmount: 'Nerabatita prezo',
-        useTriggerAmount: '[[Different trigger amount]]',
+        useTriggerAmount: 'Indiki alian ŝaltotan sumon',
         types: {
             manual: 'Permana',
             addon: 'Aldoneblo',
