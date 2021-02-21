@@ -119,6 +119,7 @@ export const membershipEntries = {
         statusTypes: {
             submitted: 'Ricevita',
             pending: 'Havas problemon',
+            processing: 'Traktata',
             canceled: 'Nuligita',
             succeeded: 'Sukcese traktita',
         },
@@ -126,6 +127,10 @@ export const membershipEntries = {
             id: 'Ekzistanta',
             object: 'Nova',
         },
+    },
+    titlePrefix: 'Aliĝo por la jaro',
+    actions: {
+        cancel: 'Nuligi',
     },
     offers: {
         add: {
@@ -146,7 +151,7 @@ export const membershipEntries = {
         },
         where: {
             // this is appended directly after the “what” string and should contain
-            // a leading space or puncutation if neccessary
+            // a leading space or punctuation if neccessary
             'codeholderData.email': ': Retpoŝtadreso',
             'codeholderData.addressAndName': ': Nomo kaj retpoŝtadreso',
             'codeholderData.addressAndFeeCountries': ': Malsamaj loĝlando kaj paglando',
@@ -171,5 +176,10 @@ export const membershipEntries = {
         title: 'Forigi aliĝon',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la aliĝon? Ne eblas malfari tiun ĉi agon.',
+    },
+    cancel: {
+        title: 'Nuligi aliĝon',
+        button: 'Nuligi',
+        description: 'Ĉu vi certas, ke vi volas nuligi la aliĝon? Ne eblas malfari tiun ĉi agon.',
     },
 };

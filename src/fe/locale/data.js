@@ -284,6 +284,7 @@ export const mime = {
         video: 'video',
     },
     exceptions: {
+        '': '[[Unknown type]]',
         'application/pdf': 'PDF-dokumento',
         'application/msword': 'Word-dokumento', // .doc, .dot
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word-dokumento', // .docx

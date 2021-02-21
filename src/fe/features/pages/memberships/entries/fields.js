@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
+import { useState, PureComponent } from 'preact/compat';
 import { Button, CircularProgress, Dialog, TextField } from '@cpsdqs/yamdl';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckIcon from '@material-ui/icons/CheckCircleOutline';
@@ -7,6 +7,7 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import UpIcon from '@material-ui/icons/KeyboardArrowUp';
 import DownIcon from '@material-ui/icons/KeyboardArrowDown';
 import AddIcon from '@material-ui/icons/Add';
+import LinkIcon from '@material-ui/icons/Link';
 import { currencyAmount, timestamp, ueaCode } from '../../../../components/data';
 import TextArea from '../../../../components/text-area';
 import DynamicHeightDiv from '../../../../components/dynamic-height-div';
@@ -31,11 +32,12 @@ export const FIELDS = {
         component ({ value }) {
             return <span class="registration-entry-id">{value}</span>;
         },
+        shouldHide: () => true,
     },
     year: {
         sortable: true,
-        component ({ value, editing, onChange }) {
-            if (editing) {
+        component ({ value, editing, onChange, item }) {
+            if (editing && item.status.status === 'submitted') {
                 return (
                     <TextField
                         outline
@@ -46,29 +48,19 @@ export const FIELDS = {
             }
             return value;
         },
+        shouldHide: (_, editing) => !editing,
     },
     status: {
         sortable: true,
-        component ({ value, slot }) {
+        component ({ value }) {
             if (!value) return null;
-            if (slot === 'detail') {
-                return (
-                    <div class="registration-entry-status">
-                        {locale.fields.statusTypes[value.status]}
-                        {value.time && (
-                            <span>
-                                {' ('}
-                                {locale.fields.timeSubmittedTime}
-                                {': '}
-                                <timestamp.renderer value={value.time * 1000} />
-                                {')'}
-                            </span>
-                        )}
-                    </div>
-                );
-            }
-            return locale.fields.statusTypes[value.status];
+            return (
+                <span class="registration-entry-status" data-status={value.status}>
+                    {locale.fields.statusTypes[value.status]}
+                </span>
+            );
         },
+        shouldHide: () => true,
     },
     timeSubmitted: {
         sortable: true,
@@ -84,95 +76,13 @@ export const FIELDS = {
             return <div>{value.split('\n').map((l, i) => <div key={i}>{l}</div>)}</div>;
         },
     },
-    codeholderData: {
-        component ({ value, editing, onChange }) {
-            let contents;
-            if (value === null || typeof value !== 'object') {
-                contents = (
-                    <div class="registration-entry-codeholder-data is-linked">
-                        {editing ? (
-                            <CodeholderPicker
-                                limit={1}
-                                value={value ? [value] : []}
-                                onChange={v => onChange(+v[0] || null)} />
-                        ) : <CodeholderCard id={value} key={value} />}
-                    </div>
-                );
-            } else {
-                contents = (
-                    <div class="registration-entry-codeholder-data">
-                        <DetailFields
-                            compact
-                            data={value}
-                            editing={editing}
-                            edit={editing ? value : null}
-                            onEditChange={onChange}
-                            fields={CODEHOLDER_DATA_FIELDS}
-                            locale={codeholdersLocale}
-                            userData={{
-                                forceShowName: true,
-                                useLocalAddress: true,
-                            }} />
-                    </div>
-                );
-            }
-
-            if (editing) {
-                const setDataType = type => {
-                    if (type === 'object') {
-                        onChange({
-                            name: {
-                                honorific: '',
-                                first: '',
-                                firstLegal: '',
-                                last: '',
-                                lastLegal: '',
-                            },
-                            address: {
-                                streetAddress: null,
-                                city: null,
-                                cityArea: null,
-                                countryArea: null,
-                                postalCode: null,
-                                sortingCode: null,
-                                country: null,
-                            },
-                            feeCountry: null,
-                            email: null,
-                            birthdate: null,
-                            cellphone: null,
-                        });
-                    } else {
-                        onChange(null);
-                    }
-                };
-
-                return (
-                    <div class="registration-entry-codeholder-data is-editing">
-                        <div class="data-type-switch-container">
-                            <Segmented
-                                selected={(value !== null && typeof value === 'object') ? 'object' : 'id'}
-                                onSelect={setDataType}>
-                                {[
-                                    { id: 'id', label: locale.fields.codeholderDataTypes.id },
-                                    { id: 'object', label: locale.fields.codeholderDataTypes.object },
-                                ]}
-                            </Segmented>
-                        </div>
-                        {contents}
-                    </div>
-                );
-            }
-            return contents;
-        },
-    },
     issue: {
         component: connectPerms(({ value, item, editing, perms }) => {
             if (!value.what) return null;
 
             let where;
-            if (value.where.startsWith('offers[')) {
-                const index = +value.where.match(/offers\[(\d+)/)[1];
+            if (value.where.startsWith('offer[')) {
+                const index = +value.where.match(/offer\[(\d+)/)[1];
                 where = (
                     <span class="issue-offer">
                         <div class="registration-issue-offer-container">
@@ -241,6 +151,7 @@ export const FIELDS = {
     },
     offers: {
         component ({ value, editing, item, onChange }) {
+            if (item.status.status !== 'submitted') editing = false;
             const [addOfferOpen, setAddOfferOpen] = useState(false);
 
             const year = item.year;
@@ -314,7 +225,182 @@ export const FIELDS = {
             );
         },
     },
+    codeholderData: {
+        weight: 1.5,
+        component ({ slot, value, editing, onChange, item }) {
+            if (item.status.status !== 'submitted') editing = false;
+
+            if (slot !== 'detail') {
+                let contents;
+                if (value === null || typeof value !== 'object') {
+                    contents = <CodeholderCard id={value} key={value} />;
+                } else {
+                    const formattedName = [
+                        value.name.honorific,
+                        value.name.first || value.name.firstLegal,
+                        value.name.last || value.name.lastLegal,
+                    ].filter(x => x).join(' ');
+                    contents = [
+                        <span key={0} class="new-codeholder">{locale.fields.codeholderDataTypes.object}</span>,
+                        <span key={1} class="formatted-name">{formattedName}</span>,
+                    ];
+                }
+
+                return (
+                    <div class="registration-entry-codeholder-data-preview">
+                        {contents}
+                    </div>
+                );
+            }
+
+            let contents;
+            if (value === null || typeof value !== 'object') {
+                contents = (
+                    <div class="registration-entry-codeholder-data is-linked">
+                        {editing ? (
+                            <CodeholderPicker
+                                limit={1}
+                                value={value ? [value] : []}
+                                onChange={v => onChange(+v[0] || null)} />
+                        ) : <CodeholderCard id={value} key={value} />}
+                    </div>
+                );
+            } else {
+                let newCodeholderId = null;
+                if (item.newCodeholderId) {
+                    newCodeholderId = (
+                        <div class="new-codeholder-id">
+                            <label>
+                                <CheckIcon style={{ verticalAlign: 'middle' }} />
+                                {' '}
+                                {locale.fields.newCodeholderId}
+                            </label>
+                            <CodeholderCard id={item.newCodeholderId} />
+                        </div>
+                    );
+                }
+
+                contents = (
+                    <div class="registration-entry-codeholder-data">
+                        {newCodeholderId}
+                        <DetailFields
+                            compact
+                            data={value}
+                            editing={editing}
+                            edit={editing ? value : null}
+                            onEditChange={onChange}
+                            fields={CODEHOLDER_DATA_FIELDS}
+                            locale={codeholdersLocale}
+                            userData={{
+                                forceShowName: true,
+                                useLocalAddress: true,
+                            }} />
+                    </div>
+                );
+            }
+
+            if (editing) {
+                const valueDataType = (value !== null && typeof value === 'object') ? 'object' : 'id';
+                const setDataType = type => {
+                    if (type === valueDataType) return;
+                    if (type === 'object') {
+                        onChange({
+                            name: {
+                                honorific: '',
+                                first: '',
+                                firstLegal: '',
+                                last: '',
+                                lastLegal: '',
+                            },
+                            address: {
+                                streetAddress: null,
+                                city: null,
+                                cityArea: null,
+                                countryArea: null,
+                                postalCode: null,
+                                sortingCode: null,
+                                country: null,
+                            },
+                            feeCountry: null,
+                            email: null,
+                            birthdate: null,
+                            cellphone: null,
+                        });
+                    } else {
+                        onChange(null);
+                    }
+                };
+
+                return (
+                    <div class="registration-entry-codeholder-data is-editing">
+                        <div class="data-type-switch-container">
+                            <Segmented
+                                selected={valueDataType}
+                                onSelect={setDataType}>
+                                {[
+                                    { id: 'id', label: locale.fields.codeholderDataTypes.id },
+                                    { id: 'object', label: locale.fields.codeholderDataTypes.object },
+                                ]}
+                            </Segmented>
+                        </div>
+                        {contents}
+                    </div>
+                );
+            }
+            return contents;
+        },
+    },
 };
+
+export class Header extends PureComponent {
+    static contextType = coreContext;
+
+    render ({ item }) {
+        let cancelButton;
+        if (item.status.status === 'pending' || item.status.status === 'submitted') {
+            cancelButton = (
+                <Button onClick={() => this.context.createTask('memberships/cancelEntry', {
+                    id: item.id,
+                })}>
+                    {locale.actions.cancel}
+                </Button>
+            );
+        }
+
+        let statusTime = null;
+        if (item.status.time) {
+            statusTime = (
+                <span>
+                    {locale.fields.timeSubmittedTime}
+                    {': '}
+                    <timestamp.renderer value={item.status.time * 1000} />
+                </span>
+            );
+        }
+
+        return (
+            <div class="registration-entry-header">
+                <div class="entry-top">
+                    <span class="inner-status" data-status={item.status.status}>
+                        {locale.fields.statusTypes[item.status.status]}
+                    </span>
+                    <span class="inner-id registration-entry-id">{item.id}</span>
+                </div>
+                <div class="entry-title">
+                    {locale.titlePrefix}
+                    {' '}
+                    {item.year}
+                </div>
+                <div class="entry-status-time">
+                    {statusTime}
+                </div>
+                <div class="entry-actions">
+                    {cancelButton}
+                </div>
+            </div>
+        );
+    }
+}
 
 const AddOfferDialog = connect(({ year }) => ['memberships/options', { id: year }])(data => ({
     data,
@@ -421,6 +507,8 @@ const CodeholderCard = connect(({ id }) => ['codeholders/codeholder', {
     if (data) {
         contents = (
             <div class="codeholder-card-inner">
+                <LinkIcon style={{ verticalAlign: 'middle' }} />
+                {' '}
                 <ueaCode.renderer value={data.code?.new} />
             </div>
         );

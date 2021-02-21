@@ -488,7 +488,7 @@ class OfferPrice extends PureComponent {
                     </div>
                     {editing && (
                         <Button icon small onClick={() => onChange({
-                            description: '',
+                            description: null,
                             script: {},
                             var: null,
                         })}>
@@ -500,6 +500,7 @@ class OfferPrice extends PureComponent {
         }
 
         const variables = [];
+        if (value.var === null) variables.push({ value: null, label: '—' });
         for (const v in value.script) {
             if (v.startsWith('_')) continue;
             variables.push({

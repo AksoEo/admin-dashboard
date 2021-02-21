@@ -115,6 +115,7 @@ const eClientFields = {
     },
     codeholderData: {
         apiFields: ['codeholderData'],
+        requires: ['newCodeholderId'],
         fromAPI: entry => (typeof entry.codeholderData === 'object' && entry.codeholderData !== null)
             ? codeholderFromAPI({ codeholderType: 'human', ...entry.codeholderData })
             : entry.codeholderData,
@@ -247,6 +248,7 @@ export const tasks = {
         const res = await client.get(`/registration/options/${id}`, {
             fields: OPTIONS_FIELDS,
         });
+        res.body.id = res.body.year;
         store.insert(REGISTRATION_OPTIONS.concat([id]), res.body);
         return res.body;
     },
@@ -346,7 +348,7 @@ export const tasks = {
 
         if (delta.fishyIsOkay) {
             // need to update from server
-            this.entry({ id }, { fields: ['issue'] });
+            this.entry({ id }, { fields: ['issue', 'newCodeholderId'] });
         }
     },
     deleteEntry: async ({ id }) => {
@@ -354,6 +356,12 @@ export const tasks = {
         await client.delete(`/registration/entries/${id}`);
         store.remove(REGISTRATION_ENTRIES.concat([id]));
         store.signal(SIG_ENTRIES);
+    },
+    cancelEntry: async ({ id }) => {
+        const client = await asyncClient;
+        await client.post(`/registration/entries/${id}/!cancel`);
+        // reload
+        tasks.entry({ id }, { fields: ['status'] }).catch(() => {});
     },
 };
 

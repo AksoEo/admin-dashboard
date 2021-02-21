@@ -20,6 +20,7 @@ export const errors = {
     'forbidden': 'Mankas permeso',
     'not-found': 'La paĝo ne estis trovita',
     'conflict': 'Okazis interna konflikto, bonvolu reprovi',
+    'payload-too-large': '[[Request payload too large]]',
     'internal-server-error': 'Okazis interna eraro',
 
     // see payments/createIntent

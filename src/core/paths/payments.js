@@ -83,12 +83,10 @@ const iClientFields = {
             if (!intent.purposes) return undefined;
             const purposes = [];
             for (const apiPurpose of intent.purposes) {
-                let purpose = apiPurpose;
+                const purpose = apiPurpose;
                 if (purpose.type === 'trigger') {
-                    purpose = {
-                        ...apiPurpose,
-                        dataId: Buffer.from(purpose.dataId).toString('hex'),
-                    };
+                    if ('dataId' in purpose) purpose.dataId = Buffer.from(purpose.dataId).toString('hex');
+                    if ('registrationEntryId' in purpose) purpose.dataId = base32.stringify(purpose.registrationEntryId);
                 }
                 purposes.push(purpose);
             }

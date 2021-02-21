@@ -146,4 +146,16 @@ export default {
             </TaskDialog>
         );
     },
+    cancelEntry ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={entriesLocale.cancel.title}
+                actionLabel={entriesLocale.cancel.button}
+                run={() => task.runOnce()}>
+                {entriesLocale.cancel.description}
+            </TaskDialog>
+        );
+    },
 };

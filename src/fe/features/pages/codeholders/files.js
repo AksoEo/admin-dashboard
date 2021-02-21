@@ -75,8 +75,8 @@ export function Mime ({ mime }) {
     }
 
     const parts = mime.split('/');
-    const type = parts[0];
-    const subtype = parts[1].toUpperCase();
+    const type = (parts[0] || '');
+    const subtype = (parts[1] || '').toUpperCase();
 
     return (
         <span class="mime-type">

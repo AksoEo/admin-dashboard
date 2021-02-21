@@ -6,7 +6,7 @@ import Meta from '../../../meta';
 import { connectPerms } from '../../../../perms';
 import { coreContext } from '../../../../core/connection';
 import { membershipEntries as locale } from '../../../../locale';
-import { FIELDS } from './fields';
+import { Header, FIELDS } from './fields';
 
 export default connectPerms(class RegistrationEntry extends Page {
     state = {
@@ -75,6 +75,7 @@ export default connectPerms(class RegistrationEntry extends Page {
                 <DetailView
                     view="memberships/entry"
                     id={id}
+                    header={Header}
                     fields={FIELDS}
                     options={{
                         fields: ['year', 'status', 'issue', 'newCodeholderId', 'timeSubmitted',

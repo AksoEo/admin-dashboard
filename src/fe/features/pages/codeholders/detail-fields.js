@@ -134,7 +134,7 @@ const NameEditor = connectPerms(function NameEditor ({
     if (!value) return null;
 
     // use actual type or heuristics otherwise
-    const itemType = item.type || (value && value.firstLegal ? 'human' : 'org');
+    const itemType = item.type || (value && ('firstLegal' in value) ? 'human' : 'org');
 
     if (!editing) {
         let primaryName;

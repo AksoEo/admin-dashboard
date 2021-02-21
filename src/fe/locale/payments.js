@@ -347,6 +347,7 @@ export const paymentIntents = {
         invalidDataId: 'Nevalida aliĝidentigilo',
     },
     triggers: {
+        registration_entry: 'Aliĝo',
         congress_registration: 'Kongresa aliĝo',
     },
     create: {

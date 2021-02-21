@@ -15,6 +15,7 @@ export default connectPerms(class RegistrationEntries extends Page {
             search: { query: '' },
             fields: [
                 { id: 'timeSubmitted', sorting: 'desc', fixed: true },
+                { id: 'codeholderData', sorting: 'none', fixed: true },
                 { id: 'year', sorting: 'none', fixed: true },
                 { id: 'status', sorting: 'none', fixed: true },
             ],
