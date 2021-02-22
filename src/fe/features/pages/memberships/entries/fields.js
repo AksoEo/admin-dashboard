@@ -389,7 +389,7 @@ export class Header extends PureComponent {
                 <div class="entry-title">
                     {locale.titlePrefix}
                     {' '}
-                    {item.year}
+                    <span class="title-year">{item.year}</span>
                 </div>
                 <div class="entry-status-time">
                     {statusTime}

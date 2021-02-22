@@ -209,6 +209,7 @@ export const paymentIntents = {
         },
         purpose: {
             triggerAmount: 'Ŝaltota monsumo',
+            originalAmount: 'Nerabatita prezo',
             triggerStatuses: {
                 awaiting: 'Atendas sukcesan pagon',
                 processing: 'Traktas AKSO-agon',

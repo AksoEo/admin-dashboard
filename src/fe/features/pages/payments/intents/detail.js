@@ -182,7 +182,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                     <span>{locale.detailTo}</span>
                     {' '}
                     <span class="intent-payment-org">
-                        <OrgIcon org={org} class="payment-org-icon" />;
+                        <OrgIcon org={org} class="payment-org-icon" />
                         {' '}
                         {!!paymentOrg && <PaymentOrgName id={paymentOrg} />}
                     </span>
