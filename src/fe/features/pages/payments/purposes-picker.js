@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import { Button, Checkbox, Dialog, MenuIcon, TextField } from '@cpsdqs/yamdl';
+import { base32 } from 'rfc4648';
 import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
 import Form, { Validator, Field } from '../../../components/form';
@@ -284,7 +285,7 @@ class AddPurposeDialog extends PureComponent {
         manualTitle: '',
         manualDescription: null,
         triggerType: Object.keys(locale.triggers)[0],
-        triggerDataId: Buffer.alloc(0),
+        triggerDataId: '',
     };
 
     #add = (id) => {
@@ -308,7 +309,7 @@ class AddPurposeDialog extends PureComponent {
                 description: this.state.manualDescription,
                 triggers: this.state.triggerType,
                 amount: 0,
-                dataId: this.state.triggerDataId.toString('hex'),
+                dataId: this.state.triggerDataId,
             });
         }
         this.props.onClose();
@@ -400,21 +401,23 @@ class AddPurposeDialog extends PureComponent {
                             label={locale.purposesPicker.dataId}
                             component={TextField}
                             validate={value => {
-                                // 12 bytes = 24 hex chars
-                                if (!value.match(/[0-9a-f]{24}/i)) throw {
-                                    error: locale.purposesPicker.invalidDataId,
-                                };
+                                if (this.state.triggerType === 'congress_registration') {
+                                    // 12 bytes = 24 hex chars
+                                    if (!value.match(/[0-9a-f]{24}/i)) throw {
+                                        error: locale.purposesPicker.invalidDataId,
+                                    };
+                                } else if (this.state.triggerType === 'registration_entry') {
+                                    try {
+                                        base32.parse(value);
+                                    } catch {
+                                        throw { error: locale.purposesPicker.invalidDataId };
+                                    }
+                                }
                             }}
                             class="trigger-data-id-field"
                             value={this.state.triggerDataId.toString('hex')}
                             onChange={e => {
-                                try {
-                                    const hex = e.target.value;
-                                    this.setState({ triggerDataId: Buffer.from(hex, 'hex') });
-                                } catch {
-                                    // no change
-                                    this.setState({ triggerDataId: this.state.triggerDataId });
-                                }
+                                this.setState({ triggerDataId: e.target.value });
                             }} />
                     </Field>
                     <div class="form-footer">

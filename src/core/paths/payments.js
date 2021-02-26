@@ -97,7 +97,10 @@ const iClientFields = {
             for (const purpose of purposes) {
                 let apiPurpose = purpose;
                 if (purpose.type === 'trigger') {
-                    apiPurpose = { ...purpose, dataId: Buffer.from(purpose.dataId, 'hex') };
+                    apiPurpose = { ...purpose };
+                    delete apiPurpose.dataId;
+                    if (apiPurpose.triggers === 'congress_registration') apiPurpose.dataId = Buffer.from(purpose.dataId, 'hex');
+                    else if (apiPurpose.triggers === 'registration_entry') apiPurpose.registrationEntryId = base32.parse(purpose.dataId, { out: Buffer.allocUnsafe });
                 }
                 apiPurposes.push(apiPurpose);
             }
