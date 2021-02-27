@@ -351,6 +351,15 @@ export const paymentIntents = {
         registration_entry: 'Aliĝo',
         congress_registration: 'Kongresa aliĝo',
     },
+    triggerPicker: {
+        titles: {
+            registration_entry: 'Elekti aliĝon',
+            congress_registration: 'Elekti kongresan aliĝon',
+        },
+        empty: {
+            registration_entry: 'Neniuj aliĝoj',
+        },
+    },
     create: {
         menuItem: 'Krei',
         title: 'Krei pagon',

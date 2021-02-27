@@ -18,6 +18,7 @@ import {
     currencies,
 } from '../../../locale';
 import { FIELDS as ADDON_FIELDS } from './orgs/addons/fields';
+import TriggerPicker from './trigger-picker';
 import './purposes-picker.less';
 
 const portalContainer = document.createElement('div');
@@ -418,7 +419,12 @@ class AddPurposeDialog extends PureComponent {
                             value={this.state.triggerDataId.toString('hex')}
                             onChange={e => {
                                 this.setState({ triggerDataId: e.target.value });
-                            }} />
+                            }}
+                            trailing={(
+                                <TriggerPicker
+                                    type={this.state.triggerType}
+                                    onChange={id => this.setState({ triggerDataId: id })} />
+                            )} />
                     </Field>
                     <div class="form-footer">
                         <Button raised>
