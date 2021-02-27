@@ -29,6 +29,7 @@ const CODEHOLDER_DATA_FIELDS = Object.fromEntries([
 
 export const FIELDS = {
     id: {
+        skipLabel: true,
         component ({ value }) {
             return <span class="registration-entry-id">{value}</span>;
         },
@@ -36,6 +37,7 @@ export const FIELDS = {
     },
     year: {
         sortable: true,
+        slot: 'title',
         component ({ value, editing, onChange, item }) {
             if (editing && item.status.status === 'submitted') {
                 return (
@@ -52,6 +54,7 @@ export const FIELDS = {
     },
     status: {
         sortable: true,
+        slot: 'titleAlt',
         component ({ value }) {
             if (!value) return null;
             return (
@@ -227,6 +230,7 @@ export const FIELDS = {
     },
     codeholderData: {
         weight: 1.5,
+        slot: 'title',
         component ({ slot, value, editing, onChange, item }) {
             if (item.status.status !== 'submitted') editing = false;
 

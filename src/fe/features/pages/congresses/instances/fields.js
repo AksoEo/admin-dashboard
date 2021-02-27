@@ -58,7 +58,7 @@ export const FIELDS = {
                         onChange={value => onChange(value || null)} />
                 );
             }
-            return <span>{value.split('\n').map((x, i) => <span key={i}>{x}</span>)}</span>;
+            return <span>{(value || '').split('\n').map((x, i) => <span key={i}>{x}</span>)}</span>;
         },
     },
     tz: {
