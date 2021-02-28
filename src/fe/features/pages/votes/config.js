@@ -89,7 +89,7 @@ export function viewerCodeholdersMemberFilter ({ value, onChange, editing }) {
 }
 
 export function timeStart ({ value, onChange, editing, item }) {
-    if (!editing) return <timestamp.renderer value={value * 1000} />;
+    if (!editing) return <timestamp.renderer value={value} />;
     if (item.state.isActive) return locale.cannotEditActive;
     return (
         <Validator

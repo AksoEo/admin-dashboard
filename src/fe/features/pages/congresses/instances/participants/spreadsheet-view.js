@@ -236,7 +236,7 @@ const DATA_STRINGIFIERS = {
     boolean: () => value => locale.spreadsheet.bool['' + value],
     money: item => value => currencyAmount.stringify(value, item.currency),
     date: () => value => date.stringify(value),
-    datetime: item => value => timestamp.stringify(value * 1000, item.tz),
+    datetime: item => value => timestamp.stringify(value, item.tz),
     boolean_table: () => value => {
         return value
             .map(r => r.map(i => locale.spreadsheet.bool['' + i]).join(','))
@@ -270,7 +270,7 @@ const DATA_RENDERERS = {
         return <date.renderer value={value} />;
     },
     datetime: item => value => {
-        return <timestamp.renderer value={value * 1000} zone={item.tz} />;
+        return <timestamp.renderer value={value} zone={item.tz} />;
     },
     boolean_table: DATA_STRINGIFIERS.boolean_table,
 };

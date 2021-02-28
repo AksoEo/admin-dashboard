@@ -53,13 +53,11 @@ Because the AKSO admin frontend has been mandated to use Google’s Material Des
 
 AKSO has basically only one accent color in two different shades (defined in `prelude.less` as `@primary` and `@secondary`) and currently their use seems a bit arbitrary.
 
-#### Opinions
-I (@cpsdqs) have opinions:
-
-- please do refer to the material.io spec sheet animations
-- please don’t replace proper animations with half-hearted fading (e.g. see material web components)
-- please don’t use `cursor: pointer` for button controls, it should be reserved for hyperlinks
-- please do at least try not to just make everything a 1:1 representation of the underlying data structures if it could be better
+#### Specific Notes
+- refer to the material.io spec sheet
+- use nice animations if possible
+- use a nice GUI representation instead of just the API if possible
+- no `cursor: pointer` for button controls! pointers are for hyperlinks
 
 ### Navigation
 App navigation is strictly hierarchical, defined in `features/pages/index.js`. At the top level are several fixed paths (e.g. Home, Members, etc.) denoting sections of the app. In those views, a hamburger icon will be displayed in the app bar if applicable.

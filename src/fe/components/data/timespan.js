@@ -3,6 +3,7 @@ import { PureComponent, createRef } from 'preact/compat';
 import { Spring, globalAnimator } from '@cpsdqs/yamdl';
 import { data as locale } from '../../locale';
 
+/// Renders a duration.
 function TimespanRenderer ({ value }) {
     if (typeof value !== 'number') return null;
 
@@ -159,6 +160,7 @@ class TimespanUnitEditor extends PureComponent {
     }
 }
 
+// FIXME: this editor isn't that great
 function TimespanEditor ({ value, onChange }) {
     value = Math.max(0, Math.min(value, 2147483647));
 

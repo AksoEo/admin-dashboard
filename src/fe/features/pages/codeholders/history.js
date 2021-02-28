@@ -98,7 +98,7 @@ function FieldHistoryItem ({ item, field, renderer: Renderer }) {
                     <div class="item-additional">
                         {locale.fieldHistory.changedBy} <DiffAuthor author={item.author} />
                         {' · '}
-                        <timestamp.inlineRenderer value={item.time * 1000} />
+                        <timestamp.inlineRenderer value={item.time} />
                     </div>
                 </div>
             ) : (

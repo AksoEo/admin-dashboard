@@ -8,7 +8,9 @@ function stringify (value, currency) {
     return stdlib.currency_fmt.apply(null, [currency || '?', value | 0]);
 }
 
-/// - value: amount in smallest currecy unit
+/// Displays a currency amount.
+///
+/// - value: amount in smallest currency unit
 /// - currency: currency id
 function CurrencyAmount ({ value, currency }) {
     return stringify(value, currency);
@@ -22,7 +24,9 @@ function CurrencyAmount ({ value, currency }) {
 /// - currency: currency id
 class CurrencyEditor extends PureComponent {
     state = {
+        // is the editor focused?
         editing: false,
+        // current input string being edited (may not be a valid number). Exists only while editing
         editingValue: null,
         error: false,
     };
@@ -51,20 +55,24 @@ class CurrencyEditor extends PureComponent {
     onKeyDown = e => {
         if (e.ctrlKey || e.metaKey) return;
         if (e.key === 'ArrowUp') {
+            // step up
             e.preventDefault();
             const value = this.props.value + this.getStep();
             this.setState({ editingValue: this.format(this.clamp(value)), error: false });
             this.props.onChange(value);
         } else if (e.key === 'ArrowDown') {
+            // step down
             e.preventDefault();
             const value = this.props.value - this.getStep();
             this.setState({ editingValue: this.format(this.clamp(value)), error: false });
             this.props.onChange(value);
         } else if (e.key.length == 1 && !e.key.match(/[-\d,.]/)) {
+            // not a valid character; don't do anything
             e.preventDefault();
         }
     };
 
+    /// Restricts the given value according to min, max, and step.
     clamp (value) {
         if (Number.isFinite(this.props.min)) {
             value = Math.max(value, this.props.min);
@@ -78,6 +86,7 @@ class CurrencyEditor extends PureComponent {
         return value;
     }
 
+    /// Formats the given value for the user according to the current currency (e.g. 102 -> "1,02")
     format (value) {
         const { currency } = this.props;
         const fractValue = currency ? (value | 0) / currencies[currency] : (value | 0);

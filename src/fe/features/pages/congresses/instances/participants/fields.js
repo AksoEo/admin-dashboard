@@ -179,18 +179,18 @@ export const FIELDS = {
         sortable: true,
         weight: 1.5,
         component ({ value }) {
-            return <timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value} />;
         },
-        stringify: v => timestamp.stringify(v * 1000),
+        stringify: v => timestamp.stringify(v),
     },
     editedTime: {
         sortable: true,
         weight: 1.5,
         component ({ value }) {
             if (!value) return '—';
-            return <timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value} />;
         },
-        stringify: v => timestamp.stringify(v * 1000),
+        stringify: v => timestamp.stringify(v),
     },
     cancelledTime: {
         sortable: true,
@@ -205,9 +205,9 @@ export const FIELDS = {
                 );
             }
             if (!value) return '—';
-            return <timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value} />;
         },
-        stringify: v => timestamp.stringify(v * 1000),
+        stringify: v => timestamp.stringify(v),
     },
     data: {
         component ({ value, editing, onChange, userData }) {

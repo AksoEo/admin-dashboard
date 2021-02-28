@@ -51,7 +51,7 @@ export default connectPerms(class FilesPage extends Page {
                         </span>
                         {' · '}
                         <span class="file-time">
-                            <timestamp.inlineRenderer value={file.time * 1000} />
+                            <timestamp.inlineRenderer value={file.time} />
                         </span>
                     </div>
                 </div>

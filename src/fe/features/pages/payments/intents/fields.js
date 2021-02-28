@@ -71,7 +71,7 @@ export const FIELDS = {
         sortable: true,
         component ({ value }) {
             if (!value) return null;
-            return <timestamp.renderer value={value * 1000} maybeRelative />;
+            return <timestamp.renderer value={value} maybeRelative />;
         },
         stringify (value) {
             if (!value) return '';
@@ -82,7 +82,7 @@ export const FIELDS = {
         sortable: true,
         component ({ value }) {
             if (!value) return null;
-            return <timestamp.renderer value={value * 1000} maybeRelative />;
+            return <timestamp.renderer value={value} maybeRelative />;
         },
         stringify (value) {
             if (!value) return '';

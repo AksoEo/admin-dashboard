@@ -75,6 +75,9 @@ export function createInput (type) {
 }
 
 const MAX_EVAL_INVOCATIONS = 4096;
+/// Attempts to evaluate an AKSO Script expression.
+///
+/// - previousNodes: array of { formVars: { [name]: { type, value } }, defs: script obj }
 export function evalExpr (expr, previousNodes) {
     if (!expr) return undefined;
 
@@ -108,6 +111,7 @@ export function evalExpr (expr, previousNodes) {
     return result;
 }
 
+/// Returns “global” definitions (e.g. @@-vars)
 export function getGlobalDefs (additionalVars) {
     return {
         defs: {},
@@ -127,7 +131,7 @@ export function getGlobalDefs (additionalVars) {
     };
 }
 
-/// Returns all AKSO Script definitions in the given item and its value (if applicable).
+/// Returns all AKSO Script definitions in the given form item and its value (if applicable).
 ///
 /// Will return { defs: script defs, formVars: form vars object { [name]: { type, value } } }
 ///
@@ -155,7 +159,7 @@ export function getAscDefs (item, value) {
         } else if (item.type === 'time') {
             type = 's';
         } else if (item.type === 'datetime') {
-            type = 'timestamp'; // TODO: support this
+            type = 'timestamp';
         } else if (item.type === 'boolean_table') {
             type = 'm';
         }

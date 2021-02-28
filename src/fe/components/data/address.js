@@ -48,7 +48,7 @@ function BasicAddressRenderer ({ value }) {
 
 /// Edits an address. Also handles locale-based validation.
 ///
-/// - editableMask: if set, only allows editing the given fields
+/// - readableMask/editableMask: array - if set, only allows viewing/editing the given fields
 class AddressEditor extends Component {
     state = {
         validationRules: null,

@@ -98,7 +98,7 @@ function Header ({ item, userData }) {
                 </span>
                 {' · '}
                 <span class="file-time">
-                    <timestamp.inlineRenderer value={item.time * 1000} />
+                    <timestamp.inlineRenderer value={item.time} />
                 </span>
             </div>
             <p class="file-description">

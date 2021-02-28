@@ -69,7 +69,7 @@ export const FIELDS = {
         sortable: true,
         weight: 2,
         component ({ value }) {
-            return <timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value} />;
         },
     },
     internalNotes: {
@@ -377,7 +377,7 @@ export class Header extends PureComponent {
                 <span>
                     {locale.fields.timeSubmittedTime}
                     {': '}
-                    <timestamp.renderer value={item.status.time * 1000} />
+                    <timestamp.renderer value={item.status.time} />
                 </span>
             );
         }

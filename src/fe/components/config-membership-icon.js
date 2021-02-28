@@ -2,7 +2,7 @@ import { h } from 'preact';
 
 /* eslint-disable react/no-unknown-property */
 
-export default function AddMembershipIcon (props) {
+export default function ConfigMembershipIcon (props) {
     return (
         <svg width="24" height="24" viewBox="0 0 24 24" {...props}>
             <g fill="currentColor" fill-rule="nonzero">

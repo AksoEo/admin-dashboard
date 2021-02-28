@@ -11,6 +11,7 @@ function DateFormatter ({ value }) {
 }
 
 const MIN_DATE = new Date(1970, 0, 1);
+// CHANGE THIS ONCE MYSQL ALLOWS DATES PAST 2038
 const MAX_DATE = new Date(2147482647 * 1000);
 
 const APPROX_DATE_EDITOR_HEIGHT = 300; // for deciding whether to show above or below

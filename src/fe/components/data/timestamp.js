@@ -13,8 +13,8 @@ function stringify (value, zone) {
             if (!zone) return time.utc();
             return time.tz(zone);
         };
-        const m = applyZone(moment(value));
-        const mlt = moment(value);
+        const m = applyZone(moment(value * 1000));
+        const mlt = moment(value * 1000);
         const now = applyZone(moment());
         if (m.year() === now.year() && m.dayOfYear() === now.dayOfYear()
             && mlt.dayOfYear() === moment().dayOfYear()) {
@@ -27,7 +27,7 @@ function stringify (value, zone) {
     return null;
 }
 
-/// Renders a formatted timestamp (not editable). Use prop `value`.
+/// Renders a formatted timestamp (not editable). Use prop `value` (in seconds).
 ///
 /// # Additional Props
 /// - zone: time zone
@@ -35,6 +35,10 @@ function TimestampFormatter ({ value, zone }) {
     return stringify(value, zone);
 }
 
+/// Edits a timestamp.
+///
+/// # Props
+/// - value (in seconds)
 function TimestampEditor ({ label, value, onChange, disabled, error, outline, zone }) {
     const applyZone = value => {
         if (zone) return value.tz(zone);

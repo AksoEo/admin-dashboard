@@ -55,7 +55,7 @@ export default class FormEditorItem extends PureComponent {
     }
 }
 
-/// The bottom bar on a form editor item.
+/// The top bar on a form editor item.
 class ItemBar extends PureComponent {
     render ({ editable, el, name, editing, onStartEditing, onClose, onRemove }) {
         let button;

@@ -12,6 +12,7 @@ import './style';
 
 import './chrome-focus';
 
+// --- TASK VIEW REGISTRY ---
 // copy-pasted from core/paths; (is this a good idea?)
 const lazyPath = (f, map = (res => res.default)) => {
     let promise;

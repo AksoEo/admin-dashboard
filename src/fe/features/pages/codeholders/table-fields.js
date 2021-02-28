@@ -427,7 +427,7 @@ export default {
         sortable: true,
         component ({ value }) {
             if (!value) return null;
-            return <timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value} />;
         },
         stringify (value) {
             return moment(value * 1000).utc().format(timestampFormat);

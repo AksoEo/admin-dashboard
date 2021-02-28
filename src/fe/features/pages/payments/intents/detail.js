@@ -712,7 +712,7 @@ function Events ({ item }) {
                 </div>
                 <div class="event-details">
                     <div class="event-timestamp">
-                        <timestamp.renderer value={abandonmentTime * 1000} />
+                        <timestamp.renderer value={abandonmentTime} />
                     </div>
                     <div class="event-title">
                         {locale.fields.statuses.willBeAbandoned}
@@ -738,7 +738,7 @@ function Events ({ item }) {
                         </div>
                         <div class="event-details">
                             <div class="event-timestamp">
-                                <timestamp.renderer value={e.time * 1000} />
+                                <timestamp.renderer value={e.time} />
                             </div>
                             <div class="event-title">
                                 {locale.fields.statuses[e.status]}

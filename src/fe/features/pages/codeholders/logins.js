@@ -37,7 +37,7 @@ function LoginItem ({ item }) {
     return (
         <div class="login-item" data-id={item.id}>
             <div class="login-time">
-                <timestamp.inlineRenderer value={item.time * 1000} />
+                <timestamp.inlineRenderer value={item.time} />
                 {' '}
                 {locale.logins.inTimezone}
                 {' '}

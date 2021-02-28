@@ -31,7 +31,7 @@ function TimeRenderer ({ value }) {
     return formatTime(value);
 }
 
-/// Edits time. Does not edit seconds.
+/// Edits time (hh:mm). Does not edit seconds.
 ///
 /// # Props
 /// - value/onChange: number of seconds

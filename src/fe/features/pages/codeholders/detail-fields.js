@@ -711,7 +711,7 @@ const fields = {
     creationTime: {
         component ({ value }) {
             if (!value) return null;
-            return <timestamp.renderer value={value * 1000} />;
+            return <timestamp.renderer value={value} />;
         },
         shouldHide: (_, editing) => editing,
         hasPerm: 'self',

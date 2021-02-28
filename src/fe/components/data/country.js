@@ -27,6 +27,7 @@ export const WithCountries = connect('countries/countryGroups')(data => ({
     return null;
 }));
 
+/// Renders a country flag and the name beside it.
 function CountryRenderer ({ value }) {
     if (!value) return null;
     return (
