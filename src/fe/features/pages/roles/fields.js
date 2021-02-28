@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { Validator } from '../../../components/form';
 import { TextField } from '@cpsdqs/yamdl';
+import TextArea from '../../../components/text-area';
 import { roles as locale } from '../../../locale';
 
 export const FIELDS = {
@@ -24,18 +25,16 @@ export const FIELDS = {
         },
     },
     description: {
-        skipLabel: true,
-        component ({ value, editing, onChange, slot }) {
+        component ({ value, editing, onChange }) {
             if (editing) {
                 return (
-                    <TextField
-                        outline={slot === 'create'}
-                        label={slot === 'create' ? locale.fields.description : null}
+                    <TextArea
+                        onKeyDown={e => e.stopPropagation()}
                         value={value || ''}
-                        onChange={e => onChange(e.target.value || null)} />
+                        onChange={value => onChange(value || null)} />
                 );
             }
-            return value;
+            return <div>{(value || '').split('\n').map((x, i) => <div key={i}>{x}</div>)}</div>;
         },
         weight: 2,
     },

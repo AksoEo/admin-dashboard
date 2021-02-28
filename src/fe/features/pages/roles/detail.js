@@ -8,6 +8,7 @@ import { coreContext } from '../../../core/connection';
 import { roles as locale } from '../../../locale';
 import { LinkButton } from '../../../router';
 import { FIELDS } from './fields';
+import './detail.less';
 
 export default connectPerms(class Role extends Page {
     state = {
@@ -94,8 +95,10 @@ function Footer ({ item }) {
     const link = `/membroj?filter(enabled:true,roles:${item.id}$)`;
 
     return (
-        <LinkButton target={link}>
-            {locale.detail.viewMembers}
-        </LinkButton>
+        <div class="detail-footer">
+            <LinkButton target={link}>
+                {locale.detail.viewMembers}
+            </LinkButton>
+        </div>
     );
 }

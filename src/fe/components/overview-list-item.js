@@ -16,7 +16,7 @@ export function lineLayout (fields, selectedFields, selection) {
     let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
     if (selection) weightSum += 0.5;
     const actualUnit = 100 / weightSum;
-    const unit = Math.max(15, actualUnit);
+    const unit = Math.max(12, actualUnit);
 
     const totalWidth = Math.round(weightSum * unit);
     const extraPixels = fieldWeights.length * 8;

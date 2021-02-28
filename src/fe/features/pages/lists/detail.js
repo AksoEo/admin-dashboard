@@ -8,6 +8,7 @@ import DetailView from '../../../components/detail';
 import JSONEditor from '../../../components/json-editor';
 import RearrangingList from '../../../components/rearranging-list';
 import Tabs from '../../../components/tabs';
+import TextArea from '../../../components/text-area';
 import DataList from '../../../components/data-list';
 import ProfilePicture from '../../../components/profile-picture';
 import Meta from '../../meta';
@@ -127,15 +128,17 @@ function Header ({ item, editing, onItemChange }) {
             <div class="detail-header">
                 <div class="detail-header-field">
                     <TextField
+                        outline
                         label={locale.fields.name}
                         value={item.name}
                         onChange={e => onItemChange({ ...item, name: e.target.value })} />
                 </div>
                 <div class="detail-header-field">
-                    <TextField
-                        label={locale.fields.description}
+                    <label class="header-field-label">{locale.fields.description}</label>
+                    <TextArea
+                        onKeyDown={e => e.stopPropagation()}
                         value={item.description}
-                        onChange={e => onItemChange({ ...item, description: e.target.value || null })} />
+                        onChange={value => onItemChange({ ...item, description: value || null })} />
                 </div>
             </div>
         );
@@ -143,7 +146,7 @@ function Header ({ item, editing, onItemChange }) {
         return (
             <div class="detail-header">
                 <h1>{item.name}</h1>
-                <p>{item.description}</p>
+                <p>{(item.description || '').split('\n').map((x, i) => <div key={i}>{x}</div>)}</p>
             </div>
         );
     }
