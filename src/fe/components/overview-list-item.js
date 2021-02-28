@@ -16,13 +16,14 @@ export function lineLayout (fields, selectedFields, selection) {
     let weightSum = fieldWeights.reduce((a, b) => a + b, 0);
     if (selection) weightSum += 0.5;
     const actualUnit = 100 / weightSum;
-    const unit = Math.max(10, actualUnit);
+    const unit = Math.max(15, actualUnit);
 
     const totalWidth = Math.round(weightSum * unit);
+    const extraPixels = fieldWeights.length * 8;
 
     const style = {
-        gridTemplateColumns: fieldWeights.map(x => (x * actualUnit) + '%').join(' '),
-        width: totalWidth > 100 ? `${totalWidth}%` : null,
+        gridTemplateColumns: fieldWeights.map(x => `calc(${x * actualUnit}% - 8px)`).join(' '),
+        width: totalWidth > 100 ? `calc(${totalWidth}% + ${extraPixels}px)` : null,
     };
     if (selection) style.gridTemplateColumns = (actualUnit / 2) + '% ' + style.gridTemplateColumns;
     style.maxWidth = style.width;

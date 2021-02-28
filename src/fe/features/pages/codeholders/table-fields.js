@@ -424,6 +424,7 @@ export default {
         },
     },
     creationTime: {
+        weight: 2,
         sortable: true,
         component ({ value }) {
             if (!value) return null;
