@@ -63,7 +63,7 @@ export const FILTERS = {
             );
         },
     },
-    newCodeholder: {
+    codeholder: {
         default: () => ({ enabled: false, value: [] }),
         serialize: ({ value }) => value.join('-'),
         deserialize: value => ({

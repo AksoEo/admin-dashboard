@@ -114,7 +114,7 @@ export const membershipEntries = {
         year: 'Jaro',
         status: 'Stato',
         statusTypeAny: 'ne gravas',
-        newCodeholder: 'Asignita UEA-kodoj',
+        codeholder: 'UEA-kodoj',
     },
     fields: {
         id: 'Aliĝo-identigilo',

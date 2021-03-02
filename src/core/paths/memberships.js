@@ -146,8 +146,13 @@ const eClientFilters = {
     status: {
         toAPI: status => ({ status }),
     },
-    newCodeholder: {
-        toAPI: codeholders => ({ newCodeholderId: { $in: codeholders } }),
+    codeholder: {
+        toAPI: codeholders => ({
+            $or: [
+                { newCodeholderId: { $in: codeholders } },
+                { $codeholderData: { $in: codeholders } },
+            ],
+        }),
     },
 };
 const eParametersToRequestData = makeParametersToRequestData({
