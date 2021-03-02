@@ -789,6 +789,9 @@ export const tasks = {
         store.remove([CONGRESS_PARTICIPANTS, id]);
         store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_CONGRESS_PARTICIPANTS]);
     },
+    participantFiltersToAPI: async ({ filters }) => {
+        return filtersToAPI(pClientFilters, filters);
+    },
 };
 
 export const views = {

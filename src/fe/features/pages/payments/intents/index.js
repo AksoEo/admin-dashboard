@@ -117,7 +117,7 @@ export default connectPerms(class Intents extends Page {
                     }}
                     inputRef={view => this.#searchInput = view}
                     filtersToAPI="payments/iFiltersToAPI"
-                    category="aksopay_payment_intents" />
+                    category="aksopay_intents" />
                 <OverviewList
                     expanded={expanded}
                     task="payments/listIntents"

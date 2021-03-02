@@ -98,7 +98,9 @@ export default class ParticipantsView extends PureComponent {
                             expanded={expanded}
                             onExpandedChange={expanded => this.setState({ expanded })}
                             inputRef={view => this.#searchInput = view}
-                            userData={{ congress, instance, currency, registrationForm }} />
+                            userData={{ congress, instance, currency, registrationForm }}
+                            category="congress_part"
+                            filtersToAPI="congresses/participantFiltersToAPI" />
                         <OverviewList
                             expanded={expanded}
                             useDeepCmp options={{ congress, instance }}
