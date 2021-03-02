@@ -31,6 +31,28 @@
             padding: 16px;
         }
 
+        .task-tabs {
+            .task-tab-label {
+                pointer-events: none;
+
+                .task-badge {
+                    display: inline-block;
+                    background: @secondary;
+                    color: @text-on-primary;
+                    padding: 2px 4px;
+                    line-height: 1;
+                    min-width: 1em;
+                    border-radius: 100px;
+                    margin-left: 8px;
+
+                    &[data-n="0"] {
+                        background: @text-fade-50;
+                        opacity: 0.5;
+                    }
+                }
+            }
+        }
+
         .home-task {
             display: block;
             width: 100%;
@@ -57,6 +79,11 @@
 
                 .task-title {
                     margin-bottom: 4px;
+
+                    .uea-code {
+                        display: inline-block;
+                        vertical-align: middle;
+                    }
                 }
 
                 .task-badge {

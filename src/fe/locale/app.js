@@ -48,6 +48,10 @@ export const index = {
     tasks: {
         title: 'Taskoj',
         empty: 'Neniuj taskoj',
+        tabs: {
+            aksopay: 'AKSO-Pago',
+            registration: 'Aliĝoj',
+        },
     },
     admin: {
         title: 'Asisto',

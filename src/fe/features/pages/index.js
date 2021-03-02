@@ -494,6 +494,7 @@ export default [
                 path: 'agordoj',
                 icon: ConfigMembershipIcon,
                 type: 'bottom',
+                badge: tasks => tasks.registration ? tasks.registration.pending : null,
                 component: elazy(() =>
                     import(/* webpackChunkName: "membership-options" */ './memberships/options')),
                 hasPerm: perms => perms.hasPerm('registration.options.read'),
