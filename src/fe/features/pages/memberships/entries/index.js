@@ -2,41 +2,55 @@ import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
 import OverviewList from '../../../../components/overview-list';
+import SearchFilters from '../../../../components/search-filters';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import Meta from '../../../meta';
 import { membershipEntries as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
+import { FILTERS } from './filters';
+
+const SEARCHABLE_FIELDS = ['internalNotes'];
 
 export default connectPerms(class RegistrationEntries extends Page {
     state = {
         parameters: {
-            search: { query: '' },
+            search: {
+                field: SEARCHABLE_FIELDS[0],
+                query: '',
+            },
             fields: [
                 { id: 'timeSubmitted', sorting: 'desc', fixed: true },
                 { id: 'year', sorting: 'none', fixed: true },
                 { id: 'codeholderData', sorting: 'none', fixed: true },
                 { id: 'status', sorting: 'none', fixed: true },
             ],
+            filters: {},
+            jsonFilter: {
+                _disabled: true,
+                filter: {},
+            },
             offset: 0,
             limit: 10,
         },
+        expanded: false,
     };
 
     static contextType = coreContext;
 
+    #searchInput = null;
     #currentQuery = '';
 
     decodeURLQuery () {
         this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
+            parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
         });
         this.#currentQuery = this.props.query;
     }
 
     encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, {});
+        const encoded = encodeURLQuery(this.state.parameters, FILTERS);
         if (encoded === this.#currentQuery) return;
         this.#currentQuery = encoded;
         this.props.onQueryChange(encoded);
@@ -44,6 +58,8 @@ export default connectPerms(class RegistrationEntries extends Page {
 
     componentDidMount () {
         this.decodeURLQuery();
+
+        this.#searchInput.focus(500);
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -55,7 +71,7 @@ export default connectPerms(class RegistrationEntries extends Page {
         }
     }
 
-    render ({ perms }, { parameters }) {
+    render ({ perms }, { parameters, expanded }) {
         const actions = [];
         if (perms.hasPerm('registration.entries.create')) {
             actions.push({
@@ -70,7 +86,23 @@ export default connectPerms(class RegistrationEntries extends Page {
                 <Meta
                     title={locale.title}
                     actions={actions} />
+                <SearchFilters
+                    value={parameters}
+                    onChange={parameters => this.setState({ parameters })}
+                    expanded={expanded}
+                    onExpandedChange={expanded => this.setState({ expanded })}
+                    searchFields={SEARCHABLE_FIELDS}
+                    filters={FILTERS}
+                    locale={{
+                        searchPlaceholders: locale.search.placeholders,
+                        searchFields: locale.search.fields,
+                        filters: locale.filters,
+                    }}
+                    inputRef={view => this.#searchInput = view}
+                    filtersToAPI="memberships/entryFiltersToAPI"
+                    category="registr_entries" />
                 <OverviewList
+                    expanded={expanded}
                     task="memberships/listEntries"
                     view="memberships/entry"
                     updateView={['memberships/sigEntries']}

@@ -102,6 +102,20 @@ export const membershipOptions = {
 export const membershipEntries = {
     title: 'Aliĝoj',
     detailTitle: 'Aliĝo',
+    search: {
+        placeholders: {
+            internalNotes: 'Serĉi en notoj',
+        },
+        fields: {
+            internalNotes: 'Internaj notoj',
+        },
+    },
+    filters: {
+        year: 'Jaro',
+        status: 'Stato',
+        statusTypeAny: 'ne gravas',
+        newCodeholder: 'Asignita UEA-kodoj',
+    },
     fields: {
         id: 'Aliĝo-identigilo',
         year: 'Jaro',

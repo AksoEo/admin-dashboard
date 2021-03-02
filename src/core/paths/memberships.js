@@ -4,7 +4,7 @@ import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
-import { fieldDiff, fieldsToOrder, makeParametersToRequestData, makeClientToAPI, makeClientFromAPI } from '../list';
+import { fieldDiff, fieldsToOrder, makeParametersToRequestData, makeClientToAPI, makeClientFromAPI, filtersToAPI } from '../list';
 import { clientFromAPI as codeholderFromAPI, clientToAPI as codeholderToAPI } from './codeholders';
 import { deepMerge } from '../../util';
 
@@ -139,7 +139,17 @@ const eClientFields = {
         },
     },
 };
-const eClientFilters = {};
+const eClientFilters = {
+    year: {
+        toAPI: year => ({ year }),
+    },
+    status: {
+        toAPI: status => ({ status }),
+    },
+    newCodeholder: {
+        toAPI: codeholders => ({ newCodeholderId: { $in: codeholders } }),
+    },
+};
 const eParametersToRequestData = makeParametersToRequestData({
     clientFields: eClientFields,
     clientFilters: eClientFilters,
@@ -362,6 +372,9 @@ export const tasks = {
         await client.post(`/registration/entries/${id}/!cancel`);
         // reload
         tasks.entry({ id }, { fields: ['status'] }).catch(() => {});
+    },
+    entryFiltersToAPI: async ({ filters }) => {
+        return filtersToAPI(eClientFilters, filters);
     },
 };
 
