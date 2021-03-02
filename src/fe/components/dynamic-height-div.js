@@ -18,6 +18,7 @@ export const layoutContext = createContext();
 ///    - lastChangeTime: number
 ///    - cooldown: cooldown time
 /// - useFirstHeight: bool
+/// - lazy: bool - if true, will not add a `height` style if no animation is happening
 export default class DynamicHeightDiv extends PureComponent {
     static contextType = layoutContext;
 
@@ -76,8 +77,11 @@ export default class DynamicHeightDiv extends PureComponent {
     }
 
     render (props) {
+        const style = {};
+        if (this.#height.wantsUpdate() || !this.props.lazy) style.height = this.#height.value;
+
         return (
-            <div {...props} ref={node => this.#node = node} style={{ height: this.#height.value }}>
+            <div {...props} ref={node => this.#node = node} style={style}>
                 <EventProxy dom target={window} onresize={this.updateHeight} />
                 <layoutContext.Provider value={this.scheduleUpdate}>
                     {props.children}

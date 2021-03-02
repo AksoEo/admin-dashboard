@@ -12,6 +12,7 @@ import {
 import { data as locale } from '../../../../locale';
 import JSONEditor from '../../../../components/json-editor';
 import DisclosureArrow from '../../../../components/disclosure-arrow';
+import DynamicHeightDiv from '../../../../components/dynamic-height-div';
 import {
     addPermission,
     hasPermission,
@@ -163,11 +164,13 @@ function PermsItem ({ item, ctx, disabled }) {
                     <span class="category-title-inner">{item.name}</span>
                 </button>
                 {reqNotice}
-                {expanded ? (
-                    <div class="perms-category-contents">
-                        {item.children.map((x, i) => <PermsItem key={i} item={x} ctx={ctx} disabled={disabled} />)}
-                    </div>
-                ) : null}
+                <DynamicHeightDiv useFirstHeight lazy>
+                    {expanded ? (
+                        <div class="perms-category-contents">
+                            {item.children.map((x, i) => <PermsItem key={i} item={x} ctx={ctx} disabled={disabled} />)}
+                        </div>
+                    ) : null}
+                </DynamicHeightDiv>
             </div>
         );
     } else if (item.type === 'group') {
@@ -191,18 +194,20 @@ function PermsItem ({ item, ctx, disabled }) {
                         if (ctx.showImplied.has(opt.id)) {
                             className += ' is-implier';
                         }
+                        const checkboxId = `perms-checkbox-${Math.random().toString(36)}`;
 
                         return (
                             <span class="switch-option" key={i}>
                                 <Checkbox
+                                    id={checkboxId}
                                     class={className}
                                     checked={isActive}
                                     onMouseOver={() => ctx.setShowImplied(opt.id)}
                                     onMouseOut={() => ctx.setShowImplied(null)}
                                     onClick={() => ctx.togglePerm(opt.id)} />
-                                <span class="switch-option-label">
+                                <label for={checkboxId} class="switch-option-label">
                                     {ctx.showRaw ? opt.id : opt.name}
-                                </span>
+                                </label>
                             </span>
                         );
                     })}
@@ -216,28 +221,34 @@ function PermsItem ({ item, ctx, disabled }) {
         if (ctx.showImplied.has(item.id)) {
             className += ' is-implier';
         }
+        const checkboxId = `perms-checkbox-${Math.random().toString(36)}`;
 
         return (
             <div class="perms-item perms-perm">
                 {reqNotice}
                 <Checkbox
+                    id={checkboxId}
                     class={className}
                     checked={isActive}
                     onMouseOver={() => ctx.setShowImplied(item.id)}
                     onMouseOut={() => ctx.setShowImplied(null)}
                     onClick={() => ctx.togglePerm(item.id)} />
-                {ctx.showRaw ? item.id : item.name}
+                <label for={checkboxId}>
+                    {ctx.showRaw ? item.id : item.name}
+                </label>
             </div>
         );
     } else if (item.type === '!memberRestrictionsSwitch') {
+        const checkboxId = `perms-checkbox-${Math.random().toString(36)}`;
         return (
             <div class="perms-item perms-perm">
                 {reqNotice}
                 <Checkbox
+                    id={checkboxId}
                     class="perm-checkbox"
                     checked={ctx.mrEnabled}
                     onClick={() => ctx.setMREnabled(!ctx.mrEnabled)} />
-                {item.name}
+                <label for={checkboxId}>{item.name}</label>
             </div>
         );
     } else if (item === '!memberFieldsEditor') {
@@ -322,6 +333,7 @@ function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
 function MemberFilterEditor ({ disabled, filter, onFilterChange }) {
     return (
         <div class="member-filter-editor">
+            <label class="filter-editor-label">{locale.permsEditor.mr}</label>
             <JSONEditor
                 disabled={disabled}
                 value={filter}

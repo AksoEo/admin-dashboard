@@ -88,6 +88,7 @@ export const data = {
     permsEditor: {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',
         requires: 'Bezonas',
+        mr: 'Membrorestriktoj (JSON-filtrilo)',
         update: {
             title: 'Ĝisdatigi permesojn',
             button: 'Ĝisdatigi',

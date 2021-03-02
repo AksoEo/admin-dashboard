@@ -11,14 +11,15 @@
     .perms-req-notice {
         font-size: small;
         padding: 8px 16px;
+        padding-bottom: 4px;
     }
 
     .perms-item {
         background: @card1-background;
-        padding: 16px;
+        padding: 8px;
         border-radius: 8px;
         .elevation(4);
-        margin-bottom: 16px;
+        margin-bottom: 8px;
 
         .perms-req-notice {
             padding-left: 0;
@@ -27,8 +28,8 @@
     }
 
     .perms-category {
-        margin-bottom: 16px;
-        padding: 16px;
+        margin-bottom: 8px;
+        padding: 8px;
         background: @card1-background;
         border-radius: 8px;
         .elevation(4);
@@ -43,7 +44,7 @@
             border: none;
             font: inherit;
             color: inherit;
-            font-size: 1.4em;
+            font-size: 1.1em;
             font-weight: bold;
 
             &:focus {
@@ -52,17 +53,6 @@
             }
             &::-moz-focus-inner {
                 border: 0;
-            }
-        }
-
-        .perms-category-contents {
-            animation: admin-perms-category-contents-in 0.3s @easing;
-
-            @keyframes admin-perms-category-contents-in {
-                0% {
-                    transform: translateY(-8px);
-                    opacity: 0;
-                }
             }
         }
 
@@ -77,6 +67,7 @@
 
         .perms-item {
             background: @card2-background;
+            border: 1px solid @separator;
             box-shadow: none;
         }
     }
@@ -132,9 +123,9 @@
     }
 
     .member-fields-container {
-        background: @card1-background;
-        .elevation(4);
-        padding: 16px;
+        background: @card2-background;
+        border: 1px solid @separator;
+        padding: 8px;
         border-radius: 8px;
         margin-bottom: 16px;
 
@@ -153,20 +144,36 @@
     }
 
     .member-filter-editor {
+        label {
+            font-size: 0.8em;
+            font-weight: 500;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .json-editor {
+            margin-top: 4px;
+        }
+
         .CodeMirror {
             height: 150px;
+            border-radius: 4px;
         }
     }
 
     .perms-switch {
+        padding-top: 0;
+        padding-bottom: 0;
+
         .switch-name {
             display: inline-block;
-            margin-right: 8px;
-            margin-bottom: 8px;
+            margin-top: 8px;
+            font-weight: 500;
         }
 
         .switch-options {
             .switch-option {
+                display: inline-block;
                 margin: 8px;
 
                 &:first-child {
