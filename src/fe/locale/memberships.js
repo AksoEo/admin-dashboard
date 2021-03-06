@@ -19,7 +19,7 @@ export const membershipCategories = {
         availableTo: 'Uzebla ĝis',
     },
     availability: {
-        always: '[[Always available]]',
+        always: 'Ĉiam uzebla',
         label: 'Uzebla:',
     },
     create: {
@@ -172,7 +172,7 @@ export const membershipEntries = {
         },
         fishyMarkedOkay: 'Strangaj datumoj enordas',
         markFishyOkay: 'Indiki ke strangaj datumoj enordas',
-        markFishyNotOkay: '[[Mark not ok]]',
+        markFishyNotOkay: 'Malindiki ke strangaj datumoj enordas',
     },
     create: {
         menuItem: 'Krei',

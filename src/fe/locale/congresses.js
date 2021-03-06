@@ -114,7 +114,7 @@ export const congressLocations = {
             internal: 'Interna loko',
             none: 'ne gravas',
         },
-        openHoursClosed: '[[Closed]]',
+        openHoursClosed: 'Fermita',
     },
     locatedWithinExternalLoc: 'situas ene de', // prefix
     locatedWithinNowhere: 'nenie', // if externalLoc is null
@@ -251,7 +251,7 @@ export const congressParticipants = {
                 false: 'ne valida',
                 none: 'ne gravas',
             },
-            canceled: '[[Canceled]]',
+            canceled: 'Nuligita',
             canceledTypes: {
                 true: 'nuligita',
                 false: 'ne nuligita',
@@ -307,12 +307,12 @@ export const congressParticipants = {
         hasPaidMinimumDescription: 'Aliĝinto antaŭpagis',
         viewPayments: 'Vidi pagoj',
         actions: {
-            createPaymentIntent: '[[Add intent]]',
+            createPaymentIntent: 'Aldoni pagon',
             createPaymentIntentData: {
                 title: 'Kongresa aliĝo',
             },
-            approveManually: '[[Approve manually]]',
-            cancel: '[[Cancel]]',
+            approveManually: 'Permane aprobi',
+            cancel: 'Nuligi',
         },
     },
     spreadsheet: {

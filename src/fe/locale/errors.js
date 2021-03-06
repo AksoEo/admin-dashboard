@@ -20,12 +20,12 @@ export const errors = {
     'forbidden': 'Mankas permeso',
     'not-found': 'La paĝo ne estis trovita',
     'conflict': 'Okazis interna konflikto, bonvolu reprovi',
-    'payload-too-large': '[[Request payload too large]]',
+    'payload-too-large': 'Tro granda sendaĵo',
     'internal-server-error': 'Okazis interna eraro',
 
     // see payments/createIntent
-    'payment-exceeds-max': '[[Amount exceeds 500k USD]]',
+    'payment-exceeds-max': 'Ne eblas krei pagojn por pli ol 500.000 USD',
     // see congresses/createParticipant
-    'congresses-already-registered': '[[Codeholder is already registered]]',
+    'congresses-already-registered': 'Jam ekzistas aliĝo por tiu ĉi membro',
 };
 

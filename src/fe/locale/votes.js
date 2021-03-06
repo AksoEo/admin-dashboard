@@ -85,7 +85,7 @@ export const votes = {
         publishVotersPercentage: 'Publikigi procentaĵon de voĉdonintoj',
         options: 'Opcioj',
 
-        noMaxOptions: '[[infinite options!!!]]',
+        noMaxOptions: 'Bv. indiki la maksimuman kvanton de elekteblaj opcioj',
     },
     inclusive: 'Inkluziva', // checkbox label
     options: {
@@ -106,7 +106,7 @@ export const votes = {
         title: 'Rezultoj',
         resultTypes: {
             undefined: 'Eraro',
-            success: '[[success]]',
+            success: 'Sukcesis',
             NO_QUORUM: 'Ne atingis kvorumon',
             TOO_MANY_BLANK_BALLOTS: 'Tro da blankaj balotiloj',
             TIE_BREAKER_NEEDED: 'Necesas egalecrompanto',
@@ -135,9 +135,9 @@ export const votes = {
         roundsOptionStats: (won, lost, mentions) => `[[won ${won}, lost ${lost}, mentioned ${mentions} time(s)]]`,
         lockGraph: '[[lock graph]]',
         rankedPairs: {
-            diff: '[[diff]]',
-            winner: '[[winner]]',
-            pair: '[[pair]]',
+            diff: 'Diferenco',
+            winner: 'Venkinto',
+            pair: 'Paro',
             vs: 'kontraŭ',
         },
     },

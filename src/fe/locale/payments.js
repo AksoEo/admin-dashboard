@@ -358,7 +358,7 @@ export const paymentIntents = {
         },
         empty: {
             registration_entry: 'Neniuj aliĝoj',
-            congress_registration: '[[No items]]',
+            congress_registration: 'Neniuj kongresaj aliĝoj',
         },
     },
     create: {

@@ -51,7 +51,7 @@ export const login = {
     createPasswordSent: 'Sendis retpoŝtmesaĝon. Bonvolu kontroli vian retpoŝtkeston (kaj spamujon).',
     resetPasswordSent: 'Sendis retpoŝtmesaĝon. Bonvolu kontroli vian retpoŝtkeston (kaj spamujon).',
 
-    forgotCodeDescription: '[[use your email i guess?]]',
+    forgotCodeDescription: '[[TODO: use your email i guess?]]',
 
     lostTotpDescription: 'Bv. kontakti AKSO-administranton ĉe helpo@akso.org',
 

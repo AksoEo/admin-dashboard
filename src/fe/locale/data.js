@@ -3,8 +3,8 @@ export const generic = {
     cancel: 'Nuligi',
 
     openExternalLink: {
-        title: '[[Open external link?]]',
-        open: '[[Open]]',
+        title: 'Ĉu vi volas malfermi tiun ĉi aleksteran ligilon?',
+        open: 'Malfermi',
     },
 };
 
@@ -285,7 +285,7 @@ export const mime = {
         video: 'video',
     },
     exceptions: {
-        '': '[[Unknown type]]',
+        '': 'Nekonata dosierspeco',
         'application/pdf': 'PDF-dokumento',
         'application/msword': 'Word-dokumento', // .doc, .dot
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'Word-dokumento', // .docx
