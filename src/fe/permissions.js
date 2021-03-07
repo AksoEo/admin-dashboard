@@ -41,36 +41,6 @@ export const spec = [
     },
     {
         type: 'category',
-        name: 'Konservitaj filitriloj',
-        children: [
-            {
-                type: 'switch',
-                options: [
-                    {
-                        name: 'Legi',
-                        id: 'queries.read',
-                    },
-                    {
-                        name: 'Redakti',
-                        id: 'queries.update',
-                        implies: ['queries.read'],
-                    },
-                    {
-                        name: 'Krei',
-                        id: 'queries.create',
-                        implies: ['queries.update'],
-                    },
-                    {
-                        name: 'Forigi',
-                        id: 'queries.delete',
-                        implies: ['queries.create'],
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        type: 'category',
         name: 'Membroj',
         children: [
             {
@@ -106,7 +76,7 @@ export const spec = [
                 type: 'group',
                 requires: ['codeholders.read'],
                 children: [
-                    { type: '!memberRestrictionsSwitch', name: '[[member restrictions]]' },
+                    { type: '!memberRestrictionsSwitch', name: 'Membrorestriktoj' },
                     '!memberFieldsEditor',
                     '!memberFilterEditor',
                 ],
@@ -142,6 +112,42 @@ export const spec = [
                 name: 'Malŝalti duan faktoron',
                 id: 'codeholders.disable_totp',
                 requires: ['codeholders.read'],
+            },
+            {
+                type: 'perm',
+                name: 'Sendi sciigon',
+                id: 'codeholders.send_notif',
+                requires: ['codeholders.read'],
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Membrokategorioj',
+        children: [
+            {
+                type: 'switch',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'membership_categories.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'membership_categories.update',
+                        implies: ['membership_categories.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'membership_categories.create',
+                        implies: ['membership_categories.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'membership_categories.delete',
+                        implies: ['membership_categories.create'],
+                    },
+                ],
             },
         ],
     },
@@ -201,6 +207,36 @@ export const spec = [
                         name: 'Forigi',
                         id: 'lists.delete',
                         implies: ['lists.create'],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Konservitaj filitriloj',
+        children: [
+            {
+                type: 'switch',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'queries.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'queries.update',
+                        implies: ['queries.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'queries.create',
+                        implies: ['queries.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'queries.delete',
+                        implies: ['queries.create'],
                     },
                 ],
             },
@@ -384,6 +420,325 @@ export const spec = [
                 ],
             };
         }),
+    },
+    {
+        type: 'category',
+        name: 'Amasmesaĝaj ŝablonoj',
+        children: Object.entries(baseOrgs).map(([org, name]) => {
+            return {
+                type: 'switch',
+                name: 'Amasmesaĝaj ŝablonoj de ' + name,
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'notif_templates.read.' + org,
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'notif_templates.update.' + org,
+                        implies: ['notif_templates.read.' + org],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'notif_templates.create.' + org,
+                        implies: ['notif_templates.update.' + org],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'notif_templates.delete.' + org,
+                        implies: ['notif_templates.create.' + org],
+                    },
+                ],
+            };
+        }),
+    },
+    {
+        type: 'category',
+        name: 'AKSO-Pago',
+        children: [
+            {
+                type: 'switch',
+                name: 'Vidi pagagordojn ...',
+                options: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        name: '... por ' + name,
+                        id: 'pay.read.' + org,
+                    };
+                }),
+            },
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Pagoj por ' + name,
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'pay.payment_intents.read.' + org,
+                                implies: ['pay.read.' + org],
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'pay.payment_intents.update.' + org,
+                                implies: ['pay.payment_intents.read.' + org],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'pay.payment_intents.create.' + org,
+                                implies: ['pay.payment_intents.update.' + org],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'pay.payment_intents.delete.' + org,
+                                implies: ['pay.payment_intents.create.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+            {
+                type: 'switch',
+                name: 'Aliri sentemajn paginformojn ...',
+                options: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        name: '... por ' + name,
+                        id: 'pay.payment_intents.sensitive_data.' + org,
+                        implies: ['pay.payment_intents.read.' + org],
+                    };
+                }),
+            },
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Pagorganizoj por ' + name,
+                        options: [
+                            {
+                                name: 'Redakti',
+                                id: 'pay.payment_orgs.update.' + org,
+                                implies: ['pay.read.' + org],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'pay.payment_orgs.create.' + org,
+                                implies: ['pay.payment_orgs.update.' + org],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'pay.payment_orgs.delete.' + org,
+                                implies: ['pay.payment_orgs.create.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Pagmetodoj por ' + name,
+                        options: [
+                            {
+                                name: 'Redakti',
+                                id: 'pay.payment_methods.update.' + org,
+                                implies: ['pay.read.' + org],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'pay.payment_methods.create.' + org,
+                                implies: ['pay.payment_methods.update.' + org],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'pay.payment_methods.delete.' + org,
+                                implies: ['pay.payment_methods.create.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Aldonebloj por ' + name,
+                        options: [
+                            {
+                                name: 'Redakti',
+                                id: 'pay.payment_addons.update.' + org,
+                                implies: ['pay.read.' + org],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'pay.payment_addons.create.' + org,
+                                implies: ['pay.payment_addons.update.' + org],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'pay.payment_addons.delete.' + org,
+                                implies: ['pay.payment_addons.create.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Membreco',
+        children: [
+            {
+                type: 'switch',
+                name: 'Agordoj',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'registration.options.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'registration.options.update',
+                        implies: ['registration.options.read'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'registration.options.delete',
+                        implies: ['registration.options.update'],
+                    },
+                ],
+            },
+            {
+                type: 'switch',
+                name: 'Aliĝintoj',
+                requires: ['registration.options.read'],
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'registration.entries.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'registration.entries.update',
+                        implies: ['registration.entries.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'registration.entries.create',
+                        implies: ['registration.entries.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'registration.entries.delete',
+                        implies: ['registration.entries.create'],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Kongresoj',
+        children: [
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Kongresoj de ' + name,
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'congresses.read.' + org,
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'congresses.update.' + org,
+                                implies: ['congresses.read.' + org],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'congresses.create.' + org,
+                                implies: ['congresses.update.' + org],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'congresses.delete.' + org,
+                                implies: ['congresses.create.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+            {
+                type: 'group',
+                name: 'Kongresaj okazoj',
+                children: [
+                    ...Object.entries(baseOrgs).map(([org, name]) => {
+                        return {
+                            type: 'switch',
+                            name: 'Kongresaj okazoj de ' + name,
+                            options: [
+                                {
+                                    name: 'Legi',
+                                    id: 'congress_instances.read.' + org,
+                                },
+                                {
+                                    name: 'Redakti',
+                                    id: 'congress_instances.update.' + org,
+                                    implies: ['congress_instances.read.' + org],
+                                },
+                                {
+                                    name: 'Krei',
+                                    id: 'congress_instances.create.' + org,
+                                    implies: ['congress_instances.update.' + org],
+                                },
+                                {
+                                    name: 'Forigi',
+                                    id: 'congress_instances.delete.' + org,
+                                    implies: ['congress_instances.create.' + org],
+                                },
+                            ],
+                        };
+                    }),
+                    {
+                        type: 'group',
+                        name: 'Kongresaj aliĝintoj',
+                        children: Object.entries(baseOrgs).map(([org, name]) => {
+                            return {
+                                type: 'switch',
+                                name: 'Kongresaj aliĝintoj de kongresoj de ' + name,
+                                options: [
+                                    {
+                                        name: 'Legi',
+                                        id: 'congress_instances.participants.read.' + org,
+                                    },
+                                    {
+                                        name: 'Redakti',
+                                        id: 'congress_instances.participants.update.' + org,
+                                        implies: ['congress_instances.participants.read.' + org],
+                                    },
+                                    {
+                                        name: 'Krei',
+                                        id: 'congress_instances.participants.create.' + org,
+                                        implies: ['congress_instances.participants.update.' + org],
+                                    },
+                                    {
+                                        name: 'Forigi',
+                                        id: 'congress_instances.participants.delete.' + org,
+                                        implies: ['congress_instances.participants.create.' + org],
+                                    },
+                                ],
+                            };
+                        }),
+                    },
+                ],
+            },
+        ],
     },
 ];
 
