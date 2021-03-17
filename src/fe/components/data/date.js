@@ -25,22 +25,35 @@ function stringifyDate (date) {
     return date ? moment(date).format('D[-a de] MMMM Y') : '';
 }
 
+const parsePreprocessors = [
+    input => input.replace(/^la/i, ''),
+    input => input.trim(),
+    input => input.replace(/\s+/g, ' '),
+    input => input.replace(/\//g, ' '),
+];
 const parseFormatsToTry = [
     undefined,
     'D[-a de] MMMM YYYY',
     'D[-a de] MMM YYYY',
+    'D[-a de] M YYYY',
     'D MMMM YYYY',
     'D MMM YYYY',
+    'D M YYYY',
     'D[-a de] MMMM',
     'D[-a de] MMM',
+    'D[-a de] M',
     'D MMMM',
     'D MMM',
+    'D M',
 ];
 
 function tryParseDate (input) {
     if (!input) return null;
+    for (const prep of parsePreprocessors) {
+        input = prep(input);
+    }
     for (const f of parseFormatsToTry) {
-        const m = moment.utc(input, f);
+        const m = moment.utc(input, f, true);
         if (m.isValid()) return m.toDate();
     }
     return undefined;
