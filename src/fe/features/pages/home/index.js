@@ -42,6 +42,7 @@ class HomeTmpTasks extends Component {
     state = {
         loading: false,
         items: null,
+        tasks: null,
         error: null,
         tab: Object.keys(locale.tasks.tabs)[0],
     };
@@ -49,6 +50,7 @@ class HomeTmpTasks extends Component {
     load () {
         this.setState({ loading: true });
         const res = Promise.all([
+            this.context.createTask('tasks/list', {}).runOnceAndDrop(),
             this.context.createTask('payments/listIntents', {}, {
                 fields: [
                     { id: 'customer', sorting: 'none' },
@@ -83,9 +85,10 @@ class HomeTmpTasks extends Component {
             }).runOnceAndDrop(),
         ]);
 
-        res.then(([pay, reg]) => {
+        res.then(([tasks, pay, reg]) => {
             this.setState({
                 loading: false,
+                tasks,
                 items: { aksopay: pay.items, registration: reg.items },
                 error: null,
             });
@@ -98,7 +101,7 @@ class HomeTmpTasks extends Component {
         this.load();
     }
 
-    render (_, { loading, items, error }) {
+    render (_, { loading, tasks, items, error }) {
         let contents = null;
         if (error) {
             contents = <DisplayError error={error} />;
@@ -121,6 +124,16 @@ class HomeTmpTasks extends Component {
                 registration: renderTabItems('registration', RegistrationTaskItem),
             };
 
+            const countTaskItems = k => {
+                if (!tasks || !tasks[k]) return 0;
+                return Object.values(tasks[k]).reduce((a, b) => a + b, 0);
+            };
+
+            const tabItemCounts = {
+                aksopay: countTaskItems('aksopay'),
+                registration: countTaskItems('registration'),
+            };
+
             contents = (
                 <Fragment>
                     <Tabs
@@ -128,7 +141,7 @@ class HomeTmpTasks extends Component {
                         tabs={Object.fromEntries(Object.keys(locale.tasks.tabs).map(k => [k, (
                             <span class="task-tab-label" key={k}>
                                 <span class="inner-label">{locale.tasks.tabs[k]}</span>
-                                <span class="task-badge" data-n={tabs[k].length}>{tabs[k].length}</span>
+                                <span class="task-badge" data-n={tabItemCounts[k]}>{tabItemCounts[k]}</span>
                             </span>
                         )]))}
                         value={this.state.tab}

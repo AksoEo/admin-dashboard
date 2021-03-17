@@ -10,6 +10,7 @@ export const tasks = {
         const client = await asyncClient;
         const res = await client.get('/tasks');
         store.insert([TASKS], res.body);
+        return res.body;
     },
 };
 
