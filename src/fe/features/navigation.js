@@ -8,8 +8,62 @@ import { MetaProvider } from './meta';
 import { app as locale } from '../locale';
 import { LinkButton } from '../router';
 
+// --- navigation model ---
+// notes:
+// - url paths represent a stack of views with associated state,
+//   e.g. /view1/state1/view2/state2/view3 -> [view1:state1] [view2:state2] [view3]
+// - the URL path is only parsed once during page load or certain types of link navigation.
+//   the page tree is used here
+// - every stack item contains its own URL,
+//   e.g. [view1:/view1/state1] [view2:/view1/state1/view2/state2]
+// - the URL only shows the path and query of the top item
+// - operations:
+//   - push: (push an item according to the page tree)
+//     - view: create a new stack item, push it on the stack (then update URL)
+//     - state: push state onto the current item (then update URL)
+//   - pop:
+//     - view: pop the view off the stack (then update URL)
+//     - state: pop the state off the current item (then update URL)
+//   - navigate: conflates both of the above into one operation due to the way parsing works
+//   - push out of tree: push a view that is not under the current top item in the page tree as a
+//     stack item.
+// -- url synchronization --
+// - URL sync will be attempted in an interval (due to rate limiting of replace/pushState).
+// - the URL is not read except...
+//   - at page load
+//   - on a popstate event
+
+/// A navigation stack item (see explanation above)
+class NavigationStackItem {
+    /// The view path of this item, i.e. excluding state. (e.g. /view1/view2)
+    viewPath = '/';
+    /// Only the state path of this item (e.g. /state1)
+    statePath = '/';
+    /// The result of matching the path component.
+    match = [];
+    /// URL state items.
+    state = {};
+    /// The query string of this item (without leading question mark)
+    query = '';
+    /// Arbitrary data associated with this item (saved as history state).
+    data = {};
+    /// The route item in the page tree.
+    route = null;
+
+    get fullPath () {
+        return this.viewPath + this.statePath;
+    }
+}
+
+class NavigationUrlState {
+    constructor (route, pathPart) {
+        this.route = route;
+        this.pathPart = pathPart;
+    }
+}
+
 const TRUNCATED_QUERY_NAME = '?T';
-const MAX_LOCATION_LEN = 1887; // you think im joking but this is actually a reasonable limit
+const MAX_LOCATION_LEN = 1887;
 
 function ForbiddenPage () {
     return (
@@ -29,10 +83,16 @@ function NotFoundPage () {
     );
 }
 
-// Parses a URL and state into a stack. State is nullable.
-function parseHistoryState (url, state, mkPopStack, perms) {
-    const stackState = state && Array.isArray(state.stack) ? state.stack : [];
+const FORBIDDEN_ROUTE = {
+    component: ForbiddenPage,
+};
 
+const NOT_FOUND_ROUTE = {
+    component: NotFoundPage,
+};
+
+/// Parses a full URL using the page tree
+function parseTreeURL (url, state, perms) {
     url = new URL(url);
 
     if (url.search === TRUNCATED_QUERY_NAME) {
@@ -48,198 +108,176 @@ function parseHistoryState (url, state, mkPopStack, perms) {
     const pathParts = url.pathname.split('/').filter(x => x);
     if (!pathParts.length) pathParts.push(''); // need at least one item to match top level page
 
-    // page stack in which multiple subpaths can appear simultaneously
-    // stack items have a source property which will be ==='d to identify if we should keep the
-    // current state for pages where we don’t have the state encoded in the URL
-    // stack items also have a state object into which state paths will be written
-    const stack = [];
-    // the subset of stack items that are views
-    const viewStack = [];
-    // current page object from the router
-    let cursor;
-
-    // if true, the user doesn’t have permission to access the page
-    let forbidden = false;
-
-    // id for the sidebar
-    let currentPageId;
-
-    // match the first path part separately because it uses a different format
-    const firstPathPart = pathParts.shift();
+    const topLevelItems = [];
     for (const category of pages) {
         if (category.path) {
-            // path category
-            if (category.path === firstPathPart) {
-                cursor = { // HACK: quick fix to fit the category in the page format
-                    ...category,
-                    paths: category.contents,
-                };
-                const item = {
-                    path: firstPathPart,
-                    source: category,
-                    component: NotFoundPage,
-                    query: '',
-                    state: {},
-                };
-                currentPageId = undefined;
-                stack.push(item);
-            }
+            topLevelItems.push({
+                path: category.path,
+                paths: category.contents,
+            });
         } else {
-            // otherwise, look in the category subpaths
-            for (const page of category.contents) {
-                if (page.path === firstPathPart) {
-                    cursor = page;
-                    const item = {
-                        path: firstPathPart,
-                        source: page,
-                        component: page.component || NotFoundPage,
-                        isVirtual: !page.component,
-                        query: '',
-                        state: {},
-                    };
-                    if (!perms._isDummy && !page.hasPerm(perms)) forbidden = true;
-                    currentPageId = page.id;
-                    stack.push(item);
-                    viewStack.push(item);
-                    break;
-                }
-            }
+            topLevelItems.push(...category.contents);
         }
     }
 
-    if (!cursor) {
-        // oh no there is no such page
-        const item = cursor = {
-            path: firstPathPart,
-            source: null,
-            component: NotFoundPage,
-            state: {},
-        };
-        stack.push(item);
-        viewStack.push(item);
-        currentPageId = null;
-    }
+    let cursor = { paths: topLevelItems };
+    const viewStack = [];
+    outer:
+    for (let i = 0; i < pathParts.length; i++) {
+        const part = pathParts[i];
 
-    if (forbidden) {
-        stack.splice(0);
-        viewStack.splice(0);
-        pathParts.splice(0); // no need to parse the rest
-        const item = cursor = {
-            path: firstPathPart,
-            source: null,
-            component: ForbiddenPage,
-            state: {},
-        };
-        stack.push(item);
-        viewStack.push(item);
-        currentPageId = null;
-    }
-
-    // traverse the rest of the path
-    let notFoundParts = '';
-    for (const part of pathParts) {
-        let match;
-        for (const subpage of (cursor.paths || [])) {
-            if (subpage.match) match = part.match(subpage.match);
-            else match = part === subpage.path ? [part] : null; // fake regex match
+        let foundRoute = false;
+        for (const route of (cursor.paths || [])) {
+            let match;
+            if (route.match) match = part.match(route.match);
+            else match = part === route.path ? [part] : null; // regex match format
 
             if (match) {
-                cursor = subpage;
+                const routeType = route.type || 'bottom';
+                const isForbidden = !perms._isDummy && route.hasPerm && !route.hasPerm(perms);
+                if (isForbidden) {
+                    const item = new NavigationStackItem();
+                    item.route = FORBIDDEN_ROUTE;
+                    viewStack.push(item);
+                } else if (routeType === 'stack' || routeType === 'bottom') {
+                    // view
+                    // the 'bottom' type clears the stack
+                    while (routeType === 'bottom' && viewStack.length) viewStack.pop();
+                    const item = new NavigationStackItem();
+                    item.match = match;
+                    item.viewPath = '/' + pathParts.slice(0, i + 1).join('/');
+                    item.route = route;
 
-                if (currentPageId === undefined) currentPageId = subpage.id;
-
-                if (subpage.type === 'bottom') {
-                    const pathParts = [];
-                    let canPop = false;
-                    while (stack.length) {
-                        const item = stack.pop();
-                        if (item.component && !item.isVirtual) canPop = true;
-                        pathParts.unshift(item.path);
+                    const stateItem = state && state.stack[viewStack.length];
+                    if (stateItem) {
+                        item.data = stateItem.data;
+                        item.query = stateItem.query;
                     }
-                    pathParts.push(part);
-                    const isForbidden = !perms._isDummy && subpage.hasPerm && !subpage.hasPerm(perms);
-                    const item = {
-                        path: pathParts.join('/'),
-                        source: subpage,
-                        component: isForbidden ? ForbiddenPage : subpage.component || NotFoundPage,
-                        canPop,
-                        pathMatch: match,
-                        query: '',
-                        state: {},
-                    };
-                    stack.push(item);
+
                     viewStack.push(item);
-                } else if (subpage.type === 'stack') {
-                    const isForbidden = !perms._isDummy && subpage.hasPerm && !subpage.hasPerm(perms);
-                    const item = {
-                        path: part,
-                        source: subpage,
-                        component: isForbidden ? ForbiddenPage : subpage.component || NotFoundPage,
-                        pathMatch: match,
-                        query: '',
-                        state: {},
-                    };
-                    stack.push(item);
-                    viewStack.push(item);
-                } else if (subpage.type === 'state') {
-                    const stateKey = subpage.state;
-                    viewStack[viewStack.length - 1].state[stateKey] = {
-                        match: match,
-                        pop: mkPopStack(stack.length),
-                    };
-                    stack.push({
-                        path: part,
-                        source: subpage,
-                    });
-                } else {
-                    throw new Error(`unknown subpage type ${subpage.type}`);
+                } else if (routeType === 'state') {
+                    // state
+                    const viewItem = viewStack[viewStack.length - 1];
+                    if (viewItem) {
+                        viewItem.statePath = '/' + viewItem.statePath.split('/').concat([part]).join('/');
+                        viewItem.state[route.state] = new NavigationUrlState(route, part);
+                    }
                 }
 
+                cursor = route;
+                foundRoute = true;
                 break;
             }
         }
-        notFoundParts += (notFoundParts ? '/' : '') + part;
 
-        if (!match) {
-            // oh no there is no such page
-            stack.splice(0);
-            viewStack.splice(0);
-            const item = cursor = {
-                path: notFoundParts,
-                source: null,
-                component: NotFoundPage,
-                state: {},
-            };
-            stack.push(item);
+        if (!foundRoute) {
+            // route not found
+            while (viewStack.length) viewStack.pop();
+            const item = new NavigationStackItem();
+            item.viewPath = '/' + pathParts.join('/');
+            item.route = NOT_FOUND_ROUTE;
             viewStack.push(item);
-        }
-    }
-
-    // load saved state if available
-    for (let i = 0; i < stackState.length; i++) {
-        if (viewStack[i] && stackState[i]) {
-            viewStack[i].data = stackState[i].data;
-            viewStack[i].query = stackState[i].query;
+            break outer;
         }
     }
 
     const urlQuery = (url.search || '').substr(1); // no question mark
-    // top stack item gets the query from the URL
+    // the top stack item gets the query from the URL
     if (viewStack.length) viewStack[viewStack.length - 1].query = urlQuery;
 
-    const currentLocation = url.pathname + url.search + url.hash;
-
     return {
-        currentLocation,
-        currentPageId,
-        urlLocation: currentLocation.length > MAX_LOCATION_LEN
-            ? url.pathname + TRUNCATED_QUERY_NAME
-            : currentLocation,
-        stack,
         viewStack,
         pathname: url.pathname,
         query: urlQuery,
     };
+}
+
+/// Copies state from stack a to stack b if the items match.
+function copyMatchingNavStackState (a, b) {
+    for (let i = 0; i < a.length && i < b.length; i++) {
+        const itemA = a[i];
+        const itemB = b[i];
+        if (itemA.route === itemB.route && itemA.fullPath === itemB.fullPath) {
+            if (i !== b.length - 1) itemB.query = itemA.query;
+            if (itemA.meta) itemB.meta = itemA.meta;
+            itemB.data = itemA.data;
+        }
+    }
+}
+
+class NavigationState {
+    stack = [];
+    /// full url location (starting with the path). may be longer than the URL length limit
+    fullLocation = '';
+    /// URL location shown in the navigation bar
+    urlLocation = '';
+    pathname = '';
+    query = '';
+
+    clone () {
+        const ns = new NavigationState();
+        Object.assign(ns, {
+            stack: this.stack.slice(),
+            fullLocation: this.fullLocation,
+            urlLocation: this.urlLocation,
+            pathname: this.pathname,
+            query: this.query,
+        });
+        return ns;
+    }
+
+    parse (url, state, perms) {
+        const result = parseTreeURL(url, state, perms);
+        this.pathname = result.pathname;
+        this.query = result.query;
+        this.stack = result.viewStack;
+        this.updateLocation();
+    }
+
+    updateLocation () {
+        this.pathname = '/';
+        this.query = '';
+        const topItem = this.stack[this.stack.length - 1];
+        if (topItem) {
+            this.pathname = topItem.fullPath;
+            if (topItem.query) this.query = '?' + topItem.query;
+        }
+
+        this.currentLocation = this.pathname + this.query;
+        this.urlLocation = this.currentLocation.length > MAX_LOCATION_LEN
+            ? this.pathname + TRUNCATED_QUERY_NAME
+            : this.currentLocation;
+    }
+
+    push (pathComponent, state, perms) {
+        this.navigate('/' + this.pathname.split('/').concat([pathComponent]).join('/'), state, perms);
+        return this;
+    }
+
+    pop (state, perms) {
+        const pathParts = this.pathname.split('/');
+        pathParts.pop();
+        this.navigate('/' + pathParts.join('/'), state, perms);
+        return this;
+    }
+
+    navigate (url, state, perms) {
+        const oldStack = this.stack;
+        this.parse(url, state, perms);
+        if (!state) copyMatchingNavStackState(oldStack, this.stack);
+        return this;
+    }
+
+    pushOutOfTree (url, state, perms) {
+        const oldStack = this.stack;
+        this.parse(url, state, perms);
+        this.stack = oldStack.concat(this.stack.slice(this.stack.length - 1));
+        return this;
+    }
+
+    get currentPageId () {
+        return this.stack.map(x => x.route.id).filter(x => x)[0];
+    }
 }
 
 /// these browsers will yell if you replaceState too often
@@ -248,6 +286,8 @@ const SLOW_SAVE_STATE = navigator.userAgent.includes('Safari/');
 /// Interval at which state will be saved. This includes writing the query string to the URL and
 /// replacing window.history state.
 const SAVE_STATE_INTERVAL = SLOW_SAVE_STATE ? 2100 : 500; // ms
+
+const ENABLE_FORCE_RELOAD = true;
 
 /// Navigation controller sort of thing.
 ///
@@ -259,198 +299,124 @@ const SAVE_STATE_INTERVAL = SLOW_SAVE_STATE ? 2100 : 500; // ms
 /// - perms: permissions
 export default class Navigation extends PureComponent {
     state = {
-        // array of objects with properties
-        //
-        // - path: the path components of this stack item (may contain /)
-        // - data: arbitrary data managed by the page
-        // - component: component ref
-        // - source: source ref
-        // - state: additional state given by the url
-        // - query: current query string
-        // - meta: optional object { title, actions } for the app bar
-        // - pathMatch: regex match of the path part
-        stack: [],
-        // current url pathname
-        pathname: '',
-        // current url query (does not include the question mark)
-        query: '',
+        state: new NavigationState(),
+        error: null,
     };
-
-    /// Full current location.
-    currentLocation = null;
-    /// Url current location; may be truncated.
-    urlLocation = null;
-
-    /// HACKY FIX: do not reload page on first two loads so we don't get stuck in an infinite
-    /// loop
-    loadCount = 2;
-
-    /// Loads a URL and a history state object.
-    loadURL (url, state) {
-        if (this.state.error && !this.loadCount) {
-            // force reload
-            window.location = url;
-        }
-        this.loadCount = Math.max(this.loadCount - 1, 0);
-
-        const {
-            urlLocation,
-            currentLocation,
-            currentPageId,
-            stack,
-            pathname,
-            query,
-        } = parseHistoryState(
-            url,
-            state,
-            index => replace => this.popStackAt(index, replace),
-            this.props.perms,
-        );
-
-        this.props.onCurrentPageChange(currentPageId);
-
-        if (currentLocation !== this.currentLocation) {
-            this.currentLocation = currentLocation;
-            this.urlLocation = urlLocation;
-            this.props.onNavigate && this.props.onNavigate(this.currentLocation);
-        }
-
-        // compute the new stack
-        const newStack = this.state.stack.slice(0, stack.length);
-        for (let i = 0; i < stack.length; i++) {
-            // check if the stack item is still the same thing
-            if (newStack[i] && stack[i].source === newStack[i].source && stack[i].path === newStack[i].path) {
-                if (stack[i].data) {
-                    // if data was decoded; load it
-                    // (otherwise just keep current state)
-                    newStack[i].data = stack[i].data;
-                }
-                if (stack[i].data || i === stack.length - 1) {
-                    newStack[i].query = stack[i].query;
-                }
-                newStack[i].state = stack[i].state;
-            } else newStack[i] = stack[i];
-        }
-
-        this.stateIsDirty = true;
-        this.setState({ stack: newStack, pathname, query });
-    }
-
-    onPopState = e => this.loadURL(document.location.href, e.state);
 
     #lastNavigateTime;
     #debouncedNavigateTimeout;
     #debouncedNavArgs;
 
-    /// Navigates with an href.
-    navigate = (href, replace) => {
-        if (this.state.error) {
+    readStateFromURL (href, historyState, pushOutOfTree) {
+        if (this.state.error && ENABLE_FORCE_RELOAD) {
             // force reload to clear error state
             window.location = href;
         }
 
-        this.#lastNavigateTime = Date.now();
-        this.#debouncedNavigateTimeout = null;
+        const state = this.state.state.clone();
 
-        // first, save the current state so it’s up to date when we go back
-        this.saveState();
-        const previousURLLocation = this.urlLocation;
         // resolve url
         // note that currentFullURL is not equal to document.location.href since the
         // document.location may be truncated
         const currentFullURL = document.location.protocol + '//' + document.location.host
-            + this.currentLocation;
+            + state.fullLocation;
         const target = new URL(href, currentFullURL);
-        // load & parse url. also, importantly, compute urlLocation
-        this.loadURL(target.href, null);
-        // then actually push it to history with the newly computed urlLocation
-        if (previousURLLocation === this.urlLocation) replace = true;
-        try {
-            if (replace) window.history.replaceState(null, '', this.urlLocation);
-            else window.history.pushState(null, '', this.urlLocation);
-            // and finally, save state
-            this.saveState();
-        } catch (err) {
-            // may fail in browsers that do not allow frequent updates
-            this.debouncedNavigate(href, replace);
-        }
-    };
 
-    debouncedNavigate = (...args) => {
-        if (this.#lastNavigateTime > Date.now() - 400) {
-            this.#debouncedNavArgs = args;
-            if (!this.#debouncedNavigateTimeout) {
-                this.#debouncedNavigateTimeout = setTimeout(() => {
-                    this.navigate(...this.#debouncedNavArgs);
-                }, 400);
-            }
-            return;
+        // const prevLocation = state.fullLocation;
+
+        if (pushOutOfTree) {
+            state.pushOutOfTree(target.href, historyState, this.props.perms);
+        } else {
+            state.navigate(target.href, historyState, this.props.perms);
         }
-        this.navigate(...args);
+
+        // always replace if it's just the same location
+        // const forceReplace = prevLocation === state.fullLocation;
+        const forceReplace = false; // FIXME: this appears to be broken
+
+        return new Promise(resolve => {
+            this.setState({ state }, () => {
+                this.props.onCurrentPageChange(this.state.state.currentPageId);
+                resolve(forceReplace);
+            });
+        });
+    }
+
+    writeStateToURL (replace) {
+        this.props.onCurrentPageChange(this.state.state.currentPageId);
+
+        if (replace) {
+            this.scheduleSaveState();
+        } else {
+            window.history.pushState(this.serializeState(), '', this.state.state.urlLocation);
+            this.stateIsDirty = false;
+        }
+    }
+
+    onPopState = e => this.readStateFromURL(document.location.href, e.state);
+
+    /// Navigates with an href.
+    navigate = (href, replace) => {
+        this.saveState();
+        this.readStateFromURL(href).then(forceReplace => {
+            this.writeStateToURL(replace || forceReplace);
+        });
     };
 
     /// Called when a page changes its query.
     onQueryChange (stackIndex, newQuery) {
-        const stack = this.state.stack.slice();
-        if (stack[stackIndex].query !== newQuery) {
-            stack[stackIndex].query = newQuery;
+        const state = this.state.state.clone();
+        if (state.stack[stackIndex].query !== newQuery) {
+            state.stack[stackIndex].query = newQuery;
+            this.stateIsDirty = true;
 
-            // check if this is the top view stack item
-            let isTopView;
-            for (let i = this.state.stack.length - 1; i >= 0; i--) {
-                if (!stack[i].component) continue;
-                isTopView = i === stackIndex;
-                break;
-            }
+            const isTopView = stackIndex === state.stack.length - 1;
 
-            if (isTopView) {
-                // save to URL
-                this.debouncedNavigate(this.state.pathname + (newQuery ? '?' + newQuery : ''), true);
-            } else {
-                this.stateIsDirty = true;
-                // just save to state
-                this.setState({ stack }, this.saveState);
-            }
+            state.updateLocation();
+            this.setState({ state }, () => {
+                if (isTopView) {
+                    // write to URL
+                    this.setState({ state }, () => this.writeStateToURL(true));
+                } else {
+                    // just save to state
+                    this.setState({ state }, () => this.scheduleSaveState());
+                }
+            });
         }
     }
 
     /// Replaces all stack items above the given index with the given path.
+    /// FIXME: deprecated; use new nav state API
     pushStackAt (stackIndex, path, replace) {
-        const stack = this.state.stack.slice();
-        stack.splice(stackIndex + 1);
-        const pathname = '/' + stack.map(x => x.path).concat(path.split('/')).join('/');
+        const state = this.state.state.clone();
+        state.stack.splice(stackIndex, 1);
+        state.updateLocation();
+        const pathname = (state.stack[state.stack.length - 1]?.fullPath).split('/').concat([path.split('/')]).join('/');
         this.navigate(pathname, replace);
     }
 
-    restoreURLWithNewStack (stack, replace) {
-        const pathname = '/' + stack.map(x => x.path).join('/');
-        let query = '';
-        // find topmost view item and use its query
-        for (let i = stack.length - 1; i >= 0; i--) {
-            if (stack[i].component) {
-                query = stack[i].query;
-                break;
-            }
-        }
-        this.navigate(pathname + (query ? '?' + query : ''), replace);
-    }
-
     /// Removes all stack items at and above the given index.
+    /// FIXME: deprecated; use new nav state API
     popStackAt (stackIndex, replace) {
-        const stack = this.state.stack.slice();
-        stack.splice(stackIndex);
-        this.restoreURLWithNewStack(stack, replace);
+        const state = this.state.state.clone();
+        state.stack.splice(stackIndex);
+        state.updateLocation();
+        this.setState({ state }, () => {
+            this.writeStateToURL(replace);
+        });
     }
 
     /// Removes all stack items, starting from the top, until an item fulfills the predicate,
     /// *after* which it stops.
     popStackUntilIncluding (predicate, replace) {
-        const stack = this.state.stack.slice();
-        for (let i = stack.length - 1; i >= 0; i--) {
-            const item = stack.pop();
+        const state = this.state.state.clone();
+        for (let i = state.stack.length - 1; i >= 0; i--) {
+            const item = state.stack.pop();
             if (predicate(item)) break;
         }
-        this.restoreURLWithNewStack(stack, replace);
+        this.setState({ state }, () => {
+            this.writeStateToURL(replace);
+        });
     }
 
     // - state saving
@@ -461,40 +427,42 @@ export default class Navigation extends PureComponent {
         this.#saveStateTimeout = setTimeout(this.saveState, SAVE_STATE_INTERVAL);
     }
 
+    serializeState () {
+        return {
+            stack: this.state.state.stack
+                .map(item => ({ data: item.data, query: item.query })),
+            href: this.state.state.currentLocation,
+        };
+    }
+
     saveState = () => {
         if (!this.state.error && this.stateIsDirty) {
+            clearTimeout(this.#saveStateTimeout);
             // only save while we don’t have an error
             this.stateIsDirty = false;
             try {
-                window.history.replaceState({
-                    stack: this.state.stack
-                        // only save for views
-                        .filter(item => item.component)
-                        .map(item => ({ data: item.data, query: item.query })),
-                    href: this.currentLocation,
-                }, '', this.urlLocation);
+                window.history.replaceState(this.serializeState(), '', this.state.state.urlLocation);
             } catch {
                 // shrug
             }
         }
-
-        this.scheduleSaveState();
     };
 
     componentDidMount () {
-        this.loadURL(document.location.href, window.history.state);
+        this.readStateFromURL(document.location.href, window.history.state);
         this.scheduleSaveState();
     }
 
     componentDidUpdate (prevProps) {
         if (prevProps.perms !== this.props.perms) {
-            this.loadURL(document.location.href, window.history.state);
+            // if perms change (e.g. shortly after page load) we need to read state again
+            // to update any “forbidden” error pages
+            this.readStateFromURL(document.location.href);
         }
     }
 
     componentWillUnmount () {
         clearTimeout(this.#saveStateTimeout);
-        clearTimeout(this.#debouncedNavigateTimeout);
     }
 
     componentDidCatch (error, errorInfo) {
@@ -545,9 +513,10 @@ export default class Navigation extends PureComponent {
         let currentTitle = locale.title();
         let currentActions = [];
 
-        for (let i = 0; i < this.state.stack.length; i++) {
-            const stackItem = this.state.stack[i];
-            if (!stackItem.component) continue; // not a view component
+        const state = this.state.state;
+
+        for (let i = 0; i < state.stack.length; i++) {
+            const stackItem = state.stack[i];
 
             if (stackItem.meta) {
                 currentTabTitle = stackItem.meta.title;
@@ -555,15 +524,17 @@ export default class Navigation extends PureComponent {
                 currentActions = stackItem.meta.actions;
             }
 
+            const stateProxies = {};
+            // TODO: state proxies
+
             const index = i;
-            const isTop = i === this.state.stack.length - 1;
+            const isTop = i === state.stack.length - 1;
             const isBottom = i === 0;
-            const PageComponent = stackItem.component;
+            const PageComponent = stackItem.route.component;
             const itemContents = (
                 <MetaProvider onUpdate={({ title, actions }) => {
-                    const stack = this.state.stack.slice();
-                    stack[index].meta = { title, actions };
-                    this.setState({ stack });
+                    stackItem.meta = { title, actions };
+                    this.forceUpdate();
                 }}>
                     <Suspense fallback={
                         <div class="page-loading-indicator">
@@ -578,13 +549,13 @@ export default class Navigation extends PureComponent {
                             key={stackItem.path}
                             isTopPage={isTop}
                             query={stackItem.query}
-                            onQueryChange={query => this.onQueryChange(i, query)}
-                            match={stackItem.pathMatch}
-                            matches={this.state.stack.slice(0, i + 1).map(x => x.pathMatch)}
+                            onQueryChange={query => this.onQueryChange(index, query)}
+                            match={stackItem.match}
+                            matches={state.stack.slice(0, index + 1).map(x => x.match)}
                             onNavigate={this.navigate}
-                            push={(path, replace) => this.pushStackAt(i, path, replace)}
-                            pop={() => this.popStackAt(i)}
-                            {...stackItem.state} />
+                            push={(path, replace) => this.pushStackAt(index, path, replace)}
+                            pop={() => this.popStackAt(index)}
+                            {...stateProxies} />
                     </Suspense>
                 </MetaProvider>
             );
