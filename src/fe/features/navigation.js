@@ -49,9 +49,21 @@ class NavigationStackItem {
     data = {};
     /// The route item in the page tree.
     route = null;
+    /// arbitrary metadata
+    meta = {};
 
     get fullPath () {
         return this.viewPath + this.statePath;
+    }
+
+    popState (key) {
+        if (key in this.state) {
+            const statePathParts = this.statePath.split('/');
+            // ASSUMPTION: state keys are unique
+            statePathParts.splice(statePathParts.indexOf(key));
+            this.statePath = statePathParts.join('/') || '/';
+            delete this.state[key];
+        }
     }
 }
 
@@ -159,7 +171,7 @@ function parseTreeURL (url, state, perms) {
                     // state
                     const viewItem = viewStack[viewStack.length - 1];
                     if (viewItem) {
-                        viewItem.statePath = '/' + viewItem.statePath.split('/').concat([part]).join('/');
+                        viewItem.statePath = '/' + viewItem.statePath.split('/').concat([part]).filter(x => x).join('/');
                         viewItem.state[route.state] = new NavigationUrlState(route, part);
                     }
                 }
@@ -193,14 +205,16 @@ function parseTreeURL (url, state, perms) {
 }
 
 /// Copies state from stack a to stack b if the items match.
-function copyMatchingNavStackState (a, b) {
+function copyMatchingNavStackState (a, b, onlyMeta) {
     for (let i = 0; i < a.length && i < b.length; i++) {
         const itemA = a[i];
         const itemB = b[i];
         if (itemA.route === itemB.route && itemA.fullPath === itemB.fullPath) {
-            if (i !== b.length - 1) itemB.query = itemA.query;
-            if (itemA.meta) itemB.meta = itemA.meta;
-            itemB.data = itemA.data;
+            if (!onlyMeta) {
+                if (i !== b.length - 1) itemB.query = itemA.query;
+                itemB.data = itemA.data;
+            }
+            itemB.meta = itemA.meta;
         }
     }
 }
@@ -243,10 +257,10 @@ class NavigationState {
             if (topItem.query) this.query = '?' + topItem.query;
         }
 
-        this.currentLocation = this.pathname + this.query;
-        this.urlLocation = this.currentLocation.length > MAX_LOCATION_LEN
+        this.fullLocation = this.pathname + this.query;
+        this.urlLocation = this.fullLocation.length > MAX_LOCATION_LEN
             ? this.pathname + TRUNCATED_QUERY_NAME
-            : this.currentLocation;
+            : this.fullLocation;
     }
 
     push (pathComponent, state, perms) {
@@ -264,7 +278,7 @@ class NavigationState {
     navigate (url, state, perms) {
         const oldStack = this.stack;
         this.parse(url, state, perms);
-        if (!state) copyMatchingNavStackState(oldStack, this.stack);
+        copyMatchingNavStackState(oldStack, this.stack, state);
         return this;
     }
 
@@ -359,6 +373,7 @@ export default class Navigation extends PureComponent {
     navigate = (href, replace) => {
         this.saveState();
         this.readStateFromURL(href).then(forceReplace => {
+            this.stateIsDirty = true;
             this.writeStateToURL(replace || forceReplace);
         });
     };
@@ -389,7 +404,7 @@ export default class Navigation extends PureComponent {
     /// FIXME: deprecated; use new nav state API
     pushStackAt (stackIndex, path, replace) {
         const state = this.state.state.clone();
-        state.stack.splice(stackIndex, 1);
+        state.stack.splice(stackIndex + 1);
         state.updateLocation();
         const pathname = (state.stack[state.stack.length - 1]?.fullPath).split('/').concat([path.split('/')]).join('/');
         this.navigate(pathname, replace);
@@ -402,6 +417,18 @@ export default class Navigation extends PureComponent {
         state.stack.splice(stackIndex);
         state.updateLocation();
         this.setState({ state }, () => {
+            this.stateIsDirty = true;
+            this.writeStateToURL(replace);
+        });
+    }
+
+    popStackState (stackIndex, stateKey, replace) {
+        const state = this.state.state.clone();
+        state.stack.splice(stackIndex + 1);
+        state.stack[stackIndex].popState(stateKey);
+        state.updateLocation();
+        this.setState({ state }, () => {
+            this.stateIsDirty = true;
             this.writeStateToURL(replace);
         });
     }
@@ -415,6 +442,7 @@ export default class Navigation extends PureComponent {
             if (predicate(item)) break;
         }
         this.setState({ state }, () => {
+            this.stateIsDirty = true;
             this.writeStateToURL(replace);
         });
     }
@@ -431,7 +459,7 @@ export default class Navigation extends PureComponent {
         return {
             stack: this.state.state.stack
                 .map(item => ({ data: item.data, query: item.query })),
-            href: this.state.state.currentLocation,
+            href: this.state.state.fullLocation,
         };
     }
 
@@ -524,10 +552,15 @@ export default class Navigation extends PureComponent {
                 currentActions = stackItem.meta.actions;
             }
 
-            const stateProxies = {};
-            // TODO: state proxies
-
             const index = i;
+
+            const stateProxies = {};
+            for (const k in stackItem.state) {
+                stateProxies[k] = {
+                    pop: (replace) => this.popStackState(index, k, replace),
+                };
+            }
+
             const isTop = i === state.stack.length - 1;
             const isBottom = i === 0;
             const PageComponent = stackItem.route.component;
