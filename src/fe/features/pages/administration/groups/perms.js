@@ -14,7 +14,7 @@ import './detail.less';
 
 export default connect(({ matches }) => {
     return ['adminGroups/group', {
-        id: +matches[matches.length - 2][1],
+        id: +matches.group[1],
         fetchPerms: true,
     }];
 })((data, core) => ({ group: data, core }))(connectPerms(class AdminGroupPermsEditor extends Page {
@@ -27,7 +27,7 @@ export default connect(({ matches }) => {
     #save = () => {
         const { core } = this.props;
         core.createTask('adminGroups/setPermissions', {
-            id: +this.props.matches[this.props.matches.length - 2][1],
+            id: +this.props.matches.group[1],
         }, {
             permissions: this.state.permissions,
             original: this.props.group.permissions,

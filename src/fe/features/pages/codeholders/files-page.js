@@ -15,7 +15,7 @@ import './files-page.less';
 export default connectPerms(class FilesPage extends Page {
     static contextType = coreContext;
 
-    getId = () => +this.props.matches[this.props.matches.length - 2][1];
+    getId = () => +this.props.matches.codeholder[1];
 
     uploadFile = () => pickFile('*/*', files => {
         const file = files[0];

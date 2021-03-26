@@ -230,7 +230,7 @@ const PaymentOrgName = connect(({ id }) => ['payments/org', {
     id,
 }], ['id'])()(function PaymentOrgName ({ id, org, name }) {
     if (!org) return; // check existence with org field
-    return <Link target={`/aksopago/organizoj/${id}`}>{name}</Link>;
+    return <Link target={`/aksopago/organizoj/${id}`} outOfTree>{name}</Link>;
 });
 
 function Purpose ({ purpose, item }) {
@@ -538,7 +538,8 @@ function Customer ({ item, editing, onItemChange }) {
                 ) : isCodeholder ? (
                     <LinkButton
                         class="customer-codeholder-link"
-                        target={codeholderLink}>
+                        target={codeholderLink}
+                        outOfTree>
                         {locale.detailViewCodeholder}
                     </LinkButton>
                 ) : (
@@ -675,7 +676,7 @@ const MethodLink = connect(({ org, id }) => ['payments/method', { org, id }], ['
     if (!exists) return;
 
     return (
-        <LinkButton class="method-link" target={`/aksopago/organizoj/${org}/metodoj/${id}`}>
+        <LinkButton class="method-link" target={`/aksopago/organizoj/${org}/metodoj/${id}`} outOfTree>
             {locale.detailViewMethod}
         </LinkButton>
     );

@@ -13,7 +13,7 @@ import { connectPerms } from '../../../../perms';
 
 export default connect(({ matches }) => {
     return ['clients/permissions', {
-        id: matches[matches.length - 2][1],
+        id: matches.client[1],
     }];
 })((data, core) => ({ clientPerms: data, core }))(connectPerms(class ClientPermsEditor extends Page {
     state = {
@@ -25,7 +25,7 @@ export default connect(({ matches }) => {
     #save = () => {
         const { core } = this.props;
         core.createTask('clients/setPermissions', {
-            id: this.props.matches[this.props.matches.length - 2][1],
+            id: this.props.matches.client[1],
         }, {
             original: this.props.clientPerms,
             permissions: this.state.permissions,

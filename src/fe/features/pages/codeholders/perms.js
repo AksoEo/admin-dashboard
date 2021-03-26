@@ -13,7 +13,7 @@ import { connectPerms } from '../../../perms';
 
 export default connect(({ matches }) => {
     return ['codeholders/permissions', {
-        id: +matches[matches.length - 2][1],
+        id: +matches.codeholder[1],
     }];
 })((data, core) => ({ codeholderPerms: data, core }))(connectPerms(class CodeholderPermsEditor extends Page {
     state = {
@@ -25,7 +25,7 @@ export default connect(({ matches }) => {
     #save = () => {
         const { core } = this.props;
         core.createTask('codeholders/setPermissions', {
-            id: +this.props.matches[this.props.matches.length - 2][1],
+            id: +this.props.matches.codeholder[1],
         }, {
             permissions: this.state.permissions,
             original: this.props.codeholderPerms,

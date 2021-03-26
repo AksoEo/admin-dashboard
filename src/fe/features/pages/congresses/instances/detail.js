@@ -57,7 +57,7 @@ export default connectPerms(class CongressInstancePage extends Page {
     };
 
     get congress () {
-        return +this.props.matches[this.props.matches.length - 3][1];
+        return +this.props.matches.congress[1];
     }
     get id () {
         return +this.props.match[1];

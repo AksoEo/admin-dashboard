@@ -104,6 +104,7 @@ export default connect(props => ([props.view, {
         data,
         fields,
         onGetItemLink,
+        outOfTree,
         onClick,
         index,
         locale,
@@ -223,6 +224,7 @@ export default connect(props => ([props.view, {
         return (
             <ItemComponent
                 target={itemLink}
+                outOfTree={outOfTree}
                 class={'overview-list-item' + (cursed ? ' is-cursed' : '') + (compact ? ' is-compact' : '')}
                 style={style}
                 ref={node => this.#node = node}

@@ -45,7 +45,7 @@ export default connectPerms(class AddonPage extends Page {
     }
 
     getOrg () {
-        return +this.props.matches[this.props.matches.length - 3][1];
+        return +this.props.matches.org[1];
     }
     getId () {
         return +this.props.match[1];

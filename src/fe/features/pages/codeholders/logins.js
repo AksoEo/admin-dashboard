@@ -13,7 +13,7 @@ export default class LoginsPage extends Page {
 
     render () {
         // get codeholder id from the match above
-        const id = +this.props.matches[this.props.matches.length - 2][1];
+        const id = +this.props.matches.codeholder[1];
 
         return (
             <div class="codeholder-logins-page">

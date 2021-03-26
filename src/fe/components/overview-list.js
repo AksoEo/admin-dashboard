@@ -38,6 +38,7 @@ function scrollToNode (node) {
 /// - expanded: bool, whether search/filters are expanded
 /// - fields: field renderers
 /// - onGetItemLink: should return a link to an item’s detail view
+/// - outOfTree: will use out-of-tree navigation to open detail views
 /// - onSetFields: callback for changing fields. If set, will show inline sorting controls.
 ///     - Make sure to also set sortable: true on field renderers wher esorting is supported
 /// - onSetOffset: callback for changing the current page
@@ -244,6 +245,7 @@ export default class OverviewList extends PureComponent {
         fields,
         parameters,
         onGetItemLink,
+        outOfTree,
         onSetFields,
         locale: localizedFields,
         view,
@@ -350,6 +352,7 @@ export default class OverviewList extends PureComponent {
                 selectedFields={compiledFields}
                 fields={fields}
                 onGetItemLink={onGetItemLink}
+                outOfTree={outOfTree}
                 index={animateBackwards ? result.items.length - i - 1 : i}
                 animateBackwards={animateBackwards}
                 skipAnimation={result.items.length > 100 && i > 30}

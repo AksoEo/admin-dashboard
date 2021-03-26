@@ -13,6 +13,7 @@ export const routerContext = createContext({
 ///
 /// # Props
 /// - `target`: the target href
+/// - outOfTree: if true, will push out of tree (see navigation for explanation)
 export const Link = forwardRef((props, ref) => (
     <routerContext.Consumer>
         {context => (
@@ -20,7 +21,7 @@ export const Link = forwardRef((props, ref) => (
                 if (e.ctrlKey || e.shiftKey || e.metaKey) return;
                 e.preventDefault();
                 if (props.onClick) if (props.onClick(e) === false) return;
-                context.navigate(props.target);
+                context.navigate(props.target, false, props.outOfTree);
             }}>
                 {props.children}
             </a>
@@ -32,6 +33,7 @@ export const Link = forwardRef((props, ref) => (
 ///
 /// # Props
 /// - `target`: the target href
+/// - outOfTree: if true, will push out of tree (see navigation for explanation)
 /// - ...rest inherited from Button
 export const LinkButton = forwardRef((props, ref) => (
     <routerContext.Consumer>
@@ -45,7 +47,7 @@ export const LinkButton = forwardRef((props, ref) => (
                     if (e.ctrlKey || e.shiftKey || e.metaKey) return;
                     e.preventDefault();
                     if (props.onClick) if (props.onClick(e) === false) return;
-                    context.navigate(props.target);
+                    context.navigate(props.target, false, props.outOfTree);
                 }}>
                 {props.children}
             </Button>

@@ -518,7 +518,7 @@ const CodeholderCard = connect(({ id }) => ['codeholders/codeholder', {
         );
     }
     return (
-        <Link class="codeholder-card" target={`/membroj/${id}`}>
+        <Link class="codeholder-card" target={`/membroj/${id}`} outOfTree>
             {contents}
         </Link>
     );

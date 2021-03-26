@@ -3,7 +3,7 @@ import { Button } from '@cpsdqs/yamdl';
 import FIELDS from './table-fields';
 import ObjectViewer from '../../../../components/object-viewer';
 import CopyIcon from '../../../../components/copy-icon';
-import { Link } from '../../../../router';
+import { LinkButton } from '../../../../router';
 import { httpLog as locale } from '../../../../locale';
 
 const DETAIL_FIELDS = Object.fromEntries(Object.entries(FIELDS)
@@ -27,11 +27,9 @@ DETAIL_FIELDS.identity.component = function Identity ({ value }) {
         <div class="request-identity">
             <IdentityComponent value={value} />
             {' '}
-            <Link target={linkTarget}>
-                <Button>
-                    {linkLabel}
-                </Button>
-            </Link>
+            <LinkButton target={linkTarget} outOfTree>
+                {linkLabel}
+            </LinkButton>
         </div>
     );
 };

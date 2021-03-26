@@ -27,7 +27,7 @@ export default class History extends Page {
         this.setState({ loading: true });
         this.#loadTask = this.context.createTask('codeholders/fieldHistory', {
             // get codeholder id from the match above
-            id: +this.props.matches[this.props.matches.length - 2][1],
+            id: +this.props.matches.codeholder[1],
             field: this.props.query,
         }).runOnceAndDrop().then(({ items }) => {
             this.setState({ items, loading: false });

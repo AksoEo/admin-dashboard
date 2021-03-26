@@ -13,9 +13,9 @@ import { votes as locale } from '../../../locale';
 import './results.less';
 
 export default connect(({ matches }) => ['votes/voteResults', {
-    id: matches[matches.length - 2][1],
+    id: matches.vote[1],
 }])((data, core, error) => ({ data, core, error }))(connect(({ matches }) => ['votes/vote', {
-    id: matches[matches.length - 2][1],
+    id: matches.vote[1],
     fields: ['config'],
 }])((data, core, error) => ({ vote: data, voteError: error }))(class VoteResultsPage extends Page {
     render ({ data, error, vote, voteError }) {

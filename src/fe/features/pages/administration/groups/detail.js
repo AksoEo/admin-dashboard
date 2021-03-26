@@ -289,6 +289,7 @@ function CodeholdersList ({ perms, id, editing }) {
                         useDeepCmp
                         parameters={{ ...parameters, offset }}
                         onGetItemLink={editing ? null : (id => `/membroj/${id}`)}
+                        outOfTree
                         onSetOffset={setOffset}
                         onSetLimit={limit => setParameters({ ...parameters, limit })}
                         updateView={editing ? null : ['adminGroups/group', { id }]}
@@ -329,6 +330,7 @@ function ClientsList ({ perms, id, editing }) {
                         useDeepCmp
                         parameters={{ ...parameters, offset }}
                         onGetItemLink={editing ? null : (id => `/administrado/klientoj/${id}`)}
+                        outOfTree
                         onSetOffset={setOffset}
                         onSetLimit={limit => setParameters({ ...parameters, limit })}
                         updateView={editing ? null : ['adminGroups/group', { id }]}

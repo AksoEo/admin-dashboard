@@ -20,7 +20,7 @@ export default connectPerms(class FileDetailPage extends Page {
         fileName: '?',
     };
 
-    getCodeholderId = () => +this.props.matches[this.props.matches.length - 3][1];
+    getCodeholderId = () => +this.props.matches.codeholder[1];
     getId = () => +this.props.match[1];
 
     render ({ perms }, { fileName }) {

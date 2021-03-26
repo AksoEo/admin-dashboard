@@ -209,7 +209,7 @@ function copyMatchingNavStackState (a, b, onlyMeta) {
     for (let i = 0; i < a.length && i < b.length; i++) {
         const itemA = a[i];
         const itemB = b[i];
-        if (itemA.route === itemB.route && itemA.fullPath === itemB.fullPath) {
+        if (itemA.route === itemB.route && itemA.viewPath === itemB.viewPath) {
             if (!onlyMeta) {
                 if (i !== b.length - 1) itemB.query = itemA.query;
                 itemB.data = itemA.data;
@@ -323,6 +323,15 @@ export default class Navigation extends PureComponent {
 
     readStateFromURL (href, historyState, pushOutOfTree) {
         if (this.state.error && ENABLE_FORCE_RELOAD) {
+            try {
+                // only force reload up to 2 times so we don't get stuck in a loop
+                window.sessionStorage.forceReloadCount = (window.sessionStorage.forceReloadCount | 0) + 1;
+                if (window.sessionStorage.forceReloadCount > 2) {
+                    return;
+                }
+            } catch {
+                return;
+            }
             // force reload to clear error state
             window.location = href;
         }
@@ -370,9 +379,9 @@ export default class Navigation extends PureComponent {
     onPopState = e => this.readStateFromURL(document.location.href, e.state);
 
     /// Navigates with an href.
-    navigate = (href, replace) => {
+    navigate = (href, replace, pushOutOfTree) => {
         this.saveState();
-        this.readStateFromURL(href).then(forceReplace => {
+        this.readStateFromURL(href, null, pushOutOfTree).then(forceReplace => {
             this.stateIsDirty = true;
             this.writeStateToURL(replace || forceReplace);
         });
@@ -401,17 +410,16 @@ export default class Navigation extends PureComponent {
     }
 
     /// Replaces all stack items above the given index with the given path.
-    /// FIXME: deprecated; use new nav state API
     pushStackAt (stackIndex, path, replace) {
         const state = this.state.state.clone();
         state.stack.splice(stackIndex + 1);
+        state.stack[state.stack.length - 1].statePath = '/'; // legacy behavior
         state.updateLocation();
-        const pathname = (state.stack[state.stack.length - 1]?.fullPath).split('/').concat([path.split('/')]).join('/');
+        const pathname = (state.stack[state.stack.length - 1]?.fullPath).split('/').concat(path.split('/')).join('/');
         this.navigate(pathname, replace);
     }
 
     /// Removes all stack items at and above the given index.
-    /// FIXME: deprecated; use new nav state API
     popStackAt (stackIndex, replace) {
         const state = this.state.state.clone();
         state.stack.splice(stackIndex);
@@ -479,6 +487,14 @@ export default class Navigation extends PureComponent {
     componentDidMount () {
         this.readStateFromURL(document.location.href, window.history.state);
         this.scheduleSaveState();
+
+        setTimeout(() => {
+            try {
+                window.sessionStorage.removeItem('forceReloadCount');
+            } catch {
+                // nothing
+            }
+        }, 30000);
     }
 
     componentDidUpdate (prevProps) {
@@ -584,7 +600,7 @@ export default class Navigation extends PureComponent {
                             query={stackItem.query}
                             onQueryChange={query => this.onQueryChange(index, query)}
                             match={stackItem.match}
-                            matches={state.stack.slice(0, index + 1).map(x => x.match)}
+                            matches={Object.fromEntries(state.stack.slice(0, index + 1).map(x => [x.route.matchKey, x.match]))}
                             onNavigate={this.navigate}
                             push={(path, replace) => this.pushStackAt(index, path, replace)}
                             pop={() => this.popStackAt(index)}

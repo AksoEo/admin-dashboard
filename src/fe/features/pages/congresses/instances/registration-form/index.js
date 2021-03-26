@@ -30,10 +30,10 @@ export default connectPerms(class RegistrationFormPage extends Page {
     onEditorLoad = loaded => this.setState({ editorLoaded: loaded });
 
     get congress () {
-        return +this.props.matches[this.props.matches.length - 4][1];
+        return +this.props.matches.congress[1];
     }
     get instance () {
-        return +this.props.matches[this.props.matches.length - 2][1];
+        return +this.props.matches.instance[1];
     }
 
     render ({ perms }, { org, editorLoaded }) {

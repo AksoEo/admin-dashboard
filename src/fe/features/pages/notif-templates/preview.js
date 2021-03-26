@@ -18,7 +18,7 @@ export default class NotifTemplatePreviewPage extends Page {
     };
 
     get id () {
-        return +this.props.matches[this.props.matches.length - 2][1];
+        return +this.props.matches.template[1];
     }
 
     static contextType = coreContext;

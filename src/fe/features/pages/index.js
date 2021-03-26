@@ -108,6 +108,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'template',
                         component: elazy(() =>
                             import(/* webpackChunkName: "notif-templates" */ './notif-templates/detail')),
                         type: 'stack',
@@ -144,6 +145,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'congress',
                         component: elazy(() =>
                             import(/* webpackChunkName: "congresses" */ './congresses/detail')),
                         type: 'stack',
@@ -160,6 +162,7 @@ export default [
                                 paths: [
                                     {
                                         match: /^(\d+)$/,
+                                        matchKey: 'instance',
                                         component: elazy(() =>
                                             import(/* webpackChunkName: "congresses-instances" */ './congresses/instances/detail')),
                                         type: 'stack',
@@ -176,6 +179,7 @@ export default [
                                                 paths: [
                                                     {
                                                         match: /^(\d+)$/,
+                                                        matchKey: 'location',
                                                         type: 'stack',
                                                         component: elazy(() => import(/* webpackChunkName: "congresses-locations" */ './congresses/instances/locations/detail')),
                                                         paths: [
@@ -195,6 +199,7 @@ export default [
                                                 paths: [
                                                     {
                                                         match: /^(\d+)$/,
+                                                        matchKey: 'program',
                                                         type: 'stack',
                                                         component: elazy(() => import(/* webpackChunkName: "congresses-programs" */ './congresses/instances/programs/detail')),
                                                         paths: [
@@ -214,6 +219,7 @@ export default [
                                                 paths: [
                                                     {
                                                         match: /^([\da-fA-F]+)$/,
+                                                        matchKey: 'participant',
                                                         type: 'stack',
                                                         component: elazy(() => import(/* webpackChunkName: "congresses-participants" */ './congresses/instances/participants/detail')),
                                                         paths: [
@@ -261,6 +267,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'vote',
                         component: elazy(() =>
                             import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes/detail')),
                         type: 'stack',
@@ -286,6 +293,7 @@ export default [
                         paths: [
                             {
                                 match: /^(\d+)$/,
+                                matchKey: 'template',
                                 component: elazy(() =>
                                     import(/* webpackChunkName: "votes", webpackPrefetch: true */ './votes/template')),
                                 type: 'stack',
@@ -333,6 +341,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'codeholder',
                         component: elazy(() =>
                             import(/* webpackChunkName: "codeholder-detail", webpackPrefetch: true */ './codeholders/detail')),
                         type: 'stack',
@@ -417,6 +426,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'role',
                         component: elazy(() =>
                             import(/* webpackChunkName: "roles" */ './roles/detail')),
                         type: 'stack',
@@ -439,6 +449,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'list',
                         component: elazy(() =>
                             import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists/detail')),
                         type: 'stack',
@@ -476,6 +487,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'category',
                         component: elazy(() =>
                             import(/* webpackChunkName: "membership-categories" */ './memberships/categories/detail')),
                         type: 'stack',
@@ -500,6 +512,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'year',
                         component: elazy(() =>
                             import(/* webpackChunkName: "membership-options" */ './memberships/options/detail')),
                         type: 'stack',
@@ -525,6 +538,7 @@ export default [
                 paths: [
                     {
                         match: /^(\w+)$/,
+                        matchKey: 'entry',
                         component: elazy(() =>
                             import(/* webpackChunkName: "membership-entries" */ './memberships/entries/detail')),
                         type: 'stack',
@@ -564,6 +578,7 @@ export default [
                     },
                     {
                         match: /^(\w+)$/,
+                        matchKey: 'intent',
                         component: elazy(() =>
                             import(/* webpackChunkName: "payment-intents" */ './payments/intents/detail')),
                         type: 'stack',
@@ -588,6 +603,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'org',
                         component: elazy(() =>
                             import(/* webpackChunkName: "payment-orgs" */ './payments/orgs/detail')),
                         type: 'stack',
@@ -604,6 +620,7 @@ export default [
                                 paths: [
                                     {
                                         match: /^(\d+)$/,
+                                        matchKey: 'addon',
                                         type: 'stack',
                                         component: elazy(() =>
                                             import(/* webpackChunkName: "payment-orgs" */ './payments/orgs/addons/detail')),
@@ -624,6 +641,7 @@ export default [
                                 paths: [
                                     {
                                         match: /^(\d+)$/,
+                                        matchKey: 'method',
                                         type: 'stack',
                                         component: elazy(() =>
                                             import(/* webpackChunkName: "payment-orgs" */ './payments/orgs/methods/detail')),
@@ -658,6 +676,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'group',
                         component: elazy(() =>
                             import(/* webpackChunkName: "admin-groups", webpackPrefetch: true */ './administration/groups/detail')),
                         type: 'stack',
@@ -688,6 +707,7 @@ export default [
                 paths: [
                     {
                         match: /^([\da-fA-F]+)$/,
+                        matchKey: 'client',
                         component: elazy(() =>
                             import(/* webpackChunkName: "admin-clients", webpackPrefetch: true */ './administration/clients/detail')),
                         type: 'stack',
@@ -718,6 +738,7 @@ export default [
                 paths: [
                     {
                         match: /^(\d+)$/,
+                        matchKey: 'entry',
                         component: elazy(() =>
                             import(/* webpackChunkName: "admin-log", webpackPrefetch: true */ './administration/log/detail')),
                         type: 'stack',
@@ -735,6 +756,7 @@ export default [
                 paths: [
                     {
                         match: /^([a-z]{2})$/i,
+                        matchKey: 'country',
                         component: elazy(() =>
                             import(/* webpackChunkName: "admin-countries", webpackPrefetch: true */ './administration/countries/detail')),
                         type: 'stack',
@@ -759,6 +781,7 @@ export default [
                 paths: [
                     {
                         match: /^(x[a-z0-9]{2})$/i,
+                        matchKey: 'group',
                         component: elazy(() =>
                             import(/* webpackChunkName: "admin-country-groups", webpackPrefetch: true */ './administration/country-groups/detail')),
                         type: 'stack',
