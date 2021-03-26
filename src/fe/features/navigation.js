@@ -41,6 +41,8 @@ class NavigationStackItem {
     statePath = '/';
     /// The result of matching the path component.
     match = [];
+    /// All matches in the *path* stack for this item.
+    matches = {};
     /// URL state items.
     state = {};
     /// The query string of this item (without leading question mark)
@@ -134,6 +136,7 @@ function parseTreeURL (url, state, perms) {
 
     let cursor = { paths: topLevelItems };
     const viewStack = [];
+    const pathMatches = {};
     outer:
     for (let i = 0; i < pathParts.length; i++) {
         const part = pathParts[i];
@@ -159,9 +162,11 @@ function parseTreeURL (url, state, perms) {
                     item.match = match;
                     item.viewPath = '/' + pathParts.slice(0, i + 1).join('/');
                     item.route = route;
+                    pathMatches[route.matchKey] = item.match;
+                    item.matches = { ...pathMatches };
 
                     const stateItem = state && state.stack[viewStack.length];
-                    if (stateItem) {
+                    if (stateItem && stateItem.viewPath == item.viewPath) {
                         item.data = stateItem.data;
                         item.query = stateItem.query;
                     }
@@ -441,19 +446,19 @@ export default class Navigation extends PureComponent {
         });
     }
 
-    /// Removes all stack items, starting from the top, until an item fulfills the predicate,
-    /// *after* which it stops.
-    popStackUntilIncluding (predicate, replace) {
+    goBackOrOpenMenu = () => {
         const state = this.state.state.clone();
-        for (let i = state.stack.length - 1; i >= 0; i--) {
-            const item = state.stack.pop();
-            if (predicate(item)) break;
+        if (state.stack.length === 1) {
+            this.props.onOpenMenu();
+            return;
         }
+        state.stack.pop();
+        state.updateLocation();
         this.setState({ state }, () => {
             this.stateIsDirty = true;
-            this.writeStateToURL(replace);
+            this.writeStateToURL();
         });
-    }
+    };
 
     // - state saving
     #saveStateTimeout;
@@ -466,7 +471,7 @@ export default class Navigation extends PureComponent {
     serializeState () {
         return {
             stack: this.state.state.stack
-                .map(item => ({ data: item.data, query: item.query })),
+                .map(item => ({ viewPath: item.viewPath, data: item.data, query: item.query })),
             href: this.state.state.fullLocation,
         };
     }
@@ -600,7 +605,7 @@ export default class Navigation extends PureComponent {
                             query={stackItem.query}
                             onQueryChange={query => this.onQueryChange(index, query)}
                             match={stackItem.match}
-                            matches={Object.fromEntries(state.stack.slice(0, index + 1).map(x => [x.route.matchKey, x.match]))}
+                            matches={stackItem.matches}
                             onNavigate={this.navigate}
                             push={(path, replace) => this.pushStackAt(index, path, replace)}
                             pop={() => this.popStackAt(index)}
@@ -635,18 +640,9 @@ export default class Navigation extends PureComponent {
             appBarMenuType = 'back';
         }
 
-        const onAppBarMenuClick = () => {
-            if (stackItems.length) {
-                // pop all items up to and including the top component
-                this.popStackUntilIncluding(item => !!item.component);
-            } else {
-                this.props.onOpenMenu();
-            }
-        };
-
         const appBarMenu = appBarMenuType
             ? (
-                <Button icon small onClick={onAppBarMenuClick}>
+                <Button icon small onClick={this.goBackOrOpenMenu}>
                     <MenuIcon type={appBarMenuType} />
                 </Button>
             )

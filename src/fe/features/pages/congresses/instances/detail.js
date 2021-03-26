@@ -87,16 +87,24 @@ export default connectPerms(class CongressInstancePage extends Page {
     set tab (tab) {
         if (tab === this.tab) return;
         this.props.onQueryChange(''); // to prevent crosstalk between the two pages
-        if (this.props.locations) this.props.locations.pop(true);
-        if (this.props.programs) this.props.programs.pop(true);
-        if (this.props.participants) this.props.participants.pop(true);
-        if (tab === 'locations') {
-            this.props.push('lokoj', true);
-        } else if (tab === 'programs') {
-            this.props.push('programeroj', true);
-        } else if (tab === 'participants') {
-            this.props.push('alighintoj', true);
-        }
+
+        // FIXME: due to the way navigation state is updated (with setState), doing too much
+        // at once will *overwrite* previous state, so we delay each step in the tab updating
+        // process
+        requestAnimationFrame(() => {
+            if (this.props.locations) this.props.locations.pop(true);
+            if (this.props.programs) this.props.programs.pop(true);
+            if (this.props.participants) this.props.participants.pop(true);
+            requestAnimationFrame(() => {
+                if (tab === 'locations') {
+                    this.props.push('lokoj', true);
+                } else if (tab === 'programs') {
+                    this.props.push('programeroj', true);
+                } else if (tab === 'participants') {
+                    this.props.push('alighintoj', true);
+                }
+            });
+        });
     }
 
     render ({ perms, editing, query, onQueryChange }, { org }) {
