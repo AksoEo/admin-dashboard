@@ -12,7 +12,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.8.3",
     "@cpsdqs/google-i18n-address": "^1.0.2",
-    "@cpsdqs/yamdl": "^0.2.0",
+    "@cpsdqs/yamdl": "^0.2.1",
     "@material-ui/core": "^4.9.3",
     "@material-ui/icons": "^4.9.1",
     "@tejo/akso-client": "^0.1.14",
