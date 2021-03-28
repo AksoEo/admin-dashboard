@@ -122,10 +122,20 @@ class DateEditor extends Component {
     update () {
         if (this.textField && this.textField.node) {
             const rect = this.textField.node.getBoundingClientRect();
-            if (rect.left !== this.state.popoutX) this.setState({ popoutX: rect.left });
+            let { left, top, bottom } = rect;
+            let windowHeight = window.innerHeight;
 
-            const anchorBottom = window.innerHeight - rect.bottom < APPROX_DATE_EDITOR_HEIGHT;
-            const popoutY = anchorBottom ? rect.top : rect.bottom;
+            if (window.visualViewport) {
+                left += window.visualViewport.offsetLeft;
+                top += window.visualViewport.offsetTop;
+                bottom += window.visualViewport.offsetTop;
+                windowHeight = window.visualViewport.height;
+            }
+
+            if (left !== this.state.popoutX) this.setState({ popoutX: left });
+
+            const anchorBottom = windowHeight - bottom < APPROX_DATE_EDITOR_HEIGHT;
+            const popoutY = anchorBottom ? top : bottom;
 
             if (popoutY !== this.state.popoutY) this.setState({ popoutY });
             if (anchorBottom !== this.state.anchorBottom) this.setState({ anchorBottom });

@@ -55,7 +55,7 @@ class NavigationStackItem {
     meta = {};
 
     get fullPath () {
-        return this.viewPath + this.statePath;
+        return this.viewPath + (this.statePath !== '/' ? this.statePath : '');
     }
 
     popState (key) {
@@ -377,6 +377,7 @@ export default class Navigation extends PureComponent {
             this.scheduleSaveState();
         } else {
             window.history.pushState(this.serializeState(), '', this.state.state.urlLocation);
+            this.props.onNavigate();
             this.stateIsDirty = false;
         }
     }

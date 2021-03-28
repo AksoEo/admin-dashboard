@@ -114,8 +114,12 @@ class SuggestionFieldRender extends Component {
     update () {
         if (!this.textField || !this.textField.node) return;
         const rect = this.textField.node.getBoundingClientRect();
-        const x = rect.left;
-        const y = rect.bottom;
+        let x = rect.left;
+        let y = rect.bottom;
+        if (window.visualViewport) {
+            x += window.visualViewport.offsetLeft;
+            y += window.visualViewport.offsetTop;
+        }
         const maxHeight = window.innerHeight - rect.bottom;
         if (x !== this.state.x || y !== this.state.y || maxHeight !== this.state.maxHeight) {
             this.setState({ x, y, maxHeight });

@@ -295,8 +295,12 @@ class EditorBarPortal extends PureComponent {
         if (!this.props.owner.current) return;
         const rect = this.props.owner.current.getBoundingClientRect();
 
-        const posX = rect.left;
-        const posY = rect.top;
+        let posX = rect.left;
+        let posY = rect.top;
+        if (window.visualViewport) {
+            posX += window.visualViewport.offsetLeft;
+            posY += window.visualViewport.offsetTop;
+        }
         const width = rect.width;
 
         this.setState({ posX, posY, width });
