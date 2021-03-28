@@ -656,12 +656,16 @@ const fields = {
         history: true,
     },
     isDead: {
-        component: permsEditable('isDead', ({ value, editing, onChange }) => {
+        component: permsEditable('isDead', ({ value, editing, item, onItemChange }) => {
             return (
                 <Checkbox
                     class={!editing ? 'fixed-checkbox' : ''}
                     checked={value}
-                    onChange={isDead => editing && onChange(isDead)} />
+                    onChange={isDead => {
+                        if (!editing) return;
+                        if (!isDead) onItemChange({ ...item, isDead, deathdate: null });
+                        else onItemChange({ ...item, isDead });
+                    }} />
             );
         }),
         hasPerm: 'self',
@@ -670,10 +674,13 @@ const fields = {
     birthdate: {
         component: permsEditable('birthdate', ({ value, editing, onChange, item }) => {
             if (editing) {
+                let maxDate = new Date();
+                if (item.deathdate && new Date(item.deathdate) < maxDate) maxDate = new Date(item.deathdate);
+
                 return (
                     <date.editor
                         value={value}
-                        max={new Date()} // today
+                        max={maxDate}
                         onChange={onChange} />
                 );
             }
@@ -705,7 +712,22 @@ const fields = {
         history: true,
     }),
     deathdate: {
-        component: permsEditable('deathdate', makeDataEditable(date)),
+        component: permsEditable('deathdate', function ({ value, editing, item, onItemChange }) {
+            if (editing) {
+                return <date.editor
+                    value={value}
+                    min={item.birthdate ? new Date(item.birthdate) : null}
+                    max={new Date()}
+                    onChange={v => {
+                        if (v) {
+                            onItemChange({ ...item, isDead: true, deathdate: v });
+                        } else {
+                            onItemChange({ ...item, deathdate: null });
+                        }
+                    }}/>;
+            }
+            return <date.renderer value={value} />;
+        }),
         hasPerm: 'self',
         history: true,
     },

@@ -10,7 +10,7 @@ function DateFormatter ({ value }) {
     return value ? moment(value).format('D[-a de] MMMM Y') : '';
 }
 
-const MIN_DATE = new Date(1970, 0, 1);
+const MIN_DATE = new Date(1900, 0, 1);
 // CHANGE THIS ONCE MYSQL ALLOWS DATES PAST 2038
 const MAX_DATE = new Date(2147482647 * 1000);
 
