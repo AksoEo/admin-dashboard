@@ -45,6 +45,7 @@
         .CodeMirror {
             height: @cm-height;
             font: inherit;
+            padding-right: 32px;
             .editor-text();
 
             .json-error-message {
@@ -115,14 +116,32 @@
             --md-button-color: @gray-button-color;
         }
 
+        .editor-char-counter {
+            position: absolute;
+            bottom: 8px;
+            right: 16px;
+            z-index: 2;
+            font-size: 0.8em;
+            opacity: 0.5;
+
+            &.is-at-limit {
+                opacity: 1;
+            }
+        }
+
         &.single-line {
             .CodeMirror {
                 height: 2em;
+                padding-right: 64px;
             }
 
             .preview-mark, .preview-button {
                 top: 50%;
                 transform: translateY(-50%);
+            }
+
+            .editor-char-counter {
+                right: 42px;
             }
         }
     }

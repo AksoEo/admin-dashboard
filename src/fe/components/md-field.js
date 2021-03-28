@@ -38,6 +38,7 @@ function orderPortalContainerFront () {
 /// # Props
 /// - value/onChange: string
 /// - editing: bool
+/// - maxLength: optional; will show a counter
 /// - rules: list of enabled rules
 /// - inline: if true, will try to style it without line breaks
 /// - singleLine: if true, will not allow line breaks
@@ -123,9 +124,9 @@ export default class MarkdownTextField extends PureComponent {
     };
 
     render ({
-        value, editing, onChange, inline, disabled, rules, singleLine, ...extra
+        value, editing, onChange, inline, disabled, rules, singleLine, maxLength, ...extra
     }, { focused, preview, editorBarPopout, helpOpen }) {
-        let editorBar;
+        let editorBar, charCounter;
 
         if (editing) {
             editorBar = (
@@ -190,6 +191,18 @@ export default class MarkdownTextField extends PureComponent {
                         }} />
                 </EditorBarPortal>
             );
+
+            if (maxLength && value) {
+                const valueLen = ('' + value).length;
+                if (maxLength - valueLen < 500) {
+                    const isAtLimit = valueLen === maxLength;
+                    charCounter = (
+                        <div class={'editor-char-counter' + (isAtLimit ? ' is-at-limit' : '')}>
+                            {valueLen}/{maxLength}
+                        </div>
+                    );
+                }
+            }
         }
 
         const rendered = (
@@ -207,6 +220,7 @@ export default class MarkdownTextField extends PureComponent {
                         value={value}
                         onChange={onChange}
                         singleLine={singleLine}
+                        maxLength={maxLength}
                         disabled={disabled}
                         onCMChange={this.props.onCMChange}
                         onMount={this.#onEditorMount}
@@ -233,6 +247,8 @@ export default class MarkdownTextField extends PureComponent {
                         }}>
                         {preview ? <CloseIcon /> : <VisibilityIcon />}
                     </Button>
+
+                    {charCounter}
 
                     <Dialog
                         class="markdown-text-field-help-dialog"
@@ -333,7 +349,7 @@ class EditorBarPortal extends PureComponent {
     }
 }
 
-function InnerEditor ({ value, onChange, disabled, singleLine, onMount, onFocus, onBlur, onCMChange }) {
+function InnerEditor ({ value, onChange, disabled, singleLine, maxLength, onMount, onFocus, onBlur, onCMChange }) {
     return (
         <RCodeMirror
             value={value}
@@ -351,9 +367,11 @@ function InnerEditor ({ value, onChange, disabled, singleLine, onMount, onFocus,
             onFocus={onFocus}
             onBlur={onBlur}
             onChange={onCMChange}
-            onBeforeChange={(editor, data, value) => singleLine
-                ? onChange(value.replace(/\n/g, ''))
-                : onChange(value)} />
+            onBeforeChange={(editor, data, value) => {
+                if (maxLength && value.length > maxLength) value = value.substr(0, maxLength);
+                if (singleLine) onChange(value.replace(/\n/g, ''));
+                else onChange(value);
+            }} />
     );
 }
 

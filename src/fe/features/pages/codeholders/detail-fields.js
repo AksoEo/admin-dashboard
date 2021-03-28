@@ -20,6 +20,7 @@ import {
 } from '../../../components/data';
 import SuggestionField from '../../../components/suggestion-field';
 import Select from '../../../components/select';
+import LimitedTextField from '../../../components/limited-text-field';
 import TinyProgress from '../../../components/tiny-progress';
 import ProfilePictureEditor from './profile-picture';
 import { FileIcon } from './icons';
@@ -87,7 +88,7 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                         })
                     ) : (
                         <Validator
-                            component={TextField}
+                            component={(editor.props && editor.props.maxLength) ? LimitedTextField : TextField}
                             disabled={!editor.hasPerm()}
                             helperLabel={!editor.hasPerm() && locale.fieldEditorInsufficientPerms}
                             validate={editor.validate || (() => {})}
@@ -697,7 +698,7 @@ const fields = {
     },
     careOf: simpleField(permsEditable('careOf', function ({ value, editing, onChange }) {
         if (!editing) return value;
-        return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+        return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }), {
         shouldHide: item => item.type !== 'org',
         hasPerm: 'self',
@@ -784,7 +785,7 @@ const fields = {
     }),
     profession: simpleField(permsEditable('profession', function ({ value, editing, onChange }) {
         if (!editing) return value;
-        return <TextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+        return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
     }), {
         shouldHide: item => item.type !== 'human',
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
@@ -803,7 +804,7 @@ const fields = {
                 </a>
             );
         }
-        return <TextField
+        return <LimitedTextField
             value={value}
             onChange={e => onChange(e.target.value || null)}
             maxLength={50}
@@ -877,6 +878,7 @@ const fields = {
                     <div class="member-biography">
                         <textarea
                             value={value}
+                            maxLength={2000}
                             onKeyDown={e => e.stopPropagation()}
                             onChange={e => onChange(e.target.value || null)} />
                     </div>
@@ -901,6 +903,7 @@ const fields = {
                     <div class="member-notes">
                         <textarea
                             value={value}
+                            maxLength={10000}
                             onKeyDown={e => e.stopPropagation()}
                             onChange={e => onChange(e.target.value || null)} />
                     </div>

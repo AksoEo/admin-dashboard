@@ -1,21 +1,10 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
 import moment from 'moment';
 import { time, timestamp } from '../../../../../components/data';
 import MdField from '../../../../../components/md-field';
+import LimitedTextField from '../../../../../components/limited-text-field';
 import LocationPicker from '../location-picker';
 import './fields.less';
-
-function TextLen100 ({ value, editing, onChange }) {
-    if (editing) {
-        return <TextField
-            outline
-            value={value}
-            onChange={e => onChange(e.target.value)}
-            maxLength="100" />;
-    }
-    return value;
-}
 
 function TimeBoundEditor ({ value, editing, onChange, userData }) {
     const { tz } = userData;
@@ -33,6 +22,7 @@ export const FIELDS = {
             return <MdField
                 value={value}
                 onChange={onChange}
+                maxLength={100}
                 editing={editing}
                 singleLine
                 rules={['emphasis', 'strikethrough']} />;
@@ -45,6 +35,7 @@ export const FIELDS = {
             return <MdField
                 class="congress-program-description"
                 data-slot={slot}
+                maxLength={2000}
                 value={value}
                 onChange={onChange}
                 editing={editing}
@@ -52,7 +43,16 @@ export const FIELDS = {
         },
     },
     owner: {
-        component: TextLen100,
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return <LimitedTextField
+                    outline
+                    value={value}
+                    onChange={e => onChange(e.target.value)}
+                    maxLength={100} />;
+            }
+            return value;
+        },
     },
     timeFrom: {
         sortable: true,

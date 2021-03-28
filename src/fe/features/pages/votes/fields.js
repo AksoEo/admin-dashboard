@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import moment from 'moment';
-import { TextField } from '@cpsdqs/yamdl';
 import MdField from '../../../components/md-field';
+import LimitedTextField from '../../../components/limited-text-field';
 import OrgIcon from '../../../components/org-icon';
 import { votes as locale, timestampFormat } from '../../../locale';
 import { timeStart as TimeStart, timeEnd as TimeEnd } from './config';
@@ -25,7 +25,10 @@ export default {
         component ({ value, onChange, editing }) {
             if (!editing) return value;
             return (
-                <TextField
+                <LimitedTextField
+                    class="name-field"
+                    outline
+                    maxLength={100}
                     value={value}
                     onChange={e => onChange(e.target.value)} />
             );
@@ -44,7 +47,8 @@ export default {
                     value={value}
                     editing={editing}
                     inline={slot !== 'detail'}
-                    onChange={onChange} />
+                    onChange={onChange}
+                    maxLength={10000} />
             );
         },
         stringify (value) {

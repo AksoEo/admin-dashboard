@@ -46,6 +46,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import TextArea from '../../../../../components/text-area';
 import MdField from '../../../../../components/md-field';
 import SvgIcon from '../../../../../components/svg-icon';
+import LimitedTextField from '../../../../../components/limited-text-field';
 import { layoutContext } from '../../../../../components/dynamic-height-div';
 import { date, time } from '../../../../../components/data';
 import { Validator } from '../../../../../components/form';
@@ -126,7 +127,8 @@ export const FIELDS = {
                 return <Validator
                     outline
                     label={locale.fields.name}
-                    component={TextField}
+                    component={LimitedTextField}
+                    maxLength={50}
                     validate={value => {
                         if (!value) throw { error: locale.fields.nameRequired };
                     }}
@@ -143,6 +145,7 @@ export const FIELDS = {
             return <MdField
                 class="congress-location-description"
                 value={value}
+                maxLength={200}
                 editing={editing}
                 onChange={value => onChange(value || null)}
                 inline={slot === 'body'}
@@ -153,7 +156,7 @@ export const FIELDS = {
     address: {
         component ({ value, editing, onChange }) {
             if (editing) {
-                return <TextArea value={value} onChange={onChange} />;
+                return <TextArea value={value} onChange={onChange} maxLength={500} />;
             }
             if (!value) return null;
             return (
