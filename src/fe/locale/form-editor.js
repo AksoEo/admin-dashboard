@@ -135,4 +135,32 @@ export const formEditor = {
 
         namePatternError: 'Kodnomoj nur povas enhavi la signojn de Esperanto, ciferojn, streketojn kaj dupunktojn',
     },
+
+    errors: {
+        fieldIsRequired: 'Tiu ĉi kampo estas deviga',
+        numericRange: (a, b) => a === null
+            ? `Devas esti maksimume ${b}`
+            : b === null
+                ? `Devas esti minimume ${a}`
+                : `Devas esti inter ${a} kaj ${b}`,
+        numericStep: n => `Devas esti oblo de ${n}`,
+        textPatternGeneric: 'La enmetita valoro ne estas valida',
+        textLenRange: (a, b) => a === null
+            ? `La teksto devas esti maksimume ${b} signojn longa`
+            : b === null
+                ? `La teksto devas esti minimume ${b} signojn longa`
+                : `La teksto devas esti iter ${a} kaj ${b} signojn longa`,
+        enumNotInSet: 'Nevalida opcio estis elektita',
+        dateTimeInvalid: 'Nevalida format',
+        dateTimeRange: (a, b) => a === null
+            ? `Ne estu post ${b}`
+            : b === null
+                ? `Ne estu antaŭ ${a}`
+                : `Estu inter ${a} kaj ${b}`,
+        boolTableSelectRange: (a, b) => a === null
+            ? `Elektu ne pli ol ${b} ĉelojn`
+            : b === null
+                ? `Elektu almenaŭ ${a} ĉelojn`
+                : `Elektu inter ${a} kaj ${b} ĉelojn`,
+    },
 };

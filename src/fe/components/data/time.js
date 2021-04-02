@@ -35,6 +35,7 @@ function TimeRenderer ({ value }) {
 ///
 /// # Props
 /// - value/onChange: number of seconds
+/// - useFmtValue: if true, will use strings like `12:45` instead of number of seconds
 /// - nullable: if true, will return null for empty input
 class TimeEditor extends PureComponent {
     state = {
@@ -42,6 +43,12 @@ class TimeEditor extends PureComponent {
     };
 
     deriveEditingValue = () => {
+        if (this.props.useFmtValue) {
+            this.setState({
+                editingValue: this.props.value,
+            });
+            return;
+        }
         this.setState({
             editingValue: Number.isFinite(this.props.value) ? formatTime(this.props.value) : '',
         });
@@ -62,7 +69,10 @@ class TimeEditor extends PureComponent {
 
     tentativeCommit = () => {
         const value = this.getValue();
-        this.props.onChange && this.props.onChange(value);
+        if (this.props.onChange) {
+            if (this.props.useFmtValue) this.props.onChange(formatTime(value));
+            else this.props.onChange(value);
+        }
     };
 
     commitEditing = () => {
@@ -88,7 +98,10 @@ class TimeEditor extends PureComponent {
             editingValue: formatTime(value),
         }, () => {
             if (value !== this.props.value) {
-                this.props.onChange && this.props.onChange(value);
+                if (this.props.onChange) {
+                    if (this.props.useFmtValue) this.props.onChange(formatTime(value));
+                    else this.props.onChange(value);
+                }
             }
         });
     };

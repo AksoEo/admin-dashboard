@@ -19,7 +19,7 @@ import './item.less';
 /// - onRemove: fn
 /// - previousNodes: previous nodes' asc definitions (see getAscDefs in model)
 export default class FormEditorItem extends PureComponent {
-    render ({ item, editable, onChange, editing, onEditingChange, value, onValueChange, onRemove }) {
+    render ({ item, editable, onChange, editing, onEditingChange, editingData, value, onValueChange, onRemove }) {
         if (!item) return null;
 
         const props = {
@@ -32,7 +32,7 @@ export default class FormEditorItem extends PureComponent {
 
         let contents;
         if (item.el === 'input') {
-            contents = <InputItem {...props} value={value} onValueChange={onValueChange} />;
+            contents = <InputItem {...props} editingData={editingData} value={value} onValueChange={onValueChange} />;
         } else if (item.el === 'text') {
             contents = <TextItem {...props} />;
         } else if (item.el === 'script') {

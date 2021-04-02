@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { createRef, PureComponent } from 'preact/compat';
 import { Button, Checkbox, Slider, TextField } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -10,10 +10,11 @@ import TimeZoneEditor from '../time-zone';
 import MdField from '../md-field';
 import Select from '../select';
 import TextArea from '../text-area';
+import { FormContext } from '../form';
 import { WithCountries } from '../data/country';
 import { date, time, timestamp, currencyAmount } from '../data';
 import { ScriptableValue, ScriptableBool } from './script-expr';
-import { evalExpr } from './model';
+import { evalExpr, validateFormInput } from './model';
 import { data as dataLocale, formEditor as locale, currencies } from '../../locale';
 import './input-item.less';
 
@@ -280,6 +281,7 @@ const TYPES = {
                 <div class="form-input-time">
                     <time.editor
                         outline
+                        useFmtValue
                         value={value}
                         onChange={onChange} />
                 </div>
@@ -385,10 +387,37 @@ const TYPES = {
 };
 
 export default class InputItem extends PureComponent {
+    static contextType = FormContext;
+
+    state = {
+        error: null,
+        didInteract: false,
+    };
+
     oldName = null;
 
     componentDidMount () {
         this.oldName = this.props.item.name || null;
+
+        if (this.context) this.context.register(this);
+    }
+
+    componentWillUnmount () {
+        if (this.context) this.context.deregister(this);
+    }
+
+    validate (submitting) {
+        if (!this.props.editingData) {
+            this.setState({ error: null });
+            return true;
+        }
+        const error = validateFormInput(this.props.item, this.props.previousNodes, this.props.value);
+        if (!error) {
+            this.setState({ error: null });
+        } else if (submitting || this.state.didInteract) {
+            this.setState({ error, didInteract: true });
+        }
+        return !error;
     }
 
     /// Evaluates any AKSO Script exprs in the item value.
@@ -436,6 +465,11 @@ export default class InputItem extends PureComponent {
                         item={item}
                         value={value}
                         onChange={onValueChange} />
+                    {this.state.error && (
+                        <InputError>
+                            {this.state.error}
+                        </InputError>
+                    )}
                 </div>
             );
         }
@@ -445,6 +479,19 @@ export default class InputItem extends PureComponent {
                 {contents}
             </div>
         );
+    }
+}
+
+/// Just shows an error string. Scrolls itself into view when mounted in the DOM.
+class InputError extends PureComponent {
+    node = createRef();
+
+    componentDidMount () {
+        this.node.current.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    render ({ children }) {
+        return <div class="input-error" ref={this.node}>{children}</div>;
     }
 }
 

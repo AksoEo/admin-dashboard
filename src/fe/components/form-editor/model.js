@@ -1,5 +1,6 @@
 //! Form editor model stuff.
 import { evaluate } from '@tejo/akso-script';
+import { formEditor as locale } from '../../locale';
 
 /// Creates an input item of the given type.
 export function createInput (type) {
@@ -166,4 +167,91 @@ export function getAscDefs (item, value) {
 
         return { defs: {}, formVars: [{ name: item.name, type, value }] };
     }
+}
+
+/// Validates the form input value. Returns null if valid, or an error if not.
+export function validateFormInput (item, previousNodes, value) {
+    const props = ['default', 'required', 'disabled'];
+    const resolved = {};
+    for (const prop of props) {
+        if (item[prop] && typeof item[prop] === 'object') {
+            // this is an AKSO Script expression (probably)
+            resolved[prop] = evalExpr(item[prop], previousNodes);
+        } else {
+            resolved[prop] = item[prop];
+        }
+    }
+
+    const hasValue = item.type === 'boolean'
+        ? value
+        : value !== null && value !== undefined;
+
+    if (resolved.required && !hasValue) {
+        return locale.errors.fieldIsRequired;
+    }
+    if (!hasValue) return null;
+
+    if (item.type === 'number' || item.type === 'money') {
+        if (item.step !== null && value % item.step !== 0) {
+            return locale.errors.numericStep(item.step);
+        }
+
+        const rangeErr = (item.min !== null && value < item.min)
+            || (item.max !== null && value > item.max);
+        if (rangeErr) return locale.errors.numericRange(item.min, item.max);
+    }
+
+    if (item.type === 'text') {
+        if (item.pattern !== null) {
+            let valid = false;
+            try {
+                valid = new RegExp(item.pattern).test(value);
+            } catch { /* nothing */ }
+            if (!valid) return item.patternError || locale.errors.textPatternGeneric;
+        }
+
+        const rangeErr = (item.minLength !== null && value.length < item.minLength)
+            || (item.maxLength !== null && value.length > item.maxLength);
+        if (rangeErr) return locale.errors.textLenRange(item.minLength, item.maxLength);
+    }
+
+    if (item.type === 'enum') {
+        let found = false;
+        for (const option of item.options) {
+            if (option.value === value) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) return locale.errors.enumNotInSet;
+    }
+
+    if (item.type === 'date') {
+        const date = new Date(value);
+        if (!date) return locale.errors.dateTimeInvalid;
+
+        const rangeErr = (item.min !== null && date < new Date(item.min))
+            || (item.max !== null && date > new Date(item.max));
+        // TODO: format
+        if (rangeErr) return locale.errors.dateTimeRange(item.min, item.max);
+    }
+
+    if (item.type === 'time' || item.type === 'datetime') {
+        // might not need validation here at all?
+    }
+
+    if (item.type === 'boolean_table') {
+        let selected = 0;
+        for (let i = 0; i < item.rows; i++) {
+            for (let j = 0; j < item.cols; j++) {
+                if (value[i] && value[i][j]) selected++;
+            }
+        }
+
+        const rangeErr = (item.minSelect !== null && selected < item.minSelect)
+            || (item.maxSelect !== null && selected > item.maxSelect);
+        if (rangeErr) return locale.errors.boolTableSelectRange(item.minSelect, item.maxSelect);
+    }
+
+    return null;
 }

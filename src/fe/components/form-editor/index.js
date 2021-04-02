@@ -14,6 +14,12 @@ import { formEditor as locale } from '../../locale';
 import './index.less';
 
 export class ScriptContextProvider extends PureComponent {
+    /// Opens the AKSO Script Editor in full screen.
+    ///
+    /// - defs: akso script definitions object
+    /// - options:
+    ///     - previousNodes: array of { defs, formVars } to be able to use variables from other
+    ///       scripts and such
     openScriptEditor = (defs, options = {}) => new Promise(resolve => {
         const editor = new AKSOScriptEditor();
 
@@ -38,6 +44,7 @@ export class ScriptContextProvider extends PureComponent {
         this.attachScriptEditor(editor);
     });
 
+    /// Opens the AKSO Script Editor for editing only a single expression.
     openScriptExprEditor = (expr, options) => new Promise(resolve => {
         const editor = new AKSOScriptEditor();
 
@@ -68,6 +75,8 @@ export class ScriptContextProvider extends PureComponent {
         openDefs: this.openScriptEditor,
         openExpr: this.openScriptExprEditor,
     };
+
+    // attaching and detaching from the DOM
 
     scriptEditor = null;
     attachScriptEditor (editor) {
@@ -106,8 +115,17 @@ export class ScriptContextProvider extends PureComponent {
 }
 
 // TODO: add Reset button to reset to default values etc
+// TODO: add Validate Form button
 
 /// The Form Editor is the component used to edit e.g. registration forms.
+/// It allows editing both the form data (i.e. like a user would) and editing the form itself.
+///
+/// The implementation will generally assume that form data and the form itself will not be edited
+/// simultaneously, so there may be weird states caused by entering form data and then editing the
+/// form.
+///
+/// If editingFormData is set to true, this will also interact with FormContext to validate the form
+/// before submission.
 ///
 /// # Props
 /// - editing: bool
@@ -141,6 +159,7 @@ export default class FormEditor extends PureComponent {
                         onSettingsChange={onChange}
                         items={value.form}
                         onItemsChange={form => onChange({ ...value, form })}
+                        editingData={editingFormData}
                         values={formData}
                         onValuesChange={values => {
                             if (this.props.onFormDataChange) {
@@ -203,9 +222,37 @@ class FormEditorItems extends PureComponent {
         this.props.onItemsChange(items);
     }
 
+    initFormEditing () {
+        // initialize form editing by creating all fields and setting them to null if necessary
+        if (!this.props.editingData) return;
+        const inputKeys = new Set();
+        const newValues = { ...this.props.values };
+        for (const item of this.props.items) {
+            if (item.el === 'input') {
+                if (!item.name) continue;
+                inputKeys.add(item.name);
+                if (!(item.name in newValues)) newValues[item.name] = null;
+            }
+        }
+        for (const k in newValues) {
+            if (!inputKeys.has(k)) delete newValues[k];
+        }
+        this.props.onValuesChange(newValues);
+    }
+
+    componentDidMount () {
+        this.initFormEditing();
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.editingData !== this.props.editingData) {
+            this.initFormEditing();
+        }
+    }
+
     render ({
         editing, settings, onSettingsChange, items, onItemsChange, values, onValuesChange,
-        additionalVars, skipSettings, skipNonInputs,
+        additionalVars, skipSettings, skipNonInputs, editingData,
     }, { editingItem }) {
         const listItems = [];
         const previousNodes = [getGlobalDefs(additionalVars)];
@@ -230,6 +277,7 @@ class FormEditorItems extends PureComponent {
                             newItems[index] = item;
                             onItemsChange(newItems);
                         }}
+                        editingData={editingData}
                         value={values[name]}
                         onValueChange={value => {
                             onValuesChange({

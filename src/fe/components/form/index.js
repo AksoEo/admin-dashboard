@@ -37,6 +37,8 @@ export const FormContext = createContext({
 /// }
 /// ```
 export default class Form extends Component {
+    static contextType = FormContext;
+
     /// Form fields registered using [FormContext].
     fields = new Set();
 
@@ -50,6 +52,14 @@ export default class Form extends Component {
             }
         }
         return valid;
+    }
+
+    componentDidMount () {
+        // register the form inside a parent form context if applicable
+        if (this.context) this.context.register(this);
+    }
+    componentWillUnmount () {
+        if (this.context) this.context.deregister(this);
     }
 
     /// FormContext register handler
