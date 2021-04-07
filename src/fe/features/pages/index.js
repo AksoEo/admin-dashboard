@@ -133,7 +133,67 @@ export default [
                 id: 'magazines',
                 icon: NewspaperIcon,
                 path: 'revuoj',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "magazines" */ './magazines')),
                 hasPerm: () => true,
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        matchKey: 'magazine',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "magazines" */ './magazines/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                            {
+                                path: '__editions__',
+                                type: 'state',
+                                state: '_dummy',
+                                paths: [
+                                    {
+                                        match: /^(\d+)$/,
+                                        matchKey: 'edition',
+                                        type: 'stack',
+                                        component: elazy(() =>
+                                            import(/* webpackChunkName: "magazines-editions" */ './magazines/editions/detail')),
+                                        paths: [
+                                            {
+                                                path: 'redakti',
+                                                type: 'state',
+                                                state: 'editing',
+                                            },
+                                            {
+                                                path: '__toc__',
+                                                type: 'state',
+                                                state: '_dummy',
+                                                paths: [
+                                                    {
+                                                        match: /^(\d+)$/,
+                                                        matchKey: 'toc',
+                                                        type: 'stack',
+                                                        component: elazy(() =>
+                                                            import(/* webpackChunkName: "magazines-toc" */ './magazines/editions/toc/detail')),
+                                                        paths: [
+                                                            {
+                                                                path: 'redakti',
+                                                                type: 'state',
+                                                                state: 'editing',
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: 'congresses',
@@ -158,7 +218,7 @@ export default [
                             {
                                 path: 'okazigoj',
                                 type: 'state',
-                                state: 'dummyStateForInstances',
+                                state: '_dummy',
                                 paths: [
                                     {
                                         match: /^(\d+)$/,

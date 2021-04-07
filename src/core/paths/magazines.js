@@ -1,3 +1,4 @@
+import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
@@ -42,7 +43,7 @@ function crudList ({
     fields: defaultFields,
     storePath,
 }) {
-    return async (options, { offset, limit, fields, jsonFilter }) => {
+    return async (options, { search, offset, limit, fields, jsonFilter }) => {
         const client = await asyncClient;
         const apiOptions = {
             offset,
@@ -50,6 +51,13 @@ function crudList ({
             fields: defaultFields,
             order: fieldsToOrder(fields),
         };
+        if (search && search.query) {
+            const transformedQuery = util.transformSearch(search.query);
+            if (!util.isValidSearch(transformedQuery)) {
+                throw { code: 'invalid-search-query', message: 'invalid search query' };
+            }
+            apiOptions.search = { cols: [search.field], str: transformedQuery };
+        }
         if (jsonFilter) options.filter = jsonFilter.filter;
         const res = await client.get(apiPath(options), apiOptions);
         for (const item of res.body) {
@@ -70,6 +78,7 @@ function crudCreate ({
     idField,
     storePath,
     signalPath,
+    useAutoNull,
 }) {
     idField = idField || 'id';
 
@@ -77,10 +86,12 @@ function crudCreate ({
         const client = await asyncClient;
 
         const apiOptions = {};
-        for (const k in fields) {
-            // FIXME: this auto-nulling might cause issues later on.
-            // maybe use some better logic  for this?
-            apiOptions[k] = (params[k] || params[k] === 0) ? params[k] : null;
+        for (const k of fields) {
+            if (useAutoNull) {
+                apiOptions[k] = (params[k] || params[k] === 0) ? params[k] : null;
+            } else if (k in params) {
+                apiOptions[k] = params[k];
+            }
         }
 
         const res = await client.post(apiPath(options), apiOptions);
@@ -388,7 +399,7 @@ export const views = {
         storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, id, E_DATA],
         get: ({ magazine, edition, id }) => tasks.tocEntry({ magazine, edition, id }),
     }),
-    sigEntries: createStoreObserver(({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, SIG_TOC]),
+    sigTocEntries: createStoreObserver(({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, SIG_TOC]),
     tocRecitations: simpleDataView({
         storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, id, RECITATIONS],
         get: ({ magazine, edition, id }) => tasks.tocRecitations({ magazine, edition, id }),
