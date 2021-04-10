@@ -3,7 +3,7 @@ import { PureComponent } from 'preact/compat';
 import ResizeObserver from 'resize-observer-polyfill';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
-import { CodeholderDisabledIcon } from './icons';
+import { CodeholderDisabledIcon } from '../../../components/icons';
 import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
 import { UEACode as AKSOUEACode } from '@tejo/akso-client';
 import moment from 'moment';

@@ -48,7 +48,7 @@ export default class TocView extends PureComponent {
 
     componentDidMount () {
         this.decodeURLQuery();
-        if (this.#searchInput) this.#searchInput.focus(500);
+        // if (this.#searchInput) this.#searchInput.focus(500);
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -85,7 +85,7 @@ export default class TocView extends PureComponent {
                     updateView={['magazines/sigTocEntries', { magazine, edition }]}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/revuoj/${magazine}/__editions__/${edition}/__toc__/${id}`}
+                    onGetItemLink={id => `/revuoj/${magazine}/numero/${edition}/enhavo/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}

@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import SvgIcon from '../../../components/svg-icon';
+import SvgIcon from './svg-icon';
 
 export function CodeholderDisabledIcon () {
     return (

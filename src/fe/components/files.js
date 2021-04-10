@@ -12,7 +12,7 @@ import {
     MicrosoftOfficeIcon,
     WinRARIcon,
 } from './icons';
-import { mime as mimeLocale, data as dataLocale } from '../../../locale';
+import { mime as mimeLocale, data as dataLocale } from '../locale';
 
 const mimeIcons = {
     'image/': function Icon () {

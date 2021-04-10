@@ -86,7 +86,7 @@ export default class EditionsView extends PureComponent {
                     updateView={['magazines/sigEditions', { magazine }]}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/revuoj/${magazine}/__editions__/${id}`}
+                    onGetItemLink={id => `/revuoj/${magazine}/numero/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}

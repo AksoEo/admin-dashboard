@@ -5,11 +5,11 @@ import Page from '../../../components/page';
 import DetailView from '../../../components/detail';
 import { timestamp } from '../../../components/data';
 import { IdUEACode } from '../../../components/data/uea-code';
+import { FileThumbnail, Mime, FileSize } from '../../../components/files';
 import Meta from '../../meta';
 import { codeholders as locale } from '../../../locale';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';
-import { FileThumbnail, Mime, FileSize } from './files';
 import FileView from './file-view';
 import './file-detail.less';
 

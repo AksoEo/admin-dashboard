@@ -22,8 +22,8 @@ import SuggestionField from '../../../components/suggestion-field';
 import Select from '../../../components/select';
 import LimitedTextField from '../../../components/limited-text-field';
 import TinyProgress from '../../../components/tiny-progress';
+import { FileIcon } from '../../../components/icons';
 import ProfilePictureEditor from './profile-picture';
-import { FileIcon } from './icons';
 import Publicity from './publicity';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
 

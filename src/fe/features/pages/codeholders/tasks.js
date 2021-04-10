@@ -17,7 +17,7 @@ import {
     data as dataLocale,
     detail as detailLocale,
 } from '../../../locale';
-import { FileThumbnail, FileSize, Mime } from './files';
+import { FileThumbnail, FileSize, Mime } from '../../../components/files';
 import './style';
 
 export default {

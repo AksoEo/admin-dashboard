@@ -26,7 +26,11 @@ export const FIELDS = {
         slot: 'titleAlt',
         component ({ value, editing, onChange }) {
             if (editing) {
-                return <date.editor outline value={value} onChange={onChange} />;
+                return <date.editor
+                    class="magazine-edition-field-id-human"
+                    outline
+                    value={value}
+                    onChange={onChange} />;
             }
             return <date.renderer value={value} />;
         },
@@ -37,6 +41,7 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <LimitedTextField
+                    class="magazine-edition-field-id-human"
                     outline
                     value={value}
                     maxLength={50}

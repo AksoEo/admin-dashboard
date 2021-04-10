@@ -150,7 +150,7 @@ export default [
                                 state: 'editing',
                             },
                             {
-                                path: '__editions__',
+                                path: 'numero',
                                 type: 'state',
                                 state: '_dummy',
                                 paths: [
@@ -167,7 +167,7 @@ export default [
                                                 state: 'editing',
                                             },
                                             {
-                                                path: '__toc__',
+                                                path: 'enhavo',
                                                 type: 'state',
                                                 state: '_dummy',
                                                 paths: [

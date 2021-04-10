@@ -70,10 +70,25 @@ export const magazineEditions = {
         button: 'Forigi',
         description: '[[copy paste warning text]]',
     },
+    files: {
+        update: {
+            title: 'Alŝuti dosieron',
+            button: 'Alŝuti',
+        },
+        delete: {
+            title: 'Forigi dosieron',
+            description: 'Ĉu vi certas, ke vi volas forigi la dosieron? Ne eblas malfari tiun ĉi agon.',
+            button: 'Forigi',
+        },
+        upload: 'Alŝuti',
+        download: 'Elŝuti',
+        downloads: n => `[[${n} downloads]]`,
+    },
 };
 
 export const magazineToc = {
-    detailTitle: '[[Toc]]',
+    title: 'Enhavo',
+    detailTitle: '[[Toc entry]]',
     search: {
         fields: {
             title: 'Titolo',

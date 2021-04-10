@@ -7,6 +7,8 @@ import {
     magazineEditions as editionsLocale,
     magazineToc as tocLocale,
 } from '../../../locale';
+import { DocumentIcon } from '../../../components/icons';
+import { FileSize } from '../../../components/files';
 import { routerContext } from '../../../router';
 import { FIELDS as MAGAZINE_FIELDS } from './fields';
 import { FIELDS as EDITION_FIELDS } from './editions/fields';
@@ -93,7 +95,7 @@ export default {
         fieldNames: ['id', 'idHuman', 'date'],
         fields: EDITION_FIELDS,
         className: 'magazines-task-create-edition',
-        onCompletion: (task, routerContext, id) => routerContext.navigate(`/revuoj/${task.options.magazine}/__editions__/${id}`),
+        onCompletion: (task, routerContext, id) => routerContext.navigate(`/revuoj/${task.options.magazine}/numero/${id}`),
     }),
     updateEdition: updateDialog({ locale: editionsLocale.update, fields: editionsLocale.fields }),
     deleteEdition: deleteDialog({ locale: editionsLocale.delete }),
@@ -103,8 +105,40 @@ export default {
         fields: TOC_FIELDS,
         className: 'magazines-task-create-toc-entry',
         onCompletion: (task, routerContext, id) => routerContext
-            .navigate(`/revuoj/${task.options.magazine}/__editions__/${task.options.edition}/__toc__/${id}/redakti`),
+            .navigate(`/revuoj/${task.options.magazine}/numero/${task.options.edition}/enhavo/${id}/redakti`),
     }),
     updateTocEntry: updateDialog({ locale: tocLocale.update, fields: tocLocale.fields }),
     deleteTocEntry: deleteDialog({ locale: tocLocale.delete }),
+
+    updateEditionFile: ({ open, task }) => {
+        const fileName = (task.parameters.file?.name || '')
+            .replace(/\.epub(\.zip)?$/, '')
+            .replace(/\.pdf$/, '');
+
+        return (
+            <TaskDialog
+                class="magazines-task-update-edition-file"
+                open={open}
+                onClose={() => !task.running && task.drop()}
+                title={editionsLocale.files.update.title}
+                actionLabel={editionsLocale.files.update.button}
+                run={() => task.runOnce()}>
+                <div class="file-preview">
+                    <div class="file-icon-container">
+                        <DocumentIcon />
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name">
+                            {fileName}
+                            <span class="file-type">
+                                {task.parameters.format}
+                            </span>
+                        </div>
+                        <FileSize bytes={task.parameters.file?.size} />
+                    </div>
+                </div>
+            </TaskDialog>
+        );
+    },
+    deleteEditionFile: deleteDialog({ locale: editionsLocale.files.delete }),
 };
