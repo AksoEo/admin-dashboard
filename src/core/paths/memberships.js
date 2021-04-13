@@ -348,8 +348,11 @@ export const tasks = {
     createEntry: async (_, params) => {
         const client = await asyncClient;
         const res = await client.post('/registration/entries', eClientToAPI(params));
-        const id = +res.res.headers.get('x-identifier');
-        store.insert(REGISTRATION_ENTRIES.concat([id]), params);
+        const id = res.res.headers.get('x-identifier');
+        store.insert(REGISTRATION_ENTRIES.concat([id]), {
+            status: { status: null, time: null },
+            ...params,
+        });
         store.signal(SIG_ENTRIES);
         return id;
     },

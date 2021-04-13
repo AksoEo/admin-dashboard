@@ -23,6 +23,15 @@ import { connectPerms } from '../../../../perms';
 import { fields as CODEHOLDER_FIELDS } from '../../codeholders/detail-fields';
 import './fields.less';
 
+const portalContainer = document.createElement('div');
+portalContainer.id = 'registration-entry-offer-picker-container';
+document.body.appendChild(portalContainer);
+
+function orderPortalContainerFront () {
+    document.body.removeChild(portalContainer);
+    document.body.appendChild(portalContainer);
+}
+
 const CODEHOLDER_DATA_FIELDS = Object.fromEntries([
     'name', 'address', 'feeCountry', 'email', 'birthdate', 'cellphone',
 ].map(id => ([id, CODEHOLDER_FIELDS[id]])));
@@ -38,11 +47,13 @@ export const FIELDS = {
     year: {
         sortable: true,
         slot: 'title',
-        component ({ value, editing, onChange, item }) {
-            if (editing && item.status.status === 'submitted') {
+        component ({ value, editing, onChange, item, slot }) {
+            if (editing && (!item.status || item.status.status === 'submitted')) {
                 return (
                     <TextField
+                        class="registration-entry-year-field"
                         outline
+                        label={slot === 'create' ? locale.fields.year : null}
                         type="number"
                         value={'' + value}
                         onChange={e => onChange(+e.target.value | 0)} />
@@ -154,8 +165,11 @@ export const FIELDS = {
     },
     offers: {
         component ({ value, editing, item, onChange }) {
-            if (item.status.status !== 'submitted') editing = false;
+            if (!item.year) return null;
+            if (item.status && item.status.status !== 'submitted') editing = false;
             const [addOfferOpen, setAddOfferOpen] = useState(false);
+
+            if (!value) value = { currency: null, selected: [] };
 
             const year = item.year;
 
@@ -182,10 +196,11 @@ export const FIELDS = {
                                 outline
                                 value={value.currency}
                                 onChange={currency => onChange({ ...value, currency })}
-                                items={Object.keys(currencies).map(currency => ({
-                                    value: currency,
-                                    label: currencies[currency],
-                                }))} />
+                                items={(!value.currency ? [{ value: null, label: '—' }] : [])
+                                    .concat(Object.keys(currencies).map(currency => ({
+                                        value: currency,
+                                        label: currencies[currency],
+                                    })))} />
                         </div>
                     )}
                     <div class="selected-offers">
@@ -199,13 +214,17 @@ export const FIELDS = {
                                 currency={value.currency}
                                 onRemove={() => removeSelected(i)} />
                         ))}
-                        {editing && (
+                        {editing && value.currency && (
                             <div class="add-offer-container">
                                 <Button
                                     icon
                                     small
                                     class="add-offer-button"
-                                    onClick={() => setAddOfferOpen(true)}>
+                                    onClick={e => {
+                                        e.preventDefault();
+                                        orderPortalContainerFront();
+                                        setAddOfferOpen(true);
+                                    }}>
                                     <AddIcon />
                                 </Button>
                             </div>
@@ -213,6 +232,7 @@ export const FIELDS = {
                         {editing && (
                             <Dialog
                                 class="registration-entry-offers-add-offer-dialog"
+                                container={portalContainer}
                                 title={locale.offers.add.title}
                                 open={addOfferOpen}
                                 backdrop
@@ -220,7 +240,7 @@ export const FIELDS = {
                                 <AddOfferDialog
                                     year={year}
                                     onAdd={onAddItem}
-                                    currency={item.offers.currency} />
+                                    currency={item.offers?.currency} />
                             </Dialog>
                         )}
                     </div>
@@ -232,9 +252,9 @@ export const FIELDS = {
         weight: 1.5,
         slot: 'title',
         component ({ slot, value, editing, onChange, item }) {
-            if (item.status.status !== 'submitted') editing = false;
+            if (item.status && item.status.status !== 'submitted') editing = false;
 
-            if (slot !== 'detail') {
+            if (slot !== 'detail' && slot !== 'create') {
                 let contents;
                 if (value === null || typeof value !== 'object') {
                     contents = <CodeholderCard id={value} key={value} />;
@@ -309,6 +329,7 @@ export const FIELDS = {
                     if (type === valueDataType) return;
                     if (type === 'object') {
                         onChange({
+                            type: 'human',
                             name: {
                                 honorific: '',
                                 first: '',
@@ -328,7 +349,7 @@ export const FIELDS = {
                             feeCountry: null,
                             email: null,
                             birthdate: null,
-                            cellphone: null,
+                            cellphone: { value: null },
                         });
                     } else {
                         onChange(null);
@@ -477,7 +498,10 @@ function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSele
             class={'registration-entry-offer-item' + (onSelect ? ' is-selectable' : '')}>
             {editing && (
                 <div class="item-remove">
-                    <Button class="item-remove-button" icon small onClick={onRemove}>
+                    <Button class="item-remove-button" icon small onClick={e => {
+                        e.preventDefault();
+                        onRemove();
+                    }}>
                         <RemoveIcon />
                     </Button>
                 </div>

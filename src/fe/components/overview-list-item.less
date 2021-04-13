@@ -96,7 +96,11 @@
     }
 
     &.is-cursed {
-        background: @golden-background;
+        .ink-ripple {
+            background: @golden-background;
+        }
+
         --md-button-color: @golden-background;
+        --md-button-highlight-opacity: 0.5;
     }
 }

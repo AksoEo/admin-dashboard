@@ -217,6 +217,7 @@ export default connect(props => ([props.view, {
         });
 
         if (userData && userData.itemStyle) Object.assign(style, userData.itemStyle(data));
+        if (userData && userData.getCursed) cursed = cursed || userData.getCursed(data);
 
         const itemLink = onGetItemLink ? onGetItemLink(id) : null;
         const ItemComponent = onGetItemLink ? LinkButton : onClick ? Button : 'div';

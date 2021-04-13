@@ -10,8 +10,11 @@ import {
 } from '../../../locale';
 import { routerContext } from '../../../router';
 import { FIELDS as CATEGORY_FIELDS } from './categories/fields';
+import { FIELDS as ENTRY_FIELDS } from './entries/fields';
+import './tasks.less';
 
 const CATEGORY_CREATE_FIELDS = ['nameAbbrev', 'name'];
+const ENTRY_CREATE_FIELDS = ['year', 'codeholderData', 'offers'];
 
 export default {
     createCategory ({ open, task }) {
@@ -120,6 +123,39 @@ export default {
         );
     },
 
+    createEntry ({ open, task }) {
+        const fields = ENTRY_CREATE_FIELDS.map(id => {
+            const Component = ENTRY_FIELDS[id].component;
+            return (
+                <Field key={id}>
+                    <Component
+                        slot="create"
+                        editing value={task.parameters[id]}
+                        onChange={value => task.update({ [id]: value })}
+                        item={task.parameters}
+                        onItemChange={v => task.update(v)} />
+                </Field>
+            );
+        });
+
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        class="memberships-tasks-create-entry"
+                        open={open}
+                        onClose={() => task.drop()}
+                        title={entriesLocale.create.title}
+                        actionLabel={entriesLocale.create.button}
+                        run={() => task.runOnce().then(id => {
+                            routerContext.navigate(`/membreco/alighoj/${id}`);
+                        })}>
+                        {fields}
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
     updateEntry ({ open, task }) {
         return (
             <TaskDialog

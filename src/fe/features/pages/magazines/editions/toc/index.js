@@ -89,7 +89,10 @@ export default class TocView extends PureComponent {
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
-                    locale={locale.fields} />
+                    locale={locale.fields}
+                    userData={{
+                        getCursed: item => item.highlighted,
+                    }} />
             </div>
         );
     }

@@ -84,7 +84,7 @@ const phoneFormat = field => ({
         ? undefined
         : { value: codeholder[field], formatted: codeholder[field + 'Formatted'] },
     // -Formatted is a derived property so we never serialize it
-    toAPI: ({ value }) => value !== undefined ? { [field]: value } : {},
+    toAPI: (value) => value?.value !== undefined ? { [field]: value.value } : {},
 });
 
 /// Codeholder fields in the client-side representation.
