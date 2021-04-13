@@ -330,7 +330,7 @@ export const tasks = {
     }),
     updateTocRecitation: async ({ magazine, edition, id }, { format, file }) => {
         const client = await asyncClient;
-        await client.put(`/magazines/${magazine}/editions/${id}/toc/${id}/recitation/${format}`, null, {}, [{
+        await client.put(`/magazines/${magazine}/editions/${edition}/toc/${id}/recitation/${format}`, null, {}, [{
             name: 'file',
             type: file.type,
             value: file,

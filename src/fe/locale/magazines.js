@@ -129,4 +129,15 @@ export const magazineToc = {
         button: 'Forigi',
         description: '[[copy paste warning text]]',
     },
+    recitations: {
+        update: {
+            title: 'Alŝuti voĉlegon',
+            button: 'Alŝuti',
+        },
+        delete: {
+            title: 'Forigi voĉlegon',
+            description: 'Ĉu vi certas, ke vi volas forigi la voĉlegon? Ne eblas malfari tiun ĉi agon.',
+            button: 'Forigi',
+        },
+    },
 };

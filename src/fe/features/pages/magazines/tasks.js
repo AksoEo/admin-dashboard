@@ -141,4 +141,34 @@ export default {
         );
     },
     deleteEditionFile: deleteDialog({ locale: editionsLocale.files.delete }),
+
+    updateTocRecitation: ({ open, task }) => {
+        const fileName = (task.parameters.file?.name || '').replace(/\.(mp3|wav|flac)?$/, '');
+
+        return (
+            <TaskDialog
+                class="magazines-task-update-edition-file"
+                open={open}
+                onClose={() => !task.running && task.drop()}
+                title={tocLocale.recitations.update.title}
+                actionLabel={tocLocale.recitations.update.button}
+                run={() => task.runOnce()}>
+                <div class="file-preview">
+                    <div class="file-icon-container">
+                        <DocumentIcon />
+                    </div>
+                    <div class="file-info">
+                        <div class="file-name">
+                            {fileName}
+                            <span class="file-type">
+                                {task.parameters.format}
+                            </span>
+                        </div>
+                        <FileSize bytes={task.parameters.file?.size} />
+                    </div>
+                </div>
+            </TaskDialog>
+        );
+    },
+    deleteTocRecitation: deleteDialog({ locale: tocLocale.recitations.delete }),
 };

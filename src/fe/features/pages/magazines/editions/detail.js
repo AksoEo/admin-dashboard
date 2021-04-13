@@ -1,20 +1,15 @@
 import { h } from 'preact';
-import { Button, LinearProgress } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-import FileUploadIcon from '@material-ui/icons/Publish';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import Page from '../../../../components/page';
 import TaskImage from '../../../../components/task-image';
 import DetailView from '../../../../components/detail';
 import { DocumentIcon } from '../../../../components/icons';
-import pickFile from '../../../../components/pick-file';
 import Meta from '../../../meta';
 import { connectPerms } from '../../../../perms';
-import { connect, coreContext } from '../../../../core/connection';
+import { coreContext } from '../../../../core/connection';
 import { magazineEditions as locale, magazineToc as tocLocale } from '../../../../locale';
-import config from '../../../../../config.val';
+import { Files } from './files';
 import { FIELDS } from './fields';
 import TocView from './toc';
 import './detail.less';
@@ -62,6 +57,8 @@ export default connectPerms(class MagazineEdition extends Page {
     }
 
     render ({ perms, editing }, { edit }) {
+        const { magazine, id } = this;
+
         const actions = [];
 
         if (perms.hasPerm('')) {
@@ -69,8 +66,8 @@ export default connectPerms(class MagazineEdition extends Page {
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.create.menuItem,
                 action: () => this.context.createTask('magazines/createTocEntry', {
-                    magazine: this.magazine,
-                    edition: this.id,
+                    magazine,
+                    edition: id,
                 }),
             });
         }
@@ -86,10 +83,7 @@ export default connectPerms(class MagazineEdition extends Page {
         if (perms.hasPerm('')) {
             actions.push({
                 label: locale.delete.menuItem,
-                action: () => this.context.createTask('magazines/deleteEdition', {
-                    magazine: this.magazine,
-                    id: this.id,
-                }),
+                action: () => this.context.createTask('magazines/deleteEdition', { magazine, id }),
                 overflow: true,
             });
         }
@@ -119,8 +113,8 @@ export default connectPerms(class MagazineEdition extends Page {
 
                 <DetailView
                     view="magazines/edition"
-                    options={{ magazine: this.magazine }}
-                    id={this.id}
+                    options={{ magazine }}
+                    id={id}
                     fields={FIELDS}
                     locale={locale}
                     edit={edit}
@@ -131,9 +125,20 @@ export default connectPerms(class MagazineEdition extends Page {
                     onDelete={() => this.props.pop()} />
 
                 {!editing && (
-                    <EditionFiles
-                        magazine={this.magazine}
-                        id={this.id} />
+                    <Files
+                        formats={{
+                            pdf: 'application/pdf',
+                            epub: 'application/epub+zip',
+                        }}
+                        icon={<DocumentIcon />}
+                        view={['magazines/editionFiles', { magazine, id }]}
+                        onUpload={(core, format, file) => {
+                            core.createTask('magazines/updateEditionFile', { magazine, id }, { format, file });
+                        }}
+                        onDelete={(core, format) => {
+                            core.createTask('magazines/deleteEditionFile', { magazine, id }, { format });
+                        }}
+                        downloadURL={f => `/magazines/${magazine}/editions/${id}/files/${f}`} />
                 )}
 
                 {!editing && (
@@ -143,8 +148,8 @@ export default connectPerms(class MagazineEdition extends Page {
                 )}
                 {!editing && (
                     <TocView
-                        magazine={this.magazine}
-                        edition={this.id}
+                        magazine={magazine}
+                        edition={id}
                         query={this.props.query}
                         onQueryChange={this.props.onQueryChange} />
                 )}
@@ -153,109 +158,3 @@ export default connectPerms(class MagazineEdition extends Page {
     }
 });
 
-const FILE_FORMATS = ['pdf', 'epub'];
-const FORMAT_MIME = {
-    pdf: 'application/pdf',
-    epub: 'application/epub+zip',
-};
-
-const EditionFiles = connect(({ magazine, id }) => ['magazines/editionFiles', { magazine, id }])((data, core) => ({
-    data,
-    core,
-}))(function EditionFiles ({ magazine, id, data, core }) {
-    if (!data) return (
-        <div class="magazine-edition-files is-loading">
-            <LinearProgress class="inner-progress" indeterminate />
-        </div>
-    );
-    const fileSlots = {};
-    for (const item of data) {
-        fileSlots[item.format] = item;
-    }
-
-    const uploadFile = format => () => {
-        pickFile(FORMAT_MIME[format], files => {
-            const file = files[0];
-            if (!file) return;
-            core.createTask('magazines/updateEditionFile', { magazine, id }, { format, file });
-        });
-    };
-
-    const downloadURL = f => new URL(`/magazines/${magazine}/editions/${id}/files/${f}`, config.base).toString();
-
-    const deleteFile = format => () => {
-        core.createTask('magazines/deleteEditionFile', { magazine, id }, { format });
-    };
-
-    return (
-        <div class="magazine-edition-files">
-            {FILE_FORMATS.map(f => (
-                <EditionFileSlot
-                    key={f}
-                    format={f}
-                    downloads={fileSlots[f]?.downloads}
-                    size={fileSlots[f]?.size}
-                    downloadURL={downloadURL(f)}
-                    onUpload={uploadFile(f)}
-                    onDelete={deleteFile(f)} />
-            ))}
-        </div>
-    );
-});
-
-function EditionFileSlot ({ format, downloads, size, onUpload, downloadURL, onDelete }) {
-    const exists = !!size;
-
-    return (
-        <div class={'edition-file-slot' + (exists ? ' file-exists' : '')}>
-            <div class="file-info">
-                <div class="file-icon">
-                    <DocumentIcon />
-                </div>
-                {exists ? (
-                    <a
-                        class="file-format is-download"
-                        href={downloadURL}
-                        rel="noopener noreferrer"
-                        download={format}
-                        target="_blank">
-                        {format.toUpperCase()}
-                        {' '}
-                        <OpenInNewIcon className="external-icon" style={{ verticalAlign: 'middle' }} />
-                    </a>
-                ) : (
-                    <span class="file-format">
-                        {format.toUpperCase()}
-                    </span>
-                )}
-                <div class="fi-spacer" />
-                {exists ? (
-                    <div class="file-actions">
-                        <Button class="file-replace" icon small onClick={onUpload}>
-                            <FileUploadIcon style={{ verticalAlign: 'middle' }} />
-                        </Button>
-                        {' '}
-                        <Button class="file-delete" icon small onClick={onDelete}>
-                            <DeleteForeverIcon style={{ verticalAlign: 'middle' }} />
-                        </Button>
-                    </div>
-                ) : (
-                    <div class="file-actions">
-                        <Button class="upload-fab" fab onClick={onUpload}>
-                            <FileUploadIcon style={{ verticalAlign: 'middle' }} />
-                            {' '}
-                            {locale.files.upload}
-                        </Button>
-                    </div>
-                )}
-            </div>
-            {exists && (
-                <div class="file-details">
-                    <span class="file-downloads">
-                        {locale.files.downloads(downloads)}
-                    </span>
-                </div>
-            )}
-        </div>
-    );
-}

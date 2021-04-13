@@ -3,10 +3,13 @@ import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../../components/page';
 import DetailView from '../../../../../components/detail';
 import Meta from '../../../../meta';
+import { AudioIcon } from '../../../../../components/icons';
 import { connectPerms } from '../../../../../perms';
 import { coreContext } from '../../../../../core/connection';
 import { magazineToc as locale } from '../../../../../locale';
+import { Files } from '../files';
 import { FIELDS } from './fields';
+import './detail.less';
 
 export default connectPerms(class MagazineTocEntry extends Page {
     state = {
@@ -56,6 +59,8 @@ export default connectPerms(class MagazineTocEntry extends Page {
     }
 
     render ({ perms, editing }, { edit }) {
+        const { magazine, edition, id } = this;
+
         const actions = [];
 
         if (perms.hasPerm('')) {
@@ -70,9 +75,9 @@ export default connectPerms(class MagazineTocEntry extends Page {
             actions.push({
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('magazines/deleteTocEntry', {
-                    magazine: this.magazine,
-                    edition: this.edition,
-                    id: this.id,
+                    magazine,
+                    edition,
+                    id,
                 }),
                 overflow: true,
             });
@@ -86,8 +91,8 @@ export default connectPerms(class MagazineTocEntry extends Page {
 
                 <DetailView
                     view="magazines/tocEntry"
-                    options={{ magazine: this.magazine, edition: this.edition }}
-                    id={this.id}
+                    options={{ magazine, edition }}
+                    id={id}
                     fields={FIELDS}
                     locale={locale}
                     edit={edit}
@@ -96,7 +101,26 @@ export default connectPerms(class MagazineTocEntry extends Page {
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
                     onDelete={() => this.props.pop()} />
+
+                {!editing && (
+                    <Files
+                        formats={{
+                            mp3: 'audio/mpeg',
+                            wav: 'audio/wave',
+                            flac: 'audio/flac',
+                        }}
+                        icon={<AudioIcon />}
+                        view={['magazines/tocRecitations', { magazine, edition, id }]}
+                        onUpload={(core, format, file) => {
+                            core.createTask('magazines/updateTocRecitation', { magazine, edition, id }, { format, file });
+                        }}
+                        onDelete={(core, format) => {
+                            core.createTask('magazines/deleteTocRecitation', { magazine, edition, id }, { format });
+                        }}
+                        downloadURL={f => `/magazines/${magazine}/editions/${edition}/toc/${id}/recitation/${f}`} />
+                )}
             </div>
         );
     }
 });
+

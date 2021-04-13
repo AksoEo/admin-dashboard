@@ -76,6 +76,7 @@ export const FIELDS = {
         weight: 2,
         component ({ value, editing, onChange, slot }) {
             return <MdField
+                class="magazine-toc-entry-text"
                 inline={slot !== 'detail'}
                 editing={editing}
                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
