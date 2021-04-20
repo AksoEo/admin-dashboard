@@ -58,12 +58,12 @@ export default class Segmented extends PureComponent {
         this.setState({ backgroundPos: targetPos });
     }
 
-    componentWillUpdate (newProps) {
-        if (newProps.selected !== this.props.selected
-            || newProps.children.length !== this.props.children.length) {
+    componentDidUpdate (prevProps) {
+        if (prevProps.selected !== this.props.selected
+            || prevProps.children.length !== this.props.children.length) {
             // set new background target because either the selected item or the number of children
             // changed
-            this.updateBackgroundPos(newProps);
+            this.updateBackgroundPos();
         }
     }
 
@@ -121,13 +121,14 @@ export default class Segmented extends PureComponent {
     onPointerUp = e => {
         const pos = this.screenToIndexPos(e.clientX);
         this.dragging = false;
-        this.updateBackgroundPos();
         window.removeEventListener('pointermove', this.onPointerMove);
         window.removeEventListener('pointerup', this.onPointerUp);
         if (pos.index !== null) {
             let index = Math.round(pos.index);
             index = Math.min(index, this.props.children.length - 1);
             this.props.onSelect(this.props.children[index].id);
+        } else {
+            this.updateBackgroundPos();
         }
     };
 

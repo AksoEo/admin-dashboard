@@ -49,6 +49,7 @@ export const FIELDS = {
     description: {
         sortable: true,
         skipLabel: true,
+        wantsCreationLabel: true,
         weight: 2,
         component ({ value, editing, onChange, slot }) {
             return <MdField

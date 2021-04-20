@@ -19,9 +19,15 @@ import './tasks.less';
 function createDialog ({ locale, fieldNames, fields: fieldDefs, className, onCompletion }) {
     return ({ open, task }) => {
         const fields = fieldNames.map(id => {
-            const Component = fieldDefs[id].component;
+            const def = fieldDefs[id];
+            const Component = def.component;
             return (
                 <Field key={id}>
+                    {def.wantsCreationLabel && (
+                        <label class="creation-label">
+                            {locale.fields[id]}
+                        </label>
+                    )}
                     <Component
                         slot="create"
                         editing value={task.parameters[id]}
@@ -37,8 +43,8 @@ function createDialog ({ locale, fieldNames, fields: fieldDefs, className, onCom
                         class={className}
                         open={open}
                         onClose={() => task.drop()}
-                        title={locale.title}
-                        actionLabel={locale.button}
+                        title={locale.create.title}
+                        actionLabel={locale.create.button}
                         run={() => task.runOnce().then(id => {
                             onCompletion(task, routerContext, id);
                         })}>
@@ -82,7 +88,7 @@ function deleteDialog ({ locale }) {
 
 export default {
     createMagazine: createDialog({
-        locale: magazinesLocale.create,
+        locale: magazinesLocale,
         fieldNames: ['org', 'name', 'description'],
         fields: MAGAZINE_FIELDS,
         className: 'magazines-task-create',
@@ -91,7 +97,7 @@ export default {
     updateMagazine: updateDialog({ locale: magazinesLocale.update, fields: magazinesLocale.fields }),
     deleteMagazine: deleteDialog({ locale: magazinesLocale.delete }),
     createEdition: createDialog({
-        locale: editionsLocale.create,
+        locale: editionsLocale,
         fieldNames: ['id', 'idHuman', 'date'],
         fields: EDITION_FIELDS,
         className: 'magazines-task-create-edition',
@@ -100,7 +106,7 @@ export default {
     updateEdition: updateDialog({ locale: editionsLocale.update, fields: editionsLocale.fields }),
     deleteEdition: deleteDialog({ locale: editionsLocale.delete }),
     createTocEntry: createDialog({
-        locale: tocLocale.create,
+        locale: tocLocale,
         fieldNames: ['page', 'title'],
         fields: TOC_FIELDS,
         className: 'magazines-task-create-toc-entry',

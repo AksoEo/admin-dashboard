@@ -3,6 +3,7 @@ import { Checkbox, TextField } from '@cpsdqs/yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import LimitedTextField from '../../../../../components/limited-text-field';
 import MdField from '../../../../../components/md-field';
+import { magazineToc as locale } from '../../../../../locale';
 
 export const FIELDS = {
     page: {
@@ -15,7 +16,8 @@ export const FIELDS = {
                     <TextField
                         outline
                         type="number"
-                        value={value}
+                        label={locale.fields.page}
+                        value={Number.isFinite(value) ? `${value}` : ''}
                         onChange={e => onChange(e.target.value | 0)} />
                 );
             }
@@ -30,6 +32,7 @@ export const FIELDS = {
                 return <LimitedTextField
                     outline
                     value={value}
+                    label={slot === 'create' && locale.fields.title}
                     maxLength={500}
                     onChange={e => onChange(e.target.value)} />;
             }
@@ -46,7 +49,7 @@ export const FIELDS = {
                     outline
                     value={value}
                     maxLength={100}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={e => onChange(e.target.value || null)} />;
             }
             return value;
         },
@@ -60,7 +63,7 @@ export const FIELDS = {
                     outline
                     value={value}
                     maxLength={100}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={e => onChange(e.target.value || null)} />;
             }
             return value;
         },

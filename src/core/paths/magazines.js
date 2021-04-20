@@ -315,6 +315,7 @@ export const tasks = {
         apiPath: ({ magazine, edition, id }) => `/magazines/${magazine}/editions/${edition}/toc/${id}`,
         storePaths: ({ magazine, edition, id }) => [
             [MAGAZINES, magazine, EDITIONS, edition, TOC, id, RECITATIONS],
+            [MAGAZINES, magazine, EDITIONS, edition, TOC, id, E_DATA],
             [MAGAZINES, magazine, EDITIONS, edition, TOC, id],
         ],
         signalPath: ({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, SIG_TOC],
