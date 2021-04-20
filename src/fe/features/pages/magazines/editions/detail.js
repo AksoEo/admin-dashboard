@@ -3,11 +3,12 @@ import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../components/page';
 import TaskImage from '../../../../components/task-image';
-import DetailView from '../../../../components/detail';
+import DetailShell from '../../../../components/detail-shell';
+import DetailFields from '../../../../components/detail-fields';
 import { DocumentIcon } from '../../../../components/icons';
 import Meta from '../../../meta';
 import { connectPerms } from '../../../../perms';
-import { coreContext } from '../../../../core/connection';
+import { connect, coreContext } from '../../../../core/connection';
 import { magazineEditions as locale, magazineToc as tocLocale } from '../../../../locale';
 import { Files } from './files';
 import { FIELDS } from './fields';
@@ -94,24 +95,7 @@ export default connectPerms(class MagazineEdition extends Page {
                     title={locale.detailTitle}
                     actions={actions} />
 
-                <TaskImage
-                    editing={editing}
-                    class="edition-thumbnail"
-                    contain lightbox
-                    sizes={[32, 64, 128, 256, 512, 1024]}
-                    task="magazines/editionThumbnail"
-                    options={{ magazine: this.magazine, id: this.id }}
-                    onUpdate={(thumbnail, core) => {
-                        const task = core.createTask('magazines/updateEditionThumbnail', {
-                            magazine: this.magazine,
-                            id: this.id,
-                        }, {
-                            thumbnail,
-                        });
-                        return task.runOnceAndDrop();
-                    }} />
-
-                <DetailView
+                <DetailShell
                     view="magazines/edition"
                     options={{ magazine }}
                     id={id}
@@ -122,7 +106,17 @@ export default connectPerms(class MagazineEdition extends Page {
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    onDelete={() => this.props.pop()} />
+                    onDelete={() => this.props.pop()}>
+                    {data => (
+                        <DetailContents
+                            magazine={magazine}
+                            id={id}
+                            data={data}
+                            item={this.state.edit || data}
+                            editing={editing}
+                            onItemChange={edit => this.setState({ edit })} />
+                    )}
+                </DetailShell>
 
                 {!editing && (
                     <Files
@@ -158,3 +152,49 @@ export default connectPerms(class MagazineEdition extends Page {
     }
 });
 
+function DetailContents ({ magazine, id, data, item, editing, onItemChange }) {
+    return (
+        <div class="edition-detail-contents">
+            <div class="edition-header">
+                <TaskImage
+                    editing={editing}
+                    class="edition-thumbnail"
+                    contain lightbox
+                    sizes={[32, 64, 128, 256, 512, 1024]}
+                    task="magazines/editionThumbnail"
+                    options={{ magazine, id }}
+                    placeholder={<EditionPlaceholderThumbnail magazine={magazine} edition={item} />}
+                    onUpdate={(thumbnail, core) => {
+                        const task = core.createTask('magazines/updateEditionThumbnail', {
+                            magazine,
+                            id,
+                        }, {
+                            thumbnail,
+                        });
+                        return task.runOnceAndDrop();
+                    }} />
+                <div class="header-details">
+                    <DetailFields
+                        data={data}
+                        edit={item}
+                        editing={editing}
+                        onEditChange={onItemChange}
+                        fields={FIELDS}
+                        locale={locale}
+                        compact />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const EditionPlaceholderThumbnail = connect(({ magazine }) => ['magazines/magazine', { id: magazine }])(data => ({
+    magazine: data,
+}))(function EditionPlaceholderThumbnail ({ magazine, edition }) {
+    return (
+        <div class="edition-placeholder-thumbnail">
+            <div class="th-title">{magazine?.name}</div>
+            <div class="th-subtitle">{edition.idHuman}</div>
+        </div>
+    );
+});

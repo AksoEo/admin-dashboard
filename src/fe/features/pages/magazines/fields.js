@@ -10,6 +10,7 @@ import './fields.less';
 export const FIELDS = {
     org: {
         weight: 0.25,
+        slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (slot === 'create' && editing) {
                 return (

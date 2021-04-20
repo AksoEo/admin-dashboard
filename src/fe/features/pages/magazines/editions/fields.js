@@ -24,22 +24,6 @@ export const FIELDS = {
             return '' + value;
         },
     },
-    date: {
-        sortable: true,
-        slot: 'titleAlt',
-        weight: 1.2,
-        component ({ value, editing, onChange, slot }) {
-            if (editing) {
-                return <date.editor
-                    class="magazine-edition-field-id-human"
-                    label={slot === 'create' && locale.fields.date}
-                    outline
-                    value={value}
-                    onChange={onChange} />;
-            }
-            return <date.renderer value={value} />;
-        },
-    },
     idHuman: {
         sortable: true,
         slot: 'title',
@@ -54,8 +38,24 @@ export const FIELDS = {
                     maxLength={50}
                     onChange={e => onChange(e.target.value)} />;
             }
-            if (slot === 'title') return <b>{value}</b>;
+            if (slot === 'title') return <b class="edition-field-id-human">{value}</b>;
             return value;
+        },
+    },
+    date: {
+        sortable: true,
+        slot: 'titleAlt',
+        weight: 1.2,
+        component ({ value, editing, onChange, slot }) {
+            if (editing) {
+                return <date.editor
+                    class="magazine-edition-field-id-human"
+                    label={slot === 'create' && locale.fields.date}
+                    outline
+                    value={value}
+                    onChange={onChange} />;
+            }
+            return <date.renderer value={value} />;
         },
     },
     description: {

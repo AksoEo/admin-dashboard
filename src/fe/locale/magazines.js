@@ -130,6 +130,7 @@ export const magazineToc = {
         description: '[[copy paste warning text]]',
     },
     recitations: {
+        title: 'Voĉlego',
         update: {
             title: 'Alŝuti voĉlegon',
             button: 'Alŝuti',

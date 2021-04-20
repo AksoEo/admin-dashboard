@@ -4,6 +4,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import LimitedTextField from '../../../../../components/limited-text-field';
 import MdField from '../../../../../components/md-field';
 import { magazineToc as locale } from '../../../../../locale';
+import './fields.less';
 
 export const FIELDS = {
     page: {
@@ -79,7 +80,7 @@ export const FIELDS = {
         weight: 2,
         component ({ value, editing, onChange, slot }) {
             return <MdField
-                class="magazine-toc-entry-text"
+                class={'magazine-toc-entry-text' + (!editing ? ' is-preview' : '')}
                 inline={slot !== 'detail'}
                 editing={editing}
                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}

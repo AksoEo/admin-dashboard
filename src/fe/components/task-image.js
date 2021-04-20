@@ -21,6 +21,7 @@ import './task-image.less';
 /// - `onUpdate`: (Blob, core) => Promise<void, any>
 /// - `contain`: bool - if true, image will use object-fit: contain instead of cover
 /// - `lightbox`: bool - if true, will allow tapping to open a lightbox
+/// - `placeholder`: VNode - placeholder to show if there is no image
 export default class TaskImage extends PureComponent {
     state = {
         loading: false,
@@ -172,6 +173,7 @@ export default class TaskImage extends PureComponent {
         editing,
         lightbox,
         contain,
+        placeholder,
         ...extra
     }, { loading, image, prevImage, imageSeqId }) {
         void sizes, task, options, hash, onUpdate;
@@ -196,6 +198,10 @@ export default class TaskImage extends PureComponent {
                         key={'i' + imageSeqId}
                         onClick={this.#onImageClick}
                         src={image} />
+                ) : !loading ? (
+                    <div class="inner-image is-placeholder">
+                        {placeholder}
+                    </div>
                 ) : null}
 
                 {editing ? (

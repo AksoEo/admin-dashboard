@@ -103,6 +103,12 @@ export default connectPerms(class MagazineTocEntry extends Page {
                     onDelete={() => this.props.pop()} />
 
                 {!editing && (
+                    <div class="recitation-title">
+                        {locale.recitations.title}
+                    </div>
+                )}
+
+                {!editing && (
                     <Files
                         formats={{
                             mp3: 'audio/mpeg',
