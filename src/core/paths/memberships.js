@@ -1,12 +1,12 @@
-import { util } from '@tejo/akso-client';
 import { base32 } from 'rfc4648';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
-import { fieldDiff, fieldsToOrder, makeParametersToRequestData, makeClientToAPI, makeClientFromAPI, filtersToAPI } from '../list';
+import { fieldDiff, makeParametersToRequestData, makeClientToAPI, makeClientFromAPI, filtersToAPI } from '../list';
 import { clientFromAPI as codeholderFromAPI, clientToAPI as codeholderToAPI } from './codeholders';
 import { deepMerge } from '../../util';
+import { crudList, crudCreate, crudGet, crudUpdate, crudDelete } from '../templates';
 
 /// Data store path.
 export const MEMBERSHIPS = 'memberships';
@@ -163,98 +163,44 @@ const eClientFromAPI = makeClientFromAPI(eClientFields, true);
 const eClientToAPI = makeClientToAPI(eClientFields);
 
 export const tasks = {
-    listCategories: async (_, { offset, limit, fields, search, jsonFilter }) => {
-        const client = await asyncClient;
+    listCategories: crudList({
+        apiPath: () => '/membership_categories',
+        storePath: (_, item) => [MEMBERSHIP_CATEGORIES, item.id],
+        fields: CATEGORY_FIELDS,
+    }),
+    category: crudGet({
+        apiPath: ({ id }) => `/membership_categories/${id}`,
+        storePath: ({ id }) => [MEMBERSHIP_CATEGORIES, id],
+        fields: CATEGORY_FIELDS,
+    }),
+    createCategory: crudCreate({
+        apiPath: () => `/membership_categories`,
+        storePath: (_, id) => [MEMBERSHIP_CATEGORIES, id],
+        signalPath: () => MEMBERSHIP_CATEGORIES.concat([SIG_CATEGORIES]),
+        fields: CATEGORY_FIELDS,
+        then: (_, id) => {
+            // fetch rest,
+            tasks.category({ id }).catch(() => {});
+        },
+    }),
+    updateCategory: crudUpdate({
+        apiPath: ({ id }) => `/membership_categories/${id}`,
+        storePath: ({ id }) => [MEMBERSHIP_CATEGORIES, id],
+    }),
+    deleteCategory: crudDelete({
+        apiPath: ({ id }) => `/membership_categories/${id}`,
+        storePath: ({ id }) => [MEMBERSHIP_CATEGORIES, id],
+        signalPath: () => MEMBERSHIP_CATEGORIES.concat([SIG_CATEGORIES]),
+    }),
 
-        const opts = {
-            offset,
-            limit,
-            fields: CATEGORY_FIELDS,
-            order: fieldsToOrder(fields),
-        };
-        if (jsonFilter) opts.filter = jsonFilter.filter;
-
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: [search.field], str: transformedQuery };
-        }
-
-        const res = await client.get('/membership_categories', opts);
-
-        for (const item of res.body) {
-            store.insert([MEMBERSHIP_CATEGORIES, item.id], item);
-        }
-
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: {
-                time: res.resTime,
-                filtered: false,
-            },
-        };
-    },
-    category: async ({ id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/membership_categories/${id}`, {
-            fields: CATEGORY_FIELDS,
-        });
-        store.insert([MEMBERSHIP_CATEGORIES, id], res.body);
-        return res.body;
-    },
-    createCategory: async (_, params) => {
-        const client = await asyncClient;
-        const res = await client.post('/membership_categories', params);
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([MEMBERSHIP_CATEGORIES, id], params);
-        store.signal(MEMBERSHIP_CATEGORIES.concat([SIG_CATEGORIES]));
-        // fetch rest
-        tasks.category({ id }).catch(() => {});
-        return id;
-    },
-    updateCategory: async ({ id }, params) => {
-        const client = await asyncClient;
-        delete params.id;
-        await client.patch(`/membership_categories/${id}`, params);
-        const existing = store.get([MEMBERSHIP_CATEGORIES, id]);
-        store.insert([MEMBERSHIP_CATEGORIES, id], deepMerge(existing, params));
-    },
-    deleteCategory: async ({ id }) => {
-        const client = await asyncClient;
-        await client.delete(`/membership_categories/${id}`);
-        store.remove([MEMBERSHIP_CATEGORIES, id]);
-        store.signal(MEMBERSHIP_CATEGORIES.concat([SIG_CATEGORIES]));
-    },
-
-    listOptions: async (_, { offset, limit, fields }) => {
-        const client = await asyncClient;
-
-        const opts = {
-            offset,
-            limit,
-            fields: OPTIONS_FIELDS,
-            order: fieldsToOrder(fields),
-        };
-
-        const res = await client.get('/registration/options', opts);
-
-        for (const item of res.body) {
+    listOptions: crudList({
+        apiPath: () => `/registration/options`,
+        storePath: (_, item) => REGISTRATION_OPTIONS.concat([item.id]),
+        fields: OPTIONS_FIELDS,
+        map: item => {
             item.id = item.year;
-            store.insert(REGISTRATION_OPTIONS.concat([item.id]), item);
-        }
-
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: {
-                time: res.resTime,
-                filtered: false,
-            },
-        };
-    },
+        },
+    }),
     options: async ({ id }) => {
         const client = await asyncClient;
 
@@ -304,12 +250,11 @@ export const tasks = {
         store.insert(REGISTRATION_OPTIONS.concat([id]), deepMerge(existing, params));
         store.signal(SIG_OPTIONS);
     },
-    deleteOptions: async ({ id }) => {
-        const client = await asyncClient;
-        await client.delete(`/registration/options/${id}`);
-        store.remove(REGISTRATION_OPTIONS.concat([id]));
-        store.signal(SIG_OPTIONS);
-    },
+    deleteOptions: crudDelete({
+        apiPath: ({ id }) => `/registration/options/${id}`,
+        storePath: ({ id }) => REGISTRATION_OPTIONS.concat([id]),
+        signalPath: SIG_OPTIONS,
+    }),
 
     listEntries: async (_, parameters) => {
         const client = await asyncClient;
