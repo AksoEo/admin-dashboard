@@ -17,16 +17,16 @@ export const magazines = {
         description: 'Priskribo',
     },
     create: {
-        title: 'Krei revuo',
+        title: 'Krei revuon',
         button: 'Krei',
-        menuItem: 'Krei revuo',
+        menuItem: 'Krei revuon',
     },
     update: {
         menuItem: 'Redakti',
         title: 'Redakti revuon',
         button: 'Aktualigi',
 
-        nameRequired: 'Necesas nomon',
+        nameRequired: 'Necesas nomo',
     },
     delete: {
         menuItem: 'Forigi',
@@ -37,38 +37,38 @@ export const magazines = {
 };
 
 export const magazineEditions = {
-    detailTitle: '[[Edition]]',
+    detailTitle: 'Revua numero',
     search: {
         fields: {
-            idHuman: 'Homa ID',
+            idHuman: 'Numero',
             description: 'Priskribo',
         },
         placeholders: {
-            idHuman: 'Serĉi homan ID-on',
+            idHuman: 'Serĉi numeron',
             description: 'Serĉi priskribon',
         },
     },
     fields: {
-        id: 'ID',
-        idHuman: 'Homa ID',
+        id: 'Identigilo',
+        idHuman: 'Numero',
         date: 'Dato',
         description: 'Priskribo',
     },
     create: {
-        title: '[[Create edition]]',
+        title: 'Krei numeron',
         button: 'Krei',
-        menuItem: '[[Create edition]]',
+        menuItem: 'Krei numeron',
     },
     update: {
         menuItem: 'Redakti',
-        title: '[[Edit edition]]',
+        title: 'Redakti numeron',
         button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
-        title: '[[Delete edition]]',
+        title: 'Forigi numeron',
         button: 'Forigi',
-        description: '[[copy paste warning text]]',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi numeron? Ne eblas malfari tiun ĉi agon.',
     },
     files: {
         update: {
@@ -82,52 +82,52 @@ export const magazineEditions = {
         },
         upload: 'Alŝuti',
         download: 'Elŝuti',
-        downloads: n => `[[${n} downloads]]`,
+        downloads: n => `${n} elŝuto${n == 1 ? '' : 'j'}`,
     },
 };
 
 export const magazineToc = {
     title: 'Enhavo',
-    detailTitle: '[[Toc entry]]',
+    detailTitle: 'Artikolo',
     search: {
         fields: {
             title: 'Titolo',
-            author: '[[Author]]',
-            recitationAuthor: '[[RecitationAuthor]]',
+            author: 'Aŭtoro',
+            recitationAuthor: 'Laŭtleginto',
             text: 'Teksto',
         },
         placeholders: {
-            idHuman: 'Serĉi homan ID-on',
+            idHuman: 'Serĉi numeron',
             description: 'Serĉi priskribon',
             title: 'Serĉi titolon',
-            author: '[[search author]]',
-            recitationAuthor: '[[search recitationAuthor]]',
-            text: '[[search text]]',
+            author: 'Serĉi aŭtoron',
+            recitationAuthor: 'Serĉi laŭtleginton',
+            text: 'Serĉi en teksto',
         },
     },
     fields: {
-        page: '[[Page]]',
+        page: 'Paĝo',
         title: 'Titolo',
-        author: '[[Author]]',
-        recitationAuthor: '[[RecitationAuthor]]',
+        author: 'Aŭtoro',
+        recitationAuthor: 'Laŭtleginto',
         text: 'Teksto',
-        highlighted: '[[Highlighted]]',
+        highlighted: 'Aparte leginda',
     },
     create: {
-        title: '[[Create toc entry]]',
-        button: 'Krei',
-        menuItem: '[[Create toc entry]]',
+        title: 'Aldoni artikolon',
+        button: 'Aldoni',
+        menuItem: 'Aldoni artikolon',
     },
     update: {
         menuItem: 'Redakti',
-        title: '[[Edit toc entry]]',
+        title: 'Redakti artikolon',
         button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
-        title: '[[Delete toc entry]]',
+        title: 'Forigi artikolon',
         button: 'Forigi',
-        description: '[[copy paste warning text]]',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi artikolon? Ne eblas malfari tiun ĉi agon.',
     },
     recitations: {
         title: 'Voĉlego',
