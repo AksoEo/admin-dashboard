@@ -98,7 +98,7 @@ export default {
     deleteMagazine: deleteDialog({ locale: magazinesLocale.delete }),
     createEdition: createDialog({
         locale: editionsLocale,
-        fieldNames: ['id', 'idHuman', 'date'],
+        fieldNames: ['idHuman', 'date'],
         fields: EDITION_FIELDS,
         className: 'magazines-task-create-edition',
         onCompletion: (task, routerContext, id) => routerContext.navigate(`/revuoj/${task.options.magazine}/numero/${id}`),

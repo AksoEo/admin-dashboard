@@ -79,7 +79,7 @@ export const tasks = {
     }),
     createEdition: crudCreate({
         apiPath: ({ magazine }) => `/magazines/${magazine}/editions`,
-        fields: ['id', 'idHuman', 'date', 'description'],
+        fields: ['idHuman', 'date', 'description'],
         storePath: ({ magazine }, id) => [MAGAZINES, magazine, EDITIONS, id, E_DATA],
         signalPath: ({ magazine }) => [MAGAZINES, magazine, EDITIONS, SIG_EDITIONS],
     }),
