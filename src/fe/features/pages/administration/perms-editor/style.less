@@ -8,6 +8,26 @@
     position: relative;
     padding: 24px;
 
+    .perms-stats {
+        font-size: 0.875em;
+        font-style: italic;
+        margin-bottom: 16px;
+
+        .stats-line {
+            margin-bottom: 4px;
+            opacity: 0.6;
+
+            &.is-linkish {
+                text-decoration: underline;
+
+                &:hover {
+                    opacity: 1;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
     .perms-req-notice {
         font-size: small;
         padding: 8px 16px;
@@ -255,6 +275,23 @@
                     text-align: left;
                 }
             }
+        }
+    }
+}
+
+.perms-editor-raw-permissions-dialog {
+    width: 100%;
+    max-width: 600px;
+
+    .perms-editor-raw-permissions {
+        .raw-perm {
+            font-family: @monospace;
+            font-size: 0.875em;
+            padding: 8px 16px;
+        }
+        .raw-perms-empty {
+            text-align: center;
+            opacity: 0.6;
         }
     }
 }

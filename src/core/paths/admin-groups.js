@@ -163,9 +163,10 @@ export const tasks = {
     },
 
     /// adminGroups/listCodeholders: lists codeholders that are part of an admin group
-    listCodeholders: async ({ group }, { offset, limit, fields }) => {
+    listCodeholders: async ({ group }, { offset, limit, fields, search }) => {
         const client = await asyncClient;
         const { options } = codeholdersPTRD({
+            search,
             fields: [{ id: 'code', sorting: 'asc' }, { id: 'name', sorting: 'asc' }],
             order: fieldsToOrder(fields),
             offset,
@@ -191,15 +192,25 @@ export const tasks = {
     },
 
     /// adminGroups/listClients: lists clients that are part of an admin group
-    listClients: async ({ group }, { offset, limit, fields }) => {
+    listClients: async ({ group }, { offset, limit, fields, search }) => {
         const client = await asyncClient;
 
-        const res = await client.get(`/admin_groups/${group}/clients`, {
+        const opts = {
             fields: ['apiKey', 'name', 'ownerName', 'ownerEmail'],
             order: fieldsToOrder(fields),
             offset,
             limit,
-        });
+        };
+
+        if (search && search.query) {
+            const transformedQuery = util.transformSearch(search.query);
+            if (!util.isValidSearch(transformedQuery)) {
+                throw { code: 'invalid-search-query', message: 'invalid search query' };
+            }
+            opts.search = { str: transformedQuery, cols: [search.field] };
+        }
+
+        const res = await client.get(`/admin_groups/${group}/clients`, opts);
 
         for (const item of res.body) {
             item.id = Buffer.from(item.apiKey).toString('hex');

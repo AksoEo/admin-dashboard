@@ -29,6 +29,7 @@ export default {
                 'lastLegal',
                 'first',
                 'last',
+                'honorific',
             ];
         } else if (task.parameters.type === 'org') nameFields = ['full', 'local', 'abbrev'];
 

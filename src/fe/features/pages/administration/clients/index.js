@@ -56,9 +56,9 @@ export default connectPerms(class Clients extends Page {
             },
             fields: [
                 { id: 'name', sorting: 'asc', fixed: true },
-                { id: 'apiKey', sorting: 'none', fixed: true },
                 { id: 'ownerName', sorting: 'none', fixed: true },
                 { id: 'ownerEmail', sorting: 'none', fixed: true },
+                { id: 'apiKey', sorting: 'none', fixed: true },
             ],
             offset: 0,
             limit: 10,

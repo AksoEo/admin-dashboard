@@ -181,9 +181,10 @@ function permsByPrefix (prefix) {
 }
 
 /// Deletes all perms that would match the given prefix. Also see permsByPrefix.
-function deleteByPrefix (xperms, prefix) {
+function deleteByPrefix (xperms, prefix, ignoreFields) {
     xperms = clone(xperms);
     for (const p of [...xperms]) {
+        if (ignoreFields && p.startsWith('@.')) continue;
         if (!prefix || p.startsWith(prefix) && p.substr(prefix.length)[0] === '.') {
             xperms.delete(p);
         }
@@ -213,7 +214,8 @@ function add (xperms, id) {
 
     if (isWildcard(id)) {
         // delete all perms covered by this wildcard
-        xperms = deleteByPrefix(xperms, pop(id));
+        // but not fields! fields aren't implied automatically
+        xperms = deleteByPrefix(xperms, pop(id), true);
     }
 
     // only add if it isn’t already active to prevent wildcards from being useless

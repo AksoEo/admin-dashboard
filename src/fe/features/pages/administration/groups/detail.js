@@ -1,12 +1,13 @@
 import { h } from 'preact';
 import { useState, PureComponent } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
-import { LinearProgress, TextField } from '@cpsdqs/yamdl';
+import { Checkbox, LinearProgress, TextField } from '@cpsdqs/yamdl';
 import Tabs from '../../../../components/tabs';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
 import { FIELDS as CLIENT_FIELDS } from '../clients/index';
 import DetailView from '../../../../components/detail';
+import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import GlobalFilterNotice from '../../codeholders/global-filter-notice';
 import Meta from '../../../meta';
@@ -108,6 +109,7 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
                     title={locale.detailTitle}
                     actions={actions} />
                 <DetailView
+                    compact
                     view="adminGroups/group"
                     id={this.id}
                     header={Header}
@@ -264,7 +266,11 @@ function CodeholdersList ({ perms, id, editing }) {
     const [parameters, setParameters] = useState({
         limit: 10,
         fields: [{ id: 'code', sorting: 'asc' }, { id: 'name', sorting: 'asc' }],
+        search: { field: 'nameOrCode', query: '' },
+        filters: {},
     });
+    const [filterToGroup, setFilterToGroup] = useState(false);
+    const ftgId = 'checkbox-' + Math.random().toString(36);
 
     return (
         <WithItems
@@ -277,8 +283,26 @@ function CodeholdersList ({ perms, id, editing }) {
             {(selection, loading) => (
                 <div>
                     <LinearProgress hideIfNone class="edit-loading" indeterminate={loading} />
+                    {editing ? (
+                        <SearchFilters
+                            value={parameters}
+                            onChange={setParameters}
+                            searchFields={['nameOrCode', 'email', 'searchAddress', 'notes']}
+                            expanded={false}
+                            onExpandedChange={() => {}}
+                            locale={{
+                                searchFields: codeholdersLocale.search.fields,
+                                searchPlaceholders: codeholdersLocale.search.placeholders,
+                            }} />
+                    ) : null}
+                    {editing ? (
+                        <div class="content-filter-to-group">
+                            <Checkbox id={ftgId} checked={filterToGroup} onChange={setFilterToGroup} />
+                            <label for={ftgId}>{locale.filterToGroup}</label>
+                        </div>
+                    ) : null}
                     <OverviewList
-                        task={editing ? 'codeholders/list' : 'adminGroups/listCodeholders'}
+                        task={(editing && !filterToGroup) ? 'codeholders/list' : 'adminGroups/listCodeholders'}
                         notice={<GlobalFilterNotice perms={perms} />}
                         view="codeholders/codeholder"
                         selection={editing && selection}
@@ -292,6 +316,7 @@ function CodeholdersList ({ perms, id, editing }) {
                         outOfTree
                         onSetOffset={setOffset}
                         onSetLimit={limit => setParameters({ ...parameters, limit })}
+                        onSetFields={fields => setParameters({ ...parameters, fields })}
                         updateView={editing ? null : ['adminGroups/group', { id }]}
                         locale={codeholdersLocale.fields} />
                 </div>
@@ -304,8 +329,11 @@ function ClientsList ({ perms, id, editing }) {
     const [offset, setOffset] = useState(0);
     const [parameters, setParameters] = useState({
         limit: 10,
-        fields: [{ id: 'name', sorting: 'none' }, { id: 'apiKey', sorting: 'asc' }, { id: 'ownerName', sorting: 'none' }],
+        fields: [{ id: 'name', sorting: 'none' }, { id: 'ownerName', sorting: 'none' }, { id: 'apiKey', sorting: 'asc' }],
+        search: { field: 'name', query: '' },
     });
+    const [filterToGroup, setFilterToGroup] = useState(false);
+    const ftgId = 'checkbox-' + Math.random().toString(36);
 
     return (
         <WithItems
@@ -318,8 +346,27 @@ function ClientsList ({ perms, id, editing }) {
             {(selection, loading) => (
                 <div>
                     <LinearProgress hideIfNone class="edit-loading" indeterminate={loading} />
+                    {editing ? (
+                        <SearchFilters
+                            value={parameters}
+                            onChange={setParameters}
+                            searchFields={['name', 'apiKey', 'ownerName', 'ownerEmail']}
+                            filters={{}}
+                            expanded={false}
+                            onExpandedChange={() => {}}
+                            locale={{
+                                searchFields: clientsLocale.fields,
+                                searchPlaceholders: clientsLocale.search.placeholders,
+                            }} />
+                    ) : null}
+                    {editing ? (
+                        <div class="content-filter-to-group">
+                            <Checkbox id={ftgId} checked={filterToGroup} onChange={setFilterToGroup} />
+                            <label for={ftgId}>{locale.filterToGroup}</label>
+                        </div>
+                    ) : null}
                     <OverviewList
-                        task={editing ? 'clients/list' : 'adminGroups/listClients'}
+                        task={(editing && !filterToGroup) ? 'clients/list' : 'adminGroups/listClients'}
                         notice={<GlobalFilterNotice perms={perms} />}
                         view="clients/client"
                         selection={editing && selection}
@@ -333,6 +380,7 @@ function ClientsList ({ perms, id, editing }) {
                         outOfTree
                         onSetOffset={setOffset}
                         onSetLimit={limit => setParameters({ ...parameters, limit })}
+                        onSetFields={fields => setParameters({ ...parameters, fields })}
                         updateView={editing ? null : ['adminGroups/group', { id }]}
                         locale={clientsLocale.fields} />
                 </div>
@@ -359,6 +407,7 @@ const fields = {
         component ({ value, onChange }) {
             return (
                 <TextField
+                    outline
                     value={value}
                     onChange={e => onChange(e.target.value)} />
             );
@@ -369,6 +418,7 @@ const fields = {
         component ({ value, onChange }) {
             return (
                 <TextField
+                    outline
                     value={value}
                     onChange={e => onChange(e.target.value)} />
             );

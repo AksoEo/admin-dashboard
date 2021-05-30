@@ -36,6 +36,7 @@ export const adminGroups = {
     addClientsCount: n => `${n} API-kliento${n === 1 ? '' : 'j'} elektitaj`,
     addClientsDone: 'Aldoni elektitojn',
     removeClientsAreYouSure: n => `Ĉu vi certas, ke vi volas elpreni ${n} API-kliento${n === 1 ? '' : 'j'}n?`,
+    filterToGroup: '[[Show only group members]]',
 
     nameRequired: 'Necesas nomo',
 

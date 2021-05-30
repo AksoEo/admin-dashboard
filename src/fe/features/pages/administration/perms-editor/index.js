@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { useState } from 'preact/compat';
-import { Checkbox } from '@cpsdqs/yamdl';
+import { Checkbox, Dialog } from '@cpsdqs/yamdl';
 import {
     spec,
     memberFields as fieldsSpec,
@@ -45,6 +45,7 @@ export default class PermsEditor extends Component {
         showImplied: null,
         // if true, will show raw perm ids
         showRaw: false,
+        showData: false,
     };
 
     #node = null;
@@ -53,7 +54,7 @@ export default class PermsEditor extends Component {
         value,
         onChange,
         editable,
-    }, { showRaw }) {
+    }, { showRaw, showData }) {
         if (!value) return null;
         const { permissions, mrEnabled, mrFilter, mrFields } = value;
 
@@ -111,8 +112,29 @@ export default class PermsEditor extends Component {
                 <p>
                     {locale.permsEditor.note}
                 </p>
+                <div class="perms-stats">
+                    <div class="stats-line is-linkish" onClick={() => this.setState({ showData: true })}>
+                        {locale.permsEditor.stats.permCount(permissions.length)}
+                    </div>
+                    {mrEnabled ? (
+                        <div class="stats-line">
+                            {mrFields
+                                ? locale.permsEditor.stats.fieldCount(Object.keys(mrFields).length)
+                                : locale.permsEditor.stats.fieldCountAll}
+                        </div>
+                    ) : null}
+                </div>
                 {spec.map((x, i) => <PermsItem item={x} key={i} ctx={ctx} />)}
                 {unknownPerms}
+
+                <Dialog
+                    class="perms-editor-raw-permissions-dialog"
+                    title={locale.permsEditor.data.title}
+                    backdrop
+                    open={showData}
+                    onClose={() => this.setState({ showData: false })}>
+                    <RawPermissions permissions={permissions} />
+                </Dialog>
             </div>
         );
     }
@@ -338,6 +360,19 @@ function MemberFilterEditor ({ disabled, filter, onFilterChange }) {
                 disabled={disabled}
                 value={filter}
                 onChange={onFilterChange} />
+        </div>
+    );
+}
+
+function RawPermissions ({ permissions }) {
+    return (
+        <div class="perms-editor-raw-permissions">
+            {[...permissions].sort().map((perm, i) => (
+                <div class="raw-perm" key={i}>
+                    {perm}
+                </div>
+            ))}
+            {!permissions.length && <div class="raw-perms-empty">{locale.permsEditor.data.empty}</div>}
         </div>
     );
 }

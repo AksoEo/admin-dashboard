@@ -82,7 +82,10 @@ export default connect(({ matches }) => {
                     class="perms-editor-app-bar"
                     priority={edited ? 9 : -Infinity}
                     menu={(
-                        <Button small icon onClick={() => this.props.pop()}>
+                        <Button small icon onClick={() => {
+                            if (edited) this.setState({ permissions: null });
+                            else this.props.pop();
+                        }}>
                             <MenuIcon type="close" />
                         </Button>
                     )}

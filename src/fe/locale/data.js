@@ -102,6 +102,15 @@ export const data = {
             px: 'Permesoj',
             mr: 'Membrorestriktoj',
         },
+        stats: {
+            permCount: n => `[[${n} raw permission${n === 1 ? '' : 's'} granted]]`,
+            fieldCount: n => `[[${n} codeholder field${n === 1 ? '' : 's'} granted]]`,
+            fieldCountAll: '[[All codeholder fields granted]]',
+        },
+        data: {
+            title: '[[Raw permissions]]',
+            empty: '[[No permissions]]',
+        },
     },
     mdEditor: {
         previewOn: 'Antaŭvidi formatigon',
