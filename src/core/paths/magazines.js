@@ -74,7 +74,7 @@ export const tasks = {
 
     listEditions: crudList({
         apiPath: ({ magazine }) => `/magazines/${magazine}/editions`,
-        fields: ['id', 'idHuman', 'date', 'description'],
+        fields: ['id', 'idHuman', 'date', 'description', 'published'],
         storePath: ({ magazine }, item) => [MAGAZINES, magazine, EDITIONS, item.id, E_DATA],
     }),
     createEdition: crudCreate({
@@ -85,7 +85,7 @@ export const tasks = {
     }),
     edition: crudGet({
         apiPath: ({ magazine, id }) => `/magazines/${magazine}/editions/${id}`,
-        fields: ['id', 'idHuman', 'date', 'description'],
+        fields: ['id', 'idHuman', 'date', 'description', 'published'],
         map: item => {
             item.thumbnailKey = getThumbnailKey();
         },

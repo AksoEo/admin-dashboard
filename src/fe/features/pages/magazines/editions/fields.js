@@ -1,33 +1,16 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { Checkbox } from '@cpsdqs/yamdl';
+import CheckIcon from '@material-ui/icons/Check';
 import LimitedTextField from '../../../../components/limited-text-field';
 import MdField from '../../../../components/md-field';
 import { date } from '../../../../components/data';
 import { magazineEditions as locale } from '../../../../locale/magazines';
 
 export const FIELDS = {
-    id: {
-        sortable: true,
-        slot: 'title',
-        weight: 0.3,
-        component ({ value, editing, onChange, slot }) {
-            if (editing && slot === 'create') {
-                return (
-                    <TextField
-                        outline
-                        label={locale.fields.id}
-                        type="number"
-                        value={Number.isFinite(value) ? `${value}` : ''}
-                        onChange={e => onChange(e.target.value | 0)} />
-                );
-            }
-            return '' + value;
-        },
-    },
     idHuman: {
         sortable: true,
         slot: 'title',
-        weight: 0.5,
+        weight: 1,
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <LimitedTextField
@@ -57,6 +40,18 @@ export const FIELDS = {
             }
             return <date.renderer value={value} />;
         },
+    },
+    published: {
+        slot: 'icon',
+        weight: 0.5,
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return <Checkbox checked={value} onChange={onChange} />;
+            }
+            if (value) return <CheckIcon value={{ verticalAlign: 'middle' }} />;
+            return '—';
+        },
+        isEmpty: () => false,
     },
     description: {
         sortable: true,

@@ -124,18 +124,24 @@ function TimespanEditor ({ value, onChange }) {
             <WizardSection title={locale.fields.timeStart} />
             <Validator
                 component={timestamp.editor}
+                outline
                 value={value.start}
                 onChange={start => onChange({ ...value, start })}
-                validate={value => {
-                    if (!value) throw { error: true };
+                validate={v => {
+                    if (!v) throw { error: true };
+                    if (v >= value.end) throw { error: locale.create.emptyTimespan };
                 }} />
+            <br />
+            <br />
             <WizardSection title={locale.fields.timeEnd} />
             <Validator
                 component={timestamp.editor}
+                outline
                 value={value.end}
                 onChange={end => onChange({ ...value, end })}
-                validate={value => {
-                    if (!value) throw { error: true };
+                validate={v => {
+                    if (!v) throw { error: true };
+                    if (v <= value.start) throw { error: locale.create.emptyTimespan };
                 }} />
         </div>
     );

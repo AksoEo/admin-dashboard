@@ -49,9 +49,9 @@ export const magazineEditions = {
         },
     },
     fields: {
-        id: 'Identigilo',
         idHuman: 'Numero',
         date: 'Dato',
+        published: '[[Published]]',
         description: 'Priskribo',
     },
     create: {

@@ -157,6 +157,7 @@ export const votes = {
 
         nameRequired: 'Necesas nomo',
         requiresSelection: 'Vi devas elekti opcion',
+        emptyTimespan: '[[Selected timespan is empty]]',
     },
     numberRequired: 'Bv. enmeti nombron',
     optionsRequired: 'Bv. enmeti voĉdonopciojn',

@@ -19,7 +19,7 @@ export default class EditionsView extends PureComponent {
                 filter: {},
             },
             fields: [
-                { id: 'id', sorting: 'none', fixed: true },
+                { id: 'published', sorting: 'none', fixed: true },
                 { id: 'date', sorting: 'desc', fixed: true },
                 { id: 'idHuman', sorting: 'none', fixed: true },
                 { id: 'description', sorting: 'none', fixed: true },
