@@ -51,7 +51,7 @@ export const magazineEditions = {
     fields: {
         idHuman: 'Numero',
         date: 'Dato',
-        published: '[[Published]]',
+        published: 'Publikigita',
         description: 'Priskribo',
     },
     create: {

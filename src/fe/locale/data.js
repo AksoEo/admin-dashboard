@@ -103,13 +103,13 @@ export const data = {
             mr: 'Membrorestriktoj',
         },
         stats: {
-            permCount: n => `[[${n} raw permission${n === 1 ? '' : 's'} granted]]`,
-            fieldCount: n => `[[${n} codeholder field${n === 1 ? '' : 's'} granted]]`,
-            fieldCountAll: '[[All codeholder fields granted]]',
+            permCount: n => `${n} simplaj permeso${n === 1 ? '' : 'j'} donitaj`,
+            fieldCount: n => `${n} membrokampo${n === 1 ? '' : 'j'} permesitaj`,
+            fieldCountAll: 'Ĉiuj membrokampoj estas permesitaj',
         },
         data: {
-            title: '[[Raw permissions]]',
-            empty: '[[No permissions]]',
+            title: 'Simplaj permesoj',
+            empty: 'Neniuj permesoj',
         },
     },
     mdEditor: {
