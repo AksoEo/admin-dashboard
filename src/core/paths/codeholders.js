@@ -1288,8 +1288,8 @@ export const tasks = {
         if (parameters.name) {
             codeSuggestions.push(...UEACode.suggestCodes({
                 type: parameters.type,
-                firstNames: [parameters.name.firstLegal, parameters.name.first],
-                lastNames: [parameters.name.lastLegal, parameters.name.last],
+                firstNames: [parameters.name.first, parameters.name.firstLegal],
+                lastNames: [parameters.name.last, parameters.name.lastLegal],
                 fullName: parameters.name.full,
                 nameAbbrev: parameters.name.abbrev,
             }));
