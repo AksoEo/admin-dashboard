@@ -18,7 +18,7 @@ export default function AMap ({
     return (
         <Map {...extra}>
             <TileLayer
-                url="https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png?lang=eo"
+                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="&copy <a href=&quot;https://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
             {(markers || []).map((m, i) => <MarkerRenderer
                 {...m}

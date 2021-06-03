@@ -78,9 +78,13 @@
 }
 
 .congress-location-rating {
-    display: flex;
-    white-space: nowrap;
-    align-items: center;
+    .inner-rating {
+        display: inline-flex;
+        white-space: nowrap;
+        align-items: center;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
 
     .rating-cell {
         display: inline-block;
@@ -124,9 +128,10 @@
 
     .rating-editor {
         flex: 1;
-        margin-left: 8px;
-        display: flex;
+        margin-top: 8px;
+        display: inline-flex;
         align-items: center;
+        vertical-align: middle;
 
         .editor-infix {
             margin: 0 4px;

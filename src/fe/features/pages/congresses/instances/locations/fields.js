@@ -213,6 +213,7 @@ export const FIELDS = {
             };
 
             const items = [];
+            let editor;
             for (let i = 0; i < max; i++) {
                 const index = i;
                 const isFilled = i < Math.floor(rating);
@@ -238,7 +239,7 @@ export const FIELDS = {
                 );
             }
             if (editing) {
-                items.push(
+                editor = (
                     <span class="rating-editor">
                         <Validator
                             component={TextField}
@@ -292,7 +293,14 @@ export const FIELDS = {
                     </span>
                 );
             }
-            return <span class="congress-location-rating">{items}</span>;
+            return (
+                <span class="congress-location-rating">
+                    <span class="inner-rating">
+                        {items}
+                    </span>
+                    {editor}
+                </span>
+            );
         },
     },
     openHours: {
