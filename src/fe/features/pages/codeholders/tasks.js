@@ -23,14 +23,15 @@ import './style';
 export default {
     create ({ open, task }) {
         let nameFields = [];
+        let nameFieldsAfter = [];
         if (task.parameters.type === 'human') {
             nameFields = [
                 'firstLegal',
                 'lastLegal',
                 'first',
                 'last',
-                'honorific',
             ];
+            nameFieldsAfter = ['honorific'];
         } else if (task.parameters.type === 'org') nameFields = ['full', 'local', 'abbrev'];
 
         useEffect(() => {
@@ -38,6 +39,27 @@ export default {
                 task.update({ type: 'human' });
             }
         });
+
+        const renderNameField = (field, isOptional) => (
+            <Validator
+                key={field}
+                component={TextField}
+                class="form-field text-field"
+                outline
+                label={locale.nameSubfields[field] + (isOptional ? '' : '*')}
+                value={(task.parameters.name || {})[field]}
+                onChange={e => task.update({
+                    name: {
+                        ...(task.parameters.name || {}),
+                        [field]: e.target.value,
+                    },
+                })}
+                disabled={task.running}
+                validate={value => {
+                    if (isOptional) return;
+                    if (!value || !value.trim()) throw { error: locale.createNoName };
+                }} />
+        );
 
         return (
             <routerContext.Consumer>
@@ -67,24 +89,7 @@ export default {
                         <DynamicHeightDiv useFirstHeight>
                             {nameFields.map((field, isOptional) => (
                                 // we assume only the first field is required, so !!index == isOptional
-                                <Validator
-                                    key={field}
-                                    component={TextField}
-                                    class="form-field text-field"
-                                    outline
-                                    label={locale.nameSubfields[field] + (isOptional ? '' : '*')}
-                                    value={(task.parameters.name || {})[field]}
-                                    onChange={e => task.update({
-                                        name: {
-                                            ...(task.parameters.name || {}),
-                                            [field]: e.target.value,
-                                        },
-                                    })}
-                                    disabled={task.running}
-                                    validate={value => {
-                                        if (isOptional) return;
-                                        if (!value || !value.trim()) throw { error: locale.createNoName };
-                                    }} />
+                                renderNameField(field, isOptional)
                             ))}
                         </DynamicHeightDiv>
                         <Validator
@@ -92,6 +97,7 @@ export default {
                             class="form-field text-field"
                             outline
                             value={(task.parameters.code || {}).new}
+                            required
                             suggestionParameters={task.parameters}
                             onChange={newCode => task.update({ code: { new: newCode } })}
                             disabled={task.running}
@@ -101,6 +107,9 @@ export default {
                                     throw { error: locale.invalidUEACode };
                                 }
                             }} />
+                        <DynamicHeightDiv useFirstHeight>
+                            {nameFieldsAfter.map(field => renderNameField(field, true))}
+                        </DynamicHeightDiv>
                     </TaskDialog>
                 )}
             </routerContext.Consumer>

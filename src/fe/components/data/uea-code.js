@@ -141,7 +141,7 @@ class UEACodeEditor extends Component {
             onChange={onChange}
             maxLength={6}
             placeholder="xxxxxx"
-            label={locale.ueaCode.newCode}
+            label={locale.ueaCode.newCode + (this.props.required ? '*' : '')}
             onFocus={() => this.updateSuggestions()}
             validate={() => {
                 try {
