@@ -174,7 +174,7 @@ export const makeParametersToRequestData = ({
 };
 
 /// converts from API repr to client repr
-export const makeClientFromAPI = (clientFields, strict) => apiRepr => {
+export const makeClientFromAPI = (clientFields, strict) => (apiRepr, userData) => {
     const clientRepr = {};
     outer:
     for (const field in clientFields) {
@@ -192,7 +192,7 @@ export const makeClientFromAPI = (clientFields, strict) => apiRepr => {
         clientRepr[field] = typeof spec === 'string' ? apiRepr[spec]
             : typeof spec.apiFields === 'string'
                 ? apiRepr[spec.apiFields]
-                : spec.fromAPI(apiRepr);
+                : spec.fromAPI(apiRepr, userData);
     }
     return clientRepr;
 };

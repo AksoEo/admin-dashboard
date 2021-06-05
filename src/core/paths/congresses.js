@@ -1,4 +1,5 @@
 import { util } from '@tejo/akso-client';
+import { evaluate } from '@tejo/akso-script';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import * as store from '../store';
@@ -68,7 +69,36 @@ const pClientFields = {
         fromAPI: part => pReadId(part.dataId),
         toAPI: () => ({}),
     },
-    codeholderId: 'codeholderId',
+    identity: {
+        apiFields: ['codeholderId'],
+        fromAPI: (part, regForm) => {
+            const res = { codeholder: part.codeholderId };
+            if (regForm && part.data) {
+                const evalScript = (n) => {
+                    const getFVar = id => {
+                        if (id in part.data) return part.data[id];
+                        if (id === '@is_member') return !!part.codeholderId;
+                        return null;
+                    };
+                    if (n.startsWith('@')) return getFVar(n.substr(1));
+                    try {
+                        const stack = regForm.form.filter(x => x.el === 'script').map(x => x.script);
+                        let invocations = 0;
+                        return evaluate(stack, n, getFVar, {
+                            shouldHalt: () => invocations++ > 4096,
+                        });
+                    } catch (err) {
+                        return null;
+                    }
+                };
+
+                res.name = evalScript(regForm.identifierName);
+                res.email = evalScript(regForm.identifierEmail);
+            }
+            return res;
+        },
+        toAPI: v => ({ codeholderId: v.codeholder || null }),
+    },
     approved: 'approved',
     notes: 'notes',
     price: {
@@ -661,6 +691,9 @@ export const tasks = {
                     'price.var',
                     'price.currency',
                     'price.minUpfront',
+                    'identifierName',
+                    'identifierEmail',
+                    'identifierCountryCode',
                     'form',
                 ],
             });
@@ -689,6 +722,15 @@ export const tasks = {
     listParticipants: async ({ congress, instance }, parameters) => {
         const client = await asyncClient;
 
+        const regFormPath = [CONGRESSES, congress, INSTANCES, instance, REG_FORM];
+        let regForm = store.get(regFormPath);
+        if (!regForm) {
+            try {
+                await tasks.registrationForm({ congress, instance });
+                regForm = store.get(regFormPath);
+            } catch { /* */ }
+        }
+
         // need to remove data.* from fields because these aren't handled client-side
         const originalFields = parameters.fields;
         const pFields = [];
@@ -696,6 +738,16 @@ export const tasks = {
         for (const field of originalFields) {
             if (!field.id.startsWith('data.')) pFields.push(field);
             else dataFields.push(field.id);
+        }
+
+        const pFieldNames = pFields.map(x => x.id);
+        const dataFieldNames = dataFields.map(x => x.id);
+        if (regForm && pFieldNames.includes('identity')) {
+            // we need all data fields for the identity field because we're running a script to
+            // figure out the participant name
+            for (const item of regForm.form) {
+                if (item.el === 'input' && !dataFieldNames.includes(item.name)) dataFields.push('data.' + item.name);
+            }
         }
 
         const { options, usedFilters, transientFields } = pParametersToRequestData({
@@ -715,7 +767,7 @@ export const tasks = {
         for (const item of list) {
             const id = pReadId(item.dataId);
             const existing = store.get([CONGRESS_PARTICIPANTS, id]);
-            store.insert([CONGRESS_PARTICIPANTS, id], deepMerge(existing, pClientFromAPI(item)));
+            store.insert([CONGRESS_PARTICIPANTS, id], deepMerge(existing, pClientFromAPI(item, regForm)));
             items.push(id);
         }
 

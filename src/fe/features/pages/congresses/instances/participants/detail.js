@@ -186,12 +186,12 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
                     )}
                     <div class="field-codeholder">
                         <span class="field-label">
-                            {locale.fields.codeholderId}
+                            {locale.fields.identity}
                             {':'}
                         </span>
                         {' '}
                         <DetailField
-                            field="codeholderId"
+                            field="identity"
                             item={item}
                             editing={editing}
                             onItemChange={onItemChange}

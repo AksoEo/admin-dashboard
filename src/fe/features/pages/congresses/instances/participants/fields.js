@@ -34,32 +34,51 @@ export const FIELDS = {
         },
         stringify: v => v,
     },
-    codeholderId: {
-        weight: 0.5,
+    identity: {
+        weight: 1,
         isEmpty: () => false,
         component ({ value, editing, onChange, slot }) {
+            if (!value) return;
+            let codeholder = null;
             if (editing) {
-                return (
+                codeholder = (
                     <CodeholderPicker
                         limit={1}
-                        value={value ? [value] : []}
-                        onChange={value => {
-                            if (value.length) onChange(+value[0]);
-                            else onChange(null);
+                        value={value.codeholder ? [value.codeholder] : []}
+                        onChange={v => {
+                            if (v.length) onChange({ ...value, codeholder: +value[0] });
+                            else onChange({ ...value, codeholder: null });
                         }} />
+                );
+            } else if (value.codeholder) {
+                codeholder = (
+                    <span class="identity-codeholder">
+                        <IdUEACode id={value.codeholder} />
+                        {slot === 'detail' && (
+                            <LinkButton target={`/membroj/${value.codeholder}`}>
+                                {locale.fields.codeholderIdViewCodeholder}
+                            </LinkButton>
+                        )}
+                    </span>
                 );
             }
 
-            if (!value) return '—';
+            let formData = null;
+            if (value.name || value.email) {
+                formData = (
+                    <span class="identity-form-data">
+                        {value.name ? <span class="fd-name">{'' + value.name}</span> : null}
+                        {value.email ? <span class="fd-email">{'' + value.email}</span> : null}
+                    </span>
+                );
+            }
+
             return (
-                <span class="congress-participant-codeholder">
-                    <IdUEACode id={value} />
-                    {slot === 'detail' && (
-                        <LinkButton target={`/membroj/${value}`}>
-                            {locale.fields.codeholderIdViewCodeholder}
-                        </LinkButton>
-                    )}
-                </span>
+                <div class="congress-participant-identity">
+                    {formData}
+                    {codeholder}
+                    {(!formData && !codeholder) ? '—' : ''}
+                </div>
             );
         },
         stringify (value, item, fields, options, core) {

@@ -31,6 +31,11 @@ export default class FormEditorSettings extends PureComponent {
                     editing={editing}
                     value={value.price}
                     onChange={price => onChange({ ...value, price })} />
+                <Variables
+                    previousNodes={previousNodes}
+                    editing={editing}
+                    value={value}
+                    onChange={onChange} />
                 <SequenceIds
                     value={value.sequenceIds}
                     editing={editing}
@@ -85,33 +90,15 @@ function Price ({ value, editing, onChange, previousNodes }) {
 
     const contents = [];
     if (value) {
-        const knownVariables = new Set();
-        const ascVariables = [];
-        for (const item of previousNodes) {
-            if (item && item.defs) {
-                for (const name in item.defs) {
-                    if (typeof name !== 'string' || name.startsWith('_')) continue;
-                    knownVariables.add(name);
-                    ascVariables.push({
-                        value: name,
-                        label: <RefNameView class="form-editor-settings-price-ref" name={name} />,
-                    });
-                }
-            }
-        }
-        const varValue = knownVariables.has(value.var) ? value.var : null;
         contents.push(
             <div key="value" class="settings-item">
-                <label class="price-var-title">
+                <label class="settings-item-title">
                     {locale.settings.price.variable}
                 </label>
-                <Select
-                    rendered
-                    disabled={!editing}
-                    emptyLabel={locale.settings.price.noVariableSelected}
-                    outline
-                    items={ascVariables}
-                    value={varValue}
+                <AscVarPicker
+                    previousNodes={previousNodes}
+                    editing={editing}
+                    value={value.var}
                     onChange={v => onChange({ ...value, var: v })} />
                 <Select
                     class="currency-select"
@@ -124,8 +111,8 @@ function Price ({ value, editing, onChange, previousNodes }) {
         );
 
         let priceValue = null;
-        if (varValue) {
-            priceValue = evalExpr({ t: 'c', f: 'id', a: [varValue] }, previousNodes);
+        if (value.var) {
+            priceValue = evalExpr({ t: 'c', f: 'id', a: [value.var] }, previousNodes);
         }
 
         contents.push(
@@ -224,5 +211,83 @@ function SequenceIds ({ value, editing, onChange }) {
                 {contents}
             </DynamicHeightDiv>
         </div>
+    );
+}
+
+const VARIABLES = [
+    { key: 'identifierName', required: true },
+    { key: 'identifierEmail', required: true },
+    { key: 'identifierCountryCode', required: false },
+];
+
+function Variables ({ previousNodes, editing, value, onChange }) {
+    const variables = [];
+    for (const v of VARIABLES) {
+        variables.push(
+            <div key={v.key} class="settings-item settings-variable">
+                <label class="settings-item-title">
+                    {locale.settings.variables[v.key]}
+                    {v.required ? ' *' : ''}
+                </label>
+                <AscVarPicker
+                    optional={!v.required}
+                    previousNodes={previousNodes}
+                    editing={editing}
+                    value={value[v.key]}
+                    onChange={x => onChange({ ...value, [v.key]: x })} />
+            </div>
+        );
+    }
+
+    return (
+        <div class="settings-variables settings-flag-options">
+            <div class="settings-section-title">
+                {locale.settings.variables.title}
+            </div>
+            {variables}
+        </div>
+    );
+}
+
+function AscVarPicker ({ previousNodes, editing, value, onChange, optional }) {
+    const knownVariables = new Set();
+    const ascVariables = [];
+    if (optional) {
+        ascVariables.push({
+            value: null,
+            label: '—',
+        });
+    }
+    for (const item of previousNodes) {
+        if (item && item.defs) {
+            for (const name in item.defs) {
+                if (typeof name !== 'string' || name.startsWith('_')) continue;
+                knownVariables.add(name);
+                ascVariables.push({
+                    value: name,
+                    label: <RefNameView class="form-editor-settings-var-ref" name={name} />,
+                });
+            }
+            for (const v of item.formVars) {
+                if (!v.name || v.name.startsWith('@')) continue;
+                const name = '@' + v.name;
+                knownVariables.add(name);
+                ascVariables.push({
+                    value: name,
+                    label: <RefNameView class="form-editor-settings-var-ref" name={name} />,
+                });
+            }
+        }
+    }
+    const varValue = knownVariables.has(value) ? value : null;
+    return (
+        <Select
+            rendered
+            disabled={!editing}
+            emptyLabel={locale.settings.variables.noVariableSelected}
+            outline
+            items={ascVariables}
+            value={varValue}
+            onChange={onChange} />
     );
 }

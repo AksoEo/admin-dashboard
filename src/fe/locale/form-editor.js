@@ -15,7 +15,6 @@ export const formEditor = {
         price: {
             enabled: 'Pagendaj aliĝoj',
             variable: 'Variablo de AKSO-Skripto',
-            noVariableSelected: 'Neniu variablo estis elektita',
             minUpfront: 'Minimuma antaŭpago',
             pricePreview: 'Nuna prezo laŭ skripto:',
             notANumber: 'ne estas nombro',
@@ -25,6 +24,13 @@ export const formEditor = {
             startAt: 'Komenci je',
             requireValid: 'Postuli validan aliĝon',
             requireValidDesc: 'Ĉu postuli validan aliĝon kaj antaŭpagon por asigni kongresan numeron',
+        },
+        variables: {
+            title: '[[Participant variables]]',
+            noVariableSelected: 'Neniu variablo estis elektita',
+            identifierName: '[[identifierName]]',
+            identifierEmail: '[[identifierEmail]]',
+            identifierCountryCode: '[[identifierCountryCode]]',
         },
     },
     itemTypes: {

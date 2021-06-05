@@ -113,7 +113,9 @@ export default class SpreadsheetView extends Page {
                 }
 
                 // TODO: better rendering
-                view = ({ data }) => renderData ? renderData(data.data[dataField]) : '' + data.data[dataField];
+                view = ({ data }) => data.data[dataField] !== null
+                    ? (renderData ? renderData(data.data[dataField]) : '' + data.data[dataField])
+                    : null;
             } else {
                 const Component = FIELDS[field].component;
                 view = ({ data }) => {
@@ -238,7 +240,7 @@ const DATA_STRINGIFIERS = {
     date: () => value => date.stringify(value),
     datetime: item => value => timestamp.stringify(value, item.tz),
     boolean_table: () => value => {
-        return value
+        return (value || [])
             .map(r => r.map(i => locale.spreadsheet.bool['' + i]).join(','))
             .join(';');
     },
