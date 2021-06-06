@@ -26,11 +26,11 @@ export const formEditor = {
             requireValidDesc: 'Ĉu postuli validan aliĝon kaj antaŭpagon por asigni kongresan numeron',
         },
         variables: {
-            title: '[[Participant variables]]',
+            title: 'Kampovariabloj',
             noVariableSelected: 'Neniu variablo estis elektita',
-            identifierName: '[[identifierName]]',
-            identifierEmail: '[[identifierEmail]]',
-            identifierCountryCode: '[[identifierCountryCode]]',
+            identifierName: 'Variablo kun nomo',
+            identifierEmail: 'Variablo kun retpoŝtadreso',
+            identifierCountryCode: 'Variablo kun landokodo',
         },
     },
     itemTypes: {

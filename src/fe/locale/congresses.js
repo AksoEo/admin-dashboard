@@ -284,7 +284,7 @@ export const congressParticipants = {
     noParticipation: 'Estas neniu aliĝilo',
     fields: {
         dataId: 'Aliĝidentigilo',
-        identity: '[[Identity]]',
+        identity: 'Identeco',
         approved: 'Aprobita',
         notes: 'Notoj',
         price: 'Aliĝkotizo',
