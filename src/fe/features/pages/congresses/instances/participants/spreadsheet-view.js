@@ -157,7 +157,9 @@ export default class SpreadsheetView extends Page {
             }
 
             // TODO: better rendering
-            return (_, item) => stringifyData ? stringifyData(item.data[dataField]) : '' + item.data[dataField];
+            return (_, item) => item.data[dataField]
+                ? (stringifyData ? stringifyData(item.data[dataField]) : '' + item.data[dataField])
+                : '';
         } else {
             const stringify = FIELDS[field].stringify;
             if (!stringify) throw new Error('no stringifier for ' + field);

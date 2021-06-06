@@ -35,8 +35,9 @@ export const FIELDS = {
         stringify: v => v,
     },
     identity: {
-        weight: 1,
+        weight: 1.5,
         isEmpty: () => false,
+        slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (!value) return;
             let codeholder = null;
@@ -64,7 +65,7 @@ export const FIELDS = {
             }
 
             let formData = null;
-            if (value.name || value.email) {
+            if (slot !== 'detail' && (value.name || value.email)) {
                 formData = (
                     <span class="identity-form-data">
                         {value.name ? <span class="fd-name">{'' + value.name}</span> : null}
@@ -83,15 +84,23 @@ export const FIELDS = {
         },
         stringify (value, item, fields, options, core) {
             if (!value) return '';
+
+            let formData = value.name || '';
+            if (value.email) {
+                if (formData) formData += ' ';
+                formData += '<' + value.email + '>';
+            }
+            if (!value.codeholder) return formData;
+
             return new Promise((resolve, reject) => {
                 const view = core.createDataView('codeholders/codeholder', {
-                    id: value,
+                    id: value.codeholder,
                     fields: ['code'],
                     lazyFetch: true,
                 });
                 view.on('update', data => {
                     if (data === null) return;
-                    resolve(data.code.new);
+                    resolve([formData, data.code.new].filter(x => x).join(' '));
                     view.drop();
                 });
                 view.on('error', err => {
@@ -147,12 +156,14 @@ export const FIELDS = {
         stringify: v => v,
     },
     price: {
+        weight: 0.5,
         component ({ value, userData }) {
             return <currencyAmount.renderer value={value} currency={userData.currency} />;
         },
         stringify: (v, item, fields, options) => currencyAmount.stringify(v, options.currency),
     },
     paid: {
+        weight: 0.5,
         component ({ value, userData }) {
             if (!value) return null;
             return (
@@ -177,6 +188,7 @@ export const FIELDS = {
     sequenceId: {
         sortable: true,
         weight: 0.5,
+        slot: 'titleAlt',
         component ({ value, editing, onChange }) {
             if (editing) {
                 return (

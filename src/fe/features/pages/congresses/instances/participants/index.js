@@ -25,8 +25,8 @@ export default class ParticipantsView extends PureComponent {
             },
             fields: [
                 { id: 'sequenceId', sorting: 'desc', fixed: true },
-                { id: 'isValid', sorting: 'none', fixed: true },
                 { id: 'identity', sorting: 'none', fixed: true },
+                { id: 'isValid', sorting: 'none', fixed: true },
                 { id: 'approved', sorting: 'none', fixed: true },
                 { id: 'price', sorting: 'none', fixed: true },
                 { id: 'paid', sorting: 'none', fixed: true },

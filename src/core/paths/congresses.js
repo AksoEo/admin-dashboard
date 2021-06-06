@@ -813,6 +813,23 @@ export const tasks = {
             else apiFields.push(pClientFields[field].apiFields);
         }
 
+        const regFormPath = [CONGRESSES, congress, INSTANCES, instance, REG_FORM];
+        let regForm = store.get(regFormPath);
+        if (!regForm) {
+            try {
+                await tasks.registrationForm({ congress, instance });
+                regForm = store.get(regFormPath);
+            } catch { /* */ }
+        }
+        if (regForm && apiFields.includes('codeholderId')) {
+            // we need all data fields for the identity field because we're running a script to
+            // figure out the participant name
+            for (const item of regForm.form) {
+                const field = 'data.' + item.name;
+                if (item.el === 'input' && !apiFields.includes(field)) apiFields.push(field);
+            }
+        }
+
         const client = await asyncClient;
         const res = await client.get(`/congresses/${congress}/instances/${instance}/participants/${id}`, {
             fields: apiFields,

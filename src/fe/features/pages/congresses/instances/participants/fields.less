@@ -5,6 +5,14 @@
         .fd-name {
             margin-right: 8px;
         }
+        .fd-name + .fd-email {
+            &::before {
+                content: '<';
+            }
+            &::after {
+                content: '>';
+            }
+        }
 
         margin-right: 8px;
     }

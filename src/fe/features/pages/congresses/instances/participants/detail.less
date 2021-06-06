@@ -22,7 +22,7 @@
                 color: @positive;
             }
             &[data-status="pending"] {
-                color: @warning;
+                color: @warning-text;
             }
             &[data-status="canceled"] {
                 color: @danger;
@@ -31,8 +31,14 @@
 
         .header-title {
             margin-top: 8px;
-            font-size: 1.5em;
-            font-weight: bold;
+            .header-name {
+                font-size: 1.5em;
+                font-weight: bold;
+            }
+            .header-email {
+                margin-top: 4px;
+                font-size: 1.2em;
+            }
         }
 
         .header-id {
@@ -41,6 +47,10 @@
             padding: 8px 16px;
             background: @text-fade-10;
         }
+    }
+
+    .congress-participant-identity {
+        display: inline-block;
     }
 
     .participant-payment, .participant-actions, .participant-details {

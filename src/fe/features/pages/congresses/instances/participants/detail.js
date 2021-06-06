@@ -165,7 +165,8 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
                 )}
                 {!creating && (
                     <div class="header-title">
-                        TODO: Participant ID goes here
+                        <div class="header-name">{item.identity?.name}</div>
+                        <div class="header-email">{item.identity?.email}</div>
                     </div>
                 )}
                 <div class="header-id">
@@ -325,9 +326,8 @@ const ParticipantActions = connectPerms(function ParticipantActions ({ perms, co
                 });
                 core.createTask('payments/createIntent', {}, {
                     customer: {
-                        // TODO: get actual values
-                        name: 'TODO McTODOFACE',
-                        email: 'todo@akso.org',
+                        name: item.identity?.name || null,
+                        email: item.identity?.email || null,
                     },
                     purposes: [
                         {
