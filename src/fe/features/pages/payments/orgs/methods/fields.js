@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Checkbox, TextField } from '@cpsdqs/yamdl';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
+import CheckIcon from '@material-ui/icons/Check';
 import { Validator } from '../../../../../components/form';
 import Segmented from '../../../../../components/segmented';
 import Select from '../../../../../components/select';
@@ -85,6 +86,16 @@ export const FIELDS = {
         },
         weight: 2,
     },
+    internal: {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return <Checkbox checked={value} onChange={onChange} />;
+            }
+
+            return value ? <CheckIcon /> : null;
+        },
+    },
     description: {
         wantsCreationLabel: true,
         component ({ value, editing, onChange, isCreation, slot }) {
@@ -95,6 +106,7 @@ export const FIELDS = {
                 inline={slot !== 'detail' && !isCreation}
                 onChange={onChange} />;
         },
+        shouldHide: item => item.internal,
     },
     stripeMethods: {
         wantsCreationLabel: true,

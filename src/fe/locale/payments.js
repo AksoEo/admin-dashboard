@@ -86,6 +86,7 @@ export const paymentMethods = {
         internalDescription: 'Internaj notoj',
         description: 'Publika priskribo',
         currencies: 'Valutoj',
+        internal: '[[Internal]]',
         paymentValidity: 'Valideco de neplenumitaj pagoj',
         isRecommended: 'Rekomendita',
         stripeSecretKey: 'Sekreta ŝlosilo de Stripe',
