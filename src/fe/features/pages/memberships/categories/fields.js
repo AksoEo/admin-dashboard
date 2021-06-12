@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { Checkbox, TextField } from '@cpsdqs/yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import { Validator } from '../../../../components/form';
+import LimitedTextField from '../../../../components/limited-text-field';
 import MdField from '../../../../components/md-field';
 import { membershipCategories as locale } from '../../../../locale';
 import './fields.less';
@@ -14,7 +15,8 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <Validator
-                    component={TextField}
+                    component={LimitedTextField}
+                    maxLength={15}
                     outline={slot === 'create'}
                     label={slot === 'create' ? locale.fields.nameAbbrev : null}
                     validate={value => {
@@ -33,7 +35,8 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <Validator
-                    component={TextField}
+                    component={LimitedTextField}
+                    maxLength={50}
                     outline={slot === 'create'}
                     label={slot === 'create' ? locale.fields.name : null}
                     validate={value => {
