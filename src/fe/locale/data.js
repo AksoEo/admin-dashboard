@@ -201,6 +201,10 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
         delete: 'Forigi',
         ok: 'Bone',
     },
+    membershipChip: {
+        lifetime: 'dumviva',
+        givesMembership: 'membrecdona',
+    },
 };
 
 export const search = {

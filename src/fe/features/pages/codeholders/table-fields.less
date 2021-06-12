@@ -58,26 +58,8 @@
 }
 
 .codeholder-memberships {
-    .membership-item {
-        .membership-item-id {
-            display: inline-block;
-            background: @text-fade-20;
-            padding: 2px 4px;
-            border-radius: 4px;
-            margin-right: 2px;
-            text-decoration: none;
-            font-size: small;
-        }
-
-        &.gives-membership .membership-item-id {
-            background: @membership-gives-membership-background;
-        }
-        &.is-lifetime .membership-item-id {
-            background: @membership-is-lifetime-background;
-        }
-        &.gives-membership.is-lifetime .membership-item-id {
-            background: @membership-gives-lifetime-membership-background;
-        }
+    .membership-item + .membership-item {
+        margin-left: 4px;
     }
 }
 

@@ -7,6 +7,7 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Page from '../../../components/page';
 import DataList from '../../../components/data-list';
 import { date } from '../../../components/data';
+import MembershipChip from '../../../components/membership-chip';
 import TinyProgress from '../../../components/tiny-progress';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
@@ -98,14 +99,15 @@ export const MembershipInDetailView = makeInDetailView(
     {},
     'codeholders/codeholderSigMemberships',
     item => {
-        let className = 'membership';
-        if (item.givesMembership) className += ' gives-membership';
-        if (item.lifetime) className += ' lifetime';
         return (
-            <span key={item.id} class={className}>
-                <span class="membership-name">{item.nameAbbrev}</span>
-                <span class="membership-year">{item.year}</span>
-            </span>
+            <MembershipChip
+                class="membership-item"
+                key={`${item.id}-${item.year}`}
+                abbrev={item.nameAbbrev}
+                name={item.name}
+                year={item.year}
+                givesMembership={item.givesMembership}
+                lifetime={item.lifetime} />
         );
     },
     locale.noMemberships,
@@ -129,7 +131,7 @@ export const RolesInDetailView = makeInDetailView(
     'role',
 );
 
-function makePage (createTask, signal, listTask, deleteTask, fieldId, perm, renderItem, renderMenu, title, add, empty) {
+function makePage (createTask, signal, listTask, deleteTask, fieldId, perm, renderItem, renderMenu, title, add, empty, itemHeight) {
     return connectPerms(class MRPage extends Page {
         static contextType = coreContext;
 
@@ -158,7 +160,7 @@ function makePage (createTask, signal, listTask, deleteTask, fieldId, perm, rend
                                 id,
                             }, { offset, limit }).runOnceAndDrop()}
                         emptyLabel={empty}
-                        itemHeight={56}
+                        itemHeight={itemHeight}
                         onRemove={canEdit && (item =>
                             this.context.createTask(deleteTask, {
                                 id,
@@ -180,17 +182,28 @@ export const MembershipPage = makePage(
     'membership',
     item => (
         <div class="membership-item">
-            <div class="item-name">
-                {item.name}
-                {item.nameAbbrev ? ` (${item.nameAbbrev})` : null}
+            <div class="item-title">
+                <MembershipChip
+                    class="item-chip"
+                    abbrev={item.nameAbbrev}
+                    name={item.name}
+                    year={item.year}
+                    givesMembership={item.givesMembership}
+                    lifetime={item.lifetime} />
+                <span class="item-name">{item.name}</span>
             </div>
             <div class="item-desc">
-                {item.year}
-                {', '}
-                {locale.membership.lifetime[item.lifetime ? 'yes' : 'no']}
-                {', '}
-                {locale.membership.givesMembership[item.givesMembership ? 'yes' : 'no']}
-                {/* TODO: more stuff */}
+                <span class="item-attr attr-lifetime" data-value={item.lifetime}>
+                    {locale.membership.lifetime[item.lifetime ? 'yes' : 'no']}
+                </span>
+                <span class="item-attr attr-gives-membership" data-value={item.givesMembership}>
+                    {locale.membership.givesMembership[item.givesMembership ? 'yes' : 'no']}
+                </span>
+                {item.canuto && (
+                    <span class="item-attr attr-canuto" data-value="true">
+                        {locale.membership.canutoAttr}
+                    </span>
+                )}
             </div>
         </div>
     ),
@@ -198,6 +211,7 @@ export const MembershipPage = makePage(
     locale.memberships,
     locale.addMembership,
     locale.noMemberships,
+    60,
 );
 
 export const RolesPage = makePage(
@@ -237,4 +251,5 @@ export const RolesPage = makePage(
     locale.roles,
     locale.addRole,
     locale.noRoles,
+    56,
 );

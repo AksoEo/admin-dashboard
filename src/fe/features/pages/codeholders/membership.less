@@ -21,13 +21,16 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
+            width: calc(100% - 8px);
             height: 56px;
             padding-left: 24px;
             padding-right: 24px;
             display: flex;
             align-items: center;
             box-sizing: border-box;
+            margin: 4px;
+            background: @text-fade-05;
+            border-radius: 4px;
 
             .list-item-contents {
                 flex: 1;
@@ -35,6 +38,42 @@
 
             .list-item-overflow {
                 --md-button-color: @gray-button-color;
+            }
+        }
+    }
+
+    .membership-item {
+        .item-title {
+            .item-chip {
+                margin-right: 4px;
+            }
+        }
+
+        .item-desc {
+            margin-top: 4px;
+
+            .item-attr {
+                font-size: small;
+                padding: 1px 2px;
+                border: 1px solid @separator;
+                border-radius: 4px;
+                margin-right: 4px;
+                --activated-color: @secondary;
+
+                &.attr-lifetime {
+                    --activated-color: @membership-is-lifetime-background;
+                }
+                &.attr-gives-membership {
+                    --activated-color: @membership-gives-membership-background;
+                }
+                &.attr-canuto {
+                    --activated-color: @membership-canuto-background;
+                }
+
+                &[data-value="true"] {
+                    border-color: currentColor;
+                    color: var(--activated-color);
+                }
             }
         }
     }

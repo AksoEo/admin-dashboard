@@ -7,6 +7,7 @@
 
 .__gen-text(@text--internal, @text-on-primary--internal) {
     --text: @text--internal;
+    --text-fade-05: fade(@text--internal, 05%);
     --text-fade-10: fade(@text--internal, 10%);
     --text-fade-20: fade(@text--internal, 20%);
     --text-fade-40: fade(@text--internal, 40%);
@@ -60,9 +61,10 @@
 
     --gray-button-color: var(--text-fade-40);
 
-    --membership-gives-membership-background: #4ebc6b;
-    --membership-is-lifetime-background: #ed9b50;
-    --membership-gives-lifetime-membership-background: #fee12a;
+    --membership-gives-membership-background: #51c64f;
+    --membership-is-lifetime-background: #ca891a;
+    --membership-gives-lifetime-membership-background: mix(#51c64f, #ca891a, 40%);
+    --membership-canuto-background: #716abf;
     --rating-stars: #faaa44;
     --rating-hearts: #fe3a43;
 
@@ -135,6 +137,7 @@
 @positive-fade-20: var(--secondary-fade-20);
 @positive-fade-50: var(--secondary-fade-50);
 @text: var(--text);
+@text-fade-05: var(--text-fade-05);
 @text-fade-10: var(--text-fade-10);
 @text-fade-40: var(--text-fade-40);
 @text-fade-20: var(--text-fade-20);
@@ -160,6 +163,7 @@
 @membership-gives-membership-background: var(--membership-gives-membership-background);
 @membership-is-lifetime-background: var(--membership-is-lifetime-background);
 @membership-gives-lifetime-membership-background: var(--membership-gives-lifetime-membership-background);
+@membership-canuto-background: var(--membership-canuto-background);
 @rating-stars: var(--rating-stars);
 @rating-hearts: var(--rating-hearts);
 @monospace: Menlo, Roboto Mono, Consolas, monospace;

@@ -405,29 +405,16 @@
         display: flex;
         align-items: flex-start;
 
-        .membership, .role {
-            display: inline-flex;
-            align-items: center;
-            border: 1px solid @text-fade-20;
-            border-radius: 4px;
+        .membership-item, .role {
             margin-right: 4px;
             margin-bottom: 4px;
-
-            .membership-name {
-                display: inline-block;
-                background: @text-fade-20;
-                padding: 2px 4px;
-                border-radius: 3px;
-                font-size: small;
-            }
-
-            .membership-year {
-                display: inline-block;
-                padding: 0 2px;
-            }
         }
 
         .role {
+            display: inline-block;
+            align-items: center;
+            border: 1px solid @text-fade-20;
+            border-radius: 4px;
             font-size: small;
             padding: 2px 4px;
 
@@ -901,6 +888,15 @@
 .codeholders-task-add-membership, .codeholders-task-add-role {
     .text-field, .category-select {
         width: 100%;
+    }
+}
+.codeholders-task-add-membership {
+    .canuto-field {
+        padding: 0 24px;
+
+        label {
+            margin-left: 8px;
+        }
     }
 }
 

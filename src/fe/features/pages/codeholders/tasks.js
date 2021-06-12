@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useEffect, PureComponent } from 'preact/compat';
-import { CircularProgress, TextField } from '@cpsdqs/yamdl';
+import { Checkbox, CircularProgress, TextField } from '@cpsdqs/yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import SavePerms from '../administration/perms-editor/save';
 import { UEACode } from '@tejo/akso-client';
@@ -170,6 +170,8 @@ export default {
             }
         });
 
+        const canutoId = `canuto-${Math.random().toString(36)}`;
+
         return (
             <TaskDialog
                 class="codeholders-task-add-membership"
@@ -180,6 +182,7 @@ export default {
                 run={() => task.runOnce()}>
                 <Validator
                     component={Select}
+                    outline
                     validate={() => {}}
                     class="category-select form-field"
                     value={task.parameters.category}
@@ -204,6 +207,7 @@ export default {
                     })) : []} />
                 <Validator
                     component={TextField}
+                    outline
                     class="form-field text-field"
                     type="number"
                     label={locale.membership.year}
@@ -214,6 +218,15 @@ export default {
                     validate={value => {
                         if (+value != value) throw { error: locale.membership.notAYear };
                     }} />
+                <div class="canuto-field">
+                    <Checkbox
+                        id={canutoId}
+                        checked={task.parameters.canuto}
+                        onChange={canuto => task.update({ canuto })} />
+                    <label for={canutoId}>
+                        {locale.membership.useCanuto}
+                    </label>
+                </div>
             </TaskDialog>
         );
     }),

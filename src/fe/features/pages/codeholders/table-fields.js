@@ -4,6 +4,7 @@ import ResizeObserver from 'resize-observer-polyfill';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import { CodeholderDisabledIcon } from '../../../components/icons';
+import MembershipChip from '../../../components/membership-chip';
 import DomainDisabledIcon from '@material-ui/icons/DomainDisabled';
 import { UEACode as AKSOUEACode } from '@tejo/akso-client';
 import moment from 'moment';
@@ -208,23 +209,16 @@ export default {
             if (!value) return null;
             return (
                 <span class="codeholder-memberships">
-                    {value.flatMap((item, i) => {
-                        let className = 'membership-item';
-                        if (item.lifetime) className += ' is-lifetime';
-                        if (item.givesMembership) className += ' gives-membership';
-
-                        return (i == 0 ? [] : [', ']).concat([(
-                            <span
-                                class={className}
-                                key={`${item.categoryId}-${item.year}`}
-                                data-category-id={item.categoryId}>
-                                <abbr class="membership-item-id" title={item.name}>
-                                    {item.nameAbbrev}
-                                </abbr>
-                                <span class="membership-year">{item.year}</span>
-                            </span>
-                        )]);
-                    })}
+                    {value.map(item => (
+                        <MembershipChip
+                            class="membership-item"
+                            key={`${item.categoryId}-${item.year}`}
+                            abbrev={item.nameAbbrev}
+                            name={item.name}
+                            year={item.year}
+                            givesMembership={item.givesMembership}
+                            lifetime={item.lifetime} />
+                    ))}
                 </span>
             );
         },

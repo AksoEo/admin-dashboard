@@ -857,6 +857,7 @@ export const tasks = {
                 'name',
                 'givesMembership',
                 'lifetime',
+                'canuto',
             ],
             order: [['year', 'desc']],
         });
@@ -869,11 +870,12 @@ export const tasks = {
     /// - id: codeholder id
     /// - category: category id
     /// - year: year
-    addMembership: async ({ id }, { category, year }) => {
+    addMembership: async ({ id }, { category, year, canuto }) => {
         const client = await asyncClient;
         await client.post(`/codeholders/${id}/membership`, {
             categoryId: +category,
             year: +year,
+            canuto: !!canuto,
         });
 
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
