@@ -49,10 +49,11 @@ export class ScriptableValue extends PureComponent {
             // an actual akso script value probably
             return value;
         }
-        return null;
+        return { t: 'u' };
     }
 
     onClick = () => {
+        if (this.props.disabled) return;
         const v = this.simplifyValue(this.props.value);
         this.beginEditing(v).then(v => this.props.onChange(this.simplifyValue(v))).catch(() => {});
     };

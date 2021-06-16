@@ -86,6 +86,7 @@ const InnerEditor = connect(({ congress, instance }) => [
 ])((data, core, err, loaded) => ({ core, data, loaded }))(class InnerEditor extends PureComponent {
     state = {
         edit: null,
+        formData: {},
     };
 
     beginEditing = () => {
@@ -174,10 +175,14 @@ const InnerEditor = connect(({ congress, instance }) => [
                         },
                     ]} />
                 <FormEditor
+                    isEditingContext
                     editing={!!edit}
                     value={edit || data}
                     onChange={edit => this.setState({ edit })}
-                    additionalVars={ADDITIONAL_VARS} />
+                    additionalVars={ADDITIONAL_VARS}
+                    editingFormData
+                    formData={this.state.formData}
+                    onFormDataChange={formData => this.setState({ formData })} />
             </div>
         );
     }

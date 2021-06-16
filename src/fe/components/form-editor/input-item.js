@@ -3,6 +3,9 @@ import { createRef, PureComponent } from 'preact/compat';
 import { Button, Checkbox, Slider, TextField } from '@cpsdqs/yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import ResetIcon from '@material-ui/icons/RotateLeft';
 import RearrangingList from '../rearranging-list';
 import DynamicHeightDiv from '../dynamic-height-div';
 import CountryPicker from '../country-picker';
@@ -30,7 +33,7 @@ const FIELD_DESCRIPTION_RULES = ['emphasis', 'strikethrough', 'link', 'list', 't
 function Desc ({ value }) {
     if (!value) return;
     return (
-        <MdField value={value} rules={FIELD_DESCRIPTION_RULES} />
+        <MdField class="input-description" value={value} rules={FIELD_DESCRIPTION_RULES} />
     );
 }
 
@@ -76,9 +79,10 @@ const TYPES = {
                                 disabled={disabled}
                                 min={item.min}
                                 max={item.max}
-                                value={value}
+                                value={Number.isFinite(value) ? value : item.min}
                                 onChange={value => {
-                                    if (item.step) value = Math.round(value * item.step) / item.step;
+                                    const step = item.step || 1;
+                                    value = Math.round(value * step) / step;
                                     onChange(value);
                                 }} />
                         </div>
@@ -130,7 +134,7 @@ const TYPES = {
                         type={type}
                         disabled={disabled}
                         placeholder={item.placeholder}
-                        value={value}
+                        value={value || ''}
                         pattern={item.pattern}
                         minLength={item.minLength}
                         maxLength={item.maxLength}
@@ -311,6 +315,8 @@ const TYPES = {
     },
     boolean_table: {
         render ({ item, value, onChange }) {
+            const excludedCells = (item.excludeCells || [])
+                .map(([x, y]) => `${x},${y}`);
             const resizeValue = (value, rows, cols) => {
                 if (!value) value = [];
                 else value = value.slice();
@@ -318,7 +324,7 @@ const TYPES = {
                 while (value.length > rows) value.pop();
                 for (let y = 0; y < rows; y++) {
                     const row = value[y].slice();
-                    while (row.length < cols) row.push(false);
+                    while (row.length < cols) row.push(excludedCells.includes(`${row.length},${y}`) ? null : false);
                     while (row.length > cols) row.pop();
                     value[y] = row;
                 }
@@ -334,8 +340,6 @@ const TYPES = {
                 }
                 rows.push(<tr key="header">{headerRow}</tr>);
             }
-            const excludedCells = (item.excludeCells || [])
-                .map(([x, y]) => `${x},${y}`);
             for (let y = 0; y < item.rows; y++) {
                 const row = [];
                 if (item.headerLeft) {
@@ -400,6 +404,22 @@ export default class InputItem extends PureComponent {
         this.oldName = this.props.item.name || null;
 
         if (this.context) this.context.register(this);
+        this.setDefaultIfNone();
+    }
+
+    setDefault () {
+        this.props.onValueChange && this.props.onValueChange(this.resolveValues().default);
+    }
+
+    setDefaultIfNone () {
+        if (this.props.onValueChange && this.props.value === undefined) {
+            // FIXME: why does this need a delay?
+            requestAnimationFrame(() => this.setDefault());
+        }
+    }
+
+    componentDidUpdate () {
+        this.setDefaultIfNone();
     }
 
     componentWillUnmount () {
@@ -451,24 +471,35 @@ export default class InputItem extends PureComponent {
         } else {
             const resolved = this.resolveValues();
             const Renderer = TYPES[item.type].render;
-            // TODO: show more details about the field
             contents = (
-                <div class="input-rendered">
-                    <div class="input-details">
-                        <Label required={resolved.required}>{item.label}</Label>
-                        <Desc value={item.description} />
+                <div class="input-rendered-container">
+                    <div class="input-rendered">
+                        <div class="input-details">
+                            <Label required={resolved.required}>{item.label}</Label>
+                            <Desc value={item.description} />
+                        </div>
+                        <Renderer
+                            required={resolved.required}
+                            disabled={resolved.disabled}
+                            default={resolved.default}
+                            item={item}
+                            value={value}
+                            onChange={onValueChange} />
+                        {this.state.error && (
+                            <InputError>
+                                {this.state.error}
+                            </InputError>
+                        )}
                     </div>
-                    <Renderer
-                        required={resolved.required}
-                        disabled={resolved.disabled}
-                        default={resolved.default}
-                        item={item}
-                        value={value}
-                        onChange={onValueChange} />
-                    {this.state.error && (
-                        <InputError>
-                            {this.state.error}
-                        </InputError>
+                    {this.props.isEditingContext && (
+                        <InputSettingsState
+                            item={item}
+                            resolved={resolved}
+                            scriptCtx={{ previousNodes }}
+                            onReset={e => {
+                                e.preventDefault();
+                                this.setDefault();
+                            }} />
                     )}
                 </div>
             );
@@ -1173,6 +1204,108 @@ function OptionsEditorItem ({ onRemove, value, onChange }) {
                     {locale.inputFields.optionsOnlyExisting}
                 </div>
             ) : null}
+        </div>
+    );
+}
+
+function InputSettingsState ({ item, resolved, scriptCtx, onReset }) {
+    return (
+        <div class="input-settings-state">
+            <ScriptValueState
+                isDefault={{ reset: onReset }}
+                label={locale.inputFields.default}
+                value={item.default}
+                resolved={resolved.default}
+                scriptCtx={scriptCtx} />
+            <ScriptValueState
+                hideIfNotComputed // redundant with required * in label
+                label={locale.inputFields.required}
+                value={item.required}
+                resolved={resolved.required}
+                scriptCtx={scriptCtx} />
+            <ScriptValueState
+                label={locale.inputFields.disabled}
+                value={item.disabled}
+                resolved={resolved.disabled}
+                scriptCtx={scriptCtx} />
+            <MinMaxStepState item={item} />
+        </div>
+    );
+}
+
+function ScriptValueState ({ label, value, isDefault, hideIfNotComputed, scriptCtx, resolved }) {
+    let contents = null;
+    let isComputed = false;
+    let defaultReset = null;
+
+    if (isDefault) {
+        defaultReset = (
+            <Button class="default-reset" icon small onClick={isDefault.reset}>
+                <ResetIcon />
+            </Button>
+        );
+    }
+
+    if (value && typeof value === 'object') {
+        contents = (
+            <div class="script-value-computed">
+                <div class="inner-expr">
+                    <ScriptableValue
+                        disabled
+                        ctx={scriptCtx}
+                        value={value} />
+                </div>
+                <div class="expr-result">
+                    <div class="er-pointer"></div>
+                    <ScriptableValue
+                        disabled
+                        ctx={scriptCtx}
+                        value={resolved} />
+                </div>
+            </div>
+        );
+        isComputed = true;
+    } else if (isDefault) {
+        contents = (
+            <div class="script-value-default">
+                <ScriptableValue
+                    disabled
+                    ctx={scriptCtx}
+                    value={value} />
+            </div>
+        );
+    } else if (typeof value === 'boolean') {
+        if (value) contents = <CheckBoxIcon style={{ verticalAlign: 'middle' }} />;
+        else contents = <CheckBoxOutlineBlankIcon style={{ verticalAlign: 'middle' }} />;
+    } else {
+        // TODO
+        contents = '?';
+    }
+
+    if (hideIfNotComputed && !isComputed) return null;
+
+    return (
+        <div class="setting-state">
+            <div class="value-label">{label}</div>
+            <div class="value-contents">
+                {contents}
+            </div>
+            {defaultReset}
+        </div>
+    );
+}
+
+function MinMaxStepState ({ item }) {
+    const hasMinMax = Number.isFinite(item.min) || Number.isFinite(item.max);
+    const hasStep = Number.isFinite(item.step);
+    if (!hasMinMax && !hasStep) return null;
+
+    return (
+        <div class="setting-state">
+            {hasMinMax && <div class="value-label">{locale.inputFields.minMaxRange}</div>}
+            {hasMinMax && <div class="value-contents">{item.min}–{item.max}</div>}
+            {hasStep && <div class="value-label">{locale.inputFields.step}</div>}
+            {hasStep && <div class="value-contents">{item.step}</div>}
         </div>
     );
 }

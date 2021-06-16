@@ -1,6 +1,9 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import { Checkbox, TextField } from '@cpsdqs/yamdl';
+import { Fragment, PureComponent } from 'preact/compat';
+import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
+import TuneIcon from '@material-ui/icons/Tune';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { formEditor as locale, currencies } from '../../locale';
 import { currencyAmount } from '../data';
 import { RefNameView } from './script-views';
@@ -19,27 +22,45 @@ const FLAGS = [
 
 /// Renders a control with general form settings (TODO: generalize; this is for congresses!).
 export default class FormEditorSettings extends PureComponent {
-    render ({ value, editing, onChange, previousNodes }) {
+    state = { expanded: false };
+
+    render ({ value, editing, onChange, previousNodes }, { expanded }) {
+        let settings = null;
+        if (expanded) {
+            settings = (
+                <Fragment>
+                    <Flags
+                        value={value}
+                        editing={editing}
+                        onChange={onChange} />
+                    <Price
+                        previousNodes={previousNodes}
+                        editing={editing}
+                        value={value.price}
+                        onChange={price => onChange({ ...value, price })} />
+                    <Variables
+                        previousNodes={previousNodes}
+                        editing={editing}
+                        value={value}
+                        onChange={onChange} />
+                    <SequenceIds
+                        value={value.sequenceIds}
+                        editing={editing}
+                        onChange={sequenceIds => onChange({ ...value, sequenceIds })} />
+                </Fragment>
+            );
+        }
+
         return (
-            <div class="form-editor-settings">
-                <Flags
-                    value={value}
-                    editing={editing}
-                    onChange={onChange} />
-                <Price
-                    previousNodes={previousNodes}
-                    editing={editing}
-                    value={value.price}
-                    onChange={price => onChange({ ...value, price })} />
-                <Variables
-                    previousNodes={previousNodes}
-                    editing={editing}
-                    value={value}
-                    onChange={onChange} />
-                <SequenceIds
-                    value={value.sequenceIds}
-                    editing={editing}
-                    onChange={sequenceIds => onChange({ ...value, sequenceIds })} />
+            <div class={'form-editor-settings' + (expanded ? ' is-expanded' : '')}>
+                <div class="settings-title" onClick={() => this.setState({ expanded: !expanded })}>
+                    <TuneIcon />
+                    <span class="inner-title">{locale.settings.title}</span>
+                    <Button icon small>
+                        {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </Button>
+                </div>
+                {settings}
             </div>
         );
     }

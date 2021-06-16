@@ -25,7 +25,10 @@ export default class RearrangingList extends PureComponent {
         for (const entry of entries) {
             if (keysByNode.has(entry.target)) {
                 let height = 0;
-                if (entry.contentBoxSize) {
+                if (navigator.userAgent.includes('Chrome')) {
+                    // Chrome ResizeObserver returns bad values
+                    height = entry.target.offsetHeight;
+                } else if (entry.contentBoxSize) {
                     height = entry.contentBoxSize.blockSize;
                 } else {
                     height = entry.contentRect.height;

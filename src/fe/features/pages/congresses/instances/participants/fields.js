@@ -39,7 +39,8 @@ export const FIELDS = {
         isEmpty: () => false,
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
-            if (!value) return;
+            if (!value && !editing) return;
+            value = value || {};
             let codeholder = null;
             if (editing) {
                 codeholder = (
@@ -47,7 +48,7 @@ export const FIELDS = {
                         limit={1}
                         value={value.codeholder ? [value.codeholder] : []}
                         onChange={v => {
-                            if (v.length) onChange({ ...value, codeholder: +value[0] });
+                            if (v.length) onChange({ ...value, codeholder: +v[0] });
                             else onChange({ ...value, codeholder: null });
                         }} />
                 );
@@ -65,7 +66,7 @@ export const FIELDS = {
             }
 
             let formData = null;
-            if (slot !== 'detail' && (value.name || value.email)) {
+            if (!editing && slot !== 'detail' && (value.name || value.email)) {
                 formData = (
                     <span class="identity-form-data">
                         {value.name ? <span class="fd-name">{'' + value.name}</span> : null}

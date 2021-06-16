@@ -16,10 +16,11 @@ import './item.less';
 /// - item/onChange: the item
 /// - editing/onEditingChange: bool
 /// - editable: bool
+/// - isEditingContext: bool
 /// - onRemove: fn
 /// - previousNodes: previous nodes' asc definitions (see getAscDefs in model)
 export default class FormEditorItem extends PureComponent {
-    render ({ item, editable, onChange, editing, onEditingChange, editingData, value, onValueChange, onRemove }) {
+    render ({ item, editable, onChange, editing, onEditingChange, editingData, value, onValueChange, onRemove, isEditingContext }) {
         if (!item) return null;
 
         const props = {
@@ -28,6 +29,7 @@ export default class FormEditorItem extends PureComponent {
             item,
             onChange,
             previousNodes: this.props.previousNodes,
+            isEditingContext,
         };
 
         let contents;

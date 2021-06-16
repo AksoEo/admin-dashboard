@@ -128,6 +128,7 @@ export class ScriptContextProvider extends PureComponent {
 /// before submission.
 ///
 /// # Props
+/// - isEditingContext: bool - whether to show internal details
 /// - editing: bool
 /// - value: { allowUse, allowGuests, ..., form } object (see API docs)
 /// - onChange: (value) => void callback
@@ -141,7 +142,7 @@ export default class FormEditor extends PureComponent {
         formData: {},
     };
 
-    render ({ skipSettings, skipNonInputs, value, editing, onChange, additionalVars, editingFormData }) {
+    render ({ skipSettings, skipNonInputs, value, editing, onChange, additionalVars, editingFormData, isEditingContext }) {
         if (!value) return null;
 
         // TODO: properly disable inputs if not editingFormData
@@ -160,6 +161,7 @@ export default class FormEditor extends PureComponent {
                         items={value.form}
                         onItemsChange={form => onChange({ ...value, form })}
                         editingData={editingFormData}
+                        isEditingContext={isEditingContext}
                         values={formData}
                         onValuesChange={values => {
                             if (this.props.onFormDataChange) {
@@ -252,7 +254,7 @@ class FormEditorItems extends PureComponent {
 
     render ({
         editing, settings, onSettingsChange, items, onItemsChange, values, onValuesChange,
-        additionalVars, skipSettings, skipNonInputs, editingData,
+        additionalVars, skipSettings, skipNonInputs, editingData, isEditingContext,
     }, { editingItem }) {
         const listItems = [];
         const previousNodes = [getGlobalDefs(additionalVars)];
@@ -265,6 +267,7 @@ class FormEditorItems extends PureComponent {
                     <FormEditorItem
                         key={key}
                         editable={editing}
+                        isEditingContext={isEditingContext}
                         previousNodes={previousNodes.slice()}
                         editing={editing && (editingItem === key)}
                         onEditingChange={editing => {

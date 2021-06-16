@@ -3,8 +3,27 @@
 .form-editor-settings {
     background: @text-fade-10;
     border-radius: 8px;
-    padding-bottom: 8px;
     margin-bottom: 16px;
+
+    &.is-expanded {
+        padding-bottom: 8px;
+    }
+
+    .settings-title {
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+
+        .inner-title {
+            flex: 1;
+            padding-left: 16px;
+            font-weight: bold;
+        }
+    }
+
+    &.is-expanded .settings-title {
+        border-bottom: 1px solid @separator;
+    }
 
     .settings-flag {
         padding: 8px 16px;

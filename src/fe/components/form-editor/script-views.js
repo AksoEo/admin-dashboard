@@ -123,6 +123,7 @@ export class RawExprView extends PureComponent {
         return (
             <MountedViewRoot
                 {...props}
+                key={expr && expr.t} // workaround for render bug when changing types
                 class={'form-editor-raw-expr-view ' + (props.class || '')}
                 init={this.init}
                 deinit={this.deinit} />
