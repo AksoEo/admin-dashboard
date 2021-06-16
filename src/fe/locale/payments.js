@@ -86,7 +86,7 @@ export const paymentMethods = {
         internalDescription: 'Internaj notoj',
         description: 'Publika priskribo',
         currencies: 'Valutoj',
-        internal: '[[Internal]]',
+        internal: 'Interna',
         paymentValidity: 'Valideco de neplenumitaj pagoj',
         isRecommended: 'Rekomendita',
         stripeSecretKey: 'Sekreta ŝlosilo de Stripe',
@@ -254,7 +254,7 @@ export const paymentIntents = {
         },
         markSucceeded: {
             title: 'Indiki pagon ricevita',
-            description: 'Ĉu vi certas, ke la mono estis ricevita? Bv. aldoni la eksteran identigilon de la pago se eblas.',
+            description: 'Ĉu vi certas, ke la mono estis ricevita? Bv. aldoni la eksternan identigilon de la pago se eblas.',
             button: 'Indiki',
         },
         submit: {

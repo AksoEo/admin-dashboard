@@ -226,7 +226,7 @@ export const codeholders = {
             no: 'nemembrecdona',
         },
         canutoAttr: 'canuto',
-        useCanuto: '[[Canuto]]',
+        useCanuto: 'Canuto',
         availableFrom: 'nur de',
         availableTo: 'nur ĝis',
         year: 'Jaro',
