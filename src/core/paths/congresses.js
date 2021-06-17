@@ -128,7 +128,15 @@ const pClientFields = {
         fromAPI: part => part.editedTime,
         toAPI: () => ({}),
     },
-    data: 'data',
+    data: {
+        apiFields: ['data'],
+        fromAPI: part => part.data,
+        toAPI: data => {
+            if (!data) return {};
+            const { '@$disableValidation': allowInvalidData, ...innerData } = data;
+            return { allowInvalidData: allowInvalidData || false, data: innerData };
+        },
+    },
 };
 const DERIVED_PARTICIPANT_FIELDS = ['isValid', 'editedTime'];
 const pClientFilters = {

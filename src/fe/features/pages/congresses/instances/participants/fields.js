@@ -243,16 +243,29 @@ export const FIELDS = {
     },
     data: {
         component ({ value, editing, onChange, userData }) {
+            const disableValidation = value && value['@$disableValidation'];
+            const dvCheckboxId = `disable-validation-${Math.random().toString(36)}`;
+
             return (
-                <div class="participant-form-data">
+                <div class="congress-participant-form-data">
                     <Suspense fallback={<CircularProgress indeterminate />}>
+                        {editing && <div class={'data-allow-invalid' + (disableValidation ? ' is-active' : '')}>
+                            <Checkbox
+                                checked={disableValidation}
+                                onChange={v => onChange({ ...value, '@$disableValidation': v })}
+                                id={dvCheckboxId} />
+                            <label for={dvCheckboxId}>
+                                {locale.fields.dataAllowInvalid}
+                            </label>
+                        </div>}
                         <FormEditor
                             skipSettings
                             skipNonInputs
                             value={userData.registrationForm}
                             formData={value}
                             editingFormData={editing}
-                            onFormDataChange={onChange} />
+                            onFormDataChange={onChange}
+                            disableValidation={disableValidation} />
                     </Suspense>
                 </div>
             );

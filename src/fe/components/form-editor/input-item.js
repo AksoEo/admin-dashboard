@@ -53,7 +53,7 @@ const TYPES = {
         settings: {},
     },
     number: {
-        render ({ disabled, item, value, onChange }) {
+        render ({ disabled, item, value, onChange, disableValidation }) {
             const input = (
                 <div class="number-input">
                     <TextField
@@ -66,9 +66,9 @@ const TYPES = {
                             else onChange(null);
                         }}
                         type="number"
-                        step={item.step}
-                        min={item.min}
-                        max={item.max} />
+                        step={disableValidation ? null : item.step}
+                        min={disableValidation ? null : item.min}
+                        max={disableValidation ? null : item.max} />
                 </div>
             );
             if (item.variant === 'slider') {
@@ -155,14 +155,14 @@ const TYPES = {
         },
     },
     money: {
-        render ({ item, value, onChange }) {
+        render ({ item, value, onChange, disableValidation }) {
             return (
                 <div class="form-input-money">
                     <currencyAmount.editor
                         outline
-                        min={item.min}
-                        max={item.max}
-                        step={item.step}
+                        min={disableValidation ? null : item.min}
+                        max={disableValidation ? null : item.max}
+                        step={disableValidation ? null : item.step}
                         value={value}
                         onChange={onChange}
                         currency={item.currency} />
@@ -178,11 +178,11 @@ const TYPES = {
         },
     },
     enum: {
-        render ({ item, value, onChange }) {
+        render ({ item, value, onChange, disableValidation }) {
             let options = item.options.map(opt => ({
                 value: opt.value,
                 label: opt.name,
-                disabled: opt.disabled,
+                disabled: !disableValidation && opt.disabled,
             }));
 
             let editor;
@@ -229,7 +229,7 @@ const TYPES = {
         },
     },
     country: {
-        render ({ value, onChange, item }) {
+        render ({ value, onChange, item, disableValidation }) {
             return (
                 <WithCountries>
                     {countries => {
@@ -238,12 +238,8 @@ const TYPES = {
 
                         for (const c in countries) {
                             const country = countries[c];
-                            if (item.exclude && item.exclude.includes(country.code)) continue;
+                            if (!disableValidation && item.exclude && item.exclude.includes(country.code)) continue;
                             options.push({ value: country.code, label: `${country.name_eo} (${country.code})` });
-                        }
-
-                        for (const add of (item.add || [])) {
-                            options.push({ value: add, label: add });
                         }
 
                         return (
@@ -314,9 +310,9 @@ const TYPES = {
         },
     },
     boolean_table: {
-        render ({ item, value, onChange }) {
-            const excludedCells = (item.excludeCells || [])
-                .map(([x, y]) => `${x},${y}`);
+        render ({ item, value, onChange, disableValidation }) {
+            const excludedCells = disableValidation ? []
+                : (item.excludeCells || []).map(([x, y]) => `${x},${y}`);
             const resizeValue = (value, rows, cols) => {
                 if (!value) value = [];
                 else value = value.slice();
@@ -418,16 +414,12 @@ export default class InputItem extends PureComponent {
         }
     }
 
-    componentDidUpdate () {
-        this.setDefaultIfNone();
-    }
-
     componentWillUnmount () {
         if (this.context) this.context.deregister(this);
     }
 
     validate (submitting) {
-        if (!this.props.editingData) {
+        if (!this.props.editingData || this.props.disableValidation) {
             this.setState({ error: null });
             return true;
         }
@@ -459,7 +451,7 @@ export default class InputItem extends PureComponent {
         return resolved;
     }
 
-    render ({ editing, item, onChange, value, onValueChange, previousNodes }) {
+    render ({ editing, item, onChange, value, onValueChange, previousNodes, disableValidation }) {
         let contents = null;
         if (editing) {
             contents = <InputSettings
@@ -484,7 +476,8 @@ export default class InputItem extends PureComponent {
                             default={resolved.default}
                             item={item}
                             value={value}
-                            onChange={onValueChange} />
+                            onChange={onValueChange}
+                            disableValidation={disableValidation} />
                         {this.state.error && (
                             <InputError>
                                 {this.state.error}

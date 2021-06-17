@@ -136,13 +136,17 @@ export class ScriptContextProvider extends PureComponent {
 /// - editingFormData: set to false to disable
 /// - skipSettings: TEMPORARY for not rendering settings
 /// - skipNonInputs: will not render modules that aren't inputs
+/// - disableValidation: bool
 export default class FormEditor extends PureComponent {
     state = {
         /// Form input name -> form input value
         formData: {},
     };
 
-    render ({ skipSettings, skipNonInputs, value, editing, onChange, additionalVars, editingFormData, isEditingContext }) {
+    render ({
+        skipSettings, skipNonInputs, value, editing, onChange, additionalVars, editingFormData,
+        isEditingContext, disableValidation,
+    }) {
         if (!value) return null;
 
         // TODO: properly disable inputs if not editingFormData
@@ -169,7 +173,8 @@ export default class FormEditor extends PureComponent {
                                 this.props.onFormDataChange(values);
                             } else this.setState({ formData });
                         }}
-                        additionalVars={additionalVars} />
+                        additionalVars={additionalVars}
+                        disableValidation={disableValidation} />
                 </ScriptContextProvider>
             </div>
         );
@@ -252,9 +257,21 @@ class FormEditorItems extends PureComponent {
         }
     }
 
+    currentBatch = {};
+    currentBatchTimeout = null;
+    batchValueChange (name, value) {
+        this.currentBatch[name] = value;
+        clearTimeout(this.currentBatchTimeout);
+
+        this.currentBatchTimeout = setTimeout(() => {
+            this.props.onValuesChange({ ...this.props.values, ...this.currentBatch });
+            this.currentBatch = {};
+        }, 1);
+    }
+
     render ({
-        editing, settings, onSettingsChange, items, onItemsChange, values, onValuesChange,
-        additionalVars, skipSettings, skipNonInputs, editingData, isEditingContext,
+        editing, settings, onSettingsChange, items, onItemsChange, values, additionalVars,
+        skipSettings, skipNonInputs, editingData, isEditingContext, disableValidation,
     }, { editingItem }) {
         const listItems = [];
         const previousNodes = [getGlobalDefs(additionalVars)];
@@ -268,6 +285,7 @@ class FormEditorItems extends PureComponent {
                         key={key}
                         editable={editing}
                         isEditingContext={isEditingContext}
+                        disableValidation={disableValidation}
                         previousNodes={previousNodes.slice()}
                         editing={editing && (editingItem === key)}
                         onEditingChange={editing => {
@@ -282,12 +300,7 @@ class FormEditorItems extends PureComponent {
                         }}
                         editingData={editingData}
                         value={values[name]}
-                        onValueChange={value => {
-                            onValuesChange({
-                                ...values,
-                                [name]: value,
-                            });
-                        }}
+                        onValueChange={value => this.batchValueChange(name, value)}
                         onRemove={() => this.removeItem(i)} />
                 );
             }
