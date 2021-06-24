@@ -1,7 +1,8 @@
 import { h } from 'preact';
-import { useState, PureComponent } from 'preact/compat';
+import { useRef, useState, PureComponent } from 'preact/compat';
+import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import { Checkbox, LinearProgress, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, Dialog, LinearProgress, TextField } from '@cpsdqs/yamdl';
 import Tabs from '../../../../components/tabs';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
@@ -10,6 +11,7 @@ import DetailView from '../../../../components/detail';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import GlobalFilterNotice from '../../codeholders/global-filter-notice';
+import { PickerDialog as CodeholderPickerDialog } from '../../../../components/codeholder-picker';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { LinkButton } from '../../../../router';
@@ -161,88 +163,14 @@ function GroupList ({ tab, id, editing, perms }) {
 /// - editing
 class WithItems extends PureComponent {
     state = {
+        selection: [],
         data: [],
         loading: false,
-        addingItems: [],
-        deletingItems: [],
+        addingItems: null,
+        deletingItems: null,
     };
 
     static contextType = coreContext;
-
-    componentDidMount () {
-        if (this.props.editing) this.load();
-    }
-
-    componentDidUpdate (prevProps) {
-        if (this.props.editing && !prevProps.editing) {
-            this.setState({ loading: true });
-            this.load();
-        }
-    }
-
-    componentWillUnmount () {
-        this.dead = true;
-    }
-
-    load () {
-        if (this.dead) return;
-        this.setState({ loading: true });
-        this.context.createTask(this.props.task, {
-            group: this.props.id,
-        }, {
-            offset: this.state.data.length,
-            fields: [],
-            limit: 100,
-        }).runOnceAndDrop().then(res => {
-            if (!res.items.length) {
-                this.setState({ loading: false });
-                return;
-            }
-            this.setState({
-                data: this.state.data.slice().concat(res.items),
-            }, () => this.load());
-        }).catch(err => {
-            console.error(err); // eslint-disable-line
-            setTimeout(() => this.load(), 1000);
-        });
-    }
-
-    addItem = id => {
-        this.setState({
-            addingItems: this.state.addingItems.slice().concat([id]),
-        });
-        this.context.createTask(this.props.addTask, {
-            group: this.props.id,
-        }, { [this.props.type]: id }).runOnceAndDrop().then(() => {
-            this.setState({
-                data: this.state.data.concat([id]),
-            });
-        }).catch(err => {
-            console.error(err); // eslint-disable-line no-console
-        }).then(() => {
-            const addingItems = this.state.addingItems.slice();
-            addingItems.splice(addingItems.indexOf(id), 1);
-            this.setState({ addingItems });
-        });
-    };
-    deleteItem = id => {
-        this.setState({
-            deletingItems: this.state.deletingItems.slice().concat([id]),
-        });
-        this.context.createTask(this.props.deleteTask, {
-            group: this.props.id,
-        }, { [this.props.type]: id }).runOnceAndDrop().then(() => {
-            const data = this.state.data.slice();
-            data.splice(data.indexOf(id), 1);
-            this.setState({ data });
-        }).catch(err => {
-            console.error(err); // eslint-disable-line no-console
-        }).then(() => {
-            const deletingItems = this.state.deletingItems.slice();
-            deletingItems.splice(deletingItems.indexOf(id), 1);
-            this.setState({ deletingItems });
-        });
-    };
 
     hasItem = id => {
         if (this.state.addingItems.includes(id)) return null;
@@ -250,18 +178,94 @@ class WithItems extends PureComponent {
         return this.state.data.includes(id);
     };
 
+    addSelected = id => {
+        this.setState({ selection: this.state.selection.slice().concat([id]) });
+    };
+    deleteSelected = id => {
+        const selection = this.state.selection.slice();
+        selection.splice(selection.indexOf(id), 1);
+        this.setState({ selection });
+    };
+    hasSelected = id => this.state.selection.includes(id);
+
+    addItems = async (items) => {
+        try {
+            for (let i = 0; i < items.length; i++) {
+                const id = items[i];
+                this.setState({ addingItems: i / items.length });
+                await this.context.createTask(this.props.addTask, {
+                    group: this.props.id,
+                }, { [this.props.type]: id }).runOnceAndDrop().then(() => {
+                    const data = this.state.data.slice();
+                    data.splice(data.indexOf(id), 1);
+                    this.setState({ data });
+                });
+            }
+        } catch (e) {
+            this.setState({ addingItems: null });
+            throw e;
+        }
+        this.setState({ selection: [], addingItems: null });
+    };
+    deleteSelection = async () => {
+        const selection = this.state.selection.slice();
+
+        try {
+            for (let i = 0; i < selection.length; i++) {
+                const id = selection[i];
+                this.setState({ deletingItems: i / selection.length });
+                await this.context.createTask(this.props.deleteTask, {
+                    group: this.props.id,
+                }, { [this.props.type]: id }).runOnceAndDrop().then(() => {
+                    const data = this.state.data.slice();
+                    data.splice(data.indexOf(id), 1);
+                    this.setState({ data });
+                });
+            }
+        } catch (e) {
+            this.setState({ deletingItems: null });
+            throw e;
+        }
+        this.setState({ selection: [], deletingItems: null });
+    };
+
     selection = {
-        add: this.addItem,
-        delete: this.deleteItem,
-        has: this.hasItem,
+        add: this.addSelected,
+        delete: this.deleteSelected,
+        has: this.hasSelected,
     };
 
     render ({ children }) {
-        return children(this.selection, this.state.loading);
+        const contents = children(this.selection, this.state.loading);
+        return (
+            <div class="set-container">
+                <div class={'set-header' + (this.state.selection.length ? ' has-selection' : '')}>
+                    <Button icon small onClick={this.props.onAdd}>
+                        <AddIcon style={{ verticalAlign: 'middle' }} />
+                    </Button>
+                    <div class="selection-header">
+                        <Button disabled={!this.state.selection.length} onClick={this.deleteSelection}>
+                            {locale.removeCodeholders(this.state.selection.length)}
+                        </Button>
+                    </div>
+                    <Dialog open={this.state.deletingItems !== null}>
+                        <div>{locale.removingMembers}</div>
+                        <LinearProgress progress={this.state.deletingItems} />
+                    </Dialog>
+                    <Dialog open={this.state.addingItems !== null}>
+                        <div>{locale.addingMembers}</div>
+                        <LinearProgress progress={this.state.addingItems} />
+                    </Dialog>
+                </div>
+                {contents}
+            </div>
+        );
     }
 }
 
 function CodeholdersList ({ perms, id, editing }) {
+    const [adding, setAdding] = useState(false);
+    const [addingValue, setAddingValue] = useState([]);
     const [offset, setOffset] = useState(0);
     const [parameters, setParameters] = useState({
         limit: 10,
@@ -269,46 +273,51 @@ function CodeholdersList ({ perms, id, editing }) {
         search: { field: 'nameOrCode', query: '' },
         filters: {},
     });
-    const [filterToGroup, setFilterToGroup] = useState(false);
-    const ftgId = 'checkbox-' + Math.random().toString(36);
+    const items = useRef(null);
 
     return (
-        <WithItems
-            id={id}
-            type="codeholder"
-            task="adminGroups/listCodeholders"
-            addTask="adminGroups/addCodeholder"
-            deleteTask="adminGroups/removeCodeholder"
-            editing={editing}>
-            {(selection, loading) => (
-                <div>
-                    <LinearProgress hideIfNone class="edit-loading" indeterminate={loading} />
-                    {editing ? (
-                        <SearchFilters
-                            value={parameters}
-                            onChange={setParameters}
-                            searchFields={['nameOrCode', 'email', 'searchAddress', 'notes']}
-                            expanded={false}
-                            onExpandedChange={() => {}}
-                            locale={{
-                                searchFields: codeholdersLocale.search.fields,
-                                searchPlaceholders: codeholdersLocale.search.placeholders,
-                            }} />
-                    ) : null}
-                    {editing ? (
-                        <div class="content-filter-to-group">
-                            <Checkbox id={ftgId} checked={filterToGroup} onChange={setFilterToGroup} />
-                            <label for={ftgId}>{locale.filterToGroup}</label>
-                        </div>
-                    ) : null}
+        <div class="group-member-list">
+            <SearchFilters
+                value={parameters}
+                onChange={setParameters}
+                searchFields={['nameOrCode', 'email', 'searchAddress', 'notes']}
+                expanded={false}
+                onExpandedChange={() => {}}
+                locale={{
+                    searchFields: codeholdersLocale.search.fields,
+                    searchPlaceholders: codeholdersLocale.search.placeholders,
+                }} />
+            <CodeholderPickerDialog
+                open={adding}
+                onClose={() => setAdding(false)}
+                value={addingValue}
+                onChange={setAddingValue}
+                actions={[
+                    {
+                        label: locale.addButton,
+                        action: () => {
+                            items.current.addItems(addingValue);
+                            setAddingValue([]);
+                            setAdding(false);
+                        },
+                    },
+                ]} />
+            <WithItems
+                ref={items}
+                id={id}
+                type="codeholder"
+                task="adminGroups/listCodeholders"
+                addTask="adminGroups/addCodeholder"
+                deleteTask="adminGroups/removeCodeholder"
+                onAdd={() => setAdding(true)}
+                editing={editing}>
+                {(selection) => (
                     <OverviewList
-                        task={(editing && !filterToGroup) ? 'codeholders/list' : 'adminGroups/listCodeholders'}
+                        task="adminGroups/listCodeholders"
                         notice={<GlobalFilterNotice perms={perms} />}
                         view="codeholders/codeholder"
-                        selection={editing && selection}
-                        options={{
-                            group: id,
-                        }}
+                        selection={selection}
+                        options={{ group: id }}
                         fields={CODEHOLDER_FIELDS}
                         useDeepCmp
                         parameters={{ ...parameters, offset }}
@@ -319,9 +328,9 @@ function CodeholdersList ({ perms, id, editing }) {
                         onSetFields={fields => setParameters({ ...parameters, fields })}
                         updateView={editing ? null : ['adminGroups/group', { id }]}
                         locale={codeholdersLocale.fields} />
-                </div>
-            )}
-        </WithItems>
+                )}
+            </WithItems>
+        </div>
     );
 }
 

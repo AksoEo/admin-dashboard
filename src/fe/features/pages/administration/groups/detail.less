@@ -1,3 +1,5 @@
+@import '../../../../prelude';
+
 .admin-group-detail-page {
     &.is-loading {
         text-align: center;
@@ -26,16 +28,51 @@
         margin-left: 16px;
     }
 
-    .content-filter-to-group {
-        margin: 16px;
-        padding: 0 16px;
+    .group-member-list {
+        padding-top: 16px;
+    }
 
-        label {
-            margin-left: 16px;
-            text-transform: uppercase;
-            font-size: 0.875em;
-            font-weight: 600;
-            opacity: 0.7;
+    .set-container {
+        .set-header {
+            position: relative;
+            margin: 16px 16px;
+            border-radius: 8px 8px 0 0;
+            background: @text-fade-10;
+            padding: 8px 16px;
+            padding-bottom: 16px;
+            margin-bottom: -8px;
+            display: flex;
+            justify-content: space-between;
+
+            .selection-header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                padding: inherit;
+                border-radius: inherit;
+                display: flex;
+                background: @card2-background;
+                justify-content: space-between;
+                transform: translateY(100%);
+                visibility: hidden;
+                transition: transform 0.3s @easing, visibility 0.3s;
+
+                .force-dark-theme();
+            }
+
+            &.has-selection {
+                .selection-header {
+                    transform: none;
+                    visibility: visible;
+                }
+            }
+        }
+        .overview-list {
+            position: relative;
+            margin-top: 0;
+            z-index: 1;
         }
     }
 }

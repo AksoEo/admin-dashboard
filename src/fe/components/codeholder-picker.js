@@ -133,7 +133,7 @@ export default class CodeholderPicker extends Component {
     }
 }
 
-export function PickerDialog ({ value, onChange, limit, container, open, onClose }) {
+export function PickerDialog ({ value, onChange, limit, container, open, onClose, ...extra }) {
     return (
         <Dialog
             class="codeholder-picker-add-dialog"
@@ -142,7 +142,8 @@ export function PickerDialog ({ value, onChange, limit, container, open, onClose
             title={limit === 1 ? locale.picker.addOne : locale.picker.add}
             container={container}
             open={open}
-            onClose={onClose}>
+            onClose={onClose}
+            {...extra}>
             <AddDialogInner
                 value={value}
                 onChange={onChange}
