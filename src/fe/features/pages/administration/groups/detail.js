@@ -2,7 +2,8 @@ import { h } from 'preact';
 import { useRef, useState, PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import { Button, Checkbox, Dialog, LinearProgress, TextField } from '@cpsdqs/yamdl';
+import SearchIcon from '@material-ui/icons/Search';
+import { Button, Dialog, LinearProgress, TextField } from '@cpsdqs/yamdl';
 import Tabs from '../../../../components/tabs';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
@@ -10,6 +11,7 @@ import { FIELDS as CLIENT_FIELDS } from '../clients/index';
 import DetailView from '../../../../components/detail';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
+import StaticOverviewList from '../../../../components/overview-list-static';
 import GlobalFilterNotice from '../../codeholders/global-filter-notice';
 import { PickerDialog as CodeholderPickerDialog } from '../../../../components/codeholder-picker';
 import Meta from '../../../meta';
@@ -154,6 +156,9 @@ function GroupList ({ tab, id, editing, perms }) {
     }
 }
 
+class AllItems extends PureComponent {
+}
+
 /// Handles item list during editing.
 ///
 /// - task: list task
@@ -171,6 +176,37 @@ class WithItems extends PureComponent {
     };
 
     static contextType = coreContext;
+
+    componentDidMount () {
+        this.load(true);
+    }
+
+    componentWillUnmount () {
+        this.dead = true;
+    }
+
+    load (first = false) {
+        if (!this.props.task) return;
+        if (this.dead) return;
+        if (first) this.setState({ data: [] });
+        this.setState({ loading: true });
+        this.context.createTask(this.props.task, { group: this.props.id }, {
+            offset: this.state.data.length,
+            fields: [],
+            limit: 100,
+        }).runOnceAndDrop().then(res => {
+            if (!res.items.length) {
+                this.setState({ loading: false });
+                return;
+            }
+            this.setState({
+                data: this.state.data.slice().concat(res.items.filter(x => !this.state.data.includes(x))),
+            }, () => this.load());
+        }).catch(err => {
+            console.error(err); // eslint-disable-line no-console
+            setTimeout(() => this.load(), 4000);
+        });
+    }
 
     hasItem = id => {
         if (this.state.addingItems.includes(id)) return null;
@@ -197,7 +233,7 @@ class WithItems extends PureComponent {
                     group: this.props.id,
                 }, { [this.props.type]: id }).runOnceAndDrop().then(() => {
                     const data = this.state.data.slice();
-                    data.splice(data.indexOf(id), 1);
+                    if (!data.includes(id)) data.push(id);
                     this.setState({ data });
                 });
             }
@@ -219,6 +255,7 @@ class WithItems extends PureComponent {
                 }, { [this.props.type]: id }).runOnceAndDrop().then(() => {
                     const data = this.state.data.slice();
                     data.splice(data.indexOf(id), 1);
+                    if (data.includes(id)) data.splice(data.indexOf(id), 1);
                     this.setState({ data });
                 });
             }
@@ -236,7 +273,7 @@ class WithItems extends PureComponent {
     };
 
     render ({ children }) {
-        const contents = children(this.selection, this.state.loading);
+        const contents = children(this.selection, this.state.loading, this.state.data);
         return (
             <div class="set-container">
                 <div class={'set-header' + (this.state.selection.length ? ' has-selection' : '')}>
@@ -287,21 +324,6 @@ function CodeholdersList ({ perms, id, editing }) {
                     searchFields: codeholdersLocale.search.fields,
                     searchPlaceholders: codeholdersLocale.search.placeholders,
                 }} />
-            <CodeholderPickerDialog
-                open={adding}
-                onClose={() => setAdding(false)}
-                value={addingValue}
-                onChange={setAddingValue}
-                actions={[
-                    {
-                        label: locale.addButton,
-                        action: () => {
-                            items.current.addItems(addingValue);
-                            setAddingValue([]);
-                            setAdding(false);
-                        },
-                    },
-                ]} />
             <WithItems
                 ref={items}
                 id={id}
@@ -309,25 +331,45 @@ function CodeholdersList ({ perms, id, editing }) {
                 task="adminGroups/listCodeholders"
                 addTask="adminGroups/addCodeholder"
                 deleteTask="adminGroups/removeCodeholder"
-                onAdd={() => setAdding(true)}
+                onAdd={() => {
+                    setAdding(true);
+                    setAddingValue([]);
+                }}
                 editing={editing}>
-                {(selection) => (
-                    <OverviewList
-                        task="adminGroups/listCodeholders"
-                        notice={<GlobalFilterNotice perms={perms} />}
-                        view="codeholders/codeholder"
-                        selection={selection}
-                        options={{ group: id }}
-                        fields={CODEHOLDER_FIELDS}
-                        useDeepCmp
-                        parameters={{ ...parameters, offset }}
-                        onGetItemLink={editing ? null : (id => `/membroj/${id}`)}
-                        outOfTree
-                        onSetOffset={setOffset}
-                        onSetLimit={limit => setParameters({ ...parameters, limit })}
-                        onSetFields={fields => setParameters({ ...parameters, fields })}
-                        updateView={editing ? null : ['adminGroups/group', { id }]}
-                        locale={codeholdersLocale.fields} />
+                {(selection, loading, data) => (
+                    <div>
+                        <CodeholderPickerDialog
+                            open={adding}
+                            onClose={() => setAdding(false)}
+                            value={addingValue}
+                            onChange={setAddingValue}
+                            filter={{ id: { $nin: data } }}
+                            actions={[
+                                {
+                                    label: locale.addButton,
+                                    action: () => {
+                                        items.current.addItems(addingValue);
+                                        setAdding(false);
+                                    },
+                                },
+                            ]} />
+                        <OverviewList
+                            task="adminGroups/listCodeholders"
+                            notice={<GlobalFilterNotice perms={perms} />}
+                            view="codeholders/codeholder"
+                            selection={selection}
+                            options={{ group: id }}
+                            fields={CODEHOLDER_FIELDS}
+                            useDeepCmp
+                            parameters={{ ...parameters, offset }}
+                            onGetItemLink={id => `/membroj/${id}`}
+                            outOfTree
+                            onSetOffset={setOffset}
+                            onSetLimit={limit => setParameters({ ...parameters, limit })}
+                            onSetFields={fields => setParameters({ ...parameters, fields })}
+                            updateView={editing ? null : ['adminGroups/group', { id }]}
+                            locale={codeholdersLocale.fields} />
+                    </div>
                 )}
             </WithItems>
         </div>
@@ -335,66 +377,73 @@ function CodeholdersList ({ perms, id, editing }) {
 }
 
 function ClientsList ({ perms, id, editing }) {
+    const [adding, setAdding] = useState(false);
+    const [addingValue, setAddingValue] = useState([]);
     const [offset, setOffset] = useState(0);
     const [parameters, setParameters] = useState({
         limit: 10,
         fields: [{ id: 'name', sorting: 'none' }, { id: 'ownerName', sorting: 'none' }, { id: 'apiKey', sorting: 'asc' }],
         search: { field: 'name', query: '' },
     });
-    const [filterToGroup, setFilterToGroup] = useState(false);
-    const ftgId = 'checkbox-' + Math.random().toString(36);
+    const items = useRef(null);
 
     return (
-        <WithItems
-            id={id}
-            type="client"
-            task="adminGroups/listClients"
-            addTask="adminGroups/addClient"
-            deleteTask="adminGroups/removeClient"
-            editing={editing}>
-            {(selection, loading) => (
-                <div>
-                    <LinearProgress hideIfNone class="edit-loading" indeterminate={loading} />
-                    {editing ? (
-                        <SearchFilters
-                            value={parameters}
-                            onChange={setParameters}
-                            searchFields={['name', 'apiKey', 'ownerName', 'ownerEmail']}
-                            filters={{}}
-                            expanded={false}
-                            onExpandedChange={() => {}}
-                            locale={{
-                                searchFields: clientsLocale.fields,
-                                searchPlaceholders: clientsLocale.search.placeholders,
-                            }} />
-                    ) : null}
-                    {editing ? (
-                        <div class="content-filter-to-group">
-                            <Checkbox id={ftgId} checked={filterToGroup} onChange={setFilterToGroup} />
-                            <label for={ftgId}>{locale.filterToGroup}</label>
-                        </div>
-                    ) : null}
-                    <OverviewList
-                        task={(editing && !filterToGroup) ? 'clients/list' : 'adminGroups/listClients'}
-                        notice={<GlobalFilterNotice perms={perms} />}
-                        view="clients/client"
-                        selection={editing && selection}
-                        options={{
-                            group: id,
-                        }}
-                        fields={CLIENT_FIELDS}
-                        useDeepCmp
-                        parameters={{ ...parameters, offset }}
-                        onGetItemLink={editing ? null : (id => `/administrado/klientoj/${id}`)}
-                        outOfTree
-                        onSetOffset={setOffset}
-                        onSetLimit={limit => setParameters({ ...parameters, limit })}
-                        onSetFields={fields => setParameters({ ...parameters, fields })}
-                        updateView={editing ? null : ['adminGroups/group', { id }]}
-                        locale={clientsLocale.fields} />
-                </div>
-            )}
-        </WithItems>
+        <div class="group-member-list">
+            <SearchFilters
+                value={parameters}
+                onChange={setParameters}
+                searchFields={['name', 'apiKey', 'ownerName', 'ownerEmail']}
+                filters={{}}
+                expanded={false}
+                onExpandedChange={() => {}}
+                locale={{
+                    searchFields: clientsLocale.fields,
+                    searchPlaceholders: clientsLocale.search.placeholders,
+                }} />
+            <WithItems
+                ref={items}
+                id={id}
+                type="client"
+                task="adminGroups/listClients"
+                addTask="adminGroups/addClient"
+                deleteTask="adminGroups/removeClient"
+                onAdd={() => {
+                    setAdding(true);
+                    setAddingValue([]);
+                }}
+                editing={editing}>
+                {(selection, loading, data) => (
+                    <div>
+                        <ClientPicker
+                            open={adding}
+                            onClose={() => setAdding(false)}
+                            value={addingValue}
+                            onChange={setAddingValue}
+                            onCommit={() => {
+                                items.current.addItems(addingValue);
+                                setAdding(false);
+                            }}
+                            exclude={data} />
+                        <OverviewList
+                            task={'adminGroups/listClients'}
+                            notice={<GlobalFilterNotice perms={perms} />}
+                            view="clients/client"
+                            selection={selection}
+                            options={{ group: id }}
+                            fields={CLIENT_FIELDS}
+                            useDeepCmp
+                            parameters={{ ...parameters, offset }}
+                            onGetItemLink={id => `/administrado/klientoj/${id}`}
+                            outOfTree
+                            onSetOffset={setOffset}
+                            onSetLimit={limit => setParameters({ ...parameters, limit })}
+                            onSetFields={fields => setParameters({ ...parameters, fields })}
+                            updateView={editing ? null : ['adminGroups/group', { id }]}
+                            locale={clientsLocale.fields} />
+                    </div>
+                )}
+            </WithItems>
+        </div>
     );
 }
 
@@ -435,3 +484,68 @@ const fields = {
         shouldHide: (_, editing) => !editing,
     },
 };
+
+function ClientPicker ({
+    open,
+    onClose,
+    value,
+    onChange,
+    onCommit,
+    exclude,
+}) {
+    const [offset, setOffset] = useState(0);
+    const [search, setSearch] = useState('');
+    const selection = {
+        add: id => {
+            if (value.includes('' + id)) return;
+            onChange(value.concat(['' + id]));
+        },
+        has: id => value.includes('' + id),
+        delete: id => {
+            if (!value.includes('' + id)) return;
+            const newValue = value.slice();
+            newValue.splice(value.indexOf('' + id), 1);
+            onChange(newValue);
+        },
+    };
+    // FIXME: don't reappropriate the codeholder picker styles
+    return (
+        <Dialog
+            backdrop
+            class="codeholder-picker-add-dialog"
+            open={open}
+            onClose={onClose}
+            actions={[{ label: locale.addButton, action: onCommit }]}>
+            <div class="codeholder-picker-search">
+                <div class="search-icon-container">
+                    <SearchIcon />
+                </div>
+                <input
+                    class="search-inner"
+                    placeholder={locale.pickerSearch}
+                    value={search}
+                    onChange={e => setSearch(e.target.value)} />
+            </div>
+            <StaticOverviewList
+                compact
+                task="clients/list"
+                view="clients/client"
+                search={{ field: 'name', query: search }}
+                jsonFilter={{ apiKey: { $nin: exclude || [] } }}
+                fields={CLIENT_FIELDS}
+                sorting={{ code: 'asc' }}
+                offset={offset}
+                onSetOffset={setOffset}
+                selection={selection}
+                onItemClick={id => {
+                    if (value.includes('' + id)) {
+                        selection.delete(id);
+                    } else {
+                        selection.add(id);
+                    }
+                }}
+                limit={10}
+                locale={locale.fields} />
+        </Dialog>
+    );
+}

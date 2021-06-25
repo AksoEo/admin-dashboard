@@ -133,7 +133,7 @@ export default class CodeholderPicker extends Component {
     }
 }
 
-export function PickerDialog ({ value, onChange, limit, container, open, onClose, ...extra }) {
+export function PickerDialog ({ value, onChange, limit, container, open, onClose, filter, ...extra }) {
     return (
         <Dialog
             class="codeholder-picker-add-dialog"
@@ -148,12 +148,13 @@ export function PickerDialog ({ value, onChange, limit, container, open, onClose
                 value={value}
                 onChange={onChange}
                 onClose={onClose}
+                filter={filter}
                 limit={this.props.limit} />
         </Dialog>
     );
 }
 
-function AddDialogInner ({ value, onChange, limit, onClose }) {
+function AddDialogInner ({ value, onChange, limit, onClose, filter }) {
     const [offset, setOffset] = useState(0);
     const [search, setSearch] = useState('');
 
@@ -189,6 +190,7 @@ function AddDialogInner ({ value, onChange, limit, onClose }) {
                 task="codeholders/list"
                 view="codeholders/codeholder"
                 search={{ field: 'nameOrCode', query: search }}
+                jsonFilter={filter}
                 fields={REDUCED_FIELDS}
                 sorting={{ code: 'asc' }}
                 offset={offset}

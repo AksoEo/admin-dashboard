@@ -12,7 +12,7 @@ export const SIG_CLIENTS = '!clients';
 
 export const tasks = {
     /// clients/list: lists clients
-    list: async (_, { search, offset, limit, fields }) => {
+    list: async (_, { search, offset, limit, fields, jsonFilter }) => {
         const client = await asyncClient;
 
         const opts = { offset, limit };
@@ -26,6 +26,11 @@ export const tasks = {
                 }
                 opts.search = { cols: [search.field], str: transformedQuery };
             }
+        }
+
+        if (jsonFilter && jsonFilter.filter) {
+            opts.filter = opts.filter ? { $and: [opts.filter, jsonFilter.filter] }
+                : jsonFilter.filter;
         }
 
         const res = await client.get('/clients', {

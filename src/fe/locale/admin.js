@@ -28,6 +28,7 @@ export const adminGroups = {
 
     addingMembers: '[[Adding members]]',
     removingMembers: '[[Removing members]]',
+    pickerSearch: 'Serĉi laŭ nomo',
 
     addCodeholders: 'Aldoni membron',
     addCodeholdersCount: n => `${n} membro${n === 1 ? '' : 'j'} elektitaj`,
