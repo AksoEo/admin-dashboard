@@ -144,6 +144,8 @@ export const codeholders = {
         lastNamePublicity: 'Publikeco de familinomo',
         landlinePhonePublicity: 'Publikeco de hejma telefono',
         cellphonePublicity: 'Publikeco de poŝtelefono',
+        mainDescriptor: '[[mainDescriptor]]',
+        factoids: '[[factoids]]',
 
         // used only in field history
         profilePictureHash: 'Profilbildo',
@@ -187,6 +189,22 @@ export const codeholders = {
         'Civitano',
         'Ges-ro',
     ],
+    factoids: {
+        duplicateKey: '[[duplicateKey]]',
+        newDupKeyName: r => `[[factoid ${r}]]`,
+        types: {
+            tel: '[[tel]]',
+            text: '[[text]]',
+            number: '[[number]]',
+            email: '[[email]]',
+            url: '[[url]]',
+        },
+        placeholders: {
+            tel: '+',
+            email: '[[test@example.com]]',
+            url: '[[https://example.com]]',
+        },
+    },
     csvOptions: {
         countryLocale: 'Lingvo de landnomoj',
         countryLocales: {

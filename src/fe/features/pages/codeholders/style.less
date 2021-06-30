@@ -683,6 +683,75 @@
             }
         }
     }
+
+    .codeholder-factoids-editor {
+        .factoid-editor {
+            display: flex;
+            justify-content: space-between;
+
+            @media (max-width: 600px) {
+                display: block;
+            }
+            &.is-editing {
+                display: block;
+            }
+
+            .factoid-header {
+                display: flex;
+                padding: 8px;
+
+                .factoid-delete {
+                    margin-right: 16px;
+                    --md-button-color: @danger;
+                }
+
+                .factoid-label, .factoid-label-editor {
+                    flex: 1;
+                    font-weight: 600;
+                }
+
+                .factoid-label-editor {
+                    margin-bottom: 4px;
+                }
+            }
+            .factoid-value {
+                display: flex;
+                padding: 8px;
+
+                .factoid-type-select {
+                    margin-right: 16px;
+                }
+
+                .value-container {
+                    flex: 1;
+
+                    & > * {
+                        width: 100%;
+                    }
+                }
+
+                &[data-type="text"] {
+                    flex-direction: column;
+
+                    .factoid-type-select {
+                        margin: 0;
+                        margin-bottom: 8px;
+                    }
+                }
+            }
+            &.is-editing .factoid-value[data-tye="text"] .markdown-text-field {
+                max-height: 100px;
+            }
+        }
+
+        .rearranging-list-item + .rearranging-list-item .factoid-editor {
+            border-top: 1px solid @separator;
+        }
+
+        .factoid-add {
+            margin-left: 8px;
+        }
+    }
 }
 
 

@@ -265,6 +265,8 @@ const clientFields = {
     lastNamePublicity: 'lastNamePublicity',
     landlinePhonePublicity: 'landlinePhonePublicity',
     cellphonePublicity: 'cellphonePublicity',
+    mainDescriptor: 'mainDescriptor',
+    factoids: 'factoids',
 };
 
 const fieldHistoryBlacklist = [

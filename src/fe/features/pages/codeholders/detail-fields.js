@@ -1,7 +1,9 @@
 import { h, Component } from 'preact';
-import { Fragment } from 'preact/compat';
+import { useState, Fragment } from 'preact/compat';
+import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
+import RemoveIcon from '@material-ui/icons/Remove';
 import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
@@ -18,9 +20,11 @@ import {
     phoneNumber,
     Required,
 } from '../../../components/data';
+import MdField from '../../../components/md-field';
 import SuggestionField from '../../../components/suggestion-field';
 import Select from '../../../components/select';
 import LimitedTextField from '../../../components/limited-text-field';
+import RearrangingList from '../../../components/rearranging-list';
 import TinyProgress from '../../../components/tiny-progress';
 import { FileIcon } from '../../../components/icons';
 import ProfilePictureEditor from './profile-picture';
@@ -382,7 +386,7 @@ function FilesButton ({ id }) {
     );
 }
 
-const Header = connectPerms(function Header ({
+export const Header = connectPerms(function Header ({
     item,
     originalItem,
     editing,
@@ -589,7 +593,7 @@ function permsEditable (field, Component) {
     });
 }
 
-const fields = {
+export const fields = {
     // for field history
     name: {
         component ({ value, item, editing, onChange }) {
@@ -911,6 +915,23 @@ const fields = {
         history: true,
         hasPerm: 'self',
     },
+    mainDescriptor: {
+        component: permsEditable('mainDescriptor', ({ value, editing, onChange }) => {
+            if (!editing) return value;
+            return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={30} />;
+        }),
+        shouldHide: item => item.type !== 'org',
+        history: true,
+        hasPerm: 'self',
+    },
+    factoids: {
+        component: permsEditable('factoids', ({ value, editing, onChange }) => {
+            return <FactoidsEditor value={value} editing={editing} onChange={onChange} />;
+        }),
+        shouldHide: item => item.type !== 'org',
+        history: true,
+        hasPerm: 'self',
+    },
     notes: {
         component: permsEditable('notes', ({ value, editing, onChange }) => {
             if (!editing) {
@@ -942,10 +963,186 @@ const fields = {
     },
 };
 
-const Footer = () => null;
+function FactoidsEditor ({ value, editing, onChange }) {
+    const [keyIdMap] = useState(new WeakMap());
+    value = value || {};
+    const keys = Object.keys(value);
 
-export {
-    Header,
-    fields,
-    Footer,
-};
+    for (const k of keys) {
+        if (!keyIdMap.has(value[k])) keyIdMap.set(value[k], Math.random());
+    }
+
+    const items = keys.map(key => (
+        <FactoidEditor
+            key={keyIdMap.get(value[key])}
+            k={key}
+            v={value[key]}
+            editing={editing}
+            onKeyChange={newKey => {
+                if (keys.includes(newKey)) return false;
+                const newKeys = keys.slice();
+                newKeys[newKeys.indexOf(key)] = newKey;
+                onChange(Object.fromEntries(newKeys.map(k => [k, k === newKey ? value[key] : value[k]])));
+                return true;
+            }}
+            onValueChange={v => {
+                keyIdMap.set(v, keyIdMap.get(value[key]));
+                onChange({ ...value, [key]: v });
+            }}
+            onDelete={() => {
+                const newKeys = keys.slice();
+                newKeys.splice(newKeys.indexOf(key), 1);
+                onChange(Object.fromEntries(newKeys.map(k => [k, value[k]])));
+            }} />
+    ));
+
+    if (editing && keys.length < 15) items.push(
+        <Button class="factoid-add" key="\nadd" icon small onClick={e => {
+            e.preventDefault();
+            let key = '';
+            let i = keys.length + 1;
+            while (keys.includes(key)) key = locale.factoids.newDupKeyName(i++);
+            onChange({ ...value, [key]: { type: 'text', val: '' } });
+        }}>
+            <AddIcon />
+        </Button>
+    );
+
+    return (
+        <div class={'codeholder-factoids-editor' + (editing ? ' is-editing' : '')}>
+            <RearrangingList
+                isItemDraggable={index => index < keys.length && editing}
+                spacing={4}
+                canMove={pos => pos < keys.length}
+                onMove={(fromPos, toPos) => {
+                    const newKeys = keys.slice();
+                    newKeys.splice(toPos, 0, newKeys.splice(fromPos, 1));
+                    onChange(Object.fromEntries(newKeys.map(k => [k, value[k]])));
+                }}>
+                {items}
+            </RearrangingList>
+        </div>
+    );
+}
+function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing }) {
+    // if this is a new item and has a weird internal name, we'll set keyDup to ''
+    const [keyDup, setKeyDup] = useState(null);
+    const keyDupEnabled = keyDup !== null;
+
+    let editor = null;
+    if (v.type === 'tel') {
+        if (editing) {
+            editor = <phoneNumber.editor
+                outline
+                value={{ value: v.val }}
+                onChange={val => onValueChange({ ...v, val: (val.value || '+').replace(/\s+/g, '') })}
+                placeholder={locale.factoids.placeholders.tel} />;
+        } else {
+            editor = <phoneNumber.renderer value={{ value: v.val }} />;
+        }
+    } else if (v.type === 'text') {
+        editor = <MdField
+            outline
+            editing={editing}
+            value={v.val}
+            onChange={val => onValueChange({ ...v, val })}
+            rules={['emphasis', 'strikethrough', 'link']} />;
+    } else if (v.type === 'number') {
+        if (editing) {
+            editor = <TextField
+                outline
+                type="number"
+                value={v.val}
+                onChange={e => {
+                    if (e.target.value === v.val.toString()) return;
+                    if (Number.isFinite(+e.target.value)) {
+                        onValueChange({ ...v, val: +e.target.value });
+                    }
+                }} />;
+        } else {
+            editor = `${v.val}`;
+        }
+    } else if (v.type === 'email') {
+        if (editing) {
+            editor = <TextField
+                outline
+                type="email"
+                value={v.val}
+                onChange={e => onValueChange({ ...v, val: e.target.value })}
+                placeholder={locale.factoids.placeholders.email} />;
+        } else {
+            editor = `${v.val}`;
+        }
+    } else if (v.type === 'url') {
+        if (editing) {
+            editor = <TextField
+                outline
+                type="url"
+                value={v.val}
+                onChange={e => onValueChange({ ...v, val: e.target.value })}
+                placeholder={locale.factoids.placeholders.url} />;
+        } else {
+            editor = `${v.val}`;
+        }
+    }
+
+    return (
+        <div class={'factoid-editor' + (editing ? ' is-editing' : '')}>
+            <div class="factoid-header">
+                {editing ? (
+                    <Button class="factoid-delete" icon small onClick={e => {
+                        e.preventDefault();
+                        onDelete();
+                    }}>
+                        <RemoveIcon />
+                    </Button>
+                ) : null}
+                {editing ? (
+                    <LimitedTextField
+                        class="factoid-label-editor"
+                        outline
+                        error={keyDupEnabled ? locale.factoids.duplicateKey : null}
+                        value={keyDupEnabled ? keyDup : k}
+                        onChange={e => {
+                            const k = e.target.value;
+                            if (onKeyChange(k)) {
+                                setKeyDup(null);
+                            } else {
+                                setKeyDup(k);
+                            }
+                        }}
+                        maxLength={30} />
+                ) : (
+                    <span class="factoid-label">
+                        {k}
+                    </span>
+                )}
+            </div>
+            <div class="factoid-value" data-type={v.type}>
+                {editing ? (
+                    <Select
+                        outline
+                        class="factoid-type-select"
+                        value={v.type}
+                        onChange={type => {
+                            if (type === v.type) return;
+                            if (type === 'tel') onValueChange({ type, val: '+' });
+                            if (type === 'text') onValueChange({ type, val: '' });
+                            if (type === 'number') onValueChange({ type, val: 0 });
+                            if (type === 'email') onValueChange({ type, val: '' });
+                            if (type === 'url') onValueChange({ type, val: '' });
+                        }}
+                        items={Object.keys(locale.factoids.types).map(k => ({
+                            value: k,
+                            label: locale.factoids.types[k],
+                        }))} />
+                ) : null}
+                <div class="value-container">
+                    {editor}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export const Footer = () => null;

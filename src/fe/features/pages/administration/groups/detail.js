@@ -156,9 +156,6 @@ function GroupList ({ tab, id, editing, perms }) {
     }
 }
 
-class AllItems extends PureComponent {
-}
-
 /// Handles item list during editing.
 ///
 /// - task: list task
