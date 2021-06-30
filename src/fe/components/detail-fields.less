@@ -10,6 +10,18 @@
         grid-template-columns: 1fr 96px 3fr;
     }
 
+    .detail-fields-section-marker {
+        font-weight: 600;
+        border-bottom: 1px solid @separator;
+        padding-top: 12px;
+        padding-bottom: 8px;
+        text-align: right;
+        color: @text-fade-80;
+    }
+    .detail-fields-section-marker-pad {
+        border-bottom: 1px solid @separator;
+    }
+
     .detail-field-id {
         text-align: right;
         text-transform: uppercase;
@@ -48,6 +60,15 @@
     .compact-detail-fields() {
         display: block;
         padding: 24px;
+
+        .detail-fields-section-marker {
+            margin-top: 4px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        .detail-fields-section-marker-pad {
+            display: none;
+        }
 
         .detail-field-id {
             display: inline-block;

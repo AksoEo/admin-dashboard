@@ -69,11 +69,31 @@ export default function DetailFields ({
         footer = <Footer {...fieldProps} createHistoryLink={createHistoryLink} canReadHistory={canReadHistory} />;
     }
 
+    let lastItemWasSectionMarker = false;
+
     for (const fieldId in fields) {
         const field = fields[fieldId];
         const FieldComponent = field.component;
 
+        if (field.sectionMarkerAbove) {
+            if (lastItemWasSectionMarker) {
+                // don't show an empty section
+                items.pop();
+            }
+            // commit empty items
+            items.push(...emptyItems.splice(0));
+            items.push(
+                <Fragment>
+                    <div class="detail-fields-section-marker">{field.sectionMarkerAbove}</div>
+                    <div class="detail-fields-section-marker-pad"></div>
+                    <div class="detail-fields-section-marker-pad"></div>
+                </Fragment>
+            );
+            lastItemWasSectionMarker = true;
+        }
+
         if (field.shouldHide && field.shouldHide(itemData, editing, userData)) continue;
+        lastItemWasSectionMarker = false;
 
         const isNotLoaded = field.virtual
             ? field.virtual.map(x => itemData[x] === undefined).reduce((a, b) => a || b, false)
@@ -137,6 +157,8 @@ export default function DetailFields ({
             items.push(itemId, itemExtra, itemContents);
         }
     }
+
+    if (lastItemWasSectionMarker) items.pop();
 
     return (
         <Fragment>

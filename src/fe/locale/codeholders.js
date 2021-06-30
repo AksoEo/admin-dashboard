@@ -144,11 +144,19 @@ export const codeholders = {
         lastNamePublicity: 'Publikeco de familinomo',
         landlinePhonePublicity: 'Publikeco de hejma telefono',
         cellphonePublicity: 'Publikeco de poŝtelefono',
+        publicCountry: '[[publicCountry]]',
         mainDescriptor: '[[mainDescriptor]]',
         factoids: '[[factoids]]',
 
         // used only in field history
         profilePictureHash: 'Profilbildo',
+
+        sections: {
+            contact: '[[Contact]]',
+            location: '[[Address]]',
+            factoids: '[[Factoids]]',
+            admin: '[[Administration]]',
+        },
     },
     fieldEditorInsufficientPerms: 'Vi ne havas redaktorajton',
     profilePictureHashSome: 'Havas bildon',

@@ -656,8 +656,24 @@ export const fields = {
                     onChange={enabled => editing && onChange(enabled)} />
             );
         }),
+        isEmpty: () => false,
         hasPerm: 'self',
         history: true,
+    },
+    hasPassword: simpleField(function ({ value }) {
+        return <Checkbox class="fixed-checkbox" checked={value} />;
+    }, {
+        isEmpty: value => !value,
+        shouldHide: (_, editing) => editing,
+        hasPerm: 'self',
+    }),
+    creationTime: {
+        component ({ value }) {
+            if (!value) return null;
+            return <timestamp.renderer value={value} />;
+        },
+        shouldHide: (_, editing) => editing,
+        hasPerm: 'self',
     },
     isDead: {
         component: permsEditable('isDead', ({ value, editing, item, onItemChange }) => {
@@ -735,12 +751,66 @@ export const fields = {
         hasPerm: 'self',
         history: true,
     },
-    creationTime: {
-        component ({ value }) {
-            if (!value) return null;
-            return <timestamp.renderer value={value} />;
-        },
-        shouldHide: (_, editing) => editing,
+    email: simpleField(permsEditable('email', makeDataEditable(email, ({ value, item }) => (
+        <Fragment>
+            <Publicity value={item.emailPublicity} style="icon" />
+            {' '}
+            <email.renderer value={value} />
+        </Fragment>
+    ))), {
+        extra: connectPerms(({ perms, item, editing, onItemChange }) => (
+            <Publicity
+                value={item.emailPublicity}
+                onChange={v => onItemChange({ ...item, emailPublicity: v })}
+                editing={editing && perms.hasCodeholderField('emailPublicity', 'w')}
+                style="icon" />
+        )),
+        history: true,
+        hasPerm: 'self',
+        sectionMarkerAbove: locale.fields.sections.contact,
+    }),
+    cellphone: simpleField(permsEditable('cellphone', makeDataEditable(phoneNumber, makePhoneHistory('cellphone'))), {
+        isEmpty: value => !value.value,
+        shouldHide: item => item.type !== 'human',
+        extra: connectPerms(({ perms, item, editing, onItemChange }) => (
+            <Publicity
+                value={item.cellphonePublicity}
+                onChange={v => onItemChange({ ...item, cellphonePublicity: v })}
+                editing={editing && perms.hasCodeholderField('cellphonePublicity', 'w')}
+                style="icon" />
+        )),
+        history: true,
+        hasPerm: 'self',
+    }),
+    landlinePhone: simpleField(permsEditable('landlinePhone', makeDataEditable(phoneNumber, makePhoneHistory('landlinePhone'))), {
+        isEmpty: value => !value.value,
+        shouldHide: item => item.type !== 'human',
+        extra: connectPerms(({ perms, item, editing, onItemChange }) => (
+            <Publicity
+                value={item.landlinePhonePublicity}
+                onChange={v => onItemChange({ ...item, landlinePhonePublicity: v })}
+                editing={editing && perms.hasCodeholderField('landlinePhonePublicity', 'w')}
+                style="icon" />
+        )),
+        history: true,
+        hasPerm: 'self',
+    }),
+    officePhone: simpleField(permsEditable('officePhone', makeDataEditable(phoneNumber, makePhoneHistory('officePhone'))), {
+        isEmpty: value => !value.value,
+        extra: connectPerms(({ perms, item, editing, onItemChange }) => (
+            <Publicity
+                value={item.officePhonePublicity}
+                onChange={v => onItemChange({ ...item, officePhonePublicity: v })}
+                editing={editing && perms.hasCodeholderField('officePhonePublicity', 'w')}
+                style="icon" />
+        )),
+        history: true,
+        hasPerm: 'self',
+    }),
+    feeCountry: {
+        sectionMarkerAbove: locale.fields.sections.location,
+        component: permsEditable('feeCountry', makeDataEditable(country)),
+        history: true,
         hasPerm: 'self',
     },
     address: {
@@ -787,28 +857,13 @@ export const fields = {
         history: true,
         hasPerm: 'self',
     },
-    feeCountry: {
-        component: permsEditable('feeCountry', makeDataEditable(country)),
+    publicCountry: {
+        sectionMarkerAbove: locale.fields.sections.factoids,
+        component: permsEditable('publicCountry', makeDataEditable(country)),
+        extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
         hasPerm: 'self',
     },
-    email: simpleField(permsEditable('email', makeDataEditable(email, ({ value, item }) => (
-        <Fragment>
-            <Publicity value={item.emailPublicity} style="icon" />
-            {' '}
-            <email.renderer value={value} />
-        </Fragment>
-    ))), {
-        extra: connectPerms(({ perms, item, editing, onItemChange }) => (
-            <Publicity
-                value={item.emailPublicity}
-                onChange={v => onItemChange({ ...item, emailPublicity: v })}
-                editing={editing && perms.hasCodeholderField('emailPublicity', 'w')}
-                style="icon" />
-        )),
-        history: true,
-        hasPerm: 'self',
-    }),
     profession: simpleField(permsEditable('profession', function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
@@ -845,51 +900,6 @@ export const fields = {
         history: true,
         hasPerm: 'self',
     }),
-    landlinePhone: simpleField(permsEditable('landlinePhone', makeDataEditable(phoneNumber, makePhoneHistory('landlinePhone'))), {
-        isEmpty: value => !value.value,
-        shouldHide: item => item.type !== 'human',
-        extra: connectPerms(({ perms, item, editing, onItemChange }) => (
-            <Publicity
-                value={item.landlinePhonePublicity}
-                onChange={v => onItemChange({ ...item, landlinePhonePublicity: v })}
-                editing={editing && perms.hasCodeholderField('landlinePhonePublicity', 'w')}
-                style="icon" />
-        )),
-        history: true,
-        hasPerm: 'self',
-    }),
-    officePhone: simpleField(permsEditable('officePhone', makeDataEditable(phoneNumber, makePhoneHistory('officePhone'))), {
-        isEmpty: value => !value.value,
-        extra: connectPerms(({ perms, item, editing, onItemChange }) => (
-            <Publicity
-                value={item.officePhonePublicity}
-                onChange={v => onItemChange({ ...item, officePhonePublicity: v })}
-                editing={editing && perms.hasCodeholderField('officePhonePublicity', 'w')}
-                style="icon" />
-        )),
-        history: true,
-        hasPerm: 'self',
-    }),
-    cellphone: simpleField(permsEditable('cellphone', makeDataEditable(phoneNumber, makePhoneHistory('cellphone'))), {
-        isEmpty: value => !value.value,
-        shouldHide: item => item.type !== 'human',
-        extra: connectPerms(({ perms, item, editing, onItemChange }) => (
-            <Publicity
-                value={item.cellphonePublicity}
-                onChange={v => onItemChange({ ...item, cellphonePublicity: v })}
-                editing={editing && perms.hasCodeholderField('cellphonePublicity', 'w')}
-                style="icon" />
-        )),
-        history: true,
-        hasPerm: 'self',
-    }),
-    hasPassword: simpleField(function ({ value }) {
-        return <Checkbox class="fixed-checkbox" checked={value} />;
-    }, {
-        isEmpty: value => !value,
-        shouldHide: (_, editing) => editing,
-        hasPerm: 'self',
-    }),
     biography: {
         component: permsEditable('biography', ({ value, editing, onChange }) => {
             if (!editing) {
@@ -920,6 +930,7 @@ export const fields = {
             if (!editing) return value;
             return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={30} />;
         }),
+        extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         shouldHide: item => item.type !== 'org',
         history: true,
         hasPerm: 'self',
@@ -928,11 +939,13 @@ export const fields = {
         component: permsEditable('factoids', ({ value, editing, onChange }) => {
             return <FactoidsEditor value={value} editing={editing} onChange={onChange} />;
         }),
+        extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         shouldHide: item => item.type !== 'org',
         history: true,
         hasPerm: 'self',
     },
     notes: {
+        sectionMarkerAbove: locale.fields.sections.admin,
         component: permsEditable('notes', ({ value, editing, onChange }) => {
             if (!editing) {
                 if (!value) return null;
