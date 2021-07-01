@@ -1,6 +1,6 @@
 export const formEditor = {
     settings: {
-        title: '[[Settings]]',
+        title: 'Agordoj',
         flags: {
             allowUse: 'Malfermita',
             allowUseDesc: 'Ĉu la aliĝilo estas malfermita kaj eblas aliĝi',
@@ -75,7 +75,7 @@ export const formEditor = {
         minEmpty: 'Neniu minimumo',
         max: 'Maksimumo',
         maxEmpty: 'Neniu maksimumo',
-        minMaxRange: '[[Range]]',
+        minMaxRange: 'Intervalo',
         variant: 'Varianto',
         variants: {
             input: 'Enigkampo',

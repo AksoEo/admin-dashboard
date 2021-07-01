@@ -26,8 +26,8 @@ export const adminGroups = {
     editPerms: 'Redakti permesojn',
     deleteSelection: 'Forigi elektitojn',
 
-    addingMembers: '[[Adding members]]',
-    removingMembers: '[[Removing members]]',
+    addingMembers: 'Aldonas membrojn',
+    removingMembers: 'Forigas membrojn',
     pickerSearch: 'Serĉi laŭ nomo',
 
     addCodeholders: 'Aldoni membron',

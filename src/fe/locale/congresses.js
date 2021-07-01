@@ -301,7 +301,7 @@ export const congressParticipants = {
             canceled: 'Nuligita',
             valid: 'Valida',
         },
-        dataAllowInvalid: '[[Allow invalid data]]',
+        dataAllowInvalid: 'Permesi nevalidajn datumojn',
 
         codeholderIdViewCodeholder: 'Vidi membron',
         hasPaidMinimumShort: 'min',
