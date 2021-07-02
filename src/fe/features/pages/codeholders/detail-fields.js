@@ -858,7 +858,6 @@ export const fields = {
         hasPerm: 'self',
     },
     publicCountry: {
-        sectionMarkerAbove: locale.fields.sections.factoids,
         component: permsEditable('publicCountry', makeDataEditable(country)),
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
@@ -872,6 +871,7 @@ export const fields = {
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
         hasPerm: 'self',
+        sectionMarkerAbove: locale.fields.sections.factoids,
     }),
     website: simpleField(permsEditable('website', function ({ value, editing, onChange }) {
         if (!editing) {

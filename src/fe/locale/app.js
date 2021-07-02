@@ -39,6 +39,7 @@ export const pages = {
     'administration-log': 'API-protokolo',
     'administration-countries': 'Landoj',
     'administration-country-groups': 'Landaroj',
+    'administration-country-lists': 'Landaj organizoj',
     lists: 'Listoj',
     reports: 'Raportoj',
     documents: 'Ŝpureblaj dokumentoj',

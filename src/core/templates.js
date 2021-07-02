@@ -3,6 +3,7 @@ import asyncClient from './client';
 import * as store from './store';
 import { deepMerge } from '../util';
 import { fieldDiff, fieldsToOrder } from './list';
+import { AbstractDataView } from './view';
 
 export function crudList ({
     apiPath,
@@ -48,6 +49,8 @@ export function crudCreate ({
     signalPath,
     useAutoNull,
     then,
+    methodName = 'post',
+    parseId = (id => +id),
 }) {
     idField = idField || 'id';
 
@@ -63,8 +66,8 @@ export function crudCreate ({
             }
         }
 
-        const res = await client.post(apiPath(options), apiOptions);
-        const id = +res.res.headers.get('x-identifier');
+        const res = await client[methodName](apiPath(options, params), apiOptions);
+        const id = parseId(res.res.headers.get('x-identifier'), options, params);
         const storeData = { ...apiOptions };
         storeData[idField] = id;
         store.insert(storePath(options, id), storeData);
@@ -137,3 +140,32 @@ export function getRawFile ({
     };
 }
 
+export function simpleDataView ({
+    storePath,
+    get,
+}) {
+    return class SimpleDataView extends AbstractDataView {
+        constructor (options, params) {
+            super();
+            this.path = storePath(options, params);
+
+            store.subscribe(this.path, this.#onUpdate);
+            const current = store.get(this.path);
+            if (current) setImmediate(this.#onUpdate);
+
+            if (get && !options.noFetch) {
+                get(options, params).catch(err => this.emit('error', err));
+            }
+        }
+        #onUpdate = (type) => {
+            if (type === store.UpdateType.DELETE) {
+                this.emit('update', store.get(this.path), 'delete');
+            } else {
+                this.emit('update', store.get(this.path));
+            }
+        };
+        drop () {
+            store.unsubscribe(this.path, this.#onUpdate);
+        }
+    };
+}

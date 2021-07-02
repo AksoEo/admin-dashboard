@@ -199,4 +199,29 @@ export const countryGroups = {
     },
     csvFilename: 'landaroj',
 };
+export const countryLists = {
+    title: '[[CountryLists]]',
+    detailTitle: '[[CountryList]]',
+    search: {
+        placeholders: '[[Search CountryLists]]',
+    },
+    fields: {
+        name: 'Nomo',
+        list: 'Listo',
+    },
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei [[clist]]',
+        button: 'Krei',
+    },
+    update: {
+        title: 'Redakti [[clist]]',
+        button: 'Aktualigi',
+    },
+    delete: {
+        title: 'Forigi [[clist]]',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la [[clist]]? Ne eblas malfari tiun ĉi agon.',
+    },
+};
 

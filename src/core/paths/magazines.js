@@ -1,8 +1,8 @@
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
-import { AbstractDataView, createStoreObserver } from '../view';
-import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, getRawFile } from '../templates';
+import { createStoreObserver } from '../view';
+import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, getRawFile, simpleDataView } from '../templates';
 
 export const MAGAZINES = 'magazines';
 export const SIG_MAGAZINES = '!magazines';
@@ -219,36 +219,6 @@ export const tasks = {
         tasks.tocRecitations({ magazine, edition, id }).catch(() => {});
     },
 };
-
-function simpleDataView ({
-    storePath,
-    get,
-}) {
-    return class SimpleDataView extends AbstractDataView {
-        constructor (options, params) {
-            super();
-            this.path = storePath(options, params);
-
-            store.subscribe(this.path, this.#onUpdate);
-            const current = store.get(this.path);
-            if (current) setImmediate(this.#onUpdate);
-
-            if (get && !options.noFetch) {
-                get(options, params).catch(err => this.emit('error', err));
-            }
-        }
-        #onUpdate = (type) => {
-            if (type === store.UpdateType.DELETE) {
-                this.emit('update', store.get(this.path), 'delete');
-            } else {
-                this.emit('update', store.get(this.path));
-            }
-        };
-        drop () {
-            store.unsubscribe(this.path, this.#onUpdate);
-        }
-    };
-}
 
 export const views = {
     magazine: simpleDataView({

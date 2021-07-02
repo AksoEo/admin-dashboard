@@ -27,6 +27,7 @@ const clients = () => import(/* webpackChunkName: 'core-clients' */ './clients')
 const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './codeholders');
 const congresses = () => import(/* webpackChunkName: 'core-congresses' */ './congresses');
 const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
+const countryLists = () => import(/* webpackChunkName: 'core-country-lists' */ './country-lists');
 const adminGroups = () => import(/* webpackChunkName: 'core-admin' */ './admin-groups');
 const httpLog = () => import(/* webpackChunkName: 'core-admin' */ './http-log');
 const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './login');
@@ -53,6 +54,7 @@ export const tasks = {
     codeholders: lazyPath(codeholders, mapTasks),
     congresses: lazyPath(congresses, mapTasks),
     countries: lazyPath(countries, mapTasks),
+    countryLists: lazyPath(countryLists, mapTasks),
     adminGroups: lazyPath(adminGroups, mapTasks),
     httpLog: lazyPath(httpLog, mapTasks),
     login: lazyPath(login, mapTasks),
@@ -75,6 +77,7 @@ export const views = {
     codeholders: lazyPath(codeholders, mapViews),
     congresses: lazyPath(congresses, mapViews),
     countries: lazyPath(countries, mapViews),
+    countryLists: lazyPath(countryLists, mapViews),
     adminGroups: lazyPath(adminGroups, mapViews),
     httpLog: lazyPath(httpLog, mapViews),
     login: lazyPath(login, mapViews),

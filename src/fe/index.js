@@ -36,6 +36,7 @@ const taskViews = {
     clients: lazyPath(() => import(/* webpackChunkName: "clients-tasks" */ './features/pages/administration/clients/tasks')),
     congresses: lazyPath(() => import(/* webpackChunkName: "congresses-tasks" */ './features/pages/congresses/tasks')),
     countries: lazyPath(() => import(/* webpackChunkName: "countries-tasks" */ './features/pages/administration/countries/tasks')),
+    countryLists: lazyPath(() => import(/* webpackChunkName: "country-lists-tasks" */ './features/pages/administration/country-lists/tasks')),
     codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
     adminGroups: lazyPath(() => import(/* webpackChunkName: "admin-groups-tasks" */ './features/pages/administration/groups/tasks')),
     lists: lazyPath(() => import(/* webpackChunkName: "lists-tasks" */ './features/pages/lists/tasks')),

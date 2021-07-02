@@ -17,6 +17,7 @@ import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
 import AddMembershipIcon from '../../components/add-membership-icon';
 import ConfigMembershipIcon from '../../components/config-membership-icon';
+import { TravelExploreIcon } from '../../components/icons';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
@@ -728,7 +729,7 @@ export default [
             {
                 id: 'administration-groups',
                 component: elazy(() =>
-                    import(/* webpackChunkName: "admin-groups", webpackPrefetch: true */ './administration/groups')),
+                    import(/* webpackChunkName: "admin-groups" */ './administration/groups')),
                 icon: SupervisorAccountIcon,
                 type: 'bottom',
                 path: 'grupoj',
@@ -738,13 +739,13 @@ export default [
                         match: /^(\d+)$/,
                         matchKey: 'group',
                         component: elazy(() =>
-                            import(/* webpackChunkName: "admin-groups", webpackPrefetch: true */ './administration/groups/detail')),
+                            import(/* webpackChunkName: "admin-groups" */ './administration/groups/detail')),
                         type: 'stack',
                         paths: [
                             {
                                 path: 'permesoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "admin-group-perms", webpackPrefetch: true */ './administration/groups/perms')),
+                                    import(/* webpackChunkName: "admin-group-perms" */ './administration/groups/perms')),
                                 type: 'stack',
                             },
                             {
@@ -760,7 +761,7 @@ export default [
                 id: 'administration-clients',
                 icon: DeveloperModeIcon,
                 component: elazy(() =>
-                    import(/* webpackChunkName: "admin-clients", webpackPrefetch: true */ './administration/clients')),
+                    import(/* webpackChunkName: "admin-clients" */ './administration/clients')),
                 type: 'bottom',
                 path: 'klientoj',
                 hasPerm: perms => perms.hasPerm('clients.read'),
@@ -769,13 +770,13 @@ export default [
                         match: /^([\da-fA-F]+)$/,
                         matchKey: 'client',
                         component: elazy(() =>
-                            import(/* webpackChunkName: "admin-clients", webpackPrefetch: true */ './administration/clients/detail')),
+                            import(/* webpackChunkName: "admin-clients" */ './administration/clients/detail')),
                         type: 'stack',
                         paths: [
                             {
                                 path: 'permesoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "admin-client-perms", webpackPrefetch: true */ './administration/clients/perms')),
+                                    import(/* webpackChunkName: "admin-client-perms" */ './administration/clients/perms')),
                                 type: 'stack',
                             },
                             {
@@ -791,7 +792,7 @@ export default [
                 id: 'administration-log',
                 icon: HttpIcon,
                 component: elazy(() =>
-                    import(/* webpackChunkName: "admin-log", webpackPrefetch: true */ './administration/log')),
+                    import(/* webpackChunkName: "admin-log" */ './administration/log')),
                 type: 'bottom',
                 path: 'protokolo',
                 hasPerm: perms => perms.hasPerm('log.read'),
@@ -800,7 +801,7 @@ export default [
                         match: /^(\d+)$/,
                         matchKey: 'entry',
                         component: elazy(() =>
-                            import(/* webpackChunkName: "admin-log", webpackPrefetch: true */ './administration/log/detail')),
+                            import(/* webpackChunkName: "admin-log" */ './administration/log/detail')),
                         type: 'stack',
                     },
                 ],
@@ -809,7 +810,7 @@ export default [
                 id: 'administration-countries',
                 icon: PublicIcon,
                 component: elazy(() =>
-                    import(/* webpackChunkName: "admin-countries", webpackPrefetch: true */ './administration/countries')),
+                    import(/* webpackChunkName: "admin-countries" */ './administration/countries')),
                 type: 'bottom',
                 path: 'landoj',
                 hasPerm: () => true,
@@ -818,7 +819,7 @@ export default [
                         match: /^([a-z]{2})$/i,
                         matchKey: 'country',
                         component: elazy(() =>
-                            import(/* webpackChunkName: "admin-countries", webpackPrefetch: true */ './administration/countries/detail')),
+                            import(/* webpackChunkName: "admin-countries" */ './administration/countries/detail')),
                         type: 'stack',
                         paths: [
                             {
@@ -834,7 +835,7 @@ export default [
                 id: 'administration-country-groups',
                 icon: LanguageIcon,
                 component: elazy(() =>
-                    import(/* webpackChunkName: "admin-country-groups", webpackPrefetch: true */ './administration/country-groups')),
+                    import(/* webpackChunkName: "admin-country-groups" */ './administration/country-groups')),
                 type: 'bottom',
                 path: 'landaroj',
                 hasPerm: () => true,
@@ -843,7 +844,31 @@ export default [
                         match: /^(x[a-z0-9]{2})$/i,
                         matchKey: 'group',
                         component: elazy(() =>
-                            import(/* webpackChunkName: "admin-country-groups", webpackPrefetch: true */ './administration/country-groups/detail')),
+                            import(/* webpackChunkName: "admin-country-groups" */ './administration/country-groups/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'administration-country-lists',
+                icon: TravelExploreIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "admin-country-lists" */ './administration/country-lists')),
+                type: 'bottom',
+                path: 'landaj-organizoj',
+                hasPerm: perms => perms.hasPerm('countries.lists.read'),
+                paths: [
+                    {
+                        match: /^(.+)$/,
+                        matchKey: 'list',
+                        component: elazy(() => import(/* webpackChunkName: "admin-country-lists" */ './administration/country-lists/detail')),
                         type: 'stack',
                         paths: [
                             {
