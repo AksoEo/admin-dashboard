@@ -1,0 +1,103 @@
+@import '../../../../prelude';
+
+.country-org-list-inner-list {
+    .country-entry {
+        padding: 8px 16px;
+        margin: 8px 0;
+        border-radius: 4px;
+        background: @card1-background;
+        .elevation(4);
+        display: flex;
+
+        .entry-delete {
+            flex-shrink: 0;
+            margin-left: 8px;
+            margin-right: 8px;
+            --md-button-color: @danger;
+        }
+
+        .entry-title {
+            font-weight: 600;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .entry-codeholders {
+            flex: 2;
+
+            .codeholder-picker {
+                width: 100%;
+            }
+
+            .codeholder-item {
+                color: inherit;
+
+                & + .codeholder-item {
+                    margin-left: 4px;
+                }
+            }
+        }
+
+        &.is-editing {
+            .entry-title {
+                line-height: 40px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            flex-wrap: wrap;
+
+            .entry-codeholders {
+                margin-top: 8px;
+                flex: none;
+                width: 100%;
+            }
+        }
+    }
+}
+
+.country-org-list-add-country-dialog {
+    max-width: 400px;
+    height: 100%;
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .search-icon {
+            margin: 0 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: none;
+            color: inherit;
+            border: none;
+            font: inherit;
+            padding: 8px 16px;
+            padding-left: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
+    .country-item {
+        display: block;
+        width: 100%;
+        padding: 8px 16px;
+        --md-button-color: @gray-button-color;
+        margin-bottom: 4px;
+        text-align: left;
+        text-transform: none;
+        letter-spacing: normal;
+        color: inherit;
+        font: inherit;
+
+        .country-flag-container {
+            margin-right: 8px;
+        }
+    }
+}

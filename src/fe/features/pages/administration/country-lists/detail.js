@@ -29,7 +29,7 @@ export default connectPerms(class CountryListsPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('countryLists/update', {
+        this.#commitTask = this.context.createTask('countryLists/updateList', {
             id: this.props.match[1],
             _changedFields: changedFields,
         }, this.state.edit);
@@ -79,7 +79,8 @@ export default connectPerms(class CountryListsPage extends Page {
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    onDelete={this.props.pop} />
+                    onDelete={this.props.pop}
+                    compact />
             </div>
         );
     }

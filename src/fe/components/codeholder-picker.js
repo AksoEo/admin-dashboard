@@ -29,6 +29,7 @@ function orderPortalContainerFront () {
 /// - value/onChange
 /// - limit: if set, will limit number of selectable codeholders
 /// - disabled
+/// - jsonFilter
 export default class CodeholderPicker extends Component {
     state = {
         addDialogOpen: false,
@@ -71,7 +72,7 @@ export default class CodeholderPicker extends Component {
         });
     }
 
-    render ({ value, onChange, limit, disabled }, { addDialogOpen }) {
+    render ({ value, onChange, limit, disabled, jsonFilter }, { addDialogOpen }) {
         const canAddMore = !this.props.limit || value.length < this.props.limit;
 
         return (
@@ -124,6 +125,7 @@ export default class CodeholderPicker extends Component {
                         limit={this.props.limit}
                         open={canAddMore && addDialogOpen}
                         container={portalContainer}
+                        filter={jsonFilter}
                         value={value}
                         onChange={onChange}
                         onClose={() => this.setState({ addDialogOpen: false })} />

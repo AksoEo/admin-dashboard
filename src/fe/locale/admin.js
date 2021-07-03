@@ -208,6 +208,13 @@ export const countryLists = {
     fields: {
         name: 'Nomo',
         list: 'Listo',
+
+        listAddCountry: {
+            title: '[[Add country]]',
+            searchPlaceholder: '[[Search countries…]]',
+            empty: '[[No countries]]',
+            confirm: '[[Add]]',
+        },
     },
     create: {
         menuItem: 'Krei',
