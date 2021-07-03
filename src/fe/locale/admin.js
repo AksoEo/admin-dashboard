@@ -200,35 +200,35 @@ export const countryGroups = {
     csvFilename: 'landaroj',
 };
 export const countryLists = {
-    title: '[[CountryLists]]',
-    detailTitle: '[[CountryList]]',
+    title: 'Listoj de landaj sekcioj',
+    detailTitle: 'Listo de landaj sekcioj',
     search: {
-        placeholders: '[[Search CountryLists]]',
+        placeholders: 'Serĉi landan sekcion ...',
     },
     fields: {
         name: 'Nomo',
         list: 'Listo',
 
         listAddCountry: {
-            title: '[[Add country]]',
-            searchPlaceholder: '[[Search countries…]]',
-            empty: '[[No countries]]',
-            confirm: '[[Add]]',
+            title: 'Aldoni landon',
+            searchPlaceholder: 'Serĉi landojn ...',
+            empty: 'La listo estas malplena',
+            confirm: 'Aldoni',
         },
     },
     create: {
         menuItem: 'Krei',
-        title: 'Krei [[clist]]',
+        title: 'Krei liston de landaj sekcioj',
         button: 'Krei',
     },
     update: {
-        title: 'Redakti [[clist]]',
+        title: 'Redakti liston de landaj sekcioj',
         button: 'Aktualigi',
     },
     delete: {
-        title: 'Forigi [[clist]]',
+        title: 'Forigi liston de landaj sekcioj',
         button: 'Forigi',
-        description: 'Ĉu vi certas, ke vi volas forigi la [[clist]]? Ne eblas malfari tiun ĉi agon.',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi liston? Ne eblas malfari tiun ĉi agon.',
     },
 };
 
