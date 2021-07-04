@@ -863,7 +863,7 @@ export default [
                     import(/* webpackChunkName: "admin-country-lists" */ './administration/country-lists')),
                 type: 'bottom',
                 path: 'landaj-organizoj',
-                hasPerm: perms => perms.hasPerm('countries.lists.read'),
+                hasPerm: perms => perms.hasPerm('countries.lists.read') && perms.hasPerm('codeholders.read'),
                 paths: [
                     {
                         match: /^(.+)$/,

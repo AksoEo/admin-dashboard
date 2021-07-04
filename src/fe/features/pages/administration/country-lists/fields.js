@@ -12,6 +12,14 @@ import { countryLists as locale } from '../../../../locale';
 import { Link } from '../../../../router';
 import './fields.less';
 
+export function Header ({ item }) {
+    return (
+        <div class="country-org-list-header">
+            <h1 class="list-title">{item.name}</h1>
+        </div>
+    );
+}
+
 export const FIELDS = {
     name: {
         sortable: true,
@@ -20,6 +28,7 @@ export const FIELDS = {
         component ({ value }) {
             return <span class="country-org-list-name">{value}</span>;
         },
+        shouldHide: () => true,
     },
     list: {
         slot: 'body',
@@ -70,6 +79,14 @@ function ListField ({ value, editing, onChange, countries }) {
                         ))
                     )}
                 </div>
+            </div>
+        );
+    }
+
+    if (!entries.length) {
+        entries.push(
+            <div class="empty-notice">
+                {locale.fields.listEmpty}
             </div>
         );
     }

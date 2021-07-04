@@ -5,17 +5,21 @@ import ChangedFields from '../../../../components/changed-fields';
 import { Field } from '../../../../components/form';
 import { countryLists as locale } from '../../../../locale';
 import { routerContext } from '../../../../router';
+import './tasks.less';
 
 export default {
     createList: ({ open, task }) => {
+        const dup = task.options._duplicate;
+
         return (
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="country-org-lists-task-creeate-list"
                         open={open}
                         onClose={() => task.drop()}
-                        title={locale.create.title}
-                        actionLabel={locale.create.button}
+                        title={dup ? locale.create.duplicateTitle : locale.create.title}
+                        actionLabel={dup ? locale.create.duplicateButton : locale.create.button}
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/administrado/landaj-organizoj/${id}`);
                         })}>

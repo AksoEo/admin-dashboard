@@ -22,6 +22,7 @@ export const errors = {
     'conflict': 'Okazis interna konflikto, bonvolu reprovi',
     'payload-too-large': 'Tro granda sendaĵo',
     'internal-server-error': 'Okazis interna eraro',
+    'object-exists': '[[An object with that name already exists]]',
 
     // see payments/createIntent
     'payment-exceeds-max': 'Ne eblas krei pagojn por pli ol 500.000 USD',

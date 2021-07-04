@@ -145,6 +145,7 @@ export function PickerDialog ({ value, onChange, limit, container, open, onClose
             container={container}
             open={open}
             onClose={onClose}
+            actions={onClose && [{ label: locale.picker.done, action: onClose }]}
             {...extra}>
             <AddDialogInner
                 value={value}

@@ -55,7 +55,7 @@ export default connectPerms(class CountryListsPage extends Page {
     render ({ perms }, { parameters }) {
         const actions = [];
 
-        if (perms.hasPerm('countries.lists.create')) {
+        if (perms.hasPerm('countries.lists.update')) {
             actions.push({
                 label: locale.create.menuItem,
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,

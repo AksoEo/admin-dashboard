@@ -209,6 +209,7 @@ export const countryLists = {
         name: 'Nomo',
         list: 'Listo',
 
+        listEmpty: 'La listo estas malplena',
         listAddCountry: {
             title: 'Aldoni landon',
             searchPlaceholder: 'Serĉi landojn ...',
@@ -220,6 +221,10 @@ export const countryLists = {
         menuItem: 'Krei',
         title: 'Krei liston de landaj sekcioj',
         button: 'Krei',
+
+        duplicateMenuItem: '[[Duplicate]]',
+        duplicateTitle: '[[Duplicate list]]',
+        duplicateButton: '[[Duplicate]]',
     },
     update: {
         title: 'Redakti liston de landaj sekcioj',
