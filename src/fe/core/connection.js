@@ -15,6 +15,7 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
     class InnerConnection extends Component {
         static contextType = coreContext;
 
+        view = { data: null };
         state = { data: null, error: null, loaded: false };
 
         componentDidMount () {
@@ -23,11 +24,18 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
             } else this.view = this.context.createDataView(...viewArgs);
             this.view.on('update', this.#onUpdate);
             this.view.on('error', this.#onError);
+            this.boundCore = this.context;
         }
 
         componentDidUpdate (prevProps) {
+            if (this.context !== this.boundCore) {
+                // core was destroyed and recreated! (e.g. because of a logout)
+                // we need to reset the connection
+                this.view = null;
+            }
+
             if (typeof viewArgs[0] === 'function' && Array.isArray(viewArgs[1])) {
-                let didChange = false;
+                let didChange = !this.view;
                 for (const key of viewArgs[1]) {
                     if (prevProps[key] !== this.props[key]) {
                         didChange = true;
@@ -36,13 +44,24 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
                 }
 
                 if (didChange) {
-                    this.view.drop();
+                    this.view?.drop();
                     this.view = this.context.createDataView(...(viewArgs[0](this.props)));
+                    this.view.on('update', this.#onUpdate);
+                    this.view.on('error', this.#onError);
+                    this.boundCore = this.context;
                 }
+            } else if (!this.view) {
+                this.view?.drop();
+                this.view = this.context.createDataView(...viewArgs);
+                this.view.on('update', this.#onUpdate);
+                this.view.on('error', this.#onError);
+                this.boundCore = this.context;
             }
         }
 
-        #onUpdate = data => this.setState({ data, loaded: true, error: null });
+        #onUpdate = data => {
+            this.setState({ data, loaded: true, error: null });
+        };
         #onError = error => this.setState({ error });
 
         componentWillUnmount () {
@@ -50,7 +69,7 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
         }
 
         render () {
-            const props = { ...this.props, ...map(this.state.data, this.context, this.state.error, this.state.loaded) };
+            const props = { ...this.props, ...map(this.view.data, this.context, this.state.error, this.state.loaded) };
             props.ref = props.coreConnForwardedRef;
             delete props.coreConnForwardedRef;
             return <Comp {...props} />;

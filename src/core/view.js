@@ -7,9 +7,11 @@ import * as log from './log';
 export default class DataView {
     isDropped = false;
 
-    constructor (id, view, options) {
+    constructor (self, id, view, options, debugName) {
+        this.self = self;
         this.id = id;
         this.inner = view.then(View => new View(options));
+        this.debugName = debugName;
 
         this.inner.then(inner => {
             log.debug(`data view ${id} loaded`);
@@ -28,18 +30,18 @@ export default class DataView {
 
     #onUpdate = (data, extra) => {
         if (this.isDropped) return;
-        self.postMessage({
+        this.self.postMessage({
             type: 'data-view-update',
             id: this.id,
             data,
             extra,
         });
-        log.debug('updating data view', this.id);
+        log.debug('updating data view', this.id, this.debugName);
     };
 
     #onError = error => {
         if (this.isDropped) return;
-        self.postMessage({
+        this.self.postMessage({
             type: 'data-view-error',
             id: this.id,
             error: transformError(error),

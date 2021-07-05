@@ -8,7 +8,8 @@ export default class Task {
     error = null;
     isDropped = false;
 
-    constructor (id, path, options, parameters) {
+    constructor (self, id, path, options, parameters) {
+        this.self = self;
         this.id = id;
         this.path = path;
         this.options = options;
@@ -18,7 +19,7 @@ export default class Task {
     /// Yells at the user if this task has been dropped but they’re trying to perform an action.
     dropCheck (action) {
         if (this.isDropped) {
-            self.postMessage({
+            this.self.postMessage({
                 type: 'task-error',
                 id: this.id,
                 error: {
@@ -56,14 +57,14 @@ export default class Task {
 
         if (error) {
             log.debug(`task ${this.id} failed with error`, error.code, error.message, error.stack);
-            self.postMessage({
+            this.self.postMessage({
                 type: 'task-error',
                 id: this.id,
                 error: transformError(error),
             });
         } else {
             log.debug(`task ${this.id} succeeded, dropping`);
-            self.postMessage({ type: 'task-success', id: this.id, result });
+            this.self.postMessage({ type: 'task-success', id: this.id, result });
             this.drop();
         }
     }

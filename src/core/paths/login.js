@@ -85,6 +85,10 @@ export const tasks = {
         if (!client.loggedIn) {
             throw { code: 'not-logged-in', message: 'not logged in' };
         }
+        if (store.get(AUTH_STATE) !== LoginAuthStates.LOGGED_IN
+            && store.get(AUTH_STATE) !== LoginAuthStates.AUTHENTICATED) {
+            throw { code: 'invalid-state', message: 'can only log out when authenticated' };
+        }
         store.insert(AUTH_STATE, LoginAuthStates.LOGGING_OUT);
         try {
             await client.logOut();
@@ -98,6 +102,10 @@ export const tasks = {
     /// login/hasPassword: checks if the user has a password
     hasPassword: async (_, { login }) => {
         const client = await asyncClient;
+
+        if (store.get(AUTH_STATE) !== LoginAuthStates.LOGGED_OUT) {
+            throw { code: 'invalid-state', message: 'cannot check hasPassword if not logged out' };
+        }
 
         try {
             await client.logIn(login, '');

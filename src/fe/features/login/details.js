@@ -45,8 +45,13 @@ export default class DetailsPage extends Component {
         if (this.props.mode !== Mode.NORMAL) return;
         if (!this.props.login) return;
         clearTimeout(this.#nopwCheckTimeout);
+
+        const login = this.props.login.includes('@')
+            ? this.props.login
+            : new UEACode(this.props.login).code;
+
         this.props.core.createTask('login/hasPassword', {}, {
-            login: this.props.login,
+            login,
         }).runOnceAndDrop().then(hasPassword => {
             if (!hasPassword) this.#spawnInitCreatePassword();
         }).catch(() => {});

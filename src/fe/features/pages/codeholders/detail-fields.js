@@ -863,6 +863,13 @@ export const fields = {
         history: true,
         hasPerm: 'self',
     },
+    publicEmail: {
+        component: permsEditable('publicEmail', makeDataEditable(email)),
+        extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
+        history: true,
+        hasPerm: 'self',
+        sectionMarkerAbove: locale.fields.sections.factoids,
+    },
     profession: simpleField(permsEditable('profession', function ({ value, editing, onChange }) {
         if (!editing) return value;
         return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
@@ -871,7 +878,6 @@ export const fields = {
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         history: true,
         hasPerm: 'self',
-        sectionMarkerAbove: locale.fields.sections.factoids,
     }),
     website: simpleField(permsEditable('website', function ({ value, editing, onChange }) {
         if (!editing) {

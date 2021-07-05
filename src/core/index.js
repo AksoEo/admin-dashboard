@@ -23,7 +23,7 @@ const messageHandlers = {
 
         log.debug(`creating task ${id} with path ${taskPath}`);
 
-        const task = new Task(id, taskPath, options, parameters);
+        const task = new Task(self, id, taskPath, options, parameters);
 
         const loadTask = async () => {
             const path = taskPath.split('/');
@@ -97,7 +97,7 @@ const messageHandlers = {
             }
         };
 
-        insert([VIEWS, id], new DataView(id, loadView(), options));
+        insert([VIEWS, id], new DataView(self, id, loadView(), options, viewPath));
     },
     'drop-data-view' ({ id }) {
         const view = remove([VIEWS, id]);

@@ -267,6 +267,7 @@ const clientFields = {
     cellphonePublicity: 'cellphonePublicity',
     mainDescriptor: 'mainDescriptor',
     factoids: 'factoids',
+    publicEmail: 'publicEmail',
     publicCountry: 'publicCountry',
 };
 

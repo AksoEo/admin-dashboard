@@ -145,6 +145,7 @@ export const codeholders = {
         landlinePhonePublicity: 'Publikeco de hejma telefono',
         cellphonePublicity: 'Publikeco de poŝtelefono',
         publicCountry: 'Publika lando',
+        publicEmail: '[[publicEmail]]',
         mainDescriptor: 'Ĉefa priskribeto',
         factoids: 'Vizitkartaj faktoj',
 
