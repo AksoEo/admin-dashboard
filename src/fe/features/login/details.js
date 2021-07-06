@@ -41,7 +41,9 @@ export default class DetailsPage extends Component {
     };
 
     #nopwCheckTimeout;
+    shouldContinuouslyCheckPassword = false; // disable this feature for now, it seems to cause issues
     #checkHasPassword = () => {
+        if (!this.shouldContinuouslyCheckPassword) return;
         if (this.props.mode !== Mode.NORMAL) return;
         if (!this.props.login) return;
         clearTimeout(this.#nopwCheckTimeout);
