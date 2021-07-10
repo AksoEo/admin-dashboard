@@ -8,8 +8,9 @@ import { coreContext, connect } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 import { Header, fields, Footer } from './detail-fields';
 
-export default connectPerms(connect('codeholders/fields')(fields => ({
-    availableFields: fields,
+export default connectPerms(connect('codeholders/fields')(res => ({
+    availableFields: res?.fields,
+    availableSelfFields: res?.ownFields,
 }))(class Detail extends Page {
     static contextType = coreContext;
 
@@ -36,7 +37,7 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
         }
 
         this.#commitTask = this.context.createTask('codeholders/update', {
-            id: +this.props.match[1],
+            id: this.props.match[1],
             _changedFields: changedFields,
         }, this.state.edit);
         this.#commitTask.on('success', this.onEndEdit);
@@ -51,29 +52,35 @@ export default connectPerms(connect('codeholders/fields')(fields => ({
     onHasEmail = hasEmail => this.setState({ hasEmail });
     onHasPassword = hasPassword => this.setState({ hasPassword });
 
+    get isSelf () {
+        return this.props.match[1] === 'self';
+    }
+
     render ({ availableFields, editing, match, perms }, { hasPassword, hasEmail }) {
         if (!availableFields) return;
         const id = match[1];
+        const isSelf = this.isSelf;
+        if (isSelf) availableFields = this.props.availableSelfFields;
 
         const canReadHistory = perms.hasPerm('codeholders.hist.read');
 
         const actions = [];
         if (!editing) {
-            if (perms.hasPerm('codeholders.perms.read')) {
+            if (perms.hasPerm('codeholders.perms.read') || isSelf) {
                 actions.push({
                     label: locale.perms.title,
                     action: () => this.props.onNavigate(`/membroj/${id}/permesoj`),
                     overflow: true,
                 });
             }
-            if (perms.hasPerm('codeholders.update')) {
+            if (perms.hasPerm('codeholders.update') || isSelf) {
                 actions.push({
                     label: detailLocale.edit,
                     icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                     action: () => this.props.onNavigate(`/membroj/${id}/redakti`, true),
                 });
             }
-            if (perms.hasCodeholderField('logins', 'r')) {
+            if (perms.hasCodeholderField('logins', 'r') || isSelf) {
                 actions.push({
                     label: locale.logins.title,
                     action: () => this.props.onNavigate(`/membroj/${id}/ensalutoj`),

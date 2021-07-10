@@ -6,7 +6,7 @@ import BusinessIcon from '@material-ui/icons/Business';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
 import { coreContext } from '../../../core/connection';
-import { connectPerms } from '../../../perms';
+import { connectPerms as connectPermsInner } from '../../../perms';
 import { LinkButton } from '../../../router';
 import { codeholders as locale, data as dataLocale } from '../../../locale';
 import { Validator } from '../../../components/form';
@@ -30,6 +30,29 @@ import { FileIcon } from '../../../components/icons';
 import ProfilePictureEditor from './profile-picture';
 import Publicity from './publicity';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
+
+const connectPerms = (Component) => {
+    const SelfConnected = connectPermsInner(({ perms, ...extra }) => {
+        const selfPerms = {
+            hasPerm: (...p) => perms.hasPerm(...p),
+            hasCodeholderField: (f, m) => {
+                if (m === 'r') return perms.hasOwnCodeholderField(f, 'r');
+                else if (m === 'w') {
+                    return perms.hasOwnCodeholderField(f, 'w') || perms.hasOwnCodeholderField(f, 'a');
+                } else throw new Error('unimplemented');
+            },
+        };
+        return <Component perms={selfPerms} {...extra} />;
+    });
+    const Connected = connectPermsInner(Component);
+    return function ChPermsWrapper ({ userData, ...extra }) {
+        if (userData?.isSelf) {
+            return <SelfConnected userData={userData} {...extra} />;
+        } else {
+            return <Connected userData={userData} {...extra} />;
+        }
+    };
+};
 
 const makeEditable = (Renderer, Editor, History) => function EditableField ({
     value,
@@ -86,15 +109,15 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                                     editor.intoValue ? editor.intoValue(newValue) : newValue,
                                 )
                             ),
-                            disabled: !editor.hasPerm(),
-                            helperLabel: !editor.hasPerm() && locale.fieldEditorInsufficientPerms,
+                            disabled: !editor.hasPerm,
+                            helperLabel: !editor.hasPerm && locale.fieldEditorInsufficientPerms,
                             ...(editor.props || {}),
                         })
                     ) : (
                         <Validator
                             component={(editor.props && editor.props.maxLength) ? LimitedTextField : TextField}
-                            disabled={!editor.hasPerm()}
-                            helperLabel={!editor.hasPerm() && locale.fieldEditorInsufficientPerms}
+                            disabled={!editor.hasPerm}
+                            helperLabel={!editor.hasPerm && locale.fieldEditorInsufficientPerms}
                             validate={editor.validate || (() => {})}
                             key={i}
                             label={editor.label}
@@ -214,7 +237,7 @@ const NameEditor = connectPerms(function NameEditor ({
                         suggestions: locale.honorificSuggestions,
                         label: locale.nameSubfields.honorific,
                     },
-                    hasPerm: () => perms.hasCodeholderField('honorific', 'w'),
+                    hasPerm: perms.hasCodeholderField('honorific', 'w'),
                 },
             ],
             [
@@ -223,13 +246,13 @@ const NameEditor = connectPerms(function NameEditor ({
                     label: <Required>{locale.nameSubfields.firstLegal}</Required>,
                     props: { maxLength: 50 },
                     validate: validators.required(),
-                    hasPerm: () => perms.hasCodeholderField('firstNameLegal', 'w'),
+                    hasPerm: perms.hasCodeholderField('firstNameLegal', 'w'),
                 },
                 {
                     key: 'lastLegal',
                     label: locale.nameSubfields.lastLegal,
                     props: { maxLength: 50 },
-                    hasPerm: () => perms.hasCodeholderField('lastNameLegal', 'w'),
+                    hasPerm: perms.hasCodeholderField('lastNameLegal', 'w'),
                 },
             ],
             [
@@ -237,13 +260,13 @@ const NameEditor = connectPerms(function NameEditor ({
                     key: 'first',
                     label: locale.nameSubfields.first,
                     props: { maxLength: 50 },
-                    hasPerm: () => perms.hasCodeholderField('firstName', 'w'),
+                    hasPerm: perms.hasCodeholderField('firstName', 'w'),
                 },
                 {
                     key: 'last',
                     label: locale.nameSubfields.last,
                     props: { maxLength: 50 },
-                    hasPerm: () => perms.hasCodeholderField('lastName', 'w'),
+                    hasPerm: perms.hasCodeholderField('lastName', 'w'),
                 },
             ],
         ], {
@@ -284,7 +307,7 @@ const NameEditor = connectPerms(function NameEditor ({
                         validatorProps: { class: 'full-name-editor' },
                     },
                     validate: validators.required(),
-                    hasPerm: () => perms.hasCodeholderField('fullName', 'w'),
+                    hasPerm: perms.hasCodeholderField('fullName', 'w'),
                 },
             ],
             [
@@ -295,7 +318,7 @@ const NameEditor = connectPerms(function NameEditor ({
                         maxLength: 100,
                         validatorProps: { class: 'full-name-editor' },
                     },
-                    hasPerm: () => perms.hasCodeholderField('fullNameLocal', 'w'),
+                    hasPerm: perms.hasCodeholderField('fullNameLocal', 'w'),
                 },
             ],
             [
@@ -303,7 +326,7 @@ const NameEditor = connectPerms(function NameEditor ({
                     key: 'abbrev',
                     label: locale.nameSubfields.abbrev,
                     props: { maxLength: 12 },
-                    hasPerm: () => perms.hasCodeholderField('nameAbbrev', 'w'),
+                    hasPerm: perms.hasCodeholderField('nameAbbrev', 'w'),
                 },
             ],
         ], {
@@ -424,10 +447,10 @@ export const Header = connectPerms(function Header ({
         <div class="member-header">
             <div class="member-picture">
                 <ProfilePictureEditor
-                    id={item.id}
+                    id={userData?.isSelf ? 'self' : item.id}
                     editing={editing}
                     profilePictureHash={item.profilePictureHash}
-                    canEdit={perms.hasPerm('codeholders.update') && perms.hasCodeholderField('profilePicture', 'w')}
+                    canEdit={(perms.hasPerm('codeholders.update') || userData?.isSelf) && perms.hasCodeholderField('profilePicture', 'w')}
                     createHistoryLink={createHistoryLink} />
                 {pictureMeta}
                 {editing && perms.hasCodeholderField('profilePicturePublicity', 'w') && <Publicity
@@ -445,14 +468,16 @@ export const Header = connectPerms(function Header ({
                     onChange={name => onItemChange({ ...item, name })}
                     lastNamePublicity={item.lastNamePublicity}
                     onLastNamePublicityChange={v => onItemChange({ ...item, lastNamePublicity: v })}
-                    createHistoryLink={createHistoryLink} />
+                    createHistoryLink={createHistoryLink}
+                    userData={userData} />
                 <div class="member-code">
                     <CodeEditor
                         value={item.code}
                         item={item}
                         originalItem={originalItem}
                         editing={editing}
-                        onChange={code => onItemChange({ ...item, code })} />
+                        onChange={code => onItemChange({ ...item, code })}
+                        userData={userData} />
                     {!editing && createHistoryLink('code')}
                 </div>
                 {!editing && perms.hasCodeholderField('membership', 'r') && (

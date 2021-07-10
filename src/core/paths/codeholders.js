@@ -519,15 +519,26 @@ export const tasks = {
     fields: async () => {
         const client = await asyncClient;
         const fields = [];
+        const ownFields = [];
         for (const field in clientFields) {
             const spec = clientFields[field];
-            let hasPerm;
-            if (typeof spec === 'string') hasPerm = await client.hasCodeholderField(spec, 'r');
-            else if (typeof spec.apiFields === 'string') hasPerm = await client.hasCodeholderField(spec.apiFields, 'r');
-            else if (spec.permFields) {
+            let hasPerm, hasOwnPerm;
+            if (typeof spec === 'string') {
+                hasPerm = await client.hasCodeholderField(spec, 'r');
+                hasOwnPerm = await client.hasOwnCodeholderField(spec, 'r');
+            } else if (typeof spec.apiFields === 'string') {
+                hasPerm = await client.hasCodeholderField(spec.apiFields, 'r');
+                hasOwnPerm = await client.hasOwnCodeholderField(spec.apiFields, 'r');
+            } else if (spec.permFields) {
                 for (const f of spec.permFields) {
                     if (await client.hasCodeholderField(f, 'r')) {
                         hasPerm = true;
+                        break;
+                    }
+                }
+                for (const f of spec.permFields) {
+                    if (await client.hasOwnCodeholderField(f, 'r')) {
+                        hasOwnPerm = true;
                         break;
                     }
                 }
@@ -538,10 +549,17 @@ export const tasks = {
                         break;
                     }
                 }
+                for (const f of spec.apiFields) {
+                    if (await client.hasOwnCodeholderField(f, 'r')) {
+                        hasOwnPerm = true;
+                        break;
+                    }
+                }
             }
             if (hasPerm) fields.push(field);
+            if (hasOwnPerm) ownFields.push(field);
         }
-        return fields;
+        return { fields, ownFields };
     },
     /// codeholders/filters: lists available filters according to permissions (it is recommended
     /// that you use the corresponding view instead)
@@ -671,9 +689,9 @@ export const tasks = {
         const apiFields = [];
 
         for (const f of rawApiFields) {
-            if (await client.hasCodeholderField(f, 'r')) {
-                apiFields.push(f);
-            }
+            const hasField = id === 'self' ? (await client.hasOwnCodeholderField(f, 'r'))
+                : (await client.hasCodeholderField(f, 'r'));
+            if (hasField) apiFields.push(f);
         }
 
         const res = await client.get(`/codeholders/${id}`, {

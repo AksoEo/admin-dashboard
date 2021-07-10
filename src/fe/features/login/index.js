@@ -16,10 +16,10 @@ const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft'
 export default connect('login')((data, core) => ({ ...data, core }))(class Login extends Component {
     state = {
         /// Whether or not non-admins are allowed to log into the admin dashboard.
-        /// This is off by default, but can be enabled for ... purposes ... if the user enters
+        /// This is off by default, but can be enabled for testing purposes if the user enters
         /// the konami code.
         /// Bugs related to this property being true shouldn’t be considered issues.
-        allowsNonAdmin: false,
+        allowsNonAdmin: sessionStorage._debug_ana,
 
         /// The current login name; this is here because it’s shared across many login pages.
         login: '',
@@ -45,11 +45,20 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
             // match
             const allowsNonAdmin = !this.state.allowsNonAdmin;
             this.setState({ allowsNonAdmin });
+            sessionStorage._debug_ana = allowsNonAdmin;
             if (this.props.authState === LoginAuthStates.LOGGED_IN) {
                 this.props.core.createTask('login/overrideIsAdmin', {
                     override: allowsNonAdmin,
                 }).runOnceAndDrop();
             }
+        }
+    };
+    #kcOnLoad = () => {
+        // update overrideIsAdmin on load
+        if (this.props.authState === LoginAuthStates.LOGGED_IN) {
+            this.props.core.createTask('login/overrideIsAdmin', {
+                override: this.state.allowsNonAdmin,
+            }).runOnceAndDrop();
         }
     };
 
@@ -88,6 +97,7 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
 
         setTimeout(() => {
             this.#focusCurrentPage();
+            this.#kcOnLoad();
         }, 200);
     }
 

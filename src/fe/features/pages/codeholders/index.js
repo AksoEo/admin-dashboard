@@ -32,8 +32,8 @@ const SEARCHABLE_FIELDS = {
     notes: ['notes'],
 };
 
-const connectToEverything = a => connect('codeholders/fields')(fields => ({
-    fields,
+const connectToEverything = a => connect('codeholders/fields')(res => ({
+    fields: res?.fields,
 }))(connect('codeholders/filters')(filters => ({
     filters,
 }))(connectPerms(a)));

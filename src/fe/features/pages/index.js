@@ -401,7 +401,7 @@ export default [
                 path: 'membroj',
                 paths: [
                     {
-                        match: /^(\d+)$/,
+                        match: /^(\d+|self)$/,
                         matchKey: 'codeholder',
                         component: elazy(() =>
                             import(/* webpackChunkName: "codeholder-detail", webpackPrefetch: true */ './codeholders/detail')),
