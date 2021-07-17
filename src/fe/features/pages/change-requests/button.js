@@ -44,9 +44,8 @@ export default class ChangeRequestsButton extends PureComponent {
         return (
             <div class="codeholder-change-requests-button-container">
                 <LinkButton class="change-reqs-button" raised target={`/membroj/${id}/shanghopetoj`}>
-                    <span class={'reqs-icon-container' + (this.state.loading ? ' is-loading' : '')}>
+                    <span class="reqs-icon-container">
                         {this.state.count ? <ChangeRequestNewIcon class="req-icon" /> : <ChangeRequestIcon class="req-icon" />}
-                        <CircularProgress class="reqs-loading" small indeterminate={this.state.loading} />
                     </span>
                     {locale.buttonLabel(this.state.count)}
                 </LinkButton>
