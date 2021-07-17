@@ -412,3 +412,46 @@ export const codeholders = {
         success: 'Sciigo sendita',
     },
 };
+
+export const codeholderChgReqs = {
+    title: 'Ŝanĝopetoj',
+    detailTitle: 'Ŝanĝopeto',
+    buttonLabel: n => n === 0 ? 'Ŝanĝopetoj' : `${n} Ŝanĝopeto${n === 1 ? '' : 'j'}`,
+    search: {
+        placeholders: {
+            codeholderDescription: '[[Search codeholderdesc]]',
+            internalNotes: '[[Search internalnotes]]',
+        },
+    },
+    fields: {
+        time: '[[Time]]',
+        codeholderId: '[[CodeholderId]]',
+        data: '[[Data]]',
+        codeholderDescription: '[[CodeholderDescription]]',
+        internalNotes: '[[InternalNotes]]',
+        status: '[[Status]]',
+
+        codeholderDescriptionEmpty: '[[No description]]',
+        statuses: {
+            pending: '[[Pending]]',
+            approved: '[[Approved]]',
+            denied: '[[Denied]]',
+        },
+        dataShowRaw: '[[Show raw json data]]',
+    },
+    approval: {
+        approve: '[[Approve]]',
+        deny: '[[Deny]]',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti ŝanĝopeton',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi ŝanĝopeton',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi ŝanĝopeton? Ne eblas malfari tiun ĉi agon.',
+    },
+};

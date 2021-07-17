@@ -19,6 +19,7 @@ export const pages = {
     home: 'Hejmo',
     ch: 'Membroj',
     codeholders: 'Membroj',
+    'change-requests': 'Ŝanĝopetoj',
     statistics: 'Statistiko',
     membership: 'Membreco',
     'membership-categories': 'Kategorioj',

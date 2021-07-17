@@ -9,6 +9,7 @@ export function crudList ({
     apiPath,
     fields: defaultFields,
     storePath,
+    withApiOptions,
     map,
 }) {
     return async (options, { search, offset, limit, fields, jsonFilter }) => {
@@ -27,6 +28,7 @@ export function crudList ({
             apiOptions.search = { cols: [search.field], str: transformedQuery };
         }
         if (jsonFilter) options.filter = jsonFilter.filter;
+        if (withApiOptions) withApiOptions(apiOptions, options);
         const res = await client.get(apiPath(options), apiOptions);
         for (const item of res.body) {
             if (map) map(item);

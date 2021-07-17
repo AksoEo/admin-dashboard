@@ -10,12 +10,14 @@ import ChangedFields from '../../../components/changed-fields';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import { Field, Validator } from '../../../components/form';
 import { ueaCode, date } from '../../../components/data';
+import { updateDialog } from '../../../components/task-templates';
 import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
 import {
     codeholders as locale,
     data as dataLocale,
     detail as detailLocale,
+    codeholderChgReqs as chgReqLocale,
 } from '../../../locale';
 import { FileThumbnail, FileSize, Mime } from '../../../components/files';
 import './style';
@@ -423,6 +425,8 @@ export default {
             </TaskDialog>
         );
     },
+
+    updateChangeRequest: updateDialog({ locale: chgReqLocale.update, fields: chgReqLocale.fields }),
 };
 
 class NotifTemplateMessage extends PureComponent {

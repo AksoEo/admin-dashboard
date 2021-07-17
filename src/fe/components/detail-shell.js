@@ -25,7 +25,7 @@ import './detail-shell.less';
 /// - onDelete: called when the item is deleted
 /// - onData: will be called with data when it loads
 /// - onError: will be called with data when it fails
-/// - children: (data) => Node
+/// - children: (data, core) => Node
 /// - inline: if true, will use a smaller inline style
 export default class DetailShell extends PureComponent {
     static contextType = coreContext;
@@ -118,7 +118,7 @@ export default class DetailShell extends PureComponent {
                                 action: () => this.beginCommit(),
                             },
                         ]} />
-                    {!!children && children(this.state.data)}
+                    {!!children && children(this.state.data, this.context)}
                 </Fragment>
             );
         } else {

@@ -1,7 +1,5 @@
 import { h } from 'preact';
 import TaskDialog from '../../../components/task-dialog';
-import ChangedFields from '../../../components/changed-fields';
-import { Field } from '../../../components/form';
 import {
     magazines as magazinesLocale,
     magazineEditions as editionsLocale,
@@ -9,82 +7,11 @@ import {
 } from '../../../locale';
 import { DocumentIcon } from '../../../components/icons';
 import { FileSize } from '../../../components/files';
-import { routerContext } from '../../../router';
+import { createDialog, updateDialog, deleteDialog } from '../../../components/task-templates';
 import { FIELDS as MAGAZINE_FIELDS } from './fields';
 import { FIELDS as EDITION_FIELDS } from './editions/fields';
 import { FIELDS as TOC_FIELDS } from './editions/toc//fields';
 import './tasks.less';
-
-// TODO: move this elsewhere
-function createDialog ({ locale, fieldNames, fields: fieldDefs, className, onCompletion }) {
-    return ({ open, task }) => {
-        const fields = fieldNames.map(id => {
-            const def = fieldDefs[id];
-            const Component = def.component;
-            return (
-                <Field key={id}>
-                    {def.wantsCreationLabel && (
-                        <label class="creation-label">
-                            {locale.fields[id]}
-                        </label>
-                    )}
-                    <Component
-                        slot="create"
-                        editing value={task.parameters[id]}
-                        onChange={value => task.update({ [id]: value })} />
-                </Field>
-            );
-        });
-
-        return (
-            <routerContext.Consumer>
-                {routerContext => (
-                    <TaskDialog
-                        class={className}
-                        open={open}
-                        onClose={() => task.drop()}
-                        title={locale.create.title}
-                        actionLabel={locale.create.button}
-                        run={() => task.runOnce().then(id => {
-                            onCompletion(task, routerContext, id);
-                        })}>
-                        {fields}
-                    </TaskDialog>
-                )}
-            </routerContext.Consumer>
-        );
-    };
-}
-function updateDialog ({ locale, fields }) {
-    return ({ open, task }) => {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.title}
-                actionLabel={locale.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={fields} />
-            </TaskDialog>
-        );
-    };
-}
-function deleteDialog ({ locale }) {
-    return ({ open, task }) => {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.title}
-                actionLabel={locale.button}
-                run={() => task.runOnce()}>
-                {locale.description}
-            </TaskDialog>
-        );
-    };
-}
 
 export default {
     createMagazine: createDialog({

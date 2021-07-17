@@ -17,7 +17,7 @@ import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
 import AddMembershipIcon from '../../components/add-membership-icon';
 import ConfigMembershipIcon from '../../components/config-membership-icon';
-import { TravelExploreIcon } from '../../components/icons';
+import { TravelExploreIcon, ChangeRequestIcon } from '../../components/icons';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
@@ -415,52 +415,58 @@ export default [
                             {
                                 path: 'membrecoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-memberships", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.MembershipPage),
+                                    import(/* webpackChunkName: "codeholder-memberships" */ './codeholders/membership-roles'), e => e.MembershipPage),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasCodeholderField('membership', 'r'),
                             },
                             {
                                 path: 'roloj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-roles", webpackPrefetch: true */ './codeholders/membership-roles'), e => e.RolesPage),
+                                    import(/* webpackChunkName: "codeholder-roles" */ './codeholders/membership-roles'), e => e.RolesPage),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholder_roles.read'),
                             },
                             {
                                 path: 'historio',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-history", webpackPrefetch: true */ './codeholders/history')),
+                                    import(/* webpackChunkName: "codeholder-history" */ './codeholders/history')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholders.hist.read'),
                             },
                             {
                                 path: 'ensalutoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-logins", webpackPrefetch: true */ './codeholders/logins')),
+                                    import(/* webpackChunkName: "codeholder-logins" */ './codeholders/logins')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasCodeholderField('logins', 'r'),
                             },
                             {
                                 path: 'permesoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-perms", webpackPrefetch: true */ './codeholders/perms')),
+                                    import(/* webpackChunkName: "codeholder-perms" */ './codeholders/perms')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholders.perms.read'),
                             },
                             {
                                 path: 'dosieroj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-files", webpackPrefetch: true */ './codeholders/files-page')),
+                                    import(/* webpackChunkName: "codeholder-files" */ './codeholders/files-page')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasCodeholderField('files', 'r'),
                                 paths: [
                                     {
                                         match: /^(\d+)$/,
                                         component: elazy(() =>
-                                            import(/* webpackChunkName: "codeholder-files", webpackPrefetch: true */ './codeholders/file-detail')),
+                                            import(/* webpackChunkName: "codeholder-files" */ './codeholders/file-detail')),
                                         type: 'stack',
                                     },
                                 ],
+                            },
+                            {
+                                path: 'shanghopetoj',
+                                component: elazy(() => import(/* webpackChunkName: "chgreqs" */ './change-requests')),
+                                type: 'stack',
+                                hasPerm: perms => perms.hasPerm('codeholders.change_requests.read'),
                             },
                         ],
                     },
@@ -476,6 +482,28 @@ export default [
                     },
                 ],
                 hasPerm: perms => perms.hasPerm('codeholders.read'),
+            },
+            {
+                id: 'change-requests',
+                icon: ChangeRequestIcon,
+                path: 'shanghopetoj',
+                component: elazy(() => import(/* webpackChunkName: "chgreqs" */ './change-requests')),
+                type: 'stack',
+                hasPerm: perms => perms.hasPerm('codeholders.change_requests.read'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        component: elazy(() => import(/* webpackChunkName: "chgreqs" */ './change-requests/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: 'roles',

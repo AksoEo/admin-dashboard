@@ -30,6 +30,7 @@ import { FileIcon } from '../../../components/icons';
 import ProfilePictureEditor from './profile-picture';
 import Publicity from './publicity';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
+import ChangeRequestsButton from '../change-requests/button';
 
 const connectPerms = (Component) => {
     const SelfConnected = connectPermsInner(({ perms, ...extra }) => {
@@ -444,57 +445,62 @@ export const Header = connectPerms(function Header ({
     }
 
     return (
-        <div class="member-header">
-            <div class="member-picture">
-                <ProfilePictureEditor
-                    id={userData?.isSelf ? 'self' : item.id}
-                    editing={editing}
-                    profilePictureHash={item.profilePictureHash}
-                    canEdit={(perms.hasPerm('codeholders.update') || userData?.isSelf) && perms.hasCodeholderField('profilePicture', 'w')}
-                    createHistoryLink={createHistoryLink} />
-                {pictureMeta}
-                {editing && perms.hasCodeholderField('profilePicturePublicity', 'w') && <Publicity
-                    value={item.profilePicturePublicity}
-                    editing={true}
-                    onChange={v => onItemChange({ ...item, profilePicturePublicity: v })}
-                    types={['members', 'public']}
-                    style="icon" />}
-            </div>
-            <div class="member-info">
-                <NameEditor
-                    value={item.name}
-                    item={item}
-                    editing={editing}
-                    onChange={name => onItemChange({ ...item, name })}
-                    lastNamePublicity={item.lastNamePublicity}
-                    onLastNamePublicityChange={v => onItemChange({ ...item, lastNamePublicity: v })}
-                    createHistoryLink={createHistoryLink}
-                    userData={userData} />
-                <div class="member-code">
-                    <CodeEditor
-                        value={item.code}
-                        item={item}
-                        originalItem={originalItem}
+        <div class="member-header-container">
+            <div class="member-header">
+                <div class="member-picture">
+                    <ProfilePictureEditor
+                        id={userData?.isSelf ? 'self' : item.id}
                         editing={editing}
-                        onChange={code => onItemChange({ ...item, code })}
-                        userData={userData} />
-                    {!editing && createHistoryLink('code')}
+                        profilePictureHash={item.profilePictureHash}
+                        canEdit={(perms.hasPerm('codeholders.update') || userData?.isSelf) && perms.hasCodeholderField('profilePicture', 'w')}
+                        createHistoryLink={createHistoryLink} />
+                    {pictureMeta}
+                    {editing && perms.hasCodeholderField('profilePicturePublicity', 'w') && <Publicity
+                        value={item.profilePicturePublicity}
+                        editing={true}
+                        onChange={v => onItemChange({ ...item, profilePicturePublicity: v })}
+                        types={['members', 'public']}
+                        style="icon" />}
                 </div>
-                {!editing && perms.hasCodeholderField('membership', 'r') && (
-                    <MembershipInDetailView
-                        id={item.id}
-                        canEdit={perms.hasPerm('codeholders.update')} />
-                )}
-                {!editing && perms.hasCodeholderField('roles', 'r') && perms.hasPerm('codeholder_roles.read') && (
-                    <RolesInDetailView
-                        id={item.id}
-                        canEdit={perms.hasPerm('codeholder_roles.update')} />
-                )}
-                {!editing && perms.hasCodeholderField('files', 'r') && (
-                    <FilesButton id={item.id} />
-                )}
+                <div class="member-info">
+                    <NameEditor
+                        value={item.name}
+                        item={item}
+                        editing={editing}
+                        onChange={name => onItemChange({ ...item, name })}
+                        lastNamePublicity={item.lastNamePublicity}
+                        onLastNamePublicityChange={v => onItemChange({ ...item, lastNamePublicity: v })}
+                        createHistoryLink={createHistoryLink}
+                        userData={userData} />
+                    <div class="member-code">
+                        <CodeEditor
+                            value={item.code}
+                            item={item}
+                            originalItem={originalItem}
+                            editing={editing}
+                            onChange={code => onItemChange({ ...item, code })}
+                            userData={userData} />
+                        {!editing && createHistoryLink('code')}
+                    </div>
+                    {!editing && perms.hasCodeholderField('membership', 'r') && (
+                        <MembershipInDetailView
+                            id={item.id}
+                            canEdit={perms.hasPerm('codeholders.update')} />
+                    )}
+                    {!editing && perms.hasCodeholderField('roles', 'r') && perms.hasPerm('codeholder_roles.read') && (
+                        <RolesInDetailView
+                            id={item.id}
+                            canEdit={perms.hasPerm('codeholder_roles.update')} />
+                    )}
+                    {!editing && perms.hasCodeholderField('files', 'r') && (
+                        <FilesButton id={item.id} />
+                    )}
+                    {!editing && perms.hasPerm('codeholders.change_requests.read') && (
+                        <ChangeRequestsButton id={userData?.isSelf ? 'self' : item.id} />
+                    )}
+                </div>
+                <div class="decorative-flourish" />
             </div>
-            <div class="decorative-flourish" />
         </div>
     );
 });

@@ -8,6 +8,7 @@ import * as log from '../log';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
 import { LOGIN_ID } from './login-keys';
 import { deepMerge, deepEq } from '../../util';
+import { crudList, crudGet, crudUpdate, simpleDataView } from '../templates';
 
 //! # Client-side codeholder representation
 //! - fields with no value are null or an empty string
@@ -59,6 +60,7 @@ import { deepMerge, deepEq } from '../../util';
 export const CODEHOLDERS = 'codeholders';
 export const CODEHOLDER_PERMS = 'codeholderPerms';
 export const CODEHOLDER_FILES = 'codeholderFiles';
+export const CODEHOLDER_CHGREQS = 'codeholderChgReqs';
 
 // signals
 export const SIG_CODEHOLDERS = '!codeholders';
@@ -270,6 +272,12 @@ const clientFields = {
     publicEmail: 'publicEmail',
     publicCountry: 'publicCountry',
 };
+
+const virtualDerivedFields = [
+    'country',
+    'addressCity',
+    'addressCountryArea',
+];
 
 const fieldHistoryBlacklist = [
     'oldCode',
@@ -1374,6 +1382,37 @@ export const tasks = {
             deleteTemplateOnComplete: deleteOnComplete,
         }, options);
     },
+
+    /// Lists change requests.
+    changeRequests: crudList({
+        apiPath: () => `/codeholders/change_requests`,
+        fields: ['id', 'time', 'codeholderId', 'status', 'codeholderDescription', 'internalNotes'],
+        withApiOptions: (apiOpts, options) => {
+            if (options.id) {
+                const filter = { codeholderId: options.id };
+                apiOpts.filter = options.filter ? ({ $and: [options.filter, filter] }) : filter;
+            }
+        },
+        storePath: (_, { id }) => [CODEHOLDER_CHGREQS, id],
+    }),
+    changeRequest: crudGet({
+        apiPath: ({ id }) => `/codeholders/change_requests/${id}`,
+        fields: ['id', 'time', 'codeholderId', 'status', 'codeholderDescription', 'internalNotes', 'data'],
+        storePath: ({ id }) => [CODEHOLDER_CHGREQS, id],
+        map: item => {
+            const clientData = clientFromAPI(item.data);
+            item.data = {};
+            for (const key in clientData) {
+                if (virtualDerivedFields.includes(key)) continue;
+                if (clientData[key] === undefined) continue;
+                item.data[key] = clientData[key];
+            }
+        },
+    }),
+    updateChangeRequest: crudUpdate({
+        apiPath: ({ id }) => `/codeholders/change_requests/${id}`,
+        storePath: ({ id }) => [CODEHOLDER_CHGREQS, id],
+    }),
 };
 
 const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms
@@ -1556,6 +1595,11 @@ export const views = {
             store.unsubscribe([CODEHOLDER_PERMS, this.id]);
         }
     },
+
+    changeRequest: simpleDataView({
+        storePath: ({ id }) => [CODEHOLDER_CHGREQS, id],
+        get: tasks.changeRequest,
+    }),
 
     /// codeholders/sigCodeholders: observes codeholders for client-side changes
     sigCodeholders: createStoreObserver([CODEHOLDERS, SIG_CODEHOLDERS]),
