@@ -222,9 +222,9 @@ export const countryLists = {
         title: 'Krei liston de landaj sekcioj',
         button: 'Krei',
 
-        duplicateMenuItem: '[[Duplicate]]',
-        duplicateTitle: '[[Duplicate list]]',
-        duplicateButton: '[[Duplicate]]',
+        duplicateMenuItem: 'Krei kopion',
+        duplicateTitle: 'Krei kopion de listo',
+        duplicateButton: 'Kopii',
     },
     update: {
         title: 'Redakti liston de landaj sekcioj',

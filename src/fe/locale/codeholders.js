@@ -145,7 +145,7 @@ export const codeholders = {
         landlinePhonePublicity: 'Publikeco de hejma telefono',
         cellphonePublicity: 'Publikeco de poŝtelefono',
         publicCountry: 'Publika lando',
-        publicEmail: '[[publicEmail]]',
+        publicEmail: 'Publika retpoŝtadreso',
         mainDescriptor: 'Ĉefa priskribeto',
         factoids: 'Vizitkartaj faktoj',
 
@@ -419,29 +419,28 @@ export const codeholderChgReqs = {
     buttonLabel: n => n === 0 ? 'Ŝanĝopetoj' : `${n} Ŝanĝopeto${n === 1 ? '' : 'j'}`,
     search: {
         placeholders: {
-            codeholderDescription: '[[Search codeholderdesc]]',
-            internalNotes: '[[Search internalnotes]]',
+            codeholderDescription: 'Serĉi priskribojn',
+            internalNotes: 'Serĉi notojn',
         },
     },
     fields: {
-        time: '[[Time]]',
-        codeholderId: '[[CodeholderId]]',
-        data: '[[Data]]',
-        codeholderDescription: '[[CodeholderDescription]]',
-        internalNotes: '[[InternalNotes]]',
-        status: '[[Status]]',
+        time: 'Horo de kreiĝo',
+        codeholderId: 'UEA-kodo',
+        data: 'Petitaj ŝanĝoj',
+        codeholderDescription: 'Priskribo de peto',
+        internalNotes: 'Internaj notoj',
+        status: 'Stato',
 
-        codeholderDescriptionEmpty: '[[No description]]',
+        codeholderDescriptionEmpty: 'Neniu priskribo',
         statuses: {
-            pending: '[[Pending]]',
-            approved: '[[Approved]]',
-            denied: '[[Denied]]',
-        },
-        dataShowRaw: '[[Show raw json data]]',
+            pending: 'Atendanta',
+            approved: 'Akceptita',
+            denied: 'Malakceptita',
+        }
     },
     approval: {
-        approve: '[[Approve]]',
-        deny: '[[Deny]]',
+        approve: 'Akcepti',
+        deny: 'Malakcepti',
     },
     update: {
         menuItem: 'Redakti',
