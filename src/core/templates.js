@@ -2,17 +2,18 @@ import { util } from '@tejo/akso-client';
 import asyncClient from './client';
 import * as store from './store';
 import { deepMerge } from '../util';
-import { fieldDiff, fieldsToOrder } from './list';
+import { fieldDiff, fieldsToOrder, filtersToAPI, addJSONFilter } from './list';
 import { AbstractDataView } from './view';
 
 export function crudList ({
     apiPath,
     fields: defaultFields,
+    filters: filterDefs,
     storePath,
     withApiOptions,
     map,
 }) {
-    return async (options, { search, offset, limit, fields, jsonFilter }) => {
+    return async (options, { search, offset, limit, fields, filters, jsonFilter }) => {
         const client = await asyncClient;
         const apiOptions = {
             offset,
@@ -27,7 +28,11 @@ export function crudList ({
             }
             apiOptions.search = { cols: [search.field], str: transformedQuery };
         }
-        if (jsonFilter) options.filter = jsonFilter.filter;
+
+        const apiFilter = filterDefs ? filtersToAPI(filterDefs, filters) : null;
+        if (apiFilter) apiOptions.filter = apiFilter;
+        if (jsonFilter) apiOptions.filter = addJSONFilter(apiOptions.filter, jsonFilter);
+
         if (withApiOptions) withApiOptions(apiOptions, options);
         const res = await client.get(apiPath(options), apiOptions);
         for (const item of res.body) {

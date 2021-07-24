@@ -69,7 +69,7 @@ class NavItem extends PureComponent {
             }
         }
 
-        const Icon = icon || (() => null);
+        const Icon = typeof icon === 'object' ? icon.resolve(tasks) : (icon || (() => null));
         // using tabIndex -1 on Link because DrawerItem is focusable anyway
         return (
             <Link target={`/${targetPath}`} class="sidebar-link" tabIndex={-1}>

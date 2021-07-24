@@ -17,7 +17,7 @@ import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
 import AddMembershipIcon from '../../components/add-membership-icon';
 import ConfigMembershipIcon from '../../components/config-membership-icon';
-import { TravelExploreIcon, ChangeRequestIcon } from '../../components/icons';
+import { TravelExploreIcon, ChangeRequestIcon, ChangeRequestNewIcon } from '../../components/icons';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
@@ -485,7 +485,8 @@ export default [
             },
             {
                 id: 'change-requests',
-                icon: ChangeRequestIcon,
+                icon: { resolve: tasks => tasks?.changeRequests ? ChangeRequestNewIcon : ChangeRequestIcon },
+                badge: tasks => tasks?.changeRequests ? 'todo' : null,
                 path: 'shanghopetoj',
                 component: elazy(() => import(/* webpackChunkName: "chgreqs" */ './change-requests')),
                 type: 'stack',

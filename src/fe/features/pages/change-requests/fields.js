@@ -1,12 +1,10 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
-import { Dialog } from '@cpsdqs/yamdl';
 import ApprovedIcon from '@material-ui/icons/CheckCircleOutline';
 import DeniedIcon from '@material-ui/icons/HighlightOff';
 import PendingIcon from '@material-ui/icons/HourglassEmpty';
+import CanceledIcon from '@material-ui/icons/NotInterested';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import TextArea from '../../../components/text-area';
-import ObjectViewer from '../../../components/object-viewer';
 import TinyProgress from '../../../components/tiny-progress';
 import { timestamp } from '../../../components/data';
 import { IdUEACode } from '../../../components/data/uea-code';
@@ -41,6 +39,7 @@ export const FIELDS = {
             let icon;
             if (value === 'approved') icon = <ApprovedIcon />;
             else if (value === 'denied') icon = <DeniedIcon />;
+            else if (value === 'canceled') icon = <CanceledIcon />;
             else icon = <PendingIcon />;
             return (
                 <div class="codeholder-change-request-status" data-slot={slot} data-status={value}>
@@ -87,23 +86,9 @@ export const FIELDS = {
     },
     data: {
         component ({ value, item }) {
-            const [showObject, setShowObject] = useState(false);
-
             return (
                 <div class="codeholder-change-request-data">
                     <ChangedFields data={value} codeholder={item.codeholderId} isPending={item.status === 'pending'} />
-
-                    <div class="raw-data-link-container">
-                        <span class="raw-data-link" small onClick={() => setShowObject(true)}>
-                            {locale.fields.dataShowRaw}
-                        </span>
-                    </div>
-                    <Dialog
-                        backdrop
-                        open={showObject}
-                        onClose={() => setShowObject(false)}>
-                        <ObjectViewer value={value} />
-                    </Dialog>
                 </div>
             );
         },

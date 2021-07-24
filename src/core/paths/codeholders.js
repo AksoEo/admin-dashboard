@@ -1387,6 +1387,11 @@ export const tasks = {
     changeRequests: crudList({
         apiPath: () => `/codeholders/change_requests`,
         fields: ['id', 'time', 'codeholderId', 'status', 'codeholderDescription', 'internalNotes'],
+        filters: {
+            status: {
+                toAPI: values => ({ status: { $in: values } }),
+            },
+        },
         withApiOptions: (apiOpts, options) => {
             if (options.id) {
                 const filter = { codeholderId: options.id };

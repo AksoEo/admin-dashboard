@@ -422,6 +422,10 @@ export const codeholderChgReqs = {
             codeholderDescription: 'Serĉi priskribojn',
             internalNotes: 'Serĉi notojn',
         },
+        filters: {
+            status: 'Stato',
+            statusesEmpty: '[[Any status]]',
+        },
     },
     fields: {
         time: 'Horo de kreiĝo',
@@ -436,7 +440,8 @@ export const codeholderChgReqs = {
             pending: 'Atendanta',
             approved: 'Akceptita',
             denied: 'Malakceptita',
-        }
+            canceled: 'Nuligita',
+        },
     },
     approval: {
         approve: 'Akcepti',

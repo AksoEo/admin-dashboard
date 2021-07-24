@@ -1,6 +1,5 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { CircularProgress } from '@cpsdqs/yamdl';
 import { ChangeRequestIcon, ChangeRequestNewIcon } from '../../../components/icons';
 import { codeholderChgReqs as locale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
