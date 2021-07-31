@@ -1395,7 +1395,7 @@ export const tasks = {
         withApiOptions: (apiOpts, options) => {
             if (options.id) {
                 const filter = { codeholderId: options.id };
-                apiOpts.filter = options.filter ? ({ $and: [options.filter, filter] }) : filter;
+                apiOpts.filter = apiOpts.filter ? ({ $and: [apiOpts.filter, filter] }) : filter;
             }
         },
         storePath: (_, { id }) => [CODEHOLDER_CHGREQS, id],

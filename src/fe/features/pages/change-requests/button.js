@@ -24,7 +24,7 @@ export default class ChangeRequestsButton extends PureComponent {
             id: this.props.id,
         }, {
             offset: 0,
-            limit: 10,
+            limit: 1,
             jsonFilter: { filter: { status: 'pending' } },
         }).runOnceAndDrop().then(({ items, total }) => {
             this.setState({ items, count: total });

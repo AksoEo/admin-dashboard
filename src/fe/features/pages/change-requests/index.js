@@ -19,7 +19,7 @@ export default class ChangeRequestsPage extends Page {
             fields: [
                 { id: 'status', sorting: 'none', fixed: true },
                 this.codeholderId ? null : ({ id: 'codeholderId', sorting: 'none', fixed: true }),
-                { id: 'time', sorting: 'asc', fixed: true },
+                { id: 'time', sorting: this.codeholderId ? 'desc' : 'asc', fixed: true },
                 { id: 'codeholderDescription', sorting: 'none', fixed: true },
             ].filter(x => x),
             filters: {},
