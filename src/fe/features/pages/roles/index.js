@@ -21,6 +21,7 @@ export default connectPerms(class Roles extends Page {
             fields: [
                 { id: 'name', sorting: 'asc', fixed: true },
                 { id: 'description', sorting: 'none', fixed: true },
+                { id: 'public', sorting: 'none', fixed: true },
             ],
             offset: 0,
             limit: 10,

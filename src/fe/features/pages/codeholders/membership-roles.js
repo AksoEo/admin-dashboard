@@ -3,10 +3,14 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
+import BusinessIcon from '@material-ui/icons/Business';
+import InfoIcon from '@material-ui/icons/Info';
+import LanguageIcon from '@material-ui/icons/Language';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
 import Page from '../../../components/page';
 import DataList from '../../../components/data-list';
-import { date } from '../../../components/data';
+import { IdUEACode } from '../../../components/data/uea-code';
+import { country, date } from '../../../components/data';
 import MembershipChip from '../../../components/membership-chip';
 import TinyProgress from '../../../components/tiny-progress';
 import { coreContext } from '../../../core/connection';
@@ -227,9 +231,31 @@ export const RolesPage = makePage(
                 {item.role.name}
             </div>
             <div class="item-desc">
-                <date.inlineRenderer value={item.durationFrom * 1000} />
-                {'–'}
-                <date.inlineRenderer value={item.durationTo * 1000} />
+                <span class="item-timespan">
+                    <date.inlineRenderer value={item.durationFrom * 1000} />
+                    {'–'}
+                    <date.inlineRenderer value={item.durationTo * 1000} />
+                </span>
+                <span class="additional-details">
+                    {item.dataCountry ? (
+                        <span class="detail-country">
+                            <LanguageIcon className="detail-icon" />
+                            <country.renderer value={item.dataCountry} />
+                        </span>
+                    ) : null}
+                    {item.dataOrg ? (
+                        <span class="detail-org">
+                            <BusinessIcon className="detail-icon" />
+                            <IdUEACode id={item.dataOrg} />
+                        </span>
+                    ) : null}
+                    {item.dataString ? (
+                        <span class="detail-string">
+                            <InfoIcon className="detail-icon" />
+                            {item.dataString}
+                        </span>
+                    ) : null}
+                </span>
             </div>
         </div>
     ),
@@ -244,6 +270,9 @@ export const RolesPage = makePage(
                     durationFrom: item.durationFrom ? new Date(item.durationFrom * 1000).toISOString().split('T')[0] : null,
                     durationTo: item.durationTo ? new Date(item.durationTo * 1000).toISOString().split('T')[0] : null,
                     role: item.role.id,
+                    dataCountry: item.dataCountry,
+                    dataOrg: item.dataOrg,
+                    dataString: item.dataString,
                 }); // task view
             },
         },

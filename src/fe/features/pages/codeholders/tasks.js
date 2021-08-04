@@ -7,9 +7,11 @@ import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
 import Select from '../../../components/select';
 import ChangedFields from '../../../components/changed-fields';
+import CodeholderPicker from '../../../components/codeholder-picker';
 import DynamicHeightDiv from '../../../components/dynamic-height-div';
+import LimitedTextField from '../../../components/limited-text-field';
 import { Field, Validator } from '../../../components/form';
-import { ueaCode, date } from '../../../components/data';
+import { country, ueaCode, date } from '../../../components/data';
 import { updateDialog } from '../../../components/task-templates';
 import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
@@ -511,7 +513,7 @@ function makeRoleEditor (type) {
                     class="category-select form-field"
                     value={task.parameters.role}
                     onChange={role => task.update({ role })}
-                    items={roles && Object.values(roles).map(({
+                    items={roles && Object.values(roles).sort((a, b) => a.name.localeCompare(b.name)).map(({
                         id,
                         name,
                     }) => ({
@@ -545,6 +547,29 @@ function makeRoleEditor (type) {
                             throw { error: locale.role.notADate };
                         }
                     }} />
+                <div class="additional-options">
+                    <div class="opt-item">
+                        <label>{locale.role.dataCountry}</label>
+                        <country.editor
+                            value={task.parameters.dataCountry}
+                            onChange={dataCountry => task.update({ dataCountry })}/>
+                    </div>
+                    <div class="opt-item">
+                        <label>{locale.role.dataOrg}</label>
+                        <CodeholderPicker
+                            limit={1}
+                            jsonFilter={{ codeholderType: 'org' }}
+                            value={task.parameters.dataOrg ? ['' + task.parameters.dataOrg] : []}
+                            onChange={v => task.update({ dataOrg: +v[0] || null })} />
+                    </div>
+                    <div class="opt-item">
+                        <label>{locale.role.dataString}</label>
+                        <LimitedTextField
+                            value={task.parameters.dataString}
+                            onChange={e => task.update({ dataString: e.target.value || null })}
+                            maxLength={50} />
+                    </div>
+                </div>
             </TaskDialog>
         );
     });

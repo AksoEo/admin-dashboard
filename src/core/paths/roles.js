@@ -25,6 +25,7 @@ async function loadAllRoles () {
                 'id',
                 'name',
                 'description',
+                'public',
             ],
         });
         total = +res.res.headers.get('x-total-items');
@@ -55,7 +56,7 @@ export const tasks = {
         const opts = {
             offset,
             limit,
-            fields: ['id', 'name', 'description'],
+            fields: ['id', 'name', 'description', 'public'],
             order: fieldsToOrder(fields),
         };
 
@@ -85,7 +86,7 @@ export const tasks = {
     role: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/codeholder_roles/${id}`, {
-            fields: ['id', 'name', 'description'],
+            fields: ['id', 'name', 'description', 'public'],
         });
         return res.body;
     },

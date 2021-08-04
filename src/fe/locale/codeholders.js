@@ -271,6 +271,9 @@ export const codeholders = {
         description: 'Se la komenca kaj fina datoj restas malplenaj, la valido iĝas senlimaj.',
         durationFrom: 'Valida ekde',
         durationTo: 'Valida ĝis',
+        dataCountry: '[[DataCountry]]',
+        dataOrg: '[[DataOrg]]',
+        dataString: '[[DataString]]',
         notADate: 'Ne estas valida dato',
     },
     files: {

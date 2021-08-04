@@ -956,6 +956,9 @@ export const tasks = {
                 'durationFrom',
                 'durationTo',
                 'isActive',
+                'dataCountry',
+                'dataOrg',
+                'dataString',
                 'role.id',
                 'role.name',
             ],
@@ -971,12 +974,13 @@ export const tasks = {
     /// - id: codeholder id
     /// - role: role id
     /// - durationFrom/durationTo: nullable date bounds
-    addRole: async ({ id }, { durationFrom, durationTo, role }) => {
+    addRole: async ({ id }, { durationFrom, durationTo, role, ...extra }) => {
         const client = await asyncClient;
         await client.post(`/codeholders/${id}/roles`, {
             durationFrom: durationFrom ? +new Date(durationFrom) / 1000 : null,
             durationTo: durationTo ? +new Date(durationTo) / 1000 : null,
             roleId: +role,
+            ...extra,
         });
 
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
@@ -989,12 +993,13 @@ export const tasks = {
     /// - entry: role id
     /// - durationFrom/durationTo: nullable date bounds
     /// - role: role id
-    updateRole: async ({ id, entry }, { durationFrom, durationTo, role }) => {
+    updateRole: async ({ id, entry }, { durationFrom, durationTo, role, ...extra }) => {
         const client = await asyncClient;
         await client.patch(`/codeholders/${id}/roles/${entry}`, {
             durationFrom: durationFrom ? +new Date(durationFrom) / 1000 : null,
             durationTo: durationTo ? +new Date(durationTo) / 1000 : null,
             roleId: +role,
+            ...extra,
         });
 
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;

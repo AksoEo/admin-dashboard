@@ -77,4 +77,37 @@
             }
         }
     }
+
+    .role-item {
+        .item-name {
+            font-weight: 600;
+        }
+
+        .item-desc {
+            .additional-details {
+                margin-left: 0.5em;
+                border-left: 1px solid @separator;
+                padding-left: 0.1em;
+
+                &:empty {
+                    display: none;
+                }
+
+                .detail-icon {
+                    font-size: inherit;
+                    vertical-align: middle;
+                    margin-right: 0.2em;
+                }
+
+                & > span {
+                    background: @text-fade-05;
+                    border-radius: 4px;
+                    padding: 1px 2px;
+                    margin-left: 0.5em;
+                    font-size: 0.9em;
+                    box-sizing: border-box;
+                }
+            }
+        }
+    }
 }

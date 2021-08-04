@@ -1,6 +1,7 @@
 import { h } from 'preact';
+import { Checkbox, TextField } from '@cpsdqs/yamdl';
+import CheckIcon from '@material-ui/icons/Check';
 import { Validator } from '../../../components/form';
-import { TextField } from '@cpsdqs/yamdl';
 import TextArea from '../../../components/text-area';
 import { roles as locale } from '../../../locale';
 
@@ -37,5 +38,13 @@ export const FIELDS = {
             return <div>{(value || '').split('\n').map((x, i) => <div key={i}>{x}</div>)}</div>;
         },
         weight: 2,
+    },
+    public: {
+        component ({ value, editing, onChange }) {
+            if (editing) return <Checkbox checked={value} onChange={onChange} />;
+            if (value) return <CheckIcon />;
+            return null;
+        },
+        weight: 0.5,
     },
 };
