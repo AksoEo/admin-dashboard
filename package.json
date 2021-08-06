@@ -15,7 +15,7 @@
     "@cpsdqs/yamdl": "^0.2.1",
     "@material-ui/core": "^4.9.3",
     "@material-ui/icons": "^4.9.1",
-    "@tejo/akso-client": "^0.1.14",
+    "@tejo/akso-client": "^0.1.16",
     "@tejo/akso-script": "^0.2.2",
     "@tejo/akso-script-editor": "git+https://github.com/AksoEo/akso-script-editor.git",
     "@wessberg/pointer-events": "^1.0.9",

@@ -3,5 +3,5 @@
 //! Additionally, cross-fetch’s feature detection is mildly broken in web workers and their XHR
 //! polyfill seems to have minor problems.
 
-export default global.fetch;
+export default global.fetch.bind(global);
 export const Headers = global.Headers;
