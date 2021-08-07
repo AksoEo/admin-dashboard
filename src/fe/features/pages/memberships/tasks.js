@@ -142,6 +142,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        sheet
                         class="memberships-tasks-create-entry"
                         open={open}
                         onClose={() => task.drop()}

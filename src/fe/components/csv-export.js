@@ -1,8 +1,9 @@
 import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
-import { Dialog, Button, LinearProgress } from '@cpsdqs/yamdl';
+import { Button, LinearProgress } from '@cpsdqs/yamdl';
 import stringify from 'csv-stringify';
 import { coreContext } from '../core/connection';
+import DialogSheet from './dialog-sheet';
 import DisplayError from './error';
 import Select from './select';
 import Segmented from './segmented';
@@ -227,7 +228,7 @@ export default class CSVExport extends PureComponent {
 
     render () {
         return (
-            <Dialog
+            <DialogSheet
                 open={this.props.open}
                 backdrop
                 class="csv-export-dialog"
@@ -321,7 +322,7 @@ export default class CSVExport extends PureComponent {
                         </div>
                     </Fragment>
                 )}
-            </Dialog>
+            </DialogSheet>
         );
     }
 }

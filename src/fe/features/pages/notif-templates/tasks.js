@@ -99,6 +99,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        sheet
                         class="notif-templates-task-create"
                         open={open}
                         onClose={() => task.drop()}

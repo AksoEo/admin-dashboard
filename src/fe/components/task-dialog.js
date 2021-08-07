@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import { Button, Dialog, CircularProgress } from '@cpsdqs/yamdl';
+import DialogSheet from './dialog-sheet';
 import Form, { Validator } from './form';
 import DisplayError from './error';
 import './task-dialog.less';
@@ -9,6 +10,7 @@ import './task-dialog.less';
 ///
 /// # Props
 /// - open/onClose
+/// - sheet: if true, will use DialogSheet
 /// - title
 /// - actionLabel: label string for the action button
 /// - run: run closure; must return a promise. success will not be handled
@@ -44,14 +46,16 @@ export default class TaskDialog extends Component {
         actionLabel,
         running,
         container,
+        sheet,
         ...extra
     }, { loading: loadingState, error }) {
         const className = 'task-dialog ' + (this.props.class || '');
 
         const loading = loadingState || running;
+        const DialogComponent = sheet ? DialogSheet : Dialog;
 
         return (
-            <Dialog
+            <DialogComponent
                 {...extra}
                 class={className}
                 backdrop
@@ -86,7 +90,7 @@ export default class TaskDialog extends Component {
                     ) : null}
                     <span ref={view => this.#errorAnchor = view} />
                 </Form>
-            </Dialog>
+            </DialogComponent>
         );
     }
 }

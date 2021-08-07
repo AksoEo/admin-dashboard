@@ -69,6 +69,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        sheet
                         title={locale.create}
                         fullScreen={width => width <= 420}
                         class="codeholders-task-create"
@@ -178,6 +179,7 @@ export default {
 
         return (
             <TaskDialog
+                sheet
                 class="codeholders-task-add-membership"
                 open={open}
                 title={locale.addMembership}
@@ -312,6 +314,7 @@ export default {
     uploadFile ({ open, task }) {
         return (
             <TaskDialog
+                sheet
                 class="codeholders-task-upload-file"
                 open={open}
                 onClose={() => task.drop()}
@@ -501,6 +504,7 @@ function makeRoleEditor (type) {
 
         return (
             <TaskDialog
+                sheet
                 class="codeholders-task-add-role"
                 open={open}
                 title={locale[type + 'Role']}
@@ -509,6 +513,7 @@ function makeRoleEditor (type) {
                 run={() => task.runOnce()}>
                 <Validator
                     component={Select}
+                    outline
                     validate={() => {}}
                     class="category-select form-field"
                     value={task.parameters.role}
@@ -525,6 +530,7 @@ function makeRoleEditor (type) {
                 </p>
                 <Validator
                     component={date.editor}
+                    outline
                     class="form-field text-field"
                     label={locale.role.durationFrom}
                     value={task.parameters.durationFrom}
@@ -537,6 +543,7 @@ function makeRoleEditor (type) {
                     }} />
                 <Validator
                     component={date.editor}
+                    outline
                     class="form-field text-field"
                     label={locale.role.durationTo}
                     value={task.parameters.durationTo}
@@ -551,6 +558,7 @@ function makeRoleEditor (type) {
                     <div class="opt-item">
                         <label>{locale.role.dataCountry}</label>
                         <country.editor
+                            outline
                             value={task.parameters.dataCountry}
                             onChange={dataCountry => task.update({ dataCountry })}/>
                     </div>
@@ -565,6 +573,7 @@ function makeRoleEditor (type) {
                     <div class="opt-item">
                         <label>{locale.role.dataString}</label>
                         <LimitedTextField
+                            outline
                             value={task.parameters.dataString}
                             onChange={e => task.update({ dataString: e.target.value || null })}
                             maxLength={50} />

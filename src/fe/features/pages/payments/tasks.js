@@ -149,6 +149,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        sheet
                         class="payment-method-task-create"
                         open={open}
                         fullScreen={width => width < 400}
@@ -350,6 +351,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        sheet
                         class="payments-task-create-intent"
                         open={open}
                         fullScreen={width => width < 400}

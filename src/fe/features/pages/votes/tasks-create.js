@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { useEffect } from 'preact/compat';
-import { Button, Dialog, TextField } from '@cpsdqs/yamdl';
+import { Button, TextField } from '@cpsdqs/yamdl';
+import DialogSheet from '../../../components/dialog-sheet';
 import ProgressIndicator from '../../../components/dialog-progress-indicator';
 import AutosizingPageView from '../../../components/autosizing-page-view';
 import Form, { Validator } from '../../../components/form';
@@ -417,7 +418,7 @@ export default function makeCreateTask (isTemplate) {
             }
 
             return (
-                <Dialog
+                <DialogSheet
                     backdrop
                     open={open}
                     onClose={() => task.drop()}
@@ -437,7 +438,7 @@ export default function makeCreateTask (isTemplate) {
                             {'' + this.state.error}
                         </div>
                     ) : null}
-                </Dialog>
+                </DialogSheet>
             );
         }
     };

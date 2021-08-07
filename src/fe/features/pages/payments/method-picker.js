@@ -128,7 +128,7 @@ export default class PaymentMethodPicker extends PureComponent {
                 onPointerDown={this.#onPointerDown}
                 onClick={this.#open}>
                 <Ripple ref={ripple => this.#ripple = ripple} />
-                <DynamicHeightDiv useFirstHeight>
+                <DynamicHeightDiv useFirstHeight lazy>
                     {contents}
                 </DynamicHeightDiv>
                 <Dialog

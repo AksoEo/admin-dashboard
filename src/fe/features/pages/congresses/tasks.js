@@ -188,6 +188,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        sheet
                         class="congresses-task-create-location"
                         data-type={task.parameters.type}
                         fullScreen={width => width < 600}
@@ -279,6 +280,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        sheet
                         class="congresses-task-create-program"
                         open={open}
                         onClose={() => task.drop()}
@@ -409,6 +411,7 @@ export default {
 
         return (
             <TaskDialog
+                sheet
                 class="congresses-task-create-participant"
                 open={open}
                 onClose={() => task.drop()}
