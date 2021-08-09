@@ -1,6 +1,6 @@
 //! easter egg for enabling devtools with vfx à la video games
 
-import { globalAnimator } from '@cpsdqs/yamdl';
+import { globalAnimator } from 'yamdl';
 
 const lerp = (a, b, x) => (b - a) * x + a;
 const clamp = (x, l, h) => Math.max(l, Math.min(x, h));

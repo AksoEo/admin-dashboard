@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 
 export const FIELDS = {
     code: {

@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { useState } from 'preact/compat';
-import { Button, Dialog } from '@cpsdqs/yamdl';
+import { Button, Dialog } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import SearchIcon from '@material-ui/icons/Search';

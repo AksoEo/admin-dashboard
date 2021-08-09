@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createContext, createPortal, PureComponent } from 'preact/compat';
-import { AppBar, Button, MenuIcon, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { AppBar, Button, MenuIcon, Spring, globalAnimator } from 'yamdl';
 import SvgIcon from '../../../components/svg-icon';
 import { notifTemplates as locale } from '../../../locale';
 import { getFormVarsForIntent } from './intents';

@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Spring } from '@cpsdqs/yamdl';
+import { Spring } from 'yamdl';
 import './autosizing-page-view.less';
 const lerp = (a, b, x) => (b - a) * x + a;
 

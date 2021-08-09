@@ -1,12 +1,13 @@
 import { h } from 'preact';
 import { PureComponent, Suspense } from 'preact/compat';
-import { Button, CircularProgress, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, AppBarProxy, MenuIcon } from 'yamdl';
 import EventProxy from '../components/event-proxy';
 import { CardStackProvider, CardStackRenderer, CardStackItem } from '../components/card-stack';
 import pages from './pages';
 import { MetaProvider } from './meta';
 import { app as locale } from '../locale';
 import { LinkButton } from '../router';
+import FatalError from './fatal-error';
 
 // --- navigation model ---
 // notes:
@@ -536,21 +537,7 @@ export default class Navigation extends PureComponent {
                     <EventProxy
                         dom target={window}
                         onpopstate={this.onPopState} />
-                    <h1>{locale.genericErrorTitle}</h1>
-                    {locale.genericError}
-                    <br />
-                    <br />
-                    <Button onClick={() => window.location.reload()}>
-                        {locale.genericErrorReload}
-                    </Button>
-                    <br />
-                    <br />
-                    <details class="error-details">
-                        <summary>{locale.genericErrorViewDetails}</summary>
-                        <pre>
-                            {this.state.error.toString()}
-                        </pre>
-                    </details>
+                    <FatalError error={this.state.error} />
                 </div>
             );
         }

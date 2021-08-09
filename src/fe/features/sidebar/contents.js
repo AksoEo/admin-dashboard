@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { Button, Menu, DrawerItem, DrawerLabel, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Button, Menu, DrawerItem, DrawerLabel, Spring, globalAnimator } from 'yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ProfilePicture from '../../components/profile-picture';
 import { TejoIcon, UeaIcon } from '../../components/org-icon';

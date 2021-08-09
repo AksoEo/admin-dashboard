@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import OrgIcon from '../../../components/org-icon';
 
 export const FIELDS = {

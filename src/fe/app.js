@@ -1,8 +1,9 @@
 import { h, Component } from 'preact';
-import { AppBarProvider, AppBarConsumer } from '@cpsdqs/yamdl';
+import { AppBarProvider, AppBarConsumer } from 'yamdl';
 import { Perms } from '@tejo/akso-client';
 import Sidebar from './features/sidebar';
 import Navigation from './features/navigation';
+import FatalError from './features/fatal-error';
 import EventProxy from './components/event-proxy';
 import { connect } from './core/connection';
 import permsContext from './perms';
@@ -37,6 +38,7 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
         permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH,
         sidebarOpen: false,
         currentPage: null,
+        error: null,
     };
 
     onResize = () => this.setState({ permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH });
@@ -74,9 +76,25 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
         }
     }
 
+    componentDidCatch (error, errorInfo) {
+        console.error(`[App] render error`, error, errorInfo); // eslint-disable-line no-console
+    }
+
+    static getDerivedStateFromError (error) {
+        return { error };
+    }
+
     render ({ tasks }) {
         let className = 'akso-app';
         if (this.props.animateIn) className += ' animate-in';
+
+        if (this.state.error) {
+            return (
+                <div class="app-error">
+                    <FatalError error={this.state.error} />
+                </div>
+            );
+        }
 
         return (
             <permsContext.Provider value={this.perms}>

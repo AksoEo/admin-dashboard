@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import JSON5 from 'json5';
 import { useState, Fragment } from 'preact/compat';
-import { Dialog } from '@cpsdqs/yamdl';
+import { Dialog } from 'yamdl';
 import Page from '../../../components/page';
 import ObjectViewer from '../../../components/object-viewer';
 import { app as locale } from '../../../locale';

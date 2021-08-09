@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { lazy, Suspense, useState } from 'preact/compat';
-import { Button, CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from 'yamdl';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
 import SendIcon from '@material-ui/icons/Send';

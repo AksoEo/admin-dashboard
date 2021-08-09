@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { Fragment, createPortal } from 'preact/compat';
 import moment from 'moment';
-import { globalAnimator, TextField, DatePicker } from '@cpsdqs/yamdl';
+import { globalAnimator, TextField, DatePicker } from 'yamdl';
 import { data as locale } from '../../locale';
 import './style';
 

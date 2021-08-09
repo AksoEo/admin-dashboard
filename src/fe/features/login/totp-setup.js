@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { CircularProgress } from 'yamdl';
 import { generateTotp } from '@tejo/akso-client';
 import { login as locale } from '../../locale';
 

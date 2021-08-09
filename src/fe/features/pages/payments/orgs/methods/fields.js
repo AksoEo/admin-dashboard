@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Checkbox, TextField } from '@cpsdqs/yamdl';
+import { Checkbox, TextField } from 'yamdl';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 import CheckIcon from '@material-ui/icons/Check';
 import { Validator } from '../../../../../components/form';

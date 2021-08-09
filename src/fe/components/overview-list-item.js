@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, CircularProgress, Checkbox, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, Checkbox, Spring, globalAnimator } from 'yamdl';
 import { connect } from '../core/connection';
 import { LinkButton } from '../router';
 import { layoutContext } from './dynamic-height-div';

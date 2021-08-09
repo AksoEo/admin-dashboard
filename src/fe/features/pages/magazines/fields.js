@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import { Validator } from '../../../components/form';
 import MdField from '../../../components/md-field';
 import Segmented from '../../../components/segmented';

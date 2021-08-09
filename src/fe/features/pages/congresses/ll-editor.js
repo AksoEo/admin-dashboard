@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { Button, TextField } from 'yamdl';
 import CloseIcon from '@material-ui/icons/Close';
 import { congresses as locale } from '../../../locale';
 

@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useEffect, PureComponent } from 'preact/compat';
-import { Checkbox, CircularProgress, TextField } from '@cpsdqs/yamdl';
+import { Checkbox, CircularProgress, TextField } from 'yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import SavePerms from '../administration/perms-editor/save';
 import { UEACode } from '@tejo/akso-client';

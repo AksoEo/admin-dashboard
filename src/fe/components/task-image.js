@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from 'yamdl';
 import ResizeObserver from 'resize-observer-polyfill';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { coreContext } from '../core/connection';

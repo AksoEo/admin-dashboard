@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Fragment, PureComponent } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import MapIcon from '@material-ui/icons/Map';
 import BusinessIcon from '@material-ui/icons/Business';
 import SearchFilters from '../../../../../components/search-filters';

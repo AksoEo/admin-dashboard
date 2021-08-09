@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, PureComponent } from 'preact/compat';
-import { Button, Dialog, Slider, TextField } from '@cpsdqs/yamdl';
+import { Button, Dialog, Slider, TextField } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Brightness1Icon from '@material-ui/icons/Brightness1';

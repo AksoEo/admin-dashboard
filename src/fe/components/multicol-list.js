@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Spring, globalAnimator } from 'yamdl';
 import './multicol-list.less';
 
 const lerp = (a, b, x) => (b - a) * x + a;

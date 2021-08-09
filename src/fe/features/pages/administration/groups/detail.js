@@ -3,7 +3,7 @@ import { useRef, useState, PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import SearchIcon from '@material-ui/icons/Search';
-import { Button, Dialog, LinearProgress, TextField } from '@cpsdqs/yamdl';
+import { Button, Dialog, LinearProgress, TextField } from 'yamdl';
 import Tabs from '../../../../components/tabs';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';

@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Suspense, useEffect, useState, Fragment } from 'preact/compat';
-import { Checkbox, Button, Dialog } from '@cpsdqs/yamdl';
+import { Checkbox, Button, Dialog } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import PaperList from './paper-list';
 import DataList from './data-list';

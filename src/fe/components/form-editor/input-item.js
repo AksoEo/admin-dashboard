@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createRef, PureComponent } from 'preact/compat';
-import { Button, Checkbox, Slider, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, Slider, TextField } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';

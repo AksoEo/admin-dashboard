@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import { codeholders as locale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 import Page from '../../../components/page';

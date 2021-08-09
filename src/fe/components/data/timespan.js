@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, createRef } from 'preact/compat';
-import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Spring, globalAnimator } from 'yamdl';
 import { data as locale } from '../../locale';
 
 /// Renders a duration.

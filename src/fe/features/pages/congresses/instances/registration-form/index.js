@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createRef, PureComponent } from 'preact/compat';
-import { AppBarProxy, Button, CircularProgress, MenuIcon } from '@cpsdqs/yamdl';
+import { AppBarProxy, Button, CircularProgress, MenuIcon } from 'yamdl';
 import Meta from '../../../../meta';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';

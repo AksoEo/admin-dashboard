@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { Button, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import AnnouncementIcon from '@material-ui/icons/Announcement';

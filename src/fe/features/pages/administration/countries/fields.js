@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import CheckIcon from '@material-ui/icons/Check';
-import { Checkbox, TextField } from '@cpsdqs/yamdl';
+import { Checkbox, TextField } from 'yamdl';
 import { countries as locale } from '../../../../locale';
 
 const nameField = {

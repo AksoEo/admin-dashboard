@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Fragment, PureComponent } from 'preact/compat';
-import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, TextField } from 'yamdl';
 import TuneIcon from '@material-ui/icons/Tune';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';

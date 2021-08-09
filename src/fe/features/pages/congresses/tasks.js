@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { lazy, Suspense, useEffect, useRef } from 'preact/compat';
-import { CircularProgress, TextField } from '@cpsdqs/yamdl';
+import { CircularProgress, TextField } from 'yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import { Field, Validator } from '../../../components/form';
 import DetailShell from '../../../components/detail-shell';

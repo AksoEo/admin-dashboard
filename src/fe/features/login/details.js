@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { TextField, Button, CircularProgress } from '@cpsdqs/yamdl';
+import { TextField, Button, CircularProgress } from 'yamdl';
 import { UEACode } from '@tejo/akso-client';
 import { LoginAuthStates } from '../../../protocol';
 import Form, { Validator } from '../../components/form';
@@ -171,7 +171,6 @@ export default class DetailsPage extends Component {
                     outline
                     label={locale.login}
                     type={this.props.login.includes('@') ? 'email' : 'text'}
-                    autocomplete="off"
                     autocapitalize="none"
                     spellcheck="false"
                     value={this.props.login}

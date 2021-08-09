@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Fragment, useState } from 'preact/compat';
-import { Checkbox, Button, Dialog } from '@cpsdqs/yamdl';
+import { Checkbox, Button, Dialog } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CloseIcon from '@material-ui/icons/Close';

@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { Fragment } from 'preact/compat';
-import { LinearProgress } from '@cpsdqs/yamdl';
+import { LinearProgress } from 'yamdl';
 import PaymentIcon from '@material-ui/icons/Payment';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Page from '../../../components/page';

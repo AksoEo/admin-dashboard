@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { useState, useEffect, Fragment, createPortal } from 'preact/compat';
-import { TextField, Button, globalAnimator } from '@cpsdqs/yamdl';
+import { TextField, Button, globalAnimator } from 'yamdl';
 import fuzzaldrin from 'fuzzaldrin';
 import './suggestion-field.less';
 

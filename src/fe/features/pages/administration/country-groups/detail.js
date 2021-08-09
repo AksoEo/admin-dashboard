@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { Checkbox, CircularProgress } from '@cpsdqs/yamdl';
+import { Checkbox, CircularProgress } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import SearchIcon from '@material-ui/icons/Search';
 import fuzzaldrin from 'fuzzaldrin';

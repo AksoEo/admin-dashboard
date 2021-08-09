@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Spring } from '@cpsdqs/yamdl';
+import { Spring } from 'yamdl';
 import './segmented.less';
 
 const lerp = (a, b, x) => (b - a) * x + a;

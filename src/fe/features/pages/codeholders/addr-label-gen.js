@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, Fragment, PureComponent } from 'preact/compat';
-import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from '@cpsdqs/yamdl';
+import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';

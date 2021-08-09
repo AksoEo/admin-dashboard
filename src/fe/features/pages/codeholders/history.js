@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { CircularProgress } from 'yamdl';
 import Page from '../../../components/page';
 import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';

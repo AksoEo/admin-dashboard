@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Button, Spring } from '@cpsdqs/yamdl';
+import { Button, Spring } from 'yamdl';
 import './dialog-progress-indicator.less';
 
 /// Dialog progress indicator.

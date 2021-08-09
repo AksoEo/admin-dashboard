@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { createContext } from 'preact/compat';
-import { Spring } from '@cpsdqs/yamdl';
+import { Spring } from 'yamdl';
 import './style';
 
 /// Context that contains an interface to the [Form] component.

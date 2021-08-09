@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, TextField } from 'yamdl';
 import moment from 'moment';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -352,7 +352,6 @@ const predicateObjectEditors = {
     bool: ({ value, onChange }) => <Checkbox checked={value} onChange={onChange} />,
     number: ({ value, onChange }) => <TextField
         outline
-        autocomplete="off"
         type="number"
         value={+(+value).toFixed(3)}
         onChange={e => {

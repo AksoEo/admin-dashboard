@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import DragHandleIcon from '@material-ui/icons/DragHandle';
-import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Spring, globalAnimator } from 'yamdl';
 import ResizeObserver from 'resize-observer-polyfill';
 import './rearranging-list.less';
 

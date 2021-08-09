@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { lazy, Suspense, Fragment } from 'preact/compat';
-import { Checkbox, CircularProgress, Button, TextField, Spring } from '@cpsdqs/yamdl';
+import { Checkbox, CircularProgress, Button, TextField, Spring } from 'yamdl';
 import { LoginAuthStates } from '../../../protocol';
 import Form, { Validator } from '../../components/form';
 import { login as locale } from '../../locale';

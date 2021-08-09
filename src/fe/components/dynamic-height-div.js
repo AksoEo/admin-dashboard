@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, createContext } from 'preact/compat';
-import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Spring, globalAnimator } from 'yamdl';
 import EventProxy from './event-proxy';
 
 export const layoutContext = createContext();

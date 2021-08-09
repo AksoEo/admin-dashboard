@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createRef, PureComponent } from 'preact/compat';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { Button, TextField } from 'yamdl';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import PhotoIcon from '@material-ui/icons/Photo';
 import AddPhotoIcon from '@material-ui/icons/AddPhotoAlternate';

@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Button, LinearProgress } from '@cpsdqs/yamdl';
+import { Button, LinearProgress } from 'yamdl';
 import DisplayError from '../../../components/error';
 import { data as dataLocale, codeholders as locale } from '../../../locale';
 import config from '../../../../config.val';

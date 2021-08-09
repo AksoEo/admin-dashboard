@@ -4,7 +4,7 @@ import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { Button, Checkbox, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, TextField } from 'yamdl';
 import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
 import JSONEditor from '../../../components/json-editor';

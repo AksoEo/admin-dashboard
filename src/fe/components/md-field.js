@@ -1,7 +1,7 @@
 import Markdown from 'markdown-it';
 import { h } from 'preact';
 import { createPortal, createRef, PureComponent, useState } from 'preact/compat';
-import { globalAnimator, Button, Dialog, TextField } from '@cpsdqs/yamdl';
+import { globalAnimator, Button, Dialog, TextField } from 'yamdl';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
 import FormatStrikethroughIcon from '@material-ui/icons/FormatStrikethrough';

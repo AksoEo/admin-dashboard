@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createContext, forwardRef } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 
 /// A React context for in-app navigation.
 ///

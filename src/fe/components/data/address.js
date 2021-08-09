@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import { getValidationRules } from '@cpsdqs/google-i18n-address';
 import Select from '../select';
 import { data as locale } from '../../locale';

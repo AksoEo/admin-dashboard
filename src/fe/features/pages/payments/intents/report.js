@@ -1,7 +1,7 @@
 import { h, render } from 'preact';
 import { PureComponent } from 'preact/compat';
 import moment from 'moment';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { CircularProgress } from 'yamdl';
 import PrintIcon from '@material-ui/icons/Print';
 import Page from '../../../../components/page';
 import Select from '../../../../components/select';

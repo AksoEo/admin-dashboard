@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Fragment, PureComponent } from 'preact/compat';
-import { CircularProgress, Dialog } from '@cpsdqs/yamdl';
+import { CircularProgress, Dialog } from 'yamdl';
 import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';
 import Page from '../../../components/page';

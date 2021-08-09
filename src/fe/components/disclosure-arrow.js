@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Spring, globalAnimator } from 'yamdl';
 import './disclosure-arrow.less';
 
 /// Renders an animated disclosure arrow.

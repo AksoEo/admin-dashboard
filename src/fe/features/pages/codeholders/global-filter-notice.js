@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Dialog } from '@cpsdqs/yamdl';
+import { Dialog } from 'yamdl';
 import ObjectViewer from '../../../components/object-viewer';
 import { useState } from 'preact/compat';
 import { codeholders as locale } from '../../../locale';

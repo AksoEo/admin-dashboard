@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import SearchIcon from '@material-ui/icons/Search';
 import Select from './select';
 import './search-input.less';

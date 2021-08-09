@@ -4,7 +4,7 @@ import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import RemoveIcon from '@material-ui/icons/Remove';
-import { Button, Checkbox, TextField, Dialog } from '@cpsdqs/yamdl';
+import { Button, Checkbox, TextField, Dialog } from 'yamdl';
 import { coreContext } from '../../../core/connection';
 import { connectPerms as connectPermsInner } from '../../../perms';
 import { LinkButton } from '../../../router';

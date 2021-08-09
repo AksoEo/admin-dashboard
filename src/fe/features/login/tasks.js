@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useRef } from 'preact/compat';
-import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
+import { Dialog, TextField, CircularProgress, Button } from 'yamdl';
 import { UEACode } from '@tejo/akso-client';
 import Form, { Validator } from '../../components/form';
 import { login as locale } from '../../locale';

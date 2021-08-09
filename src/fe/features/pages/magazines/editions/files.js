@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button, LinearProgress } from '@cpsdqs/yamdl';
+import { Button, LinearProgress } from 'yamdl';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import FileUploadIcon from '@material-ui/icons/Publish';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';

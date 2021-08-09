@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import { data as locale } from '../../locale';
 import './style';
 

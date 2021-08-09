@@ -3,7 +3,7 @@ import { PureComponent } from 'preact/compat';
 import CodeMirror from 'codemirror';
 import { Controlled as RCodeMirror } from 'react-codemirror2';
 import JSON5 from 'json5';
-import { Dialog, Button } from '@cpsdqs/yamdl';
+import { Dialog, Button } from 'yamdl';
 import HelpIcon from '@material-ui/icons/Help';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/javascript/javascript';

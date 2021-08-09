@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { Button, Menu } from '@cpsdqs/yamdl';
+import { Button, Menu } from 'yamdl';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 import PublicIcon from '@material-ui/icons/Public';

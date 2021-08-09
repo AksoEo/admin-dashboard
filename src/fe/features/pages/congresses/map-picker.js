@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, Dialog } from '@cpsdqs/yamdl';
+import { Button, Dialog } from 'yamdl';
 import { formatAddress } from '@cpsdqs/google-i18n-address';
 import Map from './map';
 import MapList from './map-list';

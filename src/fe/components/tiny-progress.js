@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { globalAnimator } from '@cpsdqs/yamdl';
+import { globalAnimator } from 'yamdl';
 
 const f = t => Math.sin(t * Math.PI);
 const g = t => 2 / (1 + Math.exp(-4 * t)) - 1;

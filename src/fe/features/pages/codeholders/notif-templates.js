@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { lazy, Suspense, PureComponent } from 'preact/compat';
-import { AppBarProxy, Button, Checkbox, CircularProgress, MenuIcon } from '@cpsdqs/yamdl';
+import { AppBarProxy, Button, Checkbox, CircularProgress, MenuIcon } from 'yamdl';
 import { CardStackItem } from '../../../components/card-stack';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';

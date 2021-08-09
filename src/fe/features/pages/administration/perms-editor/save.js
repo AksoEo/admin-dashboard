@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { CircularProgress } from 'yamdl';
 import TaskDialog from '../../../../components/task-dialog';
 import DynamicHeightDiv from '../../../../components/dynamic-height-div';
 import DisplayError from '../../../../components/error';

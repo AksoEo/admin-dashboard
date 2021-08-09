@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import TableIcon from '@material-ui/icons/TableChart';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../../components/list-url-coding';
 import SearchFilters from '../../../../../components/search-filters';

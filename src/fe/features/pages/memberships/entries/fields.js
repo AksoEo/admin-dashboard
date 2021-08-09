@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, PureComponent } from 'preact/compat';
-import { Button, CircularProgress, Dialog, TextField } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, Dialog, TextField } from 'yamdl';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckIcon from '@material-ui/icons/CheckCircleOutline';
 import RemoveIcon from '@material-ui/icons/Remove';

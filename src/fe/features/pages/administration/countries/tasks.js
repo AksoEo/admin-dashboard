@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import TaskDialog from '../../../../components/task-dialog';
 import ChangedFields from '../../../../components/changed-fields';
 import { Validator, Field } from '../../../../components/form';

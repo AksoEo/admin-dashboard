@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { useEffect } from 'preact/compat';
-import { Button, TextField } from '@cpsdqs/yamdl';
+import { Button, TextField } from 'yamdl';
 import DialogSheet from '../../../components/dialog-sheet';
 import ProgressIndicator from '../../../components/dialog-progress-indicator';
 import AutosizingPageView from '../../../components/autosizing-page-view';

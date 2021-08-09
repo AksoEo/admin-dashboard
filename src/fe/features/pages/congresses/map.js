@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createPortal, PureComponent } from 'preact/compat';
-import { Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Spring, globalAnimator } from 'yamdl';
 import L from 'leaflet';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';

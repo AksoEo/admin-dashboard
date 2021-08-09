@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import ListIcon from '@material-ui/icons/List';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import SearchFilters from '../../../../../components/search-filters';

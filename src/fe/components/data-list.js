@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { Button, Menu, CircularProgress } from '@cpsdqs/yamdl';
+import { Button, Menu, CircularProgress } from 'yamdl';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { data as locale } from '../locale';
 import { coreContext } from '../core/connection';

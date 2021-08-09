@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createRef, PureComponent } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import CodeIcon from '@material-ui/icons/Code';
 import { RawExprView } from './script-views';
 import ScriptContext from './script-context';

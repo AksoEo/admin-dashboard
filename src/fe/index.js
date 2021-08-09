@@ -1,6 +1,6 @@
 import { h, render, Component } from 'preact';
 import { Fragment } from 'preact/compat';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { CircularProgress } from 'yamdl';
 import { LoginAuthStates } from '../protocol';
 import isSpecialPage from './features/login/is-special-page';
 import { Worker } from './core';
@@ -10,6 +10,7 @@ import { insecureContext } from './locale';
 import TaskView from './task-view';
 import './style';
 
+import 'preact-debug-if-dev';
 import './chrome-focus';
 
 // --- TASK VIEW REGISTRY ---

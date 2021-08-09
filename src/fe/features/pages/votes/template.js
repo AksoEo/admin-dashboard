@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailView from '../../../components/detail';
 import Page from '../../../components/page';

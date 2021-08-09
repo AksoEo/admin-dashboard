@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Fragment, PureComponent } from 'preact/compat';
-import { Button, CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from 'yamdl';
 import ArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
 import ArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import ArrowLeftIcon from '@material-ui/icons/ChevronLeft';

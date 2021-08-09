@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import moment from 'moment';
-import { CircularProgress } from '@cpsdqs/yamdl';
+import { CircularProgress } from 'yamdl';
 import DynamicHeightDiv from '../../../../../components/dynamic-height-div';
 import DisplayError from '../../../../../components/error';
 import OverviewListItem from '../../../../../components/overview-list-item';

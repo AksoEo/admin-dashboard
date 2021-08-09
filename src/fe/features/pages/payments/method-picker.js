@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, MenuIcon, Dialog, Ripple } from '@cpsdqs/yamdl';
+import { Button, MenuIcon, Dialog, Ripple } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import { coreContext } from '../../../core/connection';
 import { paymentOrgs as orgLocale, paymentMethods as methodLocale } from '../../../locale';

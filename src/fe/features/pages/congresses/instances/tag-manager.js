@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, useRef, useState } from 'preact/compat';
-import { Button, CircularProgress, Dialog, TextField } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, Dialog, TextField } from 'yamdl';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckIcon from '@material-ui/icons/Check';

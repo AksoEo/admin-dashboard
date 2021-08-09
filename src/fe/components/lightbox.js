@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createPortal, PureComponent } from 'preact/compat';
-import { globalAnimator, Spring } from '@cpsdqs/yamdl';
+import { globalAnimator, Spring } from 'yamdl';
 import './lightbox.less';
 
 const portalContainer = document.createElement('div');

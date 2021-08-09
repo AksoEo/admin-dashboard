@@ -17,6 +17,7 @@ export default class TaskView extends Component {
 
     state = {
         mayBeOpen: false,
+        error: null,
     };
 
     #onClose = () => {
@@ -28,7 +29,19 @@ export default class TaskView extends Component {
         setImmediate(() => this.setState({ mayBeOpen: true }));
     }
 
+    componentDidCatch (error, errorInfo) {
+        console.error(`[Task View ${this.props.path}] render error`, error, errorInfo); // eslint-disable-line no-console
+    }
+
+    static getDerivedStateFromError (error) {
+        return { error };
+    }
+
     render ({ id, path, core, view: View, isDead }, { mayBeOpen }) {
+        if (this.state.error) {
+            return null;
+        }
+
         if (this.task.type !== path) {
             console.error('task type mismatch', this.task, path); // eslint-disable-line no-console
             throw new Error('wtf?');

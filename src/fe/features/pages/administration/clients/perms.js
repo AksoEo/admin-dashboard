@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { AppBarProxy, Button, MenuIcon, CircularProgress } from '@cpsdqs/yamdl';
+import { AppBarProxy, Button, MenuIcon, CircularProgress } from 'yamdl';
 import PermsEditor from '../perms-editor';
 import DoneIcon from '@material-ui/icons/Done';
 import UndoIcon from '@material-ui/icons/Undo';

@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import CloseIcon from '@material-ui/icons/Close';
 import { FIELDS } from '../notif-templates/fields';
 import StaticOverviewList from '../../../components/overview-list-static';

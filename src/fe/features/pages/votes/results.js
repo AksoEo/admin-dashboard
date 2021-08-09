@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import dagre from 'dagre';
 import { useState } from 'preact/compat';
-import { Button, CircularProgress } from '@cpsdqs/yamdl';
+import { Button, CircularProgress } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';

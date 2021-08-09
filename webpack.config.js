@@ -78,6 +78,11 @@ module.exports = function (env, argv) {
 
                 'react': 'preact/compat',
                 'react-dom': 'preact/compat',
+
+                'yamdl': path.resolve(__dirname, 'yamdl/src'),
+                'preact-debug-if-dev': prod
+                    ? path.resolve(__dirname, 'src/nothing.js')
+                    : 'preact/debug',
             },
         },
         devtool: prod ? 'source-map' : 'inline-source-map',
@@ -125,7 +130,7 @@ module.exports = function (env, argv) {
                     // exclude unsupported.js
                     // exclude all node_modules
                     // (except yamdl because it doesn’t have a compiler setup yet)
-                    exclude: /unsupported\.js|node_modules\/(?!@cpsdqs\/yamdl)/,
+                    exclude: /unsupported\.js|node_modules/,
                     use: [
                         {
                             loader: 'babel-loader',

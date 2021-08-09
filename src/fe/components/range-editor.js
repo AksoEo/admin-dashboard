@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, useRef } from 'preact/compat';
-import { TextField, Slider } from '@cpsdqs/yamdl';
+import { TextField, Slider } from 'yamdl';
 import './range-editor.less';
 
 /// A text editor optimized for editing integer range bounds.

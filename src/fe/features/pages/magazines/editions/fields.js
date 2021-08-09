@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Checkbox } from '@cpsdqs/yamdl';
+import { Checkbox } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import LimitedTextField from '../../../../components/limited-text-field';
 import MdField from '../../../../components/md-field';

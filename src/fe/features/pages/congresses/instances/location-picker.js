@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
-import { Dialog } from '@cpsdqs/yamdl';
+import { Dialog } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CloseIcon from '@material-ui/icons/Close';

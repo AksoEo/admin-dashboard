@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, Dialog } from '@cpsdqs/yamdl';
+import { Button, Dialog } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import {
     paymentIntents as locale,

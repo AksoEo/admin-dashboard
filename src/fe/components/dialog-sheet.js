@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { createPortal, PureComponent } from 'preact/compat';
-import { globalAnimator, Spring, Button, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
+import { globalAnimator, Spring, Button, AppBarProxy, MenuIcon } from 'yamdl';
 import './dialog-sheet.less';
 
 const clamp = (x, a, b) => Math.max(a, Math.min(x, b));

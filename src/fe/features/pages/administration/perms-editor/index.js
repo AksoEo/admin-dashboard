@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { useState } from 'preact/compat';
-import { Checkbox, Dialog } from '@cpsdqs/yamdl';
+import { Checkbox, Dialog } from 'yamdl';
 import {
     spec,
     memberFields as fieldsSpec,

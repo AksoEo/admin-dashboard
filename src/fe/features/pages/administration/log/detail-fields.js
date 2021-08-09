@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import FIELDS from './table-fields';
 import ObjectViewer from '../../../../components/object-viewer';
 import CopyIcon from '../../../../components/copy-icon';

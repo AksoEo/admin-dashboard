@@ -5,7 +5,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import RemoveIcon from '@material-ui/icons/Remove';
 import UpIcon from '@material-ui/icons/KeyboardArrowUp';
 import DownIcon from '@material-ui/icons/KeyboardArrowDown';
-import { Button, Checkbox, Dialog, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, Dialog, TextField } from 'yamdl';
 import TinyProgress from '../../../../components/tiny-progress';
 import MdField from '../../../../components/md-field';
 import Select from '../../../../components/select';

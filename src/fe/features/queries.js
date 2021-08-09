@@ -1,7 +1,7 @@
 //! Task views for queries.
 import { h } from 'preact';
 import { useRef, useState } from 'preact/compat';
-import { Dialog, TextField, CircularProgress, Button } from '@cpsdqs/yamdl';
+import { Dialog, TextField, CircularProgress, Button } from 'yamdl';
 import Form, { Validator } from '../components/form';
 import { search as locale } from '../locale';
 import './queries.less';

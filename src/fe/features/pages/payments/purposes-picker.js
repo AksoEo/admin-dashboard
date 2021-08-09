@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
-import { Button, Checkbox, Dialog, MenuIcon, TextField } from '@cpsdqs/yamdl';
+import { Button, Checkbox, Dialog, MenuIcon, TextField } from 'yamdl';
 import { base32 } from 'rfc4648';
 import Select from '../../../components/select';
 import Segmented from '../../../components/segmented';
@@ -323,7 +323,6 @@ class AddPurposeDialog extends PureComponent {
             <Field>
                 <Validator
                     component={TextField}
-                    autocomplete="off"
                     label={locale.purposesPicker.manual.title}
                     outline
                     value={manualTitle}

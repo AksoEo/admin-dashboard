@@ -1,14 +1,15 @@
 # AKSO Admin Dashboard
-## Usage
 ### Building
+Make sure the git submodules are present.
+
 ```sh
 npm install --dev
-npx webpack --env prod
-# ^ pass `--env analyze` to open webpack bundle analyzer, or no environment to build for development
+env AKSO_BASE=https://api.akso.org npm run build
 ```
 Build output will be located at `/dist`.
 
-Pass an environment variable named `AKSO_BASE` to override the API url base (default: https://apitest.akso.org/).
+To build for development, run `npx webpack`, and to analyze the webpack bundle, use `npx webpack --env analyze`.
+Passing an environment variable named `AKSO_BASE` overrides the API url (default: https://apitest.akso.org/).
 
 ### Server Setup
 - All files in `dist` should be served at `/`

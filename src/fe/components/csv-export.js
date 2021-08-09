@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
-import { Button, LinearProgress } from '@cpsdqs/yamdl';
+import { Button, LinearProgress } from 'yamdl';
 import stringify from 'csv-stringify';
 import { coreContext } from '../core/connection';
 import DialogSheet from './dialog-sheet';

@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Button, Dialog, Slider, CircularProgress, Spring, globalAnimator } from '@cpsdqs/yamdl';
+import { Button, Dialog, Slider, CircularProgress, Spring, globalAnimator } from 'yamdl';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { coreContext } from '../../../core/connection';
 import ProfilePicture from '../../../components/profile-picture';

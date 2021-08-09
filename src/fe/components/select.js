@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import CheckIcon from '@material-ui/icons/Check';
-import { Menu, globalAnimator } from '@cpsdqs/yamdl';
+import { Menu, globalAnimator } from 'yamdl';
 import './select.less';
 
 // appending directly to document.body causes weird glitches when a select is inside

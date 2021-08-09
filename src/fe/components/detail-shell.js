@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Fragment, PureComponent } from 'preact/compat';
-import { Button, CircularProgress, AppBarProxy, MenuIcon } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, AppBarProxy, MenuIcon } from 'yamdl';
 import DoneIcon from '@material-ui/icons/Done';
 import { coreContext } from '../core/connection';
 import { deepEq } from '../../util';

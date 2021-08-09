@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import SavePerms from '../perms-editor/save';
 import { adminGroups as locale } from '../../../../locale';
 import { Field, Validator } from '../../../../components/form';

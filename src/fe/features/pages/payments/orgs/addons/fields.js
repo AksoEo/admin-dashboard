@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { Validator } from '../../../../../components/form';
 import MdField from '../../../../../components/md-field';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import { paymentAddons as locale } from '../../../../../locale';
 
 export const FIELDS = {

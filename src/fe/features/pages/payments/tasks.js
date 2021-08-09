@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import Segmented from '../../../components/segmented';
 import Select from '../../../components/select';

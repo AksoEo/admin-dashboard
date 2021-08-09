@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import TimeZoneEditor from '../../../../components/time-zone';
 import TextArea from '../../../../components/text-area';
 import { date } from '../../../../components/data';

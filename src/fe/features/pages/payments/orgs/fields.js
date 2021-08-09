@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Validator } from '../../../../components/form';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import OrgIcon from '../../../../components/org-icon';
 import { paymentOrgs as locale } from '../../../../locale';
 

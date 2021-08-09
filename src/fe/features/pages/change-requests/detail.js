@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button } from '@cpsdqs/yamdl';
+import { Button } from 'yamdl';
 import ApprovedIcon from '@material-ui/icons/CheckCircleOutline';
 import DeniedIcon from '@material-ui/icons/HighlightOff';
 import EditIcon from '@material-ui/icons/Edit';

@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { lazy, Suspense } from 'preact/compat';
-import { Button, CircularProgress, Checkbox, TextField } from '@cpsdqs/yamdl';
+import { Button, CircularProgress, Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import CopyIcon from '../../../../../components/copy-icon';
 import CodeholderPicker from '../../../../../components/codeholder-picker';

@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Button, Dialog, CircularProgress } from '@cpsdqs/yamdl';
+import { Button, Dialog, CircularProgress } from 'yamdl';
 import DialogSheet from './dialog-sheet';
 import Form, { Validator } from './form';
 import DisplayError from './error';

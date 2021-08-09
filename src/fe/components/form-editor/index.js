@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, Menu } from '@cpsdqs/yamdl';
+import { Button, Menu } from 'yamdl';
 import AKSOScriptEditor from '@tejo/akso-script-editor';
 import InputIcon from '@material-ui/icons/Input';
 import TextIcon from '@material-ui/icons/Subject';

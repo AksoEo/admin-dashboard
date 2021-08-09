@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { stdlib, currencies } from '@tejo/akso-script';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import { data as locale } from '../../locale';
 
 function stringify (value, currency) {
@@ -100,7 +100,6 @@ class CurrencyEditor extends PureComponent {
         return (
             <TextField
                 {...extra}
-                autocomplete="off"
                 error={this.state.error ? locale.invalidCurrencyAmount : null}
                 value={editing ? this.state.editingValue : this.format(value)}
                 onChange={this.onInputChange}

@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Checkbox, TextField } from '@cpsdqs/yamdl';
+import { Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import { Validator } from '../../../components/form';
 import TextArea from '../../../components/text-area';
@@ -26,6 +26,7 @@ export const FIELDS = {
         },
     },
     description: {
+        wantsCreationLabel: true,
         component ({ value, editing, onChange }) {
             if (editing) {
                 return (
@@ -40,6 +41,7 @@ export const FIELDS = {
         weight: 2,
     },
     public: {
+        wantsCreationLabel: true,
         component ({ value, editing, onChange }) {
             if (editing) return <Checkbox checked={value} onChange={onChange} />;
             if (value) return <CheckIcon />;

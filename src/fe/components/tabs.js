@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Spring, globalAnimator, Ripple } from '@cpsdqs/yamdl';
+import { Spring, globalAnimator, Ripple } from 'yamdl';
 import './tabs.less';
 
 const ANIM_STAGGER_TIME = 0.1;

@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Dialog } from '@cpsdqs/yamdl';
+import { Dialog } from 'yamdl';
 import { generic as locale } from './locale';
 import './tasks.less';
 

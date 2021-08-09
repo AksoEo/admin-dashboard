@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { TextField } from '@cpsdqs/yamdl';
+import { TextField } from 'yamdl';
 import Select from '../../../../components/select';
 import Segmented from '../../../../components/segmented';
 import { paymentIntents as locale } from '../../../../locale';
