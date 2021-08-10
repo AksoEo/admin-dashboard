@@ -3,10 +3,13 @@
 .search-filters {
     margin: 0 auto;
     padding: 0 16px;
-    --paper-list-horiz-padding: 32px;
-    max-width: calc(800px + var(--paper-list-horiz-padding));
 
-    .paper {
+    &.paper-list {
+        --paper-list-horiz-padding: 32px;
+        max-width: calc(800px + var(--paper-list-horiz-padding));
+    }
+
+    &.paper-list .paper {
         border-radius: 8px;
     }
 
