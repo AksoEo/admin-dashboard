@@ -10,11 +10,12 @@ export const FILTERS = {
         deserialize: value => value
             ? ({ enabled: true, value: value.split(',') })
             : ({ enabled: false, value: [] }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, enabled, onEnabledChange }) {
             return (
                 <div class="codeholder-change-request-status-filter">
                     <Select
                         class="inner-select"
+                        disabled={!enabled}
                         multi
                         value={value}
                         emptyLabel={locale.search.filters.statusesEmpty}

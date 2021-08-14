@@ -104,6 +104,12 @@ class MultiSelect extends Component {
         globalAnimator.deregister(this);
     };
 
+    componentDidUpdate () {
+        if (this.state.open && this.props.disabled) {
+            this.#close();
+        }
+    }
+
     componentWillUnmount () {
         globalAnimator.deregister(this);
     }

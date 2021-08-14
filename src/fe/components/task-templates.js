@@ -3,6 +3,7 @@ import TaskDialog from './task-dialog';
 import ChangedFields from './changed-fields';
 import { Field } from './form';
 import { routerContext } from '../router';
+import './task-templates.less';
 
 export function createDialog ({ locale, fieldNames, fields: fieldDefs, className, onCompletion }) {
     return ({ open, task }) => {
@@ -28,7 +29,7 @@ export function createDialog ({ locale, fieldNames, fields: fieldDefs, className
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
-                        class={className}
+                        class={(className || '') + ' creation-task'}
                         open={open}
                         onClose={() => task.drop()}
                         title={locale.create.title}
