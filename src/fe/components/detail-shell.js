@@ -33,6 +33,7 @@ export default class DetailShell extends PureComponent {
     state = {
         data: null,
         error: null,
+        committing: false,
     };
 
     /// current data view
@@ -70,10 +71,22 @@ export default class DetailShell extends PureComponent {
         if (prevProps.view !== this.props.view || prevProps.id !== this.props.id) {
             this.createView();
         }
+
+        if (prevProps.edit !== this.props.edit && this.state.committing) {
+            this.setState({ committing: false });
+        }
     }
 
     componentWillUnmount () {
         if (this.#view) this.#view.drop();
+    }
+
+    hasChanges () {
+        if (!this.props.edit || !this.state.data) return false;
+        for (const fieldId in this.state.data) {
+            if (!deepEq(this.state.data[fieldId], this.props.edit[fieldId])) return true;
+        }
+        return false;
     }
 
     getChangedFields () {
@@ -84,8 +97,11 @@ export default class DetailShell extends PureComponent {
 
     beginCommit () {
         if (!this.#form.validate()) return;
+        if (this.state.committing) return;
         const changes = this.getChangedFields();
-        this.props.onCommit(changes);
+        this.setState({ committing: true }, () => {
+            this.props.onCommit(changes);
+        });
     }
 
     render ({ inline, editing, children }) {
@@ -105,8 +121,8 @@ export default class DetailShell extends PureComponent {
                         title={locale.editing}
                         menu={(
                             <Button icon small onClick={() => {
-                                this.props.onEditChange(null);
                                 this.props.onEndEdit();
+                                this.props.onEditChange(null);
                             }} aria-label={locale.cancel}>
                                 <MenuIcon type="close" />
                             </Button>
@@ -117,7 +133,10 @@ export default class DetailShell extends PureComponent {
                                 icon: <DoneIcon />,
                                 action: () => this.beginCommit(),
                             },
-                        ]} />
+                        ]}
+                        data={{
+                            dirty: !this.state.committing && this.hasChanges(),
+                        }} />
                     {!!children && children(this.state.data, this.context)}
                 </Fragment>
             );

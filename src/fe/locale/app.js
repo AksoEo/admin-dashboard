@@ -13,6 +13,10 @@ export const app = {
     goHome: 'Hejmen',
 
     debugPageInfo: 'Se vi ne scias kio estas tio ĉi, ne zorgu kaj alklaku sur \'Hejmo\' en la menuo.',
+
+    dirtyConfirmation: {
+        description: '[[You have unsaved changes. Are you sure you want to leave?]]',
+    },
 };
 
 export const pages = {

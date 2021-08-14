@@ -383,10 +383,24 @@ export default class Navigation extends PureComponent {
         }
     }
 
-    onPopState = e => this.readStateFromURL(document.location.href, e.state);
+    #ignoreNextPopState = false;
+    onPopState = e => {
+        if (this.#ignoreNextPopState) {
+            this.#ignoreNextPopState = false;
+            return;
+        }
+        if (this.promptCancelNavigationSync(true)) {
+            // HACK: undo popstate (preventDefault does not work)
+            window.history.forward();
+            this.#ignoreNextPopState = true;
+            return;
+        }
+        this.readStateFromURL(document.location.href, e.state);
+    };
 
     /// Navigates with an href.
     navigate = (href, replace, pushOutOfTree) => {
+        if (this.promptCancelNavigationSync()) return;
         this.saveState();
         this.readStateFromURL(href, null, pushOutOfTree).then(forceReplace => {
             this.stateIsDirty = true;
@@ -428,6 +442,7 @@ export default class Navigation extends PureComponent {
 
     /// Removes all stack items at and above the given index.
     popStackAt (stackIndex, replace) {
+        if (this.promptCancelNavigationSync()) return;
         const state = this.state.state.clone();
         state.stack.splice(stackIndex);
         state.updateLocation();
@@ -438,6 +453,7 @@ export default class Navigation extends PureComponent {
     }
 
     popStackState (stackIndex, stateKey, replace) {
+        if (this.promptCancelNavigationSync()) return;
         const state = this.state.state.clone();
         state.stack.splice(stackIndex + 1);
         state.stack[stackIndex].popState(stateKey);
@@ -490,6 +506,31 @@ export default class Navigation extends PureComponent {
             }
         }
     };
+
+    pageIsDirty = false;
+    setPageDirty (dirty) {
+        this.pageIsDirty = dirty;
+    }
+
+    onBeforeUnload = (e) => {
+        if (this.pageIsDirty) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    };
+
+    promptCancelNavigationSync (hackDontThrow) {
+        if (this.pageIsDirty) {
+            const cancel = !confirm(locale.dirtyConfirmation.description);
+            if (cancel) {
+                if (hackDontThrow) return true;
+                // FIXME: this is a hack. oftentimes state will be reset regardless of navigation,
+                // so we throw an error here to prevent any subsequent code from executing
+                throw new Error('Navigation canceled');
+            }
+        }
+        return false;
+    }
 
     componentDidMount () {
         this.readStateFromURL(document.location.href, window.history.state);
@@ -642,7 +683,8 @@ export default class Navigation extends PureComponent {
             <div class="navigation-view">
                 <EventProxy
                     dom target={window}
-                    onpopstate={this.onPopState} />
+                    onpopstate={this.onPopState}
+                    onbeforeunload={this.onBeforeUnload} />
                 <AppBarProxy
                     priority={1}
                     menu={appBarMenu}

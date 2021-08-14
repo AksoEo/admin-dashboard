@@ -111,6 +111,9 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
                     <AppBarProvider>
                         <div class="app-contents">
                             <AppBarConsumer
+                                onData={data => {
+                                    this.#navigation?.setPageDirty(!!data?.dirty);
+                                }}
                                 // TODO: use this el for document.title
                                 class="app-header" />
                             <Navigation
