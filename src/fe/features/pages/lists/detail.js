@@ -256,11 +256,16 @@ function ListPreview ({ item }) {
                                     <div class="codeholder-picture">
                                         <ProfilePicture
                                             id={item.id}
-                                            profilePictureHash={item.profilePictureHash}
-                                            profilePictureURL={id => `/lists/public/${listId}/codeholders/${id}/profile_picture/`} />
+                                            profilePictureHash={item.profilePictureHash} />
                                     </div>
                                     <div class="codeholder-name">
-                                        <Link target={`/membroj/${item.id}`}>{item.name}</Link>
+                                        <Link target={`/membroj/${item.id}`} outOfTree>
+                                            {item.firstNameLegal ? [
+                                                item.honorific,
+                                                item.firstName || item.firstNameLegal,
+                                                item.lastName || item.lastNameLegal,
+                                            ].filter(x => x).join(' ') : item.fullName}
+                                        </Link>
                                     </div>
                                 </div>
                             );

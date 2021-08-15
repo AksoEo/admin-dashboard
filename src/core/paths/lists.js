@@ -109,14 +109,32 @@ export const tasks = {
     /// lists/codeholders: lists codeholders that are part of a list
     codeholders: async ({ id }, { offset, limit }) => {
         const client = await asyncClient;
-        const res = await client.get(`/lists/public/${id}/codeholders`, {
-            fields: ['id', 'name', 'profilePictureHash'],
+        const res = await client.get(`/lists/${id}/codeholders`, {
             offset,
             limit,
         });
+
+        const res2 = await client.get(`/codeholders`, {
+            fields: [
+                'id',
+                'firstName',
+                'lastName',
+                'firstNameLegal',
+                'lastNameLegal',
+                'honorific',
+                'fullName',
+                'profilePictureHash',
+            ],
+            filter: { id: { $in: res.body } },
+            offset: 0,
+            limit,
+        });
+        const codeholders = Object.fromEntries(res2.body.map(c => [c.id, c]));
+
         return {
-            items: res.body,
-            total: +res.res.headers.get('x-total-items'),
+            items: res.body.map(id => codeholders[id]),
+            // FIXME: x-total-items is broken on the server side at the moment
+            total: 9999999, // +res.res.headers.get('x-total-items'),
         };
     },
 };
