@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { AppBarProvider, AppBarConsumer } from 'yamdl';
+import { AppBarProvider } from 'yamdl';
 import { Perms } from '@tejo/akso-client';
 import Sidebar from './features/sidebar';
 import Navigation from './features/navigation';
@@ -109,21 +109,13 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
                         onDirectTransition={this.props.onDirectTransition}
                         onDoAnimateIn={() => this.setState({ animateIn: true })} />
                     <AppBarProvider>
-                        <div class="app-contents">
-                            <AppBarConsumer
-                                onData={data => {
-                                    this.#navigation?.setPageDirty(!!data?.dirty);
-                                }}
-                                // TODO: use this el for document.title
-                                class="app-header" />
-                            <Navigation
-                                ref={view => this.#navigation = view}
-                                permaSidebar={this.state.permaSidebar}
-                                onOpenMenu={() => this.setState({ sidebarOpen: true })}
-                                onCurrentPageChange={this.onCurrentPageChange}
-                                onNavigate={this.onNavigate}
-                                perms={this.perms} />
-                        </div>
+                        <Navigation
+                            ref={view => this.#navigation = view}
+                            permaSidebar={this.state.permaSidebar}
+                            onOpenMenu={() => this.setState({ sidebarOpen: true })}
+                            onCurrentPageChange={this.onCurrentPageChange}
+                            onNavigate={this.onNavigate}
+                            perms={this.perms} />
                         {tasks}
                     </AppBarProvider>
                 </div>

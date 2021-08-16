@@ -1,13 +1,16 @@
 import { h } from 'preact';
 import { PureComponent, Suspense } from 'preact/compat';
-import { Button, CircularProgress, AppBarProxy, MenuIcon } from 'yamdl';
+import { Button, CircularProgress, AppBar, AppBarProxy, AppBarConsumer, MenuIcon } from 'yamdl';
 import EventProxy from '../components/event-proxy';
 import { CardStackProvider, CardStackRenderer, CardStackItem } from '../components/card-stack';
+import { FULL_SCREEN_LAYOUT_MAX_WIDTH } from '../components/card-stack';
 import pages from './pages';
 import { MetaProvider } from './meta';
 import { app as locale } from '../locale';
 import { LinkButton } from '../router';
 import FatalError from './fatal-error';
+
+const USE_LOCAL_MENU = false;
 
 // --- navigation model ---
 // notes:
@@ -583,7 +586,7 @@ export default class Navigation extends PureComponent {
             );
         }
 
-        let bottomPage;
+        let bottomPage, bottomPageMeta;
         let canPopBottomPage = false;
         const stackItems = [];
 
@@ -592,6 +595,7 @@ export default class Navigation extends PureComponent {
         let currentActions = [];
 
         const state = this.state.state;
+        const globalMenu = !USE_LOCAL_MENU || window.innerWidth <= FULL_SCREEN_LAYOUT_MAX_WIDTH;
 
         for (let i = 0; i < state.stack.length; i++) {
             const stackItem = state.stack[i];
@@ -619,13 +623,36 @@ export default class Navigation extends PureComponent {
                     stackItem.meta = { title, actions };
                     this.forceUpdate();
                 }}>
+                    {(!globalMenu && !isBottom && isTop) ? (
+                        <AppBarConsumer
+                            onData={data => {
+                                this.setPageDirty(!!data?.dirty);
+                            }}
+                            class="app-header local-page-header" />
+                    ) : null}
+                    {(!globalMenu && !isBottom) ? (
+                        <AppBarProxy
+                            class="local-page-header"
+                            local={!isTop}
+                            priority={1}
+                            menu={(
+                                <Button icon small onClick={this.goBackOrOpenMenu}>
+                                    <MenuIcon type="back" />
+                                </Button>
+                            )}
+                            title={stackItem.meta?.title || ''}
+                            actions={stackItem.meta?.actions || []} />
+                    ) : null}
+                    {(!globalMenu && !isBottom) ? (
+                        <div class="page-app-bar-spacer" />
+                    ) : null}
                     <Suspense fallback={
                         <div class="page-loading-indicator">
                             <CircularProgress indeterminate class="page-loading-indicator-inner" />
                         </div>
                     }>
                         <PageComponent
-                            // the page component' key is its path, such that if the
+                            // the page component's key is its path, such that if the
                             // path changes the page component will be re-created.
                             // A lot of detail views aren't equipped to handle the ID of their
                             // item changing.
@@ -645,6 +672,7 @@ export default class Navigation extends PureComponent {
 
             if (isBottom) {
                 bottomPage = itemContents;
+                bottomPageMeta = stackItem.meta;
                 if (stackItem.canPop) {
                     canPopBottomPage = stackItem.path.split('/');
                     canPopBottomPage.pop();
@@ -661,7 +689,7 @@ export default class Navigation extends PureComponent {
         }
 
         let appBarMenuType = null;
-        if (!stackItems.length) {
+        if (!stackItems.length || !globalMenu) {
             // bottom page
             // show menu button if applicable
             appBarMenuType = this.props.permaSidebar ? null : 'menu';
@@ -680,23 +708,42 @@ export default class Navigation extends PureComponent {
         document.title = locale.title(currentTabTitle);
 
         return (
-            <div class="navigation-view">
+            <div class="navigation-view-container">
                 <EventProxy
                     dom target={window}
                     onpopstate={this.onPopState}
                     onbeforeunload={this.onBeforeUnload} />
-                <AppBarProxy
-                    priority={1}
-                    menu={appBarMenu}
-                    title={currentTitle}
-                    actions={currentActions} />
-                <CardStackProvider>
-                    <div class="bottom-page-container">
-                        {bottomPage}
-                    </div>
-                    {stackItems}
-                    <CardStackRenderer class="navigation-card-stack" />
-                </CardStackProvider>
+                {globalMenu ? (
+                    <AppBarConsumer
+                        onData={data => {
+                            this.setPageDirty(!!data?.dirty);
+                        }}
+                        // TODO: use this el for document.title
+                        class="app-header" />
+                ) : null}
+                <div class="navigation-view">
+                    {globalMenu ? (
+                        <AppBarProxy
+                            priority={1}
+                            menu={appBarMenu}
+                            title={currentTitle}
+                            actions={currentActions} />
+                    ) : null}
+                    {!globalMenu ? (
+                        <AppBar
+                            menu={appBarMenu}
+                            title={bottomPageMeta?.title}
+                            actions={bottomPageMeta?.actions}
+                            class="bottom-page-header" />
+                    ) : null}
+                    <CardStackProvider>
+                        <div class="bottom-page-container">
+                            {bottomPage}
+                        </div>
+                        {stackItems}
+                        <CardStackRenderer class="navigation-card-stack" />
+                    </CardStackProvider>
+                </div>
             </div>
         );
     }

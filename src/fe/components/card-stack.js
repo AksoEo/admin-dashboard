@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import './card-stack.less';
 
 const CONTEXT_KEY = 'akso-card-stack-provider';
-const FULL_SCREEN_LAYOUT_MAX_WIDTH = 800;
+export const FULL_SCREEN_LAYOUT_MAX_WIDTH = 1100;
 
 /// Interface between CardStackRenderers and CardStackItems that provides the card stack context.
 export class CardStackProvider extends Component {
@@ -125,7 +125,11 @@ export class CardStackRenderer extends Component {
                         let style;
 
                         if (window.innerWidth <= FULL_SCREEN_LAYOUT_MAX_WIDTH) {
-                            const dx = off >= 0 ? -off * 50 : -off * 100;
+                            // parallax offset at most 50% (when narrow), at least 10% (when wide)
+                            const backDistance = Math.min(0.5, 1.1 - (window.innerWidth / FULL_SCREEN_LAYOUT_MAX_WIDTH));
+                            const dx = off >= 0
+                                ? -off * backDistance * 100
+                                : -off * 100;
                             style = {
                                 transform: `translateX(${dx}%)`,
                             };

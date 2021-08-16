@@ -137,7 +137,7 @@
         }
     }
 
-    .app-contents {
+    .navigation-view-container {
         display: flex;
         flex-direction: column;
         align-items: stretch;
@@ -197,6 +197,19 @@
                 .error-title {
                     margin: 1em;
                 }
+            }
+
+            .local-page-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 201;
+                width: 100%;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+            }
+            .page-app-bar-spacer {
+                height: 56px;
             }
         }
     }
