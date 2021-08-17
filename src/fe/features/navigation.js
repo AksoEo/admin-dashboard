@@ -728,14 +728,13 @@ export default class Navigation extends PureComponent {
                             menu={appBarMenu}
                             title={currentTitle}
                             actions={currentActions} />
-                    ) : null}
-                    {!globalMenu ? (
+                    ) : (
                         <AppBar
                             menu={appBarMenu}
                             title={bottomPageMeta?.title}
                             actions={bottomPageMeta?.actions}
                             class="bottom-page-header" />
-                    ) : null}
+                    )}
                     <CardStackProvider>
                         <div class="bottom-page-container">
                             {bottomPage}

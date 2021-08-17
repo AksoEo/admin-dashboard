@@ -88,7 +88,7 @@ export const OVERVIEW_FIELDS = {
             const { timeFrom, timeTo, location } = item;
             const { tz } = userData;
 
-            const day = moment(timeFrom * 1000).tz(tz).startOf('d');
+            const day = moment(timeFrom * 1000).tz(tz || 'UTC').startOf('d');
             const secondsFrom = moment(timeFrom * 1000).diff(day, 's');
             const secondsTo = moment(timeTo * 1000).diff(day, 's');
 
