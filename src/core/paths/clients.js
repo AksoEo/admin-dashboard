@@ -18,7 +18,13 @@ export const tasks = {
         const opts = { offset, limit };
         if (search && search.query) {
             if (search.field === 'apiKey') {
-                opts.filter = { apiKey: Buffer.from(search.query, 'hex') };
+                try {
+                    const key = Buffer.from(search.query, 'hex');
+                    if (key.length !== 16) throw new Error('invalid length');
+                    opts.filter = { apiKey: key };
+                } catch {
+                    throw { code: 'invalid-api-key', message: 'invalid API key' };
+                }
             } else {
                 const transformedQuery = util.transformSearch(search.query);
                 if (!util.isValidSearch(transformedQuery)) {

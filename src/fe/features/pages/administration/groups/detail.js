@@ -528,7 +528,17 @@ function ClientPicker ({
                 task="clients/list"
                 view="clients/client"
                 search={{ field: 'name', query: search }}
-                jsonFilter={{ apiKey: { $nin: exclude || [] } }}
+                jsonFilter={{
+                    apiKey: {
+                        $nin: (exclude || []).map(id => {
+                            try {
+                                return new Uint8Array(Buffer.from(id, 'hex').buffer);
+                            } catch {
+                                return null;
+                            }
+                        }).filter(x => x),
+                    },
+                }}
                 fields={CLIENT_FIELDS}
                 sorting={{ code: 'asc' }}
                 offset={offset}

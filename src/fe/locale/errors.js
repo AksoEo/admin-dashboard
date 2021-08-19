@@ -28,5 +28,7 @@ export const errors = {
     'payment-exceeds-max': 'Ne eblas krei pagojn por pli ol 500.000 USD',
     // see congresses/createParticipant
     'congresses-already-registered': 'Jam ekzistas aliĝo por tiu ĉi membro',
+    // see clients/list
+    'invalid-api-key': '[[Invalid API key]]',
 };
 
