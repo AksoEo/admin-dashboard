@@ -3,49 +3,14 @@ import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
-import { email } from '../../../../components/data';
 import CSVExport from '../../../../components/csv-export';
 import Meta from '../../../meta';
 import { clients as locale, search as searchLocale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
-import { apiKey } from '../../../../components/data';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
+import { FIELDS } from './fields';
 import './style';
-
-export const FIELDS = {
-    name: {
-        sortable: true,
-        slot: 'title',
-        component ({ value, slot }) {
-            if (slot === 'title') return <b>{value}</b>;
-            return value;
-        },
-        stringify: v => v,
-    },
-    apiKey: {
-        sortable: true,
-        skipLabel: true,
-        component ({ value }) {
-            return <apiKey.inlineRenderer value={value} />;
-        },
-        stringify: v => Buffer.from(v).toString('hex'),
-    },
-    ownerName: {
-        sortable: true,
-        component ({ value }) {
-            return value;
-        },
-        stringify: v => v,
-    },
-    ownerEmail: {
-        sortable: true,
-        component ({ value }) {
-            return <email.inlineRenderer value={value} />;
-        },
-        stringify: v => v,
-    },
-};
 
 export default connectPerms(class Clients extends Page {
     state = {

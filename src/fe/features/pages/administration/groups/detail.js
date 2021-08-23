@@ -7,7 +7,7 @@ import { Button, Dialog, LinearProgress, TextField } from 'yamdl';
 import Tabs from '../../../../components/tabs';
 import Page from '../../../../components/page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
-import { FIELDS as CLIENT_FIELDS } from '../clients/index';
+import { FIELDS as CLIENT_FIELDS } from '../clients/fields';
 import DetailView from '../../../../components/detail';
 import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';

@@ -50,13 +50,6 @@ export const adminGroups = {
 export const clients = {
     title: 'API-klientoj',
     detailTitle: 'API-kliento',
-    add: 'Aldoni API-klienton',
-    addButton: 'Aldoni',
-    update: 'Konservi',
-    updateButton: 'Konservi',
-    delete: 'Forigi API-klienton',
-    deleteButton: 'Forigi',
-    deleteAreYouSure: 'Ĉu vi certas, ke vi volas forigi tiun ĉi API-klienton? Ne eblas malfari tiun ĉi agon.',
     secret: {
         title: 'Sekreta API-ŝlosilo',
         description: 'Tio ĉi estas la sekreta API-ŝlosilo. Konservu ĝin aŭ ĝi estos perdita.',
@@ -80,6 +73,22 @@ export const clients = {
     nameRequired: 'Necesas nomo',
     ownerNameRequired: 'Necesas nomo de posedanto',
     ownerEmailRequired: 'Necesas retpoŝtadreso',
+
+    create: {
+        title: 'Aldoni API-klienton',
+        button: 'Aldoni',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Konservi',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi API-klienton',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi API-klienton? Ne eblas malfari tiun ĉi agon.',
+    },
 
     perms: {
         linkButton: 'Redakti permesojn',

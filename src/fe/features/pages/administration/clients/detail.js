@@ -1,70 +1,14 @@
 import { h } from 'preact';
-import { Button, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailView from '../../../../components/detail';
 import Page from '../../../../components/page';
-import CopyIcon from '../../../../components/copy-icon';
-import { apiKey, email } from '../../../../components/data';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { LinkButton } from '../../../../router';
 import { clients as locale } from '../../../../locale';
+import { FIELDS } from './fields';
 import './detail.less';
-
-const FIELDS = {
-    name: {
-        component ({ value, onChange }) {
-            return (
-                <TextField
-                    value={value}
-                    onChange={e => onChange(e.target.value)} />
-            );
-        },
-        shouldHide: (_, editing) => !editing,
-    },
-    apiKey: {
-        component ({ value }) {
-            return (
-                <div class="api-key-container">
-                    <apiKey.renderer value={value} />
-
-                    {navigator.clipboard && navigator.clipboard.writeText ? (
-                        <Button class="api-key-copy-button" icon small onClick={() => {
-                            const valueString = Buffer.from(value).toString('hex');
-                            navigator.clipboard.writeText(valueString).catch(console.error); // eslint-disable-line no-console
-                            // TODO: create toast
-                        }}>
-                            <CopyIcon style={{ verticalAlign: 'middle' }} />
-                        </Button>
-                    ) : null}
-                </div>
-            );
-        },
-        shouldhide: (_, editing) => editing,
-    },
-    ownerName: {
-        component ({ value, onChange, editing }) {
-            if (!editing) return value;
-            return (
-                <TextField
-                    value={value}
-                    onChange={e => onChange(e.target.value)} />
-            );
-        },
-    },
-    ownerEmail: {
-        component ({ value, onChange, editing }) {
-            if (!editing) return <email.renderer value={value} />;
-            return (
-                <TextField
-                    type="email"
-                    value={value}
-                    onChange={e => onChange(e.target.value)} />
-            );
-        },
-    },
-};
 
 export default connectPerms(class ClientDetailPage extends Page {
     static contextType = coreContext;
@@ -114,7 +58,7 @@ export default connectPerms(class ClientDetailPage extends Page {
 
         if (perms.hasPerm('clients.delete')) {
             actions.push({
-                label: locale.delete,
+                label: locale.delete.menuItem,
                 action: () => this.context.createTask('clients/delete', {}, { id }),
                 overflow: true,
             });
@@ -123,7 +67,7 @@ export default connectPerms(class ClientDetailPage extends Page {
         if (perms.hasPerm('clients.update')) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
-                label: locale.update,
+                label: locale.update.menuItem,
                 action: () => this.props.onNavigate(`/administrado/klientoj/${id}/redakti`, true),
             });
         }
