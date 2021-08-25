@@ -1,6 +1,13 @@
 @import '../../../prelude';
 
 .codeholders-send-notif-template {
+    .cursed-notice {
+        border-radius: 4px;
+        margin: 24px;
+        padding: 8px 16px;
+        background: @text-fade-10;
+    }
+
     .notif-template-picker-loading {
         padding: 24px;
         text-align: center;
@@ -22,6 +29,32 @@
 
             .remove-picked {
                 flex-shrink: 0;
+            }
+        }
+
+        .template-search {
+            display: flex;
+            align-items: center;
+            padding-left: 16px;
+            border-bottom: 1px solid @separator;
+            border-radius: 4px;
+
+            .search-input {
+                font: inherit;
+                color: inherit;
+                background: none;
+                border: none;
+                padding: 16px;
+                flex: 1;
+
+                &:focus {
+                    outline: none;
+                }
+            }
+
+            .simple-focus-ring-idle();
+            &:focus-within {
+                .simple-focus-ring-focused();
             }
         }
     }

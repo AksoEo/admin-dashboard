@@ -42,12 +42,12 @@ export default {
                     selected={task.parameters.base}
                     onSelect={base => {
                         task.update({ base });
-                        if (base === 'raw') task.update({ html: '', text: '' });
+                        if (base === 'raw') task.update({ html: '', text: '', modules: undefined });
                         else if (base === 'inherit') task.update({ modules: [{
                             type: 'text',
                             columns: null,
                             button: null,
-                        }] });
+                        }], html: undefined, text: undefined });
                     }}>
                     {[
                         { id: 'raw', label: locale.bases.raw },

@@ -358,6 +358,7 @@ export const codeholders = {
         menuItem: 'Sendi amasmesaĝon',
         title: 'Sendi amasmesaĝon',
         empty: 'Estas neniuj ŝablonoj kun la celo “membro”',
+        emptyWithQuery: 'Estas neniuj ŝablonoj kun la celo “membro” [[matching your search]]',
         deleteOnComplete: 'Forigi la ŝablonon post sendado',
         send: {
             button: 'Al konfirma paŝo',

@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { PureComponent, useState } from 'preact/compat';
 import { Button } from 'yamdl';
+import SearchIcon from '@material-ui/icons/Search';
 import CloseIcon from '@material-ui/icons/Close';
 import { FIELDS } from '../notif-templates/fields';
 import StaticOverviewList from '../../../components/overview-list-static';
@@ -67,14 +68,26 @@ function TemplatePreview ({ id, onLoadOrg, onRemove }) {
 
 function TemplatePicker ({ onChange }) {
     const [offset, setOffset] = useState(0);
+    const [query, setQuery] = useState('');
 
     return (
         <div class="notif-template-picker-inner">
+            <div class="template-search">
+                <div class="search-icon-container">
+                    <SearchIcon />
+                </div>
+                <input
+                    class="search-input"
+                    placeholder={notifTemplates.search.placeholders.name}
+                    value={query}
+                    onChange={e => setQuery(e.target.value)} />
+            </div>
             <StaticOverviewList
                 task="notifTemplates/list"
                 view="notifTemplates/template"
                 fields={REDUCED_FIELDS}
                 sorting={{ name: 'asc' }}
+                search={{ field: 'name', query }}
                 jsonFilter={{
                     intent: 'codeholder',
                 }}
@@ -85,7 +98,7 @@ function TemplatePicker ({ onChange }) {
                 onItemClick={id => {
                     onChange(id);
                 }}
-                emptyLabel={locale.notifTemplates.empty}
+                emptyLabel={query ? locale.notifTemplates.emptyWithQuery : locale.notifTemplates.empty}
                 compact />
         </div>
     );
