@@ -121,14 +121,15 @@ class AddressEditor extends Component {
                     value={value.countryArea}
                     onChange={onChangeField('countryArea', value => value || null)}
                     items={[{ value: '', label: '—' }].concat(rules.countryAreaChoices
+                        .sort((a, b) => a[1].localeCompare(b[1])) // sort by name
                         .map(([id, area]) => ({
                             value: id,
-                            label: area,
+                            label: `${id} - ${area}`,
                         })))} />
             );
         }
 
-        for (const k of ['city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode']) {
+        for (const k of ['streetAddress', 'city', 'cityArea', 'postalCode', 'sortingCode']) {
             if (!allowedFields.includes(k) || !rmask(k)) continue;
             const isRequired = requiredFields.includes(k);
             const isUpper = upperFields.includes(k);

@@ -619,7 +619,11 @@ class FeeCountryEditor extends Component {
         const addrCountry = this.props.item.address?.country;
         if (addrCountry && this.lastMatchedAddrCountry) {
             if (this.lastMatchedAddrCountry !== addrCountry && !this.state.addrCountryChanged) {
-                this.setState({ addrCountryChanged: true });
+                if (this.props.value === addrCountry) {
+                    this.lastMatchedAddrCountry = addrCountry;
+                } else {
+                    this.setState({ addrCountryChanged: true });
+                }
             } else if (this.lastMatchedAddrCountry === addrCountry && this.state.addrCountryChanged) {
                 this.setState({ addrCountryChanged: false });
             }
