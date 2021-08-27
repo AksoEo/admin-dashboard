@@ -160,6 +160,11 @@ export const codeholders = {
         },
     },
     fieldEditorInsufficientPerms: 'Vi ne havas redaktorajton',
+    countryChangeNotice: {
+        description: '[[You changed the address country. Change the fee country to match?]]',
+        no: '[[Leave it]]',
+        yes: '[[Change it]]',
+    },
     profilePictureHashSome: 'Havas bildon',
     profilePictureHashNone: 'Havas neniun bildon',
     csvFields: {

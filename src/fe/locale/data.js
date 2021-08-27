@@ -32,6 +32,7 @@ export const data = {
         sortingCode: 'Ordigkodo',
     },
     address: {
+        countryEmpty: '([[No country selected]])',
         invalidPostalCode: 'Nevalida poŝtkodo',
     },
     ueaCode: {

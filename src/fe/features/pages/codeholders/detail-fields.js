@@ -26,6 +26,7 @@ import Select from '../../../components/select';
 import LimitedTextField from '../../../components/limited-text-field';
 import RearrangingList from '../../../components/rearranging-list';
 import TinyProgress from '../../../components/tiny-progress';
+import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import { FileIcon } from '../../../components/icons';
 import ProfilePictureEditor from './profile-picture';
 import Publicity from './publicity';
@@ -600,6 +601,76 @@ export class CodeholderAddressRenderer extends Component {
     }
 }
 
+class FeeCountryEditor extends Component {
+    state = {
+        addrCountryChanged: false,
+    };
+
+    lastMatchedAddrCountry = null;
+
+    componentDidMount () {
+        this.updateMatch();
+    }
+    componentDidUpdate () {
+        this.updateMatch();
+    }
+
+    updateMatch () {
+        const addrCountry = this.props.item.address?.country;
+        if (addrCountry && this.lastMatchedAddrCountry) {
+            if (this.lastMatchedAddrCountry !== addrCountry && !this.state.addrCountryChanged) {
+                this.setState({ addrCountryChanged: true });
+            } else if (this.lastMatchedAddrCountry === addrCountry && this.state.addrCountryChanged) {
+                this.setState({ addrCountryChanged: false });
+            }
+        } else if (this.state.addrCountryChanged) {
+            this.setState({ addrCountryChanged: false });
+        }
+
+        if (!this.lastMatchedAddrCountry) {
+            this.lastMatchedAddrCountry = addrCountry;
+        }
+    }
+
+    ignoreCountryChange = () => {
+        this.lastMatchedAddrCountry = this.props.item.address?.country || null;
+        this.setState({ addrCountryChanged: false });
+    };
+    applyCountryChange = () => {
+        this.lastMatchedAddrCountry = this.props.item.address?.country || null;
+        this.props.onChange(this.lastMatchedAddrCountry);
+    };
+
+    render ({ value, editing, onChange }) {
+        if (!editing) return <country.renderer value={value} />;
+
+        return (
+            <div class="fee-country-editor">
+                <country.editor value={value} onChange={onChange} />
+                <DynamicHeightDiv lazy>
+                    {this.state.addrCountryChanged && (
+                        <div class="country-change-notice-container">
+                            <div class="country-change-notice">
+                                <div class="inner-description">
+                                    {locale.countryChangeNotice.description}
+                                </div>
+                                <div class="inner-buttons">
+                                    <Button onClick={this.ignoreCountryChange}>
+                                        {locale.countryChangeNotice.no}
+                                    </Button>
+                                    <Button onClick={this.applyCountryChange}>
+                                        {locale.countryChangeNotice.yes}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </DynamicHeightDiv>
+            </div>
+        );
+    }
+}
+
 function simpleField (component, extra) {
     return {
         component,
@@ -840,7 +911,7 @@ export const fields = {
     }),
     feeCountry: {
         sectionMarkerAbove: locale.fields.sections.location,
-        component: permsEditable('feeCountry', makeDataEditable(country)),
+        component: permsEditable('feeCountry', FeeCountryEditor),
         history: true,
         hasPerm: 'self',
     },

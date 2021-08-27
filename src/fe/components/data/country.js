@@ -38,7 +38,7 @@ function CountryRenderer ({ value }) {
 }
 
 /// Renders a countries dropdown.
-export function CountryEditor ({ value, onChange, disabled }) {
+export function CountryEditor ({ value, onChange, disabled, emptyLabel }) {
     return (
         <div class="data country-editor">
             <WithCountries>
@@ -47,7 +47,7 @@ export function CountryEditor ({ value, onChange, disabled }) {
                         disabled={disabled}
                         value={value}
                         onChange={value => onChange(value || null)}
-                        items={[{ value: '', label: '—' }].concat(Object.entries(countries)
+                        items={[{ value: '', label: emptyLabel || '—' }].concat(Object.entries(countries)
                             .map(([id, names]) => ({
                                 value: id,
                                 label: names.name_eo,
