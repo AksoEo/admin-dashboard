@@ -218,6 +218,7 @@ export const countryLists = {
         name: 'Nomo',
         list: 'Listo',
 
+        listSearch: 'Serĉi landojn',
         listEmpty: 'La listo estas malplena',
         listAddCountry: {
             title: 'Aldoni landon',

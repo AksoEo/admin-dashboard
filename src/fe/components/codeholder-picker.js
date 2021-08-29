@@ -72,6 +72,11 @@ export default class CodeholderPicker extends Component {
         });
     }
 
+    open () {
+        this.setState({ addDialogOpen: true });
+        orderPortalContainerFront();
+    }
+
     render ({ value, onChange, limit, disabled, jsonFilter }, { addDialogOpen }) {
         const canAddMore = !this.props.limit || value.length < this.props.limit;
 
@@ -114,8 +119,7 @@ export default class CodeholderPicker extends Component {
                             onClick={e => {
                                 e.stopPropagation();
                                 e.preventDefault();
-                                this.setState({ addDialogOpen: true });
-                                orderPortalContainerFront();
+                                this.open();
                             }}>
                             <AddIcon style={{ verticalAlign: 'middle' }} />
                         </Button>

@@ -8,6 +8,30 @@
 }
 
 .country-org-list-inner-list {
+    .country-search {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+
+        .search-icon {
+            margin: 0 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: none;
+            color: inherit;
+            border: none;
+            font: inherit;
+            padding: 8px 16px;
+            padding-left: 0;
+
+            &:focus {
+                outline: none;
+            }
+        }
+    }
+
     .empty-notice {
         text-align: center;
         color: @text-fade-60;

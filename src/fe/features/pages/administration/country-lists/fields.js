@@ -46,10 +46,18 @@ export const FIELDS = {
 };
 
 function ListField ({ value, editing, onChange, countries }) {
+    const [search, setSearch] = useState('');
     const [showAddCountry, setShowAddCountry] = useState(false);
+    const [pickers] = useState({});
+
+    const searchResults = search
+        ? fuzzaldrin
+            .filter(Object.keys(value).map(code => ({ code, name: countries[code].name_eo })), search, { key: 'name' })
+            .map(x => x.code)
+        : Object.keys(value);
 
     const entries = [];
-    for (const country of Object.keys(value)) {
+    for (const country of searchResults) {
         entries.push(
             <div class={'country-entry' + (editing ? ' is-editing' : '')} key={country}>
                 {editing ? (
@@ -70,7 +78,7 @@ function ListField ({ value, editing, onChange, countries }) {
                     {editing ? (
                         <CodeholderPicker value={value[country].map(x => '' + x)} onChange={ch => {
                             onChange({ ...value, [country]: ch.map(x => +x) }); // integer ids!
-                        }} jsonFilter={{ codeholderType: 'org' }} />
+                        }} jsonFilter={{ codeholderType: 'org' }} ref={p => pickers[country] = p} />
                     ) : (
                         value[country].map(id => (
                             <Link class="codeholder-item" key={id} outOfTree target={`/membroj/${id}`}>
@@ -94,10 +102,22 @@ function ListField ({ value, editing, onChange, countries }) {
     const onAddCountry = code => {
         onChange({ ...value, [code]: [] });
         setShowAddCountry(false);
+        setTimeout(() => {
+            // show picker after adding
+            pickers[code]?.open();
+        }, 50);
     };
 
     return (
         <div class="country-org-list-inner-list">
+            <div class="country-search">
+                <SearchIcon className="search-icon" />
+                <input
+                    class="search-input"
+                    placeholder={locale.fields.listSearch}
+                    value={search}
+                    onChange={e => setSearch(e.target.value)} />
+            </div>
             <div class="inner-countries">
                 {entries}
                 {editing ? (
