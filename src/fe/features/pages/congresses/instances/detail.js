@@ -346,7 +346,9 @@ function LocationEditor ({ item, onItemChange }) {
             <MapPicker
                 icon={<BusinessIcon />}
                 nullable value={item.locationCoords}
-                onChange={locationCoords => onItemChange({ ...item, locationCoords })} />
+                onChange={locationCoords => onItemChange({ ...item, locationCoords })}
+                address={item.locationAddress}
+                onAddressChange={locationAddress => onItemChange({ ...item, locationAddress })} />
         </div>
     );
 }

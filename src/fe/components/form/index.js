@@ -92,11 +92,6 @@ export default class Form extends Component {
             }}>
                 <form
                     {...this.props}
-                    onKeyDown={e => {
-                        // stop pressing enter from triggering buttons
-                        if (e.key === 'Enter') e.preventDefault();
-                        if (this.props.onKeyDown) this.props.onKeyDown(e);
-                    }}
                     onSubmit={this.onSubmit}>
                     {this.props.children}
                 </form>

@@ -58,6 +58,20 @@ class NavigationStackItem {
     /// arbitrary metadata
     meta = {};
 
+    clone () {
+        const ns = new NavigationStackItem();
+        ns.viewPath = this.viewPath;
+        ns.statePath = this.statePath;
+        ns.match = this.match;
+        ns.matches = this.matches;
+        ns.state = this.state;
+        ns.query = this.query;
+        ns.data = this.data;
+        ns.route = this.route;
+        ns.meta = this.meta;
+        return ns;
+    }
+
     get fullPath () {
         return this.viewPath + (this.statePath !== '/' ? this.statePath : '');
     }
@@ -330,6 +344,18 @@ export default class Navigation extends PureComponent {
     #debouncedNavigateTimeout;
     #debouncedNavArgs;
 
+    // because using this.state and this.setState is asynchronous, this may lead to weird bugs where
+    // navigation state is changed at the same time but only one of those changes is retained.
+    // this is a wrapper around react state to allow for nav state to be read and written coherently
+    #pendingNavState;
+    getNavState () {
+        return this.#pendingNavState || this.state.state;
+    }
+    setNavState (state, then) {
+        this.#pendingNavState = state;
+        this.setState({ state }, then);
+    }
+
     readStateFromURL (href, historyState, pushOutOfTree) {
         if (this.state.error && ENABLE_FORCE_RELOAD) {
             try {
@@ -345,7 +371,7 @@ export default class Navigation extends PureComponent {
             window.location = href;
         }
 
-        const state = this.state.state.clone();
+        const state = this.getNavState().clone();
 
         // resolve url
         // note that currentFullURL is not equal to document.location.href since the
@@ -367,7 +393,7 @@ export default class Navigation extends PureComponent {
         const forceReplace = false; // FIXME: this appears to be broken
 
         return new Promise(resolve => {
-            this.setState({ state }, () => {
+            this.setNavState(state, () => {
                 this.props.onCurrentPageChange(this.state.state.currentPageId);
                 resolve(forceReplace);
             });
@@ -375,7 +401,7 @@ export default class Navigation extends PureComponent {
     }
 
     writeStateToURL (replace) {
-        this.props.onCurrentPageChange(this.state.state.currentPageId);
+        this.props.onCurrentPageChange(this.getNavState().currentPageId);
 
         if (replace) {
             this.scheduleSaveState();
@@ -413,7 +439,7 @@ export default class Navigation extends PureComponent {
 
     /// Called when a page changes its query.
     onQueryChange (stackIndex, newQuery) {
-        const state = this.state.state.clone();
+        const state = this.getNavState().clone();
         if (state.stack[stackIndex].query !== newQuery) {
             state.stack[stackIndex].query = newQuery;
             this.stateIsDirty = true;
@@ -421,21 +447,19 @@ export default class Navigation extends PureComponent {
             const isTopView = stackIndex === state.stack.length - 1;
 
             state.updateLocation();
-            this.setState({ state }, () => {
-                if (isTopView) {
-                    // write to URL
-                    this.setState({ state }, () => this.writeStateToURL(true));
-                } else {
-                    // just save to state
-                    this.setState({ state }, () => this.scheduleSaveState());
-                }
-            });
+            if (isTopView) {
+                // write to URL
+                this.setNavState(state, () => this.writeStateToURL(true));
+            } else {
+                // just save to state
+                this.setNavState(state, () => this.scheduleSaveState());
+            }
         }
     }
 
     /// Replaces all stack items above the given index with the given path.
     pushStackAt (stackIndex, path, replace) {
-        const state = this.state.state.clone();
+        const state = this.getNavState().clone();
         state.stack.splice(stackIndex + 1);
         state.stack[state.stack.length - 1].statePath = '/'; // legacy behavior
         state.updateLocation();
@@ -446,10 +470,10 @@ export default class Navigation extends PureComponent {
     /// Removes all stack items at and above the given index.
     popStackAt (stackIndex, replace) {
         if (this.promptCancelNavigationSync()) return;
-        const state = this.state.state.clone();
+        const state = this.getNavState().clone();
         state.stack.splice(stackIndex);
         state.updateLocation();
-        this.setState({ state }, () => {
+        this.setNavState(state, () => {
             this.stateIsDirty = true;
             this.writeStateToURL(replace);
         });
@@ -457,25 +481,25 @@ export default class Navigation extends PureComponent {
 
     popStackState (stackIndex, stateKey, replace) {
         if (this.promptCancelNavigationSync()) return;
-        const state = this.state.state.clone();
+        const state = this.getNavState().clone();
         state.stack.splice(stackIndex + 1);
         state.stack[stackIndex].popState(stateKey);
         state.updateLocation();
-        this.setState({ state }, () => {
+        this.setNavState(state, () => {
             this.stateIsDirty = true;
             this.writeStateToURL(replace);
         });
     }
 
     goBackOrOpenMenu = () => {
-        const state = this.state.state.clone();
+        const state = this.getNavState().clone();
         if (state.stack.length === 1) {
             this.props.onOpenMenu();
             return;
         }
         state.stack.pop();
         state.updateLocation();
-        this.setState({ state }, () => {
+        this.setNavState(state, () => {
             this.stateIsDirty = true;
             this.writeStateToURL();
         });
@@ -491,9 +515,9 @@ export default class Navigation extends PureComponent {
 
     serializeState () {
         return {
-            stack: this.state.state.stack
+            stack: this.getNavState().stack
                 .map(item => ({ viewPath: item.viewPath, data: item.data, query: item.query })),
-            href: this.state.state.fullLocation,
+            href: this.getNavState().fullLocation,
         };
     }
 
@@ -503,7 +527,7 @@ export default class Navigation extends PureComponent {
             // only save while we don’t have an error
             this.stateIsDirty = false;
             try {
-                window.history.replaceState(this.serializeState(), '', this.state.state.urlLocation);
+                window.history.replaceState(this.serializeState(), '', this.getNavState().urlLocation);
             } catch {
                 // shrug
             }
@@ -620,8 +644,10 @@ export default class Navigation extends PureComponent {
             const PageComponent = stackItem.route.component;
             const itemContents = (
                 <MetaProvider onUpdate={({ title, actions }) => {
-                    stackItem.meta = { title, actions };
-                    this.forceUpdate();
+                    const state = this.getNavState().clone();
+                    state.stack[i] = state.stack[i].clone();
+                    state.stack[i].meta = { title, actions };
+                    this.setNavState(state);
                 }}>
                     {(!globalMenu && !isBottom && isTop) ? (
                         <AppBarConsumer
