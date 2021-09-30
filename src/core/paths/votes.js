@@ -160,9 +160,7 @@ const clientFields = {
                 vote.mentionThresholdInclusive = !!value.mentionThresholdInclusive;
             }
             if (item.type === 'tm') {
-                vote.maxOptionsPerBallot = Number.isFinite(+value.maxOptionsPerBallot)
-                    ? +vote.maxOptionsPerBallot
-                    : vote.maxOptionsPerBallot;
+                vote.maxOptionsPerBallot = value.maxOptionsPerBallot || null;
             }
             if (item.type === 'rp' || item.type === 'stv') {
                 vote.tieBreakerCodeholder = value.tieBreakerCodeholder;

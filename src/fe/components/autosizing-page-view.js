@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import { Spring } from 'yamdl';
+import { layoutContext } from './dynamic-height-div';
 import './autosizing-page-view.less';
 const lerp = (a, b, x) => (b - a) * x + a;
 
@@ -157,12 +158,14 @@ export default class AutosizingPageView extends Component {
         }
 
         return (
-            <div
-                class={'autosizing-page-view' + (mayOverflow ? ' may-overflow' : '')
-                    + (this.props.alwaysOverflow ? ' always-overflow' : '')}
-                style={{ height, minHeight }}>
-                {children}
-            </div>
+            <layoutContext.Provider value={() => this.updatePageHeights()}>
+                <div
+                    class={'autosizing-page-view' + (mayOverflow ? ' may-overflow' : '')
+                        + (this.props.alwaysOverflow ? ' always-overflow' : '')}
+                    style={{ height, minHeight }}>
+                    {children}
+                </div>
+            </layoutContext.Provider>
         );
     }
 }

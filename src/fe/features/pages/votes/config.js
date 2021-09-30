@@ -88,9 +88,9 @@ export function viewerCodeholdersMemberFilter ({ value, onChange, editing }) {
     );
 }
 
-export function timeStart ({ value, onChange, editing, item }) {
+const timeBound = (isStart) => function TimeBoundEditor ({ value, onChange, editing, item }) {
     if (!editing) return <timestamp.renderer value={value} />;
-    if (item.state.isActive) return locale.cannotEditActive;
+    if (isStart && item.state.isActive) return locale.cannotEditActive;
     return (
         <Validator
             component={timestamp.editor}
@@ -102,8 +102,9 @@ export function timeStart ({ value, onChange, editing, item }) {
                 }
             }} />
     );
-}
-export const timeEnd = timeStart;
+};
+export const timeStart = timeBound(true);
+export const timeEnd = timeBound(false);
 
 function bool ({ value, onChange, editing }) {
     if (!editing) {
@@ -250,9 +251,9 @@ export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
             type="number"
             value={value || ''}
             placeholder={locale.config.noMaxOptions}
-            onChange={e => onChange(e.target.value || null)}
+            onChange={e => onChange(+e.target.value || null)}
             validate={value => {
-                if (!Number.isFinite(+value)) {
+                if (!Number.isFinite(value)) {
                     throw { error: locale.numberRequired };
                 }
             }} />
@@ -265,7 +266,7 @@ export function tieBreakerCodeholder ({ value, onChange, editing }) {
         <Validator
             component={CodeholderPicker}
             value={[value].filter(x => x !== null)}
-            onChange={value => onChange(value[0] || null)}
+            onChange={value => onChange(+value[0] || null)}
             validate={() => {
                 if (value === null) {
                     throw { error: true };
@@ -314,7 +315,7 @@ export const options = class OptionsEditor extends Component {
                         value={[item.codeholderId || null].filter(x => x !== null)}
                         onChange={items => {
                             const newValue = [...value];
-                            newValue[index] = { ...item, codeholderId: items[0] || null };
+                            newValue[index] = { ...item, codeholderId: +items[0] || null };
                             onChange(newValue);
                         }} />
                 );

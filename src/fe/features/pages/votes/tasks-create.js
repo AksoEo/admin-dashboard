@@ -396,11 +396,11 @@ export default function makeCreateTask (isTemplate) {
                     this.setState({ page: i + 1 });
                 };
                 const nextButton = isLast ? (
-                    <Button raised disabled={task.running}>
+                    <Button raised disabled={task.running} type="submit">
                         {locale.create.button}
                     </Button>
                 ) : (
-                    <Button raised>
+                    <Button raised type="submit">
                         {locale.create.continue}
                     </Button>
                 );

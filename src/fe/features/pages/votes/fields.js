@@ -88,7 +88,7 @@ export default {
         sortable: true,
         component ({ value, onChange, editing, item }) {
             if (!value) return;
-            if (editing && item && item.state && item.state.isActive) return locale.cannotEditActive;
+
             return (
                 <span class="vote-timespan">
                     <TimeStart value={value.start} onChange={start => onChange({ ...value, start })} editing={editing} item={item} />
