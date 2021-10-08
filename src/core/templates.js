@@ -93,10 +93,10 @@ export function crudGet ({
     return async (options) => {
         const client = await asyncClient;
         const res = await client.get(apiPath(options), { fields });
-        const path = storePath(options);
+        const path = storePath(options, res.body);
         const existing = store.get(path);
         const data = res.body;
-        if (map) map(data);
+        if (map) map(data, options);
         store.insert(path, deepMerge(existing, data));
         return res.body;
     };
@@ -150,6 +150,7 @@ export function getRawFile ({
 export function simpleDataView ({
     storePath,
     get,
+    canBeLazy,
 }) {
     return class SimpleDataView extends AbstractDataView {
         constructor (options, params) {
@@ -160,7 +161,7 @@ export function simpleDataView ({
             const current = store.get(this.path);
             if (current) setImmediate(this.#onUpdate);
 
-            if (get && !options.noFetch) {
+            if (get && !options.noFetch && !(canBeLazy && current)) {
                 get(options, params).catch(err => this.emit('error', err));
             }
         }

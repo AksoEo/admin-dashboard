@@ -24,6 +24,7 @@ export const pages = {
     ch: 'Membroj',
     codeholders: 'Membroj',
     'change-requests': 'Ŝanĝopetoj',
+    delegations: 'Delegitoj',
     statistics: 'Statistiko',
     membership: 'Membreco',
     'membership-categories': 'Kategorioj',

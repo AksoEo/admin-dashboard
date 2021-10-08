@@ -468,6 +468,27 @@ export default [
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholders.change_requests.read'),
                             },
+                            {
+                                path: 'delegitoj',
+                                type: 'state',
+                                hasPerm: perms => perms.hasPerm('codeholders.delegations.read.uea'),
+                                paths: [
+                                    {
+                                        match: /^(\w+)$/,
+                                        matchKey: 'org',
+                                        component: elazy(() =>
+                                            import(/* webpackChunkName: "delegates" */ './delegations/delegates/detail')),
+                                        type: 'stack',
+                                        paths: [
+                                            {
+                                                path: 'redakti',
+                                                type: 'state',
+                                                state: 'editing',
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
                         ],
                     },
                     {
@@ -535,13 +556,13 @@ export default [
                 icon: ListsIcon,
                 path: 'listoj',
                 component: elazy(() =>
-                    import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists')),
+                    import(/* webpackChunkName: "lists" */ './lists')),
                 paths: [
                     {
                         match: /^(\d+)$/,
                         matchKey: 'list',
                         component: elazy(() =>
-                            import(/* webpackChunkName: "lists", webpackPrefetch: true */ './lists/detail')),
+                            import(/* webpackChunkName: "lists" */ './lists/detail')),
                         type: 'stack',
                         paths: [
                             {
@@ -553,6 +574,14 @@ export default [
                     },
                 ],
                 hasPerm: perms => perms.hasPerm('lists.read'),
+            },
+            {
+                id: 'delegations',
+                icon: ListsIcon,
+                path: 'delegitoj',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "delegates" */ './delegations/delegates')),
+                hasPerm: perms => perms.hasPerm('codeholders.read') && perms.hasPerm('codeholders.delegations.read.uea'),
             },
             {
                 id: 'statistics',

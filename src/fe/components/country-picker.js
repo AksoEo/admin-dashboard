@@ -10,6 +10,7 @@ import './country-picker.less';
 /// # Props
 /// - value/onChange: array of strings
 /// - hideGroups: if false, will hide country groups
+/// - shouldHideItem: (id) => bool will hide individual items
 /// - hidden: if true, will disable tab focusing
 export default function CountryPicker (props) {
     return (
@@ -24,11 +25,12 @@ export default function CountryPicker (props) {
     );
 }
 
-function CountryPickerInnerComponent ({ countries, countryGroups, value, onChange, hideGroups, hidden }) {
-    const items = (hideGroups ? [] : Object.keys(countryGroups)).concat(Object.keys(countries));
+function CountryPickerInnerComponent ({ countries, countryGroups, value, onChange, hideGroups, shouldHideItem, hidden }) {
+    const items = (hideGroups ? [] : Object.keys(countryGroups)).concat(Object.keys(countries))
+        .filter(id => !shouldHideItem || !shouldHideItem(id));
     const itemName = id => {
         if (id in countries) return countries[id].name_eo;
-        return countryGroups[id].name;
+        return countryGroups[id]?.name;
     };
     const renderPreviewItem = ({ id }) => {
         if (id in this.props.countries) {
@@ -55,6 +57,8 @@ function CountryPickerInnerComponent ({ countries, countryGroups, value, onChang
         renderPreviewItem={renderPreviewItem}
         itemName={itemName}
         renderItemContents={renderItemContents}
-        title={locale.countryPicker.dialogTitle}
+        title={hideGroups
+            ? locale.countryPicker.dialogTitleNoGroups
+            : locale.countryPicker.dialogTitle}
         disabled={hidden} />;
 }

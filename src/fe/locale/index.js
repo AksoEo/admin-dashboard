@@ -33,6 +33,7 @@ export * from './login';
 export * from './app';
 export * from './codeholders';
 export * from './congresses';
+export * from './delegations';
 export * from './memberships';
 export * from './magazines';
 export * from './notif-templates';

@@ -66,6 +66,7 @@ export const data = {
         fee: 'paglando',
         address: 'loĝlando',
         dialogTitle: 'Elekti land(ar)ojn',
+        dialogTitleNoGroups: 'Elekti landojn',
     },
     largeMultiSelect: {
         search: 'Serĉi…',
@@ -205,6 +206,9 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
     membershipChip: {
         lifetime: 'dumviva',
         givesMembership: 'membrecdona',
+    },
+    geoDb: {
+        nativeLabelMissing: '[[No native label]]',
     },
 };
 

@@ -20,6 +20,7 @@ import {
     data as dataLocale,
     detail as detailLocale,
     codeholderChgReqs as chgReqLocale,
+    delegations as delegationsLocale,
 } from '../../../locale';
 import { FileThumbnail, FileSize, Mime } from '../../../components/files';
 import './style';
@@ -432,6 +433,7 @@ export default {
     },
 
     updateChangeRequest: updateDialog({ locale: chgReqLocale.update, fields: chgReqLocale.fields }),
+    setDelegations: updateDialog({ locale: delegationsLocale.update, fields: delegationsLocale.fields }),
 };
 
 class NotifTemplateMessage extends PureComponent {

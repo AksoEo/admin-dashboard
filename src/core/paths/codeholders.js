@@ -61,6 +61,7 @@ export const CODEHOLDERS = 'codeholders';
 export const CODEHOLDER_PERMS = 'codeholderPerms';
 export const CODEHOLDER_FILES = 'codeholderFiles';
 export const CODEHOLDER_CHGREQS = 'codeholderChgReqs';
+export const CODEHOLDER_DELEGATIONS = 'codeholderDelegations';
 
 // signals
 export const SIG_CODEHOLDERS = '!codeholders';
@@ -1423,6 +1424,67 @@ export const tasks = {
         apiPath: ({ id }) => `/codeholders/change_requests/${id}`,
         storePath: ({ id }) => [CODEHOLDER_CHGREQS, id],
     }),
+
+    listDelegations: crudList({
+        apiPath: ({ id }) => `/codeholders/${id}/delegations`,
+        fields: [
+            'codeholderId',
+            'org',
+            'approvedBy',
+            'approvedTime',
+            'cities',
+            'countries',
+            'subjects',
+            'hosting.maxDays',
+            'hosting.maxPersons',
+        ],
+        storePath: ({ id }, item) => [CODEHOLDER_DELEGATIONS, id, item.org],
+        map: item => {
+            item.id = item.codeholderId + '~' + item.org;
+        },
+    }),
+    delegations: crudGet({
+        apiPath: ({ id, org }) => `/codeholders/${id}/delegations/${org}`,
+        fields: [
+            'org',
+            'approvedBy',
+            'approvedTime',
+            'cities',
+            'countries',
+            'subjects',
+            'hosting.maxDays',
+            'hosting.maxPersons',
+            'hosting.description',
+            'hosting.psProfileURL',
+            'tos.docDataProtectionUEA',
+            'tos.docDataProtectionUEATime',
+            'tos.docDelegatesUEA',
+            'tos.docDelegatesUEATime',
+            'tos.docDelegatesDataProtectionUEA',
+            'tos.docDelegatesDataProtectionUEATime',
+            'tos.paperAnnualBook',
+            'tos.paperAnnualBookTime',
+        ],
+        storePath: ({ id }, item) => [CODEHOLDER_DELEGATIONS, id, item.org],
+        map: (item, { id }) => {
+            item.codeholderId = id;
+        },
+    }),
+    setDelegations: async ({ id, org }, delegations) => {
+        const client = await asyncClient;
+        const obj = { ...delegations };
+        delete obj.org;
+        delete obj.codeholderId;
+        delete obj.approvedBy;
+        delete obj.approvedTime;
+        await client.put(`/codeholders/${id}/delegations/${org}`, obj);
+        store.insert([CODEHOLDER_DELEGATIONS, id, org], delegations);
+    },
+    deleteDelegations: async ({ id, org }) => {
+        const client = await asyncClient;
+        await client.delete(`/codeholders/${id}/delegations/${org}`);
+        store.remove([CODEHOLDER_DELEGATIONS, id, org]);
+    },
 };
 
 const CODEHOLDER_FETCH_BATCH_TIME = 50; // ms
@@ -1609,6 +1671,11 @@ export const views = {
     changeRequest: simpleDataView({
         storePath: ({ id }) => [CODEHOLDER_CHGREQS, id],
         get: tasks.changeRequest,
+    }),
+
+    delegation: simpleDataView({
+        storePath: ({ id, org }) => org ? [CODEHOLDER_DELEGATIONS, id, org] : [CODEHOLDER_DELEGATIONS, ...id.split('~')],
+        get: tasks.delegations,
     }),
 
     /// codeholders/sigCodeholders: observes codeholders for client-side changes

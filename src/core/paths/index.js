@@ -28,7 +28,9 @@ const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpac
 const congresses = () => import(/* webpackChunkName: 'core-congresses' */ './congresses');
 const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
 const countryLists = () => import(/* webpackChunkName: 'core-country-lists' */ './country-lists');
+const delegations = () => import(/* webpackChunkName: 'core-delegations' */ './delegations');
 const adminGroups = () => import(/* webpackChunkName: 'core-admin' */ './admin-groups');
+const geoDb = () => import(/* webpackChunkName: 'core-geo-db' */ './geo-db');
 const httpLog = () => import(/* webpackChunkName: 'core-admin' */ './http-log');
 const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './login');
 const lists = () => import(/* webpackChunkName: 'core-lists' */ './lists');
@@ -55,7 +57,9 @@ export const tasks = {
     congresses: lazyPath(congresses, mapTasks),
     countries: lazyPath(countries, mapTasks),
     countryLists: lazyPath(countryLists, mapTasks),
+    delegations: lazyPath(delegations, mapTasks),
     adminGroups: lazyPath(adminGroups, mapTasks),
+    geoDb: lazyPath(geoDb, mapTasks),
     httpLog: lazyPath(httpLog, mapTasks),
     login: lazyPath(login, mapTasks),
     lists: lazyPath(lists, mapTasks),
@@ -78,7 +82,9 @@ export const views = {
     congresses: lazyPath(congresses, mapViews),
     countries: lazyPath(countries, mapViews),
     countryLists: lazyPath(countryLists, mapViews),
+    delegations: lazyPath(delegations, mapViews),
     adminGroups: lazyPath(adminGroups, mapViews),
+    geoDb: lazyPath(geoDb, mapViews),
     httpLog: lazyPath(httpLog, mapViews),
     login: lazyPath(login, mapViews),
     lists: lazyPath(lists, mapViews),
