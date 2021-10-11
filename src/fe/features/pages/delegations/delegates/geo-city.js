@@ -10,11 +10,14 @@ export default connect(
     ({ id }) => ['geoDb/city', { id }],
     ['id']
 )((data, _, err) => ({ data, err }))(class GeoCity extends PureComponent {
-    render ({ data, err }) {
+    render ({ data, err, ...extra }) {
         if (err) return <ErrorIcon style={{ verticalAlign: 'middle' }}/>;
         if (!data) return <TinyProgress />;
+
+        extra.class = (extra.class || '') + ' geo-city';
+
         return (
-            <span class="geo-city" title={`WikiData ${data.id}`}>
+            <span title={`WikiData ${data.id}`} {...extra}>
                 {data.nativeLabel ? (
                     <span class="native-label">
                         {data.nativeLabel}

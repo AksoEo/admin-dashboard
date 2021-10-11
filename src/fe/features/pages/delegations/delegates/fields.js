@@ -1,29 +1,52 @@
 import { h } from 'preact';
-import { TextField } from 'yamdl';
+import { useState, useEffect } from 'preact/compat';
+import { Button, Checkbox, TextField } from 'yamdl';
+import RemoveIcon from '@material-ui/icons/Remove';
 import OrgIcon from '../../../../components/org-icon';
 import { CountryFlag } from '../../../../components/data/country';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { country, timestamp } from '../../../../components/data';
 import CountryPicker from '../../../../components/country-picker';
+import CodeholderPicker from '../../../../components/codeholder-picker';
+import Segmented from '../../../../components/segmented';
 import { Validator } from '../../../../components/form';
 import Select from '../../../../components/select';
 import TextArea from '../../../../components/text-area';
-import { delegations as locale } from '../../../../locale';
+import { delegations as locale, delegationSubjects as subjectsLocale } from '../../../../locale';
 import GeoCity from './geo-city';
 import Subject from './subject';
+import CityPicker from './city-picker';
+import SubjectPicker from '../subjects/subject-picker';
 
 export const FIELDS = {
     org: {
         sortable: true,
         weight: 0.3,
         slot: 'icon',
-        component: ({ value }) => <OrgIcon org={value} />,
+        component ({ value, editing, onChange, slot }) {
+            if (slot === 'create' && editing) {
+                return (
+                    <Segmented selected={value} onSelect={onChange}>
+                        {['uea'].map(id => ({ id, label: <OrgIcon org={id} /> }))}
+                    </Segmented>
+                );
+            }
+            return <OrgIcon org={value} />;
+        },
     },
     codeholderId: {
         sortable: true,
         weight: 0.3,
         slot: 'title',
-        component ({ value }) {
+        component ({ value, editing, onChange, slot }) {
+            if (slot === 'create' && editing) {
+                return (
+                    <CodeholderPicker
+                        value={value ? [value] : []}
+                        onChange={v => onChange(v[0] || null)}
+                        limit={1} />
+                );
+            }
             if (!value) return '—';
             return <IdUEACode id={value} />;
         },
@@ -53,11 +76,43 @@ export const FIELDS = {
         },
     },
     cities: {
-        component ({ value }) {
-            if (!value) return null;
+        component ({ value, editing, onChange }) {
+            const [pickerOpen, setPickerOpen] = useState(false);
+            if (!value && !editing) return null;
+            if (!value) value = [];
+
+            const removeCity = id => {
+                const newValue = [...value];
+                newValue.splice(newValue.indexOf(id), 1);
+                onChange(newValue);
+            };
+
             return (
                 <div class="delegation-cities">
-                    {value.map(id => <GeoCity key={id} id={id} />)}
+                    {value.map(id => (
+                        <div class={'delegation-city' + (editing ? ' is-editing' : '')} key={id}>
+                            {editing ? (
+                                <div class="city-remove-container">
+                                    <Button clas="remove-button" icon small onClick={() => removeCity(id)}>
+                                        <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                                    </Button>
+                                </div>
+                            ) : null}
+                            <GeoCity class="inner-city" id={id} />
+                        </div>
+                    ))}
+
+                    {editing ? (
+                        <div class="cities-editing">
+                            <Button class="pick-button" onClick={() => setPickerOpen(true)}>{locale.cityPicker.pick}</Button>
+                            <CityPicker
+                                value={value}
+                                onChange={onChange}
+                                limit={10}
+                                open={pickerOpen}
+                                onClose={() => setPickerOpen(false)} />
+                        </div>
+                    ) : null}
                 </div>
             );
         },
@@ -66,6 +121,7 @@ export const FIELDS = {
         component ({ value, editing, onChange, item, userData }) {
             if (editing) {
                 const hasPerm = p => !userData?.hasPerm || userData.hasPerm(p);
+                if (!value) value = [];
 
                 return (
                     <div class="delegation-countries is-editing">
@@ -123,12 +179,26 @@ export const FIELDS = {
         },
     },
     subjects: {
-        component ({ value }) {
-            if (!value) return null;
+        component ({ value, editing, onChange }) {
+            const [pickerOpen, setPickerOpen] = useState(false);
+
+            if (!value && !editing) return null;
+            if (!value) value = [];
 
             return (
                 <div class="delegation-subjects">
                     {value.map(id => <Subject key={id} id={id} />)}
+                    {editing ? (
+                        <Button onClick={() => setPickerOpen(true)}>
+                            {subjectsLocale.picker.pick}
+                            <SubjectPicker
+                                value={value}
+                                onChange={onChange}
+                                open={pickerOpen}
+                                onClose={() => setPickerOpen(false)}
+                                limit={50} />
+                        </Button>
+                    ) : null}
                 </div>
             );
         },
@@ -188,6 +258,7 @@ export const FIELDS = {
                             <Validator
                                 component={TextField}
                                 validate={value => {
+                                    if (!value) return;
                                     if (!value.match(/^https:\/\/www\.pasportaservo\.org\/ejo\/\d+\/?$/)) {
                                         throw { error: locale.hosting.psProfileURLInvalid };
                                     }
@@ -206,5 +277,68 @@ export const FIELDS = {
             );
         },
         isEmpty: value => !value || !Object.values(value).find(x => x),
+    },
+    tos: {
+        component ({ value, editing, onChange }) {
+            const required = [
+                'docDataProtectionUEA',
+                'docDelegatesUEA',
+                'docDelegatesDataProtectionUEA',
+            ];
+            const fieldNames = [
+                ...required,
+                'paperAnnualBook',
+            ];
+
+            if (!value) value = {};
+
+            useEffect(() => {
+                if (editing) {
+                    const newValue = { ...value };
+                    let changed = false;
+                    for (const fieldName of fieldNames) {
+                        if (required.includes(fieldName) && !newValue[fieldName]) {
+                            newValue[fieldName] = true;
+                            changed = true;
+                        }
+                    }
+                    if (changed) onChange(newValue);
+                }
+            });
+
+            const fields = [];
+            for (const fieldName of fieldNames) {
+                const checkboxId = 'tosf-' + Math.random().toString(36);
+                fields.push(
+                    <div class="tos-field" key={fieldName}>
+                        <div class="field-checkbox">
+                            <label for={checkboxId}>{locale.tos[fieldName]}</label>
+                            <Checkbox
+                                id={checkboxId}
+                                checked={value[fieldName]}
+                                onChange={checked => {
+                                    if (!editing) return;
+                                    onChange({
+                                        ...value,
+                                        [fieldName]: checked,
+                                        [fieldName + 'Time']: Math.floor(Date.now() / 1000),
+                                    });
+                                }}
+                                disabled={required.includes(fieldName)} />
+                        </div>
+                        <div class="field-time">
+                            <label>{locale.tos.fieldTime}</label>
+                            <timestamp.renderer value={value[fieldName + 'Time']} />
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div class="delegation-tos">
+                    {fields}
+                </div>
+            );
+        },
     },
 };

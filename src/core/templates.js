@@ -36,7 +36,7 @@ export function crudList ({
         if (withApiOptions) withApiOptions(apiOptions, options);
         const res = await client.get(apiPath(options), apiOptions);
         for (const item of res.body) {
-            if (map) map(item);
+            if (map) map(item, options);
             const existing = store.get(storePath(options, item));
             store.insert(storePath(options, item), deepMerge(existing, item));
         }

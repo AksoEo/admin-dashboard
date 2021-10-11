@@ -44,11 +44,11 @@ export const tasks = {
         signalPath: () => [DELEGATION_SUBJECTS, SIG_SUBJECTS],
     }),
     updateSubject: crudUpdate({
-        apiPath: ({ id }) => `/delegates/subjects/${id}`,
+        apiPath: ({ id }) => `/delegations/subjects/${id}`,
         storePath: ({ id }) => [DELEGATION_SUBJECTS, id],
     }),
     deleteSubject: crudDelete({
-        apiPath: ({ id }) => `/delegates/subjects/${id}`,
+        apiPath: ({ id }) => `/delegations/subjects/${id}`,
         storePath: ({ id }) => [DELEGATION_SUBJECTS, id],
         signalPath: () => [DELEGATION_SUBJECTS, SIG_SUBJECTS],
     }),

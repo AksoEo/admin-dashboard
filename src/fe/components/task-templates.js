@@ -20,7 +20,9 @@ export function createDialog ({ locale, fieldNames, fields: fieldDefs, className
                     <Component
                         slot="create"
                         editing value={task.parameters[id]}
-                        onChange={value => task.update({ [id]: value })} />
+                        onChange={value => task.update({ [id]: value })}
+                        item={task.parameters}
+                        onItemChange={item => task.update(item)} />
                 </Field>
             );
         });

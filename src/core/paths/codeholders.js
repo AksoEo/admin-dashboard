@@ -1428,7 +1428,6 @@ export const tasks = {
     listDelegations: crudList({
         apiPath: ({ id }) => `/codeholders/${id}/delegations`,
         fields: [
-            'codeholderId',
             'org',
             'approvedBy',
             'approvedTime',
@@ -1439,7 +1438,8 @@ export const tasks = {
             'hosting.maxPersons',
         ],
         storePath: ({ id }, item) => [CODEHOLDER_DELEGATIONS, id, item.org],
-        map: item => {
+        map: (item, { id }) => {
+            item.codeholderId = id;
             item.id = item.codeholderId + '~' + item.org;
         },
     }),
@@ -1473,12 +1473,24 @@ export const tasks = {
     setDelegations: async ({ id, org }, delegations) => {
         const client = await asyncClient;
         const obj = { ...delegations };
+        delete obj.id;
         delete obj.org;
         delete obj.codeholderId;
         delete obj.approvedBy;
         delete obj.approvedTime;
         await client.put(`/codeholders/${id}/delegations/${org}`, obj);
         store.insert([CODEHOLDER_DELEGATIONS, id, org], delegations);
+    },
+    // virtual task for task dialog
+    createDelegations: async (_, delegations) => {
+        const { codeholderId: id, org } = delegations;
+        try {
+            await tasks.delegations({ id, org });
+            throw { code: 'object-exists', message: 'delegations already exist' };
+        } catch (err) {
+            if (err.statusCode !== 404) throw err;
+        }
+        return await tasks.setDelegations({ id, org }, delegations);
     },
     deleteDelegations: async ({ id, org }) => {
         const client = await asyncClient;

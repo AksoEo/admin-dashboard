@@ -470,24 +470,10 @@ export default [
                             },
                             {
                                 path: 'delegitoj',
-                                type: 'state',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "delegates" */ './delegations/delegates')),
+                                type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholders.delegations.read.uea'),
-                                paths: [
-                                    {
-                                        match: /^(\w+)$/,
-                                        matchKey: 'org',
-                                        component: elazy(() =>
-                                            import(/* webpackChunkName: "delegates" */ './delegations/delegates/detail')),
-                                        type: 'stack',
-                                        paths: [
-                                            {
-                                                path: 'redakti',
-                                                type: 'state',
-                                                state: 'editing',
-                                            },
-                                        ],
-                                    },
-                                ],
                             },
                         ],
                     },
@@ -582,6 +568,52 @@ export default [
                 component: elazy(() =>
                     import(/* webpackChunkName: "delegates" */ './delegations/delegates')),
                 hasPerm: perms => perms.hasPerm('codeholders.read') && perms.hasPerm('codeholders.delegations.read.uea'),
+                paths: [
+                    {
+                        path: 'fakoj',
+                        type: 'stack',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "delegates" */ './delegations/subjects')),
+                        paths: [
+                            {
+                                match: /^(\d+)$/,
+                                matchKey: 'subject',
+                                type: 'stack',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "delegates" */ './delegations/subjects/detail')),
+                                paths: [
+                                    {
+                                        path: 'redakti',
+                                        type: 'state',
+                                        state: 'editing',
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        match: /^(\d+)$/,
+                        matchKey: 'codeholder',
+                        type: 'state',
+                        state: 'codeholder',
+                        paths: [
+                            {
+                                match: /^(\w+)$/,
+                                matchKey: 'org',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "delegates" */ './delegations/delegates/detail')),
+                                type: 'stack',
+                                paths: [
+                                    {
+                                        path: 'redakti',
+                                        type: 'state',
+                                        state: 'editing',
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: 'statistics',

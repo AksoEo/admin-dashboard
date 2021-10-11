@@ -5,24 +5,23 @@ import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import Meta from '../../../meta';
-import { delegations as locale } from '../../../../locale';
+import { delegationSubjects as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 
-export default connectPerms(class DelegatesPage extends Page {
+export default connectPerms(class SubjectsPage extends Page {
     state = {
         parameters: {
             search: {
-                field: 'hosting.description',
+                field: 'name',
                 query: '',
             },
             fields: [
                 { id: 'org', sorting: 'none', fixed: true },
-                { id: 'codeholderId', sorting: this.codeholderId ? 'none' : 'asc', fixed: true },
-                { id: 'countries', sorting: 'none', fixed: true },
-                { id: 'approvedTime', sorting: 'none', fixed: true },
+                { id: 'name', sorting: 'none', fixed: true },
+                { id: 'description', sorting: 'none', fixed: true },
             ],
             filters: {},
             jsonFilter: {
@@ -77,24 +76,20 @@ export default connectPerms(class DelegatesPage extends Page {
         const actions = [];
 
         // TODO: better perm check across orgs?
-        if (perms.hasPerm('codeholders.delegations.create.uea')) {
+        if (perms.hasPerm('delegations.subjects.create.uea')) {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.create.menuItem,
-                action: () => this.context.createTask('codeholders/createDelegations', {}, {
-                    codeholderId: this.codeholderId,
-                }),
+                action: () => this.context.createTask('delegations/createSubject', {}),
             });
         }
 
         return (
-            <div class="delegations-delegates-page">
+            <div class="delegations-subjects-page">
                 <Meta title={locale.title} actions={actions} />
                 <SearchFilters
                     value={parameters}
-                    searchFields={[
-                        'hosting.description',
-                    ]}
+                    searchFields={['name']}
                     filters={FILTERS}
                     onChange={parameters => this.setState({ parameters })}
                     locale={{
@@ -106,14 +101,12 @@ export default connectPerms(class DelegatesPage extends Page {
                     onExpandedChange={expanded => this.setState({ expanded })}
                     inputRef={view => this.#searchInput = view} />
                 <OverviewList
-                    task={this.codeholderId ? 'codeholders/listDelegations' : 'delegations/listDelegates'}
-                    options={this.codeholderId ? { id: this.codeholderId } : null}
-                    useDeepCmp
-                    view="codeholders/delegation"
+                    task="delegations/listSubjects"
+                    view="delegations/subject"
+                    updateView={['delegations/sigSubjects']}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={(id, data) => `/delegitoj/${data.codeholderId}/${data.org}`}
-                    outOfTree
+                    onGetItemLink={id => `/delegitoj/fakoj/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}

@@ -33,13 +33,11 @@ export const delegations = {
     },
     tos: {
         docDataProtectionUEA: '[[docDataProtectionUEA]]',
-        docDataProtectionUEATime: '[[docDataProtectionUEATime]]',
         docDelegatesUEA: '[[docDelegatesUEA]]',
-        docDelegatesUEATime: '[[docDelegatesUEATime]]',
         docDelegatesDataProtectionUEA: '[[docDelegatesDataProtectionUEA]]',
-        docDelegatesDataProtectionUEATime: '[[docDelegatesDataProtectionUEATime]]',
         paperAnnualBook: '[[paperAnnualBook]]',
-        paperAnnualBookTime: '[[paperAnnualBookTime]]',
+
+        fieldTime: '[[Accepted on]]',
     },
     create: {
         title: 'Krei [[thing]]',
@@ -62,7 +60,20 @@ export const delegations = {
         '[[main]]',
         '[[vice]]',
     ],
+    cityPicker: {
+        pick: '[[Select cities]]',
+        pickOne: '[[Select city]]',
+        search: '[[Search cities by name]]',
+        done: 'Bone',
 
+        // TODO: move this out
+        fields: {
+            nativeLabel: '[[Native label]]',
+            eoLabel: '[[Eo label]]',
+            subdivision_nativeLabel: '[[subdivision_nativeLabel]]',
+            subdivision_eoLabel: '[[subdivision_eoLabel]]',
+        },
+    },
 };
 
 export const delegationSubjects = {
@@ -79,6 +90,7 @@ export const delegationSubjects = {
         },
     },
     fields: {
+        org: 'Organizo',
         name: 'Nomo',
         description: 'Priskribo',
     },
@@ -97,5 +109,10 @@ export const delegationSubjects = {
         title: 'Forigi [[subject]]',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la [[subject]]? Ne eblas malfari tiun ĉi agon.',
+    },
+    picker: {
+        pick: '[[Select subjects]]',
+        search: '[[Search subjects by name]]',
+        done: 'Bone',
     },
 };

@@ -39,6 +39,7 @@ const taskViews = {
     countries: lazyPath(() => import(/* webpackChunkName: "countries-tasks" */ './features/pages/administration/countries/tasks')),
     countryLists: lazyPath(() => import(/* webpackChunkName: "country-lists-tasks" */ './features/pages/administration/country-lists/tasks')),
     codeholders: lazyPath(() => import(/* webpackChunkName: "codeholders-tasks" */ './features/pages/codeholders/tasks')),
+    delegations: lazyPath(() => import(/* webpackChunkName: "delegations-tasks" */ './features/pages/delegations/tasks')),
     adminGroups: lazyPath(() => import(/* webpackChunkName: "admin-groups-tasks" */ './features/pages/administration/groups/tasks')),
     lists: lazyPath(() => import(/* webpackChunkName: "lists-tasks" */ './features/pages/lists/tasks')),
     memberships: lazyPath(() => import(/* webpackChunkName: "memberships-tasks" */ './features/pages/memberships/tasks')),

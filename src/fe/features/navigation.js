@@ -191,6 +191,9 @@ function parseTreeURL (url, state, perms) {
 
                     viewStack.push(item);
                 } else if (routeType === 'state') {
+                    if (route.matchKey) {
+                        pathMatches[route.matchKey] = match;
+                    }
                     // state
                     const viewItem = viewStack[viewStack.length - 1];
                     if (viewItem) {

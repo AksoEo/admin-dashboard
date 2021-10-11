@@ -12,7 +12,7 @@ import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import LimitedTextField from '../../../components/limited-text-field';
 import { Field, Validator } from '../../../components/form';
 import { country, ueaCode, date } from '../../../components/data';
-import { updateDialog } from '../../../components/task-templates';
+import { createDialog, updateDialog } from '../../../components/task-templates';
 import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
 import {
@@ -22,6 +22,7 @@ import {
     codeholderChgReqs as chgReqLocale,
     delegations as delegationsLocale,
 } from '../../../locale';
+import { FIELDS as DELEGATION_FIELDS } from '../delegations/delegates/fields';
 import { FileThumbnail, FileSize, Mime } from '../../../components/files';
 import './style';
 
@@ -434,6 +435,12 @@ export default {
 
     updateChangeRequest: updateDialog({ locale: chgReqLocale.update, fields: chgReqLocale.fields }),
     setDelegations: updateDialog({ locale: delegationsLocale.update, fields: delegationsLocale.fields }),
+    createDelegations: createDialog({
+        locale: delegationsLocale,
+        fieldNames: ['org', 'codeholderId', 'cities', 'countries', 'subjects', 'hosting', 'tos'],
+        fields: DELEGATION_FIELDS,
+        onCompletion: (task, routerContext) => routerContext.navigate(`/delegitoj/${task.parameters.codeholderId}/${task.parameters.org}`),
+    }),
 };
 
 class NotifTemplateMessage extends PureComponent {
