@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { createPortal, useState } from 'preact/compat';
 import moment from 'moment';
 import {
     timestampFormat, timestampTzFormat, timestampFormatToday, timestampTzFormatToday,
@@ -11,6 +12,7 @@ function stringify (value, zone) {
     if (value) {
         const applyZone = time => {
             if (!zone) return time.utc();
+            if (zone === 'local') return time.local();
             return time.tz(zone);
         };
         const m = applyZone(moment(value * 1000));
@@ -33,6 +35,41 @@ function stringify (value, zone) {
 /// - zone: time zone
 function TimestampFormatter ({ value, zone }) {
     return stringify(value, zone);
+}
+
+const timestampPortal = document.createElement('div');
+timestampPortal.id = 'data-timestamp-portal-container';
+document.body.appendChild(timestampPortal);
+
+function TimestampRenderer ({ value, zone }) {
+    const [popoverOpen, setPopoverOpen] = useState(false);
+    const onMouseOver = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top;
+        setPopoverOpen({ x, y });
+    };
+    const onMouseOut = () => {
+        setPopoverOpen(false);
+    };
+
+    return (
+        <span class="data data-timestamp" onMouseOver={onMouseOver} onMouseOut={onMouseOut}>
+            <TimestampFormatter value={value} zone={zone} />
+            {popoverOpen ? (
+                createPortal(
+                    <div class="data-timestamp-popover" style={{
+                        transform: `translate(${popoverOpen.x}px, ${popoverOpen.y}px)`,
+                    }}>
+                        <div class="inner-popover">
+                            <TimestampFormatter value={value} zone="local" />
+                        </div>
+                    </div>,
+                    timestampPortal,
+                )
+            ) : null}
+        </span>
+    );
 }
 
 /// Edits a timestamp.
@@ -84,8 +121,8 @@ function TimestampEditor ({ label, value, onChange, disabled, error, outline, zo
 }
 
 export default {
-    renderer: TimestampFormatter,
-    inlineRenderer: TimestampFormatter,
+    renderer: TimestampRenderer,
+    inlineRenderer: TimestampRenderer,
     editor: TimestampEditor,
     stringify,
 };
