@@ -12,7 +12,7 @@ import DynamicHeightDiv from '../../../components/dynamic-height-div';
 import LimitedTextField from '../../../components/limited-text-field';
 import { Field, Validator } from '../../../components/form';
 import { country, ueaCode, date } from '../../../components/data';
-import { createDialog, updateDialog } from '../../../components/task-templates';
+import { createDialog, updateDialog, deleteDialog } from '../../../components/task-templates';
 import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
 import {
@@ -441,6 +441,7 @@ export default {
         fields: DELEGATION_FIELDS,
         onCompletion: (task, routerContext) => routerContext.navigate(`/delegitoj/${task.parameters.codeholderId}/${task.parameters.org}`),
     }),
+    deleteDelegations: deleteDialog({ locale: delegationsLocale.delete }),
 };
 
 class NotifTemplateMessage extends PureComponent {

@@ -17,12 +17,14 @@ import GeoCity from './geo-city';
 import Subject from './subject';
 import CityPicker from './city-picker';
 import SubjectPicker from '../subjects/subject-picker';
+import './fields.less';
 
 export const FIELDS = {
     org: {
         sortable: true,
         weight: 0.3,
         slot: 'icon',
+        wantsCreationLabel: true,
         component ({ value, editing, onChange, slot }) {
             if (slot === 'create' && editing) {
                 return (
@@ -36,8 +38,9 @@ export const FIELDS = {
     },
     codeholderId: {
         sortable: true,
-        weight: 0.3,
+        weight: 0.5,
         slot: 'title',
+        wantsCreationLabel: true,
         component ({ value, editing, onChange, slot }) {
             if (slot === 'create' && editing) {
                 return (
@@ -76,7 +79,8 @@ export const FIELDS = {
         },
     },
     cities: {
-        component ({ value, editing, onChange }) {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange, slot }) {
             const [pickerOpen, setPickerOpen] = useState(false);
             if (!value && !editing) return null;
             if (!value) value = [];
@@ -98,7 +102,7 @@ export const FIELDS = {
                                     </Button>
                                 </div>
                             ) : null}
-                            <GeoCity class="inner-city" id={id} />
+                            <GeoCity class="inner-city" id={id} short={slot !== 'detail'} />
                         </div>
                     ))}
 
@@ -118,13 +122,19 @@ export const FIELDS = {
         },
     },
     countries: {
-        component ({ value, editing, onChange, item, userData }) {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange, item, slot, userData }) {
             if (editing) {
                 const hasPerm = p => !userData?.hasPerm || userData.hasPerm(p);
                 if (!value) value = [];
 
                 return (
                     <div class="delegation-countries is-editing">
+                        {editing ? (
+                            <div class="country-select-title">
+                                {locale.countrySelectTitle}
+                            </div>
+                        ) : null}
                         <CountryPicker
                             value={value.map(x => x.country)}
                             onChange={newValue => {
@@ -167,10 +177,14 @@ export const FIELDS = {
 
             if (!value) return '—';
             return (
-                <div class="delegation-countries">
-                    {value.map(({ country, level }) => (
-                        <span class="delegation-country" key={country}>
-                            <CountryFlag country={country} />
+                <div class="delegation-countries" data-slot={slot}>
+                    {value.map(({ country: code, level }) => (
+                        <span class="delegation-country" key={code}>
+                            {(slot === 'detail') ? (
+                                <country.renderer value={code} />
+                            ) : (
+                                <CountryFlag country={code} />
+                            )}
                             <span class="country-level">{locale.countryLevels[level]}</span>
                         </span>
                     ))}
@@ -179,17 +193,35 @@ export const FIELDS = {
         },
     },
     subjects: {
-        component ({ value, editing, onChange }) {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange, slot }) {
             const [pickerOpen, setPickerOpen] = useState(false);
 
             if (!value && !editing) return null;
             if (!value) value = [];
 
+            const removeSubject = id => {
+                const newValue = [...value];
+                newValue.splice(newValue.indexOf(id), 1);
+                onChange(newValue);
+            };
+
             return (
-                <div class="delegation-subjects">
-                    {value.map(id => <Subject key={id} id={id} />)}
+                <div class={'delegation-subjects' + (editing ? ' is-editing' : '')} data-slot={slot}>
+                    {value.map(id => (
+                        <span class="subject-item" key={id}>
+                            {editing ? (
+                                <div class="subject-remove-container">
+                                    <Button clas="remove-button" icon small onClick={() => removeSubject(id)}>
+                                        <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                                    </Button>
+                                </div>
+                            ) : null}
+                            <Subject id={id} interactive={slot === 'detail' && !editing} />
+                        </span>
+                    ))}
                     {editing ? (
-                        <Button onClick={() => setPickerOpen(true)}>
+                        <Button class="pick-button" onClick={() => setPickerOpen(true)}>
                             {subjectsLocale.picker.pick}
                             <SubjectPicker
                                 value={value}
@@ -204,11 +236,26 @@ export const FIELDS = {
         },
     },
     hosting: {
+        wantsCreationLabel: true,
         component ({ value, editing, onChange }) {
             const editable = (disp, edit) => editing ? edit : disp;
 
             if (!editing && !(value && Object.values(value).find(x => x))) return null;
             if (!value) value = {};
+
+            useEffect(() => {
+                if (editing) {
+                    const newValue = { ...value };
+                    let changed = false;
+                    for (const fieldName of ['maxDays', 'maxPersons', 'description', 'psProfileURL']) {
+                        if (!(fieldName in newValue)) {
+                            newValue[fieldName] = null;
+                            changed = true;
+                        }
+                    }
+                    if (changed) onChange(newValue);
+                }
+            });
 
             return (
                 <div class="delegation-hosting is-editing">
@@ -279,6 +326,7 @@ export const FIELDS = {
         isEmpty: value => !value || !Object.values(value).find(x => x),
     },
     tos: {
+        wantsCreationLabel: true,
         component ({ value, editing, onChange }) {
             const required = [
                 'docDataProtectionUEA',
@@ -297,8 +345,8 @@ export const FIELDS = {
                     const newValue = { ...value };
                     let changed = false;
                     for (const fieldName of fieldNames) {
-                        if (required.includes(fieldName) && !newValue[fieldName]) {
-                            newValue[fieldName] = true;
+                        if (!(fieldName in newValue)) {
+                            newValue[fieldName] = required.includes(fieldName);
                             changed = true;
                         }
                     }

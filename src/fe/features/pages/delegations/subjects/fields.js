@@ -9,6 +9,7 @@ export const FIELDS = {
     org: {
         weight: 0.25,
         sortable: true,
+        slot: 'icon',
         component ({ value, editing, onChange, slot }) {
             if (slot === 'create' && editing) {
                 return (
@@ -25,6 +26,7 @@ export const FIELDS = {
     },
     name: {
         weight: 0.5,
+        slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return (
@@ -39,6 +41,7 @@ export const FIELDS = {
         },
     },
     description: {
+        skipLabel: true,
         component ({ value, editing, onChange }) {
             if (editing) return <TextArea value={value} onChange={onChange} />;
             if (!value) return null;

@@ -64,7 +64,10 @@ export default connectPerms(class Delegations extends Page {
         if (perms.hasPerm(`codeholders.delegations.delete.${this.org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
-                action: () => this.context.createTask('codeholders/deleteDelegations', { id: this.id }),
+                action: () => this.context.createTask('codeholders/deleteDelegations', {
+                    id: this.codeholder,
+                    org: this.org,
+                }),
                 overflow: true,
             });
         }

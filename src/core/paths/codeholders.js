@@ -68,6 +68,7 @@ export const SIG_CODEHOLDERS = '!codeholders';
 export const SIG_MEMBERSHIPS = '!memberships';
 export const SIG_ROLES = '!roles';
 export const SIG_FILES = '!files';
+export const SIG_DELEGATIONS = '!delegations';
 
 // used below; this is just here for DRY
 const addressSubfields = [
@@ -1480,6 +1481,7 @@ export const tasks = {
         delete obj.approvedTime;
         await client.put(`/codeholders/${id}/delegations/${org}`, obj);
         store.insert([CODEHOLDER_DELEGATIONS, id, org], delegations);
+        store.signal([CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS]);
     },
     // virtual task for task dialog
     createDelegations: async (_, delegations) => {
@@ -1496,6 +1498,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.delete(`/codeholders/${id}/delegations/${org}`);
         store.remove([CODEHOLDER_DELEGATIONS, id, org]);
+        store.signal([CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS]);
     },
 };
 
@@ -1708,4 +1711,6 @@ export const views = {
     /// # Options
     /// - id: codeholder id
     codeholderSigRoles: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_ROLES]),
+
+    sigDelegations: createStoreObserver([CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS]),
 };

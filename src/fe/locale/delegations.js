@@ -55,6 +55,7 @@ export const delegations = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la [[thing]]? Ne eblas malfari tiun ĉi agon.',
     },
+    countrySelectTitle: '[[Select countries]]',
     countryLevelsTitle: '[[Country levels]]',
     countryLevels: [
         '[[main]]',

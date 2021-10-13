@@ -1,20 +1,21 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { PureComponent, Fragment } from 'preact/compat';
 import ErrorIcon from '@material-ui/icons/Error';
 import { connect } from '../../../../core/connection';
 import TinyProgress from '../../../../components/tiny-progress';
 import { country } from '../../../../components/data';
 import { data as locale } from '../../../../locale';
+import './geo-city.less';
 
 export default connect(
     ({ id }) => ['geoDb/city', { id }],
     ['id']
 )((data, _, err) => ({ data, err }))(class GeoCity extends PureComponent {
-    render ({ data, err, ...extra }) {
+    render ({ data, err, short, ...extra }) {
         if (err) return <ErrorIcon style={{ verticalAlign: 'middle' }}/>;
         if (!data) return <TinyProgress />;
 
-        extra.class = (extra.class || '') + ' geo-city';
+        extra.class = (extra.class || '') + ' delegate-geo-city';
 
         return (
             <span title={`WikiData ${data.id}`} {...extra}>
@@ -27,17 +28,25 @@ export default connect(
                         {locale.geoDb.nativeLabelMissing}
                     </span>
                 )}
-                {data.eoLabel ? (
-                    <span class="eo-label">
-                        ({data.eoLabel})
-                    </span>
+                {!short ? (
+                    <Fragment>
+                        {data.eoLabel ? (
+                            <span class="eo-label">
+                                {' '}
+                                ({data.eoLabel})
+                            </span>
+                        ) : null}
+                        <div class="gc-location">
+                            <span class="gc-subdivision">
+                                {data.subdivision_eoLabel || data.subdivision_nativeLabel}
+                            </span>
+                            {' '}
+                            <span class="gc-country">
+                                <country.renderer value={data.country} />
+                            </span>
+                        </div>
+                    </Fragment>
                 ) : null}
-                <span class="gc-subdivision">
-                    {data.subdivision_eoLabel || data.subdivision_nativeLabel}
-                </span>
-                <span class="gc-country">
-                    <country.renderer value={data.country} />
-                </span>
             </span>
         );
     }

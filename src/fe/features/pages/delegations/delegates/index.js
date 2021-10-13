@@ -5,7 +5,7 @@ import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import Meta from '../../../meta';
-import { delegations as locale } from '../../../../locale';
+import { delegations as locale, delegationSubjects as subjectsLocale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
@@ -21,6 +21,7 @@ export default connectPerms(class DelegatesPage extends Page {
             fields: [
                 { id: 'org', sorting: 'none', fixed: true },
                 { id: 'codeholderId', sorting: this.codeholderId ? 'none' : 'asc', fixed: true },
+                { id: 'cities', sorting: 'none', fixed: true },
                 { id: 'countries', sorting: 'none', fixed: true },
                 { id: 'approvedTime', sorting: 'none', fixed: true },
             ],
@@ -76,6 +77,11 @@ export default connectPerms(class DelegatesPage extends Page {
     render ({ perms }, { parameters, expanded }) {
         const actions = [];
 
+        actions.push({
+            label: subjectsLocale.title,
+            action: () => this.props.push('fakoj'),
+        });
+
         // TODO: better perm check across orgs?
         if (perms.hasPerm('codeholders.delegations.create.uea')) {
             actions.push({
@@ -108,6 +114,7 @@ export default connectPerms(class DelegatesPage extends Page {
                 <OverviewList
                     task={this.codeholderId ? 'codeholders/listDelegations' : 'delegations/listDelegates'}
                     options={this.codeholderId ? { id: this.codeholderId } : null}
+                    updateView={['codeholders/sigDelegations']}
                     useDeepCmp
                     view="codeholders/delegation"
                     parameters={parameters}

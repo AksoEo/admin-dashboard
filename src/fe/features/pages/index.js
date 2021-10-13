@@ -21,6 +21,7 @@ import { TravelExploreIcon, ChangeRequestIcon, ChangeRequestNewIcon } from '../.
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
+import ExploreIcon from '@material-ui/icons/Explore';
 
 export function NewspaperIcon () {
     return (
@@ -563,7 +564,7 @@ export default [
             },
             {
                 id: 'delegations',
-                icon: ListsIcon,
+                icon: ExploreIcon,
                 path: 'delegitoj',
                 component: elazy(() =>
                     import(/* webpackChunkName: "delegates" */ './delegations/delegates')),
