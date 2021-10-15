@@ -86,3 +86,72 @@
         }
     }
 }
+
+.delegation-hosting {
+    .hosting-field {
+        padding: 8px 0;
+
+        .paper-text-field {
+            width: 100%;
+        }
+
+        & > label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        &.small {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            & > label {
+                margin: 0;
+            }
+
+            .paper-text-field {
+                width: 144px;
+            }
+        }
+
+        & + .hosting-field {
+            border-top: 1px solid @separator;
+        }
+    }
+}
+
+.delegation-tos {
+    .tos-field {
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+
+        & + .tos-field {
+            border-top: 1px solid @separator;
+        }
+
+        .field-checkbox {
+            margin-right: 16px;
+        }
+
+        .field-labels {
+            flex: 1;
+            min-height: calc(2.4em + 4px);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+
+            .field-time {
+                margin-top: 4px;
+                font-size: smaller;
+                opacity: 0.8;
+
+                label {
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+}

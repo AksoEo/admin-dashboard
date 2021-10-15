@@ -5,6 +5,7 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import OrgIcon from '../../../../components/org-icon';
 import { CountryFlag } from '../../../../components/data/country';
 import { IdUEACode } from '../../../../components/data/uea-code';
+import Required from '../../../../components/data/required';
 import { country, timestamp } from '../../../../components/data';
 import CountryPicker from '../../../../components/country-picker';
 import CodeholderPicker from '../../../../components/codeholder-picker';
@@ -130,7 +131,7 @@ export const FIELDS = {
 
                 return (
                     <div class="delegation-countries is-editing">
-                        {editing ? (
+                        {(editing && value.length) ? (
                             <div class="country-select-title">
                                 {locale.countrySelectTitle}
                             </div>
@@ -146,9 +147,11 @@ export const FIELDS = {
                             hideGroups
                             shouldHideItem={country =>
                                 !hasPerm(`codeholders.delegations.update_country_delegates.${item.org}.${country}`)} />
-                        <div class="country-levels-title">
-                            {locale.countryLevelsTitle}
-                        </div>
+                        {value.length ? (
+                            <div class="country-levels-title">
+                                {locale.countryLevelsTitle}
+                            </div>
+                        ) : null}
                         <div class="country-levels">
                             {value.map((item, index) => (
                                 <div class="country-item" key={item.country}>
@@ -259,10 +262,10 @@ export const FIELDS = {
 
             return (
                 <div class="delegation-hosting is-editing">
-                    <div class="hosting-max-days">
+                    <div class="hosting-field small">
                         <label>{locale.hosting.maxDays}</label>
                         {editable(
-                            value.maxDays,
+                            value.maxDays || locale.hosting.maxDaysNone,
                             <TextField
                                 type="number"
                                 outline
@@ -274,10 +277,10 @@ export const FIELDS = {
                                 }} />
                         )}
                     </div>
-                    <div class="hosting-max-persons">
+                    <div class="hosting-field small">
                         <label>{locale.hosting.maxPersons}</label>
                         {editable(
-                            value.maxPersons,
+                            value.maxPersons || locale.hosting.maxPersonsNone,
                             <TextField
                                 type="number"
                                 outline
@@ -289,19 +292,19 @@ export const FIELDS = {
                                 }} />
                         )}
                     </div>
-                    <div class="hosting-description">
+                    <div class="hosting-field">
                         <label>{locale.hosting.description}</label>
                         {editable(
-                            value.description,
+                            value.description || '—',
                             <TextArea
                                 value={value.description || ''}
                                 onChange={val => onChange({ ...value, description: val || null })} />
                         )}
                     </div>
-                    <div class="hosting-ps-profile-url">
+                    <div class="hosting-field">
                         <label>{locale.hosting.psProfileURL}</label>
                         {editable(
-                            value.psProfileURL,
+                            value.psProfileURL || '—',
                             <Validator
                                 component={TextField}
                                 validate={value => {
@@ -359,25 +362,34 @@ export const FIELDS = {
                 const checkboxId = 'tosf-' + Math.random().toString(36);
                 fields.push(
                     <div class="tos-field" key={fieldName}>
-                        <div class="field-checkbox">
-                            <label for={checkboxId}>{locale.tos[fieldName]}</label>
-                            <Checkbox
-                                id={checkboxId}
-                                checked={value[fieldName]}
-                                onChange={checked => {
-                                    if (!editing) return;
-                                    onChange({
-                                        ...value,
-                                        [fieldName]: checked,
-                                        [fieldName + 'Time']: Math.floor(Date.now() / 1000),
-                                    });
-                                }}
-                                disabled={required.includes(fieldName)} />
-                        </div>
-                        <div class="field-time">
-                            <label>{locale.tos.fieldTime}</label>
-                            <timestamp.renderer value={value[fieldName + 'Time']} />
-                        </div>
+                        <Checkbox
+                            class="field-checkbox"
+                            id={checkboxId}
+                            checked={value[fieldName]}
+                            onChange={checked => {
+                                if (!editing) return;
+                                onChange({
+                                    ...value,
+                                    [fieldName]: checked,
+                                    [fieldName + 'Time']: Math.floor(Date.now() / 1000),
+                                });
+                            }}
+                            disabled={required.includes(fieldName)} />
+                        <label for={checkboxId} class="field-labels">
+                            <div class="field-title">
+                                {required.includes(fieldName) ? (
+                                    <Required>{locale.tos[fieldName]}</Required>
+                                ) : (
+                                    locale.tos[fieldName]
+                                )}
+                            </div>
+                            {value[fieldName + 'Time'] ? (
+                                <div class="field-time">
+                                    <label>{locale.tos.fieldTime}</label>
+                                    <timestamp.renderer value={value[fieldName + 'Time']} />
+                                </div>
+                            ) : null}
+                        </label>
                     </div>
                 );
             }

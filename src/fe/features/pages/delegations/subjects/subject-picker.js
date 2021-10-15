@@ -5,6 +5,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import StaticOverviewList from '../../../../components/overview-list-static';
 import { delegationSubjects as locale } from '../../../../locale';
 import { FIELDS } from './fields';
+import './subject-picker.less';
 
 export default function PickerDialog ({ value, onChange, container, limit, open, onClose, filter, ...extra }) {
     return (

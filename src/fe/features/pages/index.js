@@ -17,11 +17,10 @@ import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
 import AddMembershipIcon from '../../components/add-membership-icon';
 import ConfigMembershipIcon from '../../components/config-membership-icon';
-import { TravelExploreIcon, ChangeRequestIcon, ChangeRequestNewIcon } from '../../components/icons';
+import { TravelExploreIcon, BadgeIcon, ChangeRequestIcon, ChangeRequestNewIcon } from '../../components/icons';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
-import ExploreIcon from '@material-ui/icons/Explore';
 
 export function NewspaperIcon () {
     return (
@@ -564,7 +563,7 @@ export default [
             },
             {
                 id: 'delegations',
-                icon: ExploreIcon,
+                icon: BadgeIcon,
                 path: 'delegitoj',
                 component: elazy(() =>
                     import(/* webpackChunkName: "delegates" */ './delegations/delegates')),
