@@ -779,4 +779,13 @@ export default {
             );
         },
     },
+    delegations: {
+        // TODO
+        default () {
+            return { enabled: false, values: [] };
+        },
+        serialize () {},
+        deserialize () {},
+        editor () {},
+    },
 };

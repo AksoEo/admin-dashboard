@@ -9,6 +9,7 @@ import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filter
 import { LOGIN_ID } from './login-keys';
 import { deepMerge, deepEq } from '../../util';
 import { crudList, crudGet, crudUpdate, simpleDataView } from '../templates';
+import { CODEHOLDER_DELEGATIONS, delegateFilters } from './delegations';
 
 //! # Client-side codeholder representation
 //! - fields with no value are null or an empty string
@@ -61,7 +62,6 @@ export const CODEHOLDERS = 'codeholders';
 export const CODEHOLDER_PERMS = 'codeholderPerms';
 export const CODEHOLDER_FILES = 'codeholderFiles';
 export const CODEHOLDER_CHGREQS = 'codeholderChgReqs';
-export const CODEHOLDER_DELEGATIONS = 'codeholderDelegations';
 
 // signals
 export const SIG_CODEHOLDERS = '!codeholders';
@@ -476,6 +476,21 @@ const clientFilters = {
             return { $or: [{ newCode: { $in: newCodes } }, { oldCode: { $in: oldCodes } }] };
         },
         fields: ['newCode'],
+    },
+    delegations: {
+        toAPI: filters => {
+            const items = filters.map(({
+                invert, filters,
+            }) => {
+                // TODO
+                void invert;
+                void filters;
+                void delegateFilters;
+                return {};
+            });
+            return items.length > 1 ? { $and: items } : items[0];
+        },
+        fields: [],
     },
 };
 

@@ -75,7 +75,7 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef
 }
 
 /// Renders a range editor with inputs on either side.
-export default function RangeEditor ({ min, max, value, onChange, tickDistance, faded, disabled }) {
+export default function RangeEditor ({ min, max, value, onChange, tickDistance, faded, disabled, transfer }) {
     const leftBound = useRef(null);
     const rightBound = useRef(null);
 
@@ -96,6 +96,7 @@ export default function RangeEditor ({ min, max, value, onChange, tickDistance, 
                 disabled={disabled}
                 popout
                 discrete
+                transfer={transfer}
                 tickDistance={tickDistance}
                 class="editor-inner"
                 onChange={value => {

@@ -32,6 +32,7 @@ import ProfilePictureEditor from './profile-picture';
 import Publicity from './publicity';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
 import ChangeRequestsButton from '../change-requests/button';
+import DelegationsButton from '../delegations/delegates/button';
 
 const connectPerms = (Component) => {
     const SelfConnected = connectPermsInner(({ perms, ...extra }) => {
@@ -498,6 +499,10 @@ export const Header = connectPerms(function Header ({
                     )}
                     {!editing && perms.hasPerm('codeholders.change_requests.read') && (
                         <ChangeRequestsButton id={userData?.isSelf ? 'self' : item.id} />
+                    )}
+                    {/* FIXME better perm check across orgs */}
+                    {!editing && perms.hasPerm('codeholders.delegations.read.uea') && (
+                        <DelegationsButton id={userData?.isSelf ? 'self' : item.id} />
                     )}
                 </div>
                 <div class="decorative-flourish" />

@@ -8,7 +8,17 @@ export const delegations = {
         placeholders: {
             'hosting.description': '[[search descriptions]]',
         },
-        filters: {},
+        filters: {
+            org: 'Organizo',
+            approvedBy: '[[approvedBy]]',
+            subjects: '[[subjects]]',
+            cities: '[[cities]]',
+            countries: '[[countries]]',
+            countryLevels: '[[Country level]]',
+            countryLevelsDontCare: 'ne gravas',
+            hostingMaxDays: '[[hostingMaxDays]]',
+            hostingMaxPersons: '[[hostingMaxPersons]]',
+        },
     },
     fields: {
         org: 'Organizo',
@@ -75,6 +85,7 @@ export const delegations = {
             subdivision_eoLabel: '[[subdivision_eoLabel]]',
         },
     },
+    buttonLabel: count => count ? `[[${count} Delegation${count === 1 ? '' : 's'}]]` : `[[Delegations]]`,
 };
 
 export const delegationSubjects = {
