@@ -69,28 +69,29 @@ export default function SearchFilters ({
         hidden: !expanded,
     });
 
-    items.push({
-        node: <SearchInput
-            compact={compact}
-            ref={inputRef}
-            value={value.search}
-            onChange={search => onChange({ ...value, search, offset: 0 })}
-            searchFields={searchFields}
-            expanded={expanded}
-            onSubmit={() => {
-                if (onExpandedChange) onExpandedChange(false);
-                onChange({ ...value, offset: 0 });
-            }}
-            localizedFields={searchLocale.searchFields}
-            localizedPlaceholders={searchLocale.searchPlaceholders} />,
-        paper: true,
-        zIndex: 3,
-        staticHeight: true,
-    });
-
+    if ('search' in value) {
+        items.push({
+            node: <SearchInput
+                compact={compact}
+                ref={inputRef}
+                value={value.search}
+                onChange={search => onChange({ ...value, search, offset: 0 })}
+                searchFields={searchFields}
+                expanded={expanded}
+                onSubmit={() => {
+                    if (onExpandedChange) onExpandedChange(false);
+                    onChange({ ...value, offset: 0 });
+                }}
+                localizedFields={searchLocale.searchFields}
+                localizedPlaceholders={searchLocale.searchPlaceholders} />,
+            paper: true,
+            zIndex: 3,
+            staticHeight: true,
+        });
+    }
     const hasFilters = filters && Object.keys(filters).length;
 
-    if (hasFilters) {
+    if (hasFilters && ('search' in value)) {
         items.push({
             node: <FiltersDisclosure
                 expanded={expanded}

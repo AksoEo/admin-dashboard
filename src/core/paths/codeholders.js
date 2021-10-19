@@ -482,11 +482,8 @@ const clientFilters = {
             const items = filters.map(({
                 invert, filters,
             }) => {
-                // TODO
-                void invert;
-                void filters;
-                void delegateFilters;
-                return {};
+                const filter = filtersToAPI(delegateFilters, filters) || {};
+                return invert ? ({ $not: { $delegations: filter  } }) : ({ $delegations: filter });
             });
             return items.length > 1 ? { $and: items } : items[0];
         },

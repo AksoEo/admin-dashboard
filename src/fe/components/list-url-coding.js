@@ -18,7 +18,7 @@
 // *cats -> (**cats)
 // cats#% -> (cats%23%25)
 // ```
-function encodeParens (str) {
+export function encodeParens (str) {
     let parens = 1;
 
     if (str.startsWith('*') || str.startsWith('(')) {
@@ -38,7 +38,7 @@ function encodeParens (str) {
 }
 
 // Returns an array: [string, length of parentheses encoding]. Ignores the rest
-function decodeParens (str) {
+export function decodeParens (str) {
     let cursor = 0;
     let parens = 0;
     while (str[cursor] === '(') {
@@ -49,8 +49,11 @@ function decodeParens (str) {
     const headerSize = cursor;
 
     let streak = 0;
+    let match = 0;
     while (cursor < str.length) {
-        if (str[cursor] === ')') streak++;
+        if (str[cursor] === '(') match++;
+        else if (str[cursor] === ')' && match) match--;
+        else if (str[cursor] === ')') streak++;
         else streak = 0;
         cursor++;
         if (streak === parens) {
@@ -63,12 +66,12 @@ function decodeParens (str) {
 
 // Will only use parenthesis encoding if the string is deemed unsafe, i.e. if it may be ambiguous
 // where the string ends in a given context
-function maybeEncodeParens (str, unsafeChars) {
+export function maybeEncodeParens (str, unsafeChars) {
     if (str.startsWith('(')) return encodeParens(str);
     for (const c of unsafeChars) if (str.includes(c)) return encodeParens(str);
     return encodeURIComponent(str);
 }
-function maybeDecodeParens (str, unsafeChars) {
+export function maybeDecodeParens (str, unsafeChars) {
     if (str.startsWith('(')) {
         return decodeParens(str);
     } else {
@@ -100,7 +103,7 @@ function deserializeFilterValue (value) {
 /// Returns an encoded string.
 export function encodeURLQuery (state, filters) {
     let data = '';
-    if (state.search.query) {
+    if (state.search?.query) {
         // search(field, query)
         data += 'search(';
         data += maybeEncodeParens(state.search.field, ',)');
@@ -150,7 +153,7 @@ export function encodeURLQuery (state, filters) {
         }
         data += ')';
     }
-    {
+    if ('offset' in state) {
         // pos(offset, limit)
         data += 'pos(' + state.offset + ',' + state.limit + ')';
     }

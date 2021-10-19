@@ -8,11 +8,14 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import moment from 'moment';
 import Segmented from '../../../components/segmented';
 import { connect } from '../../../core/connection';
-import { codeholders as locale } from '../../../locale';
+import { codeholders as locale, delegations as delegationsLocale } from '../../../locale';
 import CountryPicker from '../../../components/country-picker';
 import LargeMultiSelect from '../../../components/large-multi-select';
 import RangeEditor from '../../../components/range-editor';
 import { date, ueaCode } from '../../../components/data';
+import { FILTERS as DELEGATE_FILTERS } from '../delegations/delegates/filters';
+import SearchFilters from '../../../components/search-filters';
+import { encodeParens, decodeParens, encodeURLQuery, decodeURLQuery } from '../../../components/list-url-coding';
 
 function makeDialogMultiSelect (view, pickSome, render, itemName, itemPreview) {
     return connect(view)(data => ({
@@ -780,12 +783,62 @@ export default {
         },
     },
     delegations: {
-        // TODO
         default () {
-            return { enabled: false, values: [] };
+            return { enabled: false, value: [] };
         },
-        serialize () {},
-        deserialize () {},
-        editor () {},
+        serialize ({ value }) {
+            return value.map(({ invert, filters }) => {
+                const prefix = invert ? `~` : '+';
+                const filter = encodeURLQuery({ filters }, DELEGATE_FILTERS);
+                return prefix + filter;
+            }).map(encodeParens).join('');
+        },
+        deserialize (value) {
+            const items = [];
+            let remaining = value;
+            while (remaining) {
+                const [content, len] = decodeParens(remaining);
+                remaining = remaining.substr(len);
+
+                const invert = content[0] === '~';
+                const { filters } = decodeURLQuery(content.substr(1), DELEGATE_FILTERS);
+                items.push({ invert, filters: filters || {} });
+            }
+            return { enabled: true, value: items };
+        },
+        editor ({ value, onChange, onEnabledChange }) {
+            const addSection = () => {
+                onEnabledChange(true);
+                onChange(value.concat([
+                    {
+                        invert: false,
+                        filters: {},
+                    },
+                ]));
+            };
+
+            return (
+                <div class="codeholder-delegations-filter">
+                    {value.map((params, index) => (
+                        <SearchFilters
+                            key={index}
+                            filters={DELEGATE_FILTERS}
+                            locale={{
+                                filters: delegationsLocale.search.filters,
+                            }}
+                            value={params}
+                            expanded={true}
+                            onChange={params => {
+                                const newValue = [...value];
+                                newValue[index] = params;
+                                onChange(newValue);
+                            }} />
+                    ))}
+                    <Button icon small onClick={addSection}>
+                        <AddIcon />
+                    </Button>
+                </div>
+            );
+        },
     },
 };
