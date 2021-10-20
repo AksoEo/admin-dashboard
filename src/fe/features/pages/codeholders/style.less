@@ -87,46 +87,46 @@
         }
     }
 
+    .filter-conjunction-separator {
+        position: relative;
+        display: block;
+        margin: 8px 0;
+        text-align: center;
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 0.875em;
+        animation: members-search-membership-separator-in 0.4s @easing;
+
+        &::before, &::after {
+            content: '';
+            position: absolute;
+            background: currentColor;
+            opacity: 0.2;
+            top: 50%;
+            height: 1px;
+            width: 40%;
+        }
+        &::before {
+            left: 16px;
+        }
+        &::after {
+            right: 16px;
+        }
+
+        @keyframes members-search-membership-separator-in {
+            from {
+                transform: translateY(-50%);
+                opacity: 0;
+            }
+        }
+    }
+
     .membership-editor {
         width: 100%;
         margin-top: 8px;
 
         .filter-header {
             margin-left: -8px;
-        }
-
-        .membership-conjunction-separator {
-            position: relative;
-            display: block;
-            margin: 8px 0;
-            text-align: center;
-            text-transform: uppercase;
-            font-weight: bold;
-            font-size: 0.875em;
-            animation: members-search-membership-separator-in 0.4s @easing;
-
-            &::before, &::after {
-                content: '';
-                position: absolute;
-                background: currentColor;
-                opacity: 0.2;
-                top: 50%;
-                height: 1px;
-                width: 40%;
-            }
-            &::before {
-                left: 16px;
-            }
-            &::after {
-                right: 16px;
-            }
-
-            @keyframes members-search-membership-separator-in {
-                from {
-                    transform: translateY(-50%);
-                    opacity: 0;
-                }
-            }
         }
 
         .membership-item {
@@ -250,7 +250,47 @@
     }
 
     .codeholder-delegations-filter {
-        width: 100%;
+        &.has-contents {
+            width: 100%;
+            padding-top: 8px;
+        }
+
+        .filter-section {
+            .section-contents {
+                border: 1px solid @separator;
+                border-radius: 4px;
+                padding: 8px 16px;
+
+                .section-header {
+                    display: flex;
+                    align-items: center;
+
+                    .remove-button {
+                        margin-right: 16px;
+                    }
+
+                    .header-spacer {
+                        flex: 1;
+                    }
+                }
+
+                .search-filters {
+                    padding: 0;
+
+                    &.paper-list {
+                        --paper-list-horiz-padding: 0px;
+                    }
+                }
+            }
+        }
+
+        &.has-contents {
+            .add-button-container {
+                width: 100%;
+                margin-top: 8px;
+                text-align: center;
+            }
+        }
     }
 }
 

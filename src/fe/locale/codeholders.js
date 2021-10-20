@@ -35,6 +35,7 @@ export const codeholders = {
             isActiveMember: 'Aktiva membro iam en',
             deathdate: 'Mortjaro',
             codeList: 'Listo de UEA-kodoj',
+            delegations: '[[delegations]]',
         },
         countryFilter: {
             all: 'ne gravas',
@@ -90,6 +91,11 @@ export const codeholders = {
             pickCodes: 'Listo de kodoj',
             description: 'Enmetu UEA-kodojn en la ĉi-suban liston; po unu en unu vico.',
             ok: 'Bone',
+        },
+        delegations: {
+            has: 'havas',
+            invert: 'ne havas',
+            conjunction: 'kaj',
         },
     },
     globalFilterTitle: 'La rezultoj estas filtritaj',

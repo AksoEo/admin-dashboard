@@ -17,7 +17,7 @@ const USE_SCALE = true;
 /// - children: array of objects with, uh, various properties (TODO: docs)
 export default class PaperList extends PureComponent {
     /// ResizeObserver that observes all children.
-    resizeObserver = new ResizeObserver(() => this.update(0));
+    resizeObserver = new ResizeObserver(() => globalAnimator.register(this));
 
     childNodes = [];
     childStates = [];

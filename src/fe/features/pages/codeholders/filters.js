@@ -4,6 +4,7 @@ import { Checkbox, Button, Dialog } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import CloseIcon from '@material-ui/icons/Close';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import moment from 'moment';
 import Segmented from '../../../components/segmented';
@@ -560,7 +561,7 @@ export default {
             // intersperse items with conjunctions
             for (let i = items.length - 1; i > 0; i--) {
                 items.splice(i, 0, (
-                    <div class="membership-conjunction-separator" key={`conj-${i}`}>
+                    <div class="filter-conjunction-separator" key={`conj-${i}`}>
                         {locale.search.membership.conjunction}
                     </div>
                 ));
@@ -806,7 +807,11 @@ export default {
             }
             return { enabled: true, value: items };
         },
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, expanded }) {
+            const [expandedOverrides, setExpandedOverrides] = useState({});
+            const innerExpanded = [...new Array(value.length)].map((_, i) =>
+                expandedOverrides[i] === undefined ? expanded : expandedOverrides[i]);
+
             const addSection = () => {
                 onEnabledChange(true);
                 onChange(value.concat([
@@ -818,25 +823,81 @@ export default {
             };
 
             return (
-                <div class="codeholder-delegations-filter">
+                <div class={'codeholder-delegations-filter' + (value.length ? ' has-contents' : '')}>
                     {value.map((params, index) => (
-                        <SearchFilters
-                            key={index}
-                            filters={DELEGATE_FILTERS}
-                            locale={{
-                                filters: delegationsLocale.search.filters,
-                            }}
-                            value={params}
-                            expanded={true}
-                            onChange={params => {
-                                const newValue = [...value];
-                                newValue[index] = params;
-                                onChange(newValue);
-                            }} />
+                        <div class="filter-section" key={index}>
+                            {index > 0 ? (
+                                <div class="filter-conjunction-separator">
+                                    {locale.search.delegations.conjunction}
+                                </div>
+                            ) : null}
+                            <div class="section-contents">
+                                <div class="section-header">
+                                    <Button class="remove-button" icon small onClick={() => {
+                                        const newValue = [...value];
+                                        newValue.splice(index, 1);
+                                        onChange(newValue);
+                                        onEnabledChange(!!newValue.length);
+                                    }}>
+                                        <RemoveIcon />
+                                    </Button>
+                                    <Segmented
+                                        class="minimal"
+                                        selected={params.invert ? 'invert' : 'not'}
+                                        onSelect={i => {
+                                            const newValue = [...value];
+                                            newValue[index].invert = i === 'invert';
+                                            onChange(newValue);
+                                        }}>
+                                        {[
+                                            {
+                                                label: locale.search.delegations.has,
+                                                id: 'not',
+                                            },
+                                            {
+                                                label: locale.search.delegations.invert,
+                                                id: 'invert',
+                                            },
+                                        ]}
+                                    </Segmented>
+                                    <div class="header-spacer"></div>
+                                    <Button icon small onClick={() => {
+                                        const newValue = !innerExpanded[index];
+                                        const newOverrides = { ...expandedOverrides };
+                                        if (newValue === expanded) {
+                                            delete newOverrides[index];
+                                        } else {
+                                            newOverrides[index] = newValue;
+                                        }
+                                        setExpandedOverrides(newOverrides);
+                                    }}>
+                                        {innerExpanded[index] ? (
+                                            <ExpandLessIcon />
+                                        ) : (
+                                            <ExpandMoreIcon />
+                                        )}
+                                    </Button>
+                                </div>
+                                <SearchFilters
+                                    filters={DELEGATE_FILTERS}
+                                    locale={{
+                                        filters: delegationsLocale.search.filters,
+                                    }}
+                                    value={params}
+                                    expanded={innerExpanded[index]}
+                                    onChange={params => {
+                                        const newValue = [...value];
+                                        newValue[index] = params;
+                                        onChange(newValue);
+                                    }} />
+                            </div>
+                        </div>
                     ))}
-                    <Button icon small onClick={addSection}>
-                        <AddIcon />
-                    </Button>
+                    <div class="add-button-container">
+                        <Button icon small onClick={addSection}>
+                            <AddIcon />
+                        </Button>
+                    </div>
                 </div>
             );
         },

@@ -160,6 +160,7 @@ export default function SearchFilters ({
                     },
                     offset: 0,
                 })}
+                expanded={expanded}
                 hidden={filterIsHidden}
                 locale={searchLocale}
                 userData={userData} />,
@@ -423,7 +424,7 @@ const FilterPicker = connectPerms(function FilterPicker ({ category, open, onClo
     );
 });
 
-function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData }) {
+function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData, expanded }) {
     const FilterEditor = spec.editor;
 
     let filterSwitch;
@@ -461,6 +462,7 @@ function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData })
                 enabled={filter.enabled}
                 hidden={hidden}
                 onEnabledChange={enabled => onFilterChange(filter = { ...filter, enabled })}
+                expanded={expanded}
                 userData={userData} />
         </div>
     );
