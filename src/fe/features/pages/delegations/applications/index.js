@@ -5,21 +5,17 @@ import SearchFilters from '../../../../components/search-filters';
 import OverviewList from '../../../../components/overview-list';
 import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
 import Meta from '../../../meta';
-import {
-    delegations as locale,
-    delegationSubjects as subjectsLocale,
-    delegationApplications as applicationsLocale,
-} from '../../../../locale';
+import { delegationApplications as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 
-export default connectPerms(class DelegatesPage extends Page {
+export default connectPerms(class DelegateApplicationsPage extends Page {
     state = {
         parameters: {
             search: {
-                field: 'hosting.description',
+                field: 'internalNotes',
                 query: '',
             },
             fields: [
@@ -27,7 +23,7 @@ export default connectPerms(class DelegatesPage extends Page {
                 { id: 'codeholderId', sorting: this.codeholderId ? 'none' : 'asc', fixed: true },
                 { id: 'cities', sorting: 'none', fixed: true },
                 { id: 'countries', sorting: 'none', fixed: true },
-                { id: 'approvedTime', sorting: 'none', fixed: true },
+                { id: 'status', sorting: 'none', fixed: true },
             ],
             filters: {},
             jsonFilter: {
@@ -74,62 +70,42 @@ export default connectPerms(class DelegatesPage extends Page {
         }
     }
 
-    get codeholderId () {
-        return this.props.matches.codeholder ? +this.props.matches.codeholder[1] : null;
-    }
-
     render ({ perms }, { parameters, expanded }) {
         const actions = [];
 
-        actions.push({
-            label: subjectsLocale.title,
-            action: () => this.props.push('fakoj'),
-        });
-
-        actions.push({
-            label: applicationsLocale.title,
-            action: () => this.props.push('[[applications]]'),
-        });
-
         // TODO: better perm check across orgs?
-        if (perms.hasPerm('codeholders.delegations.create.uea')) {
+        if (perms.hasPerm('delegations.applications.read.uea')) {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.create.menuItem,
-                action: () => this.context.createTask('codeholders/createDelegations', {}, {
-                    codeholderId: this.codeholderId,
-                }),
+                action: () => this.context.createTask('delegations/createApplication', {}, {}),
             });
         }
 
         return (
-            <div class="delegations-delegates-page">
+            <div class="delegation-applications-page">
                 <Meta title={locale.title} actions={actions} />
                 <SearchFilters
                     value={parameters}
                     searchFields={[
-                        'hosting.description',
+                        'internalNotes',
                     ]}
                     filters={FILTERS}
                     onChange={parameters => this.setState({ parameters })}
                     locale={{
                         searchPlaceholders: locale.search.placeholders,
                         searchFields: locale.search.fields,
-                        filters: locale.search.filters,
                     }}
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     inputRef={view => this.#searchInput = view} />
                 <OverviewList
-                    task={this.codeholderId ? 'codeholders/listDelegations' : 'delegations/listDelegates'}
-                    options={this.codeholderId ? { id: this.codeholderId } : null}
-                    updateView={['codeholders/sigDelegations']}
-                    useDeepCmp
-                    view="codeholders/delegation"
+                    task={'delegations/listApplications'}
+                    updateView={['delegations/sigApplications']}
+                    view="delegations/application"
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={(id, data) => `/delegitoj/${data.codeholderId}/${data.org}`}
-                    outOfTree
+                    onGetItemLink={id => `/delegitoj/[[applications]]/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}

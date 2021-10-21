@@ -47,7 +47,7 @@ export const FIELDS = {
                 return (
                     <CodeholderPicker
                         value={value ? [value] : []}
-                        onChange={v => onChange(v[0] || null)}
+                        onChange={v => onChange(+v[0] || null)}
                         limit={1} />
                 );
             }

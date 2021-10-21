@@ -613,6 +613,12 @@ export default [
                             },
                         ],
                     },
+                    {
+                        path: '[[applications]]',
+                        type: 'stack',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "delegates" */ './delegations/applications')),
+                    },
                 ],
             },
             {

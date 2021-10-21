@@ -3,7 +3,9 @@ import { createStoreObserver } from '../view';
 
 export const CODEHOLDER_DELEGATIONS = 'codeholderDelegations';
 export const DELEGATION_SUBJECTS = 'delegationSubjects';
+export const DELEGATION_APPLICATIONS = 'delegationApplications';
 export const SIG_SUBJECTS = '!subjects';
+export const SIG_APPLICATIONS = '!applications';
 
 export const delegateFilters = {
     org: {
@@ -86,6 +88,62 @@ export const tasks = {
         storePath: ({ id }) => [DELEGATION_SUBJECTS, id],
         signalPath: () => [DELEGATION_SUBJECTS, SIG_SUBJECTS],
     }),
+
+    listApplications: crudList({
+        apiPath: () => `/delegations/applications`,
+        fields: [
+            'id', 'org', 'status', 'statusTime',
+            'applicantNotes', 'internalNotes', 'time', 'subjects', 'cities',
+            // 'countries', 'codeholderId',
+            'codeholderId',
+
+            'hosting',
+        ],
+        storePath: ({ id }) => [DELEGATION_APPLICATIONS, id],
+    }),
+    application: crudGet({
+        apiPath: ({ id }) => `/delegations/applications/${id}`,
+        fields: [
+            'id', 'org', 'status', 'statusTime',
+            'applicantNotes', 'internalNotes', 'time', 'subjects', 'cities',
+            'countries', 'codeholderId',
+            'hosting',
+            'tos.docDataProtectionUEA',
+            'tos.docDataProtectionUEATime',
+            'tos.docDelegatesUEA',
+            'tos.docDelegatesUEATime',
+            'tos.docDelegatesDataProtectionUEA',
+            'tos.docDelegatesDataProtectionUEATime',
+            'tos.paperAnnualBook',
+            'tos.paperAnnualBookTime',
+        ],
+        storePath: ({ id }) => [DELEGATION_APPLICATIONS, id],
+    }),
+    createApplication: crudCreate({
+        apiPath: () => `/delegations/applications`,
+        fields: [
+            'org',
+            'applicantNotes',
+            'internalNotes',
+            'subjects',
+            'cities',
+            'countries',
+            'hosting',
+            'codeholderId',
+            'tos',
+        ],
+        storePath: (_, id) => [DELEGATION_APPLICATIONS, id],
+        signalPath: () => [DELEGATION_APPLICATIONS, SIG_APPLICATIONS],
+    }),
+    updateApplication: crudUpdate({
+        apiPath: ({ id }) => `/delegations/applications/${id}`,
+        storePath: ({ id }) => [DELEGATION_APPLICATIONS, id],
+    }),
+    deleteApplication: crudDelete({
+        apiPath: ({ id }) => `/delegations/applications/${id}`,
+        storePath: ({ id }) => [DELEGATION_APPLICATIONS, id],
+        signalPath: () => [DELEGATION_APPLICATIONS, SIG_APPLICATIONS],
+    }),
 };
 
 export const views = {
@@ -95,4 +153,10 @@ export const views = {
         canBeLazy: true,
     }),
     sigSubjects: createStoreObserver([DELEGATION_SUBJECTS, SIG_SUBJECTS]),
+
+    application: simpleDataView({
+        storePath: ({ id }) => [DELEGATION_APPLICATIONS, id],
+        get: ({ id }) => tasks.application({ id }),
+    }),
+    sigApplications: createStoreObserver([DELEGATION_APPLICATIONS, SIG_APPLICATIONS]),
 };

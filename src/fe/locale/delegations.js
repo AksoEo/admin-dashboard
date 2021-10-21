@@ -128,3 +128,47 @@ export const delegationSubjects = {
         done: 'Bone',
     },
 };
+
+export const delegationApplications = {
+    title: '[[Applications]]',
+    detailTitle: '[[Application]]',
+    search: {
+        fields: {
+            internalNotes: '[[internalNotes]]',
+        },
+        placeholders: {
+            internalNotes: 'Serĉi [[internalNotes]]',
+        },
+    },
+    fields: {
+        org: 'Organizo',
+        codeholderId: 'Membro',
+        status: '[[status]]',
+        statusBy: '[[statusBy]]',
+        statusTime: '[[statusTime]]',
+        approvedBy: '[[approvedBy]]',
+        approvedTime: '[[approvedTime]]',
+        cities: '[[cities]]',
+        cityCountries: '[[cityCountries]]',
+        countries: '[[countries]]',
+        subjects: '[[subjects]]',
+        hosting: '[[hosting]]',
+        tos: '[[tos]]',
+    },
+    create: {
+        title: 'Krei [[application]]',
+        button: 'Krei',
+        menuItem: 'Krei [[application]]',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti [[application]]',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi [[application]]',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la [[application]]? Ne eblas malfari tiun ĉi agon.',
+    },
+};
