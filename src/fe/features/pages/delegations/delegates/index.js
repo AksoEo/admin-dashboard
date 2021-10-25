@@ -88,7 +88,7 @@ export default connectPerms(class DelegatesPage extends Page {
 
         actions.push({
             label: applicationsLocale.title,
-            action: () => this.props.push('[[applications]]'),
+            action: () => this.props.push('kandidatighoj'),
         });
 
         // TODO: better perm check across orgs?

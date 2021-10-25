@@ -9,7 +9,7 @@ import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filter
 import { LOGIN_ID } from './login-keys';
 import { deepMerge, deepEq } from '../../util';
 import { crudList, crudGet, crudUpdate, simpleDataView } from '../templates';
-import { CODEHOLDER_DELEGATIONS, delegateFilters } from './delegations';
+import { CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS, delegateFilters } from './delegations';
 
 //! # Client-side codeholder representation
 //! - fields with no value are null or an empty string
@@ -68,7 +68,6 @@ export const SIG_CODEHOLDERS = '!codeholders';
 export const SIG_MEMBERSHIPS = '!memberships';
 export const SIG_ROLES = '!roles';
 export const SIG_FILES = '!files';
-export const SIG_DELEGATIONS = '!delegations';
 
 // used below; this is just here for DRY
 const addressSubfields = [

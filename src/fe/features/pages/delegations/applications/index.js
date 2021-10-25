@@ -105,7 +105,7 @@ export default connectPerms(class DelegateApplicationsPage extends Page {
                     view="delegations/application"
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/delegitoj/[[applications]]/${id}`}
+                    onGetItemLink={id => `/delegitoj/kandidatighoj/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}

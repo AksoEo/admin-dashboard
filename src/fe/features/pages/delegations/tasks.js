@@ -1,5 +1,8 @@
+import { h } from 'preact';
 import { delegationSubjects as subjectsLocale, delegationApplications as applicationsLocale } from '../../../locale';
 import { createDialog, updateDialog, deleteDialog } from '../../../components/task-templates';
+import TaskDialog from '../../../components/task-dialog';
+import { routerContext } from '../../../router';
 import { FIELDS as SUBJECT_FIELDS } from './subjects/fields';
 import { FIELDS as APPLICATION_FIELDS } from './applications/fields';
 
@@ -28,9 +31,40 @@ export default {
         ],
         fields: APPLICATION_FIELDS,
         className: 'delegation-applications-task-create',
-        onCompletion: (task, routerContext, id) => routerContext.navigate(`/delegitoj/[[applications]]/${id}`),
+        onCompletion: (task, routerContext, id) => routerContext.navigate(`/delegitoj/kandidatighoj/${id}`),
     }),
     updateApplication: updateDialog({ locale: applicationsLocale.update, fields: applicationsLocale.fields }),
     deleteApplication: deleteDialog({ locale: applicationsLocale.delete }),
+
+    approveApplication ({ open, task }) {
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        open={open}
+                        onClose={() => task.drop()}
+                        title={applicationsLocale.approve.title}
+                        actionLabel={applicationsLocale.approve.button}
+                        run={() => task.runOnce().then(({ id, org }) => {
+                            routerContext.navigate(`/delegitoj/${id}/${org}`);
+                        })}>
+                        {applicationsLocale.approve.description}
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
+    denyApplication ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={applicationsLocale.deny.title}
+                actionLabel={applicationsLocale.deny.button}
+                run={() => task.runOnce()}>
+                {applicationsLocale.deny.description}
+            </TaskDialog>
+        );
+    },
 };
 

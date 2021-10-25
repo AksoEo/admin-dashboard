@@ -1,7 +1,10 @@
 import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, simpleDataView } from '../templates';
 import { createStoreObserver } from '../view';
+import asyncClient from '../client';
+import * as store from '../store';
 
 export const CODEHOLDER_DELEGATIONS = 'codeholderDelegations';
+export const SIG_DELEGATIONS = '!delegations';
 export const DELEGATION_SUBJECTS = 'delegationSubjects';
 export const DELEGATION_APPLICATIONS = 'delegationApplications';
 export const SIG_SUBJECTS = '!subjects';
@@ -92,30 +95,25 @@ export const tasks = {
     listApplications: crudList({
         apiPath: () => `/delegations/applications`,
         fields: [
-            'id', 'org', 'status', 'statusTime',
+            'id', 'org', 'status', 'statusTime', 'statusBy',
             'applicantNotes', 'internalNotes', 'time', 'subjects', 'cities',
             // 'countries', 'codeholderId',
             'codeholderId',
-
             'hosting',
         ],
-        storePath: ({ id }) => [DELEGATION_APPLICATIONS, id],
+        storePath: (_, { id }) => [DELEGATION_APPLICATIONS, id],
     }),
     application: crudGet({
         apiPath: ({ id }) => `/delegations/applications/${id}`,
         fields: [
-            'id', 'org', 'status', 'statusTime',
+            'id', 'org', 'status', 'statusTime', 'statusBy',
             'applicantNotes', 'internalNotes', 'time', 'subjects', 'cities',
-            'countries', 'codeholderId',
+            'codeholderId',
             'hosting',
             'tos.docDataProtectionUEA',
-            'tos.docDataProtectionUEATime',
             'tos.docDelegatesUEA',
-            'tos.docDelegatesUEATime',
             'tos.docDelegatesDataProtectionUEA',
-            'tos.docDelegatesDataProtectionUEATime',
             'tos.paperAnnualBook',
-            'tos.paperAnnualBookTime',
         ],
         storePath: ({ id }) => [DELEGATION_APPLICATIONS, id],
     }),
@@ -123,11 +121,12 @@ export const tasks = {
         apiPath: () => `/delegations/applications`,
         fields: [
             'org',
+            'status',
+            'statusTime',
             'applicantNotes',
             'internalNotes',
             'subjects',
             'cities',
-            'countries',
             'hosting',
             'codeholderId',
             'tos',
@@ -144,6 +143,33 @@ export const tasks = {
         storePath: ({ id }) => [DELEGATION_APPLICATIONS, id],
         signalPath: () => [DELEGATION_APPLICATIONS, SIG_APPLICATIONS],
     }),
+
+    approveApplication: async ({ id }) => {
+        const client = await asyncClient;
+        const item = await tasks.application({ id });
+        if (item.status !== 'pending') {
+            throw { code: 'bad-request', message: 'cannot approve: application is not pending' };
+        }
+        const delegation = {
+            cities: item.cities,
+            subjects: item.subjects,
+            countries: [],
+            hosting: item.hosting,
+            tos: item.tos,
+        };
+        await client.put(`/codeholders/${item.codeholderId}/delegations/${item.org}`, delegation);
+        store.insert([CODEHOLDER_DELEGATIONS, item.codeholderId, item.org], delegation);
+        store.signal([CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS]);
+        await tasks.updateApplication({ id }, { status: 'approved' });
+        return { id: item.codeholderId, org: item.org };
+    },
+    denyApplication: async ({ id }) => {
+        const item = await tasks.application({ id });
+        if (item.status !== 'pending') {
+            throw { code: 'bad-request', message: 'cannot deny: application is not pending' };
+        }
+        await tasks.updateApplication({ id }, { status: 'denied' });
+    },
 };
 
 export const views = {

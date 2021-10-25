@@ -614,10 +614,26 @@ export default [
                         ],
                     },
                     {
-                        path: '[[applications]]',
+                        path: 'kandidatighoj',
                         type: 'stack',
                         component: elazy(() =>
                             import(/* webpackChunkName: "delegates" */ './delegations/applications')),
+                        paths: [
+                            {
+                                match: /^(\d+)$/,
+                                matchKey: 'application',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "delegates" */ './delegations/applications/detail')),
+                                type: 'stack',
+                                paths: [
+                                    {
+                                        path: 'redakti',
+                                        type: 'state',
+                                        state: 'editing',
+                                    },
+                                ],
+                            },
+                        ],
                     },
                 ],
             },
