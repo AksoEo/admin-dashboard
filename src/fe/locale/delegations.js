@@ -18,6 +18,7 @@ export const delegations = {
             countryLevelsDontCare: 'ne gravas',
             hostingMaxDays: '[[hostingMaxDays]]',
             hostingMaxPersons: '[[hostingMaxPersons]]',
+            orgFilterNone: 'ne gravas',
         },
     },
     fields: {

@@ -194,6 +194,7 @@ export const FIELDS = {
                 </div>
             );
         },
+        isEmpty: value => !value || !value.length,
     },
     subjects: {
         wantsCreationLabel: true,

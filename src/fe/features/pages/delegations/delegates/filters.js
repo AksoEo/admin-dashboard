@@ -13,6 +13,7 @@ import CityPicker from './city-picker';
 import Subject from './subject';
 import GeoCity from './geo-city';
 import { delegations as locale } from '../../../../locale';
+import './filters.less';
 
 export const FILTERS = {
     org: {
@@ -27,7 +28,7 @@ export const FILTERS = {
         },
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
-                <Segmented selected={value} onSelect={value => {
+                <Segmented class="smaller" selected={value} onSelect={value => {
                     onEnabledChange(!!value);
                     onChange(value);
                 }} disabled={hidden}>
@@ -37,7 +38,8 @@ export const FILTERS = {
                             id: 'uea',
                         },
                         {
-                            label: '[[none]]',
+                            label: locale.search.filters.orgFilterNone,
+                            class: 'bordered',
                             id: null,
                         },
                     ]}
@@ -144,7 +146,7 @@ export const FILTERS = {
             const [pickerOpen, setPickerOpen] = useState(false);
 
             return (
-                <div>
+                <div class={'delegates-subjects-filter' + (value.length ? ' has-selected' : '')}>
                     <div class="selected-values">
                         {value.map(id => (
                             <Subject key={id} id={id} />
@@ -173,16 +175,18 @@ export const FILTERS = {
             return value.join('-');
         },
         deserialize (value) {
-            return { enabled: true, value: value.split('-').map(id => +id).filter(x => x) };
+            return { enabled: true, value: value.split('-').map(id => +id.substr(1)).filter(x => x).map(id => 'Q' + id) };
         },
         editor ({ value, onChange, onEnabledChange, hidden }) {
             const [pickerOpen, setPickerOpen] = useState(false);
 
             return (
-                <div>
+                <div class={'delegates-cities-filter' + (value.length ? ' has-selected' : '')}>
                     <div class="selected-values">
                         {value.map(id => (
-                            <GeoCity key={id} id={id} />
+                            <div class="city-item" key={id}>
+                                <GeoCity id={id} />
+                            </div>
                         ))}
                     </div>
                     <Button icon small onClick={() => setPickerOpen(true)} disabled={hidden}>
