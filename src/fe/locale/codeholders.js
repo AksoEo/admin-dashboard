@@ -35,7 +35,7 @@ export const codeholders = {
             isActiveMember: 'Aktiva membro iam en',
             deathdate: 'Mortjaro',
             codeList: 'Listo de UEA-kodoj',
-            delegations: '[[delegations]]',
+            delegations: 'Delegeco',
         },
         countryFilter: {
             all: 'ne gravas',
@@ -167,9 +167,9 @@ export const codeholders = {
     },
     fieldEditorInsufficientPerms: 'Vi ne havas redaktorajton',
     countryChangeNotice: {
-        description: '[[You changed the address country. Change the fee country to match?]]',
-        no: '[[Leave it]]',
-        yes: '[[Change it]]',
+        description: 'Vi ŝanĝis la adresan landon, ĉu vi volas reflekte ŝanĝi la paglandon?',
+        no: 'Ne, lasu ĝin',
+        yes: 'Jes, ŝanĝu ĝin',
     },
     profilePictureHashSome: 'Havas bildon',
     profilePictureHashNone: 'Havas neniun bildon',
@@ -282,9 +282,9 @@ export const codeholders = {
         description: 'Se la komenca kaj fina datoj restas malplenaj, la valido iĝas senlimaj.',
         durationFrom: 'Valida ekde',
         durationTo: 'Valida ĝis',
-        dataCountry: '[[DataCountry]]',
-        dataOrg: '[[DataOrg]]',
-        dataString: '[[DataString]]',
+        dataCountry: 'Rola lando',
+        dataOrg: 'Rola organizo',
+        dataString: 'Rola subteksto',
         notADate: 'Ne estas valida dato',
     },
     files: {
@@ -369,7 +369,7 @@ export const codeholders = {
         menuItem: 'Sendi amasmesaĝon',
         title: 'Sendi amasmesaĝon',
         empty: 'Estas neniuj ŝablonoj kun la celo “membro”',
-        emptyWithQuery: 'Estas neniuj ŝablonoj kun la celo “membro” [[matching your search]]',
+        emptyWithQuery: 'Estas neniuj ŝablonoj kun la celo “membro” kiuj plenumas vian filtrilon',
         deleteOnComplete: 'Forigi la ŝablonon post sendado',
         send: {
             button: 'Al konfirma paŝo',
@@ -431,7 +431,7 @@ export const codeholders = {
 export const codeholderChgReqs = {
     title: 'Ŝanĝopetoj',
     detailTitle: 'Ŝanĝopeto',
-    buttonLabel: n => n === 0 ? 'Ŝanĝopetoj' : `${n} Ŝanĝopeto${n === 1 ? '' : 'j'}`,
+    buttonLabel: n => n === 0 ? 'Ŝanĝopetoj' : `${n} ŝanĝopeto${n === 1 ? '' : 'j'}`,
     search: {
         placeholders: {
             codeholderDescription: 'Serĉi priskribojn',

@@ -4,7 +4,7 @@ export const roles = {
     fields: {
         name: 'Nomo',
         description: 'Priskribo',
-        public: '[[Public]]',
+        public: 'Publikeco',
     },
     search: {
         placeholders: {

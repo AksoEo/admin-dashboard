@@ -15,7 +15,7 @@ export const app = {
     debugPageInfo: 'Se vi ne scias kio estas tio ĉi, ne zorgu kaj alklaku sur \'Hejmo\' en la menuo.',
 
     dirtyConfirmation: {
-        description: '[[You have unsaved changes. Are you sure you want to leave?]]',
+        description: 'Estas nekonservitaj ŝanĝoj. Ĉu vi certas ke vi volas forlasi la paĝon kaj perdi la malneton?',
     },
 };
 

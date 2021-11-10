@@ -29,6 +29,6 @@ export const errors = {
     // see congresses/createParticipant
     'congresses-already-registered': 'Jam ekzistas aliĝo por tiu ĉi membro',
     // see clients/list
-    'invalid-api-key': '[[Invalid API key]]',
+    'invalid-api-key': 'Nevalida API-ŝlosilo',
 };
 
