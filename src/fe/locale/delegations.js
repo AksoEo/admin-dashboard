@@ -90,7 +90,7 @@ export const delegations = {
 };
 
 export const delegationSubjects = {
-    title: 'Delegitaj fakoj',
+    title: 'Fakoj',
     detailTitle: 'Delegita fako',
     search: {
         fields: {
@@ -131,7 +131,7 @@ export const delegationSubjects = {
 };
 
 export const delegationApplications = {
-    title: 'Kandidatiĝoj por delegitiĝi',
+    title: 'Kandidatiĝoj',
     detailTitle: 'Kandidatiĝo',
     search: {
         fields: {
