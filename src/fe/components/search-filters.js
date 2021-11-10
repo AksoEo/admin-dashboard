@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Suspense, useEffect, useState, Fragment } from 'preact/compat';
+import { Suspense, useEffect, useState, Fragment, PureComponent } from 'preact/compat';
 import { Checkbox, Button, Dialog } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import PaperList from './paper-list';
@@ -43,159 +43,158 @@ import './search-filters.less';
 /// - filtersToAPI: name of a task that will convert client filters to an api filter
 /// - compact: if true, forces compact view
 /// - userData: will be passed to filters
-export default function SearchFilters ({
-    value,
-    onChange,
-    searchFields,
-    filters,
-    expanded,
-    onExpandedChange,
-    locale: searchLocale,
-    category,
-    inputRef,
-    filtersToAPI,
-    userData,
-    compact: _compact,
-}) {
-    const items = [];
-
-    // FIXME: this is a hack to force an update when the window size is changed
-    const [forceUpdate, setForceUpdate] = useState(0);
-
-    const compact = _compact || (window.innerWidth <= 600);
-
-    items.push({
-        node: <div class="top-padding" />,
-        hidden: !expanded,
-    });
-
-    if ('search' in value) {
-        items.push({
-            node: <SearchInput
-                compact={compact}
-                ref={inputRef}
-                value={value.search}
-                onChange={search => onChange({ ...value, search, offset: 0 })}
-                searchFields={searchFields}
-                expanded={expanded}
-                onSubmit={() => {
-                    if (onExpandedChange) onExpandedChange(false);
-                    onChange({ ...value, offset: 0 });
-                }}
-                localizedFields={searchLocale.searchFields}
-                localizedPlaceholders={searchLocale.searchPlaceholders} />,
-            paper: true,
-            zIndex: 3,
-            staticHeight: true,
-        });
-    }
-    const hasFilters = filters && Object.keys(filters).length;
-
-    if (hasFilters && ('search' in value)) {
-        items.push({
-            node: <FiltersDisclosure
-                expanded={expanded}
-                onExpandedChange={onExpandedChange} />,
-            paper: true,
-            staticHeight: true,
-        });
-
-        items.push({
-            node: <FiltersBar
-                category={category}
-                value={value}
-                onChange={onChange}
-                hidden={!expanded}
-                filtersToAPITask={filtersToAPI} />,
-            hidden: !expanded,
-            paper: true,
-        });
-    }
-
-    const jsonFilterEnabled = value.jsonFilter && !value.jsonFilter._disabled;
-
-    useEffect(() => {
-        if (!hasFilters) return;
-        const newValue = { ...value };
+export default class SearchFilters extends PureComponent {
+    ensureFiltersExist() {
+        if (!this.props.filters || !Object.keys(this.props.filters).length) return;
+        const newValue = { ...this.props.value };
         if (!newValue.filters) newValue.filters = {};
         let didChange = false;
-        for (const filterId in filters) {
+        for (const filterId in this.props.filters) {
             if (!(filterId in newValue.filters)) {
                 didChange = true;
-                newValue.filters[filterId] = filters[filterId].default();
+                newValue.filters[filterId] = this.props.filters[filterId].default();
             }
         }
         for (const filterId of [...Object.keys(newValue.filters)]) {
             if (filterId === '_disabled') continue;
-            if (!(filterId in filters)) {
+            if (!(filterId in this.props.filters)) {
                 didChange = true;
                 delete newValue.filters[filterId];
             }
         }
-        if (didChange) onChange(newValue);
-    });
-
-    const filtersEnabled = value.filters && !value.filters._disabled;
-    for (const filterId in filters) {
-        // TODO: filter constaints
-        if (!value.filters[filterId]) continue; // handled above
-        const isEnabled = value.filters[filterId].enabled;
-        const filterIsHidden = !filtersEnabled || (!isEnabled && !expanded);
-        items.push({
-            node: <div style={{ height: 8 }} />,
-            paper: false,
-            hidden: filterIsHidden,
-            staticHeight: true,
-        });
-        items.push({
-            node: <Filter
-                id={filterId}
-                spec={filters[filterId]}
-                filter={value.filters[filterId]}
-                onFilterChange={filter => onChange({
-                    ...value,
-                    filters: {
-                        ...value.filters,
-                        [filterId]: filter,
-                    },
-                    offset: 0,
-                })}
-                expanded={expanded}
-                hidden={filterIsHidden}
-                locale={searchLocale}
-                userData={userData} />,
-            paper: true,
-            hidden: filterIsHidden,
-            staticHeight: true,
-        });
+        if (didChange) this.props.onChange(newValue);
     }
 
-    items.push({
-        node: jsonFilterEnabled ? (
-            <Suspense fallback={<div class="json-filter-loading">
-                {locale.loadingJSONEditor}
-            </div>}>
-                <JSONFilterEditor
-                    value={value.jsonFilter}
-                    onChange={jsonFilter => onChange({ ...value, jsonFilter, offset: 0 })}
+    render ({
+        value,
+        onChange,
+        searchFields,
+        filters,
+        expanded,
+        onExpandedChange,
+        locale: searchLocale,
+        category,
+        inputRef,
+        filtersToAPI,
+        userData,
+        compact: _compact,
+    }) {
+        const items = [];
+
+        const compact = _compact || (window.innerWidth <= 600);
+
+        items.push({
+            node: <div class="top-padding" />,
+            hidden: !expanded,
+        });
+
+        if ('search' in value) {
+            items.push({
+                node: <SearchInput
+                    compact={compact}
+                    ref={inputRef}
+                    value={value.search}
+                    onChange={search => onChange({ ...value, search, offset: 0 })}
+                    searchFields={searchFields}
                     expanded={expanded}
-                    onCollapse={() => onExpandedChange(false)} />
-            </Suspense>
-        ) : null,
-        paper: true,
-        hidden: !jsonFilterEnabled,
-    });
+                    onSubmit={() => {
+                        if (onExpandedChange) onExpandedChange(false);
+                        onChange({ ...value, offset: 0 });
+                    }}
+                    localizedFields={searchLocale.searchFields}
+                    localizedPlaceholders={searchLocale.searchPlaceholders} />,
+                paper: true,
+                zIndex: 3,
+                staticHeight: true,
+            });
+        }
+        const hasFilters = filters && Object.keys(filters).length;
 
-    items.push({
-        node: <div class="bottom-padding">
-            {/* This event proxy needs to go *somewhere* and this seemed as good a place as any */}
-            <EventProxy dom target={window} onresize={() => setForceUpdate(forceUpdate + 1)} />
-        </div>,
-        hidden: !expanded,
-        flush: true,
-    });
+        if (hasFilters && ('search' in value)) {
+            items.push({
+                node: <FiltersDisclosure
+                    expanded={expanded}
+                    onExpandedChange={onExpandedChange} />,
+                paper: true,
+                staticHeight: true,
+            });
 
-    return <PaperList class={'search-filters' + (compact ? ' is-compact' : '')}>{items}</PaperList>;
+            items.push({
+                node: <FiltersBar
+                    category={category}
+                    value={value}
+                    onChange={onChange}
+                    hidden={!expanded}
+                    filtersToAPITask={filtersToAPI} />,
+                hidden: !expanded,
+                paper: true,
+            });
+        }
+
+        const jsonFilterEnabled = value.jsonFilter && !value.jsonFilter._disabled;
+
+        const filtersEnabled = value.filters && !value.filters._disabled;
+        for (const filterId in filters) {
+            // TODO: filter constaints
+            if (!value.filters[filterId]) continue; // handled above
+            const isEnabled = value.filters[filterId].enabled;
+            const filterIsHidden = !filtersEnabled || (!isEnabled && !expanded);
+            items.push({
+                node: <div style={{ height: 8 }} />,
+                paper: false,
+                hidden: filterIsHidden,
+                staticHeight: true,
+            });
+            items.push({
+                node: <Filter
+                    id={filterId}
+                    spec={filters[filterId]}
+                    filter={value.filters[filterId]}
+                    onFilterChange={filter => onChange({
+                        ...value,
+                        filters: {
+                            ...value.filters,
+                            [filterId]: filter,
+                        },
+                        offset: 0,
+                    })}
+                    expanded={expanded}
+                    hidden={filterIsHidden}
+                    locale={searchLocale}
+                    userData={userData} />,
+                paper: true,
+                hidden: filterIsHidden,
+                staticHeight: true,
+            });
+        }
+
+        items.push({
+            node: jsonFilterEnabled ? (
+                <Suspense fallback={<div class="json-filter-loading">
+                    {locale.loadingJSONEditor}
+                </div>}>
+                    <JSONFilterEditor
+                        value={value.jsonFilter}
+                        onChange={jsonFilter => onChange({ ...value, jsonFilter, offset: 0 })}
+                        expanded={expanded}
+                        onCollapse={() => onExpandedChange(false)} />
+                </Suspense>
+            ) : null,
+            paper: true,
+            hidden: !jsonFilterEnabled,
+        });
+
+        items.push({
+            node: <div class="bottom-padding">
+                {/* This event proxy needs to go *somewhere* and this seemed as good a place as any */}
+                <EventProxy dom target={window} onresize={() => this.forceUpdate()} />
+            </div>,
+            hidden: !expanded,
+            flush: true,
+        });
+
+        return <PaperList class={'search-filters' + (compact ? ' is-compact' : '')}>{items}</PaperList>;
+    }
 }
 
 function FiltersDisclosure ({ expanded, onExpandedChange }) {

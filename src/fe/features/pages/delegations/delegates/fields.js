@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/compat';
 import { Button, Checkbox, TextField } from 'yamdl';
+import SearchIcon from '@material-ui/icons/Search';
 import RemoveIcon from '@material-ui/icons/Remove';
 import OrgIcon from '../../../../components/org-icon';
 import { CountryFlag } from '../../../../components/data/country';
@@ -14,6 +15,8 @@ import { Validator } from '../../../../components/form';
 import Select from '../../../../components/select';
 import TextArea from '../../../../components/text-area';
 import { delegations as locale, delegationSubjects as subjectsLocale } from '../../../../locale';
+import { routerContext } from '../../../../router';
+import { makeStatusTimeFilterQuery } from '../applications/filters';
 import GeoCity from './geo-city';
 import Subject from './subject';
 import CityPicker from './city-picker';
@@ -74,8 +77,33 @@ export const FIELDS = {
         },
     },
     approvedTime: {
-        component ({ value }) {
+        component ({ value, slot }) {
             if (!value) return null;
+            if (slot === 'detail') {
+                return (
+                    <div class="delegation-approved-time">
+                        <span class="inner-approved-time">
+                            <timestamp.renderer value={value} />
+                        </span>
+                        <routerContext.Consumer>
+                            {routerContext => (
+                                <Button
+                                    class="application-find-button"
+                                    title={locale.approvalTimeFindMatching}
+                                    icon small
+                                    onClick={() => {
+                                        routerContext.navigate(`/delegitoj/kandidatighoj?${makeStatusTimeFilterQuery(
+                                            new Date((value - 60) * 1000),
+                                            new Date((value + 60) * 1000),
+                                        )}`);
+                                    }}>
+                                    <SearchIcon style={{ verticalAlign: 'middle' }} />
+                                </Button>
+                            )}
+                        </routerContext.Consumer>
+                    </div>
+                );
+            }
             return <timestamp.renderer value={value} />;
         },
     },

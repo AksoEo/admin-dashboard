@@ -20,10 +20,10 @@ export default connectPerms(class DelegateApplicationsPage extends Page {
             },
             fields: [
                 { id: 'org', sorting: 'none', fixed: true },
-                { id: 'codeholderId', sorting: this.codeholderId ? 'none' : 'asc', fixed: true },
+                { id: 'status', sorting: 'desc', fixed: true },
+                { id: 'codeholderId', sorting: 'asc', fixed: true },
                 { id: 'cities', sorting: 'none', fixed: true },
                 { id: 'countries', sorting: 'none', fixed: true },
-                { id: 'status', sorting: 'none', fixed: true },
             ],
             filters: {},
             jsonFilter: {
@@ -95,6 +95,7 @@ export default connectPerms(class DelegateApplicationsPage extends Page {
                     locale={{
                         searchPlaceholders: locale.search.placeholders,
                         searchFields: locale.search.fields,
+                        filters: locale.search.filters,
                     }}
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}

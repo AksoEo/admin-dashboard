@@ -39,6 +39,11 @@ export function createDialog ({ locale, fieldNames, fields: fieldDefs, className
                         run={() => task.runOnce().then(id => {
                             onCompletion(task, routerContext, id);
                         })}>
+                        {locale.create.description ? (
+                            <div class="creation-description">
+                                {locale.create.description}
+                            </div>
+                        ) : null}
                         {fields}
                     </TaskDialog>
                 )}

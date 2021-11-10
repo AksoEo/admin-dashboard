@@ -1,8 +1,12 @@
 import { h } from 'preact';
-import { delegationSubjects as subjectsLocale, delegationApplications as applicationsLocale } from '../../../locale';
+import {
+    delegations as locale,
+    delegationSubjects as subjectsLocale,
+    delegationApplications as applicationsLocale,
+} from '../../../locale';
 import { createDialog, updateDialog, deleteDialog } from '../../../components/task-templates';
 import TaskDialog from '../../../components/task-dialog';
-import { routerContext } from '../../../router';
+import { FIELDS as DELEGATION_FIELDS } from './delegates/fields';
 import { FIELDS as SUBJECT_FIELDS } from './subjects/fields';
 import { FIELDS as APPLICATION_FIELDS } from './applications/fields';
 
@@ -36,24 +40,12 @@ export default {
     updateApplication: updateDialog({ locale: applicationsLocale.update, fields: applicationsLocale.fields }),
     deleteApplication: deleteDialog({ locale: applicationsLocale.delete }),
 
-    approveApplication ({ open, task }) {
-        return (
-            <routerContext.Consumer>
-                {routerContext => (
-                    <TaskDialog
-                        open={open}
-                        onClose={() => task.drop()}
-                        title={applicationsLocale.approve.title}
-                        actionLabel={applicationsLocale.approve.button}
-                        run={() => task.runOnce().then(({ id, org }) => {
-                            routerContext.navigate(`/delegitoj/${id}/${org}`);
-                        })}>
-                        {applicationsLocale.approve.description}
-                    </TaskDialog>
-                )}
-            </routerContext.Consumer>
-        );
-    },
+    approveApplication: createDialog({
+        locale: { ...locale, create: applicationsLocale.approve },
+        fieldNames: ['org', 'codeholderId', 'cities', 'countries', 'subjects', 'hosting', 'tos'],
+        fields: DELEGATION_FIELDS,
+        onCompletion: (task, routerContext) => routerContext.navigate(`/delegitoj/${task.parameters.codeholderId}/${task.parameters.org}`),
+    }),
     denyApplication ({ open, task }) {
         return (
             <TaskDialog

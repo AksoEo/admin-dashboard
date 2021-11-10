@@ -3,6 +3,7 @@ import { useState } from 'preact/compat';
 import { Dialog } from 'yamdl';
 import SearchIcon from '@material-ui/icons/Search';
 import StaticOverviewList from '../../../../components/overview-list-static';
+import { country } from '../../../../components/data';
 import { delegations as locale } from '../../../../locale';
 import './city-picker.less';
 
@@ -36,13 +37,21 @@ const FIELDS = {
         },
     },
     nativeLabel: {
+        skipLabel: true,
         component ({ value }) {
             return value;
         },
     },
     subdivision_eoLabel: {
+        skipLabel: true,
         component ({ value }) {
             return value;
+        },
+    },
+    country: {
+        skipLabel: true,
+        component({ value }) {
+            return <country.renderer value={value} />;
         },
     },
 };

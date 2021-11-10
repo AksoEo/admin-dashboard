@@ -44,6 +44,17 @@ export const delegateFilters = {
     // TODO: tos fields
 };
 
+const applicationFilters = {
+    status: {
+        toAPI: status => ({ status }),
+    },
+    statusTime: {
+        toAPI: ([a, b]) => ({
+            statusTime: { $gte: (+a / 1000) | 0, $lte: (+b / 1000) | 0 },
+        }),
+    },
+};
+
 export const tasks = {
     listDelegates: crudList({
         apiPath: () => `/delegations/delegates`,
@@ -94,6 +105,7 @@ export const tasks = {
 
     listApplications: crudList({
         apiPath: () => `/delegations/applications`,
+        filters: applicationFilters,
         fields: [
             'id', 'org', 'status', 'statusTime', 'statusBy',
             'applicantNotes', 'internalNotes', 'time', 'subjects', 'cities',
@@ -144,16 +156,12 @@ export const tasks = {
         signalPath: () => [DELEGATION_APPLICATIONS, SIG_APPLICATIONS],
     }),
 
-    approveApplication: async ({ id }) => {
+    approveApplication: async ({ id }, item) => {
         const client = await asyncClient;
-        const item = await tasks.application({ id });
-        if (item.status !== 'pending') {
-            throw { code: 'bad-request', message: 'cannot approve: application is not pending' };
-        }
         const delegation = {
             cities: item.cities,
             subjects: item.subjects,
-            countries: [],
+            countries: item.countries || [],
             hosting: item.hosting,
             tos: item.tos,
         };

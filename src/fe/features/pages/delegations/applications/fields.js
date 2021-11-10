@@ -30,6 +30,7 @@ const notesField = {
 
 export const FIELDS = {
     status: {
+        sortable: true,
         component ({ value, item, slot }) {
             return (
                 <div class="delegation-application-status">
@@ -48,7 +49,7 @@ export const FIELDS = {
                         <coreContext.Consumer>
                             {core => (
                                 <div class="status-pending">
-                                    <Button onClick={() => core.createTask('delegations/approveApplication', { id: item.id })}>
+                                    <Button onClick={() => core.createTask('delegations/approveApplication', { id: item.id }, item)}>
                                         {locale.status.approve}
                                     </Button>
                                     <Button onClick={() => core.createTask('delegations/denyApplication', { id: item.id })}>
