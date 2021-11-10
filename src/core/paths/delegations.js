@@ -45,6 +45,9 @@ export const delegateFilters = {
 };
 
 const applicationFilters = {
+    codeholderId: {
+        toAPI: codeholders => ({ codeholderId: { $in: codeholders } }),
+    },
     status: {
         toAPI: status => ({ status }),
     },

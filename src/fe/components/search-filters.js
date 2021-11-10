@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Suspense, useEffect, useState, Fragment, PureComponent } from 'preact/compat';
+import { Suspense, useState, Fragment, PureComponent } from 'preact/compat';
 import { Checkbox, Button, Dialog } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import PaperList from './paper-list';
@@ -44,7 +44,7 @@ import './search-filters.less';
 /// - compact: if true, forces compact view
 /// - userData: will be passed to filters
 export default class SearchFilters extends PureComponent {
-    ensureFiltersExist() {
+    ensureFiltersExist () {
         if (!this.props.filters || !Object.keys(this.props.filters).length) return;
         const newValue = { ...this.props.value };
         if (!newValue.filters) newValue.filters = {};
@@ -63,6 +63,11 @@ export default class SearchFilters extends PureComponent {
             }
         }
         if (didChange) this.props.onChange(newValue);
+    }
+
+    componentDidMount () {
+        // delay to prevent race with url coding
+        setTimeout(() => this.ensureFiltersExist(), 100);
     }
 
     render ({

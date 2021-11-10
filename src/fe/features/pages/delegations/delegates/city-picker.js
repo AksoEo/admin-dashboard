@@ -50,7 +50,7 @@ const FIELDS = {
     },
     country: {
         skipLabel: true,
-        component({ value }) {
+        component ({ value }) {
             return <country.renderer value={value} />;
         },
     },

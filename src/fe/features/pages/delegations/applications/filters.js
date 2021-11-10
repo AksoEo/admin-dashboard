@@ -1,12 +1,65 @@
 import { h } from 'preact';
+import Select from '../../../../components/select';
+import CodeholderPicker from '../../../../components/codeholder-picker';
 import { timestamp } from '../../../../components/data';
 import { delegationApplications as locale } from '../../../../locale';
 
-export function makeStatusTimeFilterQuery (from, to) {
-    return `filter(statusTime:(${from.toISOString()}$${to.toISOString()}))`;
+export function makeCodeholderFilterQuery (codeholder) {
+    return `filter(codeholderId:${codeholder})`;
 }
 
 export const FILTERS = {
+    codeholderId: {
+        default () {
+            return { enabled: false, value: [] };
+        },
+        serialize ({ value }) {
+            return value.join(',');
+        },
+        deserialize (value) {
+            return { enabled: true, value: value.split(',') };
+        },
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            return (
+                <div class="delegation-application-codeholder-filter">
+                    <CodeholderPicker
+                        disabled={hidden}
+                        value={value}
+                        onChange={v => {
+                            onChange(v);
+                            onEnabledChange(!!v.length);
+                        }} />
+                </div>
+            );
+        },
+    },
+    status: {
+        default () {
+            return { enabled: false, value: null };
+        },
+        serialize ({ value }) {
+            return value;
+        },
+        deserialize (value) {
+            return { enabled: true, value };
+        },
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            return (
+                <Select
+                    value={value}
+                    onChange={v => {
+                        onEnabledChange(!!v);
+                        onChange(v);
+                    }}
+                    items={[
+                        { value: null, label: locale.search.filters.statusAny },
+                        { value: 'pending', label: locale.status.pending },
+                        { value: 'approved', label: locale.status.approved },
+                        { value: 'denied', label: locale.status.denied },
+                    ]} />
+            );
+        },
+    },
     statusTime: {
         needsSwitch: true,
         default () {
@@ -20,7 +73,7 @@ export const FILTERS = {
         },
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
-                <div class="status-time-filter">
+                <div class="delegation-application-status-time-filter">
                     <div>
                         <timestamp.editor
                             outline

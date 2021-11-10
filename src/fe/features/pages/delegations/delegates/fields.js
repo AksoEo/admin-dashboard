@@ -15,8 +15,8 @@ import { Validator } from '../../../../components/form';
 import Select from '../../../../components/select';
 import TextArea from '../../../../components/text-area';
 import { delegations as locale, delegationSubjects as subjectsLocale } from '../../../../locale';
-import { routerContext } from '../../../../router';
-import { makeStatusTimeFilterQuery } from '../applications/filters';
+import { Link, routerContext } from '../../../../router';
+import { makeCodeholderFilterQuery } from '../applications/filters';
 import GeoCity from './geo-city';
 import Subject from './subject';
 import CityPicker from './city-picker';
@@ -55,7 +55,7 @@ export const FIELDS = {
                 );
             }
             if (!value) return '—';
-            return <IdUEACode id={value} />;
+            return <Link class="delegation-codeholder" target={`/membroj/${value}`} outOfTree><IdUEACode id={value} /></Link>;
         },
     },
     approvedBy: {
@@ -63,7 +63,7 @@ export const FIELDS = {
             if (!value) return '—';
             let content;
             if (value.startsWith('ch:')) {
-                content = <IdUEACode id={value.substr(3)} />;
+                content = <Link target={`/membroj/${value.substr(3)}`} outOfTree><IdUEACode id={value.substr(3)} /></Link>;
             } else if (value.startsWith('app:')) {
                 // TODO: this
                 content = 'todo';
@@ -77,7 +77,7 @@ export const FIELDS = {
         },
     },
     approvedTime: {
-        component ({ value, slot }) {
+        component ({ value, item, slot }) {
             if (!value) return null;
             if (slot === 'detail') {
                 return (
@@ -92,10 +92,9 @@ export const FIELDS = {
                                     title={locale.approvalTimeFindMatching}
                                     icon small
                                     onClick={() => {
-                                        routerContext.navigate(`/delegitoj/kandidatighoj?${makeStatusTimeFilterQuery(
-                                            new Date((value - 60) * 1000),
-                                            new Date((value + 60) * 1000),
-                                        )}`);
+                                        routerContext.navigate(
+                                            `/delegitoj/kandidatighoj?${makeCodeholderFilterQuery(item.codeholderId)}`
+                                        );
                                     }}>
                                     <SearchIcon style={{ verticalAlign: 'middle' }} />
                                 </Button>

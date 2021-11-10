@@ -143,8 +143,10 @@ export const delegationApplications = {
         },
         filters: {
             status: 'Stato',
+            codeholderId: 'Membro',
             statusTime: 'Horo de stato',
 
+            statusAny: 'ne gravas',
             timeRangeStart: 'Komenco',
             timeRangeEnd: 'Fino',
         },
