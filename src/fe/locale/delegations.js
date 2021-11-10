@@ -33,7 +33,7 @@ export const delegations = {
         hosting: 'Gastigado',
         tos: 'Kondiĉoj',
     },
-    approvalTimeFindMatching: '[[Find matching applications]]',
+    approvalTimeFindMatching: 'Trovi kandidatiĝon',
     hosting: {
         maxDays: 'Maksimuma daŭro',
         maxPersons: 'Maksimumaj gastoj',
@@ -143,7 +143,7 @@ export const delegationApplications = {
         },
         filters: {
             status: 'Stato',
-            statusTime: '[[StatusTime]]',
+            statusTime: 'Horo de stato',
 
             timeRangeStart: 'Komenco',
             timeRangeEnd: 'Fino',
