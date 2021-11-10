@@ -37,6 +37,8 @@ export const delegations = {
     hosting: {
         maxDays: 'Maksimuma daŭro',
         maxPersons: 'Maksimumaj gastoj',
+        maxDaysUnit: n => n == 1 ? 'tago' : 'tagoj',
+        maxPersonsUnit: n => n == 1 ? 'homo' : 'homoj',
         description: 'Priskribo',
         psProfileURL: 'Ligilo al Pasporta Servo',
         maxDaysNone: 'Nenia limo indikita',

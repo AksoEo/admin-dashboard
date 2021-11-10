@@ -55,7 +55,10 @@ export const FIELDS = {
                 );
             }
             if (!value) return '—';
-            return <Link class="delegation-codeholder" target={`/membroj/${value}`} outOfTree><IdUEACode id={value} /></Link>;
+            if (slot === 'detail') {
+                return <Link class="delegation-codeholder" target={`/membroj/${value}`} outOfTree><IdUEACode id={value} /></Link>;
+            }
+            return <IdUEACode id={value} />;
         },
     },
     approvedBy: {
@@ -120,7 +123,7 @@ export const FIELDS = {
             };
 
             return (
-                <div class="delegation-cities">
+                <div class={'delegation-cities' + (slot !== 'detail' ? ' is-short' : '')}>
                     {value.map(id => (
                         <div class={'delegation-city' + (editing ? ' is-editing' : '')} key={id}>
                             {editing ? (
@@ -293,9 +296,12 @@ export const FIELDS = {
                     <div class="hosting-field small">
                         <label>{locale.hosting.maxDays}</label>
                         {editable(
-                            value.maxDays || locale.hosting.maxDaysNone,
+                            value.maxDays ? (
+                                `${value.maxDays} ${locale.hosting.maxDaysUnit(value.maxDays)}`
+                            ) : locale.hosting.maxDaysNone,
                             <TextField
                                 type="number"
+                                trailing={locale.hosting.maxDaysUnit(0)}
                                 outline
                                 placeholder={locale.hosting.maxDaysNone}
                                 value={value.maxDays || ''}
@@ -308,9 +314,12 @@ export const FIELDS = {
                     <div class="hosting-field small">
                         <label>{locale.hosting.maxPersons}</label>
                         {editable(
-                            value.maxPersons || locale.hosting.maxPersonsNone,
+                            value.maxPersons ? (
+                                `${value.maxPersons} ${locale.hosting.maxPersonsUnit(value.maxPersons)}`
+                            ) : locale.hosting.maxPersonsNone,
                             <TextField
                                 type="number"
+                                trailing={locale.hosting.maxPersonsUnit(0)}
                                 outline
                                 placeholder={locale.hosting.maxPersonsNone}
                                 value={value.maxPersons || ''}
@@ -332,7 +341,9 @@ export const FIELDS = {
                     <div class="hosting-field">
                         <label>{locale.hosting.psProfileURL}</label>
                         {editable(
-                            value.psProfileURL || '—',
+                            value.psProfileURL ? (
+                                <a target="_blank" rel="nofollow noreferrer" href={value.psProfileURL}>{value.psProfileURL}</a>
+                            ) : '—',
                             <Validator
                                 component={TextField}
                                 validate={value => {

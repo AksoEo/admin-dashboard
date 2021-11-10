@@ -6,6 +6,10 @@
 }
 
 .delegation-cities {
+    &.is-short {
+        max-height: 5em;
+    }
+
     .delegation-city {
         display: flex;
         align-items: center;
@@ -106,6 +110,10 @@
             margin-bottom: 4px;
         }
 
+        a {
+            color: @secondary;
+        }
+
         &.small {
             display: flex;
             justify-content: space-between;
@@ -116,7 +124,11 @@
             }
 
             .paper-text-field {
-                width: 144px;
+                width: 14em;
+
+                input[type="number"] {
+                    text-align: right;
+                }
             }
         }
 

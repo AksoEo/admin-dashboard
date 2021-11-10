@@ -46,6 +46,7 @@ export const FILTERS = {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <Select
+                    disabled={hidden}
                     value={value}
                     onChange={v => {
                         onEnabledChange(!!v);
