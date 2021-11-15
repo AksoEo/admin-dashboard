@@ -3,6 +3,7 @@ import { TextField } from 'yamdl';
 import TaskDialog from '../../../components/task-dialog';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/changed-fields';
+import { createDialog } from '../../../components/task-templates';
 import {
     membershipCategories as categoriesLocale,
     membershipOptions as optionsLocale,
@@ -123,40 +124,13 @@ export default {
         );
     },
 
-    createEntry ({ open, task }) {
-        const fields = ENTRY_CREATE_FIELDS.map(id => {
-            const Component = ENTRY_FIELDS[id].component;
-            return (
-                <Field key={id}>
-                    <Component
-                        slot="create"
-                        editing value={task.parameters[id]}
-                        onChange={value => task.update({ [id]: value })}
-                        item={task.parameters}
-                        onItemChange={v => task.update(v)} />
-                </Field>
-            );
-        });
-
-        return (
-            <routerContext.Consumer>
-                {routerContext => (
-                    <TaskDialog
-                        sheet
-                        class="memberships-tasks-create-entry"
-                        open={open}
-                        onClose={() => task.drop()}
-                        title={entriesLocale.create.title}
-                        actionLabel={entriesLocale.create.button}
-                        run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/membreco/alighoj/${id}`);
-                        })}>
-                        {fields}
-                    </TaskDialog>
-                )}
-            </routerContext.Consumer>
-        );
-    },
+    createEntry: createDialog({
+        className: 'memberships-tasks-create-entry',
+        locale: entriesLocale,
+        fieldNames: ENTRY_CREATE_FIELDS,
+        fields: ENTRY_FIELDS,
+        onCompletion: (task, routerContext, id) => routerContext.navigate(`/membreco/alighoj/${id}`),
+    }),
     updateEntry ({ open, task }) {
         return (
             <TaskDialog

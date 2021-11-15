@@ -210,6 +210,9 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
     geoDb: {
         nativeLabelMissing: '[[No native label]]',
     },
+    picker: {
+        done: 'Bone',
+    },
 };
 
 export const search = {

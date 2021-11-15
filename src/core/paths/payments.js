@@ -4,6 +4,7 @@ import * as store from '../store';
 import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
+import { simpleDataView } from '../templates';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI, fieldDiff } from '../list';
 
 export const PAYMENT_ORGS = 'paymentOrgs';
@@ -15,6 +16,7 @@ export const PO_METHODS = 'poMethods';
 export const SIG_PO_METHODS = '!poMethods';
 export const PAYMENT_INTENTS = 'paymentIntents';
 export const SIG_PAYMENT_INTENTS = '!paymentIntents';
+export const EXCHANGE_RATES = 'exchRates';
 
 //! # Data structure
 //! ```
@@ -508,6 +510,13 @@ export const tasks = {
     iFiltersToAPI: async ({ filters }) => {
         return filtersToAPI(iClientFilters, filters);
     },
+
+    exchangeRates: async ({ base }) => {
+        const client = await asyncClient;
+        const res = await client.get('/aksopay/exchange_rates', { base });
+        store.insert([EXCHANGE_RATES, base], res.body);
+        return res.body;
+    },
 };
 export const views = {
     org: class Org extends AbstractDataView {
@@ -629,6 +638,12 @@ export const views = {
             store.unsubscribe([PAYMENT_INTENTS, this.id], this.#onUpdate);
         }
     },
+
+    exchangeRates: simpleDataView({
+        storePath: ({ base }) => [EXCHANGE_RATES, base],
+        get: tasks.exchangeRates,
+        canBeLazy: true,
+    }),
 
     sigOrgs: createStoreObserver([PAYMENT_ORGS, SIG_PAYMENT_ORGS]),
     sigAddons: createStoreObserver(({ org }) => [PAYMENT_ORGS, org, SIG_PO_ADDONS]),

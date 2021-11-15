@@ -43,7 +43,9 @@ export const FIELDS = {
     description: {
         skipLabel: true,
         component ({ value, editing, onChange }) {
-            if (editing) return <TextArea value={value} onChange={onChange} />;
+            if (editing) return <TextArea value={value} onChange={v => {
+                onChange(v || null);
+            }} />;
             if (!value) return null;
             return (
                 <div class="delegation-subject-description">

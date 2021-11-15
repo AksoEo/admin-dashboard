@@ -79,7 +79,6 @@ export const delegations = {
         pick: 'Elekti urbojn',
         pickOne: 'Elekti urbon',
         search: 'Serĉi urbon laŭ nomo',
-        done: 'Finita',
 
         // TODO: move this out
         fields: {
@@ -129,7 +128,6 @@ export const delegationSubjects = {
     picker: {
         pick: 'Elekti delegitajn fakojn',
         search: 'Serĉi fakon laŭ nomo',
-        done: 'Bone',
     },
 };
 

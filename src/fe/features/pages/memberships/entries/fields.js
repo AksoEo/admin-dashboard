@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { useState, PureComponent } from 'preact/compat';
-import { Button, CircularProgress, Dialog, TextField } from 'yamdl';
+import { Button, CircularProgress, Dialog } from 'yamdl';
+import moment from 'moment';
+import { evaluate } from '@tejo/akso-script';
 import WarningIcon from '@material-ui/icons/Warning';
 import CheckIcon from '@material-ui/icons/CheckCircleOutline';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -16,6 +18,7 @@ import Segmented from '../../../../components/segmented';
 import DetailFields from '../../../../components/detail-fields';
 import TinyProgress from '../../../../components/tiny-progress';
 import CodeholderPicker from '../../../../components/codeholder-picker';
+import ItemPickerDialog from '../../../../components/item-picker-dialog';
 import { membershipEntries as locale, codeholders as codeholdersLocale, currencies } from '../../../../locale';
 import { Link } from '../../../../router';
 import { connect, coreContext } from '../../../../core/connection';
@@ -36,6 +39,15 @@ const CODEHOLDER_DATA_FIELDS = Object.fromEntries([
     'name', 'address', 'feeCountry', 'email', 'birthdate', 'cellphone',
 ].map(id => ([id, CODEHOLDER_FIELDS[id]])));
 
+const YEAR_PICKER_FIELDS = {
+    year: {
+        slot: 'title',
+        component ({ value }) {
+            return '' + value;
+        },
+    },
+};
+
 export const FIELDS = {
     id: {
         skipLabel: true,
@@ -47,16 +59,29 @@ export const FIELDS = {
     year: {
         sortable: true,
         slot: 'title',
-        component ({ value, editing, onChange, item, slot }) {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange, item }) {
+            const [dialogOpen, setDialogOpen] = useState(false);
+
             if (editing && (!item.status || item.status.status === 'submitted')) {
                 return (
-                    <TextField
+                    <Button
                         class="registration-entry-year-field"
-                        outline
-                        label={slot === 'create' ? locale.fields.year : null}
-                        type="number"
-                        value={'' + value}
-                        onChange={e => onChange(+e.target.value | 0)} />
+                        onClick={() => setDialogOpen(true)}
+                        outline>
+                        {value || locale.fields.yearSelectYear}
+                        <ItemPickerDialog
+                            open={dialogOpen}
+                            onClose={() => setDialogOpen(false)}
+                            limit={1}
+                            value={value ? [value] : []}
+                            onChange={v => onChange(v[0] ? +v[0] : null)}
+                            task="memberships/listOptions"
+                            view="memberships/options"
+                            sorting={{ year: 'asc' }}
+                            locale={{ year: locale.fields.year }}
+                            fields={YEAR_PICKER_FIELDS} />
+                    </Button>
                 );
             }
             return value;
@@ -164,8 +189,11 @@ export const FIELDS = {
         shouldHide: (_, editing) => editing,
     },
     offers: {
+        wantsCreationLabel: true,
         component ({ value, editing, item, onChange }) {
-            if (!item.year) return null;
+            if (!item.year || !item.codeholderData) {
+                return locale.offers.selectYearFirst;
+            }
             if (item.status && item.status.status !== 'submitted') editing = false;
             const [addOfferOpen, setAddOfferOpen] = useState(false);
 
@@ -192,6 +220,7 @@ export const FIELDS = {
                 <div class="registration-entry-offers">
                     {editing && (
                         <div class="offers-currency">
+                            <label class="offers-currency-label">{locale.offers.currency}</label>
                             <Select
                                 outline
                                 value={value.currency}
@@ -217,15 +246,15 @@ export const FIELDS = {
                         {editing && value.currency && (
                             <div class="add-offer-container">
                                 <Button
-                                    icon
-                                    small
                                     class="add-offer-button"
                                     onClick={e => {
                                         e.preventDefault();
                                         orderPortalContainerFront();
                                         setAddOfferOpen(true);
                                     }}>
-                                    <AddIcon />
+                                    <AddIcon style={{ verticalAlign: 'middle' }} />
+                                    {' '}
+                                    {locale.offers.add.button}
                                 </Button>
                             </div>
                         )}
@@ -238,6 +267,7 @@ export const FIELDS = {
                                 backdrop
                                 onClose={() => setAddOfferOpen(false)}>
                                 <AddOfferDialog
+                                    codeholder={item.codeholderData}
                                     year={year}
                                     onAdd={onAddItem}
                                     currency={item.offers?.currency} />
@@ -251,6 +281,7 @@ export const FIELDS = {
     codeholderData: {
         weight: 1.5,
         slot: 'title',
+        wantsCreationLabel: true,
         component ({ slot, value, editing, onChange, item }) {
             if (item.status && item.status.status !== 'submitted') editing = false;
 
@@ -427,32 +458,51 @@ export class Header extends PureComponent {
     }
 }
 
+const CodeholderDataForOffers = connect(({ codeholder }) => ['codeholders/codeholder', {
+    id: codeholder,
+    fields: ['birthdate', 'age', 'agePrimo', 'feeCountry', 'feeCountryGroups', 'isActiveMember'],
+}])(data => ({ data }))(function CodeholderDataForOffers ({ data, children }) {
+    if (!data) return <div class="progress-container"><CircularProgress indeterminate /></div>;
+    return children(data);
+});
+
 const AddOfferDialog = connect(({ year }) => ['memberships/options', { id: year }])(data => ({
     data,
-}))(function AddOfferDialog ({ data, year, currency, onAdd }) {
+}))(function AddOfferDialog ({ data, year, currency, onAdd, codeholder }) {
     if (!data) return <div class="progress-container"><CircularProgress indeterminate /></div>;
 
-    return (
+    const contents = codeholder => (
         <div class="add-offer">
             {data.offers.map((group, i) => (
                 <AddOfferGroup
                     key={i}
                     group={group}
                     year={year}
+                    yearCurrency={data.currency}
                     onAdd={onAdd}
+                    codeholder={codeholder}
                     currency={currency} />
             ))}
         </div>
     );
+
+    if (typeof codeholder === 'number') {
+        return (
+            <CodeholderDataForOffers codeholder={codeholder}>
+                {codeholder => contents(codeholder)}
+            </CodeholderDataForOffers>
+        );
+    }
+    return contents(codeholder);
 });
 
-function AddOfferGroup ({ group, year, currency, onAdd }) {
+function AddOfferGroup ({ group, year, yearCurrency, currency, onAdd, codeholder }) {
     const [open, setOpen] = useState(false);
 
     return (
         <div class="offer-group">
-            <div class="group-title">
-                <Button class="disclosure-button" icon small onClick={() => setOpen(!open)}>
+            <div class="group-title" onClick={() => setOpen(!open)}>
+                <Button class="disclosure-button" icon small>
                     {open ? <UpIcon /> : <DownIcon />}
                 </Button>
                 <div class="inner-title">
@@ -463,16 +513,24 @@ function AddOfferGroup ({ group, year, currency, onAdd }) {
                 {open && (
                     <div class="group-contents">
                         {group.offers.map((item, i) => (
-                            <OfferItem
-                                key={i}
-                                onSelect={() => onAdd({
-                                    type: item.type,
-                                    id: item.id,
-                                    amount: 0,
-                                })}
-                                value={{ ...item, amount: 0 }}
-                                year={year}
-                                currency={currency} />
+                            <OfferItemAmount
+                                codeholder={codeholder}
+                                offer={item}
+                                offerCurrency={yearCurrency}
+                                currency={currency}
+                                key={i}>
+                                {amount => (
+                                    <OfferItem
+                                        onSelect={() => onAdd({
+                                            type: item.type,
+                                            id: item.id,
+                                            amount,
+                                        })}
+                                        value={{ ...item, amount }}
+                                        year={year}
+                                        currency={currency} />
+                                )}
+                            </OfferItemAmount>
                         ))}
                         {!group.offers.length && (
                             <div class="contents-empty">{locale.offers.add.emptyGroup}</div>
@@ -483,6 +541,43 @@ function AddOfferGroup ({ group, year, currency, onAdd }) {
         </div>
     );
 }
+
+const OfferItemAmount = connect(({ offerCurrency }) => [
+    'payments/exchangeRates', { base: offerCurrency },
+])(rates => ({ rates }))(class OfferItemAmount extends PureComponent {
+    state = { amount: null };
+    update () {
+        const { codeholder, offer, currency, rates } = this.props;
+        if (!codeholder || !offer?.price || !rates) return;
+        const resultKey = Symbol('result');
+        const val = evaluate([offer.price.script, { [resultKey]: { t: 'c', f: 'id', a: [offer.price.var] } }], resultKey, id => {
+            if (id === 'birthdate') return codeholder.birthdate ? new Date(codeholder.birthdate + 'T00:00:00Z') : null;
+            if (id.startsWith('age') && !('age' in codeholder)) {
+                const birthdate = new Date(codeholder.birthdate + 'T00:00:00Z');
+                if (id === 'age') return moment().diff(birthdate, 'years');
+                else if (id === 'agePrimo') {
+                    const beginningOfYear = moment([new Date().getFullYear(), 0, 1]);
+                    return beginningOfYear.diff(birthdate, 'years');
+                }
+            }
+            return codeholder[id] || null;
+        });
+        this.setState({ amount: Math.round(val * rates[currency]) });
+    }
+    componentDidMount () {
+        this.update();
+    }
+    componentDidUpdate (prevProps) {
+        if (prevProps.codeholder !== this.props.codeholder
+            || prevProps.offer !== this.props.offer
+            || prevProps.rates !== this.props.rates) {
+            this.update();
+        }
+    }
+    render ({ children }, { amount }) {
+        return children(amount);
+    }
+});
 
 function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSelect }) {
     let contents;
@@ -510,19 +605,17 @@ function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSele
                 <div class="offer-type">{locale.offers.types[value.type]}</div>
                 {contents}
             </div>
-            {!onSelect && (
-                <div class="item-amount">
-                    {editing ? (
-                        <currencyAmount.editor
-                            outline
-                            value={value.amount}
-                            onChange={amount => onChange({ ...value, amount })}
-                            currency={currency} />
-                    ) : (
-                        <currencyAmount.renderer value={value.amount} currency={currency} />
-                    )}
-                </div>
-            )}
+            <div class="item-amount">
+                {editing ? (
+                    <currencyAmount.editor
+                        outline
+                        value={value.amount}
+                        onChange={amount => onChange({ ...value, amount })}
+                        currency={currency} />
+                ) : (!onSelect || value.amount) ? (
+                    <currencyAmount.renderer value={value.amount} currency={currency} />
+                ) : null}
+            </div>
         </div>
     );
 }

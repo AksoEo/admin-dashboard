@@ -119,9 +119,21 @@
 
 .registration-entry-offers {
     .offers-currency {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
         margin-bottom: 16px;
-        text-align: right;
         font-size: 0.8em;
+
+        .offers-currency-label {
+            font-size: 1.1em;
+            font-weight: 500;
+
+            &::after {
+                content: ': ';
+            }
+        }
     }
 
     .selected-offers {
@@ -170,6 +182,7 @@
     margin-bottom: 8px;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 
     &.is-selectable {
         transition: background 0.2s @easing, box-shadow 0.2s @easing;
@@ -193,6 +206,7 @@
     .item-label {
         flex: 1;
         padding: 16px;
+        max-width: 200px;
 
         .offer-type {
             font-size: 0.8em;
