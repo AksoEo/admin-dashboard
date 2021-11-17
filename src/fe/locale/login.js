@@ -28,7 +28,7 @@ export const login = {
     notAdminLogout: 'Bonvolu elsaluti kaj reensaluti per konto de administranto se vi volas uzi la administran sistemon.',
     logOut: 'Elsaluti',
 
-    totpSetupDescription: 'Bonvolu skani la QR-kodon per via aplikaĵo por agordi dua-faktoran ensaluton.',
+    totpSetupDescription: 'Bonvolu skani la QR-kodon ] per via aplikaĵo [[or click the link below if you cant scan it because you’re on your phone or something]] por agordi dua-faktoran ensaluton.',
     totpAppDescriptionPre: 'Se vi ne havas dua-faktoran aplikaĵon, ni rekomendas ',
     totpAppName: 'Authy',
     totpAppHref: userAgent => {
@@ -36,6 +36,9 @@ export const login = {
         return 'https://authy.com/download/';
     },
     totpAppDescriptionPost: '.',
+    totpSetupInstrCode: '[[Scan this code]]',
+    totpSetupInstrOr: '[[or]]',
+    totpSetupInstrOtpauthLink: '[[open in authenticator app]]',
 
     totp: 'Sekurkodo',
     totpDescription: 'Bonvolu enmeti sekurkodon generitan de via duafaktora aplikaĵo.',

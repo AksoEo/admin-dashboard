@@ -53,12 +53,22 @@ export default class TotpSetup extends Component {
                     </a>
                     {locale.totpAppDescriptionPost}
                 </p>
+                <div class="totp-setup-instruction">
+                    {locale.totpSetupInstrCode}
+                </div>
                 <div class="totp-setup-qr-container">
                     <img
                         class="totp-qr"
                         draggable={false}
                         src={secrets.qrCode}
                         onLoad={this.props.onHeightChange} />
+                </div>
+                <div class="totp-setup-otpauth-link">
+                    {locale.totpSetupInstrOr}
+                    {' '}
+                    <a href={secrets.otpURL}>
+                        {locale.totpSetupInstrOtpauthLink}
+                    </a>
                 </div>
                 {this.props.contents}
             </div>
