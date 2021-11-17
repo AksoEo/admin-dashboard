@@ -16,6 +16,7 @@ import Select from '../../../../components/select';
 import TextArea from '../../../../components/text-area';
 import { delegations as locale, delegationSubjects as subjectsLocale } from '../../../../locale';
 import { Link, routerContext } from '../../../../router';
+import { connectPerms } from '../../../../perms';
 import { makeCodeholderFilterQuery } from '../applications/filters';
 import GeoCity from './geo-city';
 import Subject from './subject';
@@ -154,9 +155,8 @@ export const FIELDS = {
     },
     countries: {
         wantsCreationLabel: true,
-        component ({ value, editing, onChange, item, slot, userData }) {
+        component: connectPerms(({ value, editing, onChange, item, slot, perms }) => {
             if (editing) {
-                const hasPerm = p => !userData?.hasPerm || userData.hasPerm(p);
                 if (!value) value = [];
 
                 return (
@@ -176,7 +176,7 @@ export const FIELDS = {
                             }}
                             hideGroups
                             shouldHideItem={country =>
-                                !hasPerm(`codeholders.delegations.update_country_delegates.${item.org}.${country}`)} />
+                                !perms.hasPerm(`codeholders.delegations.update_country_delegates.${item.org}.${country}`)} />
                         {value.length ? (
                             <div class="country-levels-title">
                                 {locale.countryLevelsTitle}
@@ -223,7 +223,7 @@ export const FIELDS = {
                     ))}
                 </div>
             );
-        },
+        }),
         isEmpty: value => !value || !value.length,
     },
     subjects: {
@@ -413,7 +413,7 @@ export const FIELDS = {
                                     [fieldName + 'Time']: Math.floor(Date.now() / 1000),
                                 });
                             }}
-                            disabled={required.includes(fieldName)} />
+                            disabled={!editing || required.includes(fieldName)} />
                         <label for={checkboxId} class="field-labels">
                             <div class="field-title">
                                 {required.includes(fieldName) ? (

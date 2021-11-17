@@ -152,6 +152,7 @@ export class Validator extends Component {
     shake () {
         this.translateX.velocity = 500;
         this.translateX.start();
+        this.node?.scrollIntoView && this.node.scrollIntoView();
     }
 
     /** Manually sets an error. */
@@ -203,7 +204,7 @@ export class Validator extends Component {
         }
 
         return (
-            <span class="form-validator" style={{
+            <span class="form-validator" ref={node => this.node = node} style={{
                 transform: `translateX(${this.state.translateX}px)`,
             }} {...validatorProps}>
                 {h(this.props.component, props, this.props.children)}

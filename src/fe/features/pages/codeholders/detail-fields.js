@@ -5,7 +5,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import RemoveIcon from '@material-ui/icons/Remove';
 import { Button, Checkbox, TextField, Dialog } from 'yamdl';
-import { coreContext } from '../../../core/connection';
+import { connect, coreContext } from '../../../core/connection';
 import { connectPerms as connectPermsInner } from '../../../perms';
 import { LinkButton } from '../../../router';
 import { codeholders as locale, data as dataLocale } from '../../../locale';
@@ -412,7 +412,7 @@ function FilesButton ({ id }) {
     );
 }
 
-export const Header = connectPerms(function Header ({
+export const Header = connectPerms(connect('login')(login => ({ login }))(function Header ({
     item,
     originalItem,
     editing,
@@ -421,6 +421,7 @@ export const Header = connectPerms(function Header ({
     canReadHistory,
     perms,
     userData,
+    login,
 }) {
     // field callbacks for detail view
     if (userData && userData.onHasEmail) userData.onHasEmail(!!item.email);
@@ -448,6 +449,7 @@ export const Header = connectPerms(function Header ({
 
     return (
         <div class="member-header-container">
+            {(item.id === login?.id) ? <IsSelfBanner /> : null}
             <div class="member-header">
                 <div class="member-picture">
                     <ProfilePictureEditor
@@ -509,7 +511,18 @@ export const Header = connectPerms(function Header ({
             </div>
         </div>
     );
-});
+}));
+
+function IsSelfBanner () {
+    return (
+        <div class="is-self-banner">
+            <div class="inner-card">
+                <div class="inner-title">{locale.detailIsSelf.title}</div>
+                <div class="inner-description">{locale.detailIsSelf.description}</div>
+            </div>
+        </div>
+    );
+}
 
 export class CodeholderAddressRenderer extends Component {
     state = {
@@ -546,6 +559,7 @@ export class CodeholderAddressRenderer extends Component {
 
     loadPostal () {
         if (!this.props.id) return;
+
         const id = this.props.id;
         const lang = this.state.postalLang;
         this.setState({ postalAddress: '' }, () => {
@@ -944,11 +958,11 @@ export const fields = {
                 const readableMask = [
                     'country', 'countryArea', 'city', 'cityArea', 'streetAddress', 'postalCode',
                     'sortingCode',
-                ].filter(x => perms.hasCodeholderField(`address.${x}`, 'r'));
+                ].filter(x => perms.hasCodeholderField(`address.${x}`, 'r') || perms.hasCodeholderField('address', 'r'));
                 const editableMask = [
                     'country', 'countryArea', 'city', 'cityArea', 'streetAddress', 'postalCode',
                     'sortingCode',
-                ].filter(x => perms.hasCodeholderField(`address.${x}`, 'w'));
+                ].filter(x => perms.hasCodeholderField(`address.${x}`, 'w') || perms.hasCodeholderField('address', 'w'));
 
                 return <address.editor
                     value={value}

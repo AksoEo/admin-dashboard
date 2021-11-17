@@ -68,6 +68,7 @@ export default connectPerms(class CongressDetailPage extends Page {
             });
         }
 
+        const canSeeInstances = perms.hasPerm(`congress_instances.read.${org}`);
 
         return (
             <div class="congresses-detail-page">
@@ -90,6 +91,7 @@ export default connectPerms(class CongressDetailPage extends Page {
                     userData={{
                         query: this.props.query,
                         onQueryChange: this.props.onQueryChange,
+                        canSeeInstances,
                     }} />
             </div>
         );
@@ -98,6 +100,7 @@ export default connectPerms(class CongressDetailPage extends Page {
 
 function Footer ({ item, editing, userData }) {
     if (!item || editing) return;
+    if (!userData.canSeeInstances) return;
 
     return (
         <InstancesView

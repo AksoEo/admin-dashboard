@@ -401,6 +401,10 @@ export const codeholders = {
             return `https://www.openstreetmap.org/#map=${zoom}/${lat}/${lon}`;
         },
     },
+    detailIsSelf: {
+        title: '[[This is your account]]',
+        description: '[[Codeholder self-service is currently not supported in akso admin. If you want to update your information but do not have permission, please visit uea.org instead.]]',
+    },
     perms: {
         title: 'Permesoj',
     },

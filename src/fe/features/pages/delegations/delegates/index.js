@@ -104,7 +104,9 @@ export default connectPerms(class DelegatesPage extends Page {
 
         return (
             <div class="delegations-delegates-page">
-                <Meta title={locale.title} actions={actions} />
+                <Meta
+                    title={this.codeholderId ? locale.titleInCodeholder : locale.title}
+                    actions={actions} />
                 <SearchFilters
                     value={parameters}
                     searchFields={[

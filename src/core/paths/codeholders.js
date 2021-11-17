@@ -451,6 +451,7 @@ const clientFilters = {
             };
         },
         fields: [],
+        perms: ['codeholder_roles.read'],
     },
     codeList: {
         toAPI: codes => {
@@ -589,7 +590,15 @@ export const tasks = {
         const client = await asyncClient;
         const filters = [];
         for (const filter in clientFilters) {
-            if (await client.hasCodeholderFields('r', ...clientFilters[filter].fields)) {
+            const hasFields = await client.hasCodeholderFields('r', ...clientFilters[filter].fields);
+            let hasPerms = true;
+            for (const perm of (clientFilters[filter].perms || [])) {
+                if (!await client.hasPerm(perm)) {
+                    hasPerms = false;
+                    break;
+                }
+            }
+            if (hasFields && hasPerms) {
                 filters.push(filter);
             }
         }
@@ -627,9 +636,17 @@ export const tasks = {
 
         const originalFields = options.fields;
         options.fields = [];
+        const originalOrder = options.order;
+        options.order = [];
         for (const f of originalFields) {
             if (await client.hasCodeholderField(f, 'r')) {
                 options.fields.push(f);
+            }
+        }
+        for (const f of originalOrder) {
+            // always keep _ fields (e.g. _relevance). otherwise check if user has perms
+            if (f[0].startsWith('_') || (await client.hasCodeholderField(f[0], 'r'))) {
+                options.order.push(f);
             }
         }
 
@@ -710,8 +727,14 @@ export const tasks = {
         const apiFields = [];
 
         for (const f of rawApiFields) {
-            const hasField = id === 'self' ? (await client.hasOwnCodeholderField(f, 'r'))
-                : (await client.hasCodeholderField(f, 'r'));
+            const fieldNames = [f];
+            if (f.includes('.')) fieldNames.push(f.split('.')[0]); // also allow address instead of address.*
+            let hasField = false;
+            for (const f of fieldNames) {
+                hasField = hasField || (id === 'self'
+                    ? (await client.hasOwnCodeholderField(f, 'r'))
+                    : (await client.hasCodeholderField(f, 'r')));
+            }
             if (hasField) apiFields.push(f);
         }
 

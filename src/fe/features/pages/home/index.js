@@ -1,5 +1,5 @@
-import { h, Component } from 'preact';
-import { Fragment } from 'preact/compat';
+import { h } from 'preact';
+import { PureComponent, Fragment } from 'preact/compat';
 import { LinearProgress } from 'yamdl';
 import PaymentIcon from '@material-ui/icons/Payment';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -17,12 +17,7 @@ export default class HomePage extends Page {
     render () {
         return (
             <div class="home-page">
-                <div class="home-card">
-                    <div class="hc-title">
-                        {locale.tasks.title}
-                    </div>
-                    <HomeTmpTasks />
-                </div>
+                <HomeTasks />
                 <div class="home-card">
                     <div class="hc-title">
                         {locale.admin.title}
@@ -36,7 +31,7 @@ export default class HomePage extends Page {
     }
 }
 
-class HomeTmpTasks extends Component {
+class HomeTasks extends PureComponent {
     static contextType = coreContext;
 
     state = {
@@ -49,51 +44,59 @@ class HomeTmpTasks extends Component {
 
     load () {
         this.setState({ loading: true });
-        const res = Promise.all([
-            this.context.createTask('tasks/list', {}).runOnceAndDrop(),
-            this.context.createTask('payments/listIntents', {}, {
-                fields: [
-                    { id: 'customer', sorting: 'none' },
-                    { id: 'statusTime', sorting: 'asc' },
-                    { id: 'status', sorting: 'none' },
-                    { id: 'totalAmount', sorting: 'none' },
-                    { id: 'amountRefunded', sorting: 'none' },
-                    { id: 'currency', sorting: 'none' },
-                ],
-                jsonFilter: {
-                    filter: {
-                        status: { $in: ['disputed', 'submitted'] },
+        this.context.createTask('tasks/list', {}).runOnceAndDrop().then(tasks => {
+            const resPromises = [Promise.resolve(tasks)];
+            if (tasks.aksopay) {
+                resPromises.push(this.context.createTask('payments/listIntents', {}, {
+                    fields: [
+                        { id: 'customer', sorting: 'none' },
+                        { id: 'statusTime', sorting: 'asc' },
+                        { id: 'status', sorting: 'none' },
+                        { id: 'totalAmount', sorting: 'none' },
+                        { id: 'amountRefunded', sorting: 'none' },
+                        { id: 'currency', sorting: 'none' },
+                    ],
+                    jsonFilter: {
+                        filter: {
+                            status: { $in: ['disputed', 'submitted'] },
+                        },
                     },
-                },
-                offset: 0,
-                limit: 10,
-            }).runOnceAndDrop(),
-            this.context.createTask('memberships/listEntries', {}, {
-                fields: [
-                    { id: 'codeholderData', sorting: 'none' },
-                    { id: 'year', sorting: 'none' },
-                    { id: 'timeSubmitted', sorting: 'asc' },
-                    { id: 'status', sorting: 'none' },
-                ],
-                jsonFilter: {
-                    filter: {
-                        status: 'pending',
+                    offset: 0,
+                    limit: 10,
+                }).runOnceAndDrop().then(data => ({ aksopay: data.items })));
+            }
+            if ('registration' in tasks) {
+                resPromises.push(this.context.createTask('memberships/listEntries', {}, {
+                    fields: [
+                        { id: 'codeholderData', sorting: 'none' },
+                        { id: 'year', sorting: 'none' },
+                        { id: 'timeSubmitted', sorting: 'asc' },
+                        { id: 'status', sorting: 'none' },
+                    ],
+                    jsonFilter: {
+                        filter: {
+                            status: 'pending',
+                        },
                     },
-                },
-                offset: 0,
-                limit: 10,
-            }).runOnceAndDrop(),
-        ]);
+                    offset: 0,
+                    limit: 10,
+                }).runOnceAndDrop().then(data => ({ registration: data.items })));
+            }
+            const res = Promise.all(resPromises);
 
-        res.then(([tasks, pay, reg]) => {
-            this.setState({
-                loading: false,
-                tasks,
-                items: { aksopay: pay.items, registration: reg.items },
-                error: null,
+            res.then(([tasks, ...items]) => {
+                const itemsJoined = {};
+                for (const i of items) Object.assign(itemsJoined, i);
+
+                this.setState({
+                    loading: false,
+                    tasks,
+                    items: itemsJoined,
+                    error: null,
+                });
+            }).catch(error => {
+                this.setState({ loading: false, items: null, error });
             });
-        }).catch(error => {
-            this.setState({ loading: false, items: null, error });
         });
     }
 
@@ -102,13 +105,22 @@ class HomeTmpTasks extends Component {
     }
 
     render (_, { loading, tasks, items, error }) {
+        if (items && !Object.keys(items).length) {
+            // no tabs visible
+            return null;
+        }
+
         let contents = null;
         if (error) {
             contents = <DisplayError error={error} />;
         } else if (items) {
             const renderTabItems = (key, Component) => {
+                if (!(key in items)) {
+                    // no permission
+                    return null;
+                }
                 const tabItems = [];
-                for (const id of items[key]) {
+                for (const id of (items[key] || [])) {
                     tabItems.push(<Component key={id} id={id} />);
                 }
                 if (!tabItems.length) tabItems.push(
@@ -138,7 +150,7 @@ class HomeTmpTasks extends Component {
                 <Fragment>
                     <Tabs
                         class="task-tabs"
-                        tabs={Object.fromEntries(Object.keys(locale.tasks.tabs).map(k => [k, (
+                        tabs={Object.fromEntries(Object.keys(locale.tasks.tabs).filter(k => k in items).map(k => [k, (
                             <span class="task-tab-label" key={k}>
                                 <span class="inner-label">{locale.tasks.tabs[k]}</span>
                                 <span class="task-badge" data-n={tabItemCounts[k]}>{tabItemCounts[k]}</span>
@@ -152,9 +164,14 @@ class HomeTmpTasks extends Component {
         }
 
         return (
-            <div class="home-tasks">
-                <LinearProgress style={{ width: '100%' }} indeterminate={loading} hideIfNone />
-                {contents}
+            <div class="home-card">
+                <div class="hc-title">
+                    {locale.tasks.title}
+                </div>
+                <div class="home-tasks">
+                    <LinearProgress style={{ width: '100%' }} indeterminate={loading} hideIfNone />
+                    {contents}
+                </div>
             </div>
         );
     }

@@ -1,5 +1,6 @@
 export const delegations = {
     title: 'Delegitoj',
+    titleInCodeholder: 'Delegoj',
     detailTitle: 'Delegitoj',
     search: {
         fields: {
@@ -88,7 +89,7 @@ export const delegations = {
             subdivision_eoLabel: 'E-nomo de regiono',
         },
     },
-    buttonLabel: count => count ? `${count} delegito${count === 1 ? '' : 'j'}` : `Delegitoj`,
+    buttonLabel: count => count ? `${count} delego${count === 1 ? '' : 'j'}` : `Delegoj`,
 };
 
 export const delegationSubjects = {
