@@ -59,7 +59,9 @@ export default class DetailsPage extends Component {
         }).catch(() => {});
     };
 
+    #submitting = false;
     #onSubmit = () => {
+        if (this.#submitting) return;
         let task;
 
         const login = this.props.login.includes('@')
@@ -82,6 +84,7 @@ export default class DetailsPage extends Component {
             });
         }
 
+        this.#submitting = true;
         task.runOnceAndDrop().then(res => {
             const nope = !res.isAdmin && !this.props.allowsNonAdmin;
             if (this.props.mode !== Mode.NORMAL) {
@@ -106,7 +109,7 @@ export default class DetailsPage extends Component {
                 error = this.props.login.includes('@')
                     ? locale.invalidLogin.email
                     : locale.invalidLogin.ueaCode;
-            } else if (err.code === 409) {
+            } else if (err.code === 'needs-password-setup') {
                 this.#spawnInitCreatePassword();
             } else if (err.code === 'is-not-admin') {
                 error = locale.notAdminShort;
@@ -116,6 +119,8 @@ export default class DetailsPage extends Component {
 
             this.#passwordValidator.shake();
             this.#passwordValidator.setError({ error });
+        }).finally(() => {
+            this.#submitting = false;
         });
     };
 

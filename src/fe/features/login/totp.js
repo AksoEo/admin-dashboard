@@ -29,7 +29,10 @@ export default class TotpPage extends Component {
         this.#codeField.focus();
     }
 
+    #submitting = false;
     #onSubmit = () => {
+        if (this.#submitting) return;
+        this.#submitting = true;
         this.props.core.createTask('login/totp', {
             secret: this.props.totpSetupRequired ? this.state.secret : null,
         }, {
@@ -46,6 +49,8 @@ export default class TotpPage extends Component {
 
             this.#codeValidator.shake();
             this.#codeValidator.setError({ error });
+        }).finally(() => {
+            this.#submitting = false;
         });
     };
 
