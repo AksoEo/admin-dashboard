@@ -90,6 +90,21 @@ export const delegations = {
         },
     },
     buttonLabel: count => count ? `${count} delego${count === 1 ? '' : 'j'}` : `Delegoj`,
+    export: {
+        menuItem: '[[Export for yearbook]]',
+        title: '[[Export for yearbook]]',
+        start: '[[Start]]',
+        progress: {
+            messages: {
+                loadCountries: '[[Loading countries]]',
+                loadDelegates: '[[Loading delegations]]',
+                loadCodeholders: '[[Loading member data]]',
+                loadDelegatesSub: '[[Loading delegate data]]',
+                loadCities: '[[Loading cities]]',
+                loadSubjects: '[[Loading subjects]]',
+            },
+        },
+    },
 };
 
 export const delegationSubjects = {

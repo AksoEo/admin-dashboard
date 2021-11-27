@@ -41,6 +41,9 @@ export const delegateFilters = {
     countryLevels: {
         toAPI: level => ({ $countries: { level } }),
     },
+    appearsInPaperAnnualBook: {
+        toAPI: appears => ({ 'tos.paperAnnualBook': appears }),
+    },
     // TODO: tos fields
 };
 
@@ -71,6 +74,33 @@ export const tasks = {
             'subjects',
             'hosting.maxDays',
             'hosting.maxPersons',
+        ],
+        filters: delegateFilters,
+        storePath: (_, item) => [CODEHOLDER_DELEGATIONS, item.codeholderId, item.org],
+        map: item => {
+            item.id = item.codeholderId + '~' + item.org;
+        },
+    }),
+
+    // hack: used in export
+    listDelegatesExt: crudList({
+        apiPath: () => `/delegations/delegates`,
+        fields: [
+            'codeholderId',
+            'org',
+            'approvedBy',
+            'approvedTime',
+            'cities',
+            'countries',
+            'subjects',
+            'hosting.maxDays',
+            'hosting.maxPersons',
+            'hosting.description',
+            'hosting.psProfileURL',
+            'tos.docDataProtectionUEA',
+            'tos.docDelegatesUEA',
+            'tos.docDelegatesDataProtectionUEA',
+            'tos.paperAnnualBook',
         ],
         filters: delegateFilters,
         storePath: (_, item) => [CODEHOLDER_DELEGATIONS, item.codeholderId, item.org],

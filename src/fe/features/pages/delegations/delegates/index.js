@@ -14,6 +14,7 @@ import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
+import ExportDialog from './export';
 
 export default connectPerms(class DelegatesPage extends Page {
     state = {
@@ -38,6 +39,7 @@ export default connectPerms(class DelegatesPage extends Page {
             limit: 10,
         },
         expanded: false,
+        exportOpen: false,
     };
 
     static contextType = coreContext;
@@ -102,6 +104,12 @@ export default connectPerms(class DelegatesPage extends Page {
             });
         }
 
+        actions.push({
+            label: locale.export.menuItem,
+            action: () => this.setState({ exportOpen: true }),
+            overflow: true,
+        });
+
         return (
             <div class="delegations-delegates-page">
                 <Meta
@@ -137,6 +145,10 @@ export default connectPerms(class DelegatesPage extends Page {
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     expanded={expanded}
                     locale={locale.fields} />
+
+                <ExportDialog
+                    open={this.state.exportOpen}
+                    onClose={() => this.setState({ exportOpen: false })} />
             </div>
         );
     }

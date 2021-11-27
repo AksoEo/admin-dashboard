@@ -55,7 +55,7 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
     };
     #kcOnLoad = () => {
         // update overrideIsAdmin on load
-        if (this.props.authState === LoginAuthStates.LOGGED_IN) {
+        if (this.props.authState === LoginAuthStates.AUTHENTICATED || this.props.authState === LoginAuthStates.LOGGED_IN) {
             this.props.core.createTask('login/overrideIsAdmin', {
                 override: this.state.allowsNonAdmin,
             }).runOnceAndDrop();

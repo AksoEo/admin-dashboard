@@ -69,6 +69,7 @@ function fetchBatched (id) {
                     err.statusCode = 404;
                     reject(err);
                 }
+                resolve();
             } else {
                 const error = arg;
                 reject(error);
