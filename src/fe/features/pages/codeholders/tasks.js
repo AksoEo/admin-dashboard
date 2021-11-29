@@ -5,6 +5,7 @@ import TaskDialog from '../../../components/task-dialog';
 import SavePerms from '../administration/perms-editor/save';
 import { UEACode } from '@tejo/akso-client';
 import Segmented from '../../../components/segmented';
+import SuggestionField from '../../../components/suggestion-field';
 import Select from '../../../components/select';
 import ChangedFields from '../../../components/changed-fields';
 import CodeholderPicker from '../../../components/codeholder-picker';
@@ -37,7 +38,13 @@ export default {
                 'first',
                 'last',
             ];
-            nameFieldsAfter = ['honorific'];
+            nameFieldsAfter = [{
+                id: 'honorific',
+                component: SuggestionField,
+                extra: {
+                    suggestions: locale.honorificSuggestions,
+                },
+            }];
         } else if (task.parameters.type === 'org') nameFields = ['full', 'local', 'abbrev'];
 
         useEffect(() => {
@@ -46,26 +53,34 @@ export default {
             }
         });
 
-        const renderNameField = (field, isOptional) => (
-            <Validator
-                key={field}
-                component={TextField}
-                class="form-field text-field"
-                outline
-                label={locale.nameSubfields[field] + (isOptional ? '' : '*')}
-                value={(task.parameters.name || {})[field]}
-                onChange={e => task.update({
-                    name: {
-                        ...(task.parameters.name || {}),
-                        [field]: e.target.value,
-                    },
-                })}
-                disabled={task.running}
-                validate={value => {
-                    if (isOptional) return;
-                    if (!value || !value.trim()) throw { error: locale.createNoName };
-                }} />
-        );
+        const renderNameField = (field, isOptional) => {
+            const fieldId = field?.id || field;
+            const component = field?.component || TextField;
+            const extra = field?.extra || {};
+            // HACK: to make suggestionfield work
+            const mapChangeEvent = component === TextField ? (e => e.target.value) : (e => e);
+            return (
+                <Validator
+                    key={fieldId}
+                    component={component}
+                    class="form-field text-field"
+                    {...extra}
+                    outline
+                    label={locale.nameSubfields[fieldId] + (isOptional ? '' : '*')}
+                    value={(task.parameters.name || {})[fieldId]}
+                    onChange={e => task.update({
+                        name: {
+                            ...(task.parameters.name || {}),
+                            [fieldId]: mapChangeEvent(e),
+                        },
+                    })}
+                    disabled={task.running}
+                    validate={value => {
+                        if (isOptional) return;
+                        if (!value || !value.trim()) throw { error: locale.createNoName };
+                    }} />
+            );
+        };
 
         return (
             <routerContext.Consumer>
