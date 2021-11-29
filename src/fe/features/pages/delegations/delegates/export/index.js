@@ -3,10 +3,22 @@ import { PureComponent } from 'preact/compat';
 import { Button, CircularProgress } from 'yamdl';
 import DialogSheet from '../../../../../components/dialog-sheet';
 import DynamicHeightDiv from '../../../../../components/dynamic-height-div';
+import DisplayError from '../../../../../components/error';
 import { coreContext } from '../../../../../core/connection';
 import { delegations as locale } from '../../../../../locale';
-import { load } from './data';
 import './index.less';
+
+const loadLoader = (() => {
+    let loader = null;
+    return () => {
+        if (!loader) loader = import('./data');
+        return loader.then(({ load }) => load);
+    };
+})();
+const load = async (...args) => {
+    const loader = await loadLoader();
+    return loader(...args);
+};
 
 export default class DelegatesExportDialog extends PureComponent {
     render ({ open, onClose }) {
@@ -46,11 +58,11 @@ class DelegatesExport extends PureComponent {
         }, this.context, this.state.org).then(data => {
             const progress = { ...(this._pendingProgress || this.state.progress) };
             progress._current = null;
-            this.setState({ loading: false, data, progress });
-            console.log(data);
+            const objectURL = URL.createObjectURL(data);
+            this.setState({ loading: false, data: objectURL, progress });
         }).catch(error => {
             this.setState({ loading: false, error });
-            console.log(error);
+            console.error(error); // eslint-disable-line no-console
         });
     }
 
@@ -58,24 +70,43 @@ class DelegatesExport extends PureComponent {
         let contents;
         if (this.state.loading) {
             contents = (
-                <div class="export-loading">
-                    <ProgressDisplay progress={this.state.progress} />
+                <div class="export-contents">
+                    <ProgressDisplay progress={this.state.progress} running />
                 </div>
             );
         } else if (this.state.error) {
-            contents = 'todo error';
+            contents = (
+                <div class="export-contents">
+                    <ProgressDisplay progress={this.state.progress} />
+                    <div class="export-error-container">
+                        <DisplayError error={this.state.error} />
+                    </div>
+                    <div class="export-action-container">
+                        <Button raised onClick={() => this.load()}>
+                            {locale.export.retry}
+                        </Button>
+                    </div>
+                </div>
+            );
         } else if (this.state.data) {
             contents = (
-                <div class="export-result">
+                <div class="export-contents">
                     <ProgressDisplay progress={this.state.progress} />
+                    <div class="export-action-container">
+                        <Button raised download={locale.export.fileName} href={this.state.data}>
+                            {locale.export.downloadFile}
+                        </Button>
+                    </div>
                 </div>
             );
         } else {
             contents = (
-                <div class="export-start-container">
-                    <Button raised onClick={() => this.load()}>
-                        {locale.export.start}
-                    </Button>
+                <div class="export-contents">
+                    <div class="export-action-container">
+                        <Button raised onClick={() => this.load()}>
+                            {locale.export.start}
+                        </Button>
+                    </div>
                 </div>
             );
         }
@@ -88,14 +119,14 @@ class DelegatesExport extends PureComponent {
     }
 }
 
-function ProgressDisplay ({ progress }) {
+function ProgressDisplay ({ progress, running }) {
     return (
         <DynamicHeightDiv class="progress-display" useFirstHeight>
             {Object.keys(progress).filter(key => !key.startsWith('_')).map(key => (
                 <div class="progress-item" key={key}>
                     <CircularProgress
                         small
-                        indeterminate={progress._current === key}
+                        indeterminate={running && progress._current === key}
                         progress={(progress[key][0] + progress[key][1] === 0)
                             ? 1 // show 1 for 0/0
                             : progress[key][0] / Math.max(1e-9, progress[key][1])} />

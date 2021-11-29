@@ -101,6 +101,7 @@ export const codeholders = {
     globalFilterTitle: 'La rezultoj estas filtritaj',
     globalFilterNotice: ['Ĉiuj viaj serĉoj estas limigitaj laŭ ', 'membrofiltrilo', '. Okaze de demandoj, kontaktu vian administranton.'],
     fields: {
+        id: '[[id]]',
         type: 'Membrospeco',
         types: {
             human: 'Homo',

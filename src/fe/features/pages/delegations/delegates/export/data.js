@@ -1,3 +1,14 @@
+import Zip from 'jszip';
+import stringify from 'csv-stringify';
+import {
+    delegations as locale,
+    delegationSubjects as subjectsLocale,
+    codeholders as codeholdersLocale,
+    countries as countriesLocale,
+} from '../../../../../locale';
+import { FIELDS as DELEGATE_FIELDS } from '../fields';
+import CODEHOLDER_FIELDS from '../../../codeholders/table-fields';
+
 function loadDataView (core, ...args) {
     return new Promise((resolve, reject) => {
         const view = core.createDataView(...args);
@@ -57,7 +68,14 @@ async function loadSubjects (onProgress, core, ids) {
     return subjects;
 }
 
-export async function load (onProgress, core, org) {
+const CODEHOLDER_FIELD_NAMES = [
+    'id', 'type', 'name', 'lastNamePublicity', 'profilePictureHash',
+    'profilePicturePublicity', 'mainDescriptor', 'website', 'factoids', 'biography',
+    'publicEmail', 'email', 'emailPublicity', 'officePhone', 'officePhonePublicity',
+    'address', 'addressPublicity',
+];
+
+async function loadData (onProgress, core, org) {
     onProgress('loadCountries', 0, 0);
     const countries = await loadDataView(core, 'countries/countries');
     onProgress('loadCountries', Object.keys(countries).length, Object.keys(countries).length);
@@ -85,12 +103,7 @@ export async function load (onProgress, core, org) {
 
         const codeholderList = await core.createTask('codeholders/list', {}, {
             jsonFilter: { filter: { id: { $in: delegatesList.items } } },
-            fields: [
-                'id', 'type', 'name', 'lastNamePublicity', 'profilePictureHash',
-                'profilePicturePublicity', 'mainDescriptor', 'website', 'factoids', 'biography',
-                'publicEmail', 'email', 'emailPublicity', 'officePhone', 'officePhonePublicity',
-                'address', 'addressPublicity',
-            ].map(id => ({ id, sorting: 'none' })),
+            fields: CODEHOLDER_FIELD_NAMES.map(id => ({ id, sorting: 'none' })),
             limit: 100,
         }).runOnceAndDrop();
 
@@ -124,4 +137,110 @@ export async function load (onProgress, core, org) {
     const subjects = await loadSubjects(onProgress, core, [...subjectIds]);
 
     return { countries, cities, subjects, delegates };
+}
+
+async function stringifyFields (core, fields, data) {
+    const result = {};
+    for (const key in data) {
+        if (fields[key] && fields[key].stringify) {
+            result[key] = await fields[key].stringify(data[key], data, Object.keys(data), {
+                // HACK: needed for codeholders
+                countryLocale: 'eo',
+            }, core);
+        } else result[key] = data[key];
+    }
+    return result;
+}
+
+export async function load (onProgress, core, org) {
+    const { countries, cities, subjects, delegates } = await loadData(onProgress, core, org);
+
+    const zip = new Zip();
+
+    const makeFile = (fileName) => {
+        const stringifier = stringify({ delimiter: ',' });
+        const rows = [];
+        stringifier.on('readable', () => {
+            let row;
+            while ((row = stringifier.read())) rows.push(row);
+        });
+        stringifier.on('error', err => {
+            console.error(err); // eslint-disable-line no-console
+            onProgress('error', 0, Infinity);
+        });
+        stringifier.on('finish', () => {
+            zip.file(fileName + '.csv', rows.join('\n'));
+        });
+        return stringifier;
+    };
+
+    const writeData = async (fileName, progressId, fields, localizedFields, data, map = (data => data)) => {
+        const file = makeFile(fileName);
+        file.write(fields.map(field => localizedFields[field]));
+        const totalItems = Object.keys(data).length;
+        onProgress(progressId, 0, totalItems);
+        let count = 0;
+        for (const k in data) {
+            if (count % 50 === 0) {
+                // give other things a chance to run
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            const item = await map(data[k]);
+            file.write(fields.map(field => item[field]));
+            onProgress(progressId, ++count, totalItems);
+        }
+        file.end();
+    };
+
+    await Promise.all([
+        writeData(
+            locale.export.files.countries,
+            'csvCountries',
+            ['code', 'name_eo'],
+            countriesLocale.fields,
+            countries,
+        ),
+        writeData(
+            locale.export.files.cities,
+            'csvCities',
+            [
+                'id', 'country', 'population', 'nativeLabel', 'eoLabel', 'll',
+                'subdivision_nativeLabel', 'subdivision_eoLabel', 'subdivision_iso',
+            ],
+            locale.cityPicker.fields,
+            cities,
+        ),
+        writeData(
+            locale.export.files.subjects,
+            'csvSubjects',
+            ['id', 'name', 'description'],
+            subjectsLocale.fields,
+            subjects,
+        ),
+        writeData(
+            locale.export.files.delegates,
+            'csvDelegates',
+            [
+                'codeholderId',
+                'org',
+                'cities',
+                'countries',
+                'subjects',
+                'hosting',
+            ],
+            locale.fields,
+            delegates,
+            data => stringifyFields(core, DELEGATE_FIELDS, data.delegation),
+        ),
+        writeData(
+            locale.export.files.codeholders,
+            'csvCodeholders',
+            CODEHOLDER_FIELD_NAMES,
+            codeholdersLocale.fields,
+            delegates,
+            data => stringifyFields(core, CODEHOLDER_FIELDS, data.codeholder),
+        ),
+    ]);
+
+    return await zip.generateAsync({ type: 'blob' });
 }
