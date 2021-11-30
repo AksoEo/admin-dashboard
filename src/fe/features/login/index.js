@@ -12,6 +12,14 @@ import './style';
 
 const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
+const accessSessionStorage = (withStorage, onFailure) => {
+    try {
+        return withStorage(sessionStorage);
+    } catch {
+        return onFailure();
+    }
+};
+
 /// Login view.
 export default connect('login')((data, core) => ({ ...data, core }))(class Login extends Component {
     state = {
@@ -19,7 +27,7 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
         /// This is off by default, but can be enabled for testing purposes if the user enters
         /// the konami code.
         /// Bugs related to this property being true shouldn’t be considered issues.
-        allowsNonAdmin: sessionStorage._debug_ana,
+        allowsNonAdmin: accessSessionStorage(storage => storage._debug_ana, () => false),
 
         /// The current login name; this is here because it’s shared across many login pages.
         login: '',
@@ -45,7 +53,7 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
             // match
             const allowsNonAdmin = !this.state.allowsNonAdmin;
             this.setState({ allowsNonAdmin });
-            sessionStorage._debug_ana = allowsNonAdmin;
+            accessSessionStorage(storage => storage._debug_ana = allowsNonAdmin, () => {});
             if (this.props.authState === LoginAuthStates.LOGGED_IN) {
                 this.props.core.createTask('login/overrideIsAdmin', {
                     override: allowsNonAdmin,

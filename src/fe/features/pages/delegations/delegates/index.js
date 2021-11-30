@@ -83,15 +83,23 @@ export default connectPerms(class DelegatesPage extends Page {
     render ({ perms }, { parameters, expanded }) {
         const actions = [];
 
-        actions.push({
-            label: subjectsLocale.title,
-            action: () => this.props.push('fakoj'),
-        });
+        if (!this.codeholderId) {
+            actions.push({
+                label: subjectsLocale.title,
+                action: () => this.props.push('fakoj'),
+            });
 
-        actions.push({
-            label: applicationsLocale.title,
-            action: () => this.props.push('kandidatighoj'),
-        });
+            actions.push({
+                label: applicationsLocale.title,
+                action: () => this.props.push('kandidatighoj'),
+            });
+
+            actions.push({
+                label: locale.export.menuItem,
+                action: () => this.setState({ exportOpen: true }),
+                overflow: true,
+            });
+        }
 
         // TODO: better perm check across orgs?
         if (perms.hasPerm('codeholders.delegations.create.uea')) {
@@ -103,12 +111,6 @@ export default connectPerms(class DelegatesPage extends Page {
                 }),
             });
         }
-
-        actions.push({
-            label: locale.export.menuItem,
-            action: () => this.setState({ exportOpen: true }),
-            overflow: true,
-        });
 
         return (
             <div class="delegations-delegates-page">
