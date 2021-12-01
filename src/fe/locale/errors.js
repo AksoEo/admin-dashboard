@@ -30,5 +30,16 @@ export const errors = {
     'congresses-already-registered': 'Jam ekzistas aliĝo por tiu ĉi membro',
     // see clients/list
     'invalid-api-key': 'Nevalida API-ŝlosilo',
+
+    schema: {
+        nthItem: n => `[[${n % 10 === 1 ? '1st' : n % 10 === 2 ? '2nd' : n % 10 === 3 ? '3rd' : `${n}th`}]]`,
+        keywords: {
+            required: p => `[[required property ${p.missingProperty} is missing]]`,
+            additionalProperties: p => `[[unexpected property ${p.additionalProperty}]]`,
+            minLength: p => `[[should not be shorter than ${p.limit}]]`,
+            minItems: p => `[[should not have fewer than ${p.limit} items]]`,
+            oneOf: () => `[[should match exactly one of these schemas]]`,
+        },
+    },
 };
 

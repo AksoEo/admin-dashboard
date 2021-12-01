@@ -4,7 +4,11 @@ import { deepEq } from '../util';
 export function transformError (err) {
     if (!err) return { code: '?', message: '??' };
     let code;
-    if (err.statusCode === 400) code = 'bad-request';
+    if (err.statusCode === 400) {
+        code = 'bad-request';
+        if (!err.extra) err.extra = {};
+        err.extra.parsedSchemaError = tryParseSchemaError(err.message);
+    }
     else if (err.statusCode === 401) code = 'unauthorized';
     else if (err.statusCode === 403) code = 'forbidden';
     else if (err.statusCode === 404) code = 'not-found';
@@ -17,6 +21,19 @@ export function transformError (err) {
         message: (err.message || err.toString()) + (err.stack ? '\n' + err.stack : ''),
         extra: err.extra || {},
     };
+}
+
+function tryParseSchemaError (errorMessage) {
+    try {
+        // find the schema part
+        const schemaErrorJson = errorMessage.replace(/^.+\n/, ''); // comes after the first line
+        if (!schemaErrorJson) return null;
+        const schemaError = JSON.parse(schemaErrorJson);
+        return schemaError;
+    } catch (err) {
+        console.warn('Could not parse schema error', errorMessage, err); // eslint-disable-line no-console
+        return null;
+    }
 }
 
 export function fieldsToOrder (fields) {
