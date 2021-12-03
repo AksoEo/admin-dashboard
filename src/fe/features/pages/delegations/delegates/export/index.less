@@ -19,6 +19,31 @@
         padding: 8px 16px;
         overflow: hidden;
 
+        .progress-icon {
+            position: relative;
+
+            .check-icon {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.0000001);
+            }
+
+            .progress-circle, .check-icon {
+                transition: transform 0.3s @easing;
+            }
+
+            &[data-done] {
+                .progress-circle {
+                    transform: scale(0);
+                }
+
+                .check-icon {
+                    transform: translate(-50%, -50%);
+                }
+            }
+        }
+
         .progress-item {
             display: flex;
             align-items: center;

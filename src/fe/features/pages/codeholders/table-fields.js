@@ -82,6 +82,7 @@ export default {
             return <ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
         },
         stringify (value) {
+            if (!value) return null;
             const { old: oldCode, new: newCode } = value;
             if (oldCode) {
                 const oldCodeCheckLetter = new AKSOUEACode(oldCode).getCheckLetter();

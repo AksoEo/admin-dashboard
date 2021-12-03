@@ -150,6 +150,7 @@ export default connectPerms(class DelegatesPage extends Page {
 
                 <ExportDialog
                     open={this.state.exportOpen}
+                    filters={parameters}
                     onClose={() => this.setState({ exportOpen: false })} />
             </div>
         );

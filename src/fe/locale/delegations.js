@@ -102,6 +102,10 @@ export const delegations = {
         retry: '[[Retry]]',
         fileName: '[[exported]].zip',
         downloadFile: '[[Save file]]',
+        settings: {
+            useFilter: '[[Use your filters from the search page]]',
+            ignoreTos: '[[Ignore tos.paperAnnualBook]]',
+        },
         files: {
             countries: 'landoj',
             cities: 'urboj',

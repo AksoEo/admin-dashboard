@@ -8,8 +8,7 @@ export function transformError (err) {
         code = 'bad-request';
         if (!err.extra) err.extra = {};
         err.extra.parsedSchemaError = tryParseSchemaError(err.message);
-    }
-    else if (err.statusCode === 401) code = 'unauthorized';
+    } else if (err.statusCode === 401) code = 'unauthorized';
     else if (err.statusCode === 403) code = 'forbidden';
     else if (err.statusCode === 404) code = 'not-found';
     else if (err.statusCode === 409) code = 'conflict';

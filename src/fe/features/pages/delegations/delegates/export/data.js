@@ -75,7 +75,7 @@ const CODEHOLDER_FIELD_NAMES = [
     'address', 'addressPublicity',
 ];
 
-async function loadData (onProgress, core, org) {
+async function loadData (onProgress, core, org, filter, ignoreTos) {
     onProgress('loadCountries', 0, 0);
     const countries = await loadDataView(core, 'countries/countries');
     onProgress('loadCountries', Object.keys(countries).length, Object.keys(countries).length);
@@ -89,8 +89,13 @@ async function loadData (onProgress, core, org) {
     let offset = 0;
     let totalItems = Infinity;
     while (offset < totalItems) {
+        let jsonFilter = { org };
+        if (!ignoreTos) jsonFilter['tos.paperAnnualBook'] = true;
+        if (filter?.jsonFilter) jsonFilter = { $and: [jsonFilter, filter?.jsonFilter.filter] };
+
         const delegatesList = await core.createTask('delegations/listDelegatesExt', {}, {
-            jsonFilter: { filter: { org, 'tos.paperAnnualBook': true } },
+            filters: filter?.filters,
+            jsonFilter: { filter: jsonFilter },
             offset,
             limit: 100,
         }).runOnceAndDrop();
@@ -152,8 +157,8 @@ async function stringifyFields (core, fields, data) {
     return result;
 }
 
-export async function load (onProgress, core, org) {
-    const { countries, cities, subjects, delegates } = await loadData(onProgress, core, org);
+export async function load (onProgress, core, org, filter, ignoreTos) {
+    const { countries, cities, subjects, delegates } = await loadData(onProgress, core, org, filter, ignoreTos);
 
     const zip = new Zip();
 

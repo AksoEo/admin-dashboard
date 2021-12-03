@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, CircularProgress } from 'yamdl';
+import { Button, Checkbox, CircularProgress } from 'yamdl';
+import CheckIcon from '@material-ui/icons/Check';
 import DialogSheet from '../../../../../components/dialog-sheet';
 import DynamicHeightDiv from '../../../../../components/dynamic-height-div';
 import DisplayError from '../../../../../components/error';
@@ -21,7 +22,7 @@ const load = async (...args) => {
 };
 
 export default class DelegatesExportDialog extends PureComponent {
-    render ({ open, onClose }) {
+    render ({ open, onClose, filters }) {
         return (
             <DialogSheet
                 class="delegates-export-dialog"
@@ -29,7 +30,7 @@ export default class DelegatesExportDialog extends PureComponent {
                 title={locale.export.title}
                 open={open}
                 onClose={onClose}>
-                <DelegatesExport />
+                <DelegatesExport filters={filters} />
             </DialogSheet>
         );
     }
@@ -37,6 +38,7 @@ export default class DelegatesExportDialog extends PureComponent {
 
 class DelegatesExport extends PureComponent {
     state = {
+        ignoreTos: false,
         loading: false,
         progress: {},
         error: null,
@@ -55,7 +57,7 @@ class DelegatesExport extends PureComponent {
             progress._current = status;
             this._pendingProgress = progress; // setState may be too slow sometimes
             this.setState({ progress });
-        }, this.context, this.state.org).then(data => {
+        }, this.context, this.state.org, this.state.useFilter ? this.props.filters : {}, this.state.ignoreTos).then(data => {
             const progress = { ...(this._pendingProgress || this.state.progress) };
             progress._current = null;
             const objectURL = URL.createObjectURL(data);
@@ -100,8 +102,34 @@ class DelegatesExport extends PureComponent {
                 </div>
             );
         } else {
+            const ignoreTosId = 'checkbox-' + Math.random().toString(36);
+            const useFilterId = 'checkbox-' + Math.random().toString(36);
+            const hasFilter = this.props.filters
+                && (!!Object.values(this.props.filters.filters || {}).find(x => x.enabled)
+                    || (this.props.filters.jsonFilter && !this.props.filters.jsonFilter?._disabled));
+
             contents = (
                 <div class="export-contents">
+                    <div class="export-setting">
+                        <Checkbox
+                            id={ignoreTosId}
+                            checked={this.state.ignoreTos}
+                            onChange={ignoreTos => this.setState({ ignoreTos })} />
+                        <label for={ignoreTosId}>
+                            {locale.export.settings.ignoreTos}
+                        </label>
+                    </div>
+                    {hasFilter ? (
+                        <div class="export-setting">
+                            <Checkbox
+                                id={useFilterId}
+                                checked={this.state.useFilter}
+                                onChange={useFilter => this.setState({ useFilter })} />
+                            <label for={useFilterId}>
+                                {locale.export.settings.useFilter}
+                            </label>
+                        </div>
+                    ) : null}
                     <div class="export-action-container">
                         <Button raised onClick={() => this.load()}>
                             {locale.export.start}
@@ -124,12 +152,16 @@ function ProgressDisplay ({ progress, running }) {
         <DynamicHeightDiv class="progress-display" useFirstHeight>
             {Object.keys(progress).filter(key => !key.startsWith('_')).map(key => (
                 <div class="progress-item" key={key}>
-                    <CircularProgress
-                        small
-                        indeterminate={running && progress._current === key}
-                        progress={(progress[key][0] + progress[key][1] === 0)
-                            ? 1 // show 1 for 0/0
-                            : progress[key][0] / Math.max(1e-9, progress[key][1])} />
+                    <div class="progress-icon" data-done={!(running && progress._current === key) && progress[key][0] === progress[key][1]}>
+                        <CircularProgress
+                            small
+                            class="progress-circle"
+                            indeterminate={running && progress._current === key}
+                            progress={(progress[key][0] + progress[key][1] === 0)
+                                ? 1 // show 1 for 0/0
+                                : progress[key][0] / Math.max(1e-9, progress[key][1])} />
+                        <CheckIcon className="check-icon" />
+                    </div>
                     <span class="item-label">
                         {locale.export.progress.messages[key]}
                     </span>
