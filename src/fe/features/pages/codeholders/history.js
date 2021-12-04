@@ -4,7 +4,7 @@ import Page from '../../../components/page';
 import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';
 import { codeholders as locale } from '../../../locale';
-import { IdUEACode } from '../../../components/data/uea-code';
+import DiffAuthor from '../../../components/diff-author';
 import { timestamp } from '../../../components/data';
 import { fields as detailFields } from './detail-fields';
 import './history.less';
@@ -96,7 +96,7 @@ function FieldHistoryItem ({ item, field, renderer: Renderer }) {
                         </div>
                     ) : null}
                     <div class="item-additional">
-                        {locale.fieldHistory.changedBy} <DiffAuthor author={item.author} />
+                        {locale.fieldHistory.changedBy} <DiffAuthor author={item.author} interactive />
                         {' · '}
                         <timestamp.inlineRenderer value={item.time} />
                     </div>
@@ -108,16 +108,4 @@ function FieldHistoryItem ({ item, field, renderer: Renderer }) {
             )}
         </div>
     );
-}
-
-function DiffAuthor ({ author }) {
-    const parts = author.split(':');
-    if (parts[0] === 'ch') {
-        // codeholder
-        return <IdUEACode id={+parts[1]} />;
-    } else {
-        // app
-        // TODO: this
-        throw new Error('unimplemented: app author');
-    }
 }

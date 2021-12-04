@@ -14,6 +14,7 @@ import Segmented from '../../../../components/segmented';
 import { Validator } from '../../../../components/form';
 import Select from '../../../../components/select';
 import TextArea from '../../../../components/text-area';
+import DiffAuthor from '../../../../components/diff-author';
 import { delegations as locale, delegationSubjects as subjectsLocale } from '../../../../locale';
 import { Link, routerContext } from '../../../../router';
 import { connectPerms } from '../../../../perms';
@@ -63,19 +64,12 @@ export const FIELDS = {
         },
     },
     approvedBy: {
-        component ({ value }) {
+        component ({ value, slot }) {
             if (!value) return '—';
-            let content;
-            if (value.startsWith('ch:')) {
-                content = <Link target={`/membroj/${value.substr(3)}`} outOfTree><IdUEACode id={value.substr(3)} /></Link>;
-            } else if (value.startsWith('app:')) {
-                // TODO: this
-                content = 'todo';
-            }
 
             return (
                 <div class="delegation-approved-by">
-                    {content}
+                    <DiffAuthor author={value} interactive={slot === 'detail'} />
                 </div>
             );
         },
