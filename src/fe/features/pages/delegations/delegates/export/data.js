@@ -174,7 +174,7 @@ export async function load (onProgress, core, org, filter, ignoreTos) {
             onProgress('error', 0, Infinity);
         });
         stringifier.on('finish', () => {
-            zip.file(fileName + '.csv', rows.join('\n'));
+            zip.file(fileName + '.csv', rows.join(''));
         });
         return stringifier;
     };
