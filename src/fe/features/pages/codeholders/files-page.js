@@ -2,7 +2,7 @@ import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../components/page';
 import Meta from '../../meta';
-import DataList from '../../../components/data-list';
+import DataList from '../../../components/lists/data-list';
 import pickFile from '../../../components/pick-file';
 import { FileThumbnail, Mime, FileSize } from '../../../components/files';
 import { IdUEACode } from '../../../components/data/uea-code';

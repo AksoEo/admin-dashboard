@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { lazy, Suspense } from 'preact/compat';
-import TinyProgress from '../tiny-progress';
+import TinyProgress from '../controls/tiny-progress';
 import './style';
 
 // we have separate renderers using libphonenumber because libphonenumber is huuuuge

@@ -1,10 +1,10 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../components/page';
-import SearchFilters from '../../../components/search-filters';
-import OverviewList from '../../../components/overview-list';
+import SearchFilters from '../../../components/overview/search-filters';
+import OverviewList from '../../../components/lists/overview-list';
 import Meta from '../../meta';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/overview/list-url-coding';
 import { congresses as locale } from '../../../locale';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';

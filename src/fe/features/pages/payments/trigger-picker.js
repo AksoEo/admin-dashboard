@@ -7,7 +7,7 @@ import {
     membershipEntries as entriesLocale,
     congressParticipants as participantLocale,
 } from '../../../locale';
-import StaticOverviewList from '../../../components/overview-list-static';
+import StaticOverviewList from '../../../components/lists/overview-list-static';
 import { FIELDS as ENTRY_FIELDS } from '../memberships/entries/fields';
 import { FIELDS as CONGRESS_FIELDS } from '../congresses/fields';
 import { FIELDS as INSTANCE_FIELDS } from '../congresses/instances/fields';

@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import Segmented from '../../../../../components/segmented';
+import Segmented from '../../../../../components/controls/segmented';
 import { congressLocations as locale } from '../../../../../locale';
 import LocationPicker from '../location-picker';
 

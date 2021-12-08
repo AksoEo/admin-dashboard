@@ -2,8 +2,8 @@ import { h } from 'preact';
 import { Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import { Validator } from '../../../../components/form';
-import LimitedTextField from '../../../../components/limited-text-field';
-import MdField from '../../../../components/md-field';
+import LimitedTextField from '../../../../components/controls/limited-text-field';
+import MdField from '../../../../components/controls/md-field';
 import { membershipCategories as locale } from '../../../../locale';
 import './fields.less';
 

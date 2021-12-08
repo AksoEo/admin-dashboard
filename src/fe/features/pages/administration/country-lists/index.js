@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
-import OverviewList from '../../../../components/overview-list';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
+import OverviewList from '../../../../components/lists/overview-list';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
 import Meta from '../../../meta';
 import { countryLists as locale } from '../../../../locale';
 import { FIELDS } from './fields';

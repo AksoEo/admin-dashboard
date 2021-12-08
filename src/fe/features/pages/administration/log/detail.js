@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import Page from '../../../../components/page';
-import DetailView from '../../../../components/detail';
+import DetailView from '../../../../components/detail/detail';
 import Meta from '../../../meta';
 import FIELDS from './detail-fields';
 import { httpLog as locale } from '../../../../locale';

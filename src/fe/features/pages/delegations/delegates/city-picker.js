@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { country } from '../../../../components/data';
 import { delegations as locale } from '../../../../locale';
-import ItemPickerDialog from '../../../../components/item-picker-dialog';
+import ItemPickerDialog from '../../../../components/pickers/item-picker-dialog';
 
 const FIELDS = {
     eoLabel: {

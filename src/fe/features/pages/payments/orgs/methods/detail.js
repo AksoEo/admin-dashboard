@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../../../components/page';
-import DetailView from '../../../../../components/detail';
-import TaskImage from '../../../../../components/task-image';
+import DetailView from '../../../../../components/detail/detail';
+import TaskImage from '../../../../../components/controls/task-image';
 import Meta from '../../../../meta';
 import { connectPerms } from '../../../../../perms';
 import { coreContext } from '../../../../../core/connection';

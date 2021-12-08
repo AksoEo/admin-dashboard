@@ -1,13 +1,13 @@
 import { h } from 'preact';
 import { lazy, Suspense, useEffect, useRef } from 'preact/compat';
 import { CircularProgress, TextField } from 'yamdl';
-import TaskDialog from '../../../components/task-dialog';
+import TaskDialog from '../../../components/tasks/task-dialog';
 import { Field, Validator } from '../../../components/form';
-import DetailShell from '../../../components/detail-shell';
-import ChangedFields from '../../../components/changed-fields';
-import Segmented from '../../../components/segmented';
+import DetailShell from '../../../components/detail/detail-shell';
+import ChangedFields from '../../../components/tasks/changed-fields';
+import Segmented from '../../../components/controls/segmented';
 import { TejoIcon, UeaIcon } from '../../../components/org-icon';
-import MdField from '../../../components/md-field';
+import MdField from '../../../components/controls/md-field';
 import { Required, timestamp } from '../../../components/data';
 import {
     congresses as locale,

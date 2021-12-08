@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../components/page';
-import DetailView from '../../../components/detail';
+import DetailView from '../../../components/detail/detail';
 import Meta from '../../meta';
 import { codeholders as locale, detail as detailLocale } from '../../../locale';
 import { coreContext, connect } from '../../../core/connection';

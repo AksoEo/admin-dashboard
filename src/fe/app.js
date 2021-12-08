@@ -4,7 +4,7 @@ import { Perms } from '@tejo/akso-client';
 import Sidebar from './features/sidebar';
 import Navigation from './features/navigation';
 import FatalError from './features/fatal-error';
-import EventProxy from './components/event-proxy';
+import EventProxy from './components/utils/event-proxy';
 import { connect } from './core/connection';
 import permsContext from './perms';
 import './app.less';

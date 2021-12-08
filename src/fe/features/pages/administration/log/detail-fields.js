@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { Button } from 'yamdl';
 import FIELDS from './table-fields';
 import ObjectViewer from '../../../../components/object-viewer';
-import CopyIcon from '../../../../components/copy-icon';
+import { CopyIcon } from '../../../../components/icons';
 import { LinkButton } from '../../../../router';
 import { httpLog as locale } from '../../../../locale';
 

@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
-import SearchFilters from '../../../../components/search-filters';
-import OverviewList from '../../../../components/overview-list';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
+import SearchFilters from '../../../../components/overview/search-filters';
+import OverviewList from '../../../../components/lists/overview-list';
 import { magazineEditions as locale } from '../../../../locale';
 import { FIELDS } from './fields';
 

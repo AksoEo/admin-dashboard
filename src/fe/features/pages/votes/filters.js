@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import Select from '../../../components/select';
-import Segmented from '../../../components/segmented';
+import Select from '../../../components/controls/select';
+import Segmented from '../../../components/controls/segmented';
 import { timestamp } from '../../../components/data';
 import { votes as locale } from '../../../locale';
 

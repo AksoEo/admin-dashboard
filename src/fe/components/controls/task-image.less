@@ -1,0 +1,62 @@
+@import '../../prelude';
+
+.task-image {
+    position: relative;
+    overflow: hidden;
+
+    .image-loading-indicator {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 2;
+
+        --md-progress-color: white;
+    }
+
+    .inner-image {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        animation: task-image-inner-image-in 0.6s @easing;
+        /*z-index: 1;
+
+        &.is-prev-image {
+            position: absolute;
+            z-index: 0;
+        }*/
+
+        @keyframes task-image-inner-image-in {
+            0% { opacity: 0 }
+            100% { opacity: 1 }
+        }
+    }
+
+    &.p-contain .inner-image {
+        object-fit: contain;
+    }
+
+    &.p-lightbox .inner-image {
+        cursor: zoom-in;
+
+        &.is-placeholder {
+            cursor: default;
+        }
+    }
+
+    .inner-edit-button {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        animation: task-image-inner-edit-button-in 0.6s @easing;
+        z-index: 3;
+
+        @keyframes task-image-inner-edit-button-in {
+            0% {
+                transform: scale(0);
+            }
+        }
+    }
+}

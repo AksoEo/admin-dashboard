@@ -1,9 +1,9 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import TaskDialog from '../../../components/task-dialog';
+import TaskDialog from '../../../components/tasks/task-dialog';
 import { Field } from '../../../components/form';
-import ChangedFields from '../../../components/changed-fields';
-import { createDialog } from '../../../components/task-templates';
+import ChangedFields from '../../../components/tasks/changed-fields';
+import { createDialog } from '../../../components/tasks/task-templates';
 import {
     membershipCategories as categoriesLocale,
     membershipOptions as optionsLocale,

@@ -3,7 +3,7 @@ import { LoginAuthStates } from '../../../protocol';
 import { connect } from '../../core/connection';
 import { login as locale, meta as localeMeta, app as appLocale } from '../../locale';
 import ProgressIndicator from '../../components/dialog-progress-indicator';
-import AutosizingPageView from '../../components/autosizing-page-view';
+import AutosizingPageView from '../../components/layout/autosizing-page-view';
 import DetailsPage from './details';
 import TotpPage from './totp';
 import { Mode, getPageMode } from './is-special-page';

@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import Segmented from '../../../../components/segmented';
-import TextArea from '../../../../components/text-area';
+import Segmented from '../../../../components/controls/segmented';
+import TextArea from '../../../../components/controls/text-area';
 import OrgIcon from '../../../../components/org-icon';
 import { delegationSubjects as locale } from '../../../../locale';
 

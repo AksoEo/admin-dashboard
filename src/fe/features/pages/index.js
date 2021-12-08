@@ -15,9 +15,14 @@ import HttpIcon from '@material-ui/icons/Http';
 import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
 import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
-import AddMembershipIcon from '../../components/add-membership-icon';
-import ConfigMembershipIcon from '../../components/config-membership-icon';
-import { TravelExploreIcon, BadgeIcon, ChangeRequestIcon, ChangeRequestNewIcon } from '../../components/icons';
+import {
+    TravelExploreIcon,
+    BadgeIcon,
+    ChangeRequestIcon,
+    ChangeRequestNewIcon,
+    ConfigMembershipIcon,
+    AddMembershipIcon,
+} from '../../components/icons';
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';

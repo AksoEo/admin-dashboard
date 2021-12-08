@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
-import DetailView from '../../../components/detail';
+import DetailView from '../../../components/detail/detail';
 import Page from '../../../components/page';
 import OrgIcon from '../../../components/org-icon';
 import Meta from '../../meta';

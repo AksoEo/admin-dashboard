@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Validator } from '../../../../../components/form';
-import MdField from '../../../../../components/md-field';
+import MdField from '../../../../../components/controls/md-field';
 import { TextField } from 'yamdl';
 import { paymentAddons as locale } from '../../../../../locale';
 

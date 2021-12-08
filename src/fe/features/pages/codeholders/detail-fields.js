@@ -20,13 +20,13 @@ import {
     phoneNumber,
     Required,
 } from '../../../components/data';
-import MdField from '../../../components/md-field';
-import SuggestionField from '../../../components/suggestion-field';
-import Select from '../../../components/select';
-import LimitedTextField from '../../../components/limited-text-field';
-import RearrangingList from '../../../components/rearranging-list';
-import TinyProgress from '../../../components/tiny-progress';
-import DynamicHeightDiv from '../../../components/dynamic-height-div';
+import MdField from '../../../components/controls/md-field';
+import SuggestionField from '../../../components/controls/suggestion-field';
+import Select from '../../../components/controls/select';
+import LimitedTextField from '../../../components/controls/limited-text-field';
+import RearrangingList from '../../../components/lists/rearranging-list';
+import TinyProgress from '../../../components/controls/tiny-progress';
+import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import { FileIcon } from '../../../components/icons';
 import ProfilePictureEditor from './profile-picture';
 import Publicity from './publicity';

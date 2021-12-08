@@ -5,7 +5,7 @@ import Meta from '../../../../meta';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
 import Page from '../../../../../components/page';
-import DetailShell from '../../../../../components/detail-shell';
+import DetailShell from '../../../../../components/detail/detail-shell';
 import FormEditor from '../../../../../components/form-editor';
 import { connect, coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';

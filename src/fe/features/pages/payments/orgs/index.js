@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
-import OverviewList from '../../../../components/overview-list';
+import OverviewList from '../../../../components/lists/overview-list';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';

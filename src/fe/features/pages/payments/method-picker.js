@@ -6,9 +6,9 @@ import { coreContext } from '../../../core/connection';
 import { paymentOrgs as orgLocale, paymentMethods as methodLocale } from '../../../locale';
 import { FIELDS as ORG_FIELDS } from './orgs/fields';
 import { FIELDS as METHOD_FIELDS } from './orgs/methods/fields';
-import StaticOverviewList from '../../../components/overview-list-static';
-import OverviewListItem from '../../../components/overview-list-item';
-import DynamicHeightDiv from '../../../components/dynamic-height-div';
+import StaticOverviewList from '../../../components/lists/overview-list-static';
+import OverviewListItem from '../../../components/lists/overview-list-item';
+import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import './method-picker.less';
 
 const portalContainer = document.createElement('div');

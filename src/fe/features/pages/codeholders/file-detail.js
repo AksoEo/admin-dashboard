@@ -2,7 +2,7 @@ import { h } from 'preact';
 import config from '../../../../config.val';
 import DownloadIcon from '@material-ui/icons/SaveAlt';
 import Page from '../../../components/page';
-import DetailView from '../../../components/detail';
+import DetailView from '../../../components/detail/detail';
 import { timestamp } from '../../../components/data';
 import { IdUEACode } from '../../../components/data/uea-code';
 import { FileThumbnail, Mime, FileSize } from '../../../components/files';

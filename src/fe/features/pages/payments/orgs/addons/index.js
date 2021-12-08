@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import OverviewList from '../../../../../components/overview-list';
+import OverviewList from '../../../../../components/lists/overview-list';
 import { paymentAddons as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
 

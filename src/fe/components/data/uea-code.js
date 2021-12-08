@@ -7,8 +7,8 @@ import ErrorIcon from '@material-ui/icons/Error';
 import { connect, coreContext } from '../../core/connection';
 import { data as locale } from '../../locale';
 import { Validator } from '../form';
-import SuggestionField from '../suggestion-field';
-import TinyProgress from '../tiny-progress';
+import SuggestionField from '../controls/suggestion-field';
+import TinyProgress from '../controls/tiny-progress';
 import './style';
 
 /// Renders a single UEA code. Props: `value`, `old`.

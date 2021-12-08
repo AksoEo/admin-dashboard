@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import Select from '../../../../components/select';
-import CodeholderPicker from '../../../../components/codeholder-picker';
-import RangeEditor from '../../../../components/range-editor';
+import Select from '../../../../components/controls/select';
+import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
+import RangeEditor from '../../../../components/controls/range-editor';
 import { httpLog as locale } from '../../../../locale';
 import { timestamp } from '../../../../components/data';
 

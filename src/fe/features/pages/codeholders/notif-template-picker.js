@@ -4,8 +4,8 @@ import { Button } from 'yamdl';
 import SearchIcon from '@material-ui/icons/Search';
 import CloseIcon from '@material-ui/icons/Close';
 import { FIELDS } from '../notif-templates/fields';
-import StaticOverviewList from '../../../components/overview-list-static';
-import OverviewListItem from '../../../components/overview-list-item';
+import StaticOverviewList from '../../../components/lists/overview-list-static';
+import OverviewListItem from '../../../components/lists/overview-list-item';
 import { notifTemplates, codeholders as locale } from '../../../locale';
 
 const SELECTED_FIELDS = [

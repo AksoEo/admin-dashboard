@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import Select from '../../../../components/select';
-import CodeholderPicker from '../../../../components/codeholder-picker';
+import Select from '../../../../components/controls/select';
+import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import { timestamp } from '../../../../components/data';
 import { delegationApplications as locale } from '../../../../locale';
 

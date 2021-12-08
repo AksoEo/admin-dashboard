@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
 import Page from '../../../components/page';
-import MdField from '../../../components/md-field';
+import MdField from '../../../components/controls/md-field';
 import FormEditor from '../../../components/form-editor';
 
 export default class Components extends Page {

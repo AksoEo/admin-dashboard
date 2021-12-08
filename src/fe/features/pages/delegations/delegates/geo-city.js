@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { PureComponent, Fragment } from 'preact/compat';
 import ErrorIcon from '@material-ui/icons/Error';
 import { connect } from '../../../../core/connection';
-import TinyProgress from '../../../../components/tiny-progress';
+import TinyProgress from '../../../../components/controls/tiny-progress';
 import { country } from '../../../../components/data';
 import { data as locale } from '../../../../locale';
 import './geo-city.less';

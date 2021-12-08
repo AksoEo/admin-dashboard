@@ -1,9 +1,9 @@
 import { h, Component } from 'preact';
 import { useEffect } from 'preact/compat';
 import { Button, TextField } from 'yamdl';
-import DialogSheet from '../../../components/dialog-sheet';
+import DialogSheet from '../../../components/tasks/dialog-sheet';
 import ProgressIndicator from '../../../components/dialog-progress-indicator';
-import AutosizingPageView from '../../../components/autosizing-page-view';
+import AutosizingPageView from '../../../components/layout/autosizing-page-view';
 import Form, { Validator } from '../../../components/form';
 import { TejoIcon, UeaIcon, UeaColorIcon } from '../../../components/org-icon';
 import { timestamp } from '../../../components/data';

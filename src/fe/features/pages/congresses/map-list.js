@@ -5,7 +5,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import L from 'leaflet';
 import fuzzaldrin from 'fuzzaldrin';
-import DisplayError from '../../../components/error';
+import DisplayError from '../../../components/utils/error';
 import { coreContext } from '../../../core/connection';
 import { data as locale } from '../../../locale';
 import LMap from './map';

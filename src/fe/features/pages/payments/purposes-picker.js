@@ -3,13 +3,13 @@ import { PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import { Button, Checkbox, Dialog, MenuIcon, TextField } from 'yamdl';
 import { base32 } from 'rfc4648';
-import Select from '../../../components/select';
-import Segmented from '../../../components/segmented';
+import Select from '../../../components/controls/select';
+import Segmented from '../../../components/controls/segmented';
 import Form, { Validator, Field } from '../../../components/form';
-import DynamicHeightDiv from '../../../components/dynamic-height-div';
-import StaticOverviewList from '../../../components/overview-list-static';
-import OverviewListItem from '../../../components/overview-list-item';
-import MdField from '../../../components/md-field';
+import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
+import StaticOverviewList from '../../../components/lists/overview-list-static';
+import OverviewListItem from '../../../components/lists/overview-list-item';
+import MdField from '../../../components/controls/md-field';
 import { currencyAmount } from '../../../components/data';
 import {
     paymentIntents as locale,

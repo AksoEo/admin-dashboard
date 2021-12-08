@@ -1,5 +1,5 @@
 import { roles as locale } from '../../../locale';
-import { createDialog, updateDialog, deleteDialog } from '../../../components/task-templates';
+import { createDialog, updateDialog, deleteDialog } from '../../../components/tasks/task-templates';
 import { FIELDS } from './fields';
 
 export default {

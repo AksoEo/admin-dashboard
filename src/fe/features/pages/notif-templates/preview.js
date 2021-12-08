@@ -4,8 +4,8 @@ import { CircularProgress, Dialog } from 'yamdl';
 import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';
 import Page from '../../../components/page';
-import DisplayError from '../../../components/error';
-import Tabs from '../../../components/tabs';
+import DisplayError from '../../../components/utils/error';
+import Tabs from '../../../components/controls/tabs';
 import { notifTemplates as locale } from '../../../locale';
 import './preview.less';
 

@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import TaskDialog from '../../../components/task-dialog';
-import ChangedFields from '../../../components/changed-fields';
+import TaskDialog from '../../../components/tasks/task-dialog';
+import ChangedFields from '../../../components/tasks/changed-fields';
 import { votes as locale } from '../../../locale';
 import makeCreateTask from './tasks-create';
 import './tasks.less';

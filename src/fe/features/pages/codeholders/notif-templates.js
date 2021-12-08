@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { lazy, Suspense, PureComponent } from 'preact/compat';
 import { AppBarProxy, Button, Checkbox, CircularProgress, MenuIcon } from 'yamdl';
-import { CardStackItem } from '../../../components/card-stack';
+import { CardStackItem } from '../../../components/layout/card-stack';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';

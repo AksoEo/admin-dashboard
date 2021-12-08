@@ -1,19 +1,19 @@
 import { h } from 'preact';
 import { useEffect, PureComponent } from 'preact/compat';
 import { Checkbox, CircularProgress, TextField } from 'yamdl';
-import TaskDialog from '../../../components/task-dialog';
+import TaskDialog from '../../../components/tasks/task-dialog';
 import SavePerms from '../administration/perms-editor/save';
 import { UEACode } from '@tejo/akso-client';
-import Segmented from '../../../components/segmented';
-import SuggestionField from '../../../components/suggestion-field';
-import Select from '../../../components/select';
-import ChangedFields from '../../../components/changed-fields';
-import CodeholderPicker from '../../../components/codeholder-picker';
-import DynamicHeightDiv from '../../../components/dynamic-height-div';
-import LimitedTextField from '../../../components/limited-text-field';
+import Segmented from '../../../components/controls/segmented';
+import SuggestionField from '../../../components/controls/suggestion-field';
+import Select from '../../../components/controls/select';
+import ChangedFields from '../../../components/tasks/changed-fields';
+import CodeholderPicker from '../../../components/pickers/codeholder-picker';
+import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
+import LimitedTextField from '../../../components/controls/limited-text-field';
 import { Field, Validator } from '../../../components/form';
 import { country, ueaCode, date } from '../../../components/data';
-import { createDialog, updateDialog, deleteDialog } from '../../../components/task-templates';
+import { createDialog, updateDialog, deleteDialog } from '../../../components/tasks/task-templates';
 import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
 import {

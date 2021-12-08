@@ -3,7 +3,7 @@ import { Button } from 'yamdl';
 import { codeholders as locale } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 import Page from '../../../components/page';
-import DataList from '../../../components/data-list';
+import DataList from '../../../components/lists/data-list';
 import { timestamp } from '../../../components/data';
 import Meta from '../../meta';
 import './logins.less';

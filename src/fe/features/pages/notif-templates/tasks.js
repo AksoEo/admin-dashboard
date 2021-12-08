@@ -1,10 +1,10 @@
 import { h } from 'preact';
-import TaskDialog from '../../../components/task-dialog';
-import Segmented from '../../../components/segmented';
-import Select from '../../../components/select';
+import TaskDialog from '../../../components/tasks/task-dialog';
+import Segmented from '../../../components/controls/segmented';
+import Select from '../../../components/controls/select';
 import { TejoIcon, UeaIcon } from '../../../components/org-icon';
 import { Field } from '../../../components/form';
-import ChangedFields from '../../../components/changed-fields';
+import ChangedFields from '../../../components/tasks/changed-fields';
 import { notifTemplates as locale } from '../../../locale';
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';

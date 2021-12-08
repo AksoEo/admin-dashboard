@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import Select from '../../../components/select';
+import Select from '../../../components/controls/select';
 import { codeholderChgReqs as locale } from '../../../locale';
 import './filters.less';
 

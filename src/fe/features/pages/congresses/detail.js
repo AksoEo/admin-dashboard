@@ -2,7 +2,7 @@ import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../components/page';
-import DetailView from '../../../components/detail';
+import DetailView from '../../../components/detail/detail';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';

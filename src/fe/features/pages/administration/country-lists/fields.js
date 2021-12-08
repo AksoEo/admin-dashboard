@@ -5,7 +5,7 @@ import AddIcon from '@material-ui/icons/Add';
 import SearchIcon from '@material-ui/icons/Search';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
-import CodeholderPicker from '../../../../components/codeholder-picker';
+import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import { WithCountries, CountryFlag } from '../../../../components/data/country';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { countryLists as locale } from '../../../../locale';

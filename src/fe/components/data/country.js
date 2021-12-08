@@ -1,7 +1,7 @@
 //! Country utilities.
 
 import { h } from 'preact';
-import Select from '../select';
+import Select from '../controls/select';
 import { connect } from '../../core/connection';
 import './style';
 

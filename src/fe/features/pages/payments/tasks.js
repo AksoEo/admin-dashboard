@@ -1,11 +1,11 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
 import { TextField } from 'yamdl';
-import TaskDialog from '../../../components/task-dialog';
-import Segmented from '../../../components/segmented';
-import Select from '../../../components/select';
-import ChangedFields from '../../../components/changed-fields';
-import DynamicHeightDiv from '../../../components/dynamic-height-div';
+import TaskDialog from '../../../components/tasks/task-dialog';
+import Segmented from '../../../components/controls/segmented';
+import Select from '../../../components/controls/select';
+import ChangedFields from '../../../components/tasks/changed-fields';
+import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import { currencyAmount } from '../../../components/data';
 import { Validator, Field } from '../../../components/form';
 import { connectPerms } from '../../../perms';

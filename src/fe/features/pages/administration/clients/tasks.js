@@ -1,7 +1,7 @@
 import { h } from 'preact';
-import TaskDialog from '../../../../components/task-dialog';
+import TaskDialog from '../../../../components/tasks/task-dialog';
 import SavePerms from '../perms-editor/save';
-import { createDialog, updateDialog, deleteDialog } from '../../../../components/task-templates';
+import { createDialog, updateDialog, deleteDialog } from '../../../../components/tasks/task-templates';
 import { clients as locale } from '../../../../locale';
 import { FIELDS } from './fields';
 import './tasks.less';

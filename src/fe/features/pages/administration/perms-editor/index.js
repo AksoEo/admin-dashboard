@@ -10,9 +10,9 @@ import {
     memberFieldsWrite,
 } from '../../../../permissions';
 import { data as locale } from '../../../../locale';
-import JSONEditor from '../../../../components/json-editor';
+import JSONEditor from '../../../../components/controls/json-editor';
 import DisclosureArrow from '../../../../components/disclosure-arrow';
-import DynamicHeightDiv from '../../../../components/dynamic-height-div';
+import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
 import {
     addPermission,
     hasPermission,

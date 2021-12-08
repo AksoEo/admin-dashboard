@@ -1,14 +1,14 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../../components/page';
-import SearchFilters from '../../../../components/search-filters';
-import OverviewList from '../../../../components/overview-list';
-import CSVExport from '../../../../components/csv-export';
+import SearchFilters from '../../../../components/overview/search-filters';
+import OverviewList from '../../../../components/lists/overview-list';
+import CSVExport from '../../../../components/tasks/csv-export';
 import Meta from '../../../meta';
 import { clients as locale, search as searchLocale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/list-url-coding';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
 import { FIELDS } from './fields';
 import './style';
 

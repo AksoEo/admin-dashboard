@@ -2,9 +2,9 @@ import { h, Component } from 'preact';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import { CircularProgress } from 'yamdl';
-import TaskDialog from '../../../../components/task-dialog';
-import DynamicHeightDiv from '../../../../components/dynamic-height-div';
-import DisplayError from '../../../../components/error';
+import TaskDialog from '../../../../components/tasks/task-dialog';
+import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
+import DisplayError from '../../../../components/utils/error';
 import { deepEq } from '../../../../../util';
 import { data as locale } from '../../../../locale';
 

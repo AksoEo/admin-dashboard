@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import TaskDialog from '../../../../components/task-dialog';
-import ChangedFields from '../../../../components/changed-fields';
+import TaskDialog from '../../../../components/tasks/task-dialog';
+import ChangedFields from '../../../../components/tasks/changed-fields';
 import { Field } from '../../../../components/form';
 import { countryLists as locale } from '../../../../locale';
 import { routerContext } from '../../../../router';

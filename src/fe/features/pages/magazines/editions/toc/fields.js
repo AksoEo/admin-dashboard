@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import { Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
-import LimitedTextField from '../../../../../components/limited-text-field';
-import MdField from '../../../../../components/md-field';
+import LimitedTextField from '../../../../../components/controls/limited-text-field';
+import MdField from '../../../../../components/controls/md-field';
 import { magazineToc as locale } from '../../../../../locale';
 import './fields.less';
 

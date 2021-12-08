@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import moment from 'moment';
 import { time, timestamp } from '../../../../../components/data';
-import MdField from '../../../../../components/md-field';
-import LimitedTextField from '../../../../../components/limited-text-field';
+import MdField from '../../../../../components/controls/md-field';
+import LimitedTextField from '../../../../../components/controls/limited-text-field';
 import LocationPicker from '../location-picker';
 import './fields.less';
 

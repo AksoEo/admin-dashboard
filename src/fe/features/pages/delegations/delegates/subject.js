@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import ErrorIcon from '@material-ui/icons/Error';
 import { connect } from '../../../../core/connection';
-import TinyProgress from '../../../../components/tiny-progress';
+import TinyProgress from '../../../../components/controls/tiny-progress';
 import { Link } from '../../../../router';
 import './subject.less';
 

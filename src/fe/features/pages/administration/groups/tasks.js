@@ -3,8 +3,8 @@ import { TextField } from 'yamdl';
 import SavePerms from '../perms-editor/save';
 import { adminGroups as locale } from '../../../../locale';
 import { Field, Validator } from '../../../../components/form';
-import TaskDialog from '../../../../components/task-dialog';
-import ChangedFields from '../../../../components/changed-fields';
+import TaskDialog from '../../../../components/tasks/task-dialog';
+import ChangedFields from '../../../../components/tasks/changed-fields';
 import { routerContext } from '../../../../router';
 
 export default {

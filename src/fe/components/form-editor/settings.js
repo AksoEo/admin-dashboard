@@ -8,8 +8,8 @@ import { formEditor as locale, currencies } from '../../locale';
 import { currencyAmount } from '../data';
 import { RefNameView } from './script-views';
 import { evalExpr } from './model';
-import Select from '../select';
-import DynamicHeightDiv from '../dynamic-height-div';
+import Select from '../controls/select';
+import DynamicHeightDiv from '../layout/dynamic-height-div';
 import './settings.less';
 
 const FLAGS = [

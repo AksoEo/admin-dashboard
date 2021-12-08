@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { TextField } from 'yamdl';
 import { getValidationRules } from '@cpsdqs/google-i18n-address';
-import Select from '../select';
+import Select from '../controls/select';
 import { data as locale } from '../../locale';
 import { Validator } from '../form';
 import countryField, { WithCountries } from './country';

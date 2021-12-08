@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
 import { Validator } from '../../../components/form';
-import MdField from '../../../components/md-field';
-import Segmented from '../../../components/segmented';
+import MdField from '../../../components/controls/md-field';
+import Segmented from '../../../components/controls/segmented';
 import OrgIcon from '../../../components/org-icon';
 import { magazines as locale } from '../../../locale';
 import './fields.less';

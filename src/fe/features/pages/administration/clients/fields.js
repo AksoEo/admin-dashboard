@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Button, TextField } from 'yamdl';
-import CopyIcon from '../../../../components/copy-icon';
+import { CopyIcon } from '../../../../components/icons';
 import { apiKey, email } from '../../../../components/data';
 import { Validator } from '../../../../components/form';
 import { clients as locale } from '../../../../locale';

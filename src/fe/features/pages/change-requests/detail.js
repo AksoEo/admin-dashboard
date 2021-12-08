@@ -4,7 +4,7 @@ import ApprovedIcon from '@material-ui/icons/CheckCircleOutline';
 import DeniedIcon from '@material-ui/icons/HighlightOff';
 import EditIcon from '@material-ui/icons/Edit';
 import Page from '../../../components/page';
-import DetailShell from '../../../components/detail-shell';
+import DetailShell from '../../../components/detail/detail-shell';
 import Meta from '../../meta';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';

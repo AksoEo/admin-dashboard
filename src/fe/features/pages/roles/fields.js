@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import { Validator } from '../../../components/form';
-import TextArea from '../../../components/text-area';
+import TextArea from '../../../components/controls/text-area';
 import { roles as locale } from '../../../locale';
 
 export const FIELDS = {

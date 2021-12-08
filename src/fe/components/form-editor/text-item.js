@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import Segmented from '../segmented';
-import MdField from '../md-field';
+import Segmented from '../controls/segmented';
+import MdField from '../controls/md-field';
 import { ScriptableString } from './script-expr';
 import { evalExpr } from './model';
 import { formEditor as locale } from '../../locale';

@@ -1,10 +1,10 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import Page from '../../../components/page';
-import SearchFilters from '../../../components/search-filters';
-import OverviewList from '../../../components/overview-list';
-import FieldPicker from '../../../components/field-picker';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/list-url-coding';
+import SearchFilters from '../../../components/overview/search-filters';
+import OverviewList from '../../../components/lists/overview-list';
+import FieldPicker from '../../../components/pickers/field-picker';
+import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../components/overview/list-url-coding';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';

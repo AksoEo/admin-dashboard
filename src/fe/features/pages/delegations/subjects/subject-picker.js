@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { delegationSubjects as locale } from '../../../../locale';
-import ItemPickerDialog from '../../../../components/item-picker-dialog';
+import ItemPickerDialog from '../../../../components/pickers/item-picker-dialog';
 import { FIELDS } from './fields';
 
 export default function PickerDialog ({ value, onChange, container, limit, open, onClose, filter, ...extra }) {

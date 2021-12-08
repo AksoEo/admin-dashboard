@@ -6,7 +6,7 @@ import InputIcon from '@material-ui/icons/Input';
 import TextIcon from '@material-ui/icons/Subject';
 import ScriptIcon from '@material-ui/icons/Code';
 import FormEditorSettings from './settings';
-import RearrangingList from '../rearranging-list';
+import RearrangingList from '../lists/rearranging-list';
 import FormEditorItem from './item';
 import ScriptContext from './script-context';
 import { createInput, getGlobalDefs, getAscDefs } from './model';

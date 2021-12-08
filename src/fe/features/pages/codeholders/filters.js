@@ -7,16 +7,16 @@ import CloseIcon from '@material-ui/icons/Close';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import moment from 'moment';
-import Segmented from '../../../components/segmented';
+import Segmented from '../../../components/controls/segmented';
 import { connect } from '../../../core/connection';
 import { codeholders as locale, delegations as delegationsLocale } from '../../../locale';
-import CountryPicker from '../../../components/country-picker';
-import LargeMultiSelect from '../../../components/large-multi-select';
-import RangeEditor from '../../../components/range-editor';
+import CountryPicker from '../../../components/pickers/country-picker';
+import LargeMultiSelect from '../../../components/pickers/large-multi-select';
+import RangeEditor from '../../../components/controls/range-editor';
 import { date, ueaCode } from '../../../components/data';
 import { FILTERS as DELEGATE_FILTERS } from '../delegations/delegates/filters';
-import SearchFilters from '../../../components/search-filters';
-import { encodeParens, decodeParens, encodeURLQuery, decodeURLQuery } from '../../../components/list-url-coding';
+import SearchFilters from '../../../components/overview/search-filters';
+import { encodeParens, decodeParens, encodeURLQuery, decodeURLQuery } from '../../../components/overview/list-url-coding';
 
 function makeDialogMultiSelect (view, pickSome, render, itemName, itemPreview) {
     return connect(view)(data => ({

@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import TimeZoneEditor from '../../../../components/time-zone';
-import TextArea from '../../../../components/text-area';
+import TimeZoneEditor from '../../../../components/controls/time-zone';
+import TextArea from '../../../../components/controls/text-area';
 import { date } from '../../../../components/data';
 import { congressInstances as locale } from '../../../../locale';
 

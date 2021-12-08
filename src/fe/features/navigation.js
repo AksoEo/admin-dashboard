@@ -1,9 +1,9 @@
 import { h } from 'preact';
 import { PureComponent, Suspense } from 'preact/compat';
 import { Button, CircularProgress, AppBar, AppBarProxy, AppBarConsumer, MenuIcon } from 'yamdl';
-import EventProxy from '../components/event-proxy';
-import { CardStackProvider, CardStackRenderer, CardStackItem } from '../components/card-stack';
-import { FULL_SCREEN_LAYOUT_MAX_WIDTH } from '../components/card-stack';
+import EventProxy from '../components/utils/event-proxy';
+import { CardStackProvider, CardStackRenderer, CardStackItem } from '../components/layout/card-stack';
+import { FULL_SCREEN_LAYOUT_MAX_WIDTH } from '../components/layout/card-stack';
 import pages from './pages';
 import { MetaProvider } from './meta';
 import { app as locale } from '../locale';

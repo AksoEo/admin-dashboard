@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import TaskDialog from '../../../components/task-dialog';
+import TaskDialog from '../../../components/tasks/task-dialog';
 import {
     magazines as magazinesLocale,
     magazineEditions as editionsLocale,
@@ -7,7 +7,7 @@ import {
 } from '../../../locale';
 import { DocumentIcon } from '../../../components/icons';
 import { FileSize } from '../../../components/files';
-import { createDialog, updateDialog, deleteDialog } from '../../../components/task-templates';
+import { createDialog, updateDialog, deleteDialog } from '../../../components/tasks/task-templates';
 import { FIELDS as MAGAZINE_FIELDS } from './fields';
 import { FIELDS as EDITION_FIELDS } from './editions/fields';
 import { FIELDS as TOC_FIELDS } from './editions/toc//fields';

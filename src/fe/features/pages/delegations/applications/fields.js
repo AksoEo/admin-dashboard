@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { Button } from 'yamdl';
 import { FIELDS as DELEGATE_FIELDS } from '../delegates/fields';
-import TextArea from '../../../../components/text-area';
+import TextArea from '../../../../components/controls/text-area';
 import { timestamp } from '../../../../components/data';
 import { delegationApplications as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';

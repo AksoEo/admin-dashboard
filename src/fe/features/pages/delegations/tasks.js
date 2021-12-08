@@ -4,8 +4,8 @@ import {
     delegationSubjects as subjectsLocale,
     delegationApplications as applicationsLocale,
 } from '../../../locale';
-import { createDialog, updateDialog, deleteDialog } from '../../../components/task-templates';
-import TaskDialog from '../../../components/task-dialog';
+import { createDialog, updateDialog, deleteDialog } from '../../../components/tasks/task-templates';
+import TaskDialog from '../../../components/tasks/task-dialog';
 import { FIELDS as DELEGATION_FIELDS } from './delegates/fields';
 import { FIELDS as SUBJECT_FIELDS } from './subjects/fields';
 import { FIELDS as APPLICATION_FIELDS } from './applications/fields';
