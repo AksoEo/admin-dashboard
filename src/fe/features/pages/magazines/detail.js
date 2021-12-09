@@ -1,56 +1,35 @@
 import { h } from 'preact';
+import { Fragment } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import Page from '../../../components/page';
+import DetailPage from '../../../components/detail/detail-page';
 import DetailView from '../../../components/detail/detail';
-import Meta from '../../meta';
-import { connectPerms } from '../../../perms';
-import { coreContext } from '../../../core/connection';
 import { magazines as locale, magazineEditions as editionsLocale } from '../../../locale';
-import { FIELDS } from './fields';
+import { Header, FIELDS } from './fields';
 import EditionsView from './editions';
 
-export default connectPerms(class Magazine extends Page {
+export default class Magazine extends DetailPage {
     state = {
-        edit: null,
+        org: null,
     };
 
-    static contextType = coreContext;
-
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
-
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return;
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return;
-        }
-
-        this.#commitTask = this.context.createTask('magazines/updateMagazine', {
-            id: this.id,
-            _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
-    };
-
-    componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
-    }
+    locale = locale;
 
     get id () {
         return +this.props.match[1];
     }
 
-    render ({ perms, editing }, { edit }) {
+    createCommitTask (changedFields, edit) {
+        return this.context.createTask('magazines/updateMagazine', {
+            id: this.id,
+            _changedFields: changedFields,
+        }, edit);
+    }
+
+    renderActions ({ perms }, { org }) {
         const actions = [];
 
-        if (perms.hasPerm('')) {
+        if (perms.hasPerm(`magazines.update.${org}`)) {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: editionsLocale.create.menuItem,
@@ -60,15 +39,15 @@ export default connectPerms(class Magazine extends Page {
             });
         }
 
-        if (perms.hasPerm('')) {
+        if (perms.hasPerm(`magazines.update.${org}`)) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
-                action: () => this.props.push('redakti', true),
+                action: this.onBeginEdit,
             });
         }
 
-        if (perms.hasPerm('')) {
+        if (perms.hasPerm(`magazines.delete.${org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('magazines/deleteMagazine', { id: this.id }),
@@ -76,29 +55,31 @@ export default connectPerms(class Magazine extends Page {
             });
         }
 
-        return (
-            <div class="magazine-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
+        return actions;
+    }
 
+    renderContents ({ editing }, { edit }) {
+        return (
+            <Fragment>
                 <DetailView
                     view="magazines/magazine"
                     id={this.id}
+                    header={Header}
                     fields={FIELDS}
                     locale={locale}
                     edit={edit}
+                    onData={data => data && this.setState({ org: data.org })}
                     onEditChange={edit => this.setState({ edit })}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    onDelete={() => this.props.pop()} />
+                    onDelete={this.onDelete} />
 
                 <EditionsView
                     magazine={this.id}
                     query={this.props.query}
                     onQueryChange={this.props.onQueryChange} />
-            </div>
+            </Fragment>
         );
     }
-});
+}

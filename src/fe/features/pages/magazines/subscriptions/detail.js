@@ -1,0 +1,82 @@
+import { h } from 'preact';
+import { Fragment } from 'preact/compat';
+import EditIcon from '@material-ui/icons/Edit';
+import DetailPage from '../../../../components/detail/detail-page';
+import DetailView from '../../../../components/detail/detail';
+import DetailShell from '../../../../components/detail/detail-shell';
+import { FIELDS } from './fields';
+import { magazineSubs as locale } from '../../../../locale';
+
+export default class Subscription extends DetailPage {
+    state = {
+        org: null,
+    };
+
+    locale = locale;
+
+    get magazine () {
+        return +this.props.matches.magazine[1];
+    }
+
+    get id () {
+        return this.props.match[1];
+    }
+
+    createCommitTask (changedFields, edit) {
+        return this.context.createTask('magazines/updateSubscription', {
+            magazine: this.magazine,
+            id: this.id,
+            _changedFields: changedFields,
+        }, edit);
+    }
+
+    renderActions ({ perms }) {
+        const actions = [];
+
+        if (perms.hasPerm(`magazines.subscriptions.update.${this.org}`)) {
+            actions.push({
+                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.update.menuItem,
+                action: this.onBeginEdit,
+            });
+        }
+
+        if (perms.hasPerm(`magazines.subscriptions.delete.${this.org}`)) {
+            actions.push({
+                label: locale.delete.menuItem,
+                action: () => this.context.createTask('magazines/deleteSubscription', {
+                    magazine: this.magazine,
+                    id: this.id,
+                }),
+                overflow: true,
+            });
+        }
+
+        return actions;
+    }
+
+    renderContents ({ editing }, { edit }) {
+        return (
+            <Fragment>
+                <DetailView
+                    view="magazines/subscription"
+                    options={{ magazine: this.magazine }}
+                    id={this.id}
+                    fields={FIELDS}
+                    locale={locale}
+                    edit={edit}
+                    onEditChange={edit => this.setState({ edit })}
+                    editing={editing}
+                    onEndEdit={this.onEndEdit}
+                    onCommit={this.onCommit}
+                    onDelete={this.onDelete} />
+
+                <DetailShell
+                    view="magazines/magazine"
+                    id={this.magazine}
+                    fields={{}} locale={{}}
+                    onData={data => data && this.setState({ org: data.org })} />
+            </Fragment>
+        );
+    }
+}

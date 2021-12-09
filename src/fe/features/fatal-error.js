@@ -18,7 +18,7 @@ export default function FatalError ({ error }) {
             <details class="error-details">
                 <summary>{locale.genericErrorViewDetails}</summary>
                 <pre>
-                    {error?.stack ? error.stack.toString() : error.toString()}
+                    {error?.stack ? error.toString() + '\n' + error.stack.toString() : error.toString()}
                 </pre>
             </details>
         </div>

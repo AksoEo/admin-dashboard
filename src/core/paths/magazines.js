@@ -1,3 +1,4 @@
+import { base32 } from 'rfc4648';
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
@@ -14,6 +15,8 @@ export const FILES = 'files';
 export const TOC = 'toc';
 export const SIG_TOC = '!toc';
 export const RECITATIONS = 'recitations';
+export const SUBSCRIPTIONS = 'subscriptions';
+export const SIG_SUBSCRIPTIONS = '!subscriptions';
 
 //! Data structure:
 //! MAGAZINES
@@ -22,19 +25,23 @@ export const RECITATIONS = 'recitations';
 //!    |- M_DATA
 //!    |  |- (magazine data)
 //!    |- EDITIONS
-//!       |- SIG_EDITIONS
-//!       |- [edition id]
-//!          |- E_DATA
-//!          |  |- (edition data)
-//!          |- FILES
-//!          |  |- (file data)
-//!          |- TOC
-//!             |- SIG_TOC
-//!             |- [entry id]
-//!                |- E_DATA
-//!                |  |- (entry data)
-//!                |- RECITATIONS
-//!                   |- (recitation metadata)
+//!    |  |- SIG_EDITIONS
+//!    |  |- [edition id]
+//!    |     |- E_DATA
+//!    |     |  |- (edition data)
+//!    |     |- FILES
+//!    |     |  |- (file data)
+//!    |     |- TOC
+//!    |        |- SIG_TOC
+//!    |        |- [entry id]
+//!    |           |- E_DATA
+//!    |           |  |- (entry data)
+//!    |           |- RECITATIONS
+//!    |              |- (recitation metadata)
+//!    |- SUBSCRIPTIONS
+//!       |- SIG_SUBSCRIPTIONS
+//!       |- [subscription id]
+//!          |- (subscription id)
 
 // returns a random string to use as cache-buster with thumbnails
 function getThumbnailKey () {
@@ -218,30 +225,65 @@ export const tasks = {
         store.remove([MAGAZINES, magazine, EDITIONS, edition, TOC, id, RECITATIONS]);
         tasks.tocRecitations({ magazine, edition, id }).catch(() => {});
     },
+
+    listSubscriptions: crudList({
+        apiPath: ({ magazine }) => `/magazines/${magazine}/subscriptions`,
+        fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes'],
+        map: item => {
+            item.id = base32.stringify(item.id);
+        },
+        storePath: ({ magazine }, item) => [MAGAZINES, magazine, SUBSCRIPTIONS, item.id],
+    }),
+    createSubscription: crudCreate({
+        apiPath: ({ magazine }) => `/magazines/${magazine}/subscriptions`,
+        fields: ['year', 'codeholderId', 'internalNotes'],
+        storePath: ({ magazine }, id) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
+        signalPath: ({ magazine }) => [MAGAZINES, magazine, SUBSCRIPTIONS, SIG_SUBSCRIPTIONS],
+        parseId: id => id,
+    }),
+    subscription: crudGet({
+        apiPath: ({ magazine, id }) => `/magazines/${magazine}/subscriptions/${id}`,
+        fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes'],
+        storePath: ({ magazine, id }) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
+    }),
+    updateSubscription: crudUpdate({
+        apiPath: ({ magazine, id }) => `/magazines/${magazine}/subscriptions/${id}`,
+        storePath: ({ magazine, id }) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
+    }),
+    deleteSubscription: crudDelete({
+        apiPath: ({ magazine, id }) => `/magazines/${magazine}/subscriptions/${id}`,
+        storePath: ({ magazine, id }) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
+        signalPath: ({ magazine }) => [MAGAZINES, magazine, SUBSCRIPTIONS, SIG_SUBSCRIPTIONS],
+    }),
 };
 
 export const views = {
     magazine: simpleDataView({
         storePath: ({ id }) => [MAGAZINES, id, M_DATA],
-        get: ({ id }) => tasks.magazine({ id }),
+        get: tasks.magazine,
     }),
     sigMagazines: createStoreObserver([MAGAZINES, SIG_MAGAZINES]),
     edition: simpleDataView({
         storePath: ({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, E_DATA],
-        get: ({ magazine, id }) => tasks.edition({ magazine, id }),
+        get: tasks.edition,
     }),
     sigEditions: createStoreObserver(({ magazine }) => [MAGAZINES, magazine, EDITIONS, SIG_EDITIONS]),
     editionFiles: simpleDataView({
         storePath: ({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, FILES],
-        get: ({ magazine, id }) => tasks.editionFiles({ magazine, id }),
+        get: tasks.editionFiles,
     }),
     tocEntry: simpleDataView({
         storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, id, E_DATA],
-        get: ({ magazine, edition, id }) => tasks.tocEntry({ magazine, edition, id }),
+        get: tasks.tocEntry,
     }),
     sigTocEntries: createStoreObserver(({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, SIG_TOC]),
     tocRecitations: simpleDataView({
         storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, id, RECITATIONS],
-        get: ({ magazine, edition, id }) => tasks.tocRecitations({ magazine, edition, id }),
+        get: tasks.tocRecitations,
     }),
+    subscription: simpleDataView({
+        storePath: ({ magazine, id }) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
+        get: tasks.subscription,
+    }),
+    sigSubscriptions: createStoreObserver(({ magazine }) => [MAGAZINES, magazine, SUBSCRIPTIONS, SIG_SUBSCRIPTIONS]),
 };

@@ -18,6 +18,7 @@ import './detail.less';
 export default connectPerms(class MagazineEdition extends Page {
     state = {
         edit: null,
+        org: null,
     };
 
     static contextType = coreContext;
@@ -57,12 +58,12 @@ export default connectPerms(class MagazineEdition extends Page {
         return +this.props.match[1];
     }
 
-    render ({ perms, editing }, { edit }) {
+    render ({ perms, editing }, { edit, org }) {
         const { magazine, id } = this;
 
         const actions = [];
 
-        if (perms.hasPerm('')) {
+        if (perms.hasPerm(`magazines.update.${org}`)) {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.create.menuItem,
@@ -73,7 +74,7 @@ export default connectPerms(class MagazineEdition extends Page {
             });
         }
 
-        if (perms.hasPerm('')) {
+        if (perms.hasPerm(`magazines.update.${org}`)) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
@@ -81,7 +82,7 @@ export default connectPerms(class MagazineEdition extends Page {
             });
         }
 
-        if (perms.hasPerm('')) {
+        if (perms.hasPerm(`magazines.update.${org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('magazines/deleteEdition', { magazine, id }),
@@ -147,6 +148,12 @@ export default connectPerms(class MagazineEdition extends Page {
                         query={this.props.query}
                         onQueryChange={this.props.onQueryChange} />
                 )}
+
+                <DetailShell
+                    view="magazines/magazine"
+                    id={this.magazine}
+                    fields={{}} locale={{}}
+                    onData={data => data && this.setState({ org: data.org })} />
             </div>
         );
     }

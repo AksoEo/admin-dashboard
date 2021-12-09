@@ -197,6 +197,28 @@ export default [
                                     },
                                 ],
                             },
+                            {
+                                path: 'simplaj-abonoj',
+                                type: 'stack',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "magazines-subscriptions" */ './magazines/subscriptions/index')),
+                                paths: [
+                                    {
+                                        match: /^(\w+)$/,
+                                        matchKey: 'subscription',
+                                        type: 'stack',
+                                        component: elazy(() =>
+                                            import(/* webpackChunkName: "magazines-subscriptions" */ './magazines/subscriptions/detail')),
+                                        paths: [
+                                            {
+                                                path: 'redakti',
+                                                type: 'state',
+                                                state: 'editing',
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
                         ],
                     },
                 ],

@@ -4,8 +4,9 @@ import { Validator } from '../../../components/form';
 import MdField from '../../../components/controls/md-field';
 import Segmented from '../../../components/controls/segmented';
 import OrgIcon from '../../../components/org-icon';
-import { magazines as locale } from '../../../locale';
+import { magazines as locale, magazineSubs as subsLocale } from '../../../locale';
 import './fields.less';
+import { LinkButton } from '../../../router';
 
 export const FIELDS = {
     org: {
@@ -26,6 +27,7 @@ export const FIELDS = {
             }
             return <OrgIcon org={value} />;
         },
+        shouldHide: () => true,
     },
     name: {
         sortable: true,
@@ -46,6 +48,7 @@ export const FIELDS = {
             if (slot === 'title') return <b>{value}</b>;
             return value;
         },
+        shouldHide: (_, editing) => !editing,
     },
     description: {
         sortable: true,
@@ -60,5 +63,25 @@ export const FIELDS = {
                 value={value || ''}
                 onChange={value => onChange(value || null)} />;
         },
+        shouldHide: (_, editing) => !editing,
     },
 };
+
+export function Header ({ item, editing }) {
+    if (editing) return null;
+    return (
+        <div class="magazine-header">
+            <div class="inner-title">
+                <OrgIcon org={item.org} />
+                <h1 class="inner-title-text">{item.name}</h1>
+            </div>
+            <FIELDS.description.component value={item.description} slot="detail" />
+
+            <div class="header-additional">
+                <LinkButton raised class="subs-button" target={`/revuoj/${item.id}/simplaj-abonoj`}>
+                    {subsLocale.title}
+                </LinkButton>
+            </div>
+        </div>
+    );
+}

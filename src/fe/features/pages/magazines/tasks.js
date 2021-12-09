@@ -4,13 +4,15 @@ import {
     magazines as magazinesLocale,
     magazineEditions as editionsLocale,
     magazineToc as tocLocale,
+    magazineSubs as subLocale,
 } from '../../../locale';
 import { DocumentIcon } from '../../../components/icons';
 import { FileSize } from '../../../components/files';
 import { createDialog, updateDialog, deleteDialog } from '../../../components/tasks/task-templates';
 import { FIELDS as MAGAZINE_FIELDS } from './fields';
 import { FIELDS as EDITION_FIELDS } from './editions/fields';
-import { FIELDS as TOC_FIELDS } from './editions/toc//fields';
+import { FIELDS as TOC_FIELDS } from './editions/toc/fields';
+import { FIELDS as SUB_FIELDS } from './subscriptions/fields';
 import './tasks.less';
 
 export default {
@@ -104,4 +106,16 @@ export default {
         );
     },
     deleteTocRecitation: deleteDialog({ locale: tocLocale.recitations.delete }),
+
+    createSubscription: createDialog({
+        locale: subLocale,
+        fieldNames: ['codeholderId', 'year', 'internalNotes'],
+        fields: SUB_FIELDS,
+        className: 'magazines-task-create-subscription',
+        onCompletion: (task, routerContext, id) => routerContext
+            .navigate(`/revuoj/${task.options.magazine}/simplaj-abonoj/${id}`),
+    }),
+    updateSubscription: updateDialog({ locale: subLocale.update, fields: subLocale.fields }),
+    deleteSubscription: deleteDialog({ locale: subLocale.delete }),
+
 };

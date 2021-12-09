@@ -142,3 +142,35 @@ export const magazineToc = {
         },
     },
 };
+
+export const magazineSubs = {
+    title: '[[Subscriptions]]',
+    detailTitle: '[[Subscription]]',
+    search: {
+        placeholders: {
+            internalNotes: '[[asfgjkdsfda]]',
+        },
+    },
+    fields: {
+        codeholderId: 'Membro',
+        year: 'Jaro',
+        createdTime: '[[CreatedTime]]',
+        internalNotes: '[[InternalNotes]]',
+    },
+    create: {
+        title: 'Aldoni [[thing]]',
+        button: 'Aldoni',
+        menuItem: 'Aldoni [[thing]]',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti [[thing]]',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi [[thing]]',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi [[thing]]? Ne eblas malfari tiun ĉi agon.',
+    },
+};

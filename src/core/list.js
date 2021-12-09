@@ -44,7 +44,9 @@ export function fieldsToOrder (fields) {
 
 export function fieldDiff (existing, changed) {
     const delta = {};
+    if (!existing || typeof existing !== 'object') throw new Error('fieldDiff failed: no existing object loaded');
     const keySet = new Set(Object.keys(existing));
+    if (!changed || typeof changed !== 'object') throw new Error('fieldDiff failed: changed object is not an object');
     for (const k in changed) keySet.add(k);
     for (const k of keySet) {
         if (!(k in changed)) continue; // field is not in the PATCH data so don't touch it
