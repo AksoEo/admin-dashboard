@@ -128,7 +128,7 @@ export default class OverviewList extends PureComponent {
     }
 
     #reloadTimeout;
-    #skipNextDebounce;
+    #skipNextDebounce = true;
 
     /// Might trigger a reload.
     maybeReload () {
