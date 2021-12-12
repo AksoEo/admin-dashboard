@@ -22,30 +22,38 @@ export const SIG_SUBSCRIPTIONS = '!subscriptions';
 //! MAGAZINES
 //! |- SIG_MAGAZINES
 //! |- [magazine id]
-//!    |- M_DATA
-//!    |  |- (magazine data)
-//!    |- EDITIONS
-//!    |  |- SIG_EDITIONS
-//!    |  |- [edition id]
-//!    |     |- E_DATA
-//!    |     |  |- (edition data)
-//!    |     |- FILES
-//!    |     |  |- (file data)
-//!    |     |- TOC
-//!    |        |- SIG_TOC
-//!    |        |- [entry id]
-//!    |           |- E_DATA
-//!    |           |  |- (entry data)
-//!    |           |- RECITATIONS
-//!    |              |- (recitation metadata)
-//!    |- SUBSCRIPTIONS
-//!       |- SIG_SUBSCRIPTIONS
-//!       |- [subscription id]
-//!          |- (subscription id)
+//! |  |- M_DATA
+//! |  |  |- (magazine data)
+//! |  |- EDITIONS
+//! |     |- SIG_EDITIONS
+//! |     |- [edition id]
+//! |        |- E_DATA
+//! |        |  |- (edition data)
+//! |        |- FILES
+//! |        |  |- (file data)
+//! |        |- TOC
+//! |           |- SIG_TOC
+//! |           |- [entry id]
+//! |              |- E_DATA
+//! |              |  |- (entry data)
+//! |              |- RECITATIONS
+//! |                 |- (recitation metadata)
+//! |- SUBSCRIPTIONS
+//!    |- SIG_SUBSCRIPTIONS
+//!    |- [subscription id]
+//!       |- (subscription id)
 
 // returns a random string to use as cache-buster with thumbnails
 function getThumbnailKey () {
     return Math.random().toString(36).replace(/\./g, '');
+}
+
+function makeSubId (item) {
+    return item.magazineId + '+' + item.rawId;
+}
+function readSubId (id) {
+    const parts = id.split('+');
+    return { magazineId: parts[0], rawId: parts[1] };
 }
 
 export const tasks = {
@@ -229,31 +237,48 @@ export const tasks = {
     listSubscriptions: crudList({
         apiPath: ({ magazine }) => `/magazines/${magazine}/subscriptions`,
         fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes'],
-        map: item => {
-            item.id = base32.stringify(item.id);
+        map: (item, { magazine }) => {
+            item.rawId = base32.stringify(item.id);
+            item.magazineId = magazine;
+            item.id = makeSubId(item);
         },
-        storePath: ({ magazine }, item) => [MAGAZINES, magazine, SUBSCRIPTIONS, item.id],
+        storePath: (_, item) => [SUBSCRIPTIONS, makeSubId(item)],
+    }),
+    listCodeholderSubscriptions: crudList({
+        apiPath: ({ codeholder }) => `/codeholders/${codeholder}/magazine_subscriptions`,
+        fields: ['id', 'year', 'magazineId', 'createdTime', 'internalNotes'],
+        map: (item, { codeholder }) => {
+            item.rawId = base32.stringify(item.id);
+            item.codeholderId = codeholder;
+            item.id = makeSubId(item);
+        },
+        storePath: (_, item) => [SUBSCRIPTIONS, makeSubId(item)],
     }),
     createSubscription: crudCreate({
-        apiPath: ({ magazine }) => `/magazines/${magazine}/subscriptions`,
+        apiPath: (_, { magazineId }) => `/magazines/${magazineId}/subscriptions`,
         fields: ['year', 'codeholderId', 'internalNotes'],
-        storePath: ({ magazine }, id) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
-        signalPath: ({ magazine }) => [MAGAZINES, magazine, SUBSCRIPTIONS, SIG_SUBSCRIPTIONS],
+        storePath: (_, item) => [SUBSCRIPTIONS, makeSubId(item)],
+        signalPath: () => [SUBSCRIPTIONS, SIG_SUBSCRIPTIONS],
         parseId: id => id,
     }),
     subscription: crudGet({
-        apiPath: ({ magazine, id }) => `/magazines/${magazine}/subscriptions/${id}`,
+        apiPath: ({ magazine, rawId, id }) => `/magazines/${magazine || readSubId(id).magazineId}/subscriptions/${rawId || readSubId(id).rawId}`,
         fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes'],
-        storePath: ({ magazine, id }) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
+        storePath: ({ magazine, rawId, id }) => [SUBSCRIPTIONS, magazine ? makeSubId({ magazineId: magazine, rawId }) : id],
+        map: (item, { magazine, id }) => {
+            item.rawId = base32.stringify(item.id);
+            item.magazineId = magazine || readSubId(id).magazineId;
+            item.id = makeSubId(item);
+        },
     }),
     updateSubscription: crudUpdate({
-        apiPath: ({ magazine, id }) => `/magazines/${magazine}/subscriptions/${id}`,
-        storePath: ({ magazine, id }) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
+        apiPath: ({ magazine, rawId, id }) => `/magazines/${magazine || readSubId(id).magazineId}/subscriptions/${rawId || readSubId(id).rawId}`,
+        storePath: ({ magazine, rawId, id }) => [SUBSCRIPTIONS, magazine ? makeSubId({ magazineId: magazine, rawId }) : id],
     }),
     deleteSubscription: crudDelete({
-        apiPath: ({ magazine, id }) => `/magazines/${magazine}/subscriptions/${id}`,
-        storePath: ({ magazine, id }) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
-        signalPath: ({ magazine }) => [MAGAZINES, magazine, SUBSCRIPTIONS, SIG_SUBSCRIPTIONS],
+        apiPath: ({ magazine, rawId, id }) => `/magazines/${magazine || readSubId(id).magazineId}/subscriptions/${rawId || readSubId(id).rawId}`,
+        storePath: ({ magazine, rawId, id }) => [SUBSCRIPTIONS, magazine ? makeSubId({ magazineId: magazine, rawId }) : id],
+        signalPath: () => [SUBSCRIPTIONS, SIG_SUBSCRIPTIONS],
     }),
 };
 
@@ -282,8 +307,8 @@ export const views = {
         get: tasks.tocRecitations,
     }),
     subscription: simpleDataView({
-        storePath: ({ magazine, id }) => [MAGAZINES, magazine, SUBSCRIPTIONS, id],
+        storePath: ({ magazine, rawId, id }) => [SUBSCRIPTIONS, magazine ? makeSubId({ magazineId: magazine, rawId }) : id],
         get: tasks.subscription,
     }),
-    sigSubscriptions: createStoreObserver(({ magazine }) => [MAGAZINES, magazine, SUBSCRIPTIONS, SIG_SUBSCRIPTIONS]),
+    sigSubscriptions: createStoreObserver(() => [SUBSCRIPTIONS, SIG_SUBSCRIPTIONS]),
 };

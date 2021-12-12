@@ -152,6 +152,7 @@ export const magazineSubs = {
         },
     },
     fields: {
+        magazineId: '[[MagazineId]]',
         codeholderId: 'Membro',
         year: 'Jaro',
         createdTime: '[[CreatedTime]]',
@@ -173,4 +174,5 @@ export const magazineSubs = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi [[thing]]? Ne eblas malfari tiun ĉi agon.',
     },
+    buttonLabel: count => count ? `${count} [[Subscription${count === 1 ? '' : 'j'}]]` : `[[Subscriptions]]`,
 };

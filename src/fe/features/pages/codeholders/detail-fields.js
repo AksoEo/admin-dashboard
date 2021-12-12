@@ -33,6 +33,7 @@ import Publicity from './publicity';
 import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
 import ChangeRequestsButton from '../change-requests/button';
 import DelegationsButton from '../delegations/delegates/button';
+import SubscriptionsButton from '../magazines/subscriptions/button';
 
 const connectPerms = (Component) => {
     const SelfConnected = connectPermsInner(({ perms, ...extra }) => {
@@ -505,6 +506,11 @@ export const Header = connectPerms(connect('login')(login => ({ login }))(functi
                     {/* FIXME better perm check across orgs */}
                     {!editing && perms.hasPerm('codeholders.delegations.read.uea') && (
                         <DelegationsButton id={userData?.isSelf ? 'self' : item.id} />
+                    )}
+                    {!editing
+                        && (perms.hasPerm('magazines.subscriptions.read.uea')
+                        || perms.hasPerm('magazines.subscriptions.read.tejo')) && (
+                        <SubscriptionsButton id={userData?.isSelf ? 'self' : item.id} />
                     )}
                 </div>
                 <div class="decorative-flourish" />

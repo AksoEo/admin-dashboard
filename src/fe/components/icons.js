@@ -163,3 +163,28 @@ export function StripeIcon (props) {
         </svg>
     );
 }
+
+export function NewspaperIcon () {
+    return (
+        <SvgIcon>
+            <path fillRule="evenodd" fill="currentColor" d="M4 19a2 2 0 0 0 2-2V5h16v12a2 2 0 0 1-2 2H4zm4-7v4h5v-4H8zm7 0v4h5v-4h-5zM8 7v3h12V7H8z M4 19a2 2 0 0 1-2-2V7h3v10c0 1.1-.4 2-1 2z"/>
+        </SvgIcon>
+    );
+}
+
+export function ListsIcon () {
+    return (
+        <SvgIcon>
+            <path fillRule="evenodd" fill="currentColor" d="M12 1a3 3 0 0 1 2.83 2H19a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h4.17A3 3 0 0 1 12 1zm-2 13.5c-2 0-5 1-5 3V19h10v-1.5c0-2-3-3-5-3zm5.62.4c.83.73 1.38 1.42 1.38 2.6V19h2v-1.5c0-1.54-1.37-2.25-3.38-2.6zM15 7c-.32 0-.63.05-.91.14a4.93 4.93 0 0 1 0 5.72 2.99 2.99 0 0 0 3.9-2.86c0-1.66-1.33-3-2.99-3zm-5 0a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm2-4a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+        </SvgIcon>
+    );
+}
+
+export function PaymentOrgsIcon () {
+    return (
+        <SvgIcon>
+            <path d="M17.2,10 L2.8,10 C1.801,10 1.009,10.723125 1.009,11.625 L1,21.375 C1,22.276875 1.801,23 2.8,23 L17.2,23 C18.199,23 19,22.276875 19,21.375 L19,11.625 C19,10.723125 18.199,10 17.2,10 Z M17,21 L3,21 L3,16 L17,16 L17,21 Z M17,13 L3,13 L3,12 L17,12 L17,13 Z" fill="currentColor" fillRule="nonzero"></path>
+            <path d="M21.2,1 C22.199,1 23,1.723125 23,2.625 L23,2.625 L23,12.375 C23,13.276875 22.199,14 21.2,14 L21.2,14 L19.999,14 L19.999,12 L21,12 L21,7 L7,7 L6.999,9 L5.003,9 L5.009,2.625 C5.009,1.77059211 5.71982548,1.07661357 6.64406867,1.00592998 L6.8,1 Z M21,3 L7,3 L7,4 L21,4 L21,3 Z" fill="currentColor" fillRule="nonzero"></path>
+        </SvgIcon>
+    );
+}

@@ -25,7 +25,7 @@ export default class Subscription extends DetailPage {
     createCommitTask (changedFields, edit) {
         return this.context.createTask('magazines/updateSubscription', {
             magazine: this.magazine,
-            id: this.id,
+            rawId: this.id,
             _changedFields: changedFields,
         }, edit);
     }
@@ -46,7 +46,7 @@ export default class Subscription extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('magazines/deleteSubscription', {
                     magazine: this.magazine,
-                    id: this.id,
+                    rawId: this.id,
                 }),
                 overflow: true,
             });
@@ -60,7 +60,7 @@ export default class Subscription extends DetailPage {
             <Fragment>
                 <DetailView
                     view="magazines/subscription"
-                    options={{ magazine: this.magazine }}
+                    options={{ magazine: this.magazine, rawId: this.id }}
                     id={this.id}
                     fields={FIELDS}
                     locale={locale}

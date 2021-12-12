@@ -16,9 +16,10 @@ export default class SubscriptionsPage extends OverviewPage {
             },
             fields: [
                 { id: 'createdTime', sorting: 'desc', fixed: true },
-                { id: 'codeholderId', sorting: 'none', fixed: true },
+                !this.magazine && { id: 'magazineId', sorting: 'none', fixed: true },
+                !this.codeholder && { id: 'codeholderId', sorting: 'none', fixed: true },
                 { id: 'year', sorting: 'desc', fixed: true },
-            ],
+            ].filter(x => x),
             offset: 0,
             limit: 10,
         },
@@ -29,19 +30,36 @@ export default class SubscriptionsPage extends OverviewPage {
     filters = {};
     searchFields = ['internalNotes'];
 
+    get codeholder () {
+        if (this.props.matches.codeholder) return +this.props.matches.codeholder[1];
+        return null;
+    }
+
     get magazine () {
-        return +this.props.matches.magazine[1];
+        if (this.props.matches.magazine) return +this.props.matches.magazine[1];
+        return null;
     }
 
     renderActions ({ perms }) {
         const actions = [];
 
-        if (perms.hasPerm(`magazines.subscriptions.create.${this.org}`) && perms.hasPerm('codeholders.read')) {
+        if (this.magazine && perms.hasPerm(`magazines.subscriptions.create.${this.org}`) && perms.hasPerm('codeholders.read')) {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.create.menuItem,
-                action: () => this.context.createTask('magazines/createSubscription', {
-                    magazine: this.magazine,
+                action: () => this.context.createTask('magazines/createSubscription', {}, {
+                    magazineId: this.magazine,
+                }),
+            });
+        }
+
+        // TODO: better cross-org perms
+        if (this.codeholder && (perms.hasPerm(`magazines.subscriptions.create.tejo`) || perms.hasPerm(`magazines.subscriptions.create.uea`))) {
+            actions.push({
+                icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.create.menuItem,
+                action: () => this.context.createTask('magazines/createSubscription', {}, {
+                    codeholderId: this.codeholder,
                 }),
             });
         }
@@ -53,25 +71,28 @@ export default class SubscriptionsPage extends OverviewPage {
         return (
             <Fragment>
                 <OverviewList
-                    task="magazines/listSubscriptions"
+                    task={this.codeholder
+                        ? 'magazines/listCodeholderSubscriptions'
+                        : 'magazines/listSubscriptions'}
                     view="magazines/subscription"
-                    updateView={['magazines/sigSubscriptions', { magazine: this.magazine }]}
+                    updateView={['magazines/sigSubscriptions']}
                     useDeepCmp
-                    options={{ magazine: this.magazine }}
-                    viewOptions={{ magazine: this.magazine }}
+                    options={this.codeholder ? { codeholder: this.codeholder } : { magazine: this.magazine }}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/revuoj/${this.magazine}/simplaj-abonoj/${id}`}
+                    onGetItemLink={(id, data) => `/revuoj/${data.magazineId}/simplaj-abonoj/${data.rawId}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />
 
-                <DetailShell
-                    view="magazines/magazine"
-                    id={this.magazine}
-                    fields={{}} locale={{}}
-                    onData={data => data && this.setState({ org: data.org })} />
+                {this.magazine ? (
+                    <DetailShell
+                        view="magazines/magazine"
+                        id={this.magazine}
+                        fields={{}} locale={{}}
+                        onData={data => data && this.setState({ org: data.org })} />
+                ) : null}
             </Fragment>
         );
     }

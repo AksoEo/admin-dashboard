@@ -109,13 +109,12 @@ export default {
 
     createSubscription: createDialog({
         locale: subLocale,
-        fieldNames: ['codeholderId', 'year', 'internalNotes'],
+        fieldNames: ['magazineId', 'codeholderId', 'year', 'internalNotes'],
         fields: SUB_FIELDS,
         className: 'magazines-task-create-subscription',
         onCompletion: (task, routerContext, id) => routerContext
-            .navigate(`/revuoj/${task.options.magazine}/simplaj-abonoj/${id}`),
+            .navigate(`/revuoj/${task.parameters.magazineId}/simplaj-abonoj/${id}`),
     }),
     updateSubscription: updateDialog({ locale: subLocale.update, fields: subLocale.fields }),
     deleteSubscription: deleteDialog({ locale: subLocale.delete }),
-
 };
