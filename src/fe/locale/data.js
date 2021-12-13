@@ -208,7 +208,7 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
         givesMembership: 'membrecdona',
     },
     geoDb: {
-        nativeLabelMissing: '[[No native label]]',
+        nativeLabelMissing: 'Mankas loka nomo',
     },
     picker: {
         done: 'Bone',

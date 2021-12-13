@@ -32,13 +32,13 @@ export const errors = {
     'invalid-api-key': 'Nevalida API-ŝlosilo',
 
     schema: {
-        nthItem: n => `[[${n % 10 === 1 ? '1st' : n % 10 === 2 ? '2nd' : n % 10 === 3 ? '3rd' : `${n}th`}]]`,
+        nthItem: n => `${n}-a`,
         keywords: {
-            required: p => `[[required property ${p.missingProperty} is missing]]`,
-            additionalProperties: p => `[[unexpected property ${p.additionalProperty}]]`,
-            minLength: p => `[[should not be shorter than ${p.limit}]]`,
-            minItems: p => `[[should not have fewer than ${p.limit} items]]`,
-            oneOf: () => `[[should match exactly one of these schemas]]`,
+            required: p => `Mankas la deviga kampo ${p.missingProperty}`,
+            additionalProperties: p => `Aperas nekonata kampo ${p.additionalProperty}`,
+            minLength: p => `Ne estu pli mallonga ol ${p.limit}`,
+            minItems: p => `Ne estu malpli ol ${p.limit} suberoj`,
+            oneOf: () => `Estu identa al almenaŭ unu el la jenaj skemoj`,
         },
     },
 };

@@ -101,7 +101,7 @@ export const codeholders = {
     globalFilterTitle: 'La rezultoj estas filtritaj',
     globalFilterNotice: ['Ĉiuj viaj serĉoj estas limigitaj laŭ ', 'membrofiltrilo', '. Okaze de demandoj, kontaktu vian administranton.'],
     fields: {
-        id: '[[id]]',
+        id: 'Identigilo',
         type: 'Membrospeco',
         types: {
             human: 'Homo',
@@ -403,8 +403,8 @@ export const codeholders = {
         },
     },
     detailIsSelf: {
-        title: '[[This is your account]]',
-        description: '[[Codeholder self-service is currently not supported in akso admin. If you want to update your information but do not have permission, please visit uea.org instead.]]',
+        title: 'Tiu ĉi estas via konto',
+        description: 'Vi povas ĝisdatigi viajn proprajn datumojn per uea.org.',
     },
     perms: {
         title: 'Permesoj',

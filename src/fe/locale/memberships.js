@@ -128,8 +128,8 @@ export const membershipEntries = {
         offers: 'Ofertoj',
         codeholderData: 'Membrodatumoj',
 
-        yearSelectYear: '[[Select year]]',
-        yearSearchYear: '[[Search year]]',
+        yearSelectYear: 'Elekti jaron',
+        yearSearchYear: 'Serĉi jaron',
         fishyIsOkay: 'Strangaj datumoj enordas',
 
         statusTypes: {
@@ -149,7 +149,7 @@ export const membershipEntries = {
         cancel: 'Nuligi',
     },
     offers: {
-        selectYearFirst: '[[Please select a year and codeholder data to add offers]]',
+        selectYearFirst: 'Bonvolu unue elekti membron kaj jaron',
         currency: 'Valuto',
         add: {
             button: 'Aldoni oferton',

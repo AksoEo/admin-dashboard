@@ -144,35 +144,35 @@ export const magazineToc = {
 };
 
 export const magazineSubs = {
-    title: '[[Subscriptions]]',
-    detailTitle: '[[Subscription]]',
+    title: 'Simplaj abonoj revuaj',
+    detailTitle: 'Simpla abono',
     search: {
         placeholders: {
-            internalNotes: '[[asfgjkdsfda]]',
+            internalNotes: 'Internaj notoj',
         },
     },
     fields: {
-        magazineId: '[[MagazineId]]',
+        magazineId: 'Revua identigilo',
         codeholderId: 'Membro',
         year: 'Jaro',
-        createdTime: '[[CreatedTime]]',
-        internalNotes: '[[InternalNotes]]',
+        createdTime: 'Horo de kreiĝo',
+        internalNotes: 'Internaj notoj',
     },
     create: {
-        title: 'Aldoni [[thing]]',
-        button: 'Aldoni',
-        menuItem: 'Aldoni [[thing]]',
+        title: 'Krei simplan abonon revuan',
+        button: 'Krei',
+        menuItem: 'Krei abonon',
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Redakti [[thing]]',
+        title: 'Redakti simplan abonon revuan',
         button: 'Aktualigi',
     },
     delete: {
-        menuItem: 'Forigi',
-        title: 'Forigi [[thing]]',
+        menuItem: 'Forigi simplan abonon revuan',
+        title: 'Forigi simplan abonon revuan',
         button: 'Forigi',
-        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi [[thing]]? Ne eblas malfari tiun ĉi agon.',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi simplan abonon revuan? Ne eblas malfari tiun ĉi agon.',
     },
-    buttonLabel: count => count ? `${count} [[Subscription${count === 1 ? '' : 'j'}]]` : `[[Subscriptions]]`,
+    buttonLabel: count => count ? `${count} simpla${count === 1 ? '' : 'j'} abono${count === 1 ? '' : 'j'}` : `Simplaj abonoj`,
 };
