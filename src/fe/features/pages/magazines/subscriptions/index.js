@@ -3,6 +3,7 @@ import { Fragment } from 'preact/compat';
 import OverviewPage from '../../../../components/overview/overview-page';
 import OverviewList from '../../../../components/lists/overview-list';
 import { FIELDS } from './fields';
+import { FILTERS } from './filters';
 import { magazineSubs as locale } from '../../../../locale';
 import AddIcon from '@material-ui/icons/Add';
 import DetailShell from '../../../../components/detail/detail-shell';
@@ -20,6 +21,8 @@ export default class SubscriptionsPage extends OverviewPage {
                 !this.codeholder && { id: 'codeholderId', sorting: 'none', fixed: true },
                 { id: 'year', sorting: 'desc', fixed: true },
             ].filter(x => x),
+            filters: {},
+            jsonFilter: { _disabled: true, filter: {} },
             offset: 0,
             limit: 10,
         },
@@ -27,7 +30,7 @@ export default class SubscriptionsPage extends OverviewPage {
     };
 
     locale = locale;
-    filters = {};
+    filters = this.codeholder ? {} : FILTERS;
     searchFields = ['internalNotes'];
 
     get codeholder () {
@@ -71,6 +74,7 @@ export default class SubscriptionsPage extends OverviewPage {
         return (
             <Fragment>
                 <OverviewList
+                    expanded={this.state.expanded}
                     task={this.codeholder
                         ? 'magazines/listCodeholderSubscriptions'
                         : 'magazines/listSubscriptions'}

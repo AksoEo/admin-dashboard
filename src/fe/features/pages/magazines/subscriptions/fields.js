@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { Button, TextField } from 'yamdl';
+import { Button, Checkbox, TextField } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
 import { timestamp } from '../../../../components/data';
@@ -14,6 +14,7 @@ import ItemPicker from '../../../../components/pickers/item-picker-dialog';
 import { magazineSubs as locale, magazines as magazinesLocale } from '../../../../locale';
 import { FIELDS as MAGAZINE_FIELDS } from '../fields';
 import './fields.less';
+import CheckIcon from '@material-ui/icons/Check';
 
 export const FIELDS = {
     magazineId: {
@@ -131,6 +132,16 @@ export const FIELDS = {
                     ))}
                 </div>
             );
+        },
+    },
+    paperVersion: {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return <Checkbox checked={value} onChange={onChange} />;
+            }
+            if (value) return <CheckIcon />;
+            return '—';
         },
     },
 };

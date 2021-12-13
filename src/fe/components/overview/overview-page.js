@@ -29,7 +29,7 @@ export default class OverviewPage extends Page {
     componentDidMount () {
         this.decodeURLQuery();
 
-        this.#searchInput.focus(500);
+        this.#searchInput?.focus(500);
     }
 
     componentDidUpdate (prevProps, prevState) {
@@ -61,13 +61,16 @@ export default class OverviewPage extends Page {
                             <SearchFilters
                                 value={this.state.parameters}
                                 searchFields={this.searchFields}
+                                filters={this.filters}
                                 onChange={parameters => this.setState({ parameters })}
                                 locale={{
                                     searchPlaceholders: locale.search.placeholders,
                                     searchFields: locale.search.fields || locale.fields,
-                                    searchFilters: locale.filters,
+                                    filters: locale.search.filters || locale.filters,
                                 }}
-                                inputRef={view => this.#searchInput = view}/>
+                                inputRef={view => this.#searchInput = view}
+                                expanded={this.state.expanded}
+                                onExpandedChange={expanded => this.setState({ expanded })} />
 
                             {this.renderContents({ perms }, this.state)}
                         </div>

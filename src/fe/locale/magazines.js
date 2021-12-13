@@ -150,6 +150,14 @@ export const magazineSubs = {
         placeholders: {
             internalNotes: 'Internaj notoj',
         },
+        filters: {
+            paperVersion: '[[PaperVersion]]',
+            paperVersionTypes: {
+                yes: 'jes',
+                no: 'ne',
+                none: 'ne gravas',
+            },
+        },
     },
     fields: {
         magazineId: 'Revua identigilo',
@@ -157,6 +165,7 @@ export const magazineSubs = {
         year: 'Jaro',
         createdTime: 'Horo de kreiĝo',
         internalNotes: 'Internaj notoj',
+        paperVersion: '[[PaperVersion]]',
     },
     create: {
         title: 'Krei simplan abonon revuan',

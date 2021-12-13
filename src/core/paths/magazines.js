@@ -56,6 +56,12 @@ function readSubId (id) {
     return { magazineId: parts[0], rawId: parts[1] };
 }
 
+const subFilters = {
+    paperVersion: {
+        toAPI: paperVersion => ({ paperVersion }),
+    },
+};
+
 export const tasks = {
     listMagazines: crudList({
         apiPath: () => `/magazines`,
@@ -236,7 +242,8 @@ export const tasks = {
 
     listSubscriptions: crudList({
         apiPath: ({ magazine }) => `/magazines/${magazine}/subscriptions`,
-        fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes'],
+        fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes', 'paperVersion'],
+        filters: subFilters,
         map: (item, { magazine }) => {
             item.rawId = base32.stringify(item.id);
             item.magazineId = magazine;
@@ -246,7 +253,7 @@ export const tasks = {
     }),
     listCodeholderSubscriptions: crudList({
         apiPath: ({ codeholder }) => `/codeholders/${codeholder}/magazine_subscriptions`,
-        fields: ['id', 'year', 'magazineId', 'createdTime', 'internalNotes'],
+        fields: ['id', 'year', 'magazineId', 'createdTime', 'internalNotes', 'paperVersion'],
         map: (item, { codeholder }) => {
             item.rawId = base32.stringify(item.id);
             item.codeholderId = codeholder;
@@ -256,14 +263,14 @@ export const tasks = {
     }),
     createSubscription: crudCreate({
         apiPath: (_, { magazineId }) => `/magazines/${magazineId}/subscriptions`,
-        fields: ['year', 'codeholderId', 'internalNotes'],
+        fields: ['year', 'codeholderId', 'internalNotes', 'paperVersion'],
         storePath: (_, item) => [SUBSCRIPTIONS, makeSubId(item)],
         signalPath: () => [SUBSCRIPTIONS, SIG_SUBSCRIPTIONS],
         parseId: id => id,
     }),
     subscription: crudGet({
         apiPath: ({ magazine, rawId, id }) => `/magazines/${magazine || readSubId(id).magazineId}/subscriptions/${rawId || readSubId(id).rawId}`,
-        fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes'],
+        fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes', 'paperVersion'],
         storePath: ({ magazine, rawId, id }) => [SUBSCRIPTIONS, magazine ? makeSubId({ magazineId: magazine, rawId }) : id],
         map: (item, { magazine, id }) => {
             item.rawId = base32.stringify(item.id);

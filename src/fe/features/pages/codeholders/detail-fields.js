@@ -508,6 +508,7 @@ export const Header = connectPerms(connect('login')(login => ({ login }))(functi
                         <DelegationsButton id={userData?.isSelf ? 'self' : item.id} />
                     )}
                     {!editing
+                        && perms.hasCodeholderField('roles', 'r')
                         && (perms.hasPerm('magazines.subscriptions.read.uea')
                         || perms.hasPerm('magazines.subscriptions.read.tejo')) && (
                         <SubscriptionsButton id={userData?.isSelf ? 'self' : item.id} />
