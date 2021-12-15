@@ -75,6 +75,7 @@ export default class TotpPage extends Component {
                     pattern="\d*"
                     type="number"
                     onKeyDown={e => {
+                        if (e.ctrlKey || e.altKey || e.metaKey) return;
                         if (!e.key.match(/\d/) && !e.key.match(/^[A-Z]/)) {
                             e.preventDefault();
                         }
