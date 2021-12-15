@@ -580,17 +580,22 @@ const OfferItemAmount = connect(({ offerCurrency }) => [
 });
 
 function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSelect }) {
+    let disabled = false;
     let contents;
     if (value.type === 'membership') {
         contents = <OfferMembership id={value.id} noLink={onSelect} />;
+    } else if (value.type === 'magazine') {
+        contents = <OfferMagazine id={value.id} noLink={onSelect} />;
     } else if (value.type === 'addon') {
         contents = <OfferAddon id={value.id} year={year} noLink={onSelect} />;
+        onSelect = null;
+        disabled = true;
     }
 
     return (
         <div
             onClick={onSelect}
-            class={'registration-entry-offer-item' + (onSelect ? ' is-selectable' : '')}>
+            class={'registration-entry-offer-item' + (onSelect ? ' is-selectable' : '') + (disabled ? ' is-disabled' : '')}>
             {editing && (
                 <div class="item-remove">
                     <Button class="item-remove-button" icon small onClick={e => {
@@ -650,11 +655,27 @@ const OfferMembership = connect(({ id }) => ['memberships/category', { id }])(da
     return <Link target={target}>{data.name}</Link>;
 });
 
+const OfferMagazine = connect(({ id }) => ['magazines/magazine', { id }])(data => ({
+    data,
+}))(function OfferMagazine ({ data, id, noLink }) {
+    if (!data) return <TinyProgress />;
+    if (noLink) return data.name;
+    const target = `/revuoj/${id}`;
+    return <Link target={target}>{data.name}</Link>;
+});
+
 const OfferAddon = connect(({ year }) => ['memberships/options', { id: year }])(data => ({
     data,
 }))(function OfferAddon ({ data, id, noLink }) {
     if (!data) return <TinyProgress />;
-    return <OfferAddonInner org={data.paymentOrgId} id={id} noLink={noLink} />;
+    return (
+        <div class="inner-addon-offer">
+            <OfferAddonInner org={data.paymentOrgId} id={id} noLink={noLink} />
+            <div class="inner-note">
+                {locale.offers.cannotAddAddonNote}
+            </div>
+        </div>
+    );
 });
 
 const OfferAddonInner = connect(({ org, id }) => ['payments/addon', { org, id }])(data => ({

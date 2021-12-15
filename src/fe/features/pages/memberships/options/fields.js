@@ -21,11 +21,13 @@ import {
     membershipCategories as categoriesLocale,
     paymentOrgs as paymentOrgsLocale,
     paymentAddons as paymentAddonsLocale,
+    magazines as magazinesLocale,
     currencies,
 } from '../../../../locale';
 import { FIELDS as PAYMENT_ADDON_FIELDS } from '../../payments/orgs/addons/fields';
 import { FIELDS as PAYMENT_ORG_FIELDS } from '../../payments/orgs/fields';
 import { FIELDS as CATEGORY_FIELDS } from '../categories/fields';
+import { FIELDS as MAGAZINE_FIELDS } from '../../magazines/fields';
 import { connect } from '../../../../core/connection';
 import './fields.less';
 
@@ -311,6 +313,7 @@ class AddOffer extends PureComponent {
 
     render ({ year, offers, onSelect, paymentOrg }) {
         let picker, note;
+        // FIXME: might want to add, like, a search box to these?
         if (this.state.type === 'membership') {
             note = (
                 <div class="add-offer-note">
@@ -347,6 +350,24 @@ class AddOffer extends PureComponent {
                         },
                     }} />
             );
+        } else if (this.state.type === 'magazine') {
+            picker = (
+                <StaticOverviewList
+                    key="magazine"
+                    compact
+                    task="magazines/listMagazines"
+                    view="magazines/magazine"
+                    jsonFilter={{
+                        id: { $nin: offers.filter(x => x.type === 'magazine').map(x => x.id) },
+                    }}
+                    fields={MAGAZINE_FIELDS}
+                    sorting={{ name: 'asc' }}
+                    locale={magazinesLocale.fields}
+                    emptyLabel={locale.offers.add.magazinesEmpty}
+                    onItemClick={id => {
+                        onSelect({ type: 'magazine', id });
+                    }} />
+            );
         } else if (this.state.type === 'addon') {
             picker = (
                 <StaticOverviewList
@@ -381,6 +402,10 @@ class AddOffer extends PureComponent {
                                 label: locale.offers.types.membership,
                             },
                             {
+                                id: 'magazine',
+                                label: locale.offers.types.magazine,
+                            },
+                            {
                                 id: 'addon',
                                 label: locale.offers.types.addon,
                             },
@@ -400,11 +425,16 @@ class Offer extends PureComponent {
     };
 
     render ({ value, editing, onChange, onRemove, paymentOrg }) {
-        let item, price, priceButton;
+        let item, price, priceButton, paperVersion;
         if (value.type === 'addon') {
             item = <OfferPaymentAddon id={value.id} paymentOrg={paymentOrg} />;
-        } else if (value.type === 'membership') {
-            item = <OfferMembership id={value.id} />;
+        } else if (value.type === 'membership' || value.type === 'magazine') {
+            if (value.type === 'membership') {
+                item = <OfferMembership id={value.id} />;
+            } else if (value.type === 'magazine') {
+                item = <OfferMagazine id={value.id} />;
+            }
+
             const hasPrice = !!value.price;
             priceButton = (
                 <Button
@@ -435,6 +465,23 @@ class Offer extends PureComponent {
                     </div>
                 );
             }
+
+            if (value.type === 'magazine') {
+                if (editing) {
+                    const chkId = 'checkbox-' + Math.random().toString(36);
+                    paperVersion = (
+                        <div class="paper-version">
+                            <Checkbox
+                                id={chkId}
+                                checked={value.paperVersion}
+                                onChange={paperVersion => onChange({ ...value, paperVersion })} />
+                            <label for={chkId}>{locale.offers.paperVersion}</label>
+                        </div>
+                    );
+                } else if (value.paperVersion) {
+                    paperVersion = <div class="paper-version">{locale.offers.paperVersion}</div>;
+                }
+            }
         }
 
         return (
@@ -454,6 +501,7 @@ class Offer extends PureComponent {
                     {priceButton}
                 </div>
                 {price}
+                {paperVersion}
             </div>
         );
     }
@@ -470,6 +518,13 @@ const OfferPaymentAddon = connect(({ id, paymentOrg }) => ['payments/addon', {
 const OfferMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
     data,
 }))(function OfferMembership ({ data }) {
+    if (!data) return <TinyProgress />;
+    return data.name;
+});
+
+const OfferMagazine = connect(({ id }) => ['magazines/magazine', { id }])(data => ({
+    data,
+}))(function OfferMagazine ({ data }) {
     if (!data) return <TinyProgress />;
     return data.name;
 });

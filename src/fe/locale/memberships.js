@@ -65,11 +65,13 @@ export const membershipOptions = {
         types: {
             addon: 'Aldoneblo',
             membership: 'Membrokategorio',
+            magazine: '[[Magazine]]',
         },
         add: {
             title: 'Aldoni oferton',
             membershipsNote: '',
             categoriesEmpty: 'Restas neniu membrokategorio en tiu ĉi jaro, kiun vi ne jam aldonis.',
+            magazinesEmpty: 'Restas neniu [[magazines]], kiun vi ne jam aldonis.',
             addonsEmpty: 'Restas neniu aldoneblo, kiun vi ne jam aldonis.',
         },
         price: {
@@ -79,6 +81,7 @@ export const membershipOptions = {
             varLabel: 'Variablo de prezo',
             na: 'La oferto ne estas elektebla pro manko de prezo',
         },
+        paperVersion: '[[PaperVersion]]',
     },
     create: {
         menuItem: 'Krei',
@@ -159,7 +162,9 @@ export const membershipEntries = {
         types: {
             addon: 'Aldoneblo',
             membership: 'Membrokategorio',
+            magazine: '[[Magazine]]',
         },
+        cannotAddAddonNote: '[[Addons cannot be added to registration entries.]]',
     },
     issue: {
         title: 'Problemo pri aliĝo',

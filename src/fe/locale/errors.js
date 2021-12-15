@@ -39,6 +39,8 @@ export const errors = {
             minLength: p => `Ne estu pli mallonga ol ${p.limit}`,
             minItems: p => `Ne estu malpli ol ${p.limit} suberoj`,
             oneOf: () => `Estu identa al almenaŭ unu el la jenaj skemoj`,
+            enum: p => `[[Must be one of: ${p.allowedValues.join(', ')}]]`,
+            const: p => `[[Must be ${p.allowedValue}]]`,
         },
     },
 };
