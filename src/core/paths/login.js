@@ -9,11 +9,10 @@ import {
     UEA_CODE,
     LOGIN_ID,
     COMPLETED,
+    IS_ACTUALLY_ADMIN,
 } from './login-keys';
 import { LoginAuthStates } from '../../protocol';
 import { createStoreObserver } from '../view';
-
-const IS_ACTUALLY_ADMIN = [LOGIN, 'isActuallyAdmin'];
 
 export const tasks = {
     /// login/login: performs login

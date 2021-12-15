@@ -1,6 +1,14 @@
 import config from '../config.val';
 import * as store from './store';
-import { AUTH_STATE, IS_ADMIN, TOTP_REQUIRED, TOTP_SETUP_REQUIRED, UEA_CODE, LOGIN_ID } from './paths/login-keys';
+import {
+    AUTH_STATE,
+    IS_ADMIN,
+    TOTP_REQUIRED,
+    TOTP_SETUP_REQUIRED,
+    UEA_CODE,
+    LOGIN_ID,
+    IS_ACTUALLY_ADMIN,
+} from './paths/login-keys';
 import { LoginAuthStates } from '../protocol';
 import * as log from './log';
 
@@ -41,6 +49,7 @@ initialAuth.then(auth => {
             ? LoginAuthStates.AUTHENTICATED
             : LoginAuthStates.LOGGED_IN);
         store.insert(IS_ADMIN, auth.isAdmin);
+        store.insert(IS_ACTUALLY_ADMIN, auth.isAdmin);
         store.insert(TOTP_REQUIRED, totpRequired && !auth.totpUsed);
         store.insert(TOTP_SETUP_REQUIRED, auth.isAdmin && !auth.totpSetUp);
         store.insert(UEA_CODE, auth.newCode);
