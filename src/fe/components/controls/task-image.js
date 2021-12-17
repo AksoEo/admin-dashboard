@@ -30,7 +30,7 @@ export default class TaskImage extends PureComponent {
         prevImage: null,
         imageSeqId: 0,
         lightboxOpen: false,
-    }
+    };
 
     #size = null;
     #loadedSize = NaN;

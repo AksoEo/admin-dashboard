@@ -14,7 +14,7 @@ const DEFAULT_FULLSCREEN_WIDTH = 420;
 /// - open/onClose
 /// - title
 export default class DialogSheet extends Dialog {
-    container = document.createElement('div');
+    _container = document.createElement('div');
 
     updatePeriod () {
         this.presence.setPeriod((this.state.fullScreen || this.props.open) ? 0.5 : 0.3);
@@ -81,6 +81,6 @@ export default class DialogSheet extends Dialog {
     }
 
     get container () {
-        return this.props.container || this.container;
+        return this.props.container || this._container;
     }
 }

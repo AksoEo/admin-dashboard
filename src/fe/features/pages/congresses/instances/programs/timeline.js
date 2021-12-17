@@ -170,7 +170,7 @@ class TimelineDayView extends PureComponent {
             items.push(...res.items);
         }
         return items;
-    }
+    };
 
     componentDidMount () {
         this.load();

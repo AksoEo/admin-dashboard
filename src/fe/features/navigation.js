@@ -466,7 +466,7 @@ export default class Navigation extends PureComponent {
         state.stack.splice(stackIndex + 1);
         state.stack[state.stack.length - 1].statePath = '/'; // legacy behavior
         state.updateLocation();
-        const pathname = (state.stack[state.stack.length - 1]?.fullPath).split('/').concat(path.split('/')).join('/');
+        const pathname = (state.stack[state.stack.length - 1]?.fullPath || '').split('/').concat(path.split('/')).join('/');
         this.navigate(pathname, replace);
     }
 

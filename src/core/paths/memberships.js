@@ -368,7 +368,7 @@ export const views = {
             } else {
                 this.emit('update', store.get([MEMBERSHIP_CATEGORIES, this.id]));
             }
-        }
+        };
         drop () {
             store.unsubscribe([MEMBERSHIP_CATEGORIES, this.id], this.#onUpdate);
         }
@@ -393,7 +393,7 @@ export const views = {
             } else {
                 this.emit('update', store.get(REGISTRATION_OPTIONS.concat([this.id])));
             }
-        }
+        };
         drop () {
             store.unsubscribe(REGISTRATION_OPTIONS.concat([this.id]), this.#onUpdate);
         }
@@ -434,7 +434,7 @@ export const views = {
             } else {
                 this.emit('update', store.get(REGISTRATION_ENTRIES.concat([this.id])));
             }
-        }
+        };
         drop () {
             store.unsubscribe(REGISTRATION_ENTRIES.concat([this.id]), this.#onUpdate);
         }

@@ -314,7 +314,7 @@ class EditorBarPortal extends PureComponent {
     #onMutate = () => {
         globalAnimator.register(this);
         this.#updates = 0;
-    }
+    };
 
     componentDidMount () {
         this.#onMutate();

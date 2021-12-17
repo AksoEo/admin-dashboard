@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { createPortal, PureComponent } from 'preact/compat';
 import { Spring, globalAnimator } from 'yamdl';
 import L from 'leaflet';
-import { Map, TileLayer, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.less';
 
@@ -16,14 +16,14 @@ export default function AMap ({
 }) {
     extra.class = (extra.class || '') + ' a-map-container';
     return (
-        <Map {...extra}>
+        <MapContainer {...extra}>
             <TileLayer
                 url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="&copy <a href=&quot;https://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
             {(markers || []).map((m, i) => <MarkerRenderer
                 {...m}
                 key={m.key || i} />)}
-        </Map>
+        </MapContainer>
     );
 }
 

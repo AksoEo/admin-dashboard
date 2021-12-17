@@ -31,7 +31,7 @@ const lerp = (a, b, x) => (b - a) * x + a;
 export default class Segmented extends PureComponent {
     state = {
         backgroundPos: 0,
-    }
+    };
 
     /** Animates the background rectangle while it’s moving. */
     backgroundPos = new Spring(1, 0.2);

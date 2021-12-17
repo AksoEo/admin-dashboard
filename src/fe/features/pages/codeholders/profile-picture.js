@@ -167,7 +167,7 @@ class FileCropDialog extends Component {
     };
     onTouchEnd = e => {
         e.preventDefault();
-    }
+    };
 
     clampImagePos () {
         const { imageAspect, normalizedScale } = this;

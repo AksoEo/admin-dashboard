@@ -80,7 +80,7 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
             || authState === LoginAuthStates.VERIFYING_TOTP) && isAdmin) return 1;
         if (authState === LoginAuthStates.LOGGED_IN && isAdmin) return 2;
         return 0;
-    }
+    };
 
     #detailsPage;
     #totpPage;

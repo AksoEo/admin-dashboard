@@ -149,7 +149,7 @@ export const views = {
             } else {
                 this.emit('update', store.get([ROLES, this.id]));
             }
-        }
+        };
         drop () {
             store.unsubscribe([ROLES, this.id], this.#onUpdate);
         }

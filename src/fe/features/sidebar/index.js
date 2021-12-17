@@ -62,7 +62,7 @@ export default class Sidebar extends PureComponent {
         }
         this.node.style.visibility = position == 0 ? 'hidden' : '';
         this.backdropNode.style.opacity = this.props.permanent ? 0 : Math.min(1, position);
-    }
+    };
 
     componentDidMount () {
         this.updateSpringTarget();
@@ -243,7 +243,7 @@ class SidebarDragHandler {
         this.spring.velocity = 0;
 
         globalAnimator.register(this.owner);
-    }
+    };
 
     peekTimeout = null;
     peekWaiting = false;
@@ -335,7 +335,7 @@ class SidebarDragHandler {
             this.peekWaiting = false;
             this.spring.locked = false;
         }
-    }
+    };
 
     onTouchEnd = e => {
         this.spring.locked = false;
@@ -358,7 +358,7 @@ class SidebarDragHandler {
             }
         }
         globalAnimator.register(this.owner);
-    }
+    };
 
     onTouchCancel = () => {
         this.spring.locked = false;
@@ -370,5 +370,5 @@ class SidebarDragHandler {
             this.isDragging = false;
         }
         globalAnimator.register(this.owner);
-    }
+    };
 }

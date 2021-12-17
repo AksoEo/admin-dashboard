@@ -1,5 +1,5 @@
 import Zip from 'jszip';
-import stringify from 'csv-stringify';
+import { stringify } from 'csv-stringify';
 import {
     delegations as locale,
     delegationSubjects as subjectsLocale,

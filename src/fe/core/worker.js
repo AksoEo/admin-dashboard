@@ -102,5 +102,5 @@ export default class WorkerInterface extends EventEmitter {
 
     #onUnhandledRejection = ({ promise, reason }) => {
         console.error('[core] unhandled rejection!', promise, reason); // eslint-disable-line no-console
-    }
+    };
 }

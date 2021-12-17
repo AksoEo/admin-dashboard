@@ -57,7 +57,7 @@ export default class DetailShell extends PureComponent {
         }
         this.setState({ data, error: null });
         if (this.props.onData) this.props.onData(data);
-    }
+    };
     #onViewError = error => {
         console.error(error); // eslint-disable-line no-console
         this.setState({ error });

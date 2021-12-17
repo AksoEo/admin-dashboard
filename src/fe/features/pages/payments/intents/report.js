@@ -224,7 +224,6 @@ function ConvertedTotals ({ converted, currency }) {
 
 function CurrencyTable ({ byCurrency }) {
     const currencyKeys = Object.keys(byCurrency);
-    const table = {};
 
     return (
         <table class="currency-table">
