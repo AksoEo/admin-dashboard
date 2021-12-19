@@ -470,7 +470,7 @@ class Offer extends PureComponent {
                 if (editing) {
                     const chkId = 'checkbox-' + Math.random().toString(36);
                     paperVersion = (
-                        <div class="paper-version">
+                        <div class="paper-version is-editing">
                             <Checkbox
                                 id={chkId}
                                 checked={value.paperVersion}

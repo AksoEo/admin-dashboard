@@ -1,49 +1,25 @@
 import { h } from 'preact';
+import { Fragment } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
-import Page from '../../../../../components/page';
+import DetailPage from '../../../../../components/detail/detail-page';
 import DetailView from '../../../../../components/detail/detail';
-import Meta from '../../../../meta';
 import { AudioIcon } from '../../../../../components/icons';
-import { connectPerms } from '../../../../../perms';
-import { coreContext } from '../../../../../core/connection';
 import { magazineToc as locale } from '../../../../../locale';
 import { Files } from '../files';
 import { FIELDS } from './fields';
 import './detail.less';
 
-export default connectPerms(class MagazineTocEntry extends Page {
-    state = {
-        edit: null,
-    };
+export default class MagazineTocEntry extends DetailPage {
+    locale = locale;
+    className = 'magazine-toc-entry-page';
 
-    static contextType = coreContext;
-
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
-
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return;
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return;
-        }
-
-        this.#commitTask = this.context.createTask('magazines/updateTocEntry', {
+    createCommitTask (changedFields, edit) {
+        return this.context.createTask('magazines/updateTocEntry', {
             magazine: this.magazine,
             edition: this.edition,
             id: this.id,
             _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
-    };
-
-    componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
+        }, edit);
     }
 
     get magazine () {
@@ -58,7 +34,7 @@ export default connectPerms(class MagazineTocEntry extends Page {
         return +this.props.match[1];
     }
 
-    render ({ perms, editing }, { edit }) {
+    renderActions ({ perms }) {
         const { magazine, edition, id } = this;
 
         const actions = [];
@@ -67,7 +43,7 @@ export default connectPerms(class MagazineTocEntry extends Page {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
-                action: () => this.props.push('redakti', true),
+                action: this.onBeginEdit,
             });
         }
 
@@ -83,12 +59,14 @@ export default connectPerms(class MagazineTocEntry extends Page {
             });
         }
 
-        return (
-            <div class="magazine-toc-entry-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
+        return actions;
+    }
 
+    renderContents ({ editing }, { edit }) {
+        const { magazine, edition, id } = this;
+
+        return (
+            <Fragment>
                 <DetailView
                     view="magazines/tocEntry"
                     options={{ magazine, edition }}
@@ -125,8 +103,8 @@ export default connectPerms(class MagazineTocEntry extends Page {
                         }}
                         downloadURL={f => `/magazines/${magazine}/editions/${edition}/toc/${id}/recitation/${f}`} />
                 )}
-            </div>
+            </Fragment>
         );
     }
-});
+}
 

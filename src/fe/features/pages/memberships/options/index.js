@@ -1,15 +1,11 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
-import Page from '../../../../components/page';
+import OverviewPage from '../../../../components/overview/overview-page';
 import OverviewList from '../../../../components/lists/overview-list';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
-import Meta from '../../../meta';
 import { membershipOptions as locale } from '../../../../locale';
-import { coreContext } from '../../../../core/connection';
-import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 
-export default connectPerms(class MembershipOptions extends Page {
+export default class MembershipOptions extends OverviewPage {
     state = {
         parameters: {
             search: { query: '' },
@@ -24,38 +20,9 @@ export default connectPerms(class MembershipOptions extends Page {
         },
     };
 
-    static contextType = coreContext;
+    locale = locale;
 
-    #currentQuery = '';
-
-    decodeURLQuery () {
-        this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
-        });
-        this.#currentQuery = this.props.query;
-    }
-
-    encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, {});
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
-
-    componentDidMount () {
-        this.decodeURLQuery();
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters) {
-            this.encodeURLQuery();
-        }
-    }
-
-    render ({ perms }, { parameters }) {
+    renderActions ({ perms }) {
         const actions = [];
         if (perms.hasPerm('registration.options.update')) {
             actions.push({
@@ -64,24 +31,22 @@ export default connectPerms(class MembershipOptions extends Page {
                 action: () => this.context.createTask('memberships/createOptions', {}),
             });
         }
+        return actions;
+    }
 
+    renderContents (_, { parameters }) {
         return (
-            <div class="membership-options-page">
-                <Meta
-                    title={locale.title}
-                    actions={actions} />
-                <OverviewList
-                    task="memberships/listOptions"
-                    view="memberships/options"
-                    updateView={['memberships/sigOptions']}
-                    parameters={parameters}
-                    fields={FIELDS}
-                    onGetItemLink={id => `/membreco/agordoj/${id}`}
-                    onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
-                    onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
-                    onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
-                    locale={locale.fields} />
-            </div>
+            <OverviewList
+                task="memberships/listOptions"
+                view="memberships/options"
+                updateView={['memberships/sigOptions']}
+                parameters={parameters}
+                fields={FIELDS}
+                onGetItemLink={id => `/membreco/agordoj/${id}`}
+                onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
+                onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
+                onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
+                locale={locale.fields} />
         );
     }
-});
+}

@@ -58,19 +58,24 @@ export default class OverviewPage extends Page {
                             <Meta
                                 title={locale.title}
                                 actions={actions} />
-                            <SearchFilters
-                                value={this.state.parameters}
-                                searchFields={this.searchFields}
-                                filters={this.filters}
-                                onChange={parameters => this.setState({ parameters })}
-                                locale={{
-                                    searchPlaceholders: locale.search.placeholders,
-                                    searchFields: locale.search.fields || locale.fields,
-                                    filters: locale.search.filters || locale.filters,
-                                }}
-                                inputRef={view => this.#searchInput = view}
-                                expanded={this.state.expanded}
-                                onExpandedChange={expanded => this.setState({ expanded })} />
+
+                            {(this.searchFields || this.filters) ? (
+                                <SearchFilters
+                                    value={this.state.parameters}
+                                    searchFields={this.searchFields}
+                                    filters={this.filters}
+                                    onChange={parameters => this.setState({ parameters })}
+                                    locale={{
+                                        searchPlaceholders: locale.search?.placeholders,
+                                        searchFields: locale.search?.fields || locale.fields,
+                                        filters: locale.search?.filters || locale.filters,
+                                    }}
+                                    inputRef={view => this.#searchInput = view}
+                                    expanded={this.state.expanded}
+                                    onExpandedChange={expanded => this.setState({ expanded })}
+                                    filtersToAPI={this.filtersToAPI}
+                                    category={this.category} />
+                            ) : null}
 
                             {this.renderContents({ perms }, this.state)}
                         </div>

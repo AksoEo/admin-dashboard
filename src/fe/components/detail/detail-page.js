@@ -57,7 +57,7 @@ export default class DetailPage extends Page {
                     const actions = this.renderActions({ perms }, this.state);
 
                     return (
-                        <div class="detail-page">
+                        <div class={'detail-page ' + (this.className || '')}>
                             <Meta
                                 title={locale.detailTitle}
                                 actions={actions}/>

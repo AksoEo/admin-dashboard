@@ -1,16 +1,13 @@
 import { h } from 'preact';
+import { Fragment } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
-import Page from '../../../../components/page';
+import OverviewPage from '../../../../components/overview/overview-page';
 import OverviewList from '../../../../components/lists/overview-list';
 import CSVExport from '../../../../components/tasks/csv-export';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
-import Meta from '../../../meta';
 import { membershipCategories as locale, search as searchLocale } from '../../../../locale';
-import { coreContext } from '../../../../core/connection';
-import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 
-export default connectPerms(class MembershipCategories extends Page {
+export default class MembershipCategories extends OverviewPage {
     state = {
         parameters: {
             search: { query: '' },
@@ -25,38 +22,9 @@ export default connectPerms(class MembershipCategories extends Page {
         csvExportOpen: false,
     };
 
-    static contextType = coreContext;
+    locale = locale;
 
-    #currentQuery = '';
-
-    decodeURLQuery () {
-        this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
-        });
-        this.#currentQuery = this.props.query;
-    }
-
-    encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, {});
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
-
-    componentDidMount () {
-        this.decodeURLQuery();
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters) {
-            this.encodeURLQuery();
-        }
-    }
-
-    render ({ perms }, { parameters }) {
+    renderActions ({ perms }) {
         const actions = [];
         if (perms.hasPerm('membership_categories.create')) {
             actions.push({
@@ -72,11 +40,12 @@ export default connectPerms(class MembershipCategories extends Page {
             overflow: true,
         });
 
+        return actions;
+    }
+
+    renderContents (_, { parameters }) {
         return (
-            <div class="membership-categories-page">
-                <Meta
-                    title={locale.title}
-                    actions={actions} />
+            <Fragment>
                 <OverviewList
                     task="memberships/listCategories"
                     view="memberships/category"
@@ -99,7 +68,7 @@ export default connectPerms(class MembershipCategories extends Page {
                     detailViewOptions={id => ({ id, noFetch: true })}
                     locale={{ fields: locale.fields }}
                     filenamePrefix={locale.csvFilename} />
-            </div>
+            </Fragment>
         );
     }
-});
+}

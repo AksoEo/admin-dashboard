@@ -1,53 +1,33 @@
 import { h } from 'preact';
+import { Fragment } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import Page from '../../../../components/page';
+import DetailPage from '../../../../components/detail/detail-page';
 import TaskImage from '../../../../components/controls/task-image';
 import DetailShell from '../../../../components/detail/detail-shell';
 import DetailFields from '../../../../components/detail/detail-fields';
 import { DocumentIcon } from '../../../../components/icons';
-import Meta from '../../../meta';
-import { connectPerms } from '../../../../perms';
-import { connect, coreContext } from '../../../../core/connection';
+import { connect } from '../../../../core/connection';
 import { magazineEditions as locale, magazineToc as tocLocale } from '../../../../locale';
 import { Files } from './files';
 import { FIELDS } from './fields';
 import TocView from './toc';
 import './detail.less';
 
-export default connectPerms(class MagazineEdition extends Page {
+export default class MagazineEdition extends DetailPage {
     state = {
-        edit: null,
         org: null,
     };
 
-    static contextType = coreContext;
+    className = 'magazine-edition-page';
+    locale = locale;
 
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
-
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return;
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return;
-        }
-
-        this.#commitTask = this.context.createTask('magazines/updateEdition', {
+    createCommitTask (changedFields, edit) {
+        return this.context.createTask('magazines/updateEdition', {
             magazine: this.magazine,
             id: this.id,
             _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
-    };
-
-    componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
+        }, edit);
     }
 
     get magazine () {
@@ -58,9 +38,8 @@ export default connectPerms(class MagazineEdition extends Page {
         return +this.props.match[1];
     }
 
-    render ({ perms, editing }, { edit, org }) {
+    renderActions ({ perms }, { org }) {
         const { magazine, id } = this;
-
         const actions = [];
 
         if (perms.hasPerm(`magazines.update.${org}`)) {
@@ -78,7 +57,7 @@ export default connectPerms(class MagazineEdition extends Page {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
-                action: () => this.props.push('redakti', true),
+                action: this.onBeginEdit,
             });
         }
 
@@ -90,12 +69,14 @@ export default connectPerms(class MagazineEdition extends Page {
             });
         }
 
-        return (
-            <div class="magazine-edition-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
+        return actions;
+    }
 
+    renderContents ({ editing }, { edit }) {
+        const { magazine, id } = this;
+
+        return (
+            <Fragment>
                 <DetailShell
                     view="magazines/edition"
                     options={{ magazine }}
@@ -154,10 +135,10 @@ export default connectPerms(class MagazineEdition extends Page {
                     id={this.magazine}
                     fields={{}} locale={{}}
                     onData={data => data && this.setState({ org: data.org })} />
-            </div>
+            </Fragment>
         );
     }
-});
+}
 
 function DetailContents ({ magazine, id, data, item, editing, onItemChange }) {
     return (
