@@ -25,14 +25,14 @@ const browserTargets = {
 const aksoBase = process.env['AKSO_BASE'] || 'https://api.akso.org';
 const isDevServer = process.env.WEBPACK_SERVE;
 
-if (isDevServer) console.warn('\x1b[33musing dev server api proxy\x1b[m');
+if (isDevServer) console.warn(`\x1b[33musing dev server api proxy (${aksoBase})\x1b[m`);
 global.aksoConfig = {
     base: isDevServer ? 'http://localhost:2576/_api/' : aksoBase,
 };
 
 module.exports = function (env, argv) {
-    const analyze = env === 'analyze';
-    const prod = env === 'prod' || analyze;
+    const analyze = !!argv.env.analyze;
+    const prod = !!argv.env.prod || analyze;
 
     if (!prod) console.warn('\x1b[33mbuilding for development\x1b[m');
 
@@ -113,7 +113,9 @@ module.exports = function (env, argv) {
                 resourceRegExp: /^\.\/locale$/,
                 contextRegExp: /moment$/,
             }),
-            new EsLintPlugin(),
+            new EsLintPlugin({
+                exclude: ['node_modules', 'src/unsupported.js'],
+            }),
             // a lot of modules want these nodejs globals
         ].filter(x => x),
         module: {
