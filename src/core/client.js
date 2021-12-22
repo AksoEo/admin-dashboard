@@ -1,6 +1,7 @@
 import config from '../config.val';
 import * as store from './store';
 import {
+    LOGIN,
     AUTH_STATE,
     IS_ADMIN,
     TOTP_REQUIRED,
@@ -12,8 +13,12 @@ import {
 import { LoginAuthStates } from '../protocol';
 import * as log from './log';
 
+const GET_AUTH_TRIES = [LOGIN, 'getAuthTries'];
+
 /// runs GET /auth
 const getAuth = async () => {
+    let tries = 1;
+
     // this does not use akso-client so we can run this while akso-client is still loading
     while (true) { // eslint-disable-line no-constant-condition
         try {
@@ -33,8 +38,12 @@ const getAuth = async () => {
                 throw new Error('unexpected response from /auth');
             }
         } catch (err) {
-            log.error('failed to get auth', err);
+            log.error(`failed to get auth (try ${tries})`, err);
         }
+        const nextTryDelay = 1000 * Math.min(60, 2 ** tries);
+        store.insert(GET_AUTH_TRIES, [tries, Date.now() + nextTryDelay]);
+        tries++;
+        await new Promise(r => setTimeout(r, nextTryDelay));
     }
 };
 
@@ -43,6 +52,7 @@ export const initialAuth = getAuth();
 
 store.insert(AUTH_STATE, LoginAuthStates.UNKNOWN);
 initialAuth.then(auth => {
+    store.remove(GET_AUTH_TRIES);
     if (auth) {
         const totpRequired = (auth.isAdmin || auth.totpSetUp);
         store.insert(AUTH_STATE, (totpRequired && !auth.totpUsed)

@@ -13,6 +13,8 @@ export const timestampTzFormatToday = '[hodiaŭ] LT';
 export const osmAddressSearchEndpoint = 'https://nominatim.openstreetmap.org/search?';
 
 export const insecureContext = 'La paĝo ne estas sekura (http)!';
+export const getAuthSureIsTakingAWhile = '[[Connecting to the backend sure is taking a while... have you checked |https://status.akso.org| to see if it’s down? Or maybe just try reloading the page.]]';
+export const getAuthTryCounter = n => `(${n} [[tries]])`;
 
 export const meta = {
     copyright: `© ${copyrightYear}`,

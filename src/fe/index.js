@@ -6,7 +6,8 @@ import isSpecialPage from './features/login/is-special-page';
 import { Worker } from './core';
 import { coreContext } from './core/connection';
 import { routerContext } from './router';
-import { insecureContext } from './locale';
+import { insecureContext, getAuthSureIsTakingAWhile, getAuthTryCounter } from './locale';
+import config from '../config.val';
 import TaskView from './task-view';
 import './style';
 
@@ -132,6 +133,10 @@ class Session extends Component {
             return;
         }
 
+        if (data.getAuthTries) {
+            this.setState({ getAuthTries: data.getAuthTries });
+        }
+
         this.setState({ loggedIn: data.authState === LoginAuthStates.LOGGED_IN && data.isAdmin });
         if (data.authState && (data.authState !== LoginAuthStates.LOGGED_IN || !data.isAdmin)) {
             clearTimeout(this.#hideLoginTimeout);
@@ -236,6 +241,7 @@ class Session extends Component {
                 }}>
                     <Fragment>
                         <LoadingIndicator loading={!login && !app} />
+                        {!login && !app && <GetAuthSureIsTakingAWhile tries={this.state.getAuthTries} />}
                         {app}
                         {login}
                         {renderTasksHere ? tasks : null}
@@ -280,6 +286,47 @@ class LoadingIndicator extends Component {
             <div id="app-loading-indicator" class={!this.props.loading ? 'animate-out' : ''}>
                 <CircularProgress indeterminate />
             </div>
+        );
+    }
+}
+
+class GetAuthSureIsTakingAWhile extends Component {
+    componentDidMount () {
+        this.updateInterval = setInterval(this.update, 50);
+    }
+    componentWillUnmount () {
+        clearInterval(this.updateInterval);
+    }
+    update = () => this.forceUpdate();
+    render ({ tries }) {
+        if (!tries || tries[0] < 2) return;
+        const [tryCount, nextTry] = tries;
+
+        const contents = getAuthSureIsTakingAWhile.split(/[|]/g).map((x, i) =>
+            i % 2 === 0 ? x : <a href={x} target="_blank" rel="noreferrer">{x}</a>);
+
+        return (
+            <Fragment>
+                <div id="get-auth-sure-is-taking-a-while">
+                    {contents}
+                </div>
+                <div id="get-auth-sitaw-backend-url">
+                    <span class="inner-prog-box">
+                        {(Date.now() < nextTry) && (
+                            <span class="next-try-ind">{Math.ceil((nextTry - Date.now()) / 1000)}s</span>
+                        )}
+                        <CircularProgress
+                            class="inner-progress"
+                            small
+                            indeterminate={(Date.now() + 300 > nextTry) || (Date.now() > nextTry)} />
+                    </span>
+                    <a
+                        href={config.base}
+                        target="_blank"
+                        rel="noreferrer">{config.base}</a>
+                    <span class="try-counter">{getAuthTryCounter(tryCount)}</span>
+                </div>
+            </Fragment>
         );
     }
 }

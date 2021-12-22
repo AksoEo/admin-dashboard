@@ -5,6 +5,7 @@
 export function deepMerge (a, b) {
     if (b === undefined) return a;
     if (a !== null && b !== null && typeof a === 'object' && typeof b === 'object') {
+        if (a instanceof Buffer || b instanceof Buffer) return b;
         if (Array.isArray(a) || Array.isArray(b)) return b;
         for (const k in b) a[k] = deepMerge(a[k], b[k]);
         return a;

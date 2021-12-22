@@ -68,6 +68,60 @@ noscript {
     }
 }
 
+#get-auth-sure-is-taking-a-while {
+    position: fixed;
+    left: 50%;
+    bottom: 32px;
+    max-width: 50ch;
+    margin-bottom: env(safe-area-inset-bottom);
+    text-align: center;
+    transform: translateX(-50%);
+    animation: get-auth-sitaw-in 2s;
+
+    @keyframes get-auth-sitaw-in {
+        0% {
+            opacity: 0;
+            transform: translateX(-50%);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+}
+#get-auth-sitaw-backend-url {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    opacity: 0.5;
+    font-size: 10px;
+    animation: get-auth-sitaw-url-in 2s;
+    @keyframes get-auth-sitaw-url-in {
+        0% {
+            opacity: 0;
+        }
+    }
+    .inner-prog-box {
+        position: relative;
+        .next-try-ind {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+    .inner-progress {
+        transform: scale(0.7);
+        --md-progress-color: @text-fade-50;
+    }
+    a {
+        margin-left: 2px;
+        color: inherit;
+    }
+    .try-counter {
+        margin-left: 4px;
+    }
+}
+
 .akso-logo-transition {
     position: fixed;
     top: -32px;
