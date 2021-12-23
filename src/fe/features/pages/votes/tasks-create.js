@@ -344,6 +344,7 @@ export default function makeCreateTask (isTemplate) {
                     publishVoters: false,
                     publishVotersPercentage: true,
                     options: [],
+                    ballotsSecret: false,
                 },
             },
             error: null,

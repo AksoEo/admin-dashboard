@@ -45,7 +45,7 @@ export default class MagazineEdition extends DetailPage {
         if (perms.hasPerm(`magazines.update.${org}`)) {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
-                label: locale.create.menuItem,
+                label: tocLocale.create.menuItem,
                 action: () => this.context.createTask('magazines/createTocEntry', {
                     magazine,
                     edition: id,

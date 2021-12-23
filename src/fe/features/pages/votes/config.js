@@ -448,6 +448,7 @@ export const options = class OptionsEditor extends Component {
 };
 
 const CONFIG_FIELDS = {
+    ballotsSecret: [ballotsSecret],
     quorum: [quorum],
     majorityBallots: [majorityBallots, ['yn', 'ynb']],
     majorityVoters: [majorityVoters, ['yn', 'ynb']],

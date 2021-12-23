@@ -3,7 +3,6 @@ import JSON5 from 'json5';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
-import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, getRawFile, simpleDataView } from '../templates';
 import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 

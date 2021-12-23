@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { Button } from 'yamdl';
 import { FIELDS as DELEGATE_FIELDS } from '../delegates/fields';
 import TextArea from '../../../../components/controls/text-area';
+import DiffAuthor from '../../../../components/diff-author';
 import { timestamp } from '../../../../components/data';
 import { delegationApplications as locale } from '../../../../locale';
 import { coreContext } from '../../../../core/connection';
@@ -37,7 +38,7 @@ export const FIELDS = {
                     {locale.status[value]}
                     {(slot === 'detail' && item.statusBy) ? (
                         <div class="status-by">
-                            {locale.status.changedBy}: {item.statusBy}
+                            {locale.status.changedBy}: <DiffAuthor author={item.statusBy} />
                         </div>
                     ) : null}
                     {(slot === 'detail' && item.statusTime) ? (

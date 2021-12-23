@@ -72,6 +72,7 @@ export const votes = {
         hasResultsTiebreaker: 'Rezultoj pretas,\nuzis egalecrompanton',
     },
     config: {
+        ballotsSecret: 'Sekretaj balotiloj',
         quorum: 'Necesa kvorumo',
         majorityBallots: 'Plimulto de voĉdonintoj',
         majorityVoters: 'Plimulto de rajtantoj',
