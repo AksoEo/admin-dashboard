@@ -25,7 +25,8 @@ const browserTargets = {
 const aksoBase = process.env['AKSO_BASE'] || 'https://api.akso.org';
 const isDevServer = process.env.WEBPACK_SERVE;
 
-if (isDevServer) console.warn(`\x1b[33musing dev server api proxy (${aksoBase})\x1b[m`);
+console.log(`\x1b[32mAKSO_BASE: ${aksoBase}\x1b[m`);
+if (isDevServer) console.warn(`\x1b[33musing dev server api proxy\x1b[m`);
 global.aksoConfig = {
     base: isDevServer ? 'http://localhost:2576/_api/' : aksoBase,
 };
