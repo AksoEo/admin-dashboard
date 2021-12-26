@@ -46,7 +46,7 @@ export default class SubscriptionsPage extends OverviewPage {
     renderActions ({ perms }) {
         const actions = [];
 
-        if (this.magazine && perms.hasPerm(`magazines.subscriptions.create.${this.org}`) && perms.hasPerm('codeholders.read')) {
+        if (this.magazine && perms.hasPerm(`magazines.subscriptions.create.${this.state.org}`) && perms.hasPerm('codeholders.read')) {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.create.menuItem,

@@ -7,6 +7,7 @@ import { codeholders as locale, detail as detailLocale } from '../../../locale';
 import { coreContext, connect } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 import { Header, fields, Footer } from './detail-fields';
+import './style.less';
 
 export default connectPerms(connect('codeholders/fields')(res => ({
     availableFields: res?.fields,
@@ -106,6 +107,14 @@ export default connectPerms(connect('codeholders/fields')(res => ({
                 actions.push({
                     label: locale.resetPassword.create,
                     action: () => this.context.createTask('codeholders/createPassword', { id }, { org: 'akso' }),
+                    overflow: true,
+                });
+            }
+
+            if (perms.hasPerm('codeholders.disable_totp')) {
+                actions.push({
+                    label: locale.resetTotp.menuItem,
+                    action: () => this.context.createTask('codeholders/resetTotp', { id }),
                     overflow: true,
                 });
             }

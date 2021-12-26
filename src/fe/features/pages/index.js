@@ -117,7 +117,7 @@ export default [
                 path: 'revuoj',
                 component: elazy(() =>
                     import(/* webpackChunkName: "magazines" */ './magazines')),
-                hasPerm: () => true,
+                hasPerm: perms => perms.hasPerm('magazines.read.tejo') || perms.hasPerm('magazines.read.uea'),
                 paths: [
                     {
                         match: /^(\d+)$/,

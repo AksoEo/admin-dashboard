@@ -41,6 +41,7 @@ export const errors = {
             oneOf: () => `Estu identa al almenaŭ unu el la jenaj skemoj`,
             enum: p => `[[Must be one of: ${p.allowedValues.join(', ')}]]`,
             const: p => `[[Must be ${p.allowedValue}]]`,
+            type: p => `[[Should be “${p.type}”]]`,
         },
     },
 };

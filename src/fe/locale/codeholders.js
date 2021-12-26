@@ -431,6 +431,14 @@ export const codeholders = {
         send: 'Sciigo',
         success: 'Sciigo sendita',
     },
+    resetTotp: {
+        menuItem: '[[Reset TOTP]]',
+        title: '[[Reset TOTP]]',
+        description: '[[This will reset their TOTP code.]]',
+        button: '[[Reset]]',
+        success: '[[Reset successfully.]]',
+        none: '[[This codeholder does not have TOTP set up.]]',
+    },
 };
 
 export const codeholderChgReqs = {

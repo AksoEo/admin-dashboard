@@ -15,6 +15,8 @@ export const magazines = {
         org: 'Organizo',
         name: 'Nomo',
         description: 'Priskribo',
+        issn: '[[ISSN]]',
+        subscribers: '[[Subscribers]]',
     },
     create: {
         title: 'Krei revuon',
@@ -33,6 +35,35 @@ export const magazines = {
         title: 'Forigi revuon',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la revuon? Ne eblas malfari tiun ĉi agon.',
+    },
+
+    subscribers: {
+        access: '[[Online access]]',
+        paper: '[[Real life actual magazine real access]]',
+
+        everyone: '[[Everyone]]',
+        noone: '[[No one]]',
+        complex: '[[Custom]]',
+
+        filterFieldDesc: '[[Paste a codeholder filter here. You can obtain one from the codeholders page by pressing “Konverti al JSON-filtrilo”]]',
+        filterView: '[[View matching codeholders]]',
+
+        members: '[[Members]]',
+        membersDesc: '[[Members that have access to this magazine.]]',
+        membersAll: '[[All]]',
+        membersNone: '[[None]]',
+        membersFilter: '[[Use Filter]]',
+
+        membersIncludeLastYear: '[[Former member access duration]]',
+        membersIncludeLastYearNone: '[[None]]',
+        membersIncludeLastYearDesc: '[[How long members and subscribers last year (who are not members or subscribers this year) retain access.]]',
+
+        filter: '[[Unconditional access filter]]',
+        enableFilter: '[[Enable filter]]',
+        filterDesc: '[[Codeholders matching this filter will be able to view the magazine unconditionally.]]',
+
+        freelyAvailableAfter: '[[Free availability date]]',
+        freelyAvailableAfterDesc: '[[Magazine editions are freely available to everyone after this duration since publication.]]',
     },
 };
 
@@ -178,7 +209,7 @@ export const magazineSubs = {
         button: 'Aktualigi',
     },
     delete: {
-        menuItem: 'Forigi simplan abonon revuan',
+        menuItem: 'Forigi',
         title: 'Forigi simplan abonon revuan',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi simplan abonon revuan? Ne eblas malfari tiun ĉi agon.',

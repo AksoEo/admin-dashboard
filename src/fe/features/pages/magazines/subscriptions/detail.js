@@ -33,7 +33,7 @@ export default class Subscription extends DetailPage {
     renderActions ({ perms }) {
         const actions = [];
 
-        if (perms.hasPerm(`magazines.subscriptions.update.${this.org}`)) {
+        if (perms.hasPerm(`magazines.subscriptions.update.${this.state.org}`)) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
@@ -41,7 +41,7 @@ export default class Subscription extends DetailPage {
             });
         }
 
-        if (perms.hasPerm(`magazines.subscriptions.delete.${this.org}`)) {
+        if (perms.hasPerm(`magazines.subscriptions.delete.${this.state.org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('magazines/deleteSubscription', {

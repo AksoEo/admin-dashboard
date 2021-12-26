@@ -327,6 +327,24 @@ export default {
             </TaskDialog>
         );
     },
+    resetTotp ({ open, core, task }) {
+        return (
+            <TaskDialog
+                class="codeholders-task-reset-totp"
+                open={open}
+                onClose={() => task.drop()}
+                title={locale.resetTotp.title}
+                actionLabel={locale.resetTotp.button}
+                running={task.running}
+                run={() => task.runOnce().then(success => {
+                    core.createTask('info', {
+                        message: success ? locale.resetTotp.success : locale.resetTotp.none,
+                    });
+                })}>
+                {locale.resetTotp.description}
+            </TaskDialog>
+        );
+    },
 
     uploadFile ({ open, task }) {
         return (

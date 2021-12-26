@@ -740,6 +740,73 @@ export const spec = [
             },
         ],
     },
+    {
+        type: 'category',
+        name: 'Revuoj',
+        children: [
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Revuoj de ' + name,
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'magazines.read.' + org,
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'magazines.update.' + org,
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'magazines.create.' + org,
+                                implies: ['magazines.update.' + org],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'magazines.delete.' + org,
+                                implies: ['magazines.create.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Simplaj abonoj de ' + name,
+                        requires: ['codeholders.read'],
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'magazines.subscriptions.read.' + org,
+                                implies: ['codeholders.read'],
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'magazines.subscriptions.update.' + org,
+                                implies: ['magazines.subscriptions.read.' + org],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'magazines.subscriptions.create.' + org,
+                                implies: ['magazines.subscriptions.update.' + org],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'magazines.subscriptions.delete.' + org,
+                                implies: ['magazines.subscriptions.create.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+        ],
+    },
 ];
 
 

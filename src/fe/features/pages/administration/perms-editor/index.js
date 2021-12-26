@@ -222,6 +222,7 @@ function PermsItem ({ item, ctx, disabled }) {
                             <span class="switch-option" key={i}>
                                 <Checkbox
                                     id={checkboxId}
+                                    disabled={disabled}
                                     class={className}
                                     checked={isActive}
                                     onMouseOver={() => ctx.setShowImplied(opt.id)}
@@ -250,6 +251,7 @@ function PermsItem ({ item, ctx, disabled }) {
                 {reqNotice}
                 <Checkbox
                     id={checkboxId}
+                    disabled={disabled}
                     class={className}
                     checked={isActive}
                     onMouseOver={() => ctx.setShowImplied(item.id)}

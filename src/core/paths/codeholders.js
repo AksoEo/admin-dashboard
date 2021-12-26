@@ -1278,6 +1278,16 @@ export const tasks = {
         const client = await asyncClient;
         await client.post(`/codeholders/${ueaCode}/!forgot_password`, { org });
     },
+    resetTotp: async ({ id }) => {
+        const client = await asyncClient;
+        try {
+            await client.post(`/codeholders/${id}/!disable_totp`);
+            return true;
+        } catch (err) {
+            if (err.statusCode === 404) return false;
+            throw err;
+        }
+    },
 
     permissions: async ({ id }) => {
         const client = await asyncClient;

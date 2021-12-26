@@ -5,8 +5,10 @@ import MdField from '../../../components/controls/md-field';
 import Segmented from '../../../components/controls/segmented';
 import OrgIcon from '../../../components/org-icon';
 import { magazines as locale, magazineSubs as subsLocale } from '../../../locale';
-import './fields.less';
+import MagazineSubscribers from './magazine-subscribers';
+import { connectPerms } from '../../../perms';
 import { LinkButton } from '../../../router';
+import './fields.less';
 
 export const FIELDS = {
     org: {
@@ -51,7 +53,6 @@ export const FIELDS = {
         shouldHide: (_, editing) => !editing,
     },
     description: {
-        sortable: true,
         skipLabel: true,
         wantsCreationLabel: true,
         weight: 2,
@@ -65,9 +66,33 @@ export const FIELDS = {
         },
         shouldHide: (_, editing) => !editing,
     },
+    issn: {
+        wantsCreationLabel: true,
+        weight: 1.5,
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return (
+                    <TextField
+                        outline
+                        value={value}
+                        pattern="\d{8}"
+                        maxLength={8}
+                        onChange={e => onChange(e.target.value || null)} />
+                );
+            }
+            if (!value) return null;
+            return <span class="magazine-field-issn">{value}</span>;
+        },
+    },
+    subscribers: {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange }) {
+            return <MagazineSubscribers value={value} editing={editing} onChange={onChange} />;
+        },
+    },
 };
 
-export function Header ({ item, editing }) {
+export const Header = connectPerms(function Header ({ item, editing, perms }) {
     if (editing) return null;
     return (
         <div class="magazine-header">
@@ -78,10 +103,12 @@ export function Header ({ item, editing }) {
             <FIELDS.description.component value={item.description} slot="detail" />
 
             <div class="header-additional">
-                <LinkButton raised class="subs-button" target={`/revuoj/${item.id}/simplaj-abonoj`}>
-                    {subsLocale.title}
-                </LinkButton>
+                {(perms.hasPerm('codeholders.read') && perms.hasPerm(`magazines.subscriptions.read.${item.org}`)) ? (
+                    <LinkButton raised class="subs-button" target={`/revuoj/${item.id}/simplaj-abonoj`}>
+                        {subsLocale.title}
+                    </LinkButton>
+                ) : null}
             </div>
         </div>
     );
-}
+});
