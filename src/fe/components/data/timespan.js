@@ -162,7 +162,7 @@ class TimespanUnitEditor extends PureComponent {
 
 // FIXME: this editor isn't that great
 function TimespanEditor ({ value, onChange }) {
-    value = Math.max(0, Math.min(value, 2147483647));
+    value = Math.max(0, value);
 
     return (
         <span class="data timespan-editor">
@@ -191,6 +191,66 @@ function TimespanEditor ({ value, onChange }) {
                 mod={60}
                 unit={locale.timespanUnits.s} />
         </span>
+    );
+}
+
+export function IsoDuration ({ value }) {
+    let years = 0;
+    let months = 0;
+    let days = 0;
+    let match;
+    if ((match = (value || '').match(/^P(?:(\d\d?)Y)?(?:(\d\d?)M)?(?:(\d\d?)D)?$/))) {
+        years = +match[1];
+        months = +match[2];
+        days = +match[3];
+    }
+
+    const out = [];
+    if (years) out.push(locale.timespanUnits.years(years));
+    if (months) out.push(locale.timespanUnits.months(months));
+    if (days || !out.length) out.push(locale.timespanUnits.days(days));
+
+    return out.join(', ');
+}
+
+/// value: ISO8601 duration (Y M D)
+export function IsoDurationEditor ({ value, onChange }) {
+    let years = 0;
+    let months = 0;
+    let days = 0;
+    let match;
+    if ((match = (value || '').match(/^P(?:(\d\d?)Y)?(?:(\d\d?)M)?(?:(\d\d?)D)?$/))) {
+        years = +match[1];
+        months = +match[2];
+        days = +match[3];
+    }
+
+    const commit = (y, m, d) => {
+        let out = 'P';
+        if (y) out += Math.min(99, y | 0) + 'Y';
+        if (m) out += Math.min(99, m | 0) + 'M';
+        if (d) out += Math.min(99, d | 0) + 'D';
+        onChange(out);
+    };
+
+    return (
+        <div class="data timespan-editor iso-duration-editor">
+            <TimespanUnitEditor
+                value={years}
+                fac={1}
+                onChange={years => commit(years, months, days)}
+                unit={locale.timespanUnits.y} />
+            <TimespanUnitEditor
+                value={months}
+                fac={1}
+                onChange={months => commit(years, months, days)}
+                unit={locale.timespanUnits.mo} />
+            <TimespanUnitEditor
+                value={days}
+                fac={1}
+                onChange={days => commit(years, months, days)}
+                unit={locale.timespanUnits.d} />
+        </div>
     );
 }
 

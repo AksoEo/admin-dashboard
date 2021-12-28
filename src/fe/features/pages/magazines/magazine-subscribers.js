@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { Fragment } from 'preact/compat';
 import { Checkbox } from 'yamdl';
 import { magazines as locale } from '../../../locale';
+import { IsoDuration, IsoDurationEditor } from '../../../components/data/timespan';
 import JSONFilterEditor from '../../../components/overview/json-filter-editor';
 import Segmented from '../../../components/controls/segmented';
 import './magazine-subscribers.less';
@@ -14,7 +15,7 @@ function MagazinePerms ({ value, editing, onChange }) {
 
     const selected = value === true ? 'true' : value === false ? 'false' : 'complex';
     const topSwitch = (
-        <Segmented selected={selected} onSelect={value => {
+        <Segmented class="inner-switch" selected={selected} onSelect={value => {
             if (value === selected) return;
             if (value === 'complex') {
                 onChange({
@@ -70,7 +71,7 @@ function MagazinePerms ({ value, editing, onChange }) {
                     <div class="field-desc">
                         {locale.subscribers.membersIncludeLastYearDesc}
                     </div>
-                    <MagazinePermsIncludeLastYear
+                    <MagazinePermsDuration
                         value={value.membersIncludeLastYear}
                         editing={editing}
                         onChange={v => onChange({
@@ -101,6 +102,13 @@ function MagazinePerms ({ value, editing, onChange }) {
                     <div class="field-desc">
                         {locale.subscribers.freelyAvailableAfterDesc}
                     </div>
+                    <MagazinePermsDuration
+                        value={value.freelyAvailableAfter}
+                        editing={editing}
+                        onChange={v => onChange({
+                            ...value,
+                            freelyAvailableAfter: v,
+                        })} />
                 </div>
             ) : null}
         </div>
@@ -138,8 +146,18 @@ function MagazinePermsMembers ({ value, editing, onChange }) {
     );
 }
 
-function MagazinePermsIncludeLastYear ({ value, editing, onChange }) {
-    return 'emwo meow';
+function MagazinePermsDuration ({ value, editing, onChange }) {
+    return (
+        <div class="magazine-perms-duration">
+            {editing ? (
+                <IsoDurationEditor value={value} onChange={value => {
+                    onChange(value === 'P' ? null : value);
+                }} />
+            ) : (
+                <IsoDuration value={value || 'P'} />
+            )}
+        </div>
+    );
 }
 
 function MagazinePermsFilter ({ value, editing, onChange }) {
@@ -195,6 +213,8 @@ function MagazinePermsFilterControl ({ value, editing, onChange }) {
 }
 
 export default function MagazineSubscribers ({ value, editing, onChange }) {
+    if (!value) value = { paper: false, access: false };
+
     return (
         <div class="magazine-subscribers">
             <div class="subscriber-type">

@@ -5,6 +5,8 @@ import LimitedTextField from '../../../../components/controls/limited-text-field
 import MdField from '../../../../components/controls/md-field';
 import { date } from '../../../../components/data';
 import { magazineEditions as locale } from '../../../../locale/magazines';
+import MagazineSubscribers from '../magazine-subscribers';
+import './fields.less';
 
 export const FIELDS = {
     idHuman: {
@@ -65,6 +67,35 @@ export const FIELDS = {
                 value={value || ''}
                 maxLength={5000}
                 onChange={value => onChange(value || null)} />;
+        },
+    },
+    subscribers: {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange }) {
+            const chkId = Math.random().toString(36);
+            return (
+                <div class="magazine-edition-subscribers">
+                    {editing ? (
+                        <div class="override-switch">
+                            <Checkbox
+                                id={chkId}
+                                checked={value !== null}
+                                onChange={v => {
+                                    if (v === (value !== null)) return;
+                                    if (v) onChange({ paper: false, access: false });
+                                    else onChange(null);
+                                }} />
+                            {' '}
+                            <label for={chkId}>
+                                {locale.fields.subscribersOverride}
+                            </label>
+                        </div>
+                    ) : null}
+                    {(value !== null) ? (
+                        <MagazineSubscribers value={value} editing={editing} onChange={onChange} />
+                    ) : null}
+                </div>
+            );
         },
     },
 };

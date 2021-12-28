@@ -14,11 +14,24 @@
 
     .magazine-subscriber-perms {
         border: 1px solid @separator;
-        border-radius: 4px;
-        padding: 8px;
+        border-radius: 8px;
+        padding: 0 12px;
+
+        .perms-top-switch {
+            padding: 4px 0;
+            margin: 0 -8px;
+
+            .inner-switch {
+                width: 100%;
+            }
+        }
 
         .perms-field {
-            margin: 8px 0;
+            padding: 8px 0;
+
+            & + .perms-field {
+                border-top: 1px solid @separator;
+            }
 
             .field-label {
                 font-weight: 500;

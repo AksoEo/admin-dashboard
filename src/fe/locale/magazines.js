@@ -63,7 +63,7 @@ export const magazines = {
         filterDesc: '[[Codeholders matching this filter will be able to view the magazine unconditionally.]]',
 
         freelyAvailableAfter: '[[Free availability date]]',
-        freelyAvailableAfterDesc: '[[Magazine editions are freely available to everyone after this duration since publication.]]',
+        freelyAvailableAfterDesc: '[[Magazine editions are freely available to everyone after this duration since publication (set to zero for never).]]',
     },
 };
 
@@ -84,6 +84,8 @@ export const magazineEditions = {
         date: 'Dato',
         published: 'Publikigita',
         description: 'Priskribo',
+        subscribers: '[[Subscribers]]',
+        subscribersOverride: '[[Override magazine settings]]',
     },
     create: {
         title: 'Krei numeron',

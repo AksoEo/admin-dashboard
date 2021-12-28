@@ -77,10 +77,14 @@ export const data = {
     weekdays: 'DLMMJVS',
     weekStart: 1, // Monday
     timespanUnits: {
+        years: y => y === 1 ? '1 jaro' : `${y} jaroj`,
+        months: m => m === 1 ? '1 monato' : `${m} monatoj`,
         days: d => d === 1 ? '1 tago' : `${d} tagoj`,
         hours: h => h === 1 ? '1 horo' : `${h} horoj`,
         minutes: m => m === 1 ? '1 minuto' : `${m} minutoj`,
         seconds: s => s === 1 ? '1 sekundo' : `${s} sekundoj`,
+        y: 'j',
+        mo: 'm',
         d: 't',
         h: 'h',
         m: 'm',
