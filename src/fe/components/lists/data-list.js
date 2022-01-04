@@ -157,6 +157,16 @@ export default class DataList extends PureComponent {
         this.unbindUpdates();
     }
 
+    clear () {
+        this.setState({
+            items: [],
+            total: -1,
+            loading: false,
+            error: null,
+        });
+        this.fetchChunk(0).catch(this.onFailFetch);
+    }
+
     render () {
         const items = [];
 

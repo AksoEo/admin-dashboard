@@ -5,6 +5,7 @@ import {
     magazineEditions as editionsLocale,
     magazineToc as tocLocale,
     magazineSubs as subLocale,
+    magazineSnaps as snapLocale,
 } from '../../../locale';
 import { DocumentIcon } from '../../../components/icons';
 import { FileSize } from '../../../components/files';
@@ -12,6 +13,7 @@ import { createDialog, updateDialog, deleteDialog } from '../../../components/ta
 import { FIELDS as MAGAZINE_FIELDS } from './fields';
 import { FIELDS as EDITION_FIELDS } from './editions/fields';
 import { FIELDS as TOC_FIELDS } from './editions/toc/fields';
+import { FIELDS as SNAP_FIELDS } from './editions/snapshots/fields';
 import { FIELDS as SUB_FIELDS } from './subscriptions/fields';
 import './tasks.less';
 
@@ -106,6 +108,17 @@ export default {
         );
     },
     deleteTocRecitation: deleteDialog({ locale: tocLocale.recitations.delete }),
+
+    createSnapshot: createDialog({
+        locale: snapLocale,
+        fieldNames: ['name'],
+        fields: SNAP_FIELDS,
+        className: 'magazines-task-create-snapshot',
+        onCompletion: (task, routerContext, id) => routerContext
+            .navigate(`/revuoj/${task.options.magazine}/numero/${task.options.edition}/momentaj-abonantoj/${id}`),
+    }),
+    updateSnapshot: updateDialog({ locale: snapLocale.update, fields: snapLocale.fields }),
+    deleteSnapshot: deleteDialog({ locale: snapLocale.delete }),
 
     createSubscription: createDialog({
         locale: subLocale,

@@ -4,6 +4,7 @@ import * as store from '../store';
 import { deepMerge } from '../../util';
 import { createStoreObserver } from '../view';
 import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, getRawFile, simpleDataView } from '../templates';
+import { clientFromAPI as codeholderFromAPI } from './codeholders';
 
 export const MAGAZINES = 'magazines';
 export const SIG_MAGAZINES = '!magazines';
@@ -14,6 +15,8 @@ export const E_DATA = 'eData';
 export const FILES = 'files';
 export const TOC = 'toc';
 export const SIG_TOC = '!toc';
+export const SNAPSHOTS = 'snapshots';
+export const SIG_SNAPSHOTS = '!snapshots';
 export const RECITATIONS = 'recitations';
 export const SUBSCRIPTIONS = 'subscriptions';
 export const SIG_SUBSCRIPTIONS = '!subscriptions';
@@ -32,12 +35,16 @@ export const SIG_SUBSCRIPTIONS = '!subscriptions';
 //! |        |- FILES
 //! |        |  |- (file data)
 //! |        |- TOC
-//! |           |- SIG_TOC
-//! |           |- [entry id]
-//! |              |- E_DATA
-//! |              |  |- (entry data)
-//! |              |- RECITATIONS
-//! |                 |- (recitation metadata)
+//! |        |  |- SIG_TOC
+//! |        |  |- [entry id]
+//! |        |     |- E_DATA
+//! |        |     |  |- (entry data)
+//! |        |     |- RECITATIONS
+//! |        |        |- (recitation metadata)
+//! |        |- SNAPSHOTS
+//! |           |- SIG_SNAPSHOTS
+//! |           |- [snapshot id]
+//! |              |- (snapshot data)
 //! |- SUBSCRIPTIONS
 //!    |- SIG_SUBSCRIPTIONS
 //!    |- [subscription id]
@@ -240,6 +247,87 @@ export const tasks = {
         tasks.tocRecitations({ magazine, edition, id }).catch(() => {});
     },
 
+    listSnapshots: crudList({
+        apiPath: ({ magazine, edition }) => `/magazines/${magazine}/editions/${edition}/paper_snapshots`,
+        fields: ['id', 'time', 'name'],
+        storePath: ({ magazine, edition }, { id }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, id],
+    }),
+    snapshot: crudGet({
+        apiPath: ({ magazine, edition, id }) => `/magazines/${magazine}/editions/${edition}/paper_snapshots/${id}`,
+        fields: ['id', 'time', 'name'],
+        storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, id],
+    }),
+    createSnapshot: crudCreate({
+        apiPath: ({ magazine, edition }) => `/magazines/${magazine}/editions/${edition}/paper_snapshots`,
+        fields: ['name'],
+        storePath: ({ magazine, edition }, id) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, id],
+        signalPath: ({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, SIG_SNAPSHOTS],
+    }),
+    updateSnapshot: crudUpdate({
+        apiPath: ({ magazine, edition, id }) => `/magazines/${magazine}/editions/${edition}/paper_snapshots/${id}`,
+        storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, id],
+    }),
+    deleteSnapshot: crudDelete({
+        apiPath: ({ magazine, edition, id }) => `/magazines/${magazine}/editions/${edition}/paper_snapshots/${id}`,
+        storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, id],
+        signalPath: ({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, SIG_SNAPSHOTS],
+    }),
+    snapshotCodeholders: async ({ magazine, edition, id, compare }, { offset, limit }) => {
+        const client = await asyncClient;
+        const options = { offset, limit };
+        if (compare) options.compare = compare;
+        const res = await client.get(`/magazines/${magazine}/editions/${edition}/paper_snapshots/${id}/codeholders`, options);
+
+        const codeholders = {};
+
+        if (res.body.length) {
+            const options = {
+                filter: { id: { $in: res.body } },
+                offset: 0,
+                limit: res.body.length,
+                fields: [],
+            };
+            const chFields = [
+                'id',
+                'codeholderType',
+                'oldCode', 'newCode',
+                'firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific',
+                'fullName', 'fullNameLocal', 'nameAbbrev',
+                'address.country',
+                'address.countryArea',
+                'address.city',
+                'address.cityArea',
+                'address.streetAddress',
+                'address.postalCode',
+                'address.sortingCode',
+                'addressLatin.country',
+                'addressLatin.countryArea',
+                'addressLatin.city',
+                'addressLatin.cityArea',
+                'addressLatin.streetAddress',
+                'addressLatin.postalCode',
+                'addressLatin.sortingCode',
+            ];
+            for (const f of chFields) {
+                if (await client.hasCodeholderField(f, 'r')) {
+                    options.fields.push(f);
+                }
+            }
+            const res2 = await client.get(`/codeholders`, options);
+            for (const item of res2.body) codeholders[item.id] = codeholderFromAPI(item);
+
+            const res3 = await client.get(`/codeholders/${res.body.join(',')}/address/eo`);
+            for (const id in res3.body) {
+                codeholders[id].formattedAddress = res3.body[id];
+            }
+        }
+
+        return {
+            items: res.body.map(id => codeholders[id]),
+            total: +res.res.headers.get('x-total-items'),
+        };
+    },
+
     listSubscriptions: crudList({
         apiPath: ({ magazine }) => `/magazines/${magazine}/subscriptions`,
         fields: ['id', 'year', 'codeholderId', 'createdTime', 'internalNotes', 'paperVersion'],
@@ -313,6 +401,11 @@ export const views = {
         storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, id, RECITATIONS],
         get: tasks.tocRecitations,
     }),
+    snapshot: simpleDataView({
+        storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, id],
+        get: tasks.snapshot,
+    }),
+    sigSnapshots: createStoreObserver(({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, SIG_SNAPSHOTS]),
     subscription: simpleDataView({
         storePath: ({ magazine, rawId, id }) => [SUBSCRIPTIONS, magazine ? makeSubId({ magazineId: magazine, rawId }) : id],
         get: tasks.subscription,

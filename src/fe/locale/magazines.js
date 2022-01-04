@@ -218,3 +218,34 @@ export const magazineSubs = {
     },
     buttonLabel: count => count ? `${count} simpla${count === 1 ? '' : 'j'} abono${count === 1 ? '' : 'j'}` : `Simplaj abonoj`,
 };
+
+export const magazineSnaps = {
+    title: '[[Snapshots]]',
+    detailTitle: '[[Snapshot]]',
+    fields: {
+        time: '[[Time]]',
+        name: '[[Name]]',
+    },
+    codeholders: {
+        compare: '[[Compare to another snapshot]]',
+        comparing: '[[Showing only codeholders that werent in the other snapshot]]',
+        empty: '[[No codeholders in this snapshot]]',
+        compareEmpty: '[[No new codeholders in this snapshot compared to the other snapshot]]',
+    },
+    create: {
+        title: 'Krei [[asdf]]',
+        button: 'Krei',
+        menuItem: 'Krei [[asdf]]',
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti [[asdf]]',
+        button: 'Aktualigi',
+    },
+    delete: {
+        menuItem: 'Forigi',
+        title: 'Forigi [[asdf]]',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi [[sadf]]? Ne eblas malfari tiun ĉi agon.',
+    },
+};

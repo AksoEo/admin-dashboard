@@ -34,6 +34,8 @@ export default class ItemPicker extends PureComponent {
         onChange,
         task,
         view,
+        options,
+        viewOptions,
         filter,
         fields,
         locale,
@@ -61,6 +63,8 @@ export default class ItemPicker extends PureComponent {
                     onClose={onClose}
                     task={task}
                     view={view}
+                    options={options}
+                    viewOptions={viewOptions}
                     searchDef={search}
                     extraListOptions={extraListOptions}
                     fields={fields}
@@ -80,6 +84,8 @@ function DialogInner ({
     filter,
     task,
     view,
+    options,
+    viewOptions,
     extraListOptions,
     searchDef,
     sorting,
@@ -122,6 +128,9 @@ function DialogInner ({
                 compact
                 task={task}
                 view={view}
+                options={options}
+                viewOptions={viewOptions}
+                useDeepCmp
                 {...extraListOptions}
                 search={searchDef ? { field: searchDef.field, query: search } : null}
                 jsonFilter={filter}

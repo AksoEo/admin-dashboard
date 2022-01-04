@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Fragment } from 'preact/compat';
+import { Fragment, useState } from 'preact/compat';
 import { Checkbox } from 'yamdl';
 import { magazines as locale } from '../../../locale';
 import { IsoDuration, IsoDurationEditor } from '../../../components/data/timespan';
@@ -119,7 +119,7 @@ function MagazinePermsMembers ({ value, editing, onChange }) {
     if (!editing) {
         if (value === true) return locale.subscribers.membersAll;
         if (value === false) return locale.subscribers.membersNone;
-        return <MagazinePermsFilterControl valeu={value} />;
+        return <MagazinePermsFilterControl value={value} />;
     }
 
     const selected = value === true ? 'true' : value === false ? 'false' : 'filter';
@@ -191,6 +191,8 @@ function MagazinePermsFilter ({ value, editing, onChange }) {
 }
 
 function MagazinePermsFilterControl ({ value, editing, onChange }) {
+    const [source, setSource] = useState(null);
+
     // FIXME: maaaaybe don't use the filter editor, since that has extra templating stuff
     return (
         <div class="filter-control">
@@ -202,10 +204,11 @@ function MagazinePermsFilterControl ({ value, editing, onChange }) {
             <JSONFilterEditor
                 class="perms-filter"
                 expanded={editing}
-                value={{ filter: value }}
+                value={{ filter: value, source: editing ? source : null }}
                 disabled={!editing}
                 onChange={value => {
                     if (!editing) return;
+                    setSource(value?.source || null);
                     onChange(value?.filter || null);
                 }} />
         </div>

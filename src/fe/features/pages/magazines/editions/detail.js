@@ -8,7 +8,7 @@ import DetailShell from '../../../../components/detail/detail-shell';
 import DetailFields from '../../../../components/detail/detail-fields';
 import { DocumentIcon } from '../../../../components/icons';
 import { connect } from '../../../../core/connection';
-import { magazineEditions as locale, magazineToc as tocLocale } from '../../../../locale';
+import { magazineEditions as locale, magazineToc as tocLocale, magazineSnaps as snapLocale } from '../../../../locale';
 import { Files } from './files';
 import { FIELDS } from './fields';
 import TocView from './toc';
@@ -41,6 +41,12 @@ export default class MagazineEdition extends DetailPage {
     renderActions ({ perms }, { org }) {
         const { magazine, id } = this;
         const actions = [];
+
+        actions.push({
+            label: snapLocale.title,
+            action: () => this.props.push('momentaj-abonantoj'),
+            overflow: true,
+        });
 
         if (perms.hasPerm(`magazines.update.${org}`)) {
             actions.push({

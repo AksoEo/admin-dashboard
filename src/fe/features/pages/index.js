@@ -169,6 +169,28 @@ export default [
                                                     },
                                                 ],
                                             },
+                                            {
+                                                path: 'momentaj-abonantoj',
+                                                type: 'stack',
+                                                component: elazy(() =>
+                                                    import(/* webpackChunkName: "magazines-snapshots" */ './magazines/editions/snapshots/index')),
+                                                paths: [
+                                                    {
+                                                        match: /^(\w+)$/,
+                                                        matchKey: 'snapshot',
+                                                        type: 'stack',
+                                                        component: elazy(() =>
+                                                            import(/* webpackChunkName: "magazines-snapshots" */ './magazines/editions/snapshots/detail')),
+                                                        paths: [
+                                                            {
+                                                                path: 'redakti',
+                                                                type: 'state',
+                                                                state: 'editing',
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
                                         ],
                                     },
                                 ],

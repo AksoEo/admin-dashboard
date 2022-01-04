@@ -328,7 +328,7 @@ export default {
             const countryArea = showCountryArea ? value.countryAreaLatin : '';
             const showCountry = !selectedFields.includes('country');
             const country = showCountry
-                ? (<WithCountries>{countries => countries[value.country]}</WithCountries>)
+                ? (<WithCountries>{countries => countries[value.country]?.name_eo}</WithCountries>)
                 : '';
 
             const addressPseudolines = [
