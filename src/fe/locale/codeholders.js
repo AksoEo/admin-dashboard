@@ -118,6 +118,7 @@ export const codeholders = {
         ageFormat: (age, agep, dead) => `${age}` + (dead ? '' : ` (${agep} jarkomence)`),
         email: 'Retpoŝtadreso',
         address: 'Adreso',
+        addressLatin: '[[addressLatin]]',
         addressCity: 'Urbo',
         addressCountryArea: 'Regiono',
         codeholderDisabledTitle: 'malŝaltita',

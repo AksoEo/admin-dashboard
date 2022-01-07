@@ -248,4 +248,5 @@ export const magazineSnaps = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi [[sadf]]? Ne eblas malfari tiun ĉi agon.',
     },
+    csvFilename: '[[snapshot]]',
 };

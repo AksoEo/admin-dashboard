@@ -13,11 +13,17 @@ import { ueaCode, date, email, timestamp, phoneNumber } from '../../../component
 import { WithCountries, CountryFlag } from '../../../components/data/country';
 import './table-fields.less';
 
-function getCountries (core) {
+function getCountries (core, locale = 'eo') {
     return new Promise((resolve, reject) => {
-        const dv = core.createDataView('countries/countries');
+        const dv = core.createDataView('countries/countries', { locales: [locale] });
         dv.on('update', data => {
             if (data !== null) {
+                for (const k in data) {
+                    if (!(`name_${locale}` in data[k])) {
+                        return; // not ready yet
+                    }
+                    break;
+                }
                 dv.drop();
                 resolve(data);
             }
@@ -349,19 +355,32 @@ export default {
             );
         },
         stringify: async (value = {}, item, fields, options, core) => {
-            const streetAddress = (value.streetAddressLatin || '').split('\n');
+            let addr = {};
+            if (options.useNative) {
+                for (const k in value) {
+                    if (k.endsWith('Latin')) {
+                        addr[k.substr(0, k.length - 5)] = value[k];
+                    }
+                }
+            } else {
+                addr = value;
+            }
+
+            const countryLocale = options.countryLocale || 'eo';
+
+            const streetAddress = (addr.streetAddress || '').split('\n');
             const showCity = !fields.includes('addressCity');
             const showCountryArea = !fields.includes('addressCountryArea');
-            const city = showCity ? value.cityLatin : '';
-            const countryArea = showCountryArea ? value.countryAreaLatin : '';
+            const city = showCity ? value.city : '';
+            const countryArea = showCountryArea ? value.countryArea : '';
             const showCountry = !fields.includes('country');
-            const countries = await getCountries(core);
-            const country = showCountry ? countries[value.country] : '';
+            const countries = await getCountries(core, countryLocale);
+            const country = (showCountry && countries[value.country]) ? countries[value.country]['name_' + countryLocale] : '';
 
             const addressPseudolines = [
                 ...streetAddress,
                 [
-                    [value.postalCodeLatin, value.cityAreaLatin].filter(x => x).join(' '),
+                    [value.postalCode, value.cityArea].filter(x => x).join(' '),
                     city,
                 ].filter(x => x).join(', '),
                 countryArea,

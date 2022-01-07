@@ -4,8 +4,42 @@ import EditIcon from '@material-ui/icons/Edit';
 import DetailPage from '../../../../../components/detail/detail-page';
 import DetailView from '../../../../../components/detail/detail';
 import DetailShell from '../../../../../components/detail/detail-shell';
+import CSVExport from '../../../../../components/tasks/csv-export';
 import { FIELDS, Footer } from './fields';
-import { magazineSnaps as locale } from '../../../../../locale';
+import ORIG_CODEHOLDER_FIELDS from '../../../codeholders/table-fields';
+import {
+    search as searchLocale,
+    magazineSnaps as locale,
+    codeholders as codeholderLocale,
+} from '../../../../../locale';
+
+const CODEHOLDER_FIELDS = {
+    ...ORIG_CODEHOLDER_FIELDS,
+    address: {
+        stringify (value, item, fields, options, core) {
+            return ORIG_CODEHOLDER_FIELDS.address.stringify(value, item, fields, {
+                ...options,
+                useNative: true,
+            }, core);
+        },
+    },
+    addressLatin: {
+        stringify (value, item, ...etc) {
+            const addr = {};
+            for (const k in item.address) {
+                if (k.endsWith('Latin')) {
+                    addr[k.substr(0, k.length - 5)] = item.address[k];
+                }
+            }
+            return ORIG_CODEHOLDER_FIELDS.address.stringify(addr, item, ...etc);
+        },
+    },
+    formattedAddress: {
+        stringify (value) {
+            return value;
+        },
+    },
+};
 
 export default class Snapshot extends DetailPage {
     state = {
@@ -46,6 +80,12 @@ export default class Snapshot extends DetailPage {
             });
         }
 
+        actions.push({
+            label: searchLocale.csvExport,
+            action: () => this.setState({ csvExportOpen: true }),
+            overflow: true,
+        });
+
         if (perms.hasPerm(`magazines.snapshots.delete.${this.state.org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
@@ -84,6 +124,38 @@ export default class Snapshot extends DetailPage {
                     id={this.magazine}
                     fields={{}} locale={{}}
                     onData={data => data && this.setState({ org: data.org })} />
+
+                <CSVExport
+                    open={this.state.csvExportOpen}
+                    task="magazines/snapshotCodeholders"
+                    options={{ magazine: this.magazine, edition: this.edition, id: this.id }}
+                    parameters={({ countryLocale }) => ({
+                        fields: [
+                            'name',
+                            'code',
+                            'address',
+                            'addressLatin',
+                            'formattedAddress',
+                        ].map(id => ({ id })),
+                        countryLocale,
+                    })}
+                    onClose={() => this.setState({ csvExportOpen: false })}
+                    fields={CODEHOLDER_FIELDS}
+                    locale={{
+                        fields: {
+                            ...codeholderLocale.fields,
+                            formattedAddress: codeholderLocale.postalAddress,
+                        },
+                    }}
+                    filenamePrefix={locale.csvFilename}
+                    userOptions={{
+                        countryLocale: {
+                            name: codeholderLocale.csvOptions.countryLocale,
+                            type: 'select',
+                            options: Object.entries(codeholderLocale.csvOptions.countryLocales),
+                            default: 'eo',
+                        },
+                    }} />
             </Fragment>
         );
     }

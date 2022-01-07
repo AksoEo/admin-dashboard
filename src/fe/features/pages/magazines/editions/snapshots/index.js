@@ -19,6 +19,7 @@ export default class SnapshotsPage extends OverviewPage {
             limit: 10,
         },
         org: null,
+        csvExportOpen: false,
     };
 
     locale = locale;
@@ -77,3 +78,4 @@ export default class SnapshotsPage extends OverviewPage {
         );
     }
 }
+

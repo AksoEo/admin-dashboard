@@ -11,7 +11,9 @@ export const COUNTRIES = 'countries';
 export const COUNTRIES_LIST = [COUNTRIES, 'countries'];
 export const COUNTRY_GROUPS_LIST = [COUNTRIES, 'countryGroups'];
 export const COUNTRY_GROUPS_TOTAL = [COUNTRIES, 'countryGroupsCount'];
+export const COUNTRY_GROUPS_LOCK = [COUNTRIES, 'countryGroupsLock'];
 export const CACHED_LOCALES = [COUNTRIES, 'cachedLocales'];
+export const LOCKED_LOCALES = [COUNTRIES, 'lockedLocales'];
 
 store.subscribe([COUNTRIES], () => {}); // prevent GC
 
@@ -25,7 +27,11 @@ export const COUNTRY_LANGS = [
 /// Loads all countries
 async function loadCountries (locale) {
     if (!store.get(CACHED_LOCALES)) store.insert(CACHED_LOCALES, []);
+    if (!store.get(LOCKED_LOCALES)) store.insert(LOCKED_LOCALES, []);
     if (store.get(CACHED_LOCALES).includes(locale)) return;
+
+    if (store.get(LOCKED_LOCALES).includes(locale)) return;
+    store.insert(LOCKED_LOCALES, store.get(LOCKED_LOCALES).concat([locale]));
 
     const client = await asyncClient;
     const res = await client.get('/countries', {
@@ -39,11 +45,15 @@ async function loadCountries (locale) {
         store.insert(path, deepMerge(store.get(path), item));
     }
 
+    store.insert(LOCKED_LOCALES, store.get(LOCKED_LOCALES).splice(store.get(LOCKED_LOCALES).indexOf(locale), 1));
     store.insert(CACHED_LOCALES, store.get(CACHED_LOCALES).concat([locale]));
 }
 
 /// Loads all country groups
 async function loadAllCountryGroups () {
+    if (store.get(COUNTRY_GROUPS_LOCK)) return;
+    store.insert(COUNTRY_GROUPS_LOCK, true);
+
     // check if we already have all of them
     if (Object.keys(store.get(COUNTRY_GROUPS_LIST) || {}).length >= store.get(COUNTRY_GROUPS_TOTAL)) return;
 
@@ -76,6 +86,7 @@ async function loadAllCountryGroups () {
     }
 
     store.insert(COUNTRY_GROUPS_TOTAL, total);
+    store.insert(COUNTRY_GROUPS_LOCK, false);
 }
 
 export const tasks = {

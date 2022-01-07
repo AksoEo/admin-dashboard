@@ -19,7 +19,7 @@ const LIMIT = 100;
 /// - task: task name
 /// - options: current task options
 /// - parameters: current task parameters. Is expected to confirm
-/// - detailView: view name
+/// - detailView: view name. If not given, will assume the task already contains item data
 /// - detailViewOptions: id => options
 /// - filenamePrefix: file name prefix for the csv
 /// - locale: object like { fields: { ... } }
@@ -71,7 +71,9 @@ export default class CSVExport extends PureComponent {
 
     loadOne () {
         const { task, options } = this.props;
-        const parameters = { ...this.props.parameters };
+        const parameters = typeof this.props.parameters === 'function'
+            ? this.props.parameters(this.state.options)
+            : { ...this.props.parameters };
         parameters.offset = this.state.page * LIMIT;
         parameters.limit = LIMIT;
         this.context.createTask(task, options || {}, parameters).runOnceAndDrop().then(res => {
@@ -103,11 +105,14 @@ export default class CSVExport extends PureComponent {
 
     /// Compiles selected fields
     compileFields () {
+        const parameters = typeof this.props.parameters === 'function'
+            ? this.props.parameters(this.state.options)
+            : this.props.parameters;
+
         if (this.props.compileFields) {
-            return this.props.compileFields(this.props.parameters, this.state.transientFields);
+            return this.props.compileFields(parameters, this.state.transientFields);
         }
 
-        const { parameters } = this.props;
         const compiledFields = [];
         // first, push fixed fields
         for (const field of parameters.fields) if (field.fixed) compiledFields.push(field.id);
@@ -180,23 +185,28 @@ export default class CSVExport extends PureComponent {
                 rowCount++;
                 const data = [];
 
-                const itemData = await new Promise((resolve, reject) => {
-                    // get data from the appropriate detail data view
-                    const dv = this.context.createDataView(
-                        this.props.detailView,
-                        this.props.detailViewOptions(itemId)
-                    );
-                    dv.on('update', data => {
-                        if (data !== null) {
+                let itemData;
+                if (this.props.detailView) {
+                    itemData = await new Promise((resolve, reject) => {
+                        // get data from the appropriate detail data view
+                        const dv = this.context.createDataView(
+                            this.props.detailView,
+                            this.props.detailViewOptions(itemId)
+                        );
+                        dv.on('update', data => {
+                            if (data !== null) {
+                                dv.drop();
+                                resolve(data);
+                            }
+                        });
+                        dv.on('error', () => {
                             dv.drop();
-                            resolve(data);
-                        }
+                            reject();
+                        });
                     });
-                    dv.on('error', () => {
-                        dv.drop();
-                        reject();
-                    });
-                });
+                } else {
+                    itemData = itemId;
+                }
 
                 for (const id of compiledFields) {
                     const stringifyField = this.getFieldStringifier(id);
