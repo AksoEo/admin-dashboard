@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { Checkbox } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
+import moment from 'moment';
 import LimitedTextField from '../../../../components/controls/limited-text-field';
 import MdField from '../../../../components/controls/md-field';
 import { date } from '../../../../components/data';
@@ -31,7 +32,7 @@ export const FIELDS = {
         sortable: true,
         slot: 'titleAlt',
         weight: 1.2,
-        component ({ value, editing, onChange, slot }) {
+        component ({ value, editing, onChange, slot, item, userData }) {
             if (editing) {
                 return <date.editor
                     class="magazine-edition-field-id-human"
@@ -40,6 +41,40 @@ export const FIELDS = {
                     value={value}
                     onChange={onChange} />;
             }
+
+            if (slot === 'detail' && item.published && userData?.magazineSubscribers) {
+                const subscribers = item.subscribers || userData.magazineSubscribers;
+                const durPaper = subscribers.paper?.freelyAvailableAfter || null;
+                const durAccess = subscribers.access?.freelyAvailableAfter || null;
+
+                const expPaper = durPaper ? moment(value).add(moment.duration(durPaper, moment.ISO_8601)) : null;
+                const expAccess = durAccess ? moment(value).add(moment.duration(durAccess, moment.ISO_8601)) : null;
+
+                if (expPaper || expAccess) {
+                    return (
+                        <div class="magazine-edition-date">
+                            <date.renderer value={value} />
+                            <div class="expiry-dates">
+                                {expAccess ? (
+                                    <div class="expiry-date">
+                                        {locale.fields.dateFreelyAvailable.access}
+                                        {' '}
+                                        <date.renderer value={+expAccess} />
+                                    </div>
+                                ) : null}
+                                {expPaper ? (
+                                    <div class="expiry-date">
+                                        {locale.fields.dateFreelyAvailable.paper}
+                                        {' '}
+                                        <date.renderer value={+expPaper} />
+                                    </div>
+                                ) : null}
+                            </div>
+                        </div>
+                    );
+                }
+            }
+
             return <date.renderer value={value} />;
         },
     },
