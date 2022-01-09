@@ -141,7 +141,7 @@ const boundedNumber = (min, max, step, unit) => ({ value, onChange }) => {
         <TextField
             type="number"
             class={unit === 'mm' ? 'is-mm' : ''}
-            step={null}
+            step={step}
             trailing={unit}
             min={min}
             max={max}
@@ -185,7 +185,7 @@ const ptToIn = pt => pt / 72;
 const ptFromIn = i => i * 72;
 const ptToMm = pt => ptToIn(pt) * 25.4;
 const ptFromMm = mm => ptFromIn(mm / 25.4);
-const U16MmEditorRaw = boundedNumber(ptToMm(0), ptToMm(65535), 1e-15, 'mm');
+const U16MmEditorRaw = boundedNumber(ptToMm(0), ptToMm(65535), 0.1, 'mm');
 
 function U16PtEditor ({ value, onChange, view }) {
     if (view.unit === 'pt') return <U16PtEditorRaw value={Math.round(value)} onChange={onChange} />;
@@ -489,6 +489,7 @@ class AddrLabelStats extends PureComponent {
     state = {
         withAddresses: null,
         total: null,
+        actualTotal: null,
     };
 
     static contextType = coreContext;
@@ -508,7 +509,36 @@ class AddrLabelStats extends PureComponent {
         options.offset = 0;
         options.limit = 1;
 
-        this.context.createTask('codeholders/list', {}, options).runOnceAndDrop().then(({ total }) => {
+        let promise;
+        let maxTotal = Infinity;
+        if (options.snapshot) {
+            promise = this.context.createTask('magazines/snapshotCodeholders', {
+                magazine: options.snapshot.magazine,
+                edition: options.snapshot.edition,
+                id: options.snapshot.id,
+                compare: options.snapshotCompare,
+                idsOnly: true,
+            }).runOnceAndDrop().then(({ total, items }) => {
+                this.setState({ actualTotal: total });
+
+                options.jsonFilter = {
+                    filter: {
+                        $and: [
+                            options.jsonFilter.filter,
+                            { id: { $in: items } },
+                        ],
+                    },
+                };
+
+                maxTotal = total;
+            });
+        } else {
+            promise = Promise.resolve();
+        }
+
+        promise.then(() => {
+            return this.context.createTask('codeholders/list', {}, options).runOnceAndDrop();
+        }).then(({ total }) => {
             this.setState({ withAddresses: total });
         }).then(() => {
             const options = { ...this.props.options };
@@ -516,6 +546,7 @@ class AddrLabelStats extends PureComponent {
             options.limit = 1;
             return this.context.createTask('codeholders/list', {}, options).runOnceAndDrop();
         }).then(({ total }) => {
+            total = Math.min(maxTotal, total);
             this.setState({ total });
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
@@ -545,6 +576,15 @@ class AddrLabelStats extends PureComponent {
                     perPage: value.rows * value.cols,
                     pages: Math.ceil(withAddresses / (value.rows * value.cols)),
                 })}
+                {(this.state.total < this.state.actualTotal) ? (
+                    <div>
+                        <br />
+                        {locale.addrLabelGen.statsFiltered({
+                            filtered: this.state.total,
+                            total: this.state.actualTotal,
+                        })}
+                    </div>
+                ) : null}
             </div>
         );
     }

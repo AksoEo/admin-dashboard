@@ -231,6 +231,7 @@ export const magazineSnaps = {
         comparing: '[[Showing only codeholders that werent in the other snapshot]]',
         empty: '[[No codeholders in this snapshot]]',
         compareEmpty: '[[No new codeholders in this snapshot compared to the other snapshot]]',
+        missingData: id => `[[You do not have permission to view codeholder id=${id}]]`,
     },
     create: {
         title: 'Krei [[asdf]]',

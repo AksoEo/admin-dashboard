@@ -39,7 +39,7 @@ export function Footer ({ editing, userData }) {
 
     const core = useContext(coreContext);
     const [comparing, setComparing] = useState(false);
-    const [compare, setCompare] = useState(null);
+    const { compare, setCompare } = userData;
     const dataList = useRef(null);
 
     useEffect(() => {
@@ -149,6 +149,17 @@ const SnapshotItem = connect(({ magazine, edition, id }) => ['magazines/snapshot
 
 const SNAPSHOT_FIELDS = ['code', 'name', 'address'];
 function CodeholderItem ({ codeholder }) {
+    if (typeof codeholder !== 'object') {
+        // this means the codeholder couldn't be found.
+        // this is probably because the user doesn't have permission
+
+        return (
+            <div class="snapshot-codeholder is-missing">
+                {locale.codeholders.missingData(codeholder)}
+            </div>
+        );
+    }
+
     return (
         <div class="snapshot-codeholder">
             {SNAPSHOT_FIELDS.map(id => {

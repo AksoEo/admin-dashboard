@@ -14,7 +14,8 @@ export default function AMap ({
     markers,
     ...extra
 }) {
-    extra.class = (extra.class || '') + ' a-map-container';
+    extra.className = (extra.class || '') + ' a-map-container';
+    extra.class = null;
     return (
         <MapContainer {...extra}>
             <TileLayer

@@ -7,6 +7,7 @@ import DetailShell from '../../../../../components/detail/detail-shell';
 import CSVExport from '../../../../../components/tasks/csv-export';
 import { FIELDS, Footer } from './fields';
 import ORIG_CODEHOLDER_FIELDS from '../../../codeholders/table-fields';
+import AddrLabelGen from '../../../codeholders/addr-label-gen';
 import {
     search as searchLocale,
     magazineSnaps as locale,
@@ -44,6 +45,8 @@ const CODEHOLDER_FIELDS = {
 export default class Snapshot extends DetailPage {
     state = {
         org: null,
+        labelGenOptions: null,
+        snapshotCompare: null,
     };
 
     locale = locale;
@@ -86,6 +89,17 @@ export default class Snapshot extends DetailPage {
             overflow: true,
         });
 
+        actions.push({
+            label: codeholderLocale.addrLabelGen.menuItem,
+            action: () => this.setState({
+                labelGenOptions: {
+                    snapshot: { magazine: this.magazine, edition: this.edition, id: this.id },
+                    snapshotCompare: this.state.snapshotCompare,
+                },
+            }),
+            overflow: true,
+        });
+
         if (perms.hasPerm(`magazines.snapshots.delete.${this.state.org}`)) {
             actions.push({
                 label: locale.delete.menuItem,
@@ -110,7 +124,13 @@ export default class Snapshot extends DetailPage {
                     id={this.id}
                     fields={FIELDS}
                     footer={Footer}
-                    userData={{ magazine: this.magazine, edition: this.edition, id: this.id }}
+                    userData={{
+                        magazine: this.magazine,
+                        edition: this.edition,
+                        id: this.id,
+                        compare: this.state.snapshotCompare,
+                        setCompare: c => this.setState({ snapshotCompare: c }),
+                    }}
                     locale={locale}
                     edit={edit}
                     onEditChange={edit => this.setState({ edit })}
@@ -156,6 +176,11 @@ export default class Snapshot extends DetailPage {
                             default: 'eo',
                         },
                     }} />
+
+                <AddrLabelGen
+                    open={!!this.state.labelGenOptions}
+                    options={this.state.labelGenOptions}
+                    onClose={() => this.setState({ labelGenOptions: null })} />
             </Fragment>
         );
     }

@@ -272,11 +272,18 @@ export const tasks = {
         storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, id],
         signalPath: ({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, SIG_SNAPSHOTS],
     }),
-    snapshotCodeholders: async ({ magazine, edition, id, compare }, { offset, limit, countryLocale }) => {
+    snapshotCodeholders: async ({ magazine, edition, id, compare, idsOnly }, { offset, limit, countryLocale }) => {
         const client = await asyncClient;
         const options = { offset, limit };
         if (compare) options.compare = compare;
         const res = await client.get(`/magazines/${magazine}/editions/${edition}/paper_snapshots/${id}/codeholders`, options);
+
+        if (idsOnly) {
+            return {
+                items: res.body,
+                total: +res.res.headers.get('x-total-items'),
+            };
+        }
 
         const codeholders = {};
 
@@ -323,7 +330,7 @@ export const tasks = {
         }
 
         return {
-            items: res.body.map(id => codeholders[id]),
+            items: res.body.map(id => codeholders[id] || id),
             total: +res.res.headers.get('x-total-items'),
         };
     },
