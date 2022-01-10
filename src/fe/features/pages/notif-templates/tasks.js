@@ -36,18 +36,41 @@ export default {
             task.update({ org: createTejo ? 'tejo' : 'uea' });
         }
 
+        if (!task.parameters.base) {
+            // default value
+            task.update({
+                base: 'inherit',
+                modules: [{
+                    type: 'text',
+                    columns: null,
+                    button: null,
+                }],
+            });
+        }
+
         fields.push(
             <Field class="base-field" key="base">
                 <Segmented
                     selected={task.parameters.base}
                     onSelect={base => {
                         task.update({ base });
-                        if (base === 'raw') task.update({ html: '', text: '', modules: undefined });
-                        else if (base === 'inherit') task.update({ modules: [{
-                            type: 'text',
-                            columns: null,
-                            button: null,
-                        }], html: undefined, text: undefined });
+                        if (base === 'raw') {
+                            task.update({
+                                html: locale.raw.defaultHtml,
+                                text: locale.raw.defaultText,
+                                modules: undefined,
+                            });
+                        } else if (base === 'inherit') {
+                            task.update({
+                                modules: [{
+                                    type: 'text',
+                                    columns: null,
+                                    button: null,
+                                }],
+                                html: undefined,
+                                text: undefined,
+                            });
+                        }
                     }}>
                     {[
                         { id: 'raw', label: locale.bases.raw },

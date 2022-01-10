@@ -22,6 +22,8 @@ export const notifTemplates = {
         html: 'HTML',
         text: 'Teksto',
         modules: 'Moduloj',
+
+        replyToPlaceholder: '[[Same as sender]]',
     },
     bases: {
         raw: 'Kruda',
@@ -31,6 +33,9 @@ export const notifTemplates = {
         noHtmlVersion: 'Mankas HTML-mesaĝo',
         noTextVersion: 'Mankas teksta mesaĝo',
         unknownVar: v => `Nekonata variablo “${v}”`,
+
+        defaultHtml: '[[<p>This is the default value when you create a template</p>]]',
+        defaultText: '[[This is the default value when you create a template]]',
     },
     modules: {
         textButton: 'Butono',

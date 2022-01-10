@@ -140,6 +140,7 @@ export const FIELDS = {
         component ({ value, editing, onChange, item }) {
             if (editing) {
                 return <DomainEmailEditor
+                    placeholder={locale.fields.replyToPlaceholder}
                     value={value}
                     onChange={onChange}
                     org={item.org} />;
@@ -250,7 +251,7 @@ const DomainEmailEditor = connect('notifTemplates/emailDomains')(domains => ({
         this.setState({ domain }, () => this.postState());
     };
 
-    render ({ domains, org }, { address, domain }) {
+    render ({ domains, org, placeholder }, { address, domain }) {
         const domainOptions = [];
         if (domains && domains[org]) {
             for (const domain of domains[org]) {
@@ -266,6 +267,7 @@ const DomainEmailEditor = connect('notifTemplates/emailDomains')(domains => ({
                 <input
                     class="domain-email-editor-address"
                     value={address}
+                    placeholder={placeholder}
                     onKeyDown={this.onAddressKeyDown}
                     onChange={this.onAddressChange} />
                 <span class="domain-email-editor-at-sign">@</span>
