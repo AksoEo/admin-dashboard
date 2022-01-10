@@ -55,12 +55,17 @@ export default connectPerms(class IntentPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('payments/updateIntent', {
-            id: this.getId(),
-            _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
+        return new Promise(resolve => {
+            this.#commitTask = this.context.createTask('payments/updateIntent', {
+                id: this.getId(),
+                _changedFields: changedFields,
+            }, this.state.edit);
+            this.#commitTask.on('success', this.onEndEdit);
+            this.#commitTask.on('drop', () => {
+                this.#commitTask = null;
+                resolve();
+            });
+        });
     };
 
     componentWillUnmount () {

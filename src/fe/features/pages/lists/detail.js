@@ -34,12 +34,17 @@ export default connectPerms(class ListDetailPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('lists/update', {
-            id: this.props.match[1],
-            _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
+        return new Promise(resolve => {
+            this.#commitTask = this.context.createTask('lists/update', {
+                id: this.props.match[1],
+                _changedFields: changedFields,
+            }, this.state.edit);
+            this.#commitTask.on('success', this.onEndEdit);
+            this.#commitTask.on('drop', () => {
+                this.#commitTask = null;
+                resolve();
+            });
+        });
     };
     onEndEdit = () => {
         this.props.editing && this.props.editing.pop(true);

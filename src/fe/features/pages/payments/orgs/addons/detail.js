@@ -31,13 +31,18 @@ export default connectPerms(class AddonPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('payments/updateAddon', {
-            org: this.getOrg(),
-            id: this.getId(),
-            _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
+        return new Promise(resolve => {
+            this.#commitTask = this.context.createTask('payments/updateAddon', {
+                org: this.getOrg(),
+                id: this.getId(),
+                _changedFields: changedFields,
+            }, this.state.edit);
+            this.#commitTask.on('success', this.onEndEdit);
+            this.#commitTask.on('drop', () => {
+                this.#commitTask = null;
+                resolve();
+            });
+        });
     };
 
     componentWillUnmount () {

@@ -21,6 +21,7 @@ import './item-picker-dialog.less';
 /// - locale: field names
 /// - search: { field: string, placeholder: string } optional, to enable search
 /// - sorting: optional object { [field]: string }
+/// - emptyLabel: shown when no items exist
 /// - extraListOptions: additional props that will be passed to OverviewList
 /// - ...extra: additional props for the dialog
 export default class ItemPicker extends PureComponent {
@@ -36,6 +37,7 @@ export default class ItemPicker extends PureComponent {
         view,
         options,
         viewOptions,
+        emptyLabel,
         filter,
         fields,
         locale,
@@ -66,6 +68,7 @@ export default class ItemPicker extends PureComponent {
                     options={options}
                     viewOptions={viewOptions}
                     searchDef={search}
+                    emptyLabel={emptyLabel}
                     extraListOptions={extraListOptions}
                     fields={fields}
                     sorting={sorting}
@@ -86,6 +89,7 @@ function DialogInner ({
     view,
     options,
     viewOptions,
+    emptyLabel,
     extraListOptions,
     searchDef,
     sorting,
@@ -131,6 +135,7 @@ function DialogInner ({
                 options={options}
                 viewOptions={viewOptions}
                 useDeepCmp
+                emptyLabel={emptyLabel}
                 {...extraListOptions}
                 search={searchDef ? { field: searchDef.field, query: search } : null}
                 jsonFilter={filter}

@@ -14,11 +14,13 @@ export default function AMap ({
     markers,
     ...extra
 }) {
-    extra.class = (extra.class || '') + ' a-map-container';
+    extra.className = (extra.class || '') + ' a-map-container';
+    extra.class = null;
     return (
         <MapContainer {...extra}>
             <TileLayer
-                url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                // url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
                 attribution="&copy <a href=&quot;https://osm.org/copyright&quot;>OpenStreetMap</a> contributors" />
             {(markers || []).map((m, i) => <MarkerRenderer
                 {...m}

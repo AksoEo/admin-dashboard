@@ -29,12 +29,17 @@ export default connectPerms(class DelegationApplication extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('delegations/updateApplication', {
-            id: this.application,
-            _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
+        return new Promise(resolve => {
+            this.#commitTask = this.context.createTask('delegations/updateApplication', {
+                id: this.application,
+                _changedFields: changedFields,
+            }, this.state.edit);
+            this.#commitTask.on('success', this.onEndEdit);
+            this.#commitTask.on('drop', () => {
+                this.#commitTask = null;
+                resolve();
+            });
+        });
     };
 
     componentWillUnmount () {

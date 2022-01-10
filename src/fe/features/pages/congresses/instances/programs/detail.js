@@ -30,14 +30,19 @@ export default connectPerms(class ProgramPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('congresses/updateProgram', {
-            congress: this.congress,
-            instance: this.instance,
-            id: this.id,
-            _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
+        return new Promise(resolve => {
+            this.#commitTask = this.context.createTask('congresses/updateProgram', {
+                congress: this.congress,
+                instance: this.instance,
+                id: this.id,
+                _changedFields: changedFields,
+            }, this.state.edit);
+            this.#commitTask.on('success', this.onEndEdit);
+            this.#commitTask.on('drop', () => {
+                this.#commitTask = null;
+                resolve();
+            });
+        });
     };
     onEndEdit = () => {
         this.props.editing && this.props.editing.pop(true);

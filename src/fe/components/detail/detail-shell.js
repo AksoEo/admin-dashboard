@@ -100,7 +100,7 @@ export default class DetailShell extends PureComponent {
         if (this.state.committing) return;
         const changes = this.getChangedFields();
         this.setState({ committing: true }, () => {
-            this.props.onCommit(changes);
+            this.props.onCommit(changes).then(() => this.setState({ committing: false }));
         });
     }
 

@@ -31,9 +31,14 @@ export default class DetailPage extends Page {
             return;
         }
 
-        this.#commitTask = this.createCommitTask(changedFields, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
+        return new Promise(resolve => {
+            this.#commitTask = this.createCommitTask(changedFields, this.state.edit);
+            this.#commitTask.on('success', this.onEndEdit);
+            this.#commitTask.on('drop', () => {
+                this.#commitTask = null;
+                resolve();
+            });
+        });
     };
 
     onDelete = () => {

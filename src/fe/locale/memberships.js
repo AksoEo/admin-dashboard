@@ -133,6 +133,7 @@ export const membershipEntries = {
 
         yearSelectYear: 'Elekti jaron',
         yearSearchYear: 'Serĉi jaron',
+        yearSelectEmpty: '[[No registration configs available for this or following years]]',
         fishyIsOkay: 'Strangaj datumoj enordas',
 
         statusTypes: {

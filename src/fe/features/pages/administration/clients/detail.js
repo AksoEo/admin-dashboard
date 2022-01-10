@@ -31,12 +31,17 @@ export default connectPerms(class ClientDetailPage extends Page {
             return;
         }
 
-        this.#commitTask = this.context.createTask('clients/update', {
-            id: this.props.match[1],
-            _changedFields: changedFields,
-        }, this.state.edit);
-        this.#commitTask.on('success', this.onEndEdit);
-        this.#commitTask.on('drop', () => this.#commitTask = null);
+        return new Promise(resolve => {
+            this.#commitTask = this.context.createTask('clients/update', {
+                id: this.props.match[1],
+                _changedFields: changedFields,
+            }, this.state.edit);
+            this.#commitTask.on('success', this.onEndEdit);
+            this.#commitTask.on('drop', () => {
+                this.#commitTask = null;
+                resolve();
+            });
+        });
     };
 
     componentWillUnmount () {

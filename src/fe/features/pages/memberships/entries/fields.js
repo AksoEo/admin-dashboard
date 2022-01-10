@@ -79,6 +79,8 @@ export const FIELDS = {
                             task="memberships/listOptions"
                             view="memberships/options"
                             sorting={{ year: 'asc' }}
+                            filter={{ year: { $gte: new Date().getFullYear() } }}
+                            emptyLabel={locale.fields.yearSelectEmpty}
                             locale={{ year: locale.fields.year }}
                             fields={YEAR_PICKER_FIELDS} />
                     </Button>
