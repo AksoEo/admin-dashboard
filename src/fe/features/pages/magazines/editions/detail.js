@@ -17,6 +17,7 @@ import './detail.less';
 export default class MagazineEdition extends DetailPage {
     state = {
         org: null,
+        magazineSubscribers: null,
     };
 
     className = 'magazine-edition-page';
@@ -102,7 +103,8 @@ export default class MagazineEdition extends DetailPage {
                             data={data}
                             item={this.state.edit || data}
                             editing={editing}
-                            onItemChange={edit => this.setState({ edit })} />
+                            onItemChange={edit => this.setState({ edit })}
+                            magazineSubscribers={this.state.magazineSubscribers} />
                     )}
                 </DetailShell>
 
@@ -140,13 +142,13 @@ export default class MagazineEdition extends DetailPage {
                     view="magazines/magazine"
                     id={this.magazine}
                     fields={{}} locale={{}}
-                    onData={data => data && this.setState({ org: data.org })} />
+                    onData={data => data && this.setState({ org: data.org, magazineSubscribers: data.subscribers })} />
             </Fragment>
         );
     }
 }
 
-function DetailContents ({ magazine, id, data, item, editing, onItemChange }) {
+function DetailContents ({ magazine, id, data, item, editing, onItemChange, magazineSubscribers }) {
     return (
         <div class="edition-detail-contents">
             <div class="edition-header">
@@ -175,6 +177,7 @@ function DetailContents ({ magazine, id, data, item, editing, onItemChange }) {
                         onEditChange={onItemChange}
                         fields={FIELDS}
                         locale={locale}
+                        userData={{ magazineSubscribers }}
                         compact />
                 </div>
             </div>

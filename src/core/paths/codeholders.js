@@ -1060,12 +1060,21 @@ export const tasks = {
     ///
     /// # Parameters
     /// see api docs
-    makeAddressLabels: async ({ search, filters, jsonFilter, fields }, parameters) => {
+    makeAddressLabels: async ({ search, filters, jsonFilter, fields, snapshot, snapshotCompare }, parameters) => {
         const client = await asyncClient;
         const { options } = parametersToRequestData({ search, filters, jsonFilter, fields });
         delete options.fields;
+        delete options.order;
         delete options.offset;
         delete options.limit;
+
+        if (snapshot) {
+            delete options.search;
+            delete options.filter;
+
+            parameters.snapshot = +snapshot.id;
+            if (snapshotCompare) parameters.snapshotCompare = +snapshotCompare;
+        }
 
         const roundParams = (p) => {
             if (Array.isArray(p)) {
