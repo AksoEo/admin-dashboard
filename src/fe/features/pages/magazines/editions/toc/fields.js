@@ -29,16 +29,16 @@ export const FIELDS = {
         sortable: true,
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
-            if (editing) {
-                return <LimitedTextField
-                    outline
-                    value={value}
-                    label={slot === 'create' && locale.fields.title}
-                    maxLength={500}
-                    onChange={e => onChange(e.target.value)} />;
-            }
             if (slot === 'title') return <b>{value}</b>;
-            return value;
+            return <MdField
+                class={'magazine-toc-entry-title' + (!editing ? ' is-preview' : '')}
+                inline={slot !== 'detail'}
+                singleLine
+                editing={editing}
+                rules={['emphasis', 'strikethrough']}
+                value={value || ''}
+                maxLength={500}
+                onChange={value => onChange(value || null)} />;
         },
     },
     author: {
