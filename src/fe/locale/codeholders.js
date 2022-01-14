@@ -118,7 +118,7 @@ export const codeholders = {
         ageFormat: (age, agep, dead) => `${age}` + (dead ? '' : ` (${agep} jarkomence)`),
         email: 'Retpoŝtadreso',
         address: 'Adreso',
-        addressLatin: '[[addressLatin]]',
+        addressLatin: 'Adreso latinigita',
         addressCity: 'Urbo',
         addressCountryArea: 'Regiono',
         codeholderDisabledTitle: 'malŝaltita',
@@ -434,12 +434,12 @@ export const codeholders = {
         success: 'Sciigo sendita',
     },
     resetTotp: {
-        menuItem: '[[Reset TOTP]]',
-        title: '[[Reset TOTP]]',
-        description: '[[This will reset their TOTP code.]]',
-        button: '[[Reset]]',
-        success: '[[Reset successfully.]]',
-        none: '[[This codeholder does not have TOTP set up.]]',
+        menuItem: 'Nuligu 2FA',
+        title: 'Nuligo de 2-a faktora aŭtentiko',
+        description: 'Farante tion ĉi, vi nuligas la agordojn de 2-a faktora aŭtentiko de la uzanto. Faru tion ĉi nur se vi certas, ke la posedanto de la konto ne plu povas ensaluti. Certiĝu, ke ne temas pri alia maliculo.',
+        button: 'Nuligu',
+        success: 'Sukcese nuligis la agordojn pri 2-a faktora aŭtentiko.',
+        none: 'Tiu ĉi konto ne havas agorditan 2FA.',
     },
 };
 
@@ -454,7 +454,7 @@ export const codeholderChgReqs = {
         },
         filters: {
             status: 'Stato',
-            statusesEmpty: '[[Any status]]',
+            statusesEmpty: 'Ajna stato',
         },
     },
     fields: {

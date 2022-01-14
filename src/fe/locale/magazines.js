@@ -15,8 +15,8 @@ export const magazines = {
         org: 'Organizo',
         name: 'Nomo',
         description: 'Priskribo',
-        issn: '[[ISSN]]',
-        subscribers: '[[Subscribers]]',
+        issn: 'ISSN-numero',
+        subscribers: 'Abonantoj',
     },
     create: {
         title: 'Krei revuon',
@@ -38,32 +38,32 @@ export const magazines = {
     },
 
     subscribers: {
-        access: '[[Online access]]',
-        paper: '[[Real life actual magazine real access]]',
+        access: 'Retaj alirantoj',
+        paper: 'Paperaj ricevantoj',
 
-        everyone: '[[Everyone]]',
-        noone: '[[No one]]',
-        complex: '[[Custom]]',
+        everyone: 'Ĉiuj ensalutintoj',
+        noone: 'Neniu',
+        complex: 'Vd. sube',
 
-        filterFieldDesc: '[[Paste a codeholder filter here. You can obtain one from the codeholders page by pressing “Konverti al JSON-filtrilo”]]',
-        filterView: '[[View matching codeholders]]',
+        filterFieldDesc: 'Laŭ filtrilo. Vi povas akiri filtrilon el la sekcio “Membroj” alklakante je “Konverti al JSON-filtrilo”',
+        filterView: 'Vidi trovitojn',
 
-        members: '[[Members]]',
-        membersDesc: '[[Members that have access to this magazine.]]',
-        membersAll: '[[All]]',
-        membersNone: '[[None]]',
-        membersFilter: '[[Use Filter]]',
+        members: 'Membroj',
+        membersDesc: 'IMoj kiuj povas aliri la revuon',
+        membersAll: 'Ĉiuj IMoj',
+        membersNone: 'Neniuj IMoj',
+        membersFilter: 'Laŭ filtrilo',
 
-        membersIncludeLastYear: '[[Former member access duration]]',
-        membersIncludeLastYearNone: '[[None]]',
-        membersIncludeLastYearDesc: '[[How long members and subscribers last year (who are not members or subscribers this year) retain access.]]',
+        membersIncludeLastYear: 'Eksmembra alirdaŭro',
+        membersIncludeLastYearNone: 'Nenio',
+        membersIncludeLastYearDesc: 'Kiom longe IMoj kaj abonantoj de la pasinta jaro (kiuj ne jam re-aliĝis/reabonis) povas aliri la ĉi-jarajn revuojn.',
 
-        filter: '[[Unconditional access filter]]',
-        enableFilter: '[[Enable filter]]',
-        filterDesc: '[[Codeholders matching this filter will be able to view the magazine unconditionally.]]',
+        filter: 'Simpla alirfiltrilo',
+        enableFilter: 'Ŝalti filtrilon',
+        filterDesc: 'Filtrilo de tiuj kiuj povas aliri la revuon sendepende de membreco.',
 
-        freelyAvailableAfter: '[[Free availability duration]]',
-        freelyAvailableAfterDesc: '[[Magazine editions are freely available to everyone after this duration since publication (set to zero for never).]]',
+        freelyAvailableAfter: 'Libere alirebla post',
+        freelyAvailableAfterDesc: 'Revuaj eldonoj iĝos libera alireblaj de la publiko post tiom ĉi da tempo. Por neniam, enmetu 0.',
     },
 };
 
@@ -84,12 +84,11 @@ export const magazineEditions = {
         date: 'Dato',
         published: 'Publikigita',
         description: 'Priskribo',
-        subscribers: '[[Subscribers]]',
-        subscribersOverride: '[[Override magazine settings]]',
+        subscribers: 'Abonantoj',
+        subscribersOverride: 'Superskribi revuajn agordojn',
 
         dateFreelyAvailable: {
-            paper: '[[Paper freely available after]]',
-            access: '[[Access freely available after]]',
+            access: 'La reta versio libere alireblas post',
         },
     },
     create: {
@@ -189,7 +188,7 @@ export const magazineSubs = {
             internalNotes: 'Internaj notoj',
         },
         filters: {
-            paperVersion: '[[PaperVersion]]',
+            paperVersion: 'Papera versio',
             paperVersionTypes: {
                 yes: 'jes',
                 no: 'ne',
@@ -203,7 +202,7 @@ export const magazineSubs = {
         year: 'Jaro',
         createdTime: 'Horo de kreiĝo',
         internalNotes: 'Internaj notoj',
-        paperVersion: '[[PaperVersion]]',
+        paperVersion: 'Papera versio',
     },
     create: {
         title: 'Krei simplan abonon revuan',
@@ -225,34 +224,34 @@ export const magazineSubs = {
 };
 
 export const magazineSnaps = {
-    title: '[[Snapshots]]',
-    detailTitle: '[[Snapshot]]',
+    title: 'Momentaj abonantoj',
+    detailTitle: 'Momenta rigardo je abonantoj',
     fields: {
-        time: '[[Time]]',
-        name: '[[Name]]',
+        time: 'Horo',
+        name: 'Nomo',
     },
     codeholders: {
-        compare: '[[Compare to another snapshot]]',
-        comparing: '[[Showing only codeholders that werent in the other snapshot]]',
-        empty: '[[No codeholders in this snapshot]]',
-        compareEmpty: '[[No new codeholders in this snapshot compared to the other snapshot]]',
-        missingData: id => `[[You do not have permission to view codeholder id=${id}]]`,
+        compare: 'Kompari al alia momenta rigardo',
+        comparing: 'Montras nur trovitojn, kiuj ne estis en la antaŭa momenta rigardo.',
+        empty: 'Neniu kodposedanto troviĝis en tiu ĉi momenta rigardo.',
+        compareEmpty: 'Neniu kodposedanto troviĝis kompare al la antaŭa momenta rigardo.',
+        missingData: id => `Vi ne rajtas vidi la konton id=${id}`,
     },
     create: {
-        title: 'Krei [[asdf]]',
+        title: 'Kreado de momenta rigardo',
         button: 'Krei',
-        menuItem: 'Krei [[asdf]]',
+        menuItem: 'Krei momentan rigardon',
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Redakti [[asdf]]',
+        title: 'Redakti momentan rigardon',
         button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
-        title: 'Forigi [[asdf]]',
+        title: 'Forigi momentan rigardon',
         button: 'Forigi',
-        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi [[sadf]]? Ne eblas malfari tiun ĉi agon.',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi momentan rigardon? Ne eblas malfari tiun ĉi agon.',
     },
-    csvFilename: '[[snapshot]]',
+    csvFilename: 'momenta_rigardo',
 };

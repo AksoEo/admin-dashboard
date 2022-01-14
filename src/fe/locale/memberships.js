@@ -65,13 +65,13 @@ export const membershipOptions = {
         types: {
             addon: 'Aldoneblo',
             membership: 'Membrokategorio',
-            magazine: '[[Magazine]]',
+            magazine: 'Revua abono',
         },
         add: {
             title: 'Aldoni oferton',
             membershipsNote: '',
             categoriesEmpty: 'Restas neniu membrokategorio en tiu ĉi jaro, kiun vi ne jam aldonis.',
-            magazinesEmpty: 'Restas neniu [[magazines]], kiun vi ne jam aldonis.',
+            magazinesEmpty: 'Restas neniu simpla abono revua, kiun vi ne jam aldonis.',
             addonsEmpty: 'Restas neniu aldoneblo, kiun vi ne jam aldonis.',
         },
         price: {
@@ -81,7 +81,7 @@ export const membershipOptions = {
             varLabel: 'Variablo de prezo',
             na: 'La oferto ne estas elektebla pro manko de prezo',
         },
-        paperVersion: '[[PaperVersion]]',
+        paperVersion: 'Papera versio',
     },
     create: {
         menuItem: 'Krei',
@@ -133,7 +133,7 @@ export const membershipEntries = {
 
         yearSelectYear: 'Elekti jaron',
         yearSearchYear: 'Serĉi jaron',
-        yearSelectEmpty: '[[No registration configs available for this or following years]]',
+        yearSelectEmpty: 'Ankoraŭ neniu aliĝilo estis kreita',
         fishyIsOkay: 'Strangaj datumoj enordas',
 
         statusTypes: {
@@ -163,9 +163,9 @@ export const membershipEntries = {
         types: {
             addon: 'Aldoneblo',
             membership: 'Membrokategorio',
-            magazine: '[[Magazine]]',
+            magazine: 'Revua abono',
         },
-        cannotAddAddonNote: '[[Addons cannot be added to registration entries.]]',
+        cannotAddAddonNote: 'Ne eblas rekte aldoni aldoneblojn al aliĝoj.',
     },
     issue: {
         title: 'Problemo pri aliĝo',

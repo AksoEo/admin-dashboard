@@ -54,9 +54,9 @@ export const login = {
     createPasswordSent: 'Sendis retpoŝtmesaĝon. Bonvolu kontroli vian retpoŝtkeston (kaj spamujon).',
     resetPasswordSent: 'Sendis retpoŝtmesaĝon. Bonvolu kontroli vian retpoŝtkeston (kaj spamujon).',
 
-    forgotCodeDescription: '[[TODO: use your email i guess?]]',
+    forgotCodeDescription: 'Unue provu ensaluti per via retpoŝtadreso anstataŭ vian UEA-kodon. Se tiel vi ne sukcesas, bv. kontakti AKSO-administranton ĉe helpo@akso.org indikante vian plenan nomon kaj loĝadreson.',
 
-    lostTotpDescription: 'Bv. kontakti AKSO-administranton ĉe helpo@akso.org',
+    lostTotpDescription: 'Bv. kontakti AKSO-administranton ĉe helpo@akso.org indikante vian UEA-kodon.',
 
     genericTotpError: 'Ne sukcesis ensaluti, bv. reprovi poste',
     invalidTotp: 'Nevalida sekurkodo',

@@ -209,10 +209,10 @@ export const countryGroups = {
     csvFilename: 'landaroj',
 };
 export const countryLists = {
-    title: 'Listoj de landaj sekcioj',
-    detailTitle: 'Listo de landaj sekcioj',
+    title: 'Listoj de landaj asocioj',
+    detailTitle: 'Listo de landaj asocioj',
     search: {
-        placeholders: 'Serĉi landan sekcion ...',
+        placeholders: 'Serĉi landan asocion ...',
     },
     fields: {
         name: 'Nomo',
@@ -229,7 +229,7 @@ export const countryLists = {
     },
     create: {
         menuItem: 'Krei',
-        title: 'Krei liston de landaj sekcioj',
+        title: 'Krei liston de landaj asocioj',
         button: 'Krei',
 
         duplicateMenuItem: 'Krei kopion',
@@ -237,11 +237,11 @@ export const countryLists = {
         duplicateButton: 'Kopii',
     },
     update: {
-        title: 'Redakti liston de landaj sekcioj',
+        title: 'Redakti liston de landaj asocioj',
         button: 'Aktualigi',
     },
     delete: {
-        title: 'Forigi liston de landaj sekcioj',
+        title: 'Forigi liston de landaj asocioj',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi liston? Ne eblas malfari tiun ĉi agon.',
     },
