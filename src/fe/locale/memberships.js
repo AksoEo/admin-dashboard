@@ -45,6 +45,7 @@ export const membershipCategories = {
 
 export const membershipOptions = {
     title: 'Agordoj',
+    detailTitle: 'Agordoj',
     fields: {
         year: 'Jaro',
         enabled: 'Ŝaltita',

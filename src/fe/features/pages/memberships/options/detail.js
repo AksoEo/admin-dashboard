@@ -41,7 +41,7 @@ export default class RegistrationOptions extends DetailPage {
         return actions;
     }
 
-    render ({ editing }, { edit }) {
+    renderContents ({ editing }, { edit }) {
         return (
             <DetailView
                 view="memberships/options"
