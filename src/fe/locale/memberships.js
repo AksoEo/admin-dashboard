@@ -90,6 +90,11 @@ export const membershipOptions = {
         button: 'Krei',
         year: 'Jaro',
     },
+    duplicate: {
+        title: 'Krei kopion',
+        menuItem: 'Krei kopion',
+        button: 'Krei',
+    },
     update: {
         menuItem: 'Redakti',
         title: 'Redakti agordojn',

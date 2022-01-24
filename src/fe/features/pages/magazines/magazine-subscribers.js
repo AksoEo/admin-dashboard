@@ -7,7 +7,7 @@ import JSONFilterEditor from '../../../components/overview/json-filter-editor';
 import Segmented from '../../../components/controls/segmented';
 import './magazine-subscribers.less';
 
-function MagazinePerms ({ value, editing, onChange }) {
+function MagazinePerms ({ value, editing, onChange, hasCopyableItems }) {
     if (!editing) {
         if (value === true) return locale.subscribers.everyone;
         else if (value === false) return locale.subscribers.noone;
@@ -94,7 +94,7 @@ function MagazinePerms ({ value, editing, onChange }) {
                         onChange={filter => onChange({ ...value, filter })} />
                 </div>
             ) : null}
-            {(editing || value.freelyAvailableAfter) ? (
+            {hasCopyableItems && (editing || value.freelyAvailableAfter) ? (
                 <div class="perms-field">
                     <div class="field-label">
                         {locale.subscribers.freelyAvailableAfter}
@@ -223,6 +223,7 @@ export default function MagazineSubscribers ({ value, editing, onChange }) {
             <div class="subscriber-type">
                 <div class="type-label">{locale.subscribers.access}</div>
                 <MagazinePerms
+                    hasCopyableItems
                     value={value.access}
                     editing={editing}
                     onChange={access => onChange({

@@ -55,6 +55,7 @@ export const FIELDS = {
             return <MdField
                 inline={slot !== 'detail'}
                 editing={editing}
+                maxLength={2000}
                 rules={['emphasis', 'strikethrough', 'link']}
                 value={value || ''}
                 onChange={value => onChange(value || null)} />;

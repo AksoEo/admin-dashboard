@@ -79,6 +79,11 @@ const OPTIONS_FIELDS = [
     'currency',
     'offers',
 ];
+const OPTIONS_DUP_FIELDS = [
+    'paymentOrgId',
+    'currency',
+    'offers',
+];
 
 function entryReadId (idBuffer) {
     return base32.stringify(idBuffer);
@@ -237,6 +242,28 @@ export const tasks = {
         });
         return year;
     },
+    dupOptions: async ({ id }, { year }) => {
+        const client = await asyncClient;
+        try {
+            await client.get(`/registration/options/${year}`, { fields: ['year'] });
+            throw { code: 'object-exists', message: 'options for this year already exist' };
+        } catch (err) {
+            if (err.statusCode !== 404) throw err;
+        }
+
+        const fields = OPTIONS_DUP_FIELDS;
+        const source = await client.get(`/registration/options/${id}`, { fields });
+
+        const data = {
+            enabled: false,
+        };
+        for (const f of fields) data[f] = source.body[f];
+
+        await client.put(`/registration/options/${year}`, data);
+        store.insert(REGISTRATION_OPTIONS.concat([year]), data);
+        store.signal(SIG_OPTIONS);
+        return year;
+    },
     updateOptions: async ({ id }, params) => {
         const client = await asyncClient;
         const existing = store.get(REGISTRATION_OPTIONS.concat([id]));
@@ -253,7 +280,7 @@ export const tasks = {
     deleteOptions: crudDelete({
         apiPath: ({ id }) => `/registration/options/${id}`,
         storePath: ({ id }) => REGISTRATION_OPTIONS.concat([id]),
-        signalPath: SIG_OPTIONS,
+        signalPath: () => SIG_OPTIONS,
     }),
 
     listEntries: async (_, parameters) => {

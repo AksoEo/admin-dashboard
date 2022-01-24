@@ -28,6 +28,12 @@ export default class RegistrationOptions extends DetailPage {
                 label: locale.update.menuItem,
                 action: this.onBeginEdit,
             });
+
+            actions.push({
+                label: locale.duplicate.menuItem,
+                action: () => this.context.createTask('memberships/dupOptions', { id: this.id }),
+                overflow: true,
+            });
         }
 
         if (perms.hasPerm('registration.options.delete')) {

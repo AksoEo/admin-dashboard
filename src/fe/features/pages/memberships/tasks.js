@@ -97,6 +97,28 @@ export default {
             </routerContext.Consumer>
         );
     },
+    dupOptions ({ open, task }) {
+        return (
+            <routerContext.Consumer>
+                {routerContext => (
+                    <TaskDialog
+                        open={open}
+                        onClose={() => task.drop()}
+                        title={optionsLocale.duplicate.title}
+                        actionLabel={optionsLocale.duplicate.button}
+                        run={() => task.runOnce().then(id => {
+                            routerContext.navigate(`/membreco/agordoj/${id}`);
+                        })}>
+                        <TextField
+                            outline
+                            label={optionsLocale.create.year}
+                            value={task.parameters.year}
+                            onChange={e => task.update({ year: e.target.value })} />
+                    </TaskDialog>
+                )}
+            </routerContext.Consumer>
+        );
+    },
     updateOptions ({ open, task }) {
         return (
             <TaskDialog
