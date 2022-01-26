@@ -15,7 +15,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
-                        class="country-org-lists-task-creeate-list"
+                        class="country-org-lists-task-create-list"
                         open={open}
                         onClose={() => task.drop()}
                         title={dup ? locale.create.duplicateTitle : locale.create.title}

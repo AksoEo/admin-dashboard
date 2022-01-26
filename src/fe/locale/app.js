@@ -46,6 +46,7 @@ export const pages = {
     'administration-countries': 'Landoj',
     'administration-country-groups': 'Landaroj',
     'administration-country-lists': 'Landaj organizoj',
+    'administration-org-lists': '[[org lsits]]',
     lists: 'Listoj',
     reports: 'Raportoj',
     documents: 'Ŝpureblaj dokumentoj',

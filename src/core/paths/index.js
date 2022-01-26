@@ -38,6 +38,7 @@ const perms = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: t
 const memberships = () => import(/* webpackChunkName: 'core-memberships' */ './memberships');
 const magazines = () => import(/* webpackChunkName: 'core-magazines' */ './magazines');
 const notifTemplates = () => import(/* webpackChunkName: 'core-notif-templates' */ './notif-templates');
+const orgLists = () => import(/* webpackChunkName: 'core-org-lists' */ './org-lists');
 const payments = () => import(/* webpackChunkName: 'core-payments' */ './payments');
 const roles = () => import(/* webpackChunkName: 'core-codeholders' */ './roles');
 const queries = () => import(/* webpackChunkName: 'core-queries' */ './queries');
@@ -66,6 +67,7 @@ export const tasks = {
     memberships: lazyPath(memberships, mapTasks),
     magazines: lazyPath(magazines, mapTasks),
     notifTemplates: lazyPath(notifTemplates, mapTasks),
+    orgLists: lazyPath(orgLists, mapTasks),
     roles: lazyPath(roles, mapTasks),
     queries: lazyPath(queries, mapTasks),
     perms: lazyPath(perms, mapTasks),
@@ -91,6 +93,7 @@ export const views = {
     memberships: lazyPath(memberships, mapViews),
     magazines: lazyPath(magazines, mapViews),
     notifTemplates: lazyPath(notifTemplates, mapViews),
+    orgLists: lazyPath(orgLists, mapViews),
     roles: lazyPath(roles, mapViews),
     perms: lazyPath(perms, mapViews),
     payments: lazyPath(payments, mapViews),

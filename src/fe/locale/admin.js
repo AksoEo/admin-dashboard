@@ -246,4 +246,43 @@ export const countryLists = {
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi liston? Ne eblas malfari tiun ĉi agon.',
     },
 };
+export const orgLists = {
+    title: 'Listoj de [[org_lists]]',
+    detailTitle: 'Listo de [[org_lists]]',
+    search: {
+        placeholders: 'Serĉi [[org_lists]] ...',
+    },
+    fields: {
+        name: 'Nomo',
+        list: 'Listo',
+
+        listSearch: 'Serĉi fakoj',
+        listEmpty: 'La listo estas malplena',
+        listAddTag: {
+            title: 'Aldoni fako',
+            label: '[[Label]]',
+            confirm: 'Aldoni',
+            labelEmpty: '[[Label is required]]',
+            labelTaken: '[[Tag already exists]]',
+        },
+    },
+    create: {
+        menuItem: 'Krei',
+        title: 'Krei liston',
+        button: 'Krei',
+
+        duplicateMenuItem: 'Krei kopion',
+        duplicateTitle: 'Krei kopion de listo',
+        duplicateButton: 'Kopii',
+    },
+    update: {
+        title: 'Redakti liston',
+        button: 'Aktualigi',
+    },
+    delete: {
+        title: 'Forigi liston de [[org_lists]]',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi liston? Ne eblas malfari tiun ĉi agon.',
+    },
+};
 

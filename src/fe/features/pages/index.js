@@ -13,6 +13,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
 import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
+import StyleIcon from '@material-ui/icons/Style';
 import {
     TravelExploreIcon,
     BadgeIcon,
@@ -1012,6 +1013,30 @@ export default [
                         match: /^(.+)$/,
                         matchKey: 'list',
                         component: elazy(() => import(/* webpackChunkName: "admin-country-lists" */ './administration/country-lists/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                id: 'administration-org-lists',
+                icon: StyleIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "admin-org-lists" */ './administration/org-lists')),
+                type: 'bottom',
+                path: 'fakoj-organizoj',
+                hasPerm: perms => perms.hasPerm('org_lists.read') && perms.hasPerm('codeholders.read'),
+                paths: [
+                    {
+                        match: /^(.+)$/,
+                        matchKey: 'list',
+                        component: elazy(() => import(/* webpackChunkName: "admin-org-lists" */ './administration/org-lists/detail')),
                         type: 'stack',
                         paths: [
                             {
