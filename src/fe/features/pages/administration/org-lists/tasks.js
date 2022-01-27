@@ -9,7 +9,7 @@ export default {
         locale,
         fieldNames: ['name'],
         fields: FIELDS,
-        onCompletion: (task, routerContext, id) => routerContext.navigate(`/administrado/fakoj-organizoj/${id}`),
+        onCompletion: (task, routerContext, id) => routerContext.navigate(`/administrado/fakaj-asocioj/${id}`),
     }),
     updateList: updateDialog({ locale: locale.update, fields: locale.fields }),
     deleteList: deleteDialog({ locale: locale.delete }),

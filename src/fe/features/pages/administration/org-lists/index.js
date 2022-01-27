@@ -45,7 +45,7 @@ export default connectPerms(class OrgListsPage extends OverviewPage {
                 updateView={['orgLists/sigLists']}
                 parameters={parameters}
                 fields={FIELDS}
-                onGetItemLink={id => `/administrado/fakoj-organizoj/${id}`}
+                onGetItemLink={id => `/administrado/fakaj-asocioj/${id}`}
                 onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                 onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                 onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
