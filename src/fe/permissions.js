@@ -498,6 +498,37 @@ export const spec = [
                 }),
             },
             {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: '[[Intent actions]] por ' + name,
+                        options: [
+                            {
+                                name: '[[Submit]]',
+                                id: 'pay.payment_intents.submit.' + org,
+                            },
+                            {
+                                name: '[[Cancel]]',
+                                id: 'pay.payment_intents.cancel.' + org,
+                            },
+                            {
+                                name: '[[Mark Refunded]]',
+                                id: 'pay.payment_intents.mark_refunded.' + org,
+                            },
+                            {
+                                name: '[[Mark Disputed]]',
+                                id: 'pay.payment_intents.mark_disputed.' + org,
+                            },
+                            {
+                                name: '[[Mark Succeeded]]',
+                                id: 'pay.payment_intents.mark_succeeded.' + org,
+                            },
+                        ],
+                    };
+                }),
+            },
+            {
                 type: 'switch',
                 name: 'Aliri sentemajn paginformojn ...',
                 options: Object.entries(baseOrgs).map(([org, name]) => {

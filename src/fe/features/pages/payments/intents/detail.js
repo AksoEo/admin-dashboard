@@ -145,7 +145,6 @@ function DetailViewInner ({ item, editing, onItemChange }) {
 
     const fullEditing = editing && status === 'pending';
 
-
     const currentAmount = totalAmount - amountRefunded;
 
     let methodType = null;
@@ -207,7 +206,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                             .map((purpose, i) => <Purpose key={i} purpose={purpose} item={item} />)}
                     </div>
                 )}
-                {!editing && <IntentActions item={item} />}
+                {!editing && <IntentActions org={org} item={item} />}
             </DynamicHeightDiv>
             <div class="intent-customer-container">
                 <div class="intent-section-title">{locale.fields.customer}</div>
@@ -347,6 +346,7 @@ const ACTIONS = {
         enabled: (t, s) => s === 'pending' || s === 'submitted' || (t === 'manual' && s === 'disputed'),
         icon: CloseIcon,
         task: id => ['payments/cancelIntent', { id }],
+        hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.cancel.${org}`),
     },
     markDisputed: {
         state: 'disputed',
@@ -354,6 +354,7 @@ const ACTIONS = {
         manualOnly: true,
         icon: AnnouncementIcon,
         task: id => ['payments/markIntentDisputed', { id }],
+        hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.mark_disputed.${org}`),
     },
     submit: {
         state: 'submitted',
@@ -361,6 +362,7 @@ const ACTIONS = {
         manualOnly: true,
         icon: SendIcon,
         task: id => ['payments/submitIntent', { id }],
+        hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.submit.${org}`),
     },
     markSucceeded: {
         state: 'succeeded',
@@ -368,6 +370,7 @@ const ACTIONS = {
         manualOnly: true,
         icon: AssignmentTurnedInIcon,
         task: id => ['payments/markIntentSucceeded', { id }],
+        hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.mark_succeeded.${org}`),
     },
     markRefunded: {
         state: 'refunded',
@@ -382,10 +385,11 @@ const ACTIONS = {
         }, {
             amount: item.amountRefunded ? item.amountRefunded : item.totalAmount,
         }],
+        hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.mark_refunded.${org}`),
     },
 };
 
-function IntentActions ({ item }) {
+const IntentActions = connectPerms(function IntentActions ({ item, org, perms }) {
     return (
         <coreContext.Consumer>{core => {
             const actions = [];
@@ -395,6 +399,8 @@ function IntentActions ({ item }) {
             const s = item.status;
 
             for (const k in ACTIONS) {
+                if (ACTIONS[k].hasPerm && !ACTIONS[k].hasPerm(perms, org)) continue;
+
                 const isRefund = k === 'markRefunded';
                 const isDispute = k === 'markDisputed';
                 let enabled = ACTIONS[k].enabled(t, s);
@@ -448,7 +454,7 @@ function IntentActions ({ item }) {
             );
         }}</coreContext.Consumer>
     );
-}
+});
 
 function Customer ({ item, editing, onItemChange }) {
     let profilePictureHash;
