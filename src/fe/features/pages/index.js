@@ -14,6 +14,7 @@ import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
 import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
 import StyleIcon from '@material-ui/icons/Style';
+import MoveToInboxIcon from '@material-ui/icons/MoveToInbox';
 import {
     TravelExploreIcon,
     BadgeIcon,
@@ -859,6 +860,37 @@ export default [
                                         ],
                                     },
                                 ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        id: 'intermediaries',
+        path: 'perantoj',
+        contents: [
+            {
+                id: 'intermediaries-intermediaries',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "intermediaries" */ './intermediaries/intermediaries')),
+                icon: MoveToInboxIcon,
+                type: 'bottom',
+                path: 'perantoj',
+                hasPerm: perms => perms.hasPerm('intermediaries.read') && perms.hasPerm('codeholders.read'),
+                paths: [
+                    {
+                        match: /^(\w+)$/,
+                        matchKey: 'intermediary',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "intermediaries" */ './intermediaries/intermediaries/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
                             },
                         ],
                     },

@@ -32,6 +32,7 @@ const delegations = () => import(/* webpackChunkName: 'core-delegations' */ './d
 const adminGroups = () => import(/* webpackChunkName: 'core-admin' */ './admin-groups');
 const geoDb = () => import(/* webpackChunkName: 'core-geo-db' */ './geo-db');
 const httpLog = () => import(/* webpackChunkName: 'core-admin' */ './http-log');
+const intermediaries = () => import(/* webpackChunkName: 'core-intermediaries' */ './intermediaries');
 const login = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './login');
 const lists = () => import(/* webpackChunkName: 'core-lists' */ './lists');
 const perms = () => import(/* webpackChunkName: 'core-login', webpackPrefetch: true */ './perms');
@@ -62,6 +63,7 @@ export const tasks = {
     adminGroups: lazyPath(adminGroups, mapTasks),
     geoDb: lazyPath(geoDb, mapTasks),
     httpLog: lazyPath(httpLog, mapTasks),
+    intermediaries: lazyPath(intermediaries, mapTasks),
     login: lazyPath(login, mapTasks),
     lists: lazyPath(lists, mapTasks),
     memberships: lazyPath(memberships, mapTasks),
@@ -88,6 +90,7 @@ export const views = {
     adminGroups: lazyPath(adminGroups, mapViews),
     geoDb: lazyPath(geoDb, mapViews),
     httpLog: lazyPath(httpLog, mapViews),
+    intermediaries: lazyPath(intermediaries, mapViews),
     login: lazyPath(login, mapViews),
     lists: lazyPath(lists, mapViews),
     memberships: lazyPath(memberships, mapViews),

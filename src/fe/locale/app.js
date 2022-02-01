@@ -39,6 +39,8 @@ export const pages = {
     payments: 'AKSO-Pago',
     'payment-intents': 'Pagoj',
     'payment-orgs': 'Pagorganizoj',
+    intermediaries: 'Perantoj',
+    'intermediaries-intermediaries': 'Perantoj',
     administration: 'Administrado',
     'administration-groups': 'Administraj grupoj',
     'administration-clients': 'API-klientoj',

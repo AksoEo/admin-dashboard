@@ -36,6 +36,7 @@ export * from './app';
 export * from './codeholders';
 export * from './congresses';
 export * from './delegations';
+export * from './intermediaries';
 export * from './memberships';
 export * from './magazines';
 export * from './notif-templates';
