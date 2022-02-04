@@ -2,12 +2,12 @@ export const intermediaries = {
     title: 'Perantoj',
     detailTitle: 'Peranto',
     search: {
-        placeholders: '[[Search paymentDescription...]]',
+        placeholders: 'Serĉi paginstrukciojn ...',
     },
     fields: {
         countryCode: 'Lando',
         codeholderId: 'Membro',
-        paymentDescription: '[[paymentDescription]]',
+        paymentDescription: 'Paginstrukcioj',
     },
     create: {
         menuItem: 'Krei',

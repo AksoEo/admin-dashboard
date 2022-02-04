@@ -21,7 +21,7 @@ export default {
                         title={dup ? locale.create.duplicateTitle : locale.create.title}
                         actionLabel={dup ? locale.create.duplicateButton : locale.create.button}
                         run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/administrado/landaj-organizoj/${id}`);
+                            routerContext.navigate(`/administrado/landaj-asocioj/${id}`);
                         })}>
                         <Field>
                             <TextField

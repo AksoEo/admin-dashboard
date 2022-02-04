@@ -247,23 +247,23 @@ export const countryLists = {
     },
 };
 export const orgLists = {
-    title: 'Listoj de [[org_lists]]',
-    detailTitle: 'Listo de [[org_lists]]',
+    title: 'Listoj de fakaj asocioj',
+    detailTitle: 'Listo de fakaj asocioj',
     search: {
-        placeholders: 'Serĉi [[org_lists]] ...',
+        placeholders: 'Serĉi listojn de fakaj asocioj ...',
     },
     fields: {
         name: 'Nomo',
-        list: 'Listo',
+        list: 'Asocioj',
 
-        listSearch: 'Serĉi fakoj',
+        listSearch: 'Serĉi fakajn asociojn',
         listEmpty: 'La listo estas malplena',
         listAddTag: {
-            title: 'Aldoni fako',
-            label: '[[Label]]',
+            title: 'Aldoni fakon',
+            label: 'Etikedo',
             confirm: 'Aldoni',
-            labelEmpty: '[[Label is required]]',
-            labelTaken: '[[Tag already exists]]',
+            labelEmpty: 'Nepras etikedo',
+            labelTaken: 'Tiu etikedo jam ekzistas',
         },
     },
     create: {
@@ -280,7 +280,7 @@ export const orgLists = {
         button: 'Aktualigi',
     },
     delete: {
-        title: 'Forigi liston de [[org_lists]]',
+        title: 'Forigi liston de fakaj asocioj',
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi liston? Ne eblas malfari tiun ĉi agon.',
     },

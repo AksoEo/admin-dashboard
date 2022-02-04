@@ -1038,7 +1038,7 @@ export default [
                 component: elazy(() =>
                     import(/* webpackChunkName: "admin-country-lists" */ './administration/country-lists')),
                 type: 'bottom',
-                path: 'landaj-organizoj',
+                path: 'landaj-asocioj',
                 hasPerm: perms => perms.hasPerm('countries.lists.read') && perms.hasPerm('codeholders.read'),
                 paths: [
                     {

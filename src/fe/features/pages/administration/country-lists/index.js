@@ -76,7 +76,7 @@ export default connectPerms(class CountryListsPage extends Page {
                     updateView={['countryLists/sigLists']}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/administrado/landaj-organizoj/${id}`}
+                    onGetItemLink={id => `/administrado/landaj-asocioj/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
