@@ -73,6 +73,7 @@ module.exports = function (env, argv) {
                 path: require.resolve('path-browserify'),
                 process: require.resolve('process/browser'),
                 util: require.resolve('util/'),
+                url: require.resolve('url/'),
             },
         },
         devtool: prod ? 'source-map' : 'inline-source-map',
