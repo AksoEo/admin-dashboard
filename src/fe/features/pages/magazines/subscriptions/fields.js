@@ -16,6 +16,8 @@ import { FIELDS as MAGAZINE_FIELDS } from '../fields';
 import './fields.less';
 import CheckIcon from '@material-ui/icons/Check';
 
+const REDUCED_MAGAZINE_FIELDS = Object.fromEntries(['org', 'name'].map(k => [k, MAGAZINE_FIELDS[k]]));
+
 export const FIELDS = {
     magazineId: {
         wantsCreationLabel: true,
@@ -50,7 +52,7 @@ export const FIELDS = {
                             task="magazines/listMagazines"
                             view="magazines/magazine"
                             search={{ field: 'name', placeholder: magazinesLocale.search.placeholders.name }}
-                            fields={MAGAZINE_FIELDS}
+                            fields={REDUCED_MAGAZINE_FIELDS}
                             locale={magazinesLocale.fields} />
                     </div>
                 );
