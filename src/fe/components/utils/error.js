@@ -114,10 +114,14 @@ function SchemaErrorItem ({ item }) {
 }
 
 function SchemaErrorDataPath ({ path }) {
-    const contents = path.split(/[.[\]]/).filter((x, i) => x || !i).map((item, i) => {
-        if (!item) return <span class="path-item is-empty">⬥</span>;
-        if (item.match(/^\d+$/)) return <span key={i} class="path-item is-index">{locale.schema.nthItem(+item + 1)}</span>;
-        return <span key={i} class="path-item">{item}</span>;
-    });
-    return <span class="schema-error data-path">{contents}</span>;
+    try {
+        const contents = path.split(/[.[\]]/).filter((x, i) => x || !i).map((item, i) => {
+            if (!item) return <span class="path-item is-empty">⬥</span>;
+            if (item.match(/^\d+$/)) return <span key={i} class="path-item is-index">{locale.schema.nthItem(+item + 1)}</span>;
+            return <span key={i} class="path-item">{item}</span>;
+        });
+        return <span class="schema-error data-path">{contents}</span>;
+    } catch {
+        return <span class="schema-error data-path">?</span>;
+    }
 }

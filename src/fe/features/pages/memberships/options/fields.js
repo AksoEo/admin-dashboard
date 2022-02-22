@@ -12,10 +12,8 @@ import Select from '../../../../components/controls/select';
 import Segmented from '../../../../components/controls/segmented';
 import StaticOverviewList from '../../../../components/lists/overview-list-static';
 import RearrangingList from '../../../../components/lists/rearranging-list';
-import ScriptItem from '../../../../components/form-editor/script-item';
 import OrgIcon from '../../../../components/org-icon';
 import { ScriptContextProvider } from '../../../../components/form-editor';
-import { RefNameView } from '../../../../components/form-editor/script-views';
 import {
     membershipOptions as locale,
     membershipCategories as categoriesLocale,
@@ -29,6 +27,7 @@ import { FIELDS as PAYMENT_ORG_FIELDS } from '../../payments/orgs/fields';
 import { FIELDS as CATEGORY_FIELDS } from '../categories/fields';
 import { FIELDS as MAGAZINE_FIELDS } from '../../magazines/fields';
 import { connect } from '../../../../core/connection';
+import OfferPrice from './price';
 import './fields.less';
 
 export const FIELDS = {
@@ -304,7 +303,7 @@ class OfferGroup extends PureComponent {
 
 const REDUCED_CATEGORY_FIELDS = Object.fromEntries([
     // givesMembership comes before name for sorting order
-    'nameAbbrev', 'givesMembership', 'name', 'availability',
+    'givesMembership', 'nameAbbrev', 'name', 'availability',
 ].map(x => [x, CATEGORY_FIELDS[x]]));
 class AddOffer extends PureComponent {
     state = {
@@ -328,7 +327,7 @@ class AddOffer extends PureComponent {
                     task="memberships/listCategories"
                     view="memberships/category"
                     fields={REDUCED_CATEGORY_FIELDS}
-                    sorting={{ name: 'asc', givesMembership: 'desc' }}
+                    sorting={{ nameAbbrev: 'asc', givesMembership: 'desc' }}
                     jsonFilter={{
                         id: {
                             $nin: offers
@@ -528,102 +527,6 @@ const OfferMagazine = connect(({ id }) => ['magazines/magazine', { id }])(data =
     if (!data) return <TinyProgress />;
     return data.name;
 });
-
-class OfferPrice extends PureComponent {
-    state = {
-        editingScript: false,
-    };
-
-    render ({ value, editing, onChange }) {
-        if (!value) {
-            return (
-                <div class="offer-price is-none">
-                    <div class="none-label">
-                        {locale.offers.price.na}
-                    </div>
-                    {editing && (
-                        <Button icon small onClick={() => onChange({
-                            description: null,
-                            script: {},
-                            var: null,
-                        })}>
-                            <AddIcon />
-                        </Button>
-                    )}
-                </div>
-            );
-        }
-
-        const variables = [];
-        if (value.var === null) variables.push({ value: null, label: '—' });
-        for (const v in value.script) {
-            if (v.startsWith('_')) continue;
-            variables.push({
-                value: v,
-                label: v, // TODO: use fancy icons
-            });
-        }
-
-        const prevNodes = [
-            {
-                defs: {},
-                formVars: [
-                    // TODO: what to do with these values?
-                    { name: 'age', type: 'n', value: 25 },
-                    { name: 'agePrimo', type: 'n', value: 24 },
-                    { name: 'birthdate', type: 's', value: '1999-04-21' },
-                    { name: 'feeCountry', type: 's', value: 'nl' },
-                    { name: 'feeCountryGroups', type: 'm', value: ['x01'] },
-                    { name: 'isActiveMember', type: 'b', value: true },
-                ],
-            },
-        ];
-
-        return (
-            <div class="offer-price">
-                <div class="offer-price-title">
-                    <span class="title-contents">
-                        {locale.offers.price.title}
-                    </span>
-                    {editing && (
-                        <Button class="remove-button" onClick={() => onChange(null)}>
-                            {locale.offers.price.remove}
-                        </Button>
-                    )}
-                </div>
-                <ScriptItem
-                    previousNodes={prevNodes}
-                    editable={editing}
-                    editing={this.state.editingScript}
-                    onEditingChange={editingScript => this.setState({ editingScript })}
-                    item={value}
-                    onChange={onChange} />
-                <div class="price-variable">
-                    <span class="price-var-label">{locale.offers.price.varLabel}:</span>
-                    <div class="price-var-contents">
-                        {!editing ? (
-                            <RefNameView name={value.var} />
-                        ) : (
-                            <Select
-                                value={value.var}
-                                onChange={v => onChange({ ...value, var: v })}
-                                items={variables} />
-                        )}
-                    </div>
-                </div>
-                <div class="price-description-label">
-                    {locale.offers.price.description}
-                </div>
-                <MdField
-                    class="offer-price-description"
-                    value={value.description}
-                    editing={editing}
-                    onChange={description => onChange({ ...value, description: description || null })}
-                    rules={['emphasis', 'strikethrough']} />
-            </div>
-        );
-    }
-}
 
 class PaymentOrgPicker extends PureComponent {
     state = {

@@ -344,6 +344,7 @@ const ACTIONS = {
     cancel: {
         state: 'canceled',
         enabled: (t, s) => s === 'pending' || s === 'submitted' || (t === 'manual' && s === 'disputed'),
+        types: ['stripe', 'manual', 'intermediary'],
         icon: CloseIcon,
         task: id => ['payments/cancelIntent', { id }],
         hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.cancel.${org}`),
@@ -351,7 +352,7 @@ const ACTIONS = {
     markDisputed: {
         state: 'disputed',
         enabled: (t, s) => t === 'manual' && (s === 'submitted' || s === 'succeeded'),
-        manualOnly: true,
+        types: ['manual'],
         icon: AnnouncementIcon,
         task: id => ['payments/markIntentDisputed', { id }],
         hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.mark_disputed.${org}`),
@@ -359,7 +360,7 @@ const ACTIONS = {
     submit: {
         state: 'submitted',
         enabled: (t, s) => t === 'manual' && s === 'pending',
-        manualOnly: true,
+        types: ['manual', 'intermediary'],
         icon: SendIcon,
         task: id => ['payments/submitIntent', { id }],
         hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.submit.${org}`),
@@ -367,14 +368,14 @@ const ACTIONS = {
     markSucceeded: {
         state: 'succeeded',
         enabled: (t, s) => t === 'manual' && (s === 'submitted' || s === 'disputed'),
-        manualOnly: true,
+        types: ['manual', 'intermediary'],
         icon: AssignmentTurnedInIcon,
         task: id => ['payments/markIntentSucceeded', { id }],
         hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.mark_succeeded.${org}`),
     },
     markRefunded: {
         state: 'refunded',
-        manualOnly: true,
+        types: ['manual'],
         enabled: (t, s) => t === 'manual'
             && ['pending', 'submitted', 'canceled', 'succeeded', 'refunded', 'disputed'].includes(s),
         icon: AssignmentReturnIcon,
@@ -419,7 +420,7 @@ const IntentActions = connectPerms(function IntentActions ({ item, org, perms })
                         }
                     }
 
-                    if (!whyNot && t === 'stripe' && ACTIONS[k].manualOnly) {
+                    if (!whyNot && t === 'stripe' && !ACTIONS[k].types.includes('stripe')) {
                         whyNot = tur.stripe;
                         whyNotBecauseStripe = true;
                     }

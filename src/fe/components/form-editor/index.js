@@ -85,6 +85,7 @@ export class ScriptContextProvider extends PureComponent {
         const editorNode = document.createElement('div');
         editorNode.className = 'form-editor-script-node-root';
         editorNode.appendChild(editor.node);
+        if (this.props.reallyOnTop) editorNode.classList.add('really-on-top');
         document.body.appendChild(editorNode);
         this.onResize();
     }

@@ -22,6 +22,7 @@ import './item-picker-dialog.less';
 /// - search: { field: string, placeholder: string } optional, to enable search
 /// - sorting: optional object { [field]: string }
 /// - emptyLabel: shown when no items exist
+/// - noCloseButton: will not show a close button
 /// - extraListOptions: additional props that will be passed to OverviewList
 /// - ...extra: additional props for the dialog
 export default class ItemPicker extends PureComponent {
@@ -43,6 +44,7 @@ export default class ItemPicker extends PureComponent {
         locale,
         search,
         sorting,
+        noCloseButton,
         extraListOptions,
         ...extra
     }) {
@@ -55,7 +57,7 @@ export default class ItemPicker extends PureComponent {
                 backdrop
                 fullScreen={width => width < (fullScreenWidth || 400)}
                 open={open}
-                actions={onClose && [{ label: dataLocale.picker.done, action: onClose }]}
+                actions={onClose && !noCloseButton && [{ label: dataLocale.picker.done, action: onClose }]}
                 onClose={onClose}
                 {...extra}>
                 <DialogInner

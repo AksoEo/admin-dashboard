@@ -103,6 +103,7 @@ export const paymentMethods = {
         types: {
             manual: 'Permana',
             stripe: 'Stripe™',
+            intermediary: '[[Intermediary]]',
         },
         stripeMethodValues: {
             card: 'Karto',
@@ -113,6 +114,26 @@ export const paymentMethods = {
             forever: 'Neniam ekvalidiĝas',
         },
         paymentValidityWarning: 'Ni rekomendas ŝalti eksvalidiĝon',
+
+        prices: '[[Prices]]',
+    },
+    prices: {
+        addYear: '[[Add Year]]',
+        addYearAdd: '[[Add]]',
+        membershipCategories: {
+            title: '[[Membership Categories]]',
+            addCategory: '[[Add Category]]',
+            commission: '[[Commission]]',
+            price: '[[Price]]',
+        },
+        magazines: {
+            title: '[[Magazines]]',
+            addMagazine: '[[Add Magazine]]',
+            prices: {
+                paper: '[[Paper]]',
+                access: '[[Access]]',
+            },
+        },
     },
     create: {
         title: 'Krei pagmetodon',

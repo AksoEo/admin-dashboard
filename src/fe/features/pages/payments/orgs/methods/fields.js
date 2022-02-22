@@ -10,6 +10,7 @@ import { StripeIcon } from '../../../../../components/icons';
 import MdField from '../../../../../components/controls/md-field';
 import { currencyAmount, timespan } from '../../../../../components/data';
 import { paymentMethods as locale, currencies } from '../../../../../locale';
+import PricesEditor from './prices';
 import './fields.less';
 
 export function PaymentMethodType ({ value }) {
@@ -175,6 +176,12 @@ export const FIELDS = {
 
             // FIXME: prettify
             return value && value.join(', ');
+        },
+    },
+    prices: {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange }) {
+            return <PricesEditor value={value} editing={editing} onChange={onChange} />;
         },
     },
     paymentValidity: {

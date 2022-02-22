@@ -116,6 +116,19 @@ const iClientFields = {
         requires: ['currency'],
     },
     amountRefunded: 'amountRefunded',
+    createdBy: 'createdBy',
+    intermediary: {
+        apiFields: ['intermediaryCountryCode', 'intermediaryIdentifier'],
+        fromAPI: intent => ({
+            country: intent.intermediaryCountryCode,
+            year: intent.intermediaryIdentifier?.year,
+            number: intent.intermediaryIdentifier?.number,
+        }),
+        toAPI: ({ country, year, number }) => ({
+            intermediaryCountryCode: country || null,
+            intermediaryIdentifier: (year || number) ? ({ year, number }) : null,
+        }),
+    },
 };
 const iClientFilters = {
     customerName: {
@@ -326,7 +339,7 @@ export const tasks = {
                 'id', 'type', 'stripeMethods', 'name', 'internalDescription',
                 'description', 'currencies', 'paymentValidity', 'isRecommended',
                 'stripePublishableKey', 'feePercent', 'feeFixed.val', 'feeFixed.cur',
-                'internal',
+                'internal', 'prices',
             ],
         });
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];

@@ -1,0 +1,60 @@
+@import '../../../../prelude';
+
+.membership-option-price {
+    border: 1px solid @separator;
+    border-radius: 4px;
+    padding: 8px;
+
+    margin-top: 16px;
+
+    &.is-none {
+        display: flex;
+        align-items: center;
+
+        .none-label {
+            flex: 1;
+        }
+    }
+
+    .offer-price-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .title-contents {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .remove-button {
+            margin-left: 8px;
+            font-size: 0.8em;
+            --md-button-color: @gray-button-color;
+        }
+    }
+
+    .offer-price-description-label {
+        font-size: 0.9em;
+        font-weight: 600;
+        margin-top: 8px;
+        margin-bottom: 4px;
+    }
+    .offer-price-description {
+        margin: 8px 0;
+
+        &.editing {
+            max-height: 72px;
+        }
+    }
+
+    .price-variable {
+        display: flex;
+        margin-top: 8px;
+        align-items: center;
+
+        .price-var-contents {
+            margin-left: 8px;
+            display: inline-block;
+        }
+    }
+}
