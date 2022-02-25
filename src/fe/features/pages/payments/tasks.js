@@ -19,6 +19,7 @@ import {
     currencies,
 } from '../../../locale';
 import { CREATION_FIELDS as methodFields } from './orgs/methods/fields';
+import { IntermediaryEditor } from './intents/fields';
 import MethodPicker from './method-picker';
 import PurposesPicker from './purposes-picker';
 import './tasks.less';
@@ -176,6 +177,7 @@ export default {
         const [availableCurrencies, setCurrencies] = useState([]);
 
         const [shouldImmediatelySubmit, setShouldImmediatelySubmit] = useState(false);
+        const [isIntermediary, setIsIntermediary] = useState(false);
 
         fields.push(
             <div key="customer" class="create-intent-subtitle">
@@ -281,10 +283,30 @@ export default {
                         else task.update({ method: null, currency: null });
                     }}
                     onItemData={data => {
-                        if (data) setShouldImmediatelySubmit(data.type === 'manual');
+                        if (data) {
+                            setShouldImmediatelySubmit(data.type === 'manual');
+                            setIsIntermediary(data.type === 'intermediary');
+                        }
                     }} />
             </Field>
         );
+
+        if (method.id && isIntermediary) {
+            fields.push(
+                <div key="intermediary-title" class="create-intent-subtitle">
+                    {intentLocale.fields.intermediary}
+                </div>
+            );
+            fields.push(
+                <Field key="intermediary">
+                    <IntermediaryEditor
+                        slot="create"
+                        editing
+                        value={task.parameters.intermediary}
+                        onChange={intermediary => task.update({ intermediary })} />
+                </Field>
+            );
+        }
 
         if (method.id) {
             fields.push(

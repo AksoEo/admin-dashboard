@@ -180,8 +180,14 @@ export const FIELDS = {
     },
     prices: {
         wantsCreationLabel: true,
-        component ({ value, editing, onChange }) {
-            return <PricesEditor value={value} editing={editing} onChange={onChange} />;
+        component ({ value, editing, onChange, item }) {
+            return (
+                <PricesEditor
+                    value={value}
+                    editing={editing}
+                    onChange={onChange}
+                    isIntermediary={item.type === 'intermediary'} />
+            );
         },
     },
     paymentValidity: {

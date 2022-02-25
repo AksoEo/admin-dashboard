@@ -2,6 +2,7 @@
 
 import { h } from 'preact';
 import Select from '../controls/select';
+import TinyProgress from '../controls/tiny-progress';
 import { connect } from '../../core/connection';
 import './style';
 
@@ -22,16 +23,16 @@ export const WithCountries = connect('countries/countryGroups')(data => ({
     countryGroups: data,
 }))(connect('countries/countries')(data => ({
     countries: data,
-}))(function WithCountries ({ countries, countryGroups, children }) {
+}))(function WithCountries ({ countries, countryGroups, children, fallback }) {
     if (countries && countryGroups) return children(countries, countryGroups);
-    return null;
+    return fallback || null;
 }));
 
 /// Renders a country flag and the name beside it.
 function CountryRenderer ({ value }) {
     if (!value) return null;
     return (
-        <WithCountries>{countries => countries[value] ? (
+        <WithCountries fallback={<TinyProgress />}>{countries => countries[value] ? (
             <span class="data country"><CountryFlag country={value} /> {countries[value].name_eo}</span>
         ) : null}</WithCountries>
     );
@@ -41,7 +42,7 @@ function CountryRenderer ({ value }) {
 export function CountryEditor ({ value, onChange, disabled, emptyLabel }) {
     return (
         <div class="data country-editor">
-            <WithCountries>
+            <WithCountries fallback={<TinyProgress />}>
                 {countries => (
                     <Select
                         disabled={disabled}

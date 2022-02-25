@@ -101,7 +101,7 @@ function SchemaErrorItem ({ item }) {
         return (
             <div class="schema-error error-item" title={item.schemaPaths ? item.schemaPaths.join('\n') : item.schemaPath}>
                 <div class="item-header">
-                    <SchemaErrorDataPath path={item.dataPath} />
+                    <SchemaErrorDataPath path={item.instancePath} />
                     {' '}
                     {message}
                 </div>
@@ -115,7 +115,7 @@ function SchemaErrorItem ({ item }) {
 
 function SchemaErrorDataPath ({ path }) {
     try {
-        const contents = path.split(/[.[\]]/).filter((x, i) => x || !i).map((item, i) => {
+        const contents = path.split(/\//).filter((x, i) => x || !i).map((item, i) => {
             if (!item) return <span class="path-item is-empty">⬥</span>;
             if (item.match(/^\d+$/)) return <span key={i} class="path-item is-index">{locale.schema.nthItem(+item + 1)}</span>;
             return <span key={i} class="path-item">{item}</span>;

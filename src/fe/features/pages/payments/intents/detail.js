@@ -25,6 +25,7 @@ import { FIELDS as METHOD_FIELDS } from '../orgs/methods/fields';
 import Meta from '../../../meta';
 import { connectPerms } from '../../../../perms';
 import { connect, coreContext } from '../../../../core/connection';
+import { IntermediaryEditor } from './fields';
 import {
     paymentIntents as locale,
     data as dataLocale,
@@ -116,6 +117,7 @@ export default connectPerms(class IntentPage extends Page {
                             'totalAmount',
                             'amountRefunded',
                             'stripePaymentIntentId',
+                            'intermediary',
                         ],
                     }}
                     header={DetailViewInner}
@@ -212,6 +214,12 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                 <div class="intent-section-title">{locale.fields.customer}</div>
                 <Customer item={item} editing={fullEditing} onItemChange={onItemChange} />
             </div>
+            {item.intermediary ? (
+                <div class="intent-intermediary-container">
+                    <div class="intent-section-title">{locale.fields.intermediary}</div>
+                    <Intermediary item={item} editing={fullEditing} onItemChange={onItemChange} />
+                </div>
+            ) : null}
             <div class="intent-method-container">
                 <div class="intent-section-title">{locale.fields.method}</div>
                 <Method method={item.method} item={item} editing={editing} onItemChange={onItemChange} />
@@ -340,6 +348,8 @@ function PurposeTriggerInfo ({ purpose, currency }) {
     );
 }
 
+const typeIsManualLike = t => t === 'manual' || t === 'intermediary';
+
 const ACTIONS = {
     cancel: {
         state: 'canceled',
@@ -359,7 +369,7 @@ const ACTIONS = {
     },
     submit: {
         state: 'submitted',
-        enabled: (t, s) => t === 'manual' && s === 'pending',
+        enabled: (t, s) => typeIsManualLike(t) && s === 'pending',
         types: ['manual', 'intermediary'],
         icon: SendIcon,
         task: id => ['payments/submitIntent', { id }],
@@ -367,7 +377,7 @@ const ACTIONS = {
     },
     markSucceeded: {
         state: 'succeeded',
-        enabled: (t, s) => t === 'manual' && (s === 'submitted' || s === 'disputed'),
+        enabled: (t, s) => typeIsManualLike(t) && (s === 'submitted' || s === 'disputed'),
         types: ['manual', 'intermediary'],
         icon: AssignmentTurnedInIcon,
         task: id => ['payments/markIntentSucceeded', { id }],
@@ -560,6 +570,17 @@ function Customer ({ item, editing, onItemChange }) {
                     </div>
                 )}
             </div>
+        </div>
+    );
+}
+
+function Intermediary ({ item, editing, onItemChange }) {
+    return (
+        <div class="intent-card intermediary-card">
+            <IntermediaryEditor
+                value={item.intermediary}
+                editing={editing}
+                onChange={intermediary => onItemChange({ ...item, intermediary })} />
         </div>
     );
 }

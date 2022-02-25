@@ -350,7 +350,7 @@ class AddPurposeDialog extends PureComponent {
                     {nameField()}
                     {descField()}
                     <div class="form-footer">
-                        <Button raised>
+                        <Button raised type="submit">
                             {locale.purposesPicker.addPurposeButton}
                         </Button>
                     </div>

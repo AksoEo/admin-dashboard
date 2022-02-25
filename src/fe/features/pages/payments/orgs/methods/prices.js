@@ -17,7 +17,7 @@ import {
 import './prices.less';
 
 /// Edits the “prices” field on payment methods.
-export default function Prices ({ value, editing, onChange }) {
+export default function Prices ({ value, editing, onChange, isIntermediary }) {
     const [addingYear, setAddingYear] = useState(false);
 
     value = value || {};
@@ -38,7 +38,8 @@ export default function Prices ({ value, editing, onChange }) {
                     const newValue = { ...value };
                     delete newValue[year];
                     onChange(newValue);
-                }} />
+                }}
+                isIntermediary={isIntermediary} />
         );
     }
 
@@ -104,7 +105,7 @@ function AddYear ({ open, onClose, onAdd }) {
     );
 }
 
-function PriceYear ({ year, value, editing, onChange }) {
+function PriceYear ({ year, value, editing, onChange, isIntermediary }) {
     const [addingCategories, setAddingCategories] = useState(false);
     const [addingMagazines, setAddingMagazines] = useState(false);
 
@@ -151,7 +152,8 @@ function PriceYear ({ year, value, editing, onChange }) {
                                     membershipCategories,
                                 },
                             });
-                        }} />
+                        }}
+                        isIntermediary={isIntermediary} />
                 ))}
                 {editing && (
                     <Button onClick={() => setAddingCategories(true)}>
@@ -203,7 +205,8 @@ function PriceYear ({ year, value, editing, onChange }) {
                                     magazines,
                                 },
                             });
-                        }} />
+                        }}
+                        isIntermediary={isIntermediary} />
                 ))}
                 {editing && (
                     <Button onClick={() => setAddingMagazines(true)}>
@@ -284,7 +287,7 @@ function AddMagazine ({ open, onClose, onAdd }) {
     );
 }
 
-function MembershipCategory ({ value, editing, onChange, onRemove }) {
+function MembershipCategory ({ value, editing, onChange, onRemove, isIntermediary }) {
     return (
         <div class="price-membership-category" data-id={value.id}>
             <div class="item-header">
@@ -303,12 +306,13 @@ function MembershipCategory ({ value, editing, onChange, onRemove }) {
                 commission={value.commission}
                 onCommissionChange={commission => onChange({ ...value, commission })}
                 price={value.price}
-                onPriceChange={price => onChange({ ...value, price })} />
+                onPriceChange={price => onChange({ ...value, price })}
+                isIntermediary={isIntermediary} />
         </div>
     );
 }
 
-function Magazine ({ value, editing, onChange, onRemove }) {
+function Magazine ({ value, editing, onChange, onRemove, isIntermediary }) {
     return (
         <div class="price-magazine" data-id={value.id}>
             <div class="item-header">
@@ -329,7 +333,8 @@ function Magazine ({ value, editing, onChange, onRemove }) {
                     commission={value.prices.paper?.commission}
                     onCommissionChange={commission => onChange({ ...value, prices: { ...value.prices, paper: { ...value.prices.paper, commission } } })}
                     price={value.prices.paper}
-                    onPriceChange={paper => onChange({ ...value, prices: { ...value.prices, paper } })} />
+                    onPriceChange={paper => onChange({ ...value, prices: { ...value.prices, paper } })}
+                    isIntermediary={isIntermediary} />
             </div>
             <div class="magazine-price">
                 <div class="price-label">{locale.prices.magazines.prices.access}</div>
@@ -338,7 +343,8 @@ function Magazine ({ value, editing, onChange, onRemove }) {
                     commission={value.prices.access?.commission}
                     onCommissionChange={commission => onChange({ ...value, prices: { ...value.prices, access: { ...value.prices.access, commission } } })}
                     price={value.prices.access}
-                    onPriceChange={access => onChange({ ...value, prices: { ...value.prices, access } })} />
+                    onPriceChange={access => onChange({ ...value, prices: { ...value.prices, access } })}
+                    isIntermediary={isIntermediary} />
             </div>
         </div>
     );
@@ -358,7 +364,7 @@ const MagazineId = connect(({ id }) => ['magazines/magazine', { id }])(data => (
     return data.name;
 });
 
-function Price ({ commission, onCommissionChange, price, onPriceChange, editing }) {
+function Price ({ commission, onCommissionChange, price, onPriceChange, editing, isIntermediary }) {
     return (
         <div class="intermediary-price">
             {price && (
@@ -389,6 +395,7 @@ function Price ({ commission, onCommissionChange, price, onPriceChange, editing 
 
             <OfferPrice
                 noDescription
+                hasCurrencyVar={isIntermediary}
                 value={price}
                 editing={editing}
                 onChange={onPriceChange} />

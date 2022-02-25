@@ -211,6 +211,14 @@ export const paymentIntents = {
         purposes: 'Pagceloj',
         totalAmount: 'Sumo',
         amountRefunded: 'Sumo redonita',
+        createdBy: '[[CreatedBy]]',
+
+        intermediary: '[[Intermediary]]',
+        intermediaryCountry: '[[Country]]',
+        intermediaryYear: '[[Year]]',
+        intermediaryNumber: '[[Number]]',
+        intermediaryIdFmt: (year, number) => `A${number}/${year}`,
+        intermediaryIdCountryInfix: 'por',
 
         statuses: {
             created: 'Kreita', // not a real status; used in event log

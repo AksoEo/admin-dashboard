@@ -14,7 +14,7 @@ export default class OfferPrice extends PureComponent {
         editingScript: false,
     };
 
-    render ({ value, editing, onChange, noDescription }) {
+    render ({ value, editing, onChange, noDescription, hasCurrencyVar }) {
         if (!value) {
             return (
                 <div class="membership-option-price is-none">
@@ -57,7 +57,8 @@ export default class OfferPrice extends PureComponent {
                     { name: 'feeCountry', type: 's', value: 'nl' },
                     { name: 'feeCountryGroups', type: 'm', value: ['x01'] },
                     { name: 'isActiveMember', type: 'b', value: true },
-                ],
+                    hasCurrencyVar && { name: 'currency', type: 's', value: 'EUR' },
+                ].filter(x => x),
             },
         ];
 

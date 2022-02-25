@@ -118,15 +118,15 @@ const iClientFields = {
     amountRefunded: 'amountRefunded',
     createdBy: 'createdBy',
     intermediary: {
-        apiFields: ['intermediaryCountryCode', 'intermediaryIdentifier'],
-        fromAPI: intent => ({
+        apiFields: ['intermediaryCountryCode', 'intermediaryIdentifier.year', 'intermediaryIdentifier.number'],
+        fromAPI: intent => intent.intermediaryCountryCode ? ({
             country: intent.intermediaryCountryCode,
             year: intent.intermediaryIdentifier?.year,
             number: intent.intermediaryIdentifier?.number,
-        }),
+        }) : null,
         toAPI: ({ country, year, number }) => ({
             intermediaryCountryCode: country || null,
-            intermediaryIdentifier: (year || number) ? ({ year, number }) : null,
+            intermediaryIdentifier: (year || typeof number === 'number') ? ({ year, number }) : null,
         }),
     },
 };
