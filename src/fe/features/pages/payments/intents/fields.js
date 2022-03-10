@@ -43,6 +43,7 @@ export const FIELDS = {
         },
     },
     intermediary: {
+        weight: 2,
         component ({ value, editing, onChange }) {
             return <IntermediaryEditor value={value} editing={editing} onChange={onChange} />;
         },
@@ -58,6 +59,7 @@ export const FIELDS = {
         },
     },
     org: {
+        weight: 0.5,
         component ({ value }) {
             return <OrgIcon org={value} />;
         },
@@ -248,7 +250,11 @@ class AutoincrementingIntermediaryIntentNumber extends PureComponent {
                 this.props.onChange(1);
                 return;
             }
-            const view = this.context.createDataView('payments/intent', { id: topItemId, fields: ['intermediary'] });
+            const view = this.context.createDataView('payments/intent', {
+                id: topItemId,
+                fields: ['intermediary'],
+                noFetch: true,
+            });
             view.on('update', data => {
                 view.drop();
                 if (this.loadId !== loadId) return;

@@ -420,6 +420,19 @@ export const tasks = {
             },
         };
     },
+    listIntermediaryIntents: (_, { jsonFilter, ...parameters }) => {
+        const intermediaryFilter = { $not: { intermediaryCountryCode: null } };
+
+        return tasks.listIntents(_, {
+            jsonFilter: {
+                filter: (jsonFilter && !jsonFilter._disabled)
+                    ? { $and: [jsonFilter.filter, intermediaryFilter] }
+                    : intermediaryFilter,
+            },
+            ...parameters,
+        });
+    },
+
     createIntent: async (_, params) => {
         const client = await asyncClient;
         let res;

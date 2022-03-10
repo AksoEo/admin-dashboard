@@ -896,6 +896,37 @@ export default [
                     },
                 ],
             },
+            {
+                id: 'intermediaries-reports',
+                component: elazy(() =>
+                    import(/* webpackChunkName: "intermediaries-reports" */ './intermediaries/reports')),
+                icon: MoveToInboxIcon,
+                type: 'bottom',
+                path: 'spezfolioj',
+                hasPerm: perms => perms.hasPerm('registration.entries.intermediary') && (perms.hasPerm('pay.payment_intents.uea.intermediary') || perms.hasPerm('pay.payment_intents.tejo.intermediary')),
+                paths: [
+                    {
+                        path: 'krei',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "intermediaries-reports" */ './intermediaries/reports/create')),
+                        type: 'stack',
+                    },
+                    /*{
+                        match: /^(\w+)$/,
+                        matchKey: 'report',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "intermediaries-reports" */ /*'./intermediaries/reports/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },*/
+                ],
+            },
         ],
     },
     {

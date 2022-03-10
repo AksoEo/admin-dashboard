@@ -192,16 +192,20 @@ export const FIELDS = {
     },
     offers: {
         wantsCreationLabel: true,
-        component ({ value, editing, item, onChange }) {
-            if (!item.year || !item.codeholderData) {
+        component ({ value, editing, item, onChange, userData }) {
+            const year = userData?.fixedYear || item.year;
+
+            if (!year || !item.codeholderData) {
+                if (userData?.fixedYear) return locale.offers.selectMemberFirst;
                 return locale.offers.selectYearFirst;
             }
             if (item.status && item.status.status !== 'submitted') editing = false;
             const [addOfferOpen, setAddOfferOpen] = useState(false);
 
-            if (!value) value = { currency: null, selected: [] };
+            let currency = value?.currency;
+            if (userData.currency) currency = userData.currency;
 
-            const year = item.year;
+            if (!value) value = { currency, selected: [] };
 
             const onAddItem = item => {
                 onChange({ ...value, selected: value.selected.concat([item]) });
@@ -225,9 +229,9 @@ export const FIELDS = {
                             <label class="offers-currency-label">{locale.offers.currency}</label>
                             <Select
                                 outline
-                                value={value.currency}
+                                value={currency}
                                 onChange={currency => onChange({ ...value, currency })}
-                                items={(!value.currency ? [{ value: null, label: '—' }] : [])
+                                items={(!currency ? [{ value: null, label: '—' }] : [])
                                     .concat(Object.keys(currencies).map(currency => ({
                                         value: currency,
                                         label: currencies[currency],
@@ -242,10 +246,10 @@ export const FIELDS = {
                                 onChange={item => onItemChange(i, item)}
                                 editing={editing}
                                 year={year}
-                                currency={value.currency}
+                                currency={currency}
                                 onRemove={() => removeSelected(i)} />
                         ))}
-                        {editing && value.currency && (
+                        {editing && currency && (
                             <div class="add-offer-container">
                                 <Button
                                     class="add-offer-button"
@@ -268,11 +272,22 @@ export const FIELDS = {
                                 open={addOfferOpen}
                                 backdrop
                                 onClose={() => setAddOfferOpen(false)}>
-                                <AddOfferDialog
-                                    codeholder={item.codeholderData}
-                                    year={year}
-                                    onAdd={onAddItem}
-                                    currency={item.offers?.currency} />
+                                {userData?.intermediary ? (
+                                    <AddOfferDialogIntermediary
+                                        codeholder={item.codeholderData}
+                                        year={year}
+                                        org={userData.intermediary.org}
+                                        method={userData.intermediary.method}
+                                        intermediaryCurrency={currency}
+                                        onAdd={onAddItem}
+                                        currency={currency} />
+                                ) : (
+                                    <AddOfferDialog
+                                        codeholder={item.codeholderData}
+                                        year={year}
+                                        onAdd={onAddItem}
+                                        currency={currency} />
+                                )}
                             </Dialog>
                         )}
                     </div>
@@ -468,19 +483,70 @@ const CodeholderDataForOffers = connect(({ codeholder }) => ['codeholders/codeho
     return children(data);
 });
 
+// TODO: if existing codeholder, filter memberships
 const AddOfferDialog = connect(({ year }) => ['memberships/options', { id: year }])(data => ({
     data,
-}))(function AddOfferDialog ({ data, year, currency, onAdd, codeholder }) {
+}))(AddOfferDialogInner);
+const AddOfferDialogIntermediary = connect(({
+    org, method,
+}) => ['payments/method', { org, id: method }])(data => ({
+    data, intermediary: true,
+}))(AddOfferDialogInner);
+
+function AddOfferDialogInner ({ data, intermediary, intermediaryCurrency, year, currency, onAdd, codeholder }) {
     if (!data) return <div class="progress-container"><CircularProgress indeterminate /></div>;
+
+    let offerGroups = data.offers;
+    let yearCurrency = data.currency;
+    if (intermediary) {
+        // intermediary data loaded from a PaymentMethodIntermediary
+
+        let categories = [];
+        let magazines = [];
+
+        if (data.prices[year]) {
+            categories = data.prices[year].registrationEntries.membershipCategories.map(item => ({
+                type: 'membership',
+                id: item.id,
+                price: item.price,
+            }));
+            magazines = data.prices[year].registrationEntries.magazines.flatMap(item => {
+                const baseItem = {
+                    type: 'magazine',
+                    id: item.id,
+                };
+                const items = [];
+                if (item.prices && item.prices.paper) {
+                    items.push({ ...baseItem, price: item.prices.paper });
+                }
+                if (item.prices && item.prices.access) {
+                    items.push({ ...baseItem, price: item.prices.access });
+                }
+                return items;
+            });
+        }
+
+        offerGroups = [
+            categories.length && {
+                title: locale.offers.types.memberships,
+                offers: categories,
+            },
+            magazines.length && {
+                title: locale.offers.types.magazines,
+                offers: magazines,
+            },
+        ].filter(x => x);
+        yearCurrency = intermediaryCurrency;
+    }
 
     const contents = codeholder => (
         <div class="add-offer">
-            {data.offers.map((group, i) => (
+            {offerGroups.map((group, i) => (
                 <AddOfferGroup
                     key={i}
                     group={group}
                     year={year}
-                    yearCurrency={data.currency}
+                    yearCurrency={yearCurrency}
                     onAdd={onAdd}
                     codeholder={codeholder}
                     currency={currency} />
@@ -496,7 +562,7 @@ const AddOfferDialog = connect(({ year }) => ['memberships/options', { id: year 
         );
     }
     return contents(codeholder);
-});
+}
 
 function AddOfferGroup ({ group, year, yearCurrency, currency, onAdd, codeholder }) {
     const [open, setOpen] = useState(false);

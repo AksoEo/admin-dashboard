@@ -60,6 +60,7 @@ export default class CodeholderPicker extends Component {
             view.on('update', () => {
                 // HACK: mutate object directly to avoid lost updates
                 const codeCache = this.state.codeCache;
+                if (!view.data.code) return; // try again...
                 codeCache[id] = view.data.code.new;
                 this.setState({ codeCache });
                 view.drop();

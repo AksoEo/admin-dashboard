@@ -160,6 +160,7 @@ export const membershipEntries = {
     },
     offers: {
         selectYearFirst: 'Bonvolu unue elekti membron kaj jaron',
+        selectMemberFirst: 'Bonvolu unue elekti membron',
         currency: 'Valuto',
         add: {
             button: 'Aldoni oferton',
@@ -170,6 +171,8 @@ export const membershipEntries = {
             addon: 'Aldoneblo',
             membership: 'Membrokategorio',
             magazine: 'Revua abono',
+            memberships: 'Membrokategorioj',
+            magazines: 'Revuaj abonoj',
         },
         cannotAddAddonNote: 'Ne eblas rekte aldoni aldoneblojn al aliĝoj.',
     },
