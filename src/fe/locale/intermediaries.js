@@ -35,6 +35,7 @@ export const intermediaryReports = {
     idCountryInfix: 'por',
     reset: '[[Clear all inputs]]',
     entries: {
+        title: '[[Entries]]',
         edit: {
             title: '[[Edit entry]]',
             confirm: '[[Save]]',
@@ -42,8 +43,11 @@ export const intermediaryReports = {
         add: {
             button: '[[Add entry]]',
         },
+        autoInternalNotes: (year, number) => `[[Part of report A${number}/${year}]]`,
+        purposeTitle: 'Registration',
     },
     addons: {
+        title: '[[Addons]]',
         edit: {
             title: '[[Edit addon]]',
             confirm: '[[Save]]',
@@ -54,6 +58,7 @@ export const intermediaryReports = {
         },
     },
     expenses: {
+        title: '[[Expenses]]',
         item: {
             title: '[[Title]]',
         },
@@ -61,7 +66,20 @@ export const intermediaryReports = {
             button: '[[Add expense]]',
         },
     },
+    totals: {
+        sum: '',
+        final: '[[Total]]',
+    },
     create: {
         title: '[[Create Report]]',
+        submit: {
+            button: '[[Submit]]',
+            description: '[[Submit this report? This will take a little moment. If your connection dies in the middle of it we will have a horrible incomplete state situation and I am going to make no attempt to fix it.]]',
+            commit: '[[Submit]]',
+            cancel: '[[Cancel]]',
+
+            entries: '[[Submitting entries]]',
+            intent: '[[Submitting report]]',
+        },
     },
 };

@@ -7,6 +7,8 @@ import './task-templates.less';
 
 export function createDialog ({ locale, fieldNames, fields: fieldDefs, className, onCompletion }) {
     return ({ open, task }) => {
+        if (task.options._noGUI) return null;
+
         const fields = fieldNames.map(id => {
             const def = fieldDefs[id];
             const Component = def.component;

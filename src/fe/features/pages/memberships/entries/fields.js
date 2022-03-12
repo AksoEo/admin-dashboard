@@ -203,7 +203,7 @@ export const FIELDS = {
             const [addOfferOpen, setAddOfferOpen] = useState(false);
 
             let currency = value?.currency;
-            if (userData.currency) currency = userData.currency;
+            if (userData?.currency) currency = userData.currency;
 
             if (!value) value = { currency, selected: [] };
 
@@ -239,7 +239,7 @@ export const FIELDS = {
                         </div>
                     )}
                     <div class="selected-offers">
-                        {value.selected.map((item, i) => (
+                        {(value.selected || []).map((item, i) => (
                             <OfferItem
                                 key={i}
                                 value={item}

@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/compat';
-import { Button, CircularProgress, TextField } from 'yamdl';
+import { Button, CircularProgress, Dialog, LinearProgress, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Page from '../../../../components/page';
@@ -11,6 +11,7 @@ import DetailFields from '../../../../components/detail/detail-fields';
 import TinyProgress from '../../../../components/controls/tiny-progress';
 import ItemPicker from '../../../../components/pickers/item-picker-dialog';
 import MdField from '../../../../components/controls/md-field';
+import DisplayError from '../../../../components/utils/error';
 import PaymentMethodPicker from '../../payments/method-picker';
 import Meta from '../../../meta';
 import {
@@ -141,6 +142,124 @@ export default class CreateReport extends Page {
         });
     }
 
+    async doSubmit () {
+        this.setState({ submissionState: ['entries', 0, this.state.entries.length] });
+        const entryData = [];
+        for (let i = 0; i < this.state.entries.length; i++) {
+            const entry = this.state.entries[i];
+
+            const entryId = await this.context.createTask('memberships/createEntry', {
+                _noGUI: true,
+            }, {
+                year: this.state.year,
+                codeholderData: entry.codeholderData,
+                offers: {
+                    currency: this.state.currency,
+                    selected: entry.offers.selected,
+                },
+                internalNotes: locale.entries.autoInternalNotes(this.state.year, this.state.number),
+            }).runOnceAndDrop();
+
+            entryData.push({
+                entryId,
+            });
+
+            this.setState({ submissionState: ['entries', i + 1, this.state.entries.length] });
+        }
+
+        this.setState({ submissionState: ['intent', 0, 1] });
+
+        const selfView = this.context.createDataView('codeholders/codeholder', {
+            id: 'self',
+            fields: ['id', 'email', 'name'],
+            lazyFetch: true,
+        });
+        const selfInfo = await new Promise((resolve, reject) => {
+            selfView.on('update', data => {
+                if (data.email === undefined || data.name === undefined) return; // no data yet
+                resolve(data);
+                selfView.drop();
+            });
+            selfView.on('error', err => {
+                reject(err);
+                selfView.drop();
+            });
+        });
+        const selfName = [
+            selfInfo.name.full,
+            selfInfo.name.honorific,
+            (selfInfo.name.first || selfInfo.name.firstLegal),
+            (selfInfo.name.last || selfInfo.name.lastLegal),
+        ].filter(x => x).join(' ');
+
+        const purposes = [];
+        for (let i = 0; i < this.state.entries.length; i++) {
+            const entry = this.state.entries[i];
+            const { entryId } = entryData[i];
+
+            purposes.push({
+                type: 'trigger',
+                triggers: 'registration_entry',
+                dataId: entryId,
+                amount: (entry.offers?.selected || [])
+                    .map(s => s.amount)
+                    .reduce((a, b) => a + b, 0),
+                title: locale.entries.purposeTitle,
+            });
+        }
+        for (const addon of this.state.addons) {
+            purposes.push({
+                type: 'addon',
+                paymentAddonId: addon.id,
+                amount: addon.amount,
+            });
+        }
+        for (const expense of this.state.expenses) {
+            purposes.push({
+                type: 'manual',
+                title: expense.title,
+                description: expense.description,
+                amount: expense.amount,
+            });
+        }
+
+        const id = await this.context.createTask('payments/createIntent', {}, {
+            customer: {
+                id: selfInfo.id,
+                name: selfName,
+                email: selfInfo.email,
+            },
+            intermediary: {
+                country: this.state.country,
+                year: this.state.year,
+                number: this.state.number,
+            },
+            paymentOrg: this.state.org,
+            method: { id: this.state.method },
+            currency: this.state.currency,
+            purposes,
+        }).runOnceAndDrop();
+
+        this.setState({ submissionState: ['intent', 1, 1], submitCheck: true });
+        return id;
+    }
+
+    submit () {
+        this.setState({ submitting: true });
+        this.doSubmit().then(id => {
+            this.setState({ submitting: false });
+            this.reset();
+            this.context.navigate(`/perantoj/spezfolioj/${id}`);
+        }).catch(err => {
+            console.error(err); // eslint-disable-line no-console
+            this.setState({
+                submitting: false,
+                submitCheck: true,
+                submitError: err,
+            });
+        });
+    }
+
     render () {
         let contents;
         if (this.state.loading) {
@@ -168,7 +287,7 @@ export default class CreateReport extends Page {
                     {this.state.country && (
                         <Select
                             value={this.state.year}
-                            onChange={year => this.setState({ year }, () => this.loadYear())}
+                            onChange={year => this.setState({ year: +year || null }, () => this.loadYear())}
                             items={[{
                                 value: null,
                                 label: '—',
@@ -209,6 +328,15 @@ export default class CreateReport extends Page {
 
             let entries = null;
             if (this.state.currency) {
+                let totalAmount = 0;
+                for (const entry of this.state.entries) {
+                    totalAmount += (entry.offers?.selected || [])
+                        .map(s => s.amount)
+                        .reduce((a, b) => a + b, 0);
+                }
+                for (const addon of this.state.addons) totalAmount += addon.amount;
+                for (const expense of this.state.expenses) totalAmount += expense.amount;
+
                 entries = (
                     <div>
                         <EntriesEditor
@@ -227,6 +355,12 @@ export default class CreateReport extends Page {
                             currency={this.state.currency}
                             value={this.state.expenses}
                             onChange={expenses => this.setState({ expenses })} />
+                        <div class="report-final-totals">
+                            <Totals items={[]} currency={this.state.currency} isFinal total={totalAmount} />
+                        </div>
+                        <Button onClick={() => this.setState({ submitCheck: true })}>
+                            {locale.create.submit.button}
+                        </Button>
                     </div>
                 );
             }
@@ -243,58 +377,132 @@ export default class CreateReport extends Page {
             <div class="intermediary-report-create">
                 <Meta title={locale.create.title} />
                 {contents}
+                <Dialog
+                    class="intermediary-report-create-submit-dialog"
+                    open={this.state.submitting || this.state.submitCheck}
+                    onClose={() => this.setState({ submitCheck: false })}
+                    actions={this.state.submitting ? [] : [
+                        {
+                            label: locale.create.submit.cancel,
+                            action: () => this.setState({ submitCheck: false }),
+                        },
+                        {
+                            label: locale.create.submit.commit,
+                            action: () => this.submit(),
+                        },
+                    ]}>
+                    {this.state.submitting && (
+                        <LinearProgress
+                            progress={this.state.submissionState[1] / Math.max(1, this.state.submissionState[2])} />
+                    )}
+                    {this.state.submitting
+                        ? locale.create.submit[this.state.submissionState[0]]
+                        : this.state.submitError
+                            ? <DisplayError error={this.state.submitError} />
+                            : locale.create.submit.description}
+                </Dialog>
             </div>
         );
     }
 }
 
+function CollapsingSection ({ title, children }) {
+    return (
+        <details class="collapsing-section">
+            <summary>{title}</summary>
+            {children}
+        </details>
+    );
+}
+
 function EntriesEditor ({ value, onChange, year, org, method, currency }) {
     const [editing, setEditing] = useState(null);
 
+    const totalsItems = [];
+    let totalAmount = 0;
+
+    const categories = {};
+    const magazines = {};
+    for (const entry of value) {
+        for (const offer of (entry.offers?.selected || [])) {
+            let acc;
+            if (offer.type === 'membership') acc = categories;
+            else if (offer.type === 'magazine') acc = magazines;
+            else continue; // oh no we don't know what this is
+            if (!acc[offer.id]) acc[offer.id] = { id: offer.id, count: 0, amount: 0 };
+            acc[offer.id].count++;
+            acc[offer.id].amount += offer.amount;
+            totalAmount += offer.amount;
+        }
+    }
+    for (const k in categories) {
+        const category = categories[k];
+        totalsItems.push({
+            title: <CategoryName id={category.id} />,
+            count: category.count,
+            amount: category.amount,
+        });
+    }
+    for (const k in magazines) {
+        const magazine = magazines[k];
+        totalsItems.push({
+            title: <MagazineName id={magazine.id} />,
+            count: magazine.count,
+            amount: magazine.amount,
+        });
+    }
+
     return (
-        <div>
-            {value.map((entry, i) => (
-                <EntryItem
-                    key={i}
-                    entry={entry}
-                    editing={editing === i}
-                    onEdit={() => setEditing(i)}
-                    onRemove={() => {
-                        const newEntries = value.slice();
-                        newEntries.splice(i, 1);
+        <div class="report-section-container">
+            <CollapsingSection title={locale.entries.title}>
+                {value.map((entry, i) => (
+                    <EntryItem
+                        key={i}
+                        entry={entry}
+                        editing={editing === i}
+                        onEdit={() => setEditing(i)}
+                        onRemove={() => {
+                            const newEntries = value.slice();
+                            newEntries.splice(i, 1);
+                            setEditing(null);
+                            onChange(newEntries);
+                        }} />
+                ))}
+                <div>
+                    <Button onClick={() => {
+                        setEditing(value.length);
+                        onChange(value.concat([NEW_ENTRY]));
+                    }}>
+                        {locale.entries.add.button}
+                    </Button>
+                </div>
+                <EntryEditor
+                    year={year}
+                    org={org}
+                    method={method}
+                    currency={currency}
+                    entry={editing !== null ? value[editing] : null}
+                    onCancel={() => {
+                        if (value[editing].codeholderData === null) {
+                            // user canceled creation
+                            const newEntries = value.slice();
+                            newEntries.splice(editing, 1);
+                            onChange(newEntries);
+                        }
                         setEditing(null);
-                        onChange(newEntries);
-                    }} />
-            ))}
-            <div>
-                <Button onClick={() => {
-                    setEditing(value.length);
-                    onChange(value.concat([NEW_ENTRY]));
-                }}>
-                    {locale.entries.add.button}
-                </Button>
-            </div>
-            <EntryEditor
-                year={year}
-                org={org}
-                method={method}
-                currency={currency}
-                entry={editing !== null ? value[editing] : null}
-                onCancel={() => {
-                    if (value[editing].codeholderData === null) {
-                        // user canceled creation
+                    }}
+                    onConfirm={entry => {
                         const newEntries = value.slice();
-                        newEntries.splice(editing, 1);
+                        newEntries[editing] = entry;
                         onChange(newEntries);
-                    }
-                    setEditing(null);
-                }}
-                onConfirm={entry => {
-                    const newEntries = value.slice();
-                    newEntries[editing] = entry;
-                    onChange(newEntries);
-                    setEditing(null);
-                }} />
+                        setEditing(null);
+                    }} />
+            </CollapsingSection>
+            <Totals
+                showCounts
+                currency={currency}
+                items={totalsItems}
+                total={totalAmount} />
         </div>
     );
 }
@@ -402,39 +610,60 @@ function InnerEntryEditor ({ entry, onEditChange, year, org, method, currency })
     );
 }
 
+const CategoryName = connect(({ id }) => [
+    'memberships/category', { id },
+])()(function CategoryName ({ name }) {
+    if (!name) return <TinyProgress />;
+    return name;
+});
+
+const MagazineName = connect(({ id }) => [
+    'magazines/magazine', { id },
+])()(function MagazineName ({ name }) {
+    if (!name) return <TinyProgress />;
+    return name;
+});
+
 function AddonsEditor ({ org, value, onChange, currency }) {
     const [adding, setAdding] = useState(false);
+    const totalAmount = value.map(item => item.amount).reduce((a, b) => a + b, 0);
 
     return (
-        <div>
-            {value.map((addon, i) => (
-                <AddonItem
-                    key={addon.id}
-                    org={org}
-                    addon={addon}
-                    currency={currency}
-                    onChange={addon => {
-                        const newAddons = value.slice();
-                        newAddons[i] = addon;
-                        onChange(newAddons);
-                    }}
-                    onRemove={() => {
-                        const newAddons = value.slice();
-                        newAddons.splice(i, 1);
-                        onChange(newAddons);
-                    }} />
-            ))}
-            <div>
-                <Button onClick={() => setAdding(true)}>
-                    {locale.addons.add.button}
-                </Button>
-                <AddAddon
-                    open={adding}
-                    onClose={() => setAdding(false)}
-                    onAdd={item => onChange(value.concat(item))}
-                    org={org}
-                    selectedIds={value.map(item => item.id)} />
-            </div>
+        <div class="report-section-container">
+            <CollapsingSection title={locale.addons.title}>
+                {value.map((addon, i) => (
+                    <AddonItem
+                        key={addon.id}
+                        org={org}
+                        addon={addon}
+                        currency={currency}
+                        onChange={addon => {
+                            const newAddons = value.slice();
+                            newAddons[i] = addon;
+                            onChange(newAddons);
+                        }}
+                        onRemove={() => {
+                            const newAddons = value.slice();
+                            newAddons.splice(i, 1);
+                            onChange(newAddons);
+                        }} />
+                ))}
+                <div>
+                    <Button onClick={() => setAdding(true)}>
+                        {locale.addons.add.button}
+                    </Button>
+                    <AddAddon
+                        open={adding}
+                        onClose={() => setAdding(false)}
+                        onAdd={item => onChange(value.concat(item))}
+                        org={org}
+                        selectedIds={value.map(item => item.id)} />
+                </div>
+            </CollapsingSection>
+            <Totals
+                currency={currency}
+                items={[]}
+                total={totalAmount} />
         </div>
     );
 }
@@ -491,33 +720,42 @@ function AddAddon ({ open, onClose, onAdd, org, selectedIds }) {
 }
 
 function ExpensesEditor ({ value, onChange, currency }) {
+    const totalsItems = [];
+    const totalAmount = value.map(item => item.amount).reduce((a, b) => a + b, 0);
+
     return (
-        <div class="report-expenses">
-            {value.map((item, i) => (
-                <ExpenseItem
-                    key={i}
-                    expense={item}
-                    onChange={item => {
-                        const newItems = value.slice();
-                        newItems[i] = item;
-                        onChange(newItems);
-                    }}
-                    onRemove={() => {
-                        const newItems = value.slice();
-                        newItems.splice(i, 1);
-                        onChange(newItems);
-                    }}
-                    currency={currency} />
-            ))}
-            <div>
-                <Button onClick={() => onChange(value.concat({
-                    title: '',
-                    description: null,
-                    amount: 0,
-                }))}>
-                    {locale.expenses.add.button}
-                </Button>
-            </div>
+        <div class="report-section-container">
+            <CollapsingSection title={locale.expenses.title}>
+                {value.map((item, i) => (
+                    <ExpenseItem
+                        key={i}
+                        expense={item}
+                        onChange={item => {
+                            const newItems = value.slice();
+                            newItems[i] = item;
+                            onChange(newItems);
+                        }}
+                        onRemove={() => {
+                            const newItems = value.slice();
+                            newItems.splice(i, 1);
+                            onChange(newItems);
+                        }}
+                        currency={currency} />
+                ))}
+                <div>
+                    <Button onClick={() => onChange(value.concat({
+                        title: '',
+                        description: null,
+                        amount: 0,
+                    }))}>
+                        {locale.expenses.add.button}
+                    </Button>
+                </div>
+            </CollapsingSection>
+            <Totals
+                currency={currency}
+                items={totalsItems}
+                total={totalAmount} />
         </div>
     );
 }
@@ -544,6 +782,37 @@ function ExpenseItem ({ expense, onChange, onRemove, currency }) {
                 value={expense.amount}
                 onChange={amount => onChange({ ...expense, amount })}
                 currency={currency} />
+        </div>
+    );
+}
+
+function Totals ({ items, total, currency, showCounts, isFinal }) {
+    return (
+        <div class="report-totals">
+            {items.map((item, i) => (
+                <div class="totals-item" key={i}>
+                    {showCounts && (
+                        <div class="item-count">
+                            {item.count || 1}
+                        </div>
+                    )}
+                    <div class="item-title">
+                        {item.title}
+                    </div>
+                    <div class="item-price">
+                        <currencyAmount.renderer value={item.amount} currency={currency} />
+                    </div>
+                </div>
+            ))}
+            <hr />
+            <div class="totals-item">
+                <div class={'item-title' + (isFinal ? ' is-final' : '')}>
+                    {isFinal ? locale.totals.final : locale.totals.sum}
+                </div>
+                <div class="item-price">
+                    <currencyAmount.renderer value={total} currency={currency} />
+                </div>
+            </div>
         </div>
     );
 }

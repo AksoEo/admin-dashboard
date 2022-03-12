@@ -24,9 +24,58 @@
             }
         }
     }
+
+    .report-section-container {
+        margin: 16px;
+
+        .collapsing-section {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            background: @card1-background;
+            .elevation(2);
+
+            & > summary {
+                font-weight: bold;
+                padding: 4px 0;
+            }
+        }
+    }
+    .report-final-totals {
+        margin: 16px;
+    }
+
+    .report-totals {
+        .totals-item {
+            display: flex;
+            padding: 4px 0;
+
+            & + .totals-item {
+                border-top: 1px solid @separator;
+            }
+
+            .item-count {
+                min-width: 2em;
+                text-align: right;
+                margin-right: 1em;
+            }
+            .item-title {
+                flex: 1;
+
+                &.is-final {
+                    font-weight: bold;
+                }
+            }
+        }
+    }
 }
 
 .intermediary-report-entry-dialog {
     width: 100%;
     max-width: 600px;
+}
+
+.intermediary-report-create-submit-dialog {
+    width: 100%;
+    max-width: 400px;
 }
