@@ -6,14 +6,44 @@
         text-align: center;
     }
 
+    .report-setup {
+        padding: 24px;
+
+        .setup-field {
+            border-top: 1px solid @separator;
+            padding: 8px 0;
+
+            &:first-child {
+                border-top: none;
+            }
+
+            .setup-field-label {
+                font-size: smaller;
+                font-weight: 600;
+                text-transform: uppercase;
+                opacity: 0.8;
+            }
+
+            &:not(.is-stack) {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            &.is-stack .setup-field-label {
+                margin-bottom: 4px;
+            }
+        }
+    }
+
     .report-entry {
+        padding: 16px;
+        margin: 8px 0;
+        border-radius: 8px;
+        .elevation(2);
+
         .entry-header {
             display: flex;
             align-items: center;
-            padding: 16px;
-            border-radius: 8px;
-            margin: 8px 16px;
-            .elevation(2);
 
             .remove-button {
                 margin-right: 16px;
@@ -43,30 +73,6 @@
     }
     .report-final-totals {
         margin: 16px;
-    }
-
-    .report-totals {
-        .totals-item {
-            display: flex;
-            padding: 4px 0;
-
-            & + .totals-item {
-                border-top: 1px solid @separator;
-            }
-
-            .item-count {
-                min-width: 2em;
-                text-align: right;
-                margin-right: 1em;
-            }
-            .item-title {
-                flex: 1;
-
-                &.is-final {
-                    font-weight: bold;
-                }
-            }
-        }
     }
 }
 

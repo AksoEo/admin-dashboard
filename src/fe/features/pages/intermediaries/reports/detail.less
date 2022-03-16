@@ -1,0 +1,118 @@
+@import '../../../../prelude';
+
+.intermediary-report-detail {
+    padding: 24px;
+
+    .report-title {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    .report-subtitle {
+        font-size: smaller;
+        margin-top: 4px;
+    }
+
+    .section-title {
+        font-weight: bold;
+        margin-top: 16px;
+    }
+
+    .report-entries {
+        .report-entry-data {
+            padding: 8px 16px;
+            margin: 8px 0;
+            border-radius: 8px;
+            background: @card2-background;
+            .elevation(2);
+
+            &.is-loading {
+                text-align: center;
+            }
+
+            .entry-header {
+                display: flex;
+
+                .entry-header-info {
+                    flex: 1;
+
+                    .header-info-status, .header-info-issue {
+                        font-size: smaller;
+                        margin-top: 4px;
+                    }
+                }
+            }
+
+            .entry-expanded {
+                margin-top: 4px;
+            }
+        }
+    }
+
+    .report-addons {
+        .entry-addon {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin: 8px 0;
+            background: @card2-background;
+            .elevation(2);
+
+            .addon-name {
+                .addon-invalid {
+                    vertical-align: middle;
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+    .report-expenses {
+        .entry-expense {
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin: 8px 0;
+            background: @card2-background;
+            .elevation(2);
+
+            .expense-header {
+                display: flex;
+                justify-content: space-between;
+
+                .expense-title {
+                    .expense-invalid {
+                        vertical-align: middle;
+                        margin-right: 4px;
+                    }
+                }
+            }
+            .expense-description {
+                margin-top: 4px;
+                font-size: smaller;
+            }
+        }
+    }
+}
+
+.intermediary-report-totals {
+    .totals-item {
+        display: flex;
+        padding: 4px 0;
+
+        & + .totals-item {
+            border-top: 1px solid @separator;
+        }
+
+        .item-count {
+            min-width: 2em;
+            text-align: right;
+            margin-right: 1em;
+        }
+        .item-title {
+            flex: 1;
+
+            &.is-final {
+                font-weight: bold;
+            }
+        }
+    }
+}

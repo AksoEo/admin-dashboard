@@ -13,7 +13,7 @@ export default function DiffAuthor ({ author, interactive }) {
     if (author.startsWith('ch:')) {
         const chId = +author.substr(3);
         if (interactive) {
-            return <Link target={`/membroj/${chId}`} outOfTree><IdUEACode id={chId} /></Link>;
+            return <Link target={`/membroj/${chId}`} class="diff-author-link" outOfTree><IdUEACode id={chId} /></Link>;
         } else {
             <IdUEACode id={chId} />;
         }
@@ -21,7 +21,7 @@ export default function DiffAuthor ({ author, interactive }) {
         const appId = +author.substr(4);
         if (interactive) {
             return (
-                <Link target={`/administrado/klientoj/${appId}`}>
+                <Link target={`/administrado/klientoj/${appId}`} class="diff-author-link">
                     <span class="diff-author-app-id">
                         {appId}
                     </span>

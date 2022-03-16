@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState, useEffect } from 'preact/compat';
+import { PureComponent, useState, useEffect } from 'preact/compat';
 import { Button, CircularProgress, Dialog, LinearProgress, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -12,7 +12,9 @@ import TinyProgress from '../../../../components/controls/tiny-progress';
 import ItemPicker from '../../../../components/pickers/item-picker-dialog';
 import MdField from '../../../../components/controls/md-field';
 import DisplayError from '../../../../components/utils/error';
+import MembershipChip from '../../../../components/membership-chip';
 import PaymentMethodPicker from '../../payments/method-picker';
+import { Totals } from './detail';
 import Meta from '../../../meta';
 import {
     intermediaryReports as locale,
@@ -87,6 +89,7 @@ export default class CreateReport extends Page {
 
     loadMethod () {
         const { org, method: id } = this.state;
+        if (!id) return;
         this.setState({ loading: true });
         this.context.createTask('payments/getMethod', { org, id }).runOnceAndDrop().then(result => {
             this.setState({ methodData: result, loading: false });
@@ -100,6 +103,7 @@ export default class CreateReport extends Page {
     }
 
     loadYear () {
+        if (!this.state.country || !this.state.year) return;
         this.setState({ loading: true });
         this.context.createTask('payments/listIntermediaryIntents', {}, {
             jsonFilter: {
@@ -270,31 +274,37 @@ export default class CreateReport extends Page {
             );
         } else if (!this.state.country || !this.state.year) {
             contents = (
-                <div>
-                    <PaymentMethodPicker
-                        item={{}}
-                        org={this.state.org}
-                        onOrgChange={org => this.setState({ org })}
-                        value={this.state.method}
-                        onChange={method => this.setState({ method }, () => this.loadMethod())}
-                        jsonFilter={{ type: 'intermediary' }} />
-                    todo proper country editor
+                <div class="report-setup">
+                    <div class="setup-field is-stack">
+                        <div class="setup-field-label">{locale.create.setup.method}</div>
+                        <PaymentMethodPicker
+                            item={{}}
+                            org={this.state.org}
+                            onOrgChange={org => this.setState({ org })}
+                            value={this.state.method}
+                            onChange={method => this.setState({ method }, () => this.loadMethod())}
+                            jsonFilter={{ type: 'intermediary' }} />
+                    </div>
                     {this.state.method && (
-                        <country.editor
-                            value={this.state.country}
-                            onChange={country => this.setState({ country })} />
+                        <div class="setup-field">
+                            <div class="setup-field-label">{locale.create.setup.country}</div>
+                            <CountryPicker value={this.state.country} onChange={country => this.setState({ country })} />
+                        </div>
                     )}
                     {this.state.country && (
-                        <Select
-                            value={this.state.year}
-                            onChange={year => this.setState({ year: +year || null }, () => this.loadYear())}
-                            items={[{
-                                value: null,
-                                label: '—',
-                            }].concat(Object.keys(this.state.methodData.prices).map(year => ({
-                                value: +year,
-                                label: year,
-                            })))} />
+                        <div class="setup-field">
+                            <div class="setup-field-label">{locale.create.setup.year}</div>
+                            <Select
+                                value={this.state.year}
+                                onChange={year => this.setState({ year: +year || null }, () => this.loadYear())}
+                                items={[{
+                                    value: null,
+                                    label: '—',
+                                }].concat(Object.keys(this.state.methodData.prices).map(year => ({
+                                    value: +year,
+                                    label: year,
+                                })))} />
+                        </div>
                     )}
                 </div>
             );
@@ -302,7 +312,7 @@ export default class CreateReport extends Page {
             const header = (
                 <div class="report-header">
                     <Button onClick={() => this.reset()}>
-                        {locale.reset}
+                        {locale.create.reset}
                     </Button>
                     <div class="report-title">
                         {locale.idFmt(this.state.year, this.state.number)}
@@ -312,7 +322,7 @@ export default class CreateReport extends Page {
                         <country.renderer value={this.state.country} />
                     </div>
                     <div class="report-subtitle">
-                        todo method name
+                        <PaymentMethodName org={this.state.org} id={this.state.method} />
                     </div>
                     <Select
                         outline
@@ -405,6 +415,97 @@ export default class CreateReport extends Page {
         );
     }
 }
+
+const CountryPicker = connect('login')()(class CountryPicker extends PureComponent {
+    state = {
+        loading: false,
+        error: null,
+        countries: [],
+    };
+
+    static contextType = coreContext;
+
+    async doLoad () {
+        const countryNames = await new Promise((resolve, reject) => {
+            const view = this.context.createDataView('countries/countries');
+            view.on('update', data => {
+                if (!data) return;
+                resolve(data);
+                view.drop();
+            });
+            view.on('error', error => {
+                reject(error);
+                view.drop();
+            });
+        });
+
+        const result = await this.context.createTask('intermediaries/list', {
+            jsonFilter: {
+                filter: { codeholderId: this.props.id },
+            },
+            fields: ['countryCode'],
+            limit: 100,
+        }).runOnceAndDrop();
+
+        const countries = [];
+        for (const itemId of result.items) {
+            const view = this.context.createDataView('intermediaries/intermediary', { id: itemId });
+            const item = await new Promise((resolve, reject) => {
+                view.on('update', data => {
+                    if (!data) return;
+                    resolve(data);
+                    view.drop();
+                });
+                view.on('error', error => {
+                    reject(error);
+                    view.drop();
+                });
+            });
+
+            countries.push({
+                value: item.countryCode,
+                label: countryNames[item.countryCode].name_eo,
+            });
+        }
+
+        return countries;
+    }
+
+    load () {
+        this.setState({ loading: true });
+        this.doLoad().then(countries => {
+            this.setState({ loading: false, countries });
+        }).catch(error => {
+            this.setState({ loading: false, error });
+        });
+    }
+
+    componentDidMount () {
+        this.load();
+    }
+
+    render ({ value, onChange }) {
+        if (this.state.loading) return <TinyProgress />;
+        if (this.state.error) return <DisplayError error={this.state.error} />;
+
+        let countries = this.state.countries;
+        if (!value) countries = [{ label: '—', value: null }].concat(countries);
+
+        return (
+            <Select
+                items={countries}
+                value={value}
+                onChange={onChange} />
+        );
+    }
+});
+
+const PaymentMethodName = connect(({ org, id }) => ['payments/method', { org, id }])(data => ({
+    data,
+}))(function PaymentMethodName ({ data }) {
+    if (!data) return <TinyProgress />;
+    return data.name;
+});
 
 function CollapsingSection ({ title, children }) {
     return (
@@ -524,9 +625,31 @@ function EntryItem ({ entry, onEdit, onRemove }) {
                     <EditIcon />
                 </Button>
             </div>
+            <div class="entry-items">
+                {(entry.offers?.selected || []).map((offer, i) => <EntrySelectedOffer key={i} offer={offer} />)}
+            </div>
         </div>
     );
 }
+
+function EntrySelectedOffer ({ offer }) {
+    if (offer.type === 'membership') {
+        return <EntrySelectedMembership id={offer.id} />;
+    }
+}
+
+const EntrySelectedMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
+    data,
+}))(function EntrySelectedMembership ({ data }) {
+    if (!data) return <TinyProgress />;
+    return (
+        <MembershipChip
+            abbrev={data.nameAbbrev}
+            name={data.name}
+            givesMembership={data.givesMembership}
+            lifetime={data.lifetime} />
+    );
+});
 
 function RegistrationEntryName ({ entry }) {
     if (typeof entry.codeholderData === 'number') {
@@ -782,37 +905,6 @@ function ExpenseItem ({ expense, onChange, onRemove, currency }) {
                 value={expense.amount}
                 onChange={amount => onChange({ ...expense, amount })}
                 currency={currency} />
-        </div>
-    );
-}
-
-function Totals ({ items, total, currency, showCounts, isFinal }) {
-    return (
-        <div class="report-totals">
-            {items.map((item, i) => (
-                <div class="totals-item" key={i}>
-                    {showCounts && (
-                        <div class="item-count">
-                            {item.count || 1}
-                        </div>
-                    )}
-                    <div class="item-title">
-                        {item.title}
-                    </div>
-                    <div class="item-price">
-                        <currencyAmount.renderer value={item.amount} currency={currency} />
-                    </div>
-                </div>
-            ))}
-            <hr />
-            <div class="totals-item">
-                <div class={'item-title' + (isFinal ? ' is-final' : '')}>
-                    {isFinal ? locale.totals.final : locale.totals.sum}
-                </div>
-                <div class="item-price">
-                    <currencyAmount.renderer value={total} currency={currency} />
-                </div>
-            </div>
         </div>
     );
 }

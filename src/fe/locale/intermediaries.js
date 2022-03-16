@@ -33,7 +33,7 @@ export const intermediaryReports = {
     failedToLoadYear: '[[Failed to load year. Please try again later.]]',
     idFmt: (year, number) => `A${number}/${year}`,
     idCountryInfix: 'por',
-    reset: '[[Clear all inputs]]',
+    createdBy: '[[Created by]]',
     entries: {
         title: '[[Entries]]',
         edit: {
@@ -71,7 +71,13 @@ export const intermediaryReports = {
         final: '[[Total]]',
     },
     create: {
+        reset: '[[Clear all inputs]]',
         title: '[[Create Report]]',
+        setup: {
+            method: '[[Payment method]]',
+            country: '[[Country]]',
+            year: '[[Year]]',
+        },
         submit: {
             button: '[[Submit]]',
             description: '[[Submit this report? This will take a little moment. If your connection dies in the middle of it we will have a horrible incomplete state situation and I am going to make no attempt to fix it.]]',

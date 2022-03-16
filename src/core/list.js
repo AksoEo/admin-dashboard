@@ -14,6 +14,7 @@ export function transformError (err) {
     else if (err.statusCode === 409) code = 'conflict';
     else if (err.statusCode === 413) code = 'payload-too-large';
     else if (err.statusCode === 500) code = 'internal-server-error';
+    else if (err.message.includes('NetworkError')) code = 'network';
 
     return {
         code: code || err.code || '?',

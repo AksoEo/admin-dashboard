@@ -15,6 +15,7 @@ import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
 import StyleIcon from '@material-ui/icons/Style';
 import MoveToInboxIcon from '@material-ui/icons/MoveToInbox';
+import DescriptionIcon from '@material-ui/icons/Description';
 import {
     TravelExploreIcon,
     BadgeIcon,
@@ -900,7 +901,7 @@ export default [
                 id: 'intermediaries-reports',
                 component: elazy(() =>
                     import(/* webpackChunkName: "intermediaries-reports" */ './intermediaries/reports')),
-                icon: MoveToInboxIcon,
+                icon: DescriptionIcon,
                 type: 'bottom',
                 path: 'spezfolioj',
                 hasPerm: perms => perms.hasPerm('registration.entries.intermediary') && (perms.hasPerm('pay.payment_intents.uea.intermediary') || perms.hasPerm('pay.payment_intents.tejo.intermediary')),
@@ -911,11 +912,11 @@ export default [
                             import(/* webpackChunkName: "intermediaries-reports" */ './intermediaries/reports/create')),
                         type: 'stack',
                     },
-                    /*{
+                    {
                         match: /^(\w+)$/,
                         matchKey: 'report',
                         component: elazy(() =>
-                            import(/* webpackChunkName: "intermediaries-reports" */ /*'./intermediaries/reports/detail')),
+                            import(/* webpackChunkName: "intermediaries-reports" */ './intermediaries/reports/detail')),
                         type: 'stack',
                         paths: [
                             {
@@ -924,7 +925,7 @@ export default [
                                 state: 'editing',
                             },
                         ],
-                    },*/
+                    },
                 ],
             },
         ],

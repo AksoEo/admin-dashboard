@@ -720,7 +720,7 @@ const OfferMembership = connect(({ id }) => ['memberships/category', { id }])(da
     if (!data) return <TinyProgress />;
     if (noLink) return data.name;
     const target = `/membreco/kategorioj/${id}`;
-    return <Link target={target}>{data.name}</Link>;
+    return <Link target={target} outOfTree>{data.name}</Link>;
 });
 
 const OfferMagazine = connect(({ id }) => ['magazines/magazine', { id }])(data => ({
@@ -729,7 +729,7 @@ const OfferMagazine = connect(({ id }) => ['magazines/magazine', { id }])(data =
     if (!data) return <TinyProgress />;
     if (noLink) return data.name;
     const target = `/revuoj/${id}`;
-    return <Link target={target}>{data.name}</Link>;
+    return <Link target={target} outOfTree>{data.name}</Link>;
 });
 
 const OfferAddon = connect(({ year }) => ['memberships/options', { id: year }])(data => ({
@@ -752,5 +752,5 @@ const OfferAddonInner = connect(({ org, id }) => ['payments/addon', { org, id }]
     if (!data) return <TinyProgress />;
     if (noLink) return data.name;
     const target = `/aksopago/organizoj/${org}/aldonebloj/${id}`;
-    return <Link target={target}>{data.name}</Link>;
+    return <Link target={target} outOfTree>{data.name}</Link>;
 });

@@ -41,6 +41,7 @@ export const pages = {
     'payment-orgs': 'Pagorganizoj',
     intermediaries: 'Perantoj',
     'intermediaries-intermediaries': 'Perantoj',
+    'intermediaries-reports': 'Spezfolioj',
     administration: 'Administrado',
     'administration-groups': 'Administraj grupoj',
     'administration-clients': 'API-klientoj',

@@ -19,7 +19,6 @@ export default class IntermediaryReports extends OverviewPage {
     };
 
     locale = locale;
-    filters = {};
 
     renderActions ({ perms }) {
         const actions = [];

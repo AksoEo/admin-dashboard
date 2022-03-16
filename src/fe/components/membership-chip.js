@@ -19,6 +19,7 @@ export default function MembershipChip ({
     ...props
 }) {
     props.class = (props.class || '') + ' membership-chip';
+    if (year) props.class += ' has-year';
     if (givesMembership) props.class += ' gives-membership';
     if (lifetime) props.class += ' is-lifetime';
 
