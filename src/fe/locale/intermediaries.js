@@ -61,6 +61,7 @@ export const intermediaryReports = {
         title: '[[Expenses]]',
         item: {
             title: '[[Title]]',
+            description: '[[Description]]',
         },
         add: {
             button: '[[Add expense]]',
@@ -71,12 +72,15 @@ export const intermediaryReports = {
         final: '[[Total]]',
     },
     create: {
-        reset: '[[Clear all inputs]]',
+        reset: '[[Reset form]]',
+        resetConfirm: '[[Are you sure you want to reset your inputs?]]',
         title: '[[Create Report]]',
+        currency: '[[Currency]]',
         setup: {
             method: '[[Payment method]]',
             country: '[[Country]]',
             year: '[[Year]]',
+            confirm: '[[Confirm]]',
         },
         submit: {
             button: '[[Submit]]',

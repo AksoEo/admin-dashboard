@@ -35,6 +35,38 @@
         }
     }
 
+    .report-header {
+        padding: 16px;
+
+        .reset-button {
+            float: right;
+            font-size: smaller;
+            --md-button-color: @gray-button-color;
+        }
+
+        .report-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .report-subtitle {
+            font-size: smaller;
+        }
+
+        .report-currency-select {
+            margin-top: 16px;
+            font-size: smaller;
+
+            label {
+                font-size: smaller;
+                font-weight: 600;
+                text-transform: uppercase;
+                margin-bottom: 4px;
+                display: block
+            }
+        }
+    }
+
     .report-entry {
         padding: 16px;
         margin: 8px 0;
@@ -54,6 +86,50 @@
             }
         }
     }
+    .report-addon {
+        display: flex;
+        justify-content: space-between;
+
+        .addon-header {
+            display: flex;
+            align-items: center;
+
+            .remove-button {
+                margin-right: 16px;
+            }
+        }
+    }
+    .report-expense {
+        margin: 8px 0;
+        padding: 8px 16px;
+        border-radius: 4px;
+        background: @card2-background;
+        .elevation(2);
+
+        .expense-header {
+            display: flex;
+            margin-bottom: 8px;
+
+            .title-field {
+                margin-top: 4px;
+                margin-left: 16px;
+                flex: 1;
+            }
+        }
+
+        .desc-label {
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-size: smaller;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .amount-container {
+            margin-top: 4px;
+            text-align: right;
+        }
+    }
 
     .report-section-container {
         margin: 16px;
@@ -66,13 +142,25 @@
             .elevation(2);
 
             & > summary {
-                font-weight: bold;
                 padding: 4px 0;
+
+                .inner-title {
+                    font-weight: bold;
+                }
+                .inner-count {
+                    opacity: 0.7;
+                    margin-left: 8px;
+                }
             }
         }
     }
     .report-final-totals {
         margin: 16px;
+    }
+
+    .report-submit-container {
+        text-align: right;
+        padding: 16px 24px;
     }
 }
 

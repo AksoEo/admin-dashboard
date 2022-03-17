@@ -39,6 +39,7 @@ const EMPTY_STATE = {
     methodData: null,
     country: null,
     year: null,
+    setupConfirmed: false,
     number: null,
     currency: null,
     entries: [],
@@ -54,6 +55,12 @@ export default class CreateReport extends Page {
 
     reset () {
         this.setState(EMPTY_STATE);
+    }
+
+    askReset () {
+        if (confirm(locale.create.resetConfirm)) {
+            this.reset();
+        }
     }
 
     componentDidMount () {
@@ -74,6 +81,7 @@ export default class CreateReport extends Page {
                 method: this.state.method,
                 country: this.state.country,
                 year: this.state.year,
+                setupConfirmed: this.state.setupConfirmed,
                 number: this.state.number,
                 currency: this.state.currency,
                 entries: this.state.entries,
@@ -272,7 +280,7 @@ export default class CreateReport extends Page {
                     <CircularProgress indeterminate />
                 </div>
             );
-        } else if (!this.state.country || !this.state.year) {
+        } else if (!this.state.country || !this.state.year || !this.state.setupConfirmed) {
             contents = (
                 <div class="report-setup">
                     <div class="setup-field is-stack">
@@ -282,7 +290,10 @@ export default class CreateReport extends Page {
                             org={this.state.org}
                             onOrgChange={org => this.setState({ org })}
                             value={this.state.method}
-                            onChange={method => this.setState({ method }, () => this.loadMethod())}
+                            onChange={method => {
+                                this.setState({ method }, () => this.loadMethod());
+                                if (!method) this.setState({ country: null, year: null });
+                            }}
                             jsonFilter={{ type: 'intermediary' }} />
                     </div>
                     {this.state.method && (
@@ -291,7 +302,7 @@ export default class CreateReport extends Page {
                             <CountryPicker value={this.state.country} onChange={country => this.setState({ country })} />
                         </div>
                     )}
-                    {this.state.country && (
+                    {this.state.method && (
                         <div class="setup-field">
                             <div class="setup-field-label">{locale.create.setup.year}</div>
                             <Select
@@ -300,10 +311,17 @@ export default class CreateReport extends Page {
                                 items={[{
                                     value: null,
                                     label: '—',
-                                }].concat(Object.keys(this.state.methodData.prices).map(year => ({
+                                }].concat(Object.keys(this.state.methodData?.prices || []).map(year => ({
                                     value: +year,
                                     label: year,
                                 })))} />
+                        </div>
+                    )}
+                    {this.state.year && (
+                        <div class="setup-confirm-container">
+                            <Button onClick={() => this.setState({ setupConfirmed: true })}>
+                                {locale.create.setup.confirm}
+                            </Button>
                         </div>
                     )}
                 </div>
@@ -311,7 +329,7 @@ export default class CreateReport extends Page {
         } else {
             const header = (
                 <div class="report-header">
-                    <Button onClick={() => this.reset()}>
+                    <Button class="reset-button" onClick={() => this.askReset()}>
                         {locale.create.reset}
                     </Button>
                     <div class="report-title">
@@ -324,15 +342,18 @@ export default class CreateReport extends Page {
                     <div class="report-subtitle">
                         <PaymentMethodName org={this.state.org} id={this.state.method} />
                     </div>
-                    <Select
-                        outline
-                        value={this.state.currency}
-                        onChange={currency => this.setState({ currency })}
-                        items={(!this.state.currency ? [{ value: null, label: '—' }] : [])
-                            .concat((this.state.methodData?.currencies || []).map(currency => ({
-                                value: currency,
-                                label: currencies[currency],
-                            })))} />
+                    <div class="report-currency-select">
+                        <label>{locale.create.currency}</label>
+                        <Select
+                            outline
+                            value={this.state.currency}
+                            onChange={currency => this.setState({ currency })}
+                            items={(!this.state.currency ? [{ value: null, label: '—' }] : [])
+                                .concat((this.state.methodData?.currencies || []).map(currency => ({
+                                    value: currency,
+                                    label: currencies[currency],
+                                })))} />
+                    </div>
                 </div>
             );
 
@@ -368,9 +389,11 @@ export default class CreateReport extends Page {
                         <div class="report-final-totals">
                             <Totals items={[]} currency={this.state.currency} isFinal total={totalAmount} />
                         </div>
-                        <Button onClick={() => this.setState({ submitCheck: true })}>
-                            {locale.create.submit.button}
-                        </Button>
+                        <div class="report-submit-container">
+                            <Button class="report-submit-button" onClick={() => this.setState({ submitCheck: true })}>
+                                {locale.create.submit.button}
+                            </Button>
+                        </div>
                     </div>
                 );
             }
@@ -507,10 +530,13 @@ const PaymentMethodName = connect(({ org, id }) => ['payments/method', { org, id
     return data.name;
 });
 
-function CollapsingSection ({ title, children }) {
+function CollapsingSection ({ title, children, count }) {
     return (
         <details class="collapsing-section">
-            <summary>{title}</summary>
+            <summary>
+                <span class="inner-title">{title}</span>
+                <span class="inner-count">{count}</span>
+            </summary>
             {children}
         </details>
     );
@@ -555,7 +581,7 @@ function EntriesEditor ({ value, onChange, year, org, method, currency }) {
 
     return (
         <div class="report-section-container">
-            <CollapsingSection title={locale.entries.title}>
+            <CollapsingSection title={locale.entries.title} count={value.length}>
                 {value.map((entry, i) => (
                     <EntryItem
                         key={i}
@@ -753,7 +779,7 @@ function AddonsEditor ({ org, value, onChange, currency }) {
 
     return (
         <div class="report-section-container">
-            <CollapsingSection title={locale.addons.title}>
+            <CollapsingSection title={locale.addons.title} count={value.length}>
                 {value.map((addon, i) => (
                     <AddonItem
                         key={addon.id}
@@ -848,7 +874,7 @@ function ExpensesEditor ({ value, onChange, currency }) {
 
     return (
         <div class="report-section-container">
-            <CollapsingSection title={locale.expenses.title}>
+            <CollapsingSection title={locale.expenses.title} count={value.length}>
                 {value.map((item, i) => (
                     <ExpenseItem
                         key={i}
@@ -885,26 +911,31 @@ function ExpensesEditor ({ value, onChange, currency }) {
 
 function ExpenseItem ({ expense, onChange, onRemove, currency }) {
     return (
-        <div class="expense-item">
-            <Button icon small class="remove-button" onClick={onRemove}>
-                <RemoveIcon />
-            </Button>
-            <TextField
-                outline
-                label={locale.expenses.item.title}
-                value={expense.title}
-                onChange={e => onChange({ ...expense, title: e.target.value })} />
+        <div class="report-expense">
+            <div class="expense-header">
+                <Button icon small class="remove-button" onClick={onRemove}>
+                    <RemoveIcon />
+                </Button>
+                <TextField
+                    class="title-field"
+                    label={locale.expenses.item.title}
+                    value={expense.title}
+                    onChange={e => onChange({ ...expense, title: e.target.value })} />
+            </div>
+            <div class="desc-label">{locale.expenses.item.description}</div>
             <MdField
                 editing
                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
                 value={expense.description || ''}
                 maxLength={5000}
                 onChange={value => onChange({ ...expense, description: value || null })} />
-            <currencyAmount.editor
-                outline
-                value={expense.amount}
-                onChange={amount => onChange({ ...expense, amount })}
-                currency={currency} />
+            <div class="amount-container">
+                <currencyAmount.editor
+                    outline
+                    value={expense.amount}
+                    onChange={amount => onChange({ ...expense, amount })}
+                    currency={currency} />
+            </div>
         </div>
     );
 }
