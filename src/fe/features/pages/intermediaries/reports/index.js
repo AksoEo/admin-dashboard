@@ -13,6 +13,9 @@ export default class IntermediaryReports extends OverviewPage {
                 { id: 'org', sorting: 'none', fixed: true },
                 { id: 'intermediary', sorting: 'asc', fixed: true },
             ],
+            jsonFilter: {
+                filter: { status: 'submitted' },
+            },
             offset: 0,
             limit: 10,
         },

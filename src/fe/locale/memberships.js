@@ -175,6 +175,11 @@ export const membershipEntries = {
             magazines: 'Revuaj abonoj',
         },
         cannotAddAddonNote: 'Ne eblas rekte aldoni aldoneblojn al aliĝoj.',
+        availabilityCheck: {
+            checking: '[[Checking…]]',
+            duplicateConflict: '[[Unavailable because this item has already been registered.]]',
+            givesMembershipConflict: '[[Unavailable because the member already has membership for this year.]]',
+        },
     },
     issue: {
         title: 'Problemo pri aliĝo',

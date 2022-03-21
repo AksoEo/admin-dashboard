@@ -19,6 +19,7 @@ import DetailFields from '../../../../components/detail/detail-fields';
 import TinyProgress from '../../../../components/controls/tiny-progress';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import ItemPickerDialog from '../../../../components/pickers/item-picker-dialog';
+import DisplayError from '../../../../components/utils/error';
 import { membershipEntries as locale, codeholders as codeholdersLocale, currencies } from '../../../../locale';
 import { Link } from '../../../../router';
 import { connect, coreContext } from '../../../../core/connection';
@@ -483,6 +484,54 @@ const CodeholderDataForOffers = connect(({ codeholder }) => ['codeholders/codeho
     return children(data);
 });
 
+class CodeholderMembershipsInfo extends PureComponent {
+    state = {
+        memberships: null,
+        error: null,
+    };
+
+    static contextType = coreContext;
+
+    load () {
+        this.setState({ memberships: null, error: null });
+        const yearMemberships = this.context.createTask('codeholders/listMemberships', {
+            id: this.props.codeholder,
+        }, {
+            jsonFilter: {
+                filter: {
+                    year: this.props.year,
+                },
+            },
+            limit: 100,
+        }).runOnceAndDrop();
+        const lifetimeMemberships = this.context.createTask('codeholders/listMemberships', {
+            id: this.props.codeholder,
+        }, {
+            jsonFilter: {
+                filter: {
+                    lifetime: true,
+                },
+            },
+            limit: 100,
+        }).runOnceAndDrop();
+
+        Promise.all([yearMemberships, lifetimeMemberships]).then(([{ items }, { items: items2 }]) => {
+            this.setState({ memberships: items.concat(items2) });
+        }).catch(error => {
+            this.setState({ error });
+        });
+    }
+
+    componentDidMount () {
+        this.load();
+    }
+
+    render ({ children }, { memberships, error }) {
+        if (error) return <DisplayError error={error} />;
+        return children(memberships);
+    }
+}
+
 // TODO: if existing codeholder, filter memberships
 const AddOfferDialog = connect(({ year }) => ['memberships/options', { id: year }])(data => ({
     data,
@@ -539,7 +588,7 @@ function AddOfferDialogInner ({ data, intermediary, intermediaryCurrency, year, 
         yearCurrency = intermediaryCurrency;
     }
 
-    const contents = codeholder => (
+    const contents = (codeholder, memberships) => (
         <div class="add-offer">
             {offerGroups.map((group, i) => (
                 <AddOfferGroup
@@ -549,22 +598,29 @@ function AddOfferDialogInner ({ data, intermediary, intermediaryCurrency, year, 
                     yearCurrency={yearCurrency}
                     onAdd={onAdd}
                     codeholder={codeholder}
+                    memberships={memberships}
                     currency={currency} />
             ))}
         </div>
     );
 
     if (typeof codeholder === 'number') {
+        const codeholderId = codeholder;
+
         return (
             <CodeholderDataForOffers codeholder={codeholder}>
-                {codeholder => contents(codeholder)}
+                {codeholder => (
+                    <CodeholderMembershipsInfo codeholder={codeholderId} year={year}>
+                        {memberships => contents(codeholder, memberships)}
+                    </CodeholderMembershipsInfo>
+                )}
             </CodeholderDataForOffers>
         );
     }
-    return contents(codeholder);
+    return contents(codeholder, []);
 }
 
-function AddOfferGroup ({ group, year, yearCurrency, currency, onAdd, codeholder }) {
+function AddOfferGroup ({ group, year, yearCurrency, currency, onAdd, codeholder, memberships }) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -577,23 +633,25 @@ function AddOfferGroup ({ group, year, yearCurrency, currency, onAdd, codeholder
                     {group.title}
                 </div>
             </div>
-            <DynamicHeightDiv>
+            <DynamicHeightDiv lazy>
                 {open && (
                     <div class="group-contents">
                         {group.offers.map((item, i) => (
                             <OfferItemAmount
                                 codeholder={codeholder}
+                                memberships={memberships}
                                 offer={item}
                                 offerCurrency={yearCurrency}
                                 currency={currency}
                                 key={i}>
-                                {amount => (
+                                {(amount, availabilityCheck) => (
                                     <OfferItem
                                         onSelect={() => onAdd({
                                             type: item.type,
                                             id: item.id,
                                             amount,
                                         })}
+                                        availabilityCheck={availabilityCheck}
                                         value={{ ...item, amount }}
                                         year={year}
                                         currency={currency} />
@@ -642,12 +700,46 @@ const OfferItemAmount = connect(({ offerCurrency }) => [
             this.update();
         }
     }
-    render ({ children }, { amount }) {
-        return children(amount);
+    render ({ children, offer, memberships }, { amount }) {
+        const baseAvailability = {
+            checking: false,
+            unavailable: false,
+            conflict: null,
+        };
+        if (offer.type === 'membership') {
+            return (
+                <OfferMembershipData id={offer.id}>
+                    {offerMembership => {
+                        const availability = { ...baseAvailability };
+
+                        if (!offerMembership) {
+                            availability.checking = true;
+                        } else if (memberships) {
+                            for (const membership of memberships) {
+                                if (membership.givesMembership && offerMembership.givesMembership) {
+                                    availability.unavailable = true;
+                                    availability.conflict = 'givesMembershipConflict';
+                                }
+                                if (membership.id === offerMembership.id) {
+                                    availability.unavailable = true;
+                                    availability.conflict = 'duplicateConflict';
+                                }
+                            }
+                        } else {
+                            availability.checking = true;
+                        }
+
+                        return children(amount, availability);
+                    }}
+                </OfferMembershipData>
+            );
+        } else {
+            return children(amount, baseAvailability);
+        }
     }
 });
 
-function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSelect }) {
+function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSelect, availabilityCheck }) {
     let disabled = false;
     let contents;
     if (value.type === 'membership') {
@@ -679,7 +771,13 @@ function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSele
                 {contents}
             </div>
             <div class="item-amount">
-                {editing ? (
+                {availabilityCheck?.checking ? (
+                    locale.offers.availabilityCheck.checking
+                ) : availabilityCheck?.unavailable ? (
+                    <div class="item-availability-conflict">
+                        {locale.offers.availabilityCheck[availabilityCheck.conflict]}
+                    </div>
+                ) : editing ? (
                     <currencyAmount.editor
                         outline
                         value={value.amount}
@@ -712,6 +810,12 @@ const CodeholderCard = connect(({ id }) => ['codeholders/codeholder', {
             {contents}
         </Link>
     );
+});
+
+const OfferMembershipData = connect(({ id }) => ['memberships/category', { id }])(data => ({
+    data,
+}))(function OfferMembershipData ({ data, children }) {
+    return children(data);
 });
 
 const OfferMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({

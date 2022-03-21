@@ -909,7 +909,7 @@ export const tasks = {
     /// - offset, limit
     ///
     /// Returns { items, total }
-    listMemberships: async ({ id }, { offset, limit }) => {
+    listMemberships: async ({ id }, { offset, limit, jsonFilter }) => {
         const client = await asyncClient;
         const res = await client.get(`/codeholders/${id}/membership`, {
             offset,
@@ -926,6 +926,7 @@ export const tasks = {
                 'canuto',
             ],
             order: [['year', 'desc']],
+            ...(jsonFilter ? { filter: jsonFilter.filter } : {}),
         });
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };

@@ -13,7 +13,7 @@ import MdField from '../../../../components/controls/md-field';
 import TinyProgress from '../../../../components/controls/tiny-progress';
 import DisplayError from '../../../../components/utils/error';
 import { FIELDS as ENTRY_FIELDS } from '../../memberships/entries/fields';
-import { connect } from '../../../../core/connection';
+import { connect, coreContext } from '../../../../core/connection';
 import './detail.less';
 
 export default class IntermediaryReport extends DetailPage {
@@ -74,16 +74,32 @@ function ReportDetail ({ item }) {
     return (
         <div class="intermediary-report-detail">
             <div class="report-title">
-                {locale.idFmt(item.intermediary.year, item.intermediary.number)}
+                {locale.idFmt(item.intermediary?.year, item.intermediary?.number)}
                 {' '}
                 {locale.idCountryInfix}
                 {' '}
-                <country.renderer value={item.intermediary.country} />
+                <country.renderer value={item.intermediary?.country} />
             </div>
             <div class="report-subtitle">
                 {locale.createdBy}
                 {' '}
                 <DiffAuthor author={item.createdBy} interactive />
+            </div>
+            <div class="report-status">
+                {locale.intentStatuses[item.status]}
+            </div>
+            <div class="report-actions">
+                {item.status === 'submitted' ? (
+                    <coreContext.Consumer>
+                        {core => (
+                            <Button onClick={() => core.createTask('payments/markIntentSucceeded', {
+                                id: item.id,
+                            })}>
+                                {locale.markSucceeded}
+                            </Button>
+                        )}
+                    </coreContext.Consumer>
+                ) : null}
             </div>
             <ReportEntries item={item} />
             <ReportAddons item={item} />
@@ -188,7 +204,7 @@ function ReportAddons ({ item }) {
                 <div class="entry-addon" key={i}>
                     <div class="addon-name">
                         {addon.invalid && <ErrorOutlineIcon className="addon-invalid" />}
-                        {addon.paymentAddon.name}
+                        {addon.paymentAddon?.name || '???'}
                     </div>
                     <div class="addon-amount">
                         <currencyAmount.renderer value={addon.amount} currency={item.currency} />

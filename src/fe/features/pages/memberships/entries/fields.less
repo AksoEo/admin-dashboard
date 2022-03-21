@@ -169,6 +169,8 @@
         }
 
         .group-contents {
+            overflow: hidden;
+
             .contents-empty {
                 text-align: center;
             }
@@ -232,6 +234,14 @@
     .item-amount {
         padding: 16px;
         min-width: 72px;
+
+        @media (min-width: 500px) {
+            max-width: 50%;
+        }
+    }
+
+    .item-availability-conflict {
+        font-size: smaller;
     }
 }
 

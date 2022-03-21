@@ -34,6 +34,17 @@ export const intermediaryReports = {
     idFmt: (year, number) => `A${number}/${year}`,
     idCountryInfix: 'por',
     createdBy: '[[Created by]]',
+    markSucceeded: '[[Mark payment received]]',
+    intentStatuses: {
+        pending: 'Ankoraŭ ne plenumita',
+        processing: 'Traktata de sistemo',
+        submitted: '[[Pago sendita de kliento (some other text probably?)]]',
+        canceled: 'Nuligita',
+        succeeded: 'Fintraktita',
+        abandoned: 'Eksvalidiĝis',
+        disputed: 'Disputita',
+        refunded: 'Mono redonita',
+    },
     entries: {
         title: '[[Entries]]',
         edit: {
@@ -61,7 +72,6 @@ export const intermediaryReports = {
         title: '[[Expenses]]',
         item: {
             title: '[[Title]]',
-            description: '[[Description]]',
         },
         add: {
             button: '[[Add expense]]',

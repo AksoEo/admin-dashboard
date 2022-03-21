@@ -104,11 +104,20 @@
         padding: 8px 16px;
         border-radius: 4px;
         background: @card2-background;
+        display: flex;
         .elevation(2);
 
+        @media (max-width: 600px) {
+            display: block;
+            .expense-header {
+                margin-bottom: 8px;
+            }
+        }
+
         .expense-header {
+            flex: 1;
+            margin-right: 8px;
             display: flex;
-            margin-bottom: 8px;
 
             .title-field {
                 margin-top: 4px;

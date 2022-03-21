@@ -10,7 +10,6 @@ import DialogSheet from '../../../../components/tasks/dialog-sheet';
 import DetailFields from '../../../../components/detail/detail-fields';
 import TinyProgress from '../../../../components/controls/tiny-progress';
 import ItemPicker from '../../../../components/pickers/item-picker-dialog';
-import MdField from '../../../../components/controls/md-field';
 import DisplayError from '../../../../components/utils/error';
 import MembershipChip from '../../../../components/membership-chip';
 import PaymentMethodPicker from '../../payments/method-picker';
@@ -159,6 +158,7 @@ export default class CreateReport extends Page {
         const entryData = [];
         for (let i = 0; i < this.state.entries.length; i++) {
             const entry = this.state.entries[i];
+            if (!entry.offers.selected.length) continue;
 
             const entryId = await this.context.createTask('memberships/createEntry', {
                 _noGUI: true,
@@ -230,7 +230,6 @@ export default class CreateReport extends Page {
             purposes.push({
                 type: 'manual',
                 title: expense.title,
-                description: expense.description,
                 amount: expense.amount,
             });
         }
@@ -253,6 +252,9 @@ export default class CreateReport extends Page {
         }).runOnceAndDrop();
 
         this.setState({ submissionState: ['intent', 1, 1], submitCheck: true });
+
+        await this.context.createTask('payments/submitIntent', { id }).runOnceAndDrop();
+
         return id;
     }
 
@@ -261,7 +263,7 @@ export default class CreateReport extends Page {
         this.doSubmit().then(id => {
             this.setState({ submitting: false });
             this.reset();
-            this.context.navigate(`/perantoj/spezfolioj/${id}`);
+            this.props.onNavigate(`/perantoj/spezfolioj/${id}`);
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
             this.setState({
@@ -894,7 +896,6 @@ function ExpensesEditor ({ value, onChange, currency }) {
                 <div>
                     <Button onClick={() => onChange(value.concat({
                         title: '',
-                        description: null,
                         amount: 0,
                     }))}>
                         {locale.expenses.add.button}
@@ -917,18 +918,12 @@ function ExpenseItem ({ expense, onChange, onRemove, currency }) {
                     <RemoveIcon />
                 </Button>
                 <TextField
+                    outline
                     class="title-field"
                     label={locale.expenses.item.title}
                     value={expense.title}
                     onChange={e => onChange({ ...expense, title: e.target.value })} />
             </div>
-            <div class="desc-label">{locale.expenses.item.description}</div>
-            <MdField
-                editing
-                rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
-                value={expense.description || ''}
-                maxLength={5000}
-                onChange={value => onChange({ ...expense, description: value || null })} />
             <div class="amount-container">
                 <currencyAmount.editor
                     outline
