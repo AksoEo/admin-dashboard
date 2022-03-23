@@ -8,6 +8,7 @@ import DetailPage from '../../../../components/detail/detail-page';
 import DetailShell from '../../../../components/detail/detail-shell';
 import { country, currencyAmount } from '../../../../components/data';
 import DiffAuthor from '../../../../components/diff-author';
+import MembershipChip from '../../../../components/membership-chip';
 import { intermediaryReports as locale } from '../../../../locale';
 import MdField from '../../../../components/controls/md-field';
 import TinyProgress from '../../../../components/controls/tiny-progress';
@@ -127,6 +128,10 @@ function ReportEntries ({ item }) {
             {entries.map((entry, i) => (
                 <ReportEntry key={i} entry={entry} />
             ))}
+            <Totals
+                items={[]}
+                currency={item.currency}
+                total={item.totalAmount} />
         </div>
     );
 }
@@ -168,7 +173,11 @@ const ReportEntryData = connect(({ id }) => [
         );
     } else {
         contents = (
-            null
+            <div class="entry-collapsed">
+                {data.offers.selected.map((offer, i) => (
+                    <EntrySelectedOffer key={i} offer={offer} />
+                ))}
+            </div>
         );
     }
     return (
@@ -242,6 +251,41 @@ function ReportExpenses ({ item }) {
         </div>
     );
 }
+
+export function EntrySelectedOffer ({ offer }) {
+    let contents;
+    if (offer.type === 'membership') contents = <EntrySelectedMembership id={offer.id} />;
+    else if (offer.type === 'magazine') contents = <EntrySelectedMagazine id={offer.id} />;
+    return (
+        <span class="intermediary-report-entry-selected-offer">
+            {contents}
+        </span>
+    );
+}
+
+export const EntrySelectedMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
+    data,
+}))(function EntrySelectedMembership ({ data }) {
+    if (!data) return <TinyProgress />;
+    return (
+        <MembershipChip
+            abbrev={data.nameAbbrev}
+            name={data.name}
+            givesMembership={data.givesMembership}
+            lifetime={data.lifetime} />
+    );
+});
+
+export const EntrySelectedMagazine = connect(({ id }) => ['magazines/magazine', { id }])(data => ({
+    data,
+}))(function EntrySelectedMagazine ({ data }) {
+    if (!data) return <TinyProgress />;
+    return (
+        <span class="intermediary-report-entry-selected-magazine">
+            {data.name}
+        </span>
+    );
+});
 
 export function Totals ({ items, total, currency, showCounts, isFinal }) {
     return (

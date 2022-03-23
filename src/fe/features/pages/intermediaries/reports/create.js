@@ -11,9 +11,8 @@ import DetailFields from '../../../../components/detail/detail-fields';
 import TinyProgress from '../../../../components/controls/tiny-progress';
 import ItemPicker from '../../../../components/pickers/item-picker-dialog';
 import DisplayError from '../../../../components/utils/error';
-import MembershipChip from '../../../../components/membership-chip';
 import PaymentMethodPicker from '../../payments/method-picker';
-import { Totals } from './detail';
+import { EntrySelectedOffer, Totals } from './detail';
 import Meta from '../../../meta';
 import {
     intermediaryReports as locale,
@@ -252,9 +251,6 @@ export default class CreateReport extends Page {
         }).runOnceAndDrop();
 
         this.setState({ submissionState: ['intent', 1, 1], submitCheck: true });
-
-        await this.context.createTask('payments/submitIntent', { id }).runOnceAndDrop();
-
         return id;
     }
 
@@ -441,7 +437,7 @@ export default class CreateReport extends Page {
     }
 }
 
-const CountryPicker = connect('login')()(class CountryPicker extends PureComponent {
+class CountryPicker extends PureComponent {
     state = {
         loading: false,
         error: null,
@@ -451,6 +447,19 @@ const CountryPicker = connect('login')()(class CountryPicker extends PureCompone
     static contextType = coreContext;
 
     async doLoad () {
+        const login = await new Promise((resolve, reject) => {
+            const view = this.context.createDataView('login');
+            view.on('update', data => {
+                if (!data) return;
+                resolve(data);
+                view.drop();
+            });
+            view.on('error', error => {
+                reject(error);
+                view.drop();
+            });
+        });
+
         const countryNames = await new Promise((resolve, reject) => {
             const view = this.context.createDataView('countries/countries');
             view.on('update', data => {
@@ -464,13 +473,17 @@ const CountryPicker = connect('login')()(class CountryPicker extends PureCompone
             });
         });
 
-        const result = await this.context.createTask('intermediaries/list', {
+        const result = await this.context.createTask('intermediaries/list', {}, {
             jsonFilter: {
-                filter: { codeholderId: this.props.id },
+                filter: { codeholderId: login.id },
             },
-            fields: ['countryCode'],
+            fields: [{ id: 'countryCode', sorting: 'none' }],
             limit: 100,
         }).runOnceAndDrop();
+
+        if (result.items.length === 1) {
+            this.props.onChange(result.items[0]);
+        }
 
         const countries = [];
         for (const itemId of result.items) {
@@ -523,7 +536,7 @@ const CountryPicker = connect('login')()(class CountryPicker extends PureCompone
                 onChange={onChange} />
         );
     }
-});
+}
 
 const PaymentMethodName = connect(({ org, id }) => ['payments/method', { org, id }])(data => ({
     data,
@@ -659,25 +672,6 @@ function EntryItem ({ entry, onEdit, onRemove }) {
         </div>
     );
 }
-
-function EntrySelectedOffer ({ offer }) {
-    if (offer.type === 'membership') {
-        return <EntrySelectedMembership id={offer.id} />;
-    }
-}
-
-const EntrySelectedMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
-    data,
-}))(function EntrySelectedMembership ({ data }) {
-    if (!data) return <TinyProgress />;
-    return (
-        <MembershipChip
-            abbrev={data.nameAbbrev}
-            name={data.name}
-            givesMembership={data.givesMembership}
-            lifetime={data.lifetime} />
-    );
-});
 
 function RegistrationEntryName ({ entry }) {
     if (typeof entry.codeholderData === 'number') {

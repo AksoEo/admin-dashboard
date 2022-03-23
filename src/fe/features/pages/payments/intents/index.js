@@ -120,7 +120,7 @@ export default connectPerms(class Intents extends Page {
                     category="aksopay_intents" />
                 <OverviewList
                     expanded={expanded}
-                    task="payments/listIntents"
+                    task="payments/listPaymentIntents"
                     view="payments/intent"
                     parameters={parameters}
                     fields={FIELDS}

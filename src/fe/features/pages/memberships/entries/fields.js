@@ -225,7 +225,7 @@ export const FIELDS = {
 
             return (
                 <div class="registration-entry-offers">
-                    {editing && (
+                    {editing && !userData?.currency && (
                         <div class="offers-currency">
                             <label class="offers-currency-label">{locale.offers.currency}</label>
                             <Select
@@ -677,6 +677,7 @@ const OfferItemAmount = connect(({ offerCurrency }) => [
         if (!codeholder || !offer?.price || !rates) return;
         const resultKey = Symbol('result');
         const val = evaluate([offer.price.script, { [resultKey]: { t: 'c', f: 'id', a: [offer.price.var] } }], resultKey, id => {
+            if (id === 'currency') return currency;
             if (id === 'birthdate') return codeholder.birthdate ? new Date(codeholder.birthdate + 'T00:00:00Z') : null;
             if (id.startsWith('age') && !('age' in codeholder)) {
                 const birthdate = new Date(codeholder.birthdate + 'T00:00:00Z');
@@ -754,7 +755,7 @@ function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSele
 
     return (
         <div
-            onClick={onSelect}
+            onClick={availabilityCheck?.unavailable ? null : onSelect}
             class={'registration-entry-offer-item' + (onSelect ? ' is-selectable' : '') + (disabled ? ' is-disabled' : '')}>
             {editing && (
                 <div class="item-remove">

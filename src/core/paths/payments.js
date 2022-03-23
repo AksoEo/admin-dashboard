@@ -123,7 +123,7 @@ const iClientFields = {
             country: intent.intermediaryCountryCode,
             year: intent.intermediaryIdentifier?.year,
             number: intent.intermediaryIdentifier?.number,
-        }) : null,
+        }) : ('intermediaryCountryCode' in intent) ? null : undefined,
         toAPI: ({ country, year, number }) => ({
             intermediaryCountryCode: country || null,
             intermediaryIdentifier: (year || typeof number === 'number') ? ({ year, number }) : null,
@@ -419,6 +419,18 @@ export const tasks = {
                 filtered: usedFilters,
             },
         };
+    },
+    listPaymentIntents: (_, { jsonFilter, ...parameters }) => {
+        const notIntermediaryFilter = { intermediaryCountryCode: null };
+
+        return tasks.listIntents(_, {
+            jsonFilter: {
+                filter: (jsonFilter && !jsonFilter._disabled)
+                    ? { $and: [jsonFilter.filter, notIntermediaryFilter] }
+                    : notIntermediaryFilter,
+            },
+            ...parameters,
+        });
     },
     listIntermediaryIntents: (_, { jsonFilter, ...parameters }) => {
         const intermediaryFilter = { $not: { intermediaryCountryCode: null } };
