@@ -566,10 +566,10 @@ function AddOfferDialogInner ({ data, intermediary, intermediaryCurrency, year, 
                 };
                 const items = [];
                 if (item.prices && item.prices.paper) {
-                    items.push({ ...baseItem, price: item.prices.paper });
+                    items.push({ ...baseItem, price: item.prices.paper, paperVersion: true });
                 }
                 if (item.prices && item.prices.access) {
-                    items.push({ ...baseItem, price: item.prices.access });
+                    items.push({ ...baseItem, price: item.prices.access, paperVersion: false });
                 }
                 return items;
             });
@@ -650,6 +650,7 @@ function AddOfferGroup ({ group, year, yearCurrency, currency, onAdd, codeholder
                                             type: item.type,
                                             id: item.id,
                                             amount,
+                                            ...(item.paperVersion ? { paperVersion: item.paperVersion } : {}),
                                         })}
                                         availabilityCheck={availabilityCheck}
                                         value={{ ...item, amount }}
@@ -770,6 +771,11 @@ function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSele
             <div class="item-label">
                 <div class="offer-type">{locale.offers.types[value.type]}</div>
                 {contents}
+                {('paperVersion' in value) ? (
+                    <span class="offer-version-tag">
+                        {locale.offers.paperVersionLabels[value.paperVersion.toString()]}
+                    </span>
+                ) : null}
             </div>
             <div class="item-amount">
                 {availabilityCheck?.checking ? (

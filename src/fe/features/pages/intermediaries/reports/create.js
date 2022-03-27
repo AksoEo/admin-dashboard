@@ -9,16 +9,17 @@ import { country, currencyAmount } from '../../../../components/data';
 import DialogSheet from '../../../../components/tasks/dialog-sheet';
 import DetailFields from '../../../../components/detail/detail-fields';
 import TinyProgress from '../../../../components/controls/tiny-progress';
+import TextArea from '../../../../components/controls/text-area';
 import ItemPicker from '../../../../components/pickers/item-picker-dialog';
 import DisplayError from '../../../../components/utils/error';
 import PaymentMethodPicker from '../../payments/method-picker';
-import { EntrySelectedOffer, Totals } from './detail';
+import { EntrySelectedOffer, Totals, CategoryName, MagazineName } from './detail';
 import Meta from '../../../meta';
 import {
     intermediaryReports as locale,
     membershipEntries as entriesLocale,
     paymentAddons as addonsLocale,
-    currencies,
+    currencies, countryCurrencies,
 } from '../../../../locale';
 import { FIELDS as ENTRY_FIELDS } from '../../memberships/entries/fields';
 import { FIELDS as ADDON_FIELDS } from '../../payments/orgs/addons/fields';
@@ -52,7 +53,9 @@ export default class CreateReport extends Page {
     };
 
     reset () {
-        this.setState(EMPTY_STATE);
+        this.setState(EMPTY_STATE, () => {
+            this.autoPickMethod();
+        });
     }
 
     askReset () {
@@ -66,9 +69,12 @@ export default class CreateReport extends Page {
             const reportState = JSON.parse(sessionStorage.spReportState);
             this.setState(reportState, () => {
                 if (this.state.method) this.loadMethod();
+                else this.autoPickMethod();
             });
         } catch {
             /* doesnt matter */
+
+            this.autoPickMethod();
         }
     }
 
@@ -93,11 +99,52 @@ export default class CreateReport extends Page {
 
     static contextType = coreContext;
 
+    autoPickMethod () {
+        if (this.state.method) return;
+        this.setState({ loading: true });
+        this.context.createTask('payments/listOrgs', {}, {
+            limit: 10,
+        }).runOnceAndDrop().then(result => {
+            if (result.items.length === 1) {
+                const org = result.items[0];
+                return this.context.createTask('payments/listMethods', {
+                    jsonFilter: {
+                        filter: {
+                            type: 'intermediary',
+                        },
+                    },
+                    org,
+                }, {
+                    limit: 10,
+                }).runOnceAndDrop().then(res => [org, res]);
+            } else {
+                return null;
+            }
+        }).then(_result => {
+            if (!_result) return null;
+            const [org, result] = _result;
+
+            if (result.items.length === 1) {
+                this.setState({ org, method: result.items[0] });
+            }
+        }).catch(err => {
+            console.error(err); // eslint-disable-line no-console
+            // oh well
+        }).finally(() => {
+            this.setState({ loading: false });
+        });
+    }
+
     loadMethod () {
         const { org, method: id } = this.state;
         if (!id) return;
         this.setState({ loading: true });
         this.context.createTask('payments/getMethod', { org, id }).runOnceAndDrop().then(result => {
+            const currentYear = new Date().getFullYear();
+            if ((result.prices || {})[currentYear]) {
+                this.setState({ year: currentYear });
+            }
+
             this.setState({ methodData: result, loading: false });
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
@@ -233,7 +280,9 @@ export default class CreateReport extends Page {
             });
         }
 
-        const id = await this.context.createTask('payments/createIntent', {}, {
+        const id = await this.context.createTask('payments/createIntent', {
+            _noGUI: true,
+        }, {
             customer: {
                 id: selfInfo.id,
                 name: selfName,
@@ -252,6 +301,19 @@ export default class CreateReport extends Page {
 
         this.setState({ submissionState: ['intent', 1, 1], submitCheck: true });
         return id;
+    }
+
+    confirmSetup () {
+        this.setState({ setupConfirmed: true });
+        if (this.state.methodData) {
+            const countryCurrency = countryCurrencies[this.state.country];
+            const currencies = this.state.methodData.currencies;
+            if (currencies.length === 1) {
+                this.setState({ currency: currencies[0] });
+            } else if (currencies.includes(countryCurrency)) {
+                this.setState({ currency: countryCurrency });
+            }
+        }
     }
 
     submit () {
@@ -317,7 +379,7 @@ export default class CreateReport extends Page {
                     )}
                     {this.state.year && (
                         <div class="setup-confirm-container">
-                            <Button onClick={() => this.setState({ setupConfirmed: true })}>
+                            <Button onClick={() => this.confirmSetup()}>
                                 {locale.create.setup.confirm}
                             </Button>
                         </div>
@@ -372,6 +434,7 @@ export default class CreateReport extends Page {
                             year={this.state.year}
                             org={this.state.org}
                             method={this.state.method}
+                            methodData={this.state.methodData}
                             currency={this.state.currency}
                             value={this.state.entries}
                             onChange={entries => this.setState({ entries })} />
@@ -481,10 +544,6 @@ class CountryPicker extends PureComponent {
             limit: 100,
         }).runOnceAndDrop();
 
-        if (result.items.length === 1) {
-            this.props.onChange(result.items[0]);
-        }
-
         const countries = [];
         for (const itemId of result.items) {
             const view = this.context.createDataView('intermediaries/intermediary', { id: itemId });
@@ -504,6 +563,10 @@ class CountryPicker extends PureComponent {
                 value: item.countryCode,
                 label: countryNames[item.countryCode].name_eo,
             });
+        }
+
+        if (countries.length === 1) {
+            this.props.onChange(countries[0].value);
         }
 
         return countries;
@@ -547,7 +610,7 @@ const PaymentMethodName = connect(({ org, id }) => ['payments/method', { org, id
 
 function CollapsingSection ({ title, children, count }) {
     return (
-        <details class="collapsing-section">
+        <details class="collapsing-section" open>
             <summary>
                 <span class="inner-title">{title}</span>
                 <span class="inner-count">{count}</span>
@@ -557,8 +620,18 @@ function CollapsingSection ({ title, children, count }) {
     );
 }
 
-function EntriesEditor ({ value, onChange, year, org, method, currency }) {
+function EntriesEditor ({ value, onChange, year, org, method, methodData, currency }) {
     const [editing, setEditing] = useState(null);
+
+    const entryPrices = (methodData?.prices || {})[year]?.registrationEntries || {};
+    const categoryPrices = {};
+    const magazinePrices = {};
+    for (const category of (entryPrices.membershipCategories || [])) {
+        categoryPrices[category.id] = category;
+    }
+    for (const magazine of (entryPrices.magazines || [])) {
+        magazinePrices[magazine.id] = magazine;
+    }
 
     const totalsItems = [];
     let totalAmount = 0;
@@ -567,22 +640,38 @@ function EntriesEditor ({ value, onChange, year, org, method, currency }) {
     const magazines = {};
     for (const entry of value) {
         for (const offer of (entry.offers?.selected || [])) {
-            let acc;
-            if (offer.type === 'membership') acc = categories;
-            else if (offer.type === 'magazine') acc = magazines;
-            else continue; // oh no we don't know what this is
-            if (!acc[offer.id]) acc[offer.id] = { id: offer.id, count: 0, amount: 0 };
-            acc[offer.id].count++;
-            acc[offer.id].amount += offer.amount;
+            let acc, id, commission;
+            if (offer.type === 'membership') {
+                acc = categories;
+                id = offer.id;
+                commission = categoryPrices[offer.id]?.commission;
+            } else if (offer.type === 'magazine') {
+                acc = magazines;
+                id = `${offer.id}-${offer.paperVersion}`;
+                const type = offer.paperVersion ? 'paper' : 'access';
+                commission = (magazinePrices[offer.id]?.prices || {})[type]?.commission;
+            } else continue; // oh no we don't know what this is
+
+            if (!acc[id]) {
+                acc[id] = {
+                    id: offer.id,
+                    count: 0,
+                    amount: 0,
+                    commission,
+                };
+            }
+            acc[id].count++;
+            acc[id].amount += offer.amount;
             totalAmount += offer.amount;
         }
     }
     for (const k in categories) {
         const category = categories[k];
         totalsItems.push({
-            title: <CategoryName id={category.id} />,
+            title: <CategoryName id={category.id} abbrev />,
             count: category.count,
             amount: category.amount,
+            commission: category.commission,
         });
     }
     for (const k in magazines) {
@@ -591,6 +680,7 @@ function EntriesEditor ({ value, onChange, year, org, method, currency }) {
             title: <MagazineName id={magazine.id} />,
             count: magazine.count,
             amount: magazine.amount,
+            commission: magazine.commission,
         });
     }
 
@@ -641,6 +731,7 @@ function EntriesEditor ({ value, onChange, year, org, method, currency }) {
                     }} />
             </CollapsingSection>
             <Totals
+                showCommission
                 showCounts
                 currency={currency}
                 items={totalsItems}
@@ -754,21 +845,6 @@ function InnerEntryEditor ({ entry, onEditChange, year, org, method, currency })
             }} />
     );
 }
-
-const CategoryName = connect(({ id }) => [
-    'memberships/category', { id },
-])()(function CategoryName ({ name }) {
-    if (!name) return <TinyProgress />;
-    return name;
-});
-
-const MagazineName = connect(({ id }) => [
-    'magazines/magazine', { id },
-])()(function MagazineName ({ name }) {
-    if (!name) return <TinyProgress />;
-    return name;
-});
-
 function AddonsEditor ({ org, value, onChange, currency }) {
     const [adding, setAdding] = useState(false);
     const totalAmount = value.map(item => item.amount).reduce((a, b) => a + b, 0);
@@ -822,13 +898,23 @@ function AddonItem ({ org, addon, onChange, onRemove, currency }) {
                 <Button icon small class="remove-button" onClick={onRemove}>
                     <RemoveIcon />
                 </Button>
-                <AddonName org={org} id={addon.id} />
+                <div class="addon-name-container">
+                    <AddonName org={org} id={addon.id} />
+                </div>
+                <currencyAmount.editor
+                    outline
+                    value={addon.amount}
+                    onChange={amount => onChange({ ...addon, amount })}
+                    currency={currency} />
             </div>
-            <currencyAmount.editor
-                outline
-                value={addon.amount}
-                onChange={amount => onChange({ ...addon, amount })}
-                currency={currency} />
+            <div class="desc-label">
+                {locale.addons.edit.description}
+            </div>
+            <TextArea
+                value={addon.description || ''}
+                onChange={value => onChange({ ...addon, description: value || null })}
+                maxLength={255}
+                placeholder={locale.addons.edit.descriptionPlaceholder} />
         </div>
     );
 }

@@ -29,6 +29,7 @@ export const intermediaries = {
 
 export const intermediaryReports = {
     title: '[[Reports]]',
+    detailTitle: '[[Report]]',
     failedToLoadMethod: '[[Failed to load intermediary settings [the payment method]. Please try again later.]]',
     failedToLoadYear: '[[Failed to load year. Please try again later.]]',
     idFmt: (year, number) => `A${number}/${year}`,
@@ -62,6 +63,8 @@ export const intermediaryReports = {
         edit: {
             title: '[[Edit addon]]',
             confirm: '[[Save]]',
+            description: '[[Description]]',
+            descriptionPlaceholder: '[[Please type your favorite reason to add this addon]]',
         },
         add: {
             button: '[[Add addon]]',
@@ -101,5 +104,10 @@ export const intermediaryReports = {
             entries: '[[Submitting entries]]',
             intent: '[[Submitting report]]',
         },
+    },
+    update: {
+        menuItem: 'Redakti',
+        title: 'Redakti [[report]]',
+        button: 'Aktualigi',
     },
 };

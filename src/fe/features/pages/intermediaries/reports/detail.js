@@ -1,6 +1,7 @@
 import { h } from 'preact';
-import { Fragment, useState } from 'preact/compat';
+import { Fragment, useState, useEffect, PureComponent } from 'preact/compat';
 import { Button } from 'yamdl';
+import EditIcon from '@material-ui/icons/Edit';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
@@ -9,7 +10,7 @@ import DetailShell from '../../../../components/detail/detail-shell';
 import { country, currencyAmount } from '../../../../components/data';
 import DiffAuthor from '../../../../components/diff-author';
 import MembershipChip from '../../../../components/membership-chip';
-import { intermediaryReports as locale } from '../../../../locale';
+import { intermediaryReports as locale, membershipEntries as entriesLocale } from '../../../../locale';
 import MdField from '../../../../components/controls/md-field';
 import TinyProgress from '../../../../components/controls/tiny-progress';
 import DisplayError from '../../../../components/utils/error';
@@ -32,7 +33,13 @@ export default class IntermediaryReport extends DetailPage {
     }
 
     renderActions () {
-        return [];
+        return [
+            {
+                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.update.menuItem,
+                action: this.onBeginEdit,
+            },
+        ];
     }
 
     renderContents ({ editing }, { edit }) {
@@ -45,6 +52,7 @@ export default class IntermediaryReport extends DetailPage {
                             'id',
                             'org',
                             'paymentOrg',
+                            'method',
                             'currency',
                             'intermediary',
                             'purposes',
@@ -116,30 +124,112 @@ function ReportDetail ({ item }) {
     );
 }
 
-function ReportEntries ({ item }) {
-    if (!item.purposes) return <TinyProgress />;
-    const entries = item.purposes.filter(purpose => purpose.type === 'trigger'
-        && purpose.triggers === 'registration_entry');
-    if (!entries.length) return null;
+class ReportEntries extends PureComponent {
+    entryData = {};
 
-    return (
-        <div class="report-entries">
-            <div class="section-title">{locale.entries.title}</div>
-            {entries.map((entry, i) => (
-                <ReportEntry key={i} entry={entry} />
-            ))}
-            <Totals
-                items={[]}
-                currency={item.currency}
-                total={item.totalAmount} />
-        </div>
-    );
+    setEntryData (key, value) {
+        this.entryData[key] = value;
+        this.forceUpdate();
+    }
+
+    render ({ item }) {
+        if (!item.purposes) return <TinyProgress />;
+        const entries = item.purposes.filter(purpose => purpose.type === 'trigger'
+            && purpose.triggers === 'registration_entry');
+        if (!entries.length) return null;
+
+        const { entryData } = this;
+
+        let totalAmount = 0;
+        const memberships = {};
+        const magazines = {};
+        for (const k in entryData) {
+            const entry = entryData[k];
+            for (const offer of (entry?.offers?.selected || [])) {
+                if (offer.type === 'membership') {
+                    const key = `${entry.year}-${offer.id}`;
+                    if (!memberships[key]) memberships[key] = [];
+                    memberships[key].push(offer);
+                } else if (offer.type === 'magazine') {
+                    const key = `${entry.year}-${offer.id}`;
+                    if (!magazines[key]) magazines[key] = [];
+                    magazines[key].push(offer);
+                }
+                totalAmount += offer.amount;
+            }
+        }
+
+        const entryPrices = (item.method?.prices || {})[item.intermediary.year]?.registrationEntries || {};
+        const categoryPrices = {};
+        const magazinePrices = {};
+        for (const category of (entryPrices.membershipCategories || [])) {
+            categoryPrices[category.id] = category;
+        }
+        for (const magazine of (entryPrices.magazines || [])) {
+            magazinePrices[magazine.id] = magazine;
+        }
+
+        const items = [];
+        for (const k in memberships) {
+            const offers = memberships[k];
+            items.push({
+                title: <CategoryName id={offers[0].id} abbrev />,
+                count: offers.length,
+                amount: offers.map(offer => offer.amount).reduce((a, b) => a + b, 0),
+                commission: categoryPrices[offers[0].id]?.commission,
+            });
+        }
+        for (const k in magazines) {
+            const offers = magazines[k];
+            const accessTypes = {};
+            for (const item of offers) {
+                const accessType = item.paperVersion ? 'paper' : 'access';
+                if (!accessTypes[accessType]) accessTypes[accessType] = [];
+                accessTypes[accessType].push(item);
+            }
+            for (const type in accessTypes) {
+                const offers = accessTypes[type];
+                items.push({
+                    title: <MagazineName id={offers[0].id} />,
+                    count: offers.length,
+                    amount: offers.map(offer => offer.amount).reduce((a, b) => a + b, 0),
+                    commission: (magazinePrices[offers[0].id]?.prices || {})[type]?.commission,
+                });
+            }
+        }
+        if (Object.keys(entryData).length < entries.length) {
+            items.push({
+                title: <TinyProgress />,
+                count: ' ',
+            });
+        }
+
+        return (
+            <div class="report-entries">
+                <div class="section-title">{locale.entries.title}</div>
+                {entries.map((entry, i) => (
+                    <ReportEntry
+                        key={i}
+                        entry={entry}
+                        onData={data => {
+                            this.setEntryData(entry.dataId, data);
+                        }} />
+                ))}
+                <Totals
+                    showCounts
+                    showCommission
+                    items={items}
+                    currency={item.currency}
+                    total={totalAmount} />
+            </div>
+        );
+    }
 }
 
-function ReportEntry ({ entry }) {
+function ReportEntry ({ entry, onData }) {
     return (
         <div class="report-entry">
-            <ReportEntryData id={entry.dataId} />
+            <ReportEntryData id={entry.dataId} onData={onData} />
         </div>
     );
 }
@@ -153,6 +243,7 @@ const ReportEntryData = connect(({ id }) => [
     data,
     loaded,
     error,
+    onData,
 }) {
     const [collapsed, setCollapsed] = useState(true);
 
@@ -163,6 +254,10 @@ const ReportEntryData = connect(({ id }) => [
     if (!loaded) {
         return <div class="report-entry-data is-loading"><TinyProgress /></div>;
     }
+
+    useEffect(() => {
+        onData(data);
+    }, [data]);
 
     let contents;
     if (!collapsed) {
@@ -254,14 +349,32 @@ function ReportExpenses ({ item }) {
 
 export function EntrySelectedOffer ({ offer }) {
     let contents;
-    if (offer.type === 'membership') contents = <EntrySelectedMembership id={offer.id} />;
-    else if (offer.type === 'magazine') contents = <EntrySelectedMagazine id={offer.id} />;
+    if (offer.type === 'membership') {
+        contents = <EntrySelectedMembership id={offer.id} />;
+    } else if (offer.type === 'magazine') {
+        contents = <EntrySelectedMagazine id={offer.id} paperVersion={offer.paperVersion} />;
+    }
     return (
         <span class="intermediary-report-entry-selected-offer">
             {contents}
         </span>
     );
 }
+
+export const CategoryName = connect(({ id }) => [
+    'memberships/category', { id },
+])()(function CategoryName ({ name, nameAbbrev, abbrev }) {
+    if (!name) return <TinyProgress />;
+    return abbrev ? nameAbbrev : name;
+});
+
+export const MagazineName = connect(({ id }) => [
+    'magazines/magazine', { id },
+])()(function MagazineName ({ name }) {
+    if (!name) return <TinyProgress />;
+    return name;
+});
+
 
 export const EntrySelectedMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
     data,
@@ -278,20 +391,32 @@ export const EntrySelectedMembership = connect(({ id }) => ['memberships/categor
 
 export const EntrySelectedMagazine = connect(({ id }) => ['magazines/magazine', { id }])(data => ({
     data,
-}))(function EntrySelectedMagazine ({ data }) {
+}))(function EntrySelectedMagazine ({ data, paperVersion }) {
     if (!data) return <TinyProgress />;
     return (
         <span class="intermediary-report-entry-selected-magazine">
             {data.name}
+            <span class="version-tag">
+                {entriesLocale.offers.paperVersionLabels[(paperVersion || false).toString()]}
+            </span>
         </span>
     );
 });
 
-export function Totals ({ items, total, currency, showCounts, isFinal }) {
+export function Totals ({ items, total, currency, showCounts, showCommission, isFinal }) {
     return (
         <div class="intermediary-report-totals">
             {items.map((item, i) => (
                 <div class="totals-item" key={i}>
+                    {showCommission && (
+                        <div class="item-commission">
+                            {item.commission && (
+                                <span>
+                                    {Math.round(item.commission)} %
+                                </span>
+                            )}
+                        </div>
+                    )}
                     {showCounts && (
                         <div class="item-count">
                             {item.count || 1}

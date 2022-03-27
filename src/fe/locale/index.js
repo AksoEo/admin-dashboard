@@ -46,3 +46,4 @@ export * from './admin';
 export * from './lists';
 export * from './votes';
 export * from './form-editor';
+export * from './country-currencies';

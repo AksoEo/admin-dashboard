@@ -838,6 +838,22 @@ export const spec = [
             },
         ],
     },
+    {
+        type: 'category',
+        name: 'i just need these real quick ty',
+        children: [
+            {
+                type: 'perm',
+                name: 'registration entries intermediary',
+                id: 'registration.entries.intermediary',
+            },
+            {
+                type: 'perm',
+                name: 'pay payment intents uea intermediary',
+                id: 'pay.payment_intents.uea.intermediary',
+            },
+        ],
+    },
 ];
 
 

@@ -174,6 +174,10 @@ export const membershipEntries = {
             memberships: 'Membrokategorioj',
             magazines: 'Revuaj abonoj',
         },
+        paperVersionLabels: {
+            false: '[[Access]]',
+            true: '[[Paper]]',
+        },
         cannotAddAddonNote: 'Ne eblas rekte aldoni aldoneblojn al aliĝoj.',
         availabilityCheck: {
             checking: '[[Checking…]]',

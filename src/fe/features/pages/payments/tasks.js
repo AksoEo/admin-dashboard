@@ -170,6 +170,8 @@ export default {
     },
 
     createIntent ({ open, core, task }) {
+        if (task.options._noGUI) return null;
+
         const fields = [];
 
         const customer = task.parameters.customer || {};
@@ -277,6 +279,7 @@ export default {
                             .filter(purpose => purpose.type !== 'addon');
                         task.update({ paymentOrg, purposes });
                     }}
+                    jsonFilter={{ $not: { type: 'intermediary' } }}
                     value={method.id}
                     onChange={id => {
                         if (id) task.update({ method: { id } });

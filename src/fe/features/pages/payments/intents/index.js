@@ -82,7 +82,7 @@ export default connectPerms(class Intents extends Page {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.create.menuItem,
-                action: () => this.context.createTask('payments/createIntent'),
+                action: () => this.context.createTask('payments/createIntent', {}),
             });
         }
 

@@ -87,16 +87,32 @@
         }
     }
     .report-addon {
-        display: flex;
-        justify-content: space-between;
+        margin: 8px 0;
+        padding: 8px 16px;
+        border-radius: 4px;
+        background: @card2-background;
+        .elevation(2);
 
         .addon-header {
             display: flex;
             align-items: center;
+            margin-bottom: 8px;
 
             .remove-button {
                 margin-right: 16px;
             }
+
+            .addon-name-container {
+                flex: 1;
+            }
+        }
+
+        .desc-label {
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-size: smaller;
+            font-weight: 600;
+            opacity: 0.7;
         }
     }
     .report-expense {
@@ -124,14 +140,6 @@
                 margin-left: 16px;
                 flex: 1;
             }
-        }
-
-        .desc-label {
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            font-size: smaller;
-            font-weight: 600;
-            opacity: 0.7;
         }
 
         .amount-container {

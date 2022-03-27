@@ -219,12 +219,23 @@
     .item-label {
         flex: 1;
         padding: 16px;
-        max-width: 200px;
+        max-width: 240px;
+        overflow: hidden;
 
         .offer-type {
             font-size: 0.8em;
             font-weight: 600;
             text-transform: uppercase;
+        }
+
+        .offer-version-tag {
+            font-size: smaller;
+            font-weight: 600;
+            text-transform: uppercase;
+            border: 1px solid @separator;
+            padding: 1px 2px;
+            border-radius: 4px;
+            margin: 0 2px;
         }
 
         a {
