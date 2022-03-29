@@ -26,7 +26,7 @@ export default class IntermediaryReports extends OverviewPage {
     renderActions ({ perms }) {
         const actions = [];
 
-        if (perms.hasPerm('intermediaries.update')) {
+        if (perms.hasPerm('pay.read.uea') || perms.hasPerm('pay.read.tejo')) {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.create.menuItem,

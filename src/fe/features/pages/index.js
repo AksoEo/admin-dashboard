@@ -904,7 +904,7 @@ export default [
                 icon: DescriptionIcon,
                 type: 'bottom',
                 path: 'spezfolioj',
-                hasPerm: perms => perms.hasPerm('registration.entries.intermediary') && (perms.hasPerm('pay.payment_intents.uea.intermediary') || perms.hasPerm('pay.payment_intents.tejo.intermediary')),
+                hasPerm: perms => perms.hasPerm('registration.entries.intermediary') && (perms.hasPerm('pay.payment_intents.intermediary.uea') || perms.hasPerm('pay.payment_intents.intermediary.tejo')),
                 paths: [
                     {
                         path: 'krei',

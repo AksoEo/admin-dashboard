@@ -848,9 +848,9 @@ export const spec = [
                 id: 'registration.entries.intermediary',
             },
             {
-                type: 'perm',
-                name: 'pay payment intents uea intermediary',
-                id: 'pay.payment_intents.uea.intermediary',
+                type: 'perm.country',
+                name: 'pay payment intents intermediary uea',
+                id: 'pay.payment_intents.intermediary.uea',
             },
         ],
     },
@@ -954,6 +954,11 @@ function buildReverseMap (spec, mapping, path = [], reqs = []) {
     } else if (spec.type === 'perm') {
         reqs = reqs.concat(spec.requires || []);
         mapping[spec.id] = { path, type: 'perm-node', node: spec, requires: reqs };
+    } else if (spec.type === 'perm.country') {
+        reqs = reqs.concat(spec.requires || []);
+        // for the purposes of the mapping, we will consider this to be the "all countries"
+        // permission, since this mapping is mostly used for wildcard handling
+        mapping[spec.id + '.*'] = { path, type: 'perm-node', node: spec, requires: reqs };
     } else if (typeof spec === 'string' || spec.type.startsWith('!')) {
         // nope
     } else {

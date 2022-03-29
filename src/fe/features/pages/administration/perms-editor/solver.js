@@ -14,7 +14,7 @@ import {
 } from '../../../../permissions';
 
 /// Pops an item from the permission path.
-function pop (perm) {
+export function pop (perm) {
     return perm.substr(0, perm.lastIndexOf('.'));
 }
 
@@ -318,7 +318,9 @@ export function hasPermission (permissions, memberFields, perm) {
 
 /// Returns true if the given permission is not known to the permissions tree.
 export function isPermissionUnknown (perm) {
-    return !reverseMap[perm];
+    // check the reverse map
+    // special case for perm.country: we will ignore all children, since they're proobably a country
+    return !reverseMap[perm] && reverseMap[pop(perm) + '.*']?.node?.type !== 'perm.country';
 }
 
 /// Adds a member field.

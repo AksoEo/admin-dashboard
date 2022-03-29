@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent, useState, useEffect } from 'preact/compat';
+import { useState, useEffect } from 'preact/compat';
 import { Button, CircularProgress, Dialog, LinearProgress, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -24,6 +24,7 @@ import {
 import { FIELDS as ENTRY_FIELDS } from '../../memberships/entries/fields';
 import { FIELDS as ADDON_FIELDS } from '../../payments/orgs/addons/fields';
 import { connect, coreContext } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 import './create.less';
 
 const REDUCED_ENTRY_FIELDS = Object.fromEntries(['codeholderData', 'offers'].map(id => [id, ENTRY_FIELDS[id]]));
@@ -35,6 +36,7 @@ const NEW_ENTRY = {
 const EMPTY_STATE = {
     org: null,
     method: null,
+    aksoOrg: null,
     methodData: null,
     country: null,
     year: null,
@@ -108,13 +110,13 @@ export default class CreateReport extends Page {
             if (result.items.length === 1) {
                 const org = result.items[0];
                 return this.context.createTask('payments/listMethods', {
+                    org,
+                }, {
                     jsonFilter: {
                         filter: {
                             type: 'intermediary',
                         },
                     },
-                    org,
-                }, {
                     limit: 10,
                 }).runOnceAndDrop().then(res => [org, res]);
             } else {
@@ -125,7 +127,9 @@ export default class CreateReport extends Page {
             const [org, result] = _result;
 
             if (result.items.length === 1) {
-                this.setState({ org, method: result.items[0] });
+                this.setState({ org, method: result.items[0] }, () => {
+                    this.loadMethod();
+                });
             }
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
@@ -139,13 +143,22 @@ export default class CreateReport extends Page {
         const { org, method: id } = this.state;
         if (!id) return;
         this.setState({ loading: true });
-        this.context.createTask('payments/getMethod', { org, id }).runOnceAndDrop().then(result => {
-            const currentYear = new Date().getFullYear();
-            if ((result.prices || {})[currentYear]) {
-                this.setState({ year: currentYear });
-            }
 
-            this.setState({ methodData: result, loading: false });
+        this.context.createTask('payments/getOrg', { id: org }).runOnceAndDrop().then(result => {
+            this.setState({ aksoOrg: result.org });
+
+            return this.context.createTask('payments/getMethod', { org, id }).runOnceAndDrop();
+        }).then(result => {
+            this.setState({ methodData: result, loading: false }, () => {
+                const currentYear = new Date().getFullYear();
+                if (!this.state.year && (result.prices || {})[currentYear]) {
+                    this.setState({ year: currentYear }, () => {
+                        this.loadYear();
+                    });
+                } else if (this.state.year) {
+                    this.loadYear();
+                }
+            });
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
             this.context.createTask('info', {
@@ -181,6 +194,7 @@ export default class CreateReport extends Page {
                     noFetch: true,
                 });
                 view.on('update', data => {
+                    if (!data.intermediary) return; // try again...
                     this.setState({ number: (data.intermediary?.number | 0) + 1, loading: false });
                     resolve();
                     view.drop();
@@ -304,6 +318,7 @@ export default class CreateReport extends Page {
     }
 
     confirmSetup () {
+        this.loadYear();
         this.setState({ setupConfirmed: true });
         if (this.state.methodData) {
             const countryCurrency = countryCurrencies[this.state.country];
@@ -359,7 +374,10 @@ export default class CreateReport extends Page {
                     {this.state.method && (
                         <div class="setup-field">
                             <div class="setup-field-label">{locale.create.setup.country}</div>
-                            <CountryPicker value={this.state.country} onChange={country => this.setState({ country })} />
+                            <CountryPicker
+                                org={this.state.aksoOrg}
+                                value={this.state.country}
+                                onChange={country => this.setState({ country })} />
                         </div>
                     )}
                     {this.state.method && (
@@ -367,7 +385,7 @@ export default class CreateReport extends Page {
                             <div class="setup-field-label">{locale.create.setup.year}</div>
                             <Select
                                 value={this.state.year}
-                                onChange={year => this.setState({ year: +year || null }, () => this.loadYear())}
+                                onChange={year => this.setState({ year: +year || null })}
                                 items={[{
                                     value: null,
                                     label: '—',
@@ -500,106 +518,41 @@ export default class CreateReport extends Page {
     }
 }
 
-class CountryPicker extends PureComponent {
-    state = {
-        loading: false,
-        error: null,
-        countries: [],
-    };
+const CountryPicker = connect('countries/countries')(countries => ({
+    countries,
+}))(connectPerms(function CountryPicker ({ value, onChange, org, countries, perms }) {
+    if (!org || !countries) return <TinyProgress />;
+    if (this.state.error) return <DisplayError error={this.state.error} />;
 
-    static contextType = coreContext;
+    let items = [];
+    const countryItems = items;
 
-    async doLoad () {
-        const login = await new Promise((resolve, reject) => {
-            const view = this.context.createDataView('login');
-            view.on('update', data => {
-                if (!data) return;
-                resolve(data);
-                view.drop();
-            });
-            view.on('error', error => {
-                reject(error);
-                view.drop();
-            });
-        });
-
-        const countryNames = await new Promise((resolve, reject) => {
-            const view = this.context.createDataView('countries/countries');
-            view.on('update', data => {
-                if (!data) return;
-                resolve(data);
-                view.drop();
-            });
-            view.on('error', error => {
-                reject(error);
-                view.drop();
-            });
-        });
-
-        const result = await this.context.createTask('intermediaries/list', {}, {
-            jsonFilter: {
-                filter: { codeholderId: login.id },
-            },
-            fields: [{ id: 'countryCode', sorting: 'none' }],
-            limit: 100,
-        }).runOnceAndDrop();
-
-        const countries = [];
-        for (const itemId of result.items) {
-            const view = this.context.createDataView('intermediaries/intermediary', { id: itemId });
-            const item = await new Promise((resolve, reject) => {
-                view.on('update', data => {
-                    if (!data) return;
-                    resolve(data);
-                    view.drop();
-                });
-                view.on('error', error => {
-                    reject(error);
-                    view.drop();
-                });
-            });
-
-            countries.push({
-                value: item.countryCode,
-                label: countryNames[item.countryCode].name_eo,
-            });
+    for (const code in countries) {
+        if (!perms.hasPerm(`pay.payment_intents.intermediary.${org}.${code}`)) {
+            continue;
         }
 
-        if (countries.length === 1) {
-            this.props.onChange(countries[0].value);
-        }
-
-        return countries;
-    }
-
-    load () {
-        this.setState({ loading: true });
-        this.doLoad().then(countries => {
-            this.setState({ loading: false, countries });
-        }).catch(error => {
-            this.setState({ loading: false, error });
+        items.push({
+            value: code,
+            label: countries[code].name_eo,
         });
     }
 
-    componentDidMount () {
-        this.load();
-    }
+    if (!value) items = [{ label: '—', value: null }].concat(items);
 
-    render ({ value, onChange }) {
-        if (this.state.loading) return <TinyProgress />;
-        if (this.state.error) return <DisplayError error={this.state.error} />;
+    useEffect(() => {
+        if (!value && countryItems.length === 1) {
+            onChange(countryItems[0].value);
+        }
+    });
 
-        let countries = this.state.countries;
-        if (!value) countries = [{ label: '—', value: null }].concat(countries);
-
-        return (
-            <Select
-                items={countries}
-                value={value}
-                onChange={onChange} />
-        );
-    }
-}
+    return (
+        <Select
+            items={items}
+            value={value}
+            onChange={onChange} />
+    );
+}));
 
 const PaymentMethodName = connect(({ org, id }) => ['payments/method', { org, id }])(data => ({
     data,

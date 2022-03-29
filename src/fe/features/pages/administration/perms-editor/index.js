@@ -10,6 +10,8 @@ import {
     memberFieldsWrite,
 } from '../../../../permissions';
 import { data as locale } from '../../../../locale';
+import { WithCountries } from '../../../../components/data/country';
+import CountryPicker from '../../../../components/pickers/country-picker';
 import JSONEditor from '../../../../components/controls/json-editor';
 import DisclosureArrow from '../../../../components/disclosure-arrow';
 import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
@@ -65,6 +67,11 @@ export default class PermsEditor extends Component {
             memberFields: mrFields,
             showImplied: new Set(), // TODO
             setShowImplied: implied => this.setState({ showImplied: implied }),
+            mutatePerms: (callback) => {
+                if (!editable) return;
+                const [p, m] = callback(permissions, mrFields);
+                onChange({ ...value, permissions: p, mrFields: m });
+            },
             togglePerm: perm => {
                 if (!editable) return;
                 if (hasPermission(permissions, mrFields, perm)) {
@@ -260,6 +267,55 @@ function PermsItem ({ item, ctx, disabled }) {
                 <label for={checkboxId}>
                     {ctx.showRaw ? item.id : item.name}
                 </label>
+            </div>
+        );
+    } else if (item.type === 'perm.country') {
+        return (
+            <div class="perms-item perms-perm-select">
+                {reqNotice}
+                <label>
+                    {ctx.showRaw ? item.id : item.name}
+                </label>
+                <WithCountries>
+                    {countries => {
+                        const selectedItems = [];
+                        for (const country of Object.keys(countries)) {
+                            if (hasPermission(ctx.permissions, ctx.memberFields, item.id + '.' + country)) {
+                                selectedItems.push(country);
+                            }
+                        }
+                        const onSelectedChange = (value) => {
+                            ctx.mutatePerms((perms, mrFields) => {
+                                if (value.length === Object.keys(countries).length) {
+                                    // all countries! add the wildcard instead
+                                    value = [];
+                                    [perms, mrFields] = addPermission(perms, mrFields, item.id + '.*');
+                                } else if (hasPermission(perms, mrFields, item.id + '.*')) {
+                                    [perms, mrFields] = removePermission(perms, mrFields, item.id + '.*');
+                                }
+
+                                for (const country of Object.keys(countries)) {
+                                    const id = item.id + '.' + country;
+                                    const hasPerm = hasPermission(ctx.permissions, ctx.memberFields, id);
+                                    const shouldHavePerm = value.includes(country);
+                                    if (hasPerm && !shouldHavePerm) {
+                                        [perms, mrFields] = removePermission(perms, mrFields, id);
+                                    } else if (!hasPerm && shouldHavePerm) {
+                                        [perms, mrFields] = addPermission(perms, mrFields, id);
+                                    }
+                                }
+                                return [perms, mrFields];
+                            });
+                        };
+
+                        return (
+                            <CountryPicker
+                                hideGroups
+                                value={selectedItems}
+                                onChange={onSelectedChange} />
+                        );
+                    }}
+                </WithCountries>
             </div>
         );
     } else if (item.type === '!memberRestrictionsSwitch') {
