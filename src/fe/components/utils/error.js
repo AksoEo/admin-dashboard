@@ -44,6 +44,8 @@ export default function DisplayError ({ error }) {
         } else {
             errorString = locale[error.code];
         }
+    } else if (error.localizedDescription) {
+        errorString = error.localizedDescription;
     }
 
     return (

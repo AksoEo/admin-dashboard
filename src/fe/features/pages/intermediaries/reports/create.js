@@ -283,6 +283,7 @@ export default class CreateReport extends Page {
             purposes.push({
                 type: 'addon',
                 paymentAddonId: addon.id,
+                description: addon.description,
                 amount: addon.amount,
             });
         }
@@ -505,13 +506,16 @@ export default class CreateReport extends Page {
                     ]}>
                     {this.state.submitting && (
                         <LinearProgress
+                            class="inner-progress"
                             progress={this.state.submissionState[1] / Math.max(1, this.state.submissionState[2])} />
                     )}
-                    {this.state.submitting
-                        ? locale.create.submit[this.state.submissionState[0]]
-                        : this.state.submitError
-                            ? <DisplayError error={this.state.submitError} />
-                            : locale.create.submit.description}
+                    <div>
+                        {this.state.submitting
+                            ? locale.create.submit[this.state.submissionState[0]]
+                            : this.state.submitError
+                                ? <DisplayError error={this.state.submitError} />
+                                : locale.create.submit.description}
+                    </div>
                 </Dialog>
             </div>
         );

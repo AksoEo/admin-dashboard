@@ -315,7 +315,7 @@ export const tasks = {
         });
         const existing = store.get(REGISTRATION_ENTRIES.concat([id]));
         store.insert(REGISTRATION_ENTRIES.concat([id]), deepMerge(existing, eClientFromAPI(res.body)));
-        return res.body;
+        return store.get(REGISTRATION_ENTRIES.concat([id]));
     },
     createEntry: async (_, params) => {
         const client = await asyncClient;

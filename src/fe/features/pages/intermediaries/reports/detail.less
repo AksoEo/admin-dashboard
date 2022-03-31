@@ -62,19 +62,26 @@
 
     .report-addons {
         .entry-addon {
-            display: flex;
-            justify-content: space-between;
             padding: 8px 16px;
             border-radius: 8px;
             margin: 8px 0;
             background: @card2-background;
             .elevation(2);
 
-            .addon-name {
-                .addon-invalid {
-                    vertical-align: middle;
-                    margin-right: 4px;
+            .addon-header {
+                display: flex;
+                justify-content: space-between;
+
+                .addon-name {
+                    .addon-invalid {
+                        vertical-align: middle;
+                        margin-right: 4px;
+                    }
                 }
+            }
+
+            .addon-description {
+                font-size: smaller;
             }
         }
     }
@@ -149,5 +156,14 @@
         font-weight: 600;
         margin-left: 4px;
         text-transform: uppercase;
+    }
+}
+
+.intermediary-report-delete-redraft-progress-dialog {
+    width: 100%;
+    max-width: 400px;
+
+    .inner-progress-bar {
+        width: 100%;
     }
 }

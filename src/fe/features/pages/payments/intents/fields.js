@@ -43,6 +43,7 @@ export const FIELDS = {
         },
     },
     intermediary: {
+        sortable: true,
         weight: 2,
         component ({ value, editing, onChange }) {
             return <IntermediaryEditor value={value} editing={editing} onChange={onChange} />;

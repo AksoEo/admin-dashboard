@@ -472,7 +472,7 @@ export const tasks = {
         const existing = store.get([PAYMENT_INTENTS, id]);
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, iClientFromAPI(res.body)));
 
-        return +id;
+        return store.get([PAYMENT_INTENTS, id]);
     },
     updateIntent: async ({ id }, params) => {
         const client = await asyncClient;

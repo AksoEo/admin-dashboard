@@ -120,7 +120,7 @@ export const FIELDS = {
     },
     issue: {
         component: connectPerms(({ value, item, editing, perms }) => {
-            if (!value.what) return null;
+            if (!value || !value.what) return null;
 
             let where;
             if (value.where.startsWith('offer[')) {

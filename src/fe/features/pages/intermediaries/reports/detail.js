@@ -1,10 +1,10 @@
 import { h } from 'preact';
 import { Fragment, useState, useEffect, PureComponent } from 'preact/compat';
-import { Button } from 'yamdl';
-import EditIcon from '@material-ui/icons/Edit';
+import { Button, Dialog, LinearProgress } from 'yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import { DeleteRedraftIcon } from '../../../../components/icons';
 import DetailPage from '../../../../components/detail/detail-page';
 import DetailShell from '../../../../components/detail/detail-shell';
 import { country, currencyAmount } from '../../../../components/data';
@@ -16,28 +16,184 @@ import TinyProgress from '../../../../components/controls/tiny-progress';
 import DisplayError from '../../../../components/utils/error';
 import { FIELDS as ENTRY_FIELDS } from '../../memberships/entries/fields';
 import { connect, coreContext } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 import './detail.less';
 
-export default class IntermediaryReport extends DetailPage {
+export default connectPerms(class IntermediaryReport extends DetailPage {
+    state = {
+        showEditPrompt: false,
+        deleteRedrafting: null,
+    };
+
     locale = locale;
 
     get id () {
         return this.props.match[1];
     }
 
-    createCommitTask (changedFields, edit) {
-        return this.context.createTask('payments/updateIntent', {
-            id: this.id,
-            _changedFields: changedFields,
-        }, edit);
+    deleteAndRedraft () {
+        this.setState({ deleteRedraftError: null, showEditPrompt: false });
+        this.doDeleteAndRedraft().catch(error => {
+            console.error(error); // eslint-disable-line no-console
+            this.setState({ deleteRedraftError: error });
+        });
+    }
+
+    async doDeleteAndRedraft () {
+        this.setState({ deleteRedrafting: ['intent', 0, 1] });
+
+        const intent = await this.context.createTask('payments/getIntent', { id: this.id }, {
+            fields: [
+                'org',
+                'paymentOrg',
+                'intermediary',
+                'purposes',
+                'method',
+            ],
+        }).runOnceAndDrop();
+
+        this.setState({ deleteRedrafting: ['method', 0, 1] });
+        const method = await this.context.createTask('payments/getMethod', {
+            org: intent.paymentOrg,
+            id: intent.method.id,
+        }).runOnceAndDrop();
+
+        const { country, year, number } = intent.intermediary;
+        this.setState({ deleteRedrafting: ['regYear', 0, 1] });
+
+        const yearAvailable = year >= new Date().getUTCFullYear();
+        if (!yearAvailable) {
+            const err = new Error('year is < current year');
+            err.localizedDescription = locale.update.steps.yearUnavailable;
+            throw year;
+        }
+
+        const membershipYear = await this.context.createTask('memberships/options', {
+            id: year,
+        }).runOnceAndDrop();
+        if (!membershipYear.enabled) {
+            const err = new Error('year is not enabled');
+            err.localizedDescription = locale.update.steps.yearUnavailable;
+            throw err;
+        }
+
+        const entries = [];
+        const addons = [];
+        const expenses = [];
+        for (const purpose of intent.purposes) {
+            if (purpose.type === 'trigger') {
+                if (purpose.triggers !== 'registration_entry') {
+                    const err = new Error('unknown trigger type');
+                    err.localizedDescription = locale.update.steps.unknownPurpose;
+                    throw err;
+                }
+                entries.push({
+                    id: purpose.dataId,
+                    amount: purpose.amount,
+                });
+            } else if (purpose.type === 'addon') {
+                addons.push(purpose);
+            } else if (purpose.type === 'manual') {
+                expenses.push(purpose);
+            } else {
+                const err = new Error('unknown purpose type');
+                err.localizedDescription = locale.update.steps.unknownPurpose;
+                throw err;
+            }
+        }
+
+        const dataEntries = [];
+
+        for (let i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+            this.setState({ deleteRedrafting: ['entries', i, entries.length] });
+
+            const entryData = await this.context.createTask('memberships/entry', { id: entry.id }, {
+                fields: ['offers', 'codeholderData', 'status'],
+            }).runOnceAndDrop();
+
+            if (!['submitted', 'canceled'].includes(entryData.status.status)) {
+                const err = new Error('invalid entry status');
+                err.localizedDescription = locale.update.steps.entryInvalidStatus;
+                throw err;
+            }
+
+            dataEntries.push({
+                codeholderData: entryData.codeholderData,
+                offers: entryData.offers,
+            });
+        }
+
+        const dataAddons = [];
+        for (let i = 0; i < addons.length; i++) {
+            const addon = addons[i];
+            this.setState({ deleteRedrafting: ['addons', i, addons.length] });
+
+            // fail on 404
+            await this.context.createTask('payments/getAddon', {
+                org: intent.paymentOrg,
+                id: addon.paymentAddonId,
+            }).runOnceAndDrop();
+
+            dataAddons.push({
+                id: addon.paymentAddonId,
+                description: addon.description,
+                amount: addon.amount,
+            });
+        }
+
+        const dataExpenses = [];
+        for (let i = 0; i < expenses.length; i++) {
+            const expense = expenses[i];
+            if (expense.title.match(locale.update.steps.matchPaymentFee)) {
+                // skip
+                continue;
+            }
+            dataExpenses.push({
+                title: expense.title,
+                amount: expense.amount,
+            });
+        }
+
+        // perform delete
+        this.setState({ deleteRedrafting: ['delIntent', 0, 1] });
+        await this.context.createTask('payments/cancelIntent', {
+            id: intent.id,
+        }).runOnceAndDrop();
+
+        for (let i = 0; i < entries.length; i++) {
+            this.setState({ deleteRedrafting: ['delEntries', i, entries.length] });
+            try {
+                await this.context.createTask('memberships/cancelEntry', {
+                    id: entries[i].id,
+                }).runOnceAndDrop();
+            } catch (err) {
+                console.log('Failed to cancel entry—ignoring', err); // eslint-disable-line no-console
+            }
+        }
+
+        sessionStorage.spReportState = JSON.stringify({
+            org: intent.paymentOrg,
+            method: method.id,
+            country,
+            year,
+            number,
+            setupConfirmed: true,
+            currency: intent.currency,
+            entries: dataEntries,
+            addons: dataAddons,
+            expenses: dataExpenses,
+        });
+        this.props.onNavigate(`/perantoj/spezfolioj/krei`);
     }
 
     renderActions () {
+        // TODO: we need to check country perms!! also the status
         return [
             {
-                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                icon: <DeleteRedraftIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
-                action: this.onBeginEdit,
+                action: () => this.setState({ showEditPrompt: true }),
             },
         ];
     }
@@ -74,10 +230,50 @@ export default class IntermediaryReport extends DetailPage {
                         <ReportDetail item={data} />
                     )}
                 </DetailShell>
+                <Dialog
+                    backdrop
+                    open={this.state.showEditPrompt}
+                    onClose={() => this.setState({ showEditPrompt: false })}
+                    title={locale.update.title}
+                    actions={[
+                        {
+                            label: locale.update.cancel,
+                            action: () => this.setState({ showEditPrompt: false }),
+                        },
+                        {
+                            label: locale.update.confirm,
+                            action: () => this.deleteAndRedraft(),
+                        },
+                    ]}>
+                    {locale.update.description}
+                </Dialog>
+                <Dialog
+                    class="intermediary-report-delete-redraft-progress-dialog"
+                    backdrop
+                    open={this.state.deleteRedrafting}
+                    title={locale.update.title}
+                    onClose={() => this.state.deleteRedraftError && this.setState({ deleteRedrafting: null })}
+                    actions={this.state.deleteRedraftError && [{
+                        label: locale.update.errorClose,
+                        action: () => this.setState({ deleteRedrafting: null }),
+                    }]}>
+                    {this.state.deleteRedrafting && (
+                        <div>
+                            <LinearProgress
+                                class="inner-progress-bar"
+                                progress={this.state.deleteRedrafting[1] / this.state.deleteRedrafting[2]} />
+                            <div>
+                                {locale.update.steps[this.state.deleteRedrafting[0]]}
+                                {' '}({this.state.deleteRedrafting[1]}/{this.state.deleteRedrafting[2]})
+                            </div>
+                            {this.state.deleteRedraftError && <DisplayError error={this.state.deleteRedraftError} />}
+                        </div>
+                    )}
+                </Dialog>
             </Fragment>
         );
     }
-}
+});
 
 function ReportDetail ({ item }) {
     return (
@@ -306,12 +502,17 @@ function ReportAddons ({ item }) {
             <div class="section-title">{locale.addons.title}</div>
             {addons.map((addon, i) => (
                 <div class="entry-addon" key={i}>
-                    <div class="addon-name">
-                        {addon.invalid && <ErrorOutlineIcon className="addon-invalid" />}
-                        {addon.paymentAddon?.name || '???'}
+                    <div class="addon-header">
+                        <div class="addon-name">
+                            {addon.invalid && <ErrorOutlineIcon className="addon-invalid" />}
+                            {addon.paymentAddon?.name || '???'}
+                        </div>
+                        <div class="addon-amount">
+                            <currencyAmount.renderer value={addon.amount} currency={item.currency} />
+                        </div>
                     </div>
-                    <div class="addon-amount">
-                        <currencyAmount.renderer value={addon.amount} currency={item.currency} />
+                    <div class="addon-description">
+                        {(addon.description || '').split('\n').map((line, i) => <div key={i}>{line}</div>)}
                     </div>
                 </div>
             ))}

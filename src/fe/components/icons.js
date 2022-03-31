@@ -188,3 +188,11 @@ export function PaymentOrgsIcon () {
         </SvgIcon>
     );
 }
+
+export function DeleteRedraftIcon () {
+    return (
+        <SvgIcon>
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25ZM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83ZM19.617 9.547A8 8 0 0 1 20 12c0 4.42-3.58 8-8 8a8 8 0 0 1-2.453-.383l1.669-1.668a6.005 6.005 0 0 0 6.733-6.733ZM6 12c0 .266.017.528.051.785l-1.668 1.669A8 8 0 0 1 4 12Zm6-12v4a8 8 0 0 1 2.453.383L12.784 6.05A6.038 6.038 0 0 0 12 6v.835l-1.583 1.582L7 5l5-5Z" fillRule="nonzero" fill="currentColor" />
+        </SvgIcon>
+    );
+}

@@ -56,7 +56,7 @@ export const intermediaryReports = {
             button: '[[Add entry]]',
         },
         autoInternalNotes: (year, number) => `[[Part of report A${number}/${year}]]`,
-        purposeTitle: 'Registration',
+        purposeTitle: '[[Registration]]',
     },
     addons: {
         title: '[[Addons]]',
@@ -85,6 +85,7 @@ export const intermediaryReports = {
         final: '[[Total]]',
     },
     create: {
+        menuItem: '[[Create report]]',
         reset: '[[Reset form]]',
         resetConfirm: '[[Are you sure you want to reset your inputs?]]',
         title: '[[Create Report]]',
@@ -106,8 +107,28 @@ export const intermediaryReports = {
         },
     },
     update: {
-        menuItem: 'Redakti',
-        title: 'Redakti [[report]]',
-        button: 'Aktualigi',
+        menuItem: '[[Delete & Re-Draft]]',
+        title: '[[Delete & Re-Draft]]',
+        description: '[[Do you want t cancel this report and re-create it?]]',
+        cancel: '[[Cancel]]',
+        confirm: '[[Confirm]]',
+        errorClose: '[[Close]]',
+        steps: {
+            intent: '[[Loading report]]',
+            method: '[[Checking payment method]]',
+            regYear: '[[Checking availability]]',
+            entries: '[[Loading entries]]',
+            addons: '[[Checking addons]]',
+            delEntries: '[[Canceling entries]]',
+            delIntent: '[[Canceling intent]]',
+            // we will attempt to remove the payment fee item by checking if the last manual purpose
+            // has a title matching this regex
+            matchPaymentFee: /kotizo pro pagmaniero/i,
+
+            error: 'Eraro',
+            yearUnavailable: '[[Registration year unavailable]]',
+            unknownPurpose: '[[Intent contains unknown purpose]]',
+            entryInvalidStatus: '[[A registration entry has already been processed]]',
+        },
     },
 };
