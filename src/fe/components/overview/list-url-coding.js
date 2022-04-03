@@ -232,10 +232,10 @@ export function decodeURLQuery (data, filters) {
 }
 
 /// Applies the decoded partial parameters to a parameters object.
-export function applyDecoded (decoded, parameters) {
+export function applyDecoded (decoded, parameters, softInitial) {
     parameters = { ...parameters };
     if (decoded.search) parameters.search = decoded.search;
-    else parameters.search.query = '';
+    else if (parameters.search) parameters.search.query = '';
     parameters.filters = { ...parameters.filters };
     if (decoded.filters) {
         parameters.filters._disabled = false;
@@ -246,7 +246,7 @@ export function applyDecoded (decoded, parameters) {
             if (id === '_disabled') continue;
             if (!(id in decoded.filters)) parameters.filters[id].enabled = false;
         }
-    } else {
+    } else if (!softInitial) {
         for (const id in parameters.filters) {
             if (id === '_disabled') continue;
             parameters.filters[id].enabled = false;

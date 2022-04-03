@@ -1066,7 +1066,7 @@ export const fields = {
     mainDescriptor: {
         component: permsEditable('mainDescriptor', ({ value, editing, onChange }) => {
             if (!editing) return value;
-            return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={30} />;
+            return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={80} />;
         }),
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         shouldHide: item => item.type !== 'org',

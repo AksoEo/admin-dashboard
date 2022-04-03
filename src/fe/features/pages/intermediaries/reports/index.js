@@ -4,22 +4,36 @@ import OverviewList from '../../../../components/lists/overview-list';
 import OverviewPage from '../../../../components/overview/overview-page';
 import { paymentIntents as intentsLocale, intermediaryReports as locale } from '../../../../locale';
 import { FIELDS } from '../../payments/intents/fields';
+import { FILTERS } from '../../payments/intents/filters';
 
 export default class IntermediaryReports extends OverviewPage {
     state = {
         parameters: {
-            search: { query: '' },
             fields: [
                 { id: 'org', sorting: 'none', fixed: true },
-                { id: 'intermediary', sorting: 'desc', fixed: true },
+                { id: 'intermediary', sorting: 'none', fixed: true },
                 { id: 'status', sorting: 'none', fixed: true },
+                { id: 'statusTime', sorting: 'desc', fixed: true },
             ],
+            filters: {
+                status: {
+                    enabled: true,
+                    value: ['pending', 'submitted', 'disputed', 'succeeded', 'refunded'],
+                },
+            },
             offset: 0,
             limit: 10,
         },
+        expanded: true,
     };
 
-    locale = locale;
+    filters = {
+        status: FILTERS.status,
+    };
+    locale = {
+        ...locale,
+        filters: intentsLocale.filters,
+    };
 
     renderActions ({ perms }) {
         const actions = [];

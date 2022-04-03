@@ -904,6 +904,7 @@ export default [
                 icon: DescriptionIcon,
                 type: 'bottom',
                 path: 'spezfolioj',
+                badge: tasks => tasks.aksopay ? tasks.aksopay.intermediary : null,
                 hasPerm: perms => perms.hasPerm('registration.entries.intermediary') && (perms.hasPerm('pay.payment_intents.intermediary.uea') || perms.hasPerm('pay.payment_intents.intermediary.tejo')),
                 paths: [
                     {

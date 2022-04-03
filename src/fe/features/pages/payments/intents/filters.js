@@ -62,20 +62,23 @@ export const FILTERS = {
         },
     },
     status: {
-        default: () => ({ enabled: false, value: null }),
-        serialize: ({ value }) => value,
-        deserialize: value => ({ enabled: true, value }),
+        default: () => ({ enabled: false, value: [] }),
+        serialize: ({ value }) => value.join(','),
+        deserialize: value => ({ enabled: true, value: value.split(',') }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return <Select
                 disabled={hidden}
-                value={value || ''}
+                multi
+                value={value || []}
                 onChange={value => {
-                    onEnabledChange(!!value);
+                    onEnabledChange(!!value.length);
                     onChange(value);
                 }}
-                items={Object.keys(locale.filters.statuses).map(id => ({
+                emptyLabel={locale.filters.statuses['']}
+                items={Object.keys(locale.filters.statuses).filter(id => id).map(id => ({
                     value: id,
                     label: locale.filters.statuses[id],
+                    shortLabel: locale.filters.shortStatuses[id],
                 }))} />;
         },
     },

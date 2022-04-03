@@ -377,7 +377,7 @@ const ACTIONS = {
     },
     markSucceeded: {
         state: 'succeeded',
-        enabled: (t, s) => typeIsManualLike(t) && (s === 'submitted' || s === 'disputed'),
+        enabled: (t, s) => typeIsManualLike(t) && (s === 'pending' || s === 'submitted' || s === 'disputed'),
         types: ['manual', 'intermediary'],
         icon: AssignmentTurnedInIcon,
         task: id => ['payments/markIntentSucceeded', { id }],

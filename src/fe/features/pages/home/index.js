@@ -47,7 +47,7 @@ class HomeTasks extends PureComponent {
         this.context.createTask('tasks/list', {}).runOnceAndDrop().then(tasks => {
             const resPromises = [Promise.resolve(tasks)];
             if (tasks.aksopay) {
-                resPromises.push(this.context.createTask('payments/listIntents', {}, {
+                const params = {
                     fields: [
                         { id: 'customer', sorting: 'none' },
                         { id: 'statusTime', sorting: 'asc' },
@@ -55,15 +55,30 @@ class HomeTasks extends PureComponent {
                         { id: 'totalAmount', sorting: 'none' },
                         { id: 'amountRefunded', sorting: 'none' },
                         { id: 'currency', sorting: 'none' },
+                        { id: 'intermediary', sorting: 'none' },
                     ],
+                    offset: 0,
+                    limit: 10,
+                };
+                resPromises.push(this.context.createTask('payments/listIntents', {}, {
+                    ...params,
                     jsonFilter: {
                         filter: {
+                            intermediaryCountryCode: null,
                             status: { $in: ['disputed', 'submitted'] },
                         },
                     },
-                    offset: 0,
-                    limit: 10,
                 }).runOnceAndDrop().then(data => ({ aksopay: data.items })));
+
+                resPromises.push(this.context.createTask('payments/listIntents', {}, {
+                    ...params,
+                    jsonFilter: {
+                        filter: {
+                            $not: { intermediaryCountryCode: null },
+                            status: { $in: ['disputed', 'submitted'] },
+                        },
+                    },
+                }).runOnceAndDrop().then(data => ({ intermediary: data.items })));
             }
             if ('registration' in tasks) {
                 resPromises.push(this.context.createTask('memberships/listEntries', {}, {
@@ -133,6 +148,7 @@ class HomeTasks extends PureComponent {
 
             const tabs = {
                 aksopay: renderTabItems('aksopay', PaymentTaskItem),
+                intermediary: renderTabItems('intermediary', IntermediaryTaskItem),
                 registration: renderTabItems('registration', RegistrationTaskItem),
             };
 
@@ -142,7 +158,8 @@ class HomeTasks extends PureComponent {
             };
 
             const tabItemCounts = {
-                aksopay: countTaskItems('aksopay'),
+                aksopay: tasks?.aksopay?.submitted + tasks?.aksopay?.disputed,
+                intermediary: tasks?.aksopay?.intermediary,
                 registration: countTaskItems('registration'),
             };
 
@@ -179,18 +196,28 @@ class HomeTasks extends PureComponent {
 
 const PaymentTaskItem = connect(({ id }) => ['payments/intent', {
     id,
-    fields: ['customer', 'status', 'totalAmount', 'amountRefunded', 'currency'],
+    fields: ['customer', 'status', 'totalAmount', 'amountRefunded', 'currency', 'intermediary'],
     lazyFetch: true,
-}])(data => ({ data }))(function PaymentTaskItem ({ id, data }) {
+}])(data => ({ data }))(function PaymentTaskItem ({ id, data, intermediary }) {
     if (!data) return null;
+    const target = intermediary
+        ? `/perantoj/spezfolioj/${id}`
+        : `/aksopago/pagoj/${id}`;
     return (
-        <LinkButton class="home-task" target={`/aksopago/pagoj/${id}`}>
+        <LinkButton class="home-task" target={target}>
             <div class="task-icon">
                 <PaymentIcon />
             </div>
             <div class="task-details">
                 <div class="task-title">
-                    {data.customer.name}
+                    {intermediary ? (
+                        intentLocale.fields.intermediaryIdFmt(
+                            data.intermediary?.year,
+                            data.intermediary?.number,
+                        )
+                    ) : (
+                        data.customer.name
+                    )}
                     {': '}
                     <currencyAmount.renderer value={data.totalAmount - data.amountRefunded} currency={data.currency} />
                 </div>
@@ -204,6 +231,8 @@ const PaymentTaskItem = connect(({ id }) => ['payments/intent', {
         </LinkButton>
     );
 });
+
+const IntermediaryTaskItem = (props) => <PaymentTaskItem {...props} intermediary />;
 
 const RegistrationTaskItem = connect(({ id }) => ['memberships/entry', {
     id,

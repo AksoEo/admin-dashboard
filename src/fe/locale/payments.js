@@ -190,6 +190,16 @@ export const paymentIntents = {
             disputed: 'disputita',
             refunded: 'mono redonita',
         },
+        shortStatuses: {
+            pending: '[[ne plen.]]',
+            processing: '[[traktata]]',
+            submitted: '[[sendita]]',
+            canceled: '[[nuligita]]',
+            succeeded: '[[fin.]]',
+            abandoned: '[[eksval.]]',
+            disputed: '[[disputita]]',
+            refunded: '[[redonita]]',
+        },
         purposeTriggerNone: 'ne gravas',
     },
     fields: {

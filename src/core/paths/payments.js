@@ -150,7 +150,7 @@ const iClientFilters = {
         toAPI: value => ({ currency: { $in: value } }),
     },
     status: {
-        toAPI: value => ({ status: value }),
+        toAPI: value => ({ status: { $in: value } }),
     },
     purposeTrigger: {
         toAPI: value => ({ $purposes: { triggers: value } }),

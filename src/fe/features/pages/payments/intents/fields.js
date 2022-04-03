@@ -80,7 +80,11 @@ export const FIELDS = {
     status: {
         sortable: true,
         component ({ value }) {
-            return locale.fields.statuses[value];
+            return (
+                <span class="payment-intent-status" data-status={value}>
+                    {locale.fields.statuses[value]}
+                </span>
+            );
         },
         stringify (value) {
             return locale.fields.statuses[value];

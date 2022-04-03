@@ -19,3 +19,13 @@
         }
     }
 }
+
+.payment-intent-status {
+    &[data-status="submitted"],
+    &[data-status="disputed"] {
+        color: @warning-text;
+    }
+    &[data-status="succeeded"] {
+        color: @positive;
+    }
+}

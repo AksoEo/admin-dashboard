@@ -12,9 +12,9 @@ export default class OverviewPage extends Page {
     #searchInput;
     #currentQuery = '';
 
-    decodeURLQuery () {
+    decodeURLQuery (softInitial) {
         this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, this.filters), this.state.parameters),
+            parameters: applyDecoded(decodeURLQuery(this.props.query, this.filters), this.state.parameters, softInitial),
         });
         this.#currentQuery = this.props.query;
     }
@@ -27,7 +27,7 @@ export default class OverviewPage extends Page {
     }
 
     componentDidMount () {
-        this.decodeURLQuery();
+        this.decodeURLQuery(true);
 
         this.#searchInput?.focus(500);
     }

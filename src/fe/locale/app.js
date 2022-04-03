@@ -61,6 +61,7 @@ export const index = {
         empty: 'Neniuj taskoj',
         tabs: {
             aksopay: 'AKSO-Pago',
+            intermediary: '[[Intermediary]]',
             registration: 'Aliĝoj',
         },
     },
