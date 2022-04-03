@@ -35,7 +35,6 @@ export const intermediaryReports = {
     idFmt: (year, number) => `A${number}/${year}`,
     idCountryInfix: 'por',
     createdBy: '[[Created by]]',
-    markSucceeded: '[[Mark payment received]]',
     intentStatuses: {
         pending: 'Ankoraŭ ne plenumita',
         processing: 'Traktata de sistemo',

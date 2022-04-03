@@ -15,7 +15,8 @@ import MdField from '../../../../components/controls/md-field';
 import TinyProgress from '../../../../components/controls/tiny-progress';
 import DisplayError from '../../../../components/utils/error';
 import { FIELDS as ENTRY_FIELDS } from '../../memberships/entries/fields';
-import { connect, coreContext } from '../../../../core/connection';
+import { IntentActions } from '../../payments/intents/detail';
+import { connect } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import './detail.less';
 
@@ -187,15 +188,23 @@ export default connectPerms(class IntermediaryReport extends DetailPage {
         this.props.onNavigate(`/perantoj/spezfolioj/krei`);
     }
 
-    renderActions () {
-        // TODO: we need to check country perms!! also the status
-        return [
-            {
+    renderActions ({ perms }) {
+        const actions = [];
+
+        if (this.state.intentData
+            && (this.state.intentData.status === 'pending')
+            && perms.hasPerm(`pay.payment_intents.cancel.${this.state.intentData.org}`)
+            && perms.hasPerm('pay.payment_intents.intermediary.'
+                + this.state.intentData.org + '.'
+                + this.state.intentData.intermediary?.country)) {
+            actions.push({
                 icon: <DeleteRedraftIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
                 action: () => this.setState({ showEditPrompt: true }),
-            },
-        ];
+            });
+        }
+
+        return actions;
     }
 
     renderContents ({ editing }, { edit }) {
@@ -224,6 +233,7 @@ export default connectPerms(class IntermediaryReport extends DetailPage {
                     onEditChange={edit => this.setState({ edit })}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
+                    onData={data => this.setState({ intentData: data })}
                     onCommit={this.onCommit}
                     onDelete={this.onDelete}>
                     {data => (
@@ -294,17 +304,9 @@ function ReportDetail ({ item }) {
                 {locale.intentStatuses[item.status]}
             </div>
             <div class="report-actions">
-                {item.status === 'submitted' ? (
-                    <coreContext.Consumer>
-                        {core => (
-                            <Button onClick={() => core.createTask('payments/markIntentSucceeded', {
-                                id: item.id,
-                            })}>
-                                {locale.markSucceeded}
-                            </Button>
-                        )}
-                    </coreContext.Consumer>
-                ) : null}
+                <IntentActions
+                    item={item}
+                    org={item.org} />
             </div>
             <ReportEntries item={item} />
             <ReportAddons item={item} />

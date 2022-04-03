@@ -208,7 +208,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                             .map((purpose, i) => <Purpose key={i} purpose={purpose} item={item} />)}
                     </div>
                 )}
-                {!editing && <IntentActions org={org} item={item} />}
+                {!editing && <IntentActions item={item} />}
             </DynamicHeightDiv>
             <div class="intent-customer-container">
                 <div class="intent-section-title">{locale.fields.customer}</div>
@@ -400,7 +400,7 @@ const ACTIONS = {
     },
 };
 
-const IntentActions = connectPerms(function IntentActions ({ item, org, perms }) {
+export const IntentActions = connectPerms(function IntentActions ({ item, perms }) {
     return (
         <coreContext.Consumer>{core => {
             const actions = [];
@@ -410,7 +410,7 @@ const IntentActions = connectPerms(function IntentActions ({ item, org, perms })
             const s = item.status;
 
             for (const k in ACTIONS) {
-                if (ACTIONS[k].hasPerm && !ACTIONS[k].hasPerm(perms, org)) continue;
+                if (ACTIONS[k].hasPerm && !ACTIONS[k].hasPerm(perms, item.org)) continue;
 
                 const isRefund = k === 'markRefunded';
                 const isDispute = k === 'markDisputed';
