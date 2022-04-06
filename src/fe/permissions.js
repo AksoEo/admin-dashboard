@@ -7,6 +7,9 @@ const baseOrgs = {'uea': 'UEA', 'tejo': 'TEJO'};
 ///
 /// - type `perm`: shows a simple permission checkbox. Has a `name` (string)
 ///   and `id` (permission string).
+/// - type `perm.country` shows a country picker. Has a `name` (string)
+//    and `id` (permission string prefix). The final permissions will look like `id`.<country code>.
+//    `id` should not end in a wildcard!
 /// - type `category`: a category of permissions. has a `name` (string)
 /// - type `group`: identical to category except in presentation
 ///   and `children` (list of nodes)
@@ -16,6 +19,9 @@ const baseOrgs = {'uea': 'UEA', 'tejo': 'TEJO'};
 /// Every node may additionally have a field `implies` that contains a list of permissions that will
 /// also be activated by this node (requirements, sort of), and `requires`, which will disable the
 /// node until all requirements are met.
+///
+/// The `impliesFields` field works like `implies`, except it implies member fields for member
+/// restrictions (if enabled).
 ///
 /// There are also three special nodes:
 /// - `{ type: '!memberRestrictionsSwitch', name: string }` which will show a switch to enable or
