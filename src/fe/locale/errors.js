@@ -1,6 +1,6 @@
 export const errors = {
     unknown: 'Okazis nekonata eraro',
-    network: '[[Network error. Check... ur internets.........]]',
+    network: 'Vi ne estas konektita al la interreto. Bonvolu kontroli vian interretan konekton kaj tiam reŝarĝu la paĝon.',
     invalidSearchQuery: {
         pre: [
             'La serĉkriterio ne estas valida. Ĉiuj signoj ne literaj aŭ numeraj estas ignoritaj.',

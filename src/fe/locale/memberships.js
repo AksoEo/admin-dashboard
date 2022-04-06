@@ -175,14 +175,14 @@ export const membershipEntries = {
             magazines: 'Revuaj abonoj',
         },
         paperVersionLabels: {
-            false: '[[Access]]',
-            true: '[[Paper]]',
+            false: 'Reta aliro',
+            true: 'Papera ricevanto',
         },
         cannotAddAddonNote: 'Ne eblas rekte aldoni aldoneblojn al aliĝoj.',
         availabilityCheck: {
-            checking: '[[Checking…]]',
-            duplicateConflict: '[[Unavailable because this item has already been registered.]]',
-            givesMembershipConflict: '[[Unavailable because the member already has membership for this year.]]',
+            checking: 'Kontrolas haveblon ...',
+            duplicateConflict: 'Tiu oferto estas neuzebla, ĉar la koncerna membro jam havas ĝin.',
+            givesMembershipConflict: 'Tiu oferto estas neuzebla, ĉar la koncerna membro jam estas membro en tiu jaro.',
         },
     },
     issue: {
