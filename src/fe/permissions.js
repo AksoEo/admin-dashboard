@@ -49,7 +49,6 @@ export const spec = [
                     {
                         name: 'Legi',
                         id: 'codeholders.read',
-                        implies: ['codeholder_roles.read'],
                     },
                     {
                         name: 'Redakti',
@@ -161,6 +160,10 @@ export const spec = [
                     {
                         name: 'Legi',
                         id: 'codeholder_roles.read',
+                        implies: ['codeholders.read'],
+                        impliesFields: {
+                            roles: 'r',
+                        },
                     },
                     {
                         name: 'Redakti',
@@ -488,11 +491,6 @@ export const spec = [
                                 id: 'pay.payment_intents.create.' + org,
                                 implies: ['pay.payment_intents.update.' + org],
                             },
-                            {
-                                name: 'Forigi',
-                                id: 'pay.payment_intents.delete.' + org,
-                                implies: ['pay.payment_intents.create.' + org],
-                            },
                         ],
                     };
                 }),
@@ -502,26 +500,26 @@ export const spec = [
                 children: Object.entries(baseOrgs).map(([org, name]) => {
                     return {
                         type: 'switch',
-                        name: '[[Intent actions]] por ' + name,
+                        name: 'Pag-agoj por ' + name,
                         options: [
                             {
-                                name: '[[Submit]]',
+                                name: 'Marki kiel sendita',
                                 id: 'pay.payment_intents.submit.' + org,
                             },
                             {
-                                name: '[[Cancel]]',
+                                name: 'Nuligi',
                                 id: 'pay.payment_intents.cancel.' + org,
                             },
                             {
-                                name: '[[Mark Refunded]]',
+                                name: 'Marki kiel repagita',
                                 id: 'pay.payment_intents.mark_refunded.' + org,
                             },
                             {
-                                name: '[[Mark Disputed]]',
+                                name: 'Marki kiel disputita',
                                 id: 'pay.payment_intents.mark_disputed.' + org,
                             },
                             {
-                                name: '[[Mark Succeeded]]',
+                                name: 'Marki kiel fintraktita',
                                 id: 'pay.payment_intents.mark_succeeded.' + org,
                             },
                         ],
@@ -646,7 +644,10 @@ export const spec = [
             {
                 type: 'switch',
                 name: 'Aliĝintoj',
-                requires: ['registration.options.read'],
+                requires: [
+                    'registration.options.read',
+                    'codeholders.read',
+                ],
                 options: [
                     {
                         name: 'Legi',
@@ -838,6 +839,80 @@ export const spec = [
             },
         ],
     },
+];
+
+/*
+Missing permissions:
+codeholders:
+    change_requests:
+        read
+        update
+    delegations:
+        read: <org>
+        update: <org>
+        update_country_delegates:
+            <org>: <country>
+        delete: <org>
+
+delegations:
+    applications:
+        create: <org>
+        read: <org>
+        update: <org>
+        delete: <org>
+    subjects:
+        create: <org>
+        read: <org>
+        update: <org>
+        delete: <org>
+
+geodb:
+    read
+
+countries:
+    lists:
+        read
+        update
+        delete
+
+org_lists:
+    read
+    update
+    delete
+
+magazines:
+    files:
+        update: <org>
+        delete: <org>
+    recitations:
+        update: <org>
+        delete: <org>
+    snapshots:
+        create: <org>
+        read: <org>
+        update: <org>
+        delete: <org>
+
+pay:
+    payment_intents:
+        intermediary:
+            <org>:
+                <country>
+
+registration:
+    entries:
+        intermediary:
+            <country>
+
+intermediaries:
+    read
+    update
+    delete
+
+*/
+
+/*
+
     {
         type: 'category',
         name: 'i just need these real quick ty',
@@ -854,26 +929,7 @@ export const spec = [
             },
         ],
     },
-];
-
-
-/*
-{
-    type: 'group',
-    name: 'Membrecoj',
-    requires: ['codeholders.read'],
-    children: [
-        {
-            type: 'perm',
-            name: 'fjkdsfda',
-            id: 'memberships.read',
-            impliesFields: {
-                profilePicture: 'r',
-            },
-        },
-    ],
-},
- */
+*/
 
 export const memberFieldsAll = 'Ĉiuj kampoj';
 export const memberFieldsRead = 'Vidi';
