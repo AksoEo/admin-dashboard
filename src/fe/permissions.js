@@ -110,17 +110,32 @@ export const spec = [
                             },
                         ],
                     },
+                    {
+                        type: 'perm',
+                        name: 'Malŝalti duan faktoron',
+                        id: 'codeholders.disable_totp',
+                        requires: ['codeholders.read'],
+                    },
+                    {
+                        type: 'switch',
+                        name: 'Ŝanĝpetoj',
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'codeholders.change_requests.read',
+                            },
+                            {
+                                name: 'Ŝanĝi kaj (mal)aprobi',
+                                id: 'codeholders.change_requests.update',
+                                implies: ['codeholders.change_requests.read'],
+                            },
+                        ],
+                    },
                 ],
             },
             {
                 type: 'perm',
-                name: 'Malŝalti duan faktoron',
-                id: 'codeholders.disable_totp',
-                requires: ['codeholders.read'],
-            },
-            {
-                type: 'perm',
-                name: 'Sendi sciigon',
+                name: 'Sendi amasmesaĝon',
                 id: 'codeholders.send_notif',
                 requires: ['codeholders.read'],
             },
@@ -845,36 +860,102 @@ export const spec = [
             },
         ],
     },
+    {
+        type: 'category',
+        name: 'Delegita Reto',
+        children: Object.entries({ uea: 'UEA' }).map(([org, name]) => {
+            return {
+                type: 'group',
+                name: 'Delegita Reto de ' + name,
+                requires: ['codeholders.read'],
+                children: [
+                    {
+                        type: 'switch',
+                        name: 'Delegoj',
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'codeholders.delegations.read.' + org,
+                                implies: ['geodb.read']
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'codeholders.delegations.update.' + org,
+                                implies: ['codeholders.delegations.read.' + org]
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'codeholders.delegations.delete.' + org,
+                                implies: ['codeholders.delegations.update.' + org]
+                            },
+                        ],
+                    },
+                    {
+                        type: 'perm.country',
+                        name: 'Redakti delegojn por specifa lando',
+                        implies: ['codeholders.delegations.read.' + org],
+                        id: 'codeholders.delegations.update_country_delegates.' + org,
+                    },
+                    {
+                        type: 'switch',
+                        name: 'Delegaj kandidatiĝoj',
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'delegations.applications.read.' + org,
+                                implies: ['codeholders.delegations.read.' + org]
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'delegations.applications.update.' + org,
+                                implies: ['delegations.applications.read.' + org]
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'delegations.applications.create.' + org,
+                                implies: ['delegations.applications.update.' + org]
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'delegations.applications.delete.' + org,
+                                implies: ['delegations.applications.create.' + org]
+                            },
+                        ],
+                    },
+                    {
+                        type: 'switch',
+                        name: 'Delegaj fakoj',
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'delegations.subjects.read.' + org,
+                                implies: ['geodb.read']
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'delegations.subjects.update.' + org,
+                                implies: ['delegations.subjects.read.' + org]
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'delegations.subjects.create.' + org,
+                                implies: ['delegations.subjects.update.' + org]
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'delegations.subjects.delete.' + org,
+                                implies: ['delegations.subjects.create.' + org]
+                            },
+                        ],
+                    },
+                ],
+            };
+        }
+    }
 ];
 
 /*
 Missing permissions:
-codeholders:
-    change_requests:
-        read
-        update
-    delegations:
-        read: <org>
-        update: <org>
-        update_country_delegates:
-            <org>: <country>
-        delete: <org>
-
-delegations:
-    applications:
-        create: <org>
-        read: <org>
-        update: <org>
-        delete: <org>
-    subjects:
-        create: <org>
-        read: <org>
-        update: <org>
-        delete: <org>
-
-geodb:
-    read
-
 countries:
     lists:
         read
@@ -914,6 +995,8 @@ intermediaries:
     read
     update
     delete
+
+TODO: Missing fields
 
 */
 

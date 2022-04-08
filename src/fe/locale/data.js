@@ -109,8 +109,8 @@ export const data = {
             mr: 'Membrorestriktoj',
         },
         stats: {
-            permCount: n => `${n} simplaj permeso${n === 1 ? '' : 'j'} donitaj`,
-            fieldCount: n => `${n} membrokampo${n === 1 ? '' : 'j'} permesitaj`,
+            permCount: n => `${n} simpla${n === 1 ? '' : 'j'} permeso${n === 1 ? '' : 'j'} donitaj`,
+            fieldCount: n => `${n} membrokampo${n === 1 ? '' : 'j'} permesita${n === 1 ? '' : 'j'}`,
             fieldCountAll: 'Ĉiuj membrokampoj estas permesitaj',
         },
         data: {
