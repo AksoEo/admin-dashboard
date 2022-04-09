@@ -63,6 +63,7 @@ export const index = {
             aksopay: 'AKSO-Pago',
             intermediary: 'Spezfolioj',
             registration: 'Aliĝoj',
+            changeRequests: 'Ŝanĝopetoj',
         },
     },
     admin: {

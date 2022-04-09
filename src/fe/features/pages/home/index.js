@@ -7,8 +7,14 @@ import Page from '../../../components/page';
 import DisplayError from '../../../components/utils/error';
 import { IdUEACode } from '../../../components/data/uea-code';
 import Tabs from '../../../components/controls/tabs';
-import { index as locale, paymentIntents as intentLocale, membershipEntries as registrationLocale } from '../../../locale';
-import { currencyAmount } from '../../../components/data';
+import {
+    index as locale,
+    paymentIntents as intentLocale,
+    intermediaryReports as reportsLocale,
+    membershipEntries as registrationLocale,
+    codeholderChgReqs as chgReqLocale,
+} from '../../../locale';
+import { country, currencyAmount } from '../../../components/data';
 import { connect, coreContext } from '../../../core/connection';
 import { LinkButton } from '../../../router';
 import './index.less';
@@ -97,6 +103,20 @@ class HomeTasks extends PureComponent {
                     limit: 10,
                 }).runOnceAndDrop().then(data => ({ registration: data.items })));
             }
+            if (tasks.codeholderChangeRequests) {
+                resPromises.push(this.context.createTask('codeholders/changeRequests', {}, {
+                    fields: [
+                        { id: 'time', sorting: 'asc' },
+                    ],
+                    jsonFilter: {
+                        filter: {
+                            status: 'pending',
+                        },
+                    },
+                    offset: 0,
+                    limit: 10,
+                }).runOnceAndDrop().then(data => ({ changeRequests: data.items })));
+            }
             const res = Promise.all(resPromises);
 
             res.then(([tasks, ...items]) => {
@@ -150,6 +170,7 @@ class HomeTasks extends PureComponent {
                 aksopay: renderTabItems('aksopay', PaymentTaskItem),
                 intermediary: renderTabItems('intermediary', IntermediaryTaskItem),
                 registration: renderTabItems('registration', RegistrationTaskItem),
+                changeRequests: renderTabItems('changeRequests', ChangeRequestTaskItem),
             };
 
             const countTaskItems = k => {
@@ -161,6 +182,7 @@ class HomeTasks extends PureComponent {
                 aksopay: tasks?.aksopay?.submitted + tasks?.aksopay?.disputed,
                 intermediary: tasks?.aksopay?.intermediary,
                 registration: countTaskItems('registration'),
+                changeRequests: countTaskItems('codeholderChangeRequests'),
             };
 
             contents = (
@@ -211,10 +233,16 @@ const PaymentTaskItem = connect(({ id }) => ['payments/intent', {
             <div class="task-details">
                 <div class="task-title">
                     {intermediary ? (
-                        intentLocale.fields.intermediaryIdFmt(
-                            data.intermediary?.year,
-                            data.intermediary?.number,
-                        )
+                        <span>
+                            {intentLocale.fields.intermediaryIdFmt(
+                                data.intermediary?.year,
+                                data.intermediary?.number,
+                            )}
+                            {' '}
+                            {intentLocale.fields.intermediaryIdCountryInfix}
+                            {' '}
+                            <country.renderer value={data.intermediary?.country} />
+                        </span>
                     ) : (
                         data.customer.name
                     )}
@@ -222,7 +250,11 @@ const PaymentTaskItem = connect(({ id }) => ['payments/intent', {
                     <currencyAmount.renderer value={data.totalAmount - data.amountRefunded} currency={data.currency} />
                 </div>
                 <span class="task-badge">
-                    {intentLocale.fields.statuses[data.status]}
+                    {intermediary ? (
+                        reportsLocale.intentStatuses[data.status]
+                    ) : (
+                        intentLocale.fields.statuses[data.status]
+                    )}
                 </span>
             </div>
             <div class="task-alt-icon">
@@ -261,6 +293,29 @@ const RegistrationTaskItem = connect(({ id }) => ['memberships/entry', {
                 </div>
                 <span class="task-badge">
                     {registrationLocale.fields.statusTypes[data.status.status]}
+                </span>
+            </div>
+            <div class="task-alt-icon">
+                <ChevronRightIcon />
+            </div>
+        </LinkButton>
+    );
+});
+
+const ChangeRequestTaskItem = connect(({ id }) => ['codeholders/changeRequest', {
+    id,
+    lazyFetch: true,
+}])(data => ({ data }))(function ChangeRequestTaskItem ({ id, data }) {
+    if (!data) return null;
+
+    return (
+        <LinkButton class="home-task" target={`/shanghopetoj/${id}`}>
+            <div class="task-details">
+                <div class="task-title">
+                    <IdUEACode id={data.codeholderId} />
+                </div>
+                <span class="task-badge">
+                    {chgReqLocale.fields.statuses[data.status]}
                 </span>
             </div>
             <div class="task-alt-icon">

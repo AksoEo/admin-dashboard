@@ -11,6 +11,7 @@ import { IdUEACode } from '../../../components/data/uea-code';
 import { codeholderChgReqs as locale, codeholders as chLocale } from '../../../locale';
 import { connectPerms } from '../../../perms';
 import { connect } from '../../../core/connection';
+import { Link } from '../../../router';
 import { fields as CH_FIELDS } from '../codeholders/detail-fields';
 import './fields.less';
 
@@ -18,8 +19,15 @@ export const FIELDS = {
     codeholderId: {
         weight: 0.3,
         slot: 'title',
-        component ({ value }) {
+        component ({ value, slot }) {
             if (!value) return '—';
+            if (slot === 'detail') {
+                return (
+                    <Link class="codeholder-change-request-codeholder-link" target={`/membroj/${value}`} outOfTree>
+                        <IdUEACode id={value} />
+                    </Link>
+                );
+            }
             return <IdUEACode id={value} />;
         },
     },

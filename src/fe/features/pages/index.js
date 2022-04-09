@@ -526,12 +526,12 @@ export default [
             },
             {
                 id: 'change-requests',
-                icon: { resolve: tasks => tasks?.changeRequests ? ChangeRequestNewIcon : ChangeRequestIcon },
-                badge: tasks => tasks?.changeRequests ? 'todo' : null,
+                icon: { resolve: tasks => tasks?.codeholderChangeRequests?.pending ? ChangeRequestNewIcon : ChangeRequestIcon },
+                badge: tasks => tasks?.codeholderChangeRequests?.pending || null,
                 path: 'shanghopetoj',
                 component: elazy(() => import(/* webpackChunkName: "chgreqs" */ './change-requests')),
                 type: 'stack',
-                hasPerm: perms => perms.hasPerm('codeholders.change_requests.read'),
+                hasPerm: perms => perms.hasPerm('codeholders.read') && perms.hasPerm('codeholders.change_requests.read'),
                 paths: [
                     {
                         match: /^(\d+)$/,

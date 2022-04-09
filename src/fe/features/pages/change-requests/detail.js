@@ -96,6 +96,7 @@ export default connectPerms(class ChangeRequest extends Page {
 function DetailField ({ field, item, editing, onItemChange }) {
     const Cmp = FIELDS[field].component;
     return <Cmp
+        slot="detail"
         value={item[field]}
         onChange={v => onItemChange({ ...item, [field]: v })}
         editing={editing}

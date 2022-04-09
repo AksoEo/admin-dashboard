@@ -9,6 +9,7 @@ import Page from '../../../components/page';
 import Meta from '../../meta';
 import { connect, coreContext } from '../../../core/connection';
 import { IdUEACode } from '../../../components/data/uea-code';
+import DisplayError from '../../../components/utils/error';
 import { votes as locale } from '../../../locale';
 import './results.less';
 
@@ -23,7 +24,7 @@ export default connect(({ matches }) => ['votes/voteResults', {
             if (error || voteError) {
                 return (
                     <div class="vote-results has-error">
-                        {'' + (error || voteError)}
+                        <DisplayError error={error || voteError} />
                     </div>
                 );
             }
