@@ -57,6 +57,10 @@
             .entry-expanded {
                 margin-top: 4px;
             }
+
+            .entry-actions-container {
+                text-align: right;
+            }
         }
     }
 
@@ -122,15 +126,15 @@
         }
 
         .item-commission {
-            width: 3em;
+            width: 3.5rem;
             text-align: right;
-            margin-right: 0.5em;
+            margin-right: 0.5rem;
         }
 
         .item-count {
-            min-width: 2em;
+            min-width: 3.5rem;
             text-align: right;
-            margin-right: 1em;
+            margin-right: 1rem;
         }
         .item-title {
             flex: 1;
@@ -138,6 +142,21 @@
             &.is-final {
                 font-weight: bold;
             }
+        }
+
+        .item-price.has-net {
+            opacity: 0.7;
+        }
+
+        .item-net-price {
+            min-width: 6rem;
+            text-align: right;
+            margin-left: 0.5em;
+        }
+
+        &.is-header {
+            font-size: smaller;
+            font-weight: 600;
         }
     }
 }

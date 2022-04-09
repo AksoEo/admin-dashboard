@@ -2,9 +2,49 @@ import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import OverviewList from '../../../../components/lists/overview-list';
 import OverviewPage from '../../../../components/overview/overview-page';
+import Select from '../../../../components/controls/select';
 import { paymentIntents as intentsLocale, intermediaryReports as locale } from '../../../../locale';
 import { FIELDS } from '../../payments/intents/fields';
-import { FILTERS } from '../../payments/intents/filters';
+
+// copy-pasted from payment/intents (but this one needs to use intermediaries locale)
+const statusFilter = {
+    default: () => ({ enabled: false, value: [] }),
+    serialize: ({ value }) => value.join(','),
+    deserialize: value => ({ enabled: true, value: value.split(',') }),
+    editor ({ value, onChange, onEnabledChange, hidden }) {
+        return <Select
+            disabled={hidden}
+            multi
+            value={value || []}
+            onChange={value => {
+                onEnabledChange(!!value.length);
+                onChange(value);
+            }}
+            emptyLabel={locale.intentStatuses['']}
+            items={Object.keys(locale.intentStatuses).filter(id => id).map(id => ({
+                value: id,
+                label: locale.intentStatuses[id],
+                shortLabel: locale.intentStatusesShort[id],
+            }))} />;
+    },
+};
+
+const FIELDS2 = {
+    ...FIELDS,
+    status: {
+        sortable: true,
+        component ({ value }) {
+            return (
+                <span class="payment-intent-status" data-status={value}>
+                    {locale.intentStatuses[value]}
+                </span>
+            );
+        },
+        stringify (value) {
+            return locale.intentStatuses[value];
+        },
+    },
+};
 
 export default class IntermediaryReports extends OverviewPage {
     state = {
@@ -18,7 +58,7 @@ export default class IntermediaryReports extends OverviewPage {
             filters: {
                 status: {
                     enabled: true,
-                    value: ['pending', 'submitted', 'disputed', 'succeeded', 'refunded'],
+                    value: ['pending', 'submitted', 'succeeded'],
                 },
             },
             offset: 0,
@@ -28,7 +68,7 @@ export default class IntermediaryReports extends OverviewPage {
     };
 
     filters = {
-        status: FILTERS.status,
+        status: statusFilter,
     };
     locale = {
         ...locale,
@@ -56,7 +96,7 @@ export default class IntermediaryReports extends OverviewPage {
                 view="payments/intent"
                 updateView={['payments/sigIntents']}
                 parameters={parameters}
-                fields={FIELDS}
+                fields={FIELDS2}
                 onGetItemLink={id => `/perantoj/spezfolioj/${id}`}
                 onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                 onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}

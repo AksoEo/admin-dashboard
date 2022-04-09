@@ -178,7 +178,12 @@ function PermsItem ({ item, ctx, disabled }) {
     if (unfulfilledRequirements.length) {
         reqNotice = (
             <div class="perms-req-notice">
-                {locale.permsEditor.requires} {unfulfilledRequirements.map(i => <PermName key={i} id={i} />)}
+                {locale.permsEditor.requires} {unfulfilledRequirements.map((p, i) => (
+                    <span key={p}>
+                        {i > 0 ? ', ' : ''}
+                        <PermName id={p} />
+                    </span>
+                ))}
             </div>
         );
     }

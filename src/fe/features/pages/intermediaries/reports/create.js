@@ -214,6 +214,20 @@ export default class CreateReport extends Page {
     }
 
     async doSubmit () {
+        this.setState({ submissionState: ['countries', 0, 1] });
+        const countries = await new Promise((resolve, reject) => {
+            const view = this.context.createDataView('countries/countries', {});
+            view.on('update', data => {
+                resolve(data);
+                view.drop();
+            });
+            view.on('error', err => {
+                reject(err);
+                view.drop();
+            });
+        });
+        const countryName = countries[this.state.country].name_eo;
+
         this.setState({ submissionState: ['entries', 0, this.state.entries.length] });
         const entryData = [];
         for (let i = 0; i < this.state.entries.length; i++) {
@@ -229,7 +243,7 @@ export default class CreateReport extends Page {
                     currency: this.state.currency,
                     selected: entry.offers.selected,
                 },
-                internalNotes: locale.entries.autoInternalNotes(this.state.year, this.state.number),
+                internalNotes: locale.entries.autoInternalNotes(this.state.year, this.state.number, countryName),
             }).runOnceAndDrop();
 
             entryData.push({
@@ -240,29 +254,6 @@ export default class CreateReport extends Page {
         }
 
         this.setState({ submissionState: ['intent', 0, 1] });
-
-        const selfView = this.context.createDataView('codeholders/codeholder', {
-            id: 'self',
-            fields: ['id', 'email', 'name'],
-            lazyFetch: true,
-        });
-        const selfInfo = await new Promise((resolve, reject) => {
-            selfView.on('update', data => {
-                if (data.email === undefined || data.name === undefined) return; // no data yet
-                resolve(data);
-                selfView.drop();
-            });
-            selfView.on('error', err => {
-                reject(err);
-                selfView.drop();
-            });
-        });
-        const selfName = [
-            selfInfo.name.full,
-            selfInfo.name.honorific,
-            (selfInfo.name.first || selfInfo.name.firstLegal),
-            (selfInfo.name.last || selfInfo.name.lastLegal),
-        ].filter(x => x).join(' ');
 
         const purposes = [];
         for (let i = 0; i < this.state.entries.length; i++) {
@@ -298,11 +289,7 @@ export default class CreateReport extends Page {
         const id = await this.context.createTask('payments/createIntent', {
             _noGUI: true,
         }, {
-            customer: {
-                id: selfInfo.id,
-                name: selfName,
-                email: selfInfo.email,
-            },
+            customer: null,
             intermediary: {
                 country: this.state.country,
                 year: this.state.year,
@@ -756,6 +743,7 @@ function CodeholderNameLabel ({ name }) {
 
 function EntryEditor ({ entry, onCancel, onConfirm, year, org, method, currency }) {
     const [edit, onEditChange] = useState(null);
+    const [missingFields, setMissingFields] = useState(null);
 
     return (
         <DialogSheet
@@ -766,7 +754,31 @@ function EntryEditor ({ entry, onCancel, onConfirm, year, org, method, currency 
             actions={[
                 {
                     label: locale.entries.edit.confirm,
-                    action: () => onConfirm(edit),
+                    action: () => {
+                        if (!edit) {
+                            onCancel();
+                            return;
+                        }
+
+                        // we'll just do a little manual checking i suppose...
+                        const missing = [];
+                        if (!edit.codeholderData) {
+                            missing.push('codeholderData');
+                        } else if (typeof edit.codeholderData === 'object') {
+                            const ch = edit.codeholderData;
+                            if (!ch.name?.firstLegal) missing.push('codeholderData.name');
+                            if (!ch.address?.country || !ch.address?.streetAddress) missing.push('codeholderData.address');
+                            if (!ch.feeCountry) missing.push('codeholderData.feeCountry');
+                            if (!ch.email) missing.push('codeholderData.email');
+                            if (!ch.birthdate) missing.push('codeholderData.birthdate');
+                        }
+
+                        if (missing.length) {
+                            setMissingFields(missing);
+                        } else {
+                            onConfirm(edit);
+                        }
+                    },
                 },
             ]}>
             <InnerEntryEditor
@@ -776,6 +788,26 @@ function EntryEditor ({ entry, onCancel, onConfirm, year, org, method, currency 
                 org={org}
                 method={method}
                 currency={currency} />
+            <Dialog
+                backdrop
+                open={!!missingFields}
+                onClose={() => setMissingFields(null)}
+                actions={[
+                    {
+                        label: locale.entries.missingFieldsClose,
+                        action: () => setMissingFields(null),
+                    },
+                ]}
+                title={locale.entries.missingFields}>
+                <p>
+                    {locale.entries.missingFieldsDesc}
+                </p>
+                <ul>
+                    {(missingFields || []).map(field => (
+                        <li key={field}>{locale.entries.fields[field]}</li>
+                    ))}
+                </ul>
+            </Dialog>
         </DialogSheet>
     );
 }

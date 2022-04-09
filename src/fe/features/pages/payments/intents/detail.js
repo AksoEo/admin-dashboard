@@ -400,7 +400,10 @@ const ACTIONS = {
     },
 };
 
-export const IntentActions = connectPerms(function IntentActions ({ item, perms }) {
+/// Renders intent action buttons.
+/// - item: intent item
+/// - typeOnly: will hide buttons depending on the intent type instead of just greying them out
+export const IntentActions = connectPerms(function IntentActions ({ item, perms, typeOnly }) {
     return (
         <coreContext.Consumer>{core => {
             const actions = [];
@@ -411,6 +414,7 @@ export const IntentActions = connectPerms(function IntentActions ({ item, perms 
 
             for (const k in ACTIONS) {
                 if (ACTIONS[k].hasPerm && !ACTIONS[k].hasPerm(perms, item.org)) continue;
+                if (typeOnly && !ACTIONS[k].types.includes(t)) continue;
 
                 const isRefund = k === 'markRefunded';
                 const isDispute = k === 'markDisputed';

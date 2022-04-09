@@ -36,21 +36,19 @@ export const intermediaryReports = {
     idCountryInfix: 'por',
     createdBy: 'Kreita de',
     intentStatuses: {
+        '': 'ne gravas',
         pending: 'Malneta',
-        processing: null,
         submitted: 'Ensendita',
         canceled: 'Nuligita',
         succeeded: 'Aprobita',
         abandoned: 'Eksvalidiĝis',
-        disputed: null,
-        refunded: null,
     },
     intentStatusesShort: {
         pending: 'Malneta',
         submitted: 'Sendita',
         canceled: 'Nuligita',
         succeeded: 'Aprobita',
-        abandoned: 'Eksvalida'
+        abandoned: 'Eksvalida',
     },
     entries: {
         title: 'Aliĝoj',
@@ -63,6 +61,20 @@ export const intermediaryReports = {
         },
         autoInternalNotes: (year, number, country) => `Parto de spezfolio A${number}/${year} por ${country}`,
         purposeTitle: 'Aliĝo',
+        magazinePrefix: 'Revuo',
+        openDetail: '[[View full entry]]',
+
+        missingFields: '[[Missing fields]]',
+        missingFieldsDesc: '[[Please fill out the following fields to complete the entry:]]',
+        missingFieldsClose: '[[Close]]',
+        fields: {
+            codeholderData: 'Membrodatumoj',
+            'codeholderData.name': 'Membrodatumoj ▸ Nomo',
+            'codeholderData.address': 'Membrodatumoj ▸ Adreso',
+            'codeholderData.feeCountry': 'Membrodatumoj ▸ Paglando',
+            'codeholderData.email': 'Membrodatumoj ▸ Retpoŝtadreso',
+            'codeholderData.birthdate': 'Membrodatumoj ▸ Naskiĝtago',
+        },
     },
     addons: {
         title: 'Donacoj',
@@ -87,6 +99,15 @@ export const intermediaryReports = {
         },
     },
     totals: {
+        headers: {
+            commission: '[[Comm.]]',
+            commissionTitle: '[[Commission]]',
+            count: '[[Count]]',
+            desc: '[[Description]]',
+            price: '[[Price]]', // if net/gross is not visible
+            gross: '[[Gross]]',
+            net: '[[Net]]',
+        },
         sum: '',
         final: 'Sumo',
     },
@@ -120,6 +141,7 @@ export const intermediaryReports = {
         confirm: 'Reverki',
         errorClose: 'Fermi',
         steps: {
+            countries: 'Ŝarĝas landojn ...',
             intent: 'Ŝarĝas spezfolion ...',
             method: 'Legas spezfoliajn informojn ...',
             regYear: 'Kontrolas spezfolian numeron ...',

@@ -18,6 +18,7 @@ import { FIELDS as ENTRY_FIELDS } from '../../memberships/entries/fields';
 import { IntentActions } from '../../payments/intents/detail';
 import { connect } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
+import { LinkButton } from '../../../../router';
 import './detail.less';
 
 export default connectPerms(class IntermediaryReport extends DetailPage {
@@ -286,6 +287,8 @@ export default connectPerms(class IntermediaryReport extends DetailPage {
 });
 
 function ReportDetail ({ item }) {
+    const [entriesNet, setEntriesNet] = useState(0);
+
     return (
         <div class="intermediary-report-detail">
             <div class="report-title">
@@ -304,19 +307,21 @@ function ReportDetail ({ item }) {
                 {locale.intentStatuses[item.status]}
             </div>
             <div class="report-actions">
-                <IntentActions
-                    item={item}
-                    org={item.org} />
+                <IntentActions typeOnly item={item} />
             </div>
-            <ReportEntries item={item} />
+            <ReportEntries item={item} onNetTotalChange={nt => setEntriesNet(nt)} />
             <ReportAddons item={item} />
             <ReportExpenses item={item} />
             <div class="report-final-total">
                 <Totals
                     isFinal
+                    showCommission
+                    showNet
                     items={[]}
                     currency={item.currency}
-                    total={item.totalAmount} />
+                    total={item.totalAmount}
+                    netTotal={item.totalAmount - entriesNet?.difference}
+                    incompleteNet={!entriesNet?.complete} />
             </div>
         </div>
     );
@@ -327,35 +332,23 @@ class ReportEntries extends PureComponent {
 
     setEntryData (key, value) {
         this.entryData[key] = value;
+        this.updateEntries();
         this.forceUpdate();
     }
 
-    render ({ item }) {
-        if (!item.purposes) return <TinyProgress />;
-        const entries = item.purposes.filter(purpose => purpose.type === 'trigger'
-            && purpose.triggers === 'registration_entry');
-        if (!entries.length) return null;
+    componentDidMount () {
+        this.updateEntries();
+        this.forceUpdate();
+    }
 
+    totalAmount = 0;
+    netTotalAmount = 0;
+    memberships = {};
+    magazines = {};
+
+    updateEntries () {
         const { entryData } = this;
-
-        let totalAmount = 0;
-        const memberships = {};
-        const magazines = {};
-        for (const k in entryData) {
-            const entry = entryData[k];
-            for (const offer of (entry?.offers?.selected || [])) {
-                if (offer.type === 'membership') {
-                    const key = `${entry.year}-${offer.id}`;
-                    if (!memberships[key]) memberships[key] = [];
-                    memberships[key].push(offer);
-                } else if (offer.type === 'magazine') {
-                    const key = `${entry.year}-${offer.id}`;
-                    if (!magazines[key]) magazines[key] = [];
-                    magazines[key].push(offer);
-                }
-                totalAmount += offer.amount;
-            }
-        }
+        const { item } = this.props;
 
         const entryPrices = (item.method?.prices || {})[item.intermediary.year]?.registrationEntries || {};
         const categoryPrices = {};
@@ -367,18 +360,71 @@ class ReportEntries extends PureComponent {
             magazinePrices[magazine.id] = magazine;
         }
 
+        this.totalAmount = 0;
+        this.netTotalAmount = 0;
+        this.memberships = {};
+        this.magazines = {};
+        for (const k in entryData) {
+            const entry = entryData[k];
+            for (const offer of (entry?.offers?.selected || [])) {
+                let commission = 0;
+
+                if (offer.type === 'membership') {
+                    const key = `${entry.year}-${offer.id}`;
+                    if (!this.memberships[key]) {
+                        this.memberships[key] = {
+                            commission: categoryPrices[offer.id]?.commission || 0,
+                            offers: [],
+                        };
+                    }
+                    this.memberships[key].offers.push(offer);
+                    commission = this.memberships[key].commission;
+                } else if (offer.type === 'magazine') {
+                    const key = `${entry.year}-${offer.id}`;
+                    if (!this.magazines[key]) {
+                        const paper = (magazinePrices[offer.id]?.prices || {}).paper?.commission || 0;
+                        const access = (magazinePrices[offer.id]?.prices || {}).access?.commission || 0;
+                        this.magazines[key] = {
+                            commission: { paper, access },
+                            offers: [],
+                        };
+                    }
+                    this.magazines[key].offers.push(offer);
+                    commission = this.magazines[key].commission[offer.paper ? 'paper' : 'access'];
+                }
+                this.totalAmount += offer.amount;
+                this.netTotalAmount += offer.amount * (1 - commission / 100);
+            }
+        }
+
+        const entries = (item.purposes || []).filter(purpose => purpose.type === 'trigger'
+            && purpose.triggers === 'registration_entry');
+        const isComplete = Object.keys(entryData).length == entries.length;
+
+        this.props.onNetTotalChange({
+            difference: this.totalAmount - this.netTotalAmount,
+            complete: isComplete,
+        });
+    }
+
+    render ({ item }) {
+        if (!item.purposes) return <TinyProgress />;
+        const entries = item.purposes.filter(purpose => purpose.type === 'trigger'
+            && purpose.triggers === 'registration_entry');
+        if (!entries.length) return null;
+
         const items = [];
-        for (const k in memberships) {
-            const offers = memberships[k];
+        for (const k in this.memberships) {
+            const { commission, offers } = this.memberships[k];
             items.push({
                 title: <CategoryName id={offers[0].id} abbrev />,
                 count: offers.length,
                 amount: offers.map(offer => offer.amount).reduce((a, b) => a + b, 0),
-                commission: categoryPrices[offers[0].id]?.commission,
+                commission,
             });
         }
-        for (const k in magazines) {
-            const offers = magazines[k];
+        for (const k in this.magazines) {
+            const { commission, offers } = this.magazines[k];
             const accessTypes = {};
             for (const item of offers) {
                 const accessType = item.paperVersion ? 'paper' : 'access';
@@ -391,11 +437,11 @@ class ReportEntries extends PureComponent {
                     title: <MagazineName id={offers[0].id} />,
                     count: offers.length,
                     amount: offers.map(offer => offer.amount).reduce((a, b) => a + b, 0),
-                    commission: (magazinePrices[offers[0].id]?.prices || {})[type]?.commission,
+                    commission: commission[type],
                 });
             }
         }
-        if (Object.keys(entryData).length < entries.length) {
+        if (Object.keys(this.entryData).length < entries.length) {
             items.push({
                 title: <TinyProgress />,
                 count: ' ',
@@ -416,9 +462,11 @@ class ReportEntries extends PureComponent {
                 <Totals
                     showCounts
                     showCommission
+                    showNet
                     items={items}
                     currency={item.currency}
-                    total={totalAmount} />
+                    total={this.totalAmount}
+                    netTotal={this.netTotalAmount} />
             </div>
         );
     }
@@ -438,6 +486,7 @@ const ReportEntryData = connect(({ id }) => [
         fields: ['year', 'status', 'offers', 'codeholderData', 'issue'],
     },
 ])((data, _, error, loaded) => ({ data, error, loaded }))(function ReportEntryData ({
+    id,
     data,
     loaded,
     error,
@@ -462,14 +511,19 @@ const ReportEntryData = connect(({ id }) => [
         contents = (
             <div class="entry-expanded">
                 <ENTRY_FIELDS.offers.component value={data.offers} item={data} />
+                <div class="entry-actions-container">
+                    <LinkButton outOfTree target={`/membreco/alighoj/${id}`}>
+                        {locale.entries.openDetail}
+                    </LinkButton>
+                </div>
             </div>
         );
     } else {
         contents = (
             <div class="entry-collapsed">
-                {data.offers.selected.map((offer, i) => (
+                {data.offers ? data.offers.selected.map((offer, i) => (
                     <EntrySelectedOffer key={i} offer={offer} />
-                ))}
+                )) : null}
             </div>
         );
     }
@@ -598,6 +652,8 @@ export const EntrySelectedMagazine = connect(({ id }) => ['magazines/magazine', 
     if (!data) return <TinyProgress />;
     return (
         <span class="intermediary-report-entry-selected-magazine">
+            {locale.entries.magazinePrefix}
+            {' '}
             {data.name}
             <span class="version-tag">
                 {entriesLocale.offers.paperVersionLabels[(paperVersion || false).toString()]}
@@ -606,18 +662,42 @@ export const EntrySelectedMagazine = connect(({ id }) => ['magazines/magazine', 
     );
 });
 
-export function Totals ({ items, total, currency, showCounts, showCommission, isFinal }) {
+export function Totals ({ items, total, netTotal, currency, showCounts, showCommission, showNet, isFinal, incompleteNet }) {
     return (
         <div class="intermediary-report-totals">
+            <div class="totals-item is-header">
+                {showCommission && (
+                    <div class="item-commission" title={locale.totals.headers.commissionTitle}>
+                        {items.length ? locale.totals.headers.commission : null}
+                    </div>
+                )}
+                {showCounts && (
+                    <div class="item-count">
+                        {locale.totals.headers.count}
+                    </div>
+                )}
+                <div class="item-title">
+                    {items.length ? locale.totals.headers.desc : null}
+                </div>
+                <div class="item-price">
+                    {showNet ? locale.totals.headers.gross : locale.totals.headers.price}
+                </div>
+                {showNet && (
+                    <div class="item-net-price">
+                        {locale.totals.headers.net}
+                    </div>
+                )}
+            </div>
+
             {items.map((item, i) => (
                 <div class="totals-item" key={i}>
                     {showCommission && (
                         <div class="item-commission">
-                            {item.commission && (
+                            {item.commission ? (
                                 <span>
                                     {Math.round(item.commission)} %
                                 </span>
-                            )}
+                            ) : null}
                         </div>
                     )}
                     {showCounts && (
@@ -628,9 +708,16 @@ export function Totals ({ items, total, currency, showCounts, showCommission, is
                     <div class="item-title">
                         {item.title}
                     </div>
-                    <div class="item-price">
+                    <div class={'item-price' + (showNet ? ' has-net' : '')}>
                         <currencyAmount.renderer value={item.amount} currency={currency} />
                     </div>
+                    {showNet && (
+                        <div class="item-net-price">
+                            <currencyAmount.renderer
+                                value={item.netAmount || (item.amount * (1 - item.commission / 100))}
+                                currency={currency} />
+                        </div>
+                    )}
                 </div>
             ))}
             <hr />
@@ -638,9 +725,18 @@ export function Totals ({ items, total, currency, showCounts, showCommission, is
                 <div class={'item-title' + (isFinal ? ' is-final' : '')}>
                     {isFinal ? locale.totals.final : locale.totals.sum}
                 </div>
-                <div class="item-price">
+                <div class={'item-price' + (showNet ? ' has-net' : '')}>
                     <currencyAmount.renderer value={total} currency={currency} />
                 </div>
+                {showNet && (
+                    <div class="item-net-price">
+                        {incompleteNet ? (
+                            <TinyProgress />
+                        ) : (
+                            <currencyAmount.renderer value={netTotal} currency={currency} />
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -876,17 +876,17 @@ export const spec = [
                             {
                                 name: 'Legi',
                                 id: 'codeholders.delegations.read.' + org,
-                                implies: ['geodb.read']
+                                implies: ['geodb.read'],
                             },
                             {
                                 name: 'Redakti',
                                 id: 'codeholders.delegations.update.' + org,
-                                implies: ['codeholders.delegations.read.' + org]
+                                implies: ['codeholders.delegations.read.' + org],
                             },
                             {
                                 name: 'Forigi',
                                 id: 'codeholders.delegations.delete.' + org,
-                                implies: ['codeholders.delegations.update.' + org]
+                                implies: ['codeholders.delegations.update.' + org],
                             },
                         ],
                     },
@@ -903,22 +903,22 @@ export const spec = [
                             {
                                 name: 'Legi',
                                 id: 'delegations.applications.read.' + org,
-                                implies: ['codeholders.delegations.read.' + org]
+                                implies: ['codeholders.delegations.read.' + org],
                             },
                             {
                                 name: 'Redakti',
                                 id: 'delegations.applications.update.' + org,
-                                implies: ['delegations.applications.read.' + org]
+                                implies: ['delegations.applications.read.' + org],
                             },
                             {
                                 name: 'Krei',
                                 id: 'delegations.applications.create.' + org,
-                                implies: ['delegations.applications.update.' + org]
+                                implies: ['delegations.applications.update.' + org],
                             },
                             {
                                 name: 'Forigi',
                                 id: 'delegations.applications.delete.' + org,
-                                implies: ['delegations.applications.create.' + org]
+                                implies: ['delegations.applications.create.' + org],
                             },
                         ],
                     },
@@ -929,29 +929,29 @@ export const spec = [
                             {
                                 name: 'Legi',
                                 id: 'delegations.subjects.read.' + org,
-                                implies: ['geodb.read']
+                                implies: ['geodb.read'],
                             },
                             {
                                 name: 'Redakti',
                                 id: 'delegations.subjects.update.' + org,
-                                implies: ['delegations.subjects.read.' + org]
+                                implies: ['delegations.subjects.read.' + org],
                             },
                             {
                                 name: 'Krei',
                                 id: 'delegations.subjects.create.' + org,
-                                implies: ['delegations.subjects.update.' + org]
+                                implies: ['delegations.subjects.update.' + org],
                             },
                             {
                                 name: 'Forigi',
                                 id: 'delegations.subjects.delete.' + org,
-                                implies: ['delegations.subjects.create.' + org]
+                                implies: ['delegations.subjects.create.' + org],
                             },
                         ],
                     },
                 ],
             };
-        }
-    }
+        }),
+    },
 ];
 
 /*
