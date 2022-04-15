@@ -17,6 +17,7 @@ import {
 import { country, currencyAmount } from '../../../components/data';
 import { connect, coreContext } from '../../../core/connection';
 import { LinkButton } from '../../../router';
+import Notices from './notices';
 import './index.less';
 
 export default class HomePage extends Page {
@@ -24,6 +25,7 @@ export default class HomePage extends Page {
         return (
             <div class="home-page">
                 <HomeTasks />
+                <Notices />
                 <div class="home-card">
                     <div class="hc-title">
                         {locale.admin.title}

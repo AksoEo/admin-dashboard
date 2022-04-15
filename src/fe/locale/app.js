@@ -70,5 +70,13 @@ export const index = {
         title: 'Asisto',
         description: 'Se vi spertas problemojn pri AKSO-Administranto, vi ĉiam povas sendi retmesaĝon al helpo@akso.org. Bonvolu indiki detale la problemon, eventuale aldonante ekranfotojn.',
     },
+    notices: {
+        title: '[[Notices]]',
+        markAllRead: '[[Mark all read]]',
+        markRead: '[[Mark read]]',
+        markedRead: '[[Read]]',
+        noticeExpand: '[[Show more]]',
+        noticeCollapse: '[[Close]]',
+    },
 };
 

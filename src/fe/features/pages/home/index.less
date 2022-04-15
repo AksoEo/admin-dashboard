@@ -1,10 +1,15 @@
 @import '../../../prelude';
 
 .home-page {
+    display: grid;
+    padding: 24px;
+    gap: 16px;
+    grid-template-columns: 100%;
+
     .home-card {
-        margin: 24px;
         border-radius: 8px;
         background: @card1-background;
+        width: 100%;
         .elevation(7);
 
         .hc-title {
@@ -12,16 +17,11 @@
             font-size: 1.2em;
             font-weight: 600;
         }
+    }
 
-        @media (min-width: 700px) and (max-width: 899px), (min-width: 1000px) {
-            vertical-align: top;
-            display: inline-block;
-            width: calc(50% - 36px);
-
-            &:nth-child(2n) {
-                margin-left: 0;
-            }
-        }
+    @media (min-width: 1270px) {
+        grid-template-columns: calc(50% - 8px) calc(50% - 8px);
+        grid-template-rows: masonry;
     }
 
     .home-tasks {
