@@ -62,11 +62,11 @@ export const intermediaryReports = {
         autoInternalNotes: (year, number, country) => `Parto de spezfolio A${number}/${year} por ${country}`,
         purposeTitle: 'Aliĝo',
         magazinePrefix: 'Revuo',
-        openDetail: '[[View full entry]]',
+        openDetail: 'Montri plenan aliĝon',
 
-        missingFields: '[[Missing fields]]',
-        missingFieldsDesc: '[[Please fill out the following fields to complete the entry:]]',
-        missingFieldsClose: '[[Close]]',
+        missingFields: 'Mankas kampoj',
+        missingFieldsDesc: 'Bonvolu plenigi la jena(j)n kampo(j)n por aldoni la aliĝon:',
+        missingFieldsClose: 'Fermi',
         fields: {
             codeholderData: 'Membrodatumoj',
             'codeholderData.name': 'Membrodatumoj ▸ Nomo',
@@ -100,13 +100,13 @@ export const intermediaryReports = {
     },
     totals: {
         headers: {
-            commission: '[[Comm.]]',
-            commissionTitle: '[[Commission]]',
-            count: '[[Count]]',
-            desc: '[[Description]]',
-            price: '[[Price]]', // if net/gross is not visible
-            gross: '[[Gross]]',
-            net: '[[Net]]',
+            commission: 'Depreno',
+            commissionTitle: 'Depreno',
+            count: 'Kvanto',
+            desc: 'Priskribo',
+            price: 'Prezo', // if net/gross is not visible
+            gross: 'Malneto',
+            net: 'Neto',
         },
         sum: '',
         final: 'Sumo',
