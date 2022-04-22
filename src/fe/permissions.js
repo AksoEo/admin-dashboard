@@ -416,6 +416,56 @@ export const spec = [
     },
     {
         type: 'category',
+        name: 'Listoj de landaj asocioj',
+        children: [
+            {
+                type: 'switch',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'countries.lists.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'countries.lists.update',
+                        implies: ['countries.lists.read'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'countries.lists.delete',
+                        implies: ['countries.lists.update'],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Listoj de fakaj asocioj',
+        children: [
+            {
+                type: 'switch',
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'org_lists.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'org_lists.update',
+                        implies: ['org_lists.read'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'org_lists.delete',
+                        implies: ['org_lists.update'],
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        type: 'category',
         name: 'Voĉdonoj',
         children: Object.entries(baseOrgs).map(([org, name]) => {
             return {
@@ -831,13 +881,54 @@ export const spec = [
                 children: Object.entries(baseOrgs).map(([org, name]) => {
                     return {
                         type: 'switch',
+                        name: 'Revuaj dosieroj de ' + name,
+                        requires: ['magazines.read'],
+                        options: [
+                            {
+                                name: 'Redakti',
+                                id: 'magazines.files.update.' + org,
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'magazines.files.delete.' + org,
+                                implies: ['magazines.files.update.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Revuaj sondosieroj de ' + name,
+                        requires: ['magazines.read'],
+                        options: [
+                            {
+                                name: 'Redakti',
+                                id: 'magazines.recitations.update.' + org,
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'magazines.recitations.delete.' + org,
+                                implies: ['magazines.recitations.update.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
                         name: 'Simplaj abonoj de ' + name,
-                        requires: ['codeholders.read'],
+                        requires: ['magazines.read'],
                         options: [
                             {
                                 name: 'Legi',
                                 id: 'magazines.subscriptions.read.' + org,
-                                implies: ['codeholders.read'],
                             },
                             {
                                 name: 'Redakti',
@@ -956,24 +1047,7 @@ export const spec = [
 
 /*
 Missing permissions:
-countries:
-    lists:
-        read
-        update
-        delete
-
-org_lists:
-    read
-    update
-    delete
-
 magazines:
-    files:
-        update: <org>
-        delete: <org>
-    recitations:
-        update: <org>
-        delete: <org>
     snapshots:
         create: <org>
         read: <org>
