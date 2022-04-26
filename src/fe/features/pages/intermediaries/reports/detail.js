@@ -4,6 +4,7 @@ import { Button, Dialog, LinearProgress } from 'yamdl';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import PictureAsPdfIcon from '@material-ui/icons/PictureAsPdf';
 import { DeleteRedraftIcon } from '../../../../components/icons';
 import DetailPage from '../../../../components/detail/detail-page';
 import DetailShell from '../../../../components/detail/detail-shell';
@@ -19,6 +20,7 @@ import { IntentActions } from '../../payments/intents/detail';
 import { connect } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import { LinkButton } from '../../../../router';
+import config from '../../../../../config.val';
 import './detail.less';
 
 export default connectPerms(class IntermediaryReport extends DetailPage {
@@ -202,6 +204,18 @@ export default connectPerms(class IntermediaryReport extends DetailPage {
                 icon: <DeleteRedraftIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
                 action: () => this.setState({ showEditPrompt: true }),
+            });
+        } else if (this.state.intentData && this.state.intentData.status === 'succeeded') {
+            actions.push({
+                icon: <PictureAsPdfIcon style={{ verticalAlign: 'middle' }} />,
+                action: () => {
+                    const anchor = document.createElement('a');
+                    const url = new URL(`aksopay/payment_intents/${this.id}/!make_intermediary_pdf`, config.base).toString();
+                    anchor.href = url;
+                    const { year, number, country } = this.state.intentData.intermediary;
+                    anchor.download = country.toUpperCase() + ' ' + locale.idFmt(year, number) + '.pdf';
+                    anchor.click();
+                },
             });
         }
 
