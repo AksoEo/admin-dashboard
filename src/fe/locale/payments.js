@@ -424,6 +424,14 @@ export const paymentIntents = {
         title: 'Ĝisdatigi',
         button: 'Konservi',
     },
+    resendReceipt: {
+        menuItem: '[[Re-send Receipt]]',
+        title: '[[Re-send Receipt]]',
+        description: '[[You can re-send the receipt for whatever reason.]]',
+        email: '[[Customer email]]',
+        noEmail: '[[Email is required]]',
+        button: '[[Send]]',
+    },
 
     report: {
         title: 'Raporto',

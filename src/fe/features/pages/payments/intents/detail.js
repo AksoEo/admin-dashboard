@@ -77,7 +77,7 @@ export default connectPerms(class IntentPage extends Page {
         return this.props.match[1];
     }
 
-    render ({ perms, editing }, { edit, org }) {
+    render ({ perms, editing }, { edit, org, status, customer }) {
         const actions = [];
 
         const id = this.getId();
@@ -87,6 +87,16 @@ export default connectPerms(class IntentPage extends Page {
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
                 action: () => this.props.push('redakti', true),
+            });
+        }
+
+        if (status === 'succeeded') {
+            actions.push({
+                label: locale.resendReceipt.menuItem,
+                overflow: true,
+                action: () => this.context.createTask('payments/resendIntentReceipt', { id }, {
+                    email: customer?.email || null,
+                }),
             });
         }
 
@@ -124,7 +134,11 @@ export default connectPerms(class IntentPage extends Page {
                     locale={locale}
                     edit={edit}
                     onEditChange={edit => this.setState({ edit })}
-                    onData={data => this.setState({ org: data.org })}
+                    onData={data => this.setState({
+                        org: data.org,
+                        status: data.status,
+                        customer: data.customer,
+                    })}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}

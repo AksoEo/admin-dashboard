@@ -535,7 +535,7 @@ export default {
                     {intentLocale.actions.markRefunded.description}
                 </div>
 
-                <Field class="task-refund-amount-container">
+                <Field class="input-container">
                     <Validator
                         component={currencyAmount.editor}
                         outline
@@ -617,6 +617,30 @@ export default {
                 actionLabel={intentLocale.actions.submit.button}
                 run={() => task.runOnce()}>
                 {intentLocale.actions.submit.description}
+            </TaskDialog>
+        );
+    },
+    resendIntentReceipt ({ open, task }) {
+        return (
+            <TaskDialog
+                class="payments-task-intent-action"
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.resendReceipt.title}
+                actionLabel={intentLocale.resendReceipt.button}
+                run={() => task.runOnce()}>
+                {intentLocale.resendReceipt.description}
+                <Field class="input-container">
+                    <Validator
+                        outline
+                        component={TextField}
+                        validate={value => {
+                            if (!value) throw { error: intentLocale.resendReceipt.noEmail };
+                        }}
+                        label={intentLocale.resendReceipt.email}
+                        value={task.parameters.email || ''}
+                        onChange={e => task.update(e.target.value || null)} />
+                </Field>
             </TaskDialog>
         );
     },

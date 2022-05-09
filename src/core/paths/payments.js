@@ -533,6 +533,12 @@ export const tasks = {
         // event log should be updated
         tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
     },
+    resendIntentReceipt: async ({ id }, { email }) => {
+        const client = await asyncClient;
+        await client.post(`/aksopay/payment_intents/${id}/!send_receipt`, {
+            email,
+        });
+    },
 
     report: async (_, { time, currency }) => {
         const client = await asyncClient;
