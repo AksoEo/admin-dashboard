@@ -105,6 +105,7 @@ export const intermediaryReports = {
             count: 'Kvanto',
             desc: 'Priskribo',
             price: 'Prezo', // if net/gross is not visible
+            perItem: 'Kotizo',
             gross: 'Malneto',
             net: 'Neto',
         },

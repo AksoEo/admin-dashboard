@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { Link } from '../router';
 import { IdUEACode } from './data/uea-code';
+import { connect } from '../core/connection';
 import './diff-author.less';
 
 /// Renders a diff author, like `ch:1234` or `app:0123456abcdef`, with their proper name.
@@ -18,17 +19,21 @@ export default function DiffAuthor ({ author, interactive }) {
             <IdUEACode id={chId} />;
         }
     } else if (author.startsWith('app:')) {
-        const appId = +author.substr(4);
+        const appId = author.substr(4);
         if (interactive) {
             return (
                 <Link target={`/administrado/klientoj/${appId}`} class="diff-author-link">
-                    <span class="diff-author-app-id">
-                        {appId}
-                    </span>
+                    <AppId id={appId} />
                 </Link>
             );
         } else {
-            return <span class="diff-author-app-id">{appId}</span>;
+            return <AppId id={appId} />;
         }
     }
 }
+
+const AppId = connect(({ id }) => ['clients/client', { id }])(data => ({ data }))(function AppId ({ id, data }) {
+    if (!data) return <span class="diff-author-app-id not-loaded">{id}</span>;
+    return <span class="diff-author-app-id">{data.name}</span>;
+});
+

@@ -210,10 +210,9 @@ export default connectPerms(class IntermediaryReport extends DetailPage {
                 icon: <PictureAsPdfIcon style={{ verticalAlign: 'middle' }} />,
                 action: () => {
                     const anchor = document.createElement('a');
-                    const url = new URL(`aksopay/payment_intents/${this.id}/!make_intermediary_pdf`, config.base).toString();
+                    const url = new URL(`aksopay/payment_intents/${this.id}/intermediary_pdf`, config.base).toString();
                     anchor.href = url;
-                    const { year, number, country } = this.state.intentData.intermediary;
-                    anchor.download = country.toUpperCase() + ' ' + locale.idFmt(year, number) + '.pdf';
+                    anchor.target = '_blank';
                     anchor.click();
                 },
             });
@@ -404,7 +403,7 @@ class ReportEntries extends PureComponent {
                         };
                     }
                     this.magazines[key].offers.push(offer);
-                    commission = this.magazines[key].commission[offer.paper ? 'paper' : 'access'];
+                    commission = this.magazines[key].commission[offer.paperVersion ? 'paper' : 'access'];
                 }
                 this.totalAmount += offer.amount;
                 this.netTotalAmount += offer.amount * (1 - commission / 100);
@@ -430,12 +429,22 @@ class ReportEntries extends PureComponent {
         const items = [];
         for (const k in this.memberships) {
             const { commission, offers } = this.memberships[k];
-            items.push({
-                title: <CategoryName id={offers[0].id} abbrev />,
-                count: offers.length,
-                amount: offers.map(offer => offer.amount).reduce((a, b) => a + b, 0),
-                commission,
-            });
+            const byAmount = new Map();
+            for (const offer of offers) {
+                if (!byAmount.has(offer.amount)) {
+                    const item = {
+                        title: <CategoryName id={offers[0].id} abbrev />,
+                        perItem: offer.amount,
+                        count: 0,
+                        amount: 0,
+                        commission,
+                    };
+                    byAmount.set(offer.amount, item);
+                    items.push(item);
+                }
+                byAmount.get(offer.amount).count++;
+                byAmount.get(offer.amount).amount += offer.amount;
+            }
         }
         for (const k in this.magazines) {
             const { commission, offers } = this.magazines[k];
@@ -447,12 +456,23 @@ class ReportEntries extends PureComponent {
             }
             for (const type in accessTypes) {
                 const offers = accessTypes[type];
-                items.push({
-                    title: <MagazineName id={offers[0].id} />,
-                    count: offers.length,
-                    amount: offers.map(offer => offer.amount).reduce((a, b) => a + b, 0),
-                    commission: commission[type],
-                });
+                const byAmount = new Map();
+
+                for (const offer of offers) {
+                    if (!byAmount.has(offer.amount)) {
+                        const item = {
+                            title: <MagazineName id={offers[0].id} />,
+                            perItem: offer.amount,
+                            count: 0,
+                            amount: 0,
+                            commission: commission[type],
+                        };
+                        byAmount.set(offer.amount, item);
+                        items.push(item);
+                    }
+                    byAmount.get(offer.amount).count++;
+                    byAmount.get(offer.amount).amount += offer.amount;
+                }
             }
         }
         if (Object.keys(this.entryData).length < entries.length) {
@@ -476,6 +496,7 @@ class ReportEntries extends PureComponent {
                 <Totals
                     showCounts
                     showCommission
+                    showPerItem
                     showNet
                     items={items}
                     currency={item.currency}
@@ -676,7 +697,10 @@ export const EntrySelectedMagazine = connect(({ id }) => ['magazines/magazine', 
     );
 });
 
-export function Totals ({ items, total, netTotal, currency, showCounts, showCommission, showNet, isFinal, incompleteNet }) {
+export function Totals ({
+    items, total, netTotal, currency, showCounts, showCommission, showPerItem, showNet, isFinal,
+    incompleteNet,
+}) {
     return (
         <div class="intermediary-report-totals">
             <div class="totals-item is-header">
@@ -685,15 +709,20 @@ export function Totals ({ items, total, netTotal, currency, showCounts, showComm
                         {items.length ? locale.totals.headers.commission : null}
                     </div>
                 )}
+                <div class="item-title">
+                    {items.length ? locale.totals.headers.desc : null}
+                </div>
                 {showCounts && (
                     <div class="item-count">
                         {locale.totals.headers.count}
                     </div>
                 )}
-                <div class="item-title">
-                    {items.length ? locale.totals.headers.desc : null}
-                </div>
-                <div class="item-price">
+                {showPerItem && (
+                    <div class="item-price-per">
+                        {locale.totals.headers.perItem}
+                    </div>
+                )}
+                <div class={'item-price' + (showNet ? ' has-net' : '')}>
                     {showNet ? locale.totals.headers.gross : locale.totals.headers.price}
                 </div>
                 {showNet && (
@@ -714,14 +743,20 @@ export function Totals ({ items, total, netTotal, currency, showCounts, showComm
                             ) : null}
                         </div>
                     )}
-                    {showCounts && (
-                        <div class="item-count">
-                            {item.count || 1}
-                        </div>
-                    )}
                     <div class="item-title">
                         {item.title}
                     </div>
+                    {showCounts && (
+                        <div class="item-count">
+                            {item.count || 1}
+                            {showPerItem && ' ×'}
+                        </div>
+                    )}
+                    {showPerItem && (
+                        <div class="item-price-per">
+                            <currencyAmount.renderer value={item.perItem} currency={currency} />
+                        </div>
+                    )}
                     <div class={'item-price' + (showNet ? ' has-net' : '')}>
                         <currencyAmount.renderer value={item.amount} currency={currency} />
                     </div>
