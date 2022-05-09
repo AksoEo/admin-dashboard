@@ -403,7 +403,8 @@ const ACTIONS = {
 /// Renders intent action buttons.
 /// - item: intent item
 /// - typeOnly: will hide buttons depending on the intent type instead of just greying them out
-export const IntentActions = connectPerms(function IntentActions ({ item, perms, typeOnly }) {
+/// - intermediary: will show labels for intermediary reports
+export const IntentActions = connectPerms(function IntentActions ({ item, perms, typeOnly, intermediary }) {
     return (
         <coreContext.Consumer>{core => {
             const actions = [];
@@ -457,7 +458,7 @@ export const IntentActions = connectPerms(function IntentActions ({ item, perms,
                         onClick={() => core.createTask(...task)}>
                         <Icon style={{ verticalAlign: 'middle' }} />
                         {' '}
-                        {locale.actions[k].title}
+                        {intermediary ? locale.actions.intermediary[k] : locale.actions[k].title}
                     </Button>
                 );
             }

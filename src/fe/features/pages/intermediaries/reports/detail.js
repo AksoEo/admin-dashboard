@@ -320,7 +320,7 @@ function ReportDetail ({ item }) {
                 {locale.intentStatuses[item.status]}
             </div>
             <div class="report-actions">
-                <IntentActions typeOnly item={item} />
+                <IntentActions typeOnly intermediary item={item} />
             </div>
             <ReportEntries item={item} onNetTotalChange={nt => setEntriesNet(nt)} />
             <ReportAddons item={item} />

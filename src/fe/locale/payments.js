@@ -301,6 +301,13 @@ export const paymentIntents = {
             description: 'Ĉu vi certas, ke la mono estis sendita (eĉ se ankoraŭ ne ricevita)?',
             button: 'Indiki',
         },
+        intermediary: {
+            cancel: '[[Cancel]]',
+            markDisputed: '[[Mark disputed]]',
+            markRefunded: '[[Mark refunded]]',
+            markSucceeded: '[[Mark succeeded]]',
+            submit: '[[Submit]]',
+        },
     },
     transitionUnavailabilityReasons: {
         stripe: 'Ne eblas fari tion ĉi por pagoj faritaj per Stripe.', // fallback
