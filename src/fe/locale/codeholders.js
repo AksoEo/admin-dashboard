@@ -30,6 +30,7 @@ export const codeholders = {
             country: 'Lando',
             birthdate: 'Naskiĝtago',
             hasPassword: 'Kreis konton',
+            addressInvalid: '[[AddressInvalid]]',
             membership: 'Membreckategorioj',
             roles: 'Roloj',
             isActiveMember: 'Aktiva membro iam en',
@@ -121,6 +122,7 @@ export const codeholders = {
         addressLatin: 'Adreso latinigita',
         addressCity: 'Urbo',
         addressCountryArea: 'Regiono',
+        addressInvalid: '[[AddressInvalid]]',
         codeholderDisabledTitle: 'malŝaltita',
         codeholderDeadTitle: 'mortinta',
         notes: 'Notoj',
@@ -175,6 +177,10 @@ export const codeholders = {
     },
     profilePictureHashSome: 'Havas bildon',
     profilePictureHashNone: 'Havas neniun bildon',
+    addressInvalid: {
+        title: '[[Address was marked invalid]]',
+        description: '[[Meow meow meow meowm oewm oewmo emwfdjhgjrk eghsjk hgsj hetghjh gdfhjkg dfhjkdgfsjhkgdfjkgfd]]',
+    },
     csvFields: {
         membership: 'Membreco (resumo)',
     },

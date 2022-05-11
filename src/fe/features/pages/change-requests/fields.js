@@ -156,6 +156,7 @@ function ChangedField ({ field, data, oldDataAvailable, oldData }) {
                     <div class="old-value">
                         {(oldData && oldData[field] !== undefined) ? (
                             <FieldComponent
+                                slot="chgreq"
                                 editing={false}
                                 value={oldData[field]}
                                 item={oldData}
@@ -169,6 +170,7 @@ function ChangedField ({ field, data, oldDataAvailable, oldData }) {
                     </div>
                     <div class="new-value">
                         <FieldComponent
+                            slot="chgreq"
                             editing={false}
                             value={data[field]}
                             item={data}
@@ -178,6 +180,7 @@ function ChangedField ({ field, data, oldDataAvailable, oldData }) {
             ) : (
                 <div class="field-value">
                     <FieldComponent
+                        slot="chgreq"
                         editing={false}
                         value={data[field]}
                         item={data}

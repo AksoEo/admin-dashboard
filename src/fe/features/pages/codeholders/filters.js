@@ -346,6 +346,12 @@ export default {
         },
         editor: tripleSwitchYesNo(locale.search.boolean),
     },
+    addressInvalid: {
+        default () {
+            return { enabled: false, value: false };
+        },
+        editor: tripleSwitchYesNo(locale.search.boolean),
+    },
     isDead: {
         default () {
             return { enabled: false, value: false };

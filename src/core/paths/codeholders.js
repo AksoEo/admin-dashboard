@@ -26,6 +26,7 @@ import { CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS, delegateFilters } from './dele
 //! - code: object { new, old } where old always has a check letter
 //! - creationTime: identical to API
 //! - hasPassword: identical to API
+//! - addressInvalid: identical to API
 //! - address: object that’s identical to API, except every field also has a -Latin variant
 //!   may have a magic `$latin: bool` key to only send one variant to the API
 //! - feeCountry: identical to API
@@ -174,6 +175,7 @@ const clientFields = {
     },
     creationTime: 'creationTime',
     hasPassword: 'hasPassword',
+    addressInvalid: 'addressInvalid',
     address: {
         apiFields: addressSubfields.flatMap(f => [`address.${f}`, `addressLatin.${f}`]),
         permFields: ['address', 'addressLatin'],
@@ -318,6 +320,7 @@ export const clientToAPI = makeClientToAPI(clientFields);
 //! - hasOldCode: true or false
 //! - hasEmail: true or false
 //! - hasPassword: true or false
+//! - addressInvalid: true or false
 //! - isDead: true or false
 //! - membership: array of objects { invert, lifetime, givesMembership, useRange, range, categories }
 //!   where invert, lifetime, givesMembership, useRange are bool, range is an inclusive year
@@ -376,6 +379,10 @@ const clientFilters = {
     hasPassword: {
         toAPI: value => ({ hasPassword: value }),
         fields: ['hasPassword'],
+    },
+    addressInvalid: {
+        toAPI: value => ({ addressInvalid: value }),
+        fields: ['addressInvalid'],
     },
     isDead: {
         toAPI: value => ({ isDead: value }),

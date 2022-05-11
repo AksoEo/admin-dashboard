@@ -4,6 +4,7 @@ import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import RemoveIcon from '@material-ui/icons/Remove';
+import WarningIcon from '@material-ui/icons/Warning';
 import { Button, Checkbox, TextField, Dialog } from 'yamdl';
 import { connect, coreContext } from '../../../core/connection';
 import { connectPerms as connectPermsInner } from '../../../perms';
@@ -34,6 +35,7 @@ import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
 import ChangeRequestsButton from '../change-requests/button';
 import DelegationsButton from '../delegations/delegates/button';
 import SubscriptionsButton from '../magazines/subscriptions/button';
+import './detail-fields.less';
 
 const connectPerms = (Component) => {
     const SelfConnected = connectPermsInner(({ perms, ...extra }) => {
@@ -989,6 +991,29 @@ export const fields = {
         history: true,
         hasPerm: 'self',
     },
+    addressInvalid: simpleField(function ({ value, editing, onChange, slot }) {
+        if (editing) {
+            return <Checkbox checked={value} onChange={onChange} />;
+        }
+        if (value && slot === 'detail') {
+            return (
+                <div class="codeholder-address-invalid-warning">
+                    <div class="inner-icon-container">
+                        <WarningIcon />
+                    </div>
+                    <div class="inner-content">
+                        <div class="inner-title">{locale.addressInvalid.title}</div>
+                        <div class="inner-desc">{locale.addressInvalid.description}</div>
+                    </div>
+                </div>
+            );
+        }
+        return value ? <Checkbox class="fixed-checkbox" checked={value} /> : '—';
+    }, {
+        isEmpty: value => !value,
+        shouldHide: (value, editing) => !editing && !value,
+        hasPerm: 'self',
+    }),
     publicCountry: {
         component: permsEditable('publicCountry', makeDataEditable(country)),
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
