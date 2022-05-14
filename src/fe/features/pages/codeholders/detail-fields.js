@@ -1010,8 +1010,7 @@ export const fields = {
         }
         return value ? <Checkbox class="fixed-checkbox" checked={value} /> : '—';
     }, {
-        isEmpty: value => !value,
-        shouldHide: (value, editing) => !editing && !value,
+        shouldHide: ({ addressInvalid }, editing) => !editing && !addressInvalid,
         hasPerm: 'self',
     }),
     publicCountry: {

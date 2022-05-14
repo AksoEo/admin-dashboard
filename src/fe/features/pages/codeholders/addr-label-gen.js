@@ -81,13 +81,33 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
     const [view, setView] = useState({
         unit: 'pt',
     });
+    const [filterInvalid, setFilterInvalid] = useState(true);
     const [isLoading, setLoading] = useState(false);
     const [resultOpen, setResultOpen] = useState(false);
 
     const sendRequest = () => {
         setLoading(true);
 
-        core.createTask('codeholders/makeAddressLabels', options, settings)
+        let sendOptions = options;
+
+        if (filterInvalid) {
+            sendOptions = { ...sendOptions };
+
+            const extraFilter = { addressInvalid: false };
+            if (!sendOptions.jsonFilter._disabled) {
+                sendOptions.jsonFilter = {
+                    filter: {
+                        $and: [sendOptions.jsonFilter, extraFilter],
+                    },
+                };
+            } else {
+                sendOptions.jsonFilter = {
+                    filter: extraFilter,
+                };
+            }
+        }
+
+        core.createTask('codeholders/makeAddressLabels', sendOptions, settings)
             .runOnceAndDrop()
             .then(onSuccess).catch(err => {
                 console.error(err); // eslint-disable-line no-console
@@ -107,6 +127,16 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
                     onChange={setSettings}
                     view={view}
                     onViewChange={setView} />
+            </div>
+            <div class="addr-label-gen-request-settings">
+                <Checkbox
+                    id="addr-label-gen-filter-invalid"
+                    checked={filterInvalid}
+                    onChange={setFilterInvalid} />
+                {' '}
+                <label for="addr-label-gen-filter-invalid">
+                    {locale.addrLabelGen.filterInvalidAddresses}
+                </label>
             </div>
             <footer class="addr-label-gen-footer">
                 <span class="phantom" />

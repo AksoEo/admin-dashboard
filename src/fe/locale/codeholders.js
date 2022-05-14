@@ -371,6 +371,7 @@ export const codeholders = {
                 button: 'Ĝisdatigi',
             },
         },
+        filterInvalidAddresses: '[[Filter out invalid addresses]]',
     },
     notifTemplates: {
         cursedNotice: 'Oraj rezultoj ne ricevos mesaĝon.',
