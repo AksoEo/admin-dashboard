@@ -325,6 +325,7 @@ export const codeholders = {
     addrLabelGen: {
         menuItem: 'Krei adresetikedojn',
         title: 'Kreado de adresetikedoj',
+        description: '[[Here you can create address labels for all codeholders with addresses in the current search results. You will receive them by email.]]',
         labels: {
             language: 'Lingvo',
             latin: 'Latinigita',

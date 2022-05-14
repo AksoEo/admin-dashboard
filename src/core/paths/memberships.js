@@ -201,7 +201,8 @@ export const tasks = {
     listOptions: crudList({
         apiPath: () => `/registration/options`,
         storePath: (_, item) => REGISTRATION_OPTIONS.concat([item.id]),
-        fields: OPTIONS_FIELDS,
+        // we do not request 'offers' here because that breaks things
+        fields: ['year', 'enabled', 'paymentOrgId', 'currency'],
         map: item => {
             item.id = item.year;
         },

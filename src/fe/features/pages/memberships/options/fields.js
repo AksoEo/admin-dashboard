@@ -159,7 +159,7 @@ class Offers extends PureComponent {
         const addItem = () => {
             onChange(value.concat([{
                 title: '',
-                description: '',
+                description: null,
                 offers: [],
             }]));
         };
@@ -226,6 +226,7 @@ class OfferGroup extends PureComponent {
         };
 
         const addOffer = offer => {
+            if (offer.type === 'magazine') offer.paperVersion = true;
             onChange({ ...value, offers: value.offers.concat([offer]) });
             this.setState({ adding: false });
         };
@@ -305,6 +306,9 @@ const REDUCED_CATEGORY_FIELDS = Object.fromEntries([
     // givesMembership comes before name for sorting order
     'givesMembership', 'nameAbbrev', 'name', 'availability',
 ].map(x => [x, CATEGORY_FIELDS[x]]));
+const REDUCED_MAGAZINE_FIELDS = Object.fromEntries([
+    'org', 'name', 'description',
+].map(x => [x, MAGAZINE_FIELDS[x]]));
 class AddOffer extends PureComponent {
     state = {
         type: null,
@@ -359,7 +363,7 @@ class AddOffer extends PureComponent {
                     jsonFilter={{
                         id: { $nin: offers.filter(x => x.type === 'magazine').map(x => x.id) },
                     }}
-                    fields={MAGAZINE_FIELDS}
+                    fields={REDUCED_MAGAZINE_FIELDS}
                     sorting={{ name: 'asc' }}
                     locale={magazinesLocale.fields}
                     emptyLabel={locale.offers.add.magazinesEmpty}
@@ -471,6 +475,7 @@ class Offer extends PureComponent {
                     paperVersion = (
                         <div class="paper-version is-editing">
                             <Checkbox
+                                disabled
                                 id={chkId}
                                 checked={value.paperVersion}
                                 onChange={paperVersion => onChange({ ...value, paperVersion })} />

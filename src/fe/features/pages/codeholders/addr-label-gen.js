@@ -117,6 +117,9 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
 
     return (
         <div class="codeholders-addr-label-gen">
+            <div class="addr-label-gen-desc">
+                {locale.addrLabelGen.description}
+            </div>
             {lvIsCursed ? <div class="cursed-notice">
                 {locale.addrLabelGen.cursedNotice}
             </div> : null}
