@@ -5,6 +5,7 @@ import PaymentIcon from '@material-ui/icons/Payment';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Page from '../../../components/page';
 import DisplayError from '../../../components/utils/error';
+import MdField from '../../../components/controls/md-field';
 import { IdUEACode } from '../../../components/data/uea-code';
 import Tabs from '../../../components/controls/tabs';
 import {
@@ -30,8 +31,10 @@ export default class HomePage extends Page {
                     <div class="hc-title">
                         {locale.admin.title}
                     </div>
-                    <div style={{ padding: '16px' }}>
-                        {locale.admin.description}
+                    <div class="hc-content-box">
+                        <MdField
+                            value={locale.admin.description}
+                            rules={['emphasis', 'strikethrough', 'link', 'list', 'table', 'image']} />
                     </div>
                 </div>
             </div>

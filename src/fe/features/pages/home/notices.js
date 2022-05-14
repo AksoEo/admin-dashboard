@@ -33,10 +33,13 @@ export default class Notices extends PureComponent {
         }
 
         this.setState({ loading: true, error: null });
-        fetch('/notices/index.txt').then(res => res.text()).then(res => {
+        fetch('/notices/index.txt').then(res => res.text().then(text => ([res, text]))).then(([res, text]) => {
+            if (!res.ok) {
+                throw text;
+            }
             this.setState({
                 loading: false,
-                index: res.split('\n').map(x => x.trim()).filter(x => x && !x.startsWith('#')).sort().reverse(),
+                index: text.split('\n').map(x => x.trim()).filter(x => x && !x.startsWith('#')).sort().reverse(),
             });
         }).catch(error => {
             this.setState({
@@ -132,10 +135,15 @@ class NoticeItem extends PureComponent {
 
     load () {
         this.setState({ loading: true, error: null });
-        fetch(`/notices/${this.props.id}.md`).then(res => res.text()).then(res => {
+        fetch(`/notices/${this.props.id}.md`).then(res => res.text().then(text => ([res, text]))).then(([res, text]) => {
+            if (!res.ok) {
+                if (res.status === 404) throw { code: 'not-found', message: text };
+                if (res.status === 403) throw { code: 'forbidden', message: text };
+                throw text;
+            }
             this.setState({
                 loading: false,
-                data: res,
+                data: text,
             });
         }).catch(error => {
             this.setState({
