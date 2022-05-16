@@ -1,10 +1,18 @@
 @import '../../../prelude';
 
 .home-page {
-    display: grid;
-    padding: 24px;
-    gap: 16px;
-    grid-template-columns: 100%;
+    .inner-grid {
+        display: grid;
+        padding: 24px;
+        gap: 16px;
+        grid-template-columns: 100%;
+        box-sizing: border-box;
+
+        @media (min-width: 1270px) {
+            grid-template-columns: calc(50% - 8px) calc(50% - 8px);
+            grid-template-rows: masonry;
+        }
+    }
 
     .home-card {
         border-radius: 8px;
@@ -20,12 +28,19 @@
 
         .hc-content-box {
             padding: 16px;
+            padding-top: 0;
         }
     }
 
-    @media (min-width: 1270px) {
-        grid-template-columns: calc(50% - 8px) calc(50% - 8px);
-        grid-template-rows: masonry;
+    .hc-system-info {
+        padding: 16px;
+
+        textarea {
+            display: block;
+            width: 100%;
+            height: 4em;
+            resize: none;
+        }
     }
 
     .home-tasks {

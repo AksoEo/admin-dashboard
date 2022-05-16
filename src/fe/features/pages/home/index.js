@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import { PureComponent, Fragment } from 'preact/compat';
-import { LinearProgress } from 'yamdl';
+import { PureComponent, Fragment, useRef } from 'preact/compat';
+import { Button, LinearProgress } from 'yamdl';
 import PaymentIcon from '@material-ui/icons/Payment';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Page from '../../../components/page';
@@ -19,24 +19,69 @@ import { country, currencyAmount } from '../../../components/data';
 import { connect, coreContext } from '../../../core/connection';
 import { LinkButton } from '../../../router';
 import Notices from './notices';
+import config from '../../../../config.val';
 import './index.less';
 
 export default class HomePage extends Page {
     render () {
         return (
             <div class="home-page">
-                <HomeTasks />
-                <Notices />
-                <div class="home-card">
-                    <div class="hc-title">
-                        {locale.admin.title}
-                    </div>
-                    <div class="hc-content-box">
-                        <MdField
-                            value={locale.admin.description}
-                            rules={['emphasis', 'strikethrough', 'link', 'list', 'table', 'image']} />
+                <div class="inner-grid">
+                    <HomeTasks />
+                    <Notices />
+                    <div class="home-card">
+                        <div class="hc-title">
+                            {locale.admin.title}
+                        </div>
+                        <div class="hc-content-box">
+                            <MdField
+                                value={locale.admin.description}
+                                rules={['emphasis', 'strikethrough', 'link', 'list', 'table', 'image']} />
+                        </div>
+                        <details class="hc-system-info">
+                            <summary>{locale.admin.systemInfo.title}</summary>
+                            <SystemInfo />
+                        </details>
                     </div>
                 </div>
+            </div>
+        );
+    }
+}
+
+class SystemInfo extends PureComponent {
+    state = {
+        apiVersion: null,
+    };
+
+    static contextType = coreContext;
+
+    componentDidMount () {
+        this.context.createTask('login/apiVersion').runOnceAndDrop().then(version => {
+            this.setState({ apiVersion: version });
+        }).catch(err => {
+            console.error('Could not fetch API version', err); // eslint-disable-line no-console
+        });
+    }
+
+    render () {
+        const info = [
+            navigator.userAgent,
+            `AKSO ${config.version} @ ${config.buildTime}`,
+            `API ${this.state.apiVersion || '?version?'} @ ${config.base}`,
+        ];
+
+        const textarea = useRef();
+        return (
+            <div>
+                <Button onClick={() => {
+                    navigator.clipboard.writeText(info.join('\n')).catch(console.error); // eslint-disable-line no-console
+                }}>
+                    {locale.admin.systemInfo.copy}
+                </Button>
+                <textarea readOnly ref={textarea} onClick={() => textarea.current.select()}>
+                    {info.join('\n')}
+                </textarea>
             </div>
         );
     }
