@@ -519,7 +519,7 @@ export const parametersToRequestData = makeParametersToRequestData({
                 const code = new UEACode(query);
                 if (code.type === 'new') prependedUeaCodeSearch = { newCode: query };
                 else prependedUeaCodeSearch = { oldCode: query };
-            } catch (invalidUeaCode) { /* only search for name otherwise */ }
+            } catch { /* only search for name otherwise */ }
         } else if (['landlinePhone', 'officePhone', 'cellphone'].includes(field)) {
             // filter out non-alphanumeric characters because they might be interpreted as
             // search operators
@@ -527,6 +527,10 @@ export const parametersToRequestData = makeParametersToRequestData({
         }
 
         const transformedQuery = util.transformSearch(query);
+
+        if (transformedQuery.length < 3) {
+            throw { code: 'search-query-too-short', message: 'search query too short' };
+        }
 
         if (!util.isValidSearch(transformedQuery)) {
             throw { code: 'invalid-search-query', message: 'invalid search query' };

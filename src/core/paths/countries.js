@@ -106,6 +106,9 @@ export const tasks = {
         };
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
+            if (transformedQuery.length < 3) {
+                throw { code: 'search-query-too-short', message: 'search query too short' };
+            }
             if (!util.isValidSearch(transformedQuery)) {
                 throw { code: 'invalid-search-query', message: 'invalid search query' };
             }
@@ -141,6 +144,9 @@ export const tasks = {
         };
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
+            if (transformedQuery.length < 3) {
+                throw { code: 'search-query-too-short', message: 'search query too short' };
+            }
             if (!util.isValidSearch(transformedQuery)) {
                 throw { code: 'invalid-search-query', message: 'invalid search query' };
             }

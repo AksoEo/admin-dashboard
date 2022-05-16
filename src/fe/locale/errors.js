@@ -14,6 +14,7 @@ export const errors = {
         ],
         post: ['Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.'],
     },
+    'search-query-too-short': '[[Your search query is too short.]]',
     'unknown-field': err => `Nekonata kampo ${err.field}`,
     'unknown-filter': err => `Nekonata kampo ${err.filter}`,
     'bad-request': 'La aplikaĵo sendis nevalidan peton. Bonvolu reŝarĝi la paĝon.',

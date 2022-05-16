@@ -3,7 +3,7 @@ import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
-import { fieldsToOrder } from '../list';
+import { crudList, crudGet, crudCreate, crudUpdate, crudDelete } from '../templates';
 import { deepMerge } from '../../util';
 
 /// Data store path.
@@ -50,67 +50,31 @@ async function loadAllRoles () {
 }
 
 export const tasks = {
-    list: async (_, { offset, limit, fields, search }) => {
-        const client = await asyncClient;
-
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name', 'description', 'public'],
-            order: fieldsToOrder(fields),
-        };
-
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: [search.field], str: transformedQuery };
-        }
-
-        const res = await client.get('/codeholder_roles', opts);
-
-        for (const item of res.body) {
-            store.insert([ROLES, item.id], item);
-        }
-
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: {
-                time: res.resTime,
-                filtered: false,
-            },
-        };
-    },
-    role: async ({ id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/codeholder_roles/${id}`, {
-            fields: ['id', 'name', 'description', 'public'],
-        });
-        return res.body;
-    },
-    create: async (_, params) => {
-        const client = await asyncClient;
-        const res = await client.post('/codeholder_roles', params);
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([ROLES, id], params);
-        store.signal([ROLES, SIG_ROLES]);
-        return id;
-    },
-    update: async ({ id }, params) => {
-        const client = await asyncClient;
-        delete params.id;
-        await client.patch(`/codeholder_roles/${id}`, params);
-        const existing = store.get([ROLES, id]);
-        store.insert([ROLES, id], deepMerge(existing, params));
-    },
-    delete: async ({ id }) => {
-        const client = await asyncClient;
-        await client.delete(`/codeholder_roles/${id}`);
-        store.remove([ROLES, id]);
-        store.signal([ROLES, SIG_ROLES]);
-    },
+    list: crudList({
+        apiPath: () => `/codeholder_roles`,
+        fields: ['id', 'name', 'description', 'public'],
+        storePath: (_, item) => [ROLES, item.id],
+    }),
+    role: crudGet({
+        apiPath: ({ id }) => `/codeholder_roles/${id}`,
+        fields: ['id', 'name', 'description', 'public'],
+        storePath: ({ id }) => [ROLES, id],
+    }),
+    create: crudCreate({
+        apiPath: () => `/codeholder_roles`,
+        fields: ['name', 'description', 'public'],
+        storePath: (_, id) => [ROLES, id],
+        signalPath: () => [ROLES, SIG_ROLES],
+    }),
+    update: crudUpdate({
+        apiPath: ({ id }) => `/codeholder_roles/${id}`,
+        storePath: ({ id }) => [ROLES, id],
+    }),
+    delete: crudDelete({
+        apiPath: ({ id }) => `/codeholder_roles/${id}`,
+        storePath: ({ id }) => [ROLES, id],
+        signalPath: () => [ROLES, SIG_ROLES],
+    }),
 };
 
 export const views = {

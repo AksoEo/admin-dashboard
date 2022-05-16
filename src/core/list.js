@@ -136,6 +136,9 @@ export const makeParametersToRequestData = ({
             options.search = search;
         } else {
             const transformedQuery = util.transformSearch(params.search.query);
+            if (transformedQuery.length < 3) {
+                throw { code: 'search-query-too-short', message: 'search query too short' };
+            }
             if (!util.isValidSearch(transformedQuery)) {
                 throw { code: 'invalid-search-query', message: 'invalid search query' };
             }
