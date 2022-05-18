@@ -1,8 +1,8 @@
 import { h, Component } from 'preact';
-import { TextField, Button, CircularProgress } from 'yamdl';
+import { Button, CircularProgress } from 'yamdl';
 import { UEACode } from '@tejo/akso-client';
 import { LoginAuthStates } from '../../../protocol';
-import Form, { Validator } from '../../components/form';
+import { Form, Field, ValidatedTextField } from '../../components/form';
 import { login as locale } from '../../locale';
 import { Mode } from './is-special-page';
 
@@ -118,7 +118,7 @@ export default class DetailsPage extends Component {
             console.error(err); // eslint-disable-line no-console
 
             this.#passwordValidator.shake();
-            this.#passwordValidator.setError({ error });
+            this.#passwordField.setError(error);
         }).finally(() => {
             this.#submitting = false;
         });
@@ -170,77 +170,82 @@ export default class DetailsPage extends Component {
 
         return (
             <Form ref={form => this.#form = form} onSubmit={this.#onSubmit}>
-                <Validator component={TextField}
-                    class="form-field"
-                    innerRef={view => this.#loginField = view}
-                    outline
-                    label={locale.login}
-                    type={this.props.login.includes('@') ? 'email' : 'text'}
-                    autocapitalize="none"
-                    spellcheck="false"
-                    value={this.props.login}
-                    onChange={e => {
-                        this.props.onLoginChange(e.target.value);
-                        clearTimeout(this.#nopwCheckTimeout);
-                        this.#nopwCheckTimeout = setTimeout(this.#checkHasPassword, 2000);
-                    }}
-                    onBlur={() => {
-                        clearTimeout(this.#nopwCheckTimeout);
-                        this.#checkHasPassword();
-                    }}
-                    onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                            if (!this.state.password) {
-                                // instead of submitting; focus the password field
-                                e.preventDefault();
-                                this.#passwordField.focus();
-                            } else {
-                                this.#form.submit();
-                            }
-                        }
-                    }}
-                    validate={value => {
-                        if (!value.includes('@') && !UEACode.validate(value)) {
-                            throw { error: locale.invalidUEACode };
-                        }
-                    }} />
-                <Validator component={TextField}
-                    class="form-field"
-                    ref={view => this.#passwordValidator = view}
-                    innerRef={view => this.#passwordField = view}
-                    outline
-                    label={locale.password}
-                    value={this.state.password}
-                    type="password"
-                    placeholder={this.props.mode === Mode.CREATING_PASSWORD
-                        ? locale.createPasswordPlaceholder
-                        : null}
-                    onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                            if (!needsPasswordValidation) this.#form.submit();
-                            else this.#passwordField2.focus();
-                        }
-                    }}
-                    onChange={e => this.setState({ password: e.target.value })}
-                    validate={() => true} />
-                {needsPasswordValidation ? (
-                    <Validator component={TextField}
-                        innerRef={view => this.#passwordField2 = view}
+                <Field>
+                    <ValidatedTextField
                         class="form-field"
+                        ref={view => this.#loginField = view}
                         outline
-                        label={locale.confirmPassword}
-                        value={this.state.confirmPassword}
-                        type="password"
-                        placeholder={locale.confirmPasswordPlaceholder}
-                        onChange={e => this.setState({ confirmPassword: e.target.value })}
-                        onKeyDown={e => {
-                            if (e.key === 'Enter') this.#form.submit();
+                        label={locale.login}
+                        type={this.props.login.includes('@') ? 'email' : 'text'}
+                        autocapitalize="none"
+                        spellcheck="false"
+                        value={this.props.login}
+                        onChange={e => {
+                            this.props.onLoginChange(e.target.value);
+                            clearTimeout(this.#nopwCheckTimeout);
+                            this.#nopwCheckTimeout = setTimeout(this.#checkHasPassword, 2000);
                         }}
-                        validate={value => {
-                            if (value !== this.state.password) {
-                                throw { error: locale.passwordMismatch };
+                        onBlur={() => {
+                            clearTimeout(this.#nopwCheckTimeout);
+                            this.#checkHasPassword();
+                        }}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                                if (!this.state.password) {
+                                    // instead of submitting; focus the password field
+                                    e.preventDefault();
+                                    this.#passwordField.focus();
+                                } else {
+                                    this.#form.submit();
+                                }
+                            }
+                        }}
+                        validate={() => {
+                            if (!this.props.login.includes('@') && !UEACode.validate(this.props.login)) {
+                                return locale.invalidUEACode;
                             }
                         }} />
+                </Field>
+                <Field ref={view => this.#passwordValidator = view}>
+                    <ValidatedTextField
+                        class="form-field"
+                        ref={view => this.#passwordField = view}
+                        outline
+                        label={locale.password}
+                        value={this.state.password}
+                        type="password"
+                        placeholder={this.props.mode === Mode.CREATING_PASSWORD
+                            ? locale.createPasswordPlaceholder
+                            : null}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                                if (!needsPasswordValidation) this.#form.submit();
+                                else this.#passwordField2.focus();
+                            }
+                        }}
+                        onChange={e => this.setState({ password: e.target.value })}
+                        validate={() => null} />
+                </Field>
+                {needsPasswordValidation ? (
+                    <Field>
+                        <ValidatedTextField
+                            ref={view => this.#passwordField2 = view}
+                            class="form-field"
+                            outline
+                            label={locale.confirmPassword}
+                            value={this.state.confirmPassword}
+                            type="password"
+                            placeholder={locale.confirmPasswordPlaceholder}
+                            onChange={e => this.setState({ confirmPassword: e.target.value })}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') this.#form.submit();
+                            }}
+                            validate={() => {
+                                if (this.state.confirmPassword !== this.state.password) {
+                                    return locale.passwordMismatch;
+                                }
+                            }} />
+                    </Field>
                 ) : null}
                 <footer class="form-footer">
                     {shouldShowHelpLinks ? (

@@ -76,7 +76,7 @@ function TimestampRenderer ({ value, zone }) {
 ///
 /// # Props
 /// - value (in seconds)
-function TimestampEditor ({ label, value, onChange, disabled, error, outline, zone }) {
+function TimestampEditor ({ label, value, onChange, disabled, error, outline, zone, required }) {
     const applyZone = value => {
         if (zone) return value.tz(zone);
         return value.utc();
@@ -104,7 +104,7 @@ function TimestampEditor ({ label, value, onChange, disabled, error, outline, zo
                 newDate.seconds(timeValue);
                 const newValue = newDate.unix();
                 if (Number.isFinite(newValue)) onChange(newValue);
-            }} error={error} />
+            }} error={error} required={required} />
             {outline ? ' ' : ''}
             <time.editor nullable outline={outline} disabled={disabled} value={timeValue} onChange={v => {
                 if (v === null) {

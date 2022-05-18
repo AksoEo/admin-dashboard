@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { createPortal, PureComponent } from 'preact/compat';
 import { Spring, globalAnimator } from 'yamdl';
 import L from 'leaflet';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.less';
 
@@ -12,6 +12,7 @@ import './map.less';
 /// - markers: { key: string?, location: coords, icon: Node }[]
 export default function AMap ({
     markers,
+    eventHandlers,
     ...extra
 }) {
     extra.className = (extra.class || '') + ' a-map-container';
@@ -25,8 +26,14 @@ export default function AMap ({
             {(markers || []).map((m, i) => <MarkerRenderer
                 {...m}
                 key={m.key || i} />)}
+            <MapEventProxy events={eventHandlers || {}} />
         </MapContainer>
     );
+}
+
+// sigh. why
+function MapEventProxy ({ events }) {
+    useMapEvents(events);
 }
 
 function pinShape (midY = 16, bottomY = 52) {

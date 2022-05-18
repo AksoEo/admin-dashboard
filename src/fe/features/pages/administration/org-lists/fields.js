@@ -6,7 +6,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
-import Form, { Validator } from '../../../../components/form';
+import { Form, Validator } from '../../../../components/form';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { orgLists as locale } from '../../../../locale';
 import { Link } from '../../../../router';

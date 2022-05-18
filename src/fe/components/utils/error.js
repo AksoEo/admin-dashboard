@@ -3,7 +3,7 @@ import './error.less';
 import { errors as locale } from '../../locale';
 
 /// Renders an error.
-export default function DisplayError ({ error }) {
+export default function DisplayError ({ error, class: className, ...extra }) {
     if (error.code === 'invalid-search-query') {
         return (
             <div class="display-error is-invalid-search-query">
@@ -49,7 +49,7 @@ export default function DisplayError ({ error }) {
     }
 
     return (
-        <div class="display-error">
+        <div class={'display-error ' + (className || '')} {...extra}>
             {errorString}
         </div>
     );

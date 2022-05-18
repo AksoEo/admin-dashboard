@@ -3,7 +3,7 @@ import { Button, TextField } from 'yamdl';
 import CloseIcon from '@material-ui/icons/Close';
 import { congresses as locale } from '../../../locale';
 
-export default function LatLonEditor ({ value, editing, onChange, onDelete }) {
+export default function LatLonEditor ({ value, editing, onChange, onDelete, required }) {
     if (editing) {
         const lat = value ? value[0] : 0;
         const lon = value ? value[1] : 0;
@@ -23,6 +23,7 @@ export default function LatLonEditor ({ value, editing, onChange, onDelete }) {
         return (
             <span class="congress-ll-field is-editing">
                 <TextField
+                    required={required}
                     outline
                     label={locale.misc.llLat}
                     inputmode="numeric"
@@ -33,6 +34,7 @@ export default function LatLonEditor ({ value, editing, onChange, onDelete }) {
                         : onChange(null)} />
                 {' '}
                 <TextField
+                    required={required}
                     outline
                     label={locale.misc.llLon}
                     inputmode="numeric"

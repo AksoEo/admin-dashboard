@@ -1,6 +1,5 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import { Validator } from '../../../components/form';
 import MdField from '../../../components/controls/md-field';
 import Segmented from '../../../components/controls/segmented';
 import OrgIcon from '../../../components/org-icon';
@@ -36,14 +35,12 @@ export const FIELDS = {
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (editing) {
-                return <Validator
+                return <TextField
                     class="magazine-field-name"
                     component={TextField}
                     outline
                     label={slot === 'create' ? locale.fields.name : null}
-                    validate={value => {
-                        if (!value) throw { error: locale.update.nameRequired };
-                    }}
+                    required
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }

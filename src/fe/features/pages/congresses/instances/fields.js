@@ -5,7 +5,7 @@ import TextArea from '../../../../components/controls/text-area';
 import { date } from '../../../../components/data';
 import { congressInstances as locale } from '../../../../locale';
 
-const string100Editor = label => ({
+const string100Editor = (label, props = {}) => ({
     component ({ value, editing, onChange }) {
         if (editing) {
             return <TextField
@@ -13,15 +13,16 @@ const string100Editor = label => ({
                 label={label}
                 value={value}
                 maxLength={100}
-                onChange={e => onChange(e.target.value || null)} />;
+                onChange={e => onChange(e.target.value || null)}
+                {...props} />;
         }
         return value;
     },
 });
 
-const dateEditor = label => ({
+const dateEditor = (label, props = {}) => ({
     component ({ value, editing, onChange }) {
-        if (editing) return <date.editor outline label={label} value={value} onChange={onChange} />;
+        if (editing) return <date.editor outline label={label} value={value} onChange={onChange} {...props} />;
         return <date.renderer value={value} />;
     },
 });
@@ -34,6 +35,7 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <TextField
+                    required
                     outline
                     label={locale.fields.humanId}
                     value={value}
@@ -44,9 +46,9 @@ export const FIELDS = {
             return value;
         },
     },
-    name: { ...string100Editor(locale.fields.name), sortable: true, weight: 2, slot: 'title' },
-    dateFrom: { ...dateEditor(locale.fields.dateFrom), sortable: true },
-    dateTo: { ...dateEditor(locale.fields.dateTo), sortable: true },
+    name: { ...string100Editor(locale.fields.name, { required: true }), sortable: true, weight: 2, slot: 'title' },
+    dateFrom: { ...dateEditor(locale.fields.dateFrom, { required: true }), sortable: true },
+    dateTo: { ...dateEditor(locale.fields.dateTo, { required: true }), sortable: true },
     locationName: string100Editor(locale.fields.locationName),
     locationNameLocal: string100Editor(locale.fields.locationNameLocal),
     locationAddress: {

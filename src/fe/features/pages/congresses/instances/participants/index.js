@@ -38,6 +38,7 @@ export default class ParticipantsView extends PureComponent {
 
         currency: null,
         registrationForm: null,
+        hasRegistrationForm: true,
     };
 
     #searchInput;
@@ -71,12 +72,12 @@ export default class ParticipantsView extends PureComponent {
         }
     }
 
-    render ({ congress, instance, push }, { parameters, expanded, currency, registrationForm }) {
+    render ({ congress, instance, push }, { parameters, expanded, currency, registrationForm, hasRegistrationForm }) {
         // TODO: hide this page if the user does not have permission?
         return (
             <div class="participants-view">
                 {/* FIXME: this is suboptimal because it can't distinguish between no registration form and not loaded */}
-                {this.state.registrationForm ? (
+                {hasRegistrationForm && registrationForm ? (
                     <div class="participants-view-contents">
                         <div class="participants-table-view-link">
                             <Button icon small onClick={() => push('alighintoj/tabelo')}>
@@ -117,22 +118,25 @@ export default class ParticipantsView extends PureComponent {
                             locale={locale.fields}
                             userData={{ congress, instance, currency }} />
                     </div>
-                ) : (
+                ) : !hasRegistrationForm ? (
                     <div class="no-registration-form">
                         {locale.noParticipation}
                     </div>
+                ) : (
+                    <DetailShell
+                        /* a hack to get the currency */
+                        view="congresses/registrationForm"
+                        options={{ congress, instance }}
+                        id="irrelevant" // detail shell won't work without one
+                        fields={{}}
+                        locale={{}}
+                        onData={data => data ? this.setState({
+                            registrationForm: data.form,
+                            currency: data.price ? data.price.currency : null,
+                        }) : this.setState({
+                            hasRegistrationForm: false,
+                        })} />
                 )}
-                <DetailShell
-                    /* a hack to get the currency */
-                    view="congresses/registrationForm"
-                    options={{ congress, instance }}
-                    id="irrelevant" // detail shell won't work without one
-                    fields={{}}
-                    locale={{}}
-                    onData={data => data && this.setState({
-                        registrationForm: data.form,
-                        currency: data.price ? data.price.currency : null,
-                    })} />
             </div>
         );
     }

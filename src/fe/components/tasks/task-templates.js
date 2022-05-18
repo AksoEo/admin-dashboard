@@ -13,7 +13,12 @@ export function createDialog ({ locale, fieldNames, fields: fieldDefs, className
             const def = fieldDefs[id];
             const Component = def.component;
             return (
-                <Field key={id} data-field={id}>
+                <Field key={id} data-field={id} validate={() => {
+                    if (def.validate) return def.validate({
+                        value: task.parameters[id],
+                        item: task.parameters,
+                    });
+                }}>
                     {def.wantsCreationLabel && (
                         <label class="creation-label">
                             {locale.fields[id]}

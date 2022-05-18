@@ -2,14 +2,14 @@
 import { h } from 'preact';
 import { useRef, useState } from 'preact/compat';
 import { Dialog, TextField, CircularProgress, Button } from 'yamdl';
-import Form, { Validator } from '../components/form';
+import { Form, Field } from '../components/form';
 import { search as locale } from '../locale';
 import './queries.less';
 
 function makeQuerySaveDialog (type) {
     void type; // TODO
     return ({ task, open }) => {
-        const buttonValidator = useRef(null);
+        const buttonContainer = useRef(null);
         const [error, setError] = useState(null);
 
         return (
@@ -23,39 +23,32 @@ function makeQuerySaveDialog (type) {
                     setError(null);
                     task.runOnce().catch(err => {
                         setError(err);
-                        buttonValidator.current.shake();
+                        buttonContainer.current.shake();
                     });
                 }}>
-                    <Validator
-                        component={TextField}
+                    <TextField
+                        required
                         class="form-field text-field"
                         label={locale.savedFilterName}
                         value={task.parameters.name}
-                        onChange={e => task.update({ name: e.target.value })}
-                        validate={value => {
-                            if (!value) throw { error: locale.nameRequired };
-                        }} />
-                    <Validator
+                        onChange={e => task.update({ name: e.target.value })} />
+                    <TextField
                         component={TextField}
                         class="form-field text-field"
                         label={locale.savedFilterDesc}
                         value={task.parameters.description}
-                        onChange={e => task.update({ description: e.target.value })}
-                        validate={() => {}} />
+                        onChange={e => task.update({ description: e.target.value })} />
                     {error ? (
                         <div class="error-message">
                             {'' + error}
                         </div>
                     ) : null}
-                    <footer class="form-footer">
+                    <Field class="form-footer" ref={buttonContainer}>
                         <span class="footer-spacer" />
-                        <Validator
-                            component={Button}
+                        <Button
                             raised
                             type="submit"
-                            disabled={task.running}
-                            ref={buttonValidator}
-                            validate={() => {}}>
+                            disabled={task.running}>
                             <CircularProgress
                                 class="progress-overlay"
                                 indeterminate={task.running}
@@ -63,8 +56,8 @@ function makeQuerySaveDialog (type) {
                             <span>
                                 {locale.saveFilter}
                             </span>
-                        </Validator>
-                    </footer>
+                        </Button>
+                    </Field>
                 </Form>
             </Dialog>
         );

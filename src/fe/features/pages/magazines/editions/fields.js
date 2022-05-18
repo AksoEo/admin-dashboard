@@ -20,6 +20,7 @@ export const FIELDS = {
                     class="magazine-edition-field-id-human"
                     outline
                     label={slot === 'create' && locale.fields.idHuman}
+                    required
                     value={value}
                     maxLength={50}
                     onChange={e => onChange(e.target.value)} />;
@@ -38,6 +39,7 @@ export const FIELDS = {
                     class="magazine-edition-field-id-human"
                     label={slot === 'create' && locale.fields.date}
                     outline
+                    required
                     value={value}
                     onChange={onChange} />;
             }

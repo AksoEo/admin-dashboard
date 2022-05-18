@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { Button, Dialog, CircularProgress } from 'yamdl';
 import DialogSheet from './dialog-sheet';
-import Form, { Validator } from '../form';
+import { Form, Field } from '../form';
 import DisplayError from '../utils/error';
 import './task-dialog.less';
 
@@ -23,7 +23,7 @@ export default class TaskDialog extends Component {
     };
 
     // button ref; for shaking on error
-    #buttonValidator;
+    #buttonField;
     #errorAnchor;
 
     #run = () => {
@@ -33,7 +33,7 @@ export default class TaskDialog extends Component {
                 this.#errorAnchor.scrollIntoView && this.#errorAnchor.scrollIntoView({ behavior: 'smooth' });
             });
             console.error(error); // eslint-disable-line no-console
-            this.#buttonValidator.shake();
+            this.#buttonField.shake();
         }).then(() => {
             this.setState({ loading: false });
         });
@@ -65,14 +65,12 @@ export default class TaskDialog extends Component {
                 container={container}>
                 <Form class="task-dialog-form" onSubmit={this.#run}>
                     {this.props.children}
-                    <footer class="task-dialog-footer">
+                    <Field class="task-dialog-footer" ref={view => this.#buttonField = view}>
                         <span class="task-dialog-footer-phantom" />
-                        <Validator
-                            component={Button}
+                        <Button
                             raised
                             type="submit"
                             disabled={loading}
-                            ref={view => this.#buttonValidator = view}
                             validate={() => {}}>
                             <CircularProgress
                                 class="progress-overlay"
@@ -81,8 +79,8 @@ export default class TaskDialog extends Component {
                             <span>
                                 {actionLabel}
                             </span>
-                        </Validator>
-                    </footer>
+                        </Button>
+                    </Field>
                     {error ? (
                         <div class="task-dialog-error">
                             <DisplayError error={error} />

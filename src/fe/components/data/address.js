@@ -1,9 +1,8 @@
 import { h, Component } from 'preact';
-import { TextField } from 'yamdl';
 import { getValidationRules } from '@cpsdqs/google-i18n-address';
 import Select from '../controls/select';
 import { data as locale } from '../../locale';
-import { Validator } from '../form';
+import { Field, ValidatedTextField } from '../form';
 import countryField, { WithCountries } from './country';
 import Required from './required';
 import './style';
@@ -98,7 +97,7 @@ class AddressEditor extends Component {
                     emptyLabel={locale.address.countryEmpty}
                     value={country && country.toLowerCase()}
                     onChange={onChangeField('country')}
-                    disabled={!wmask('country')} />,
+                    disabled={!wmask('country')} />
             );
         }
 
@@ -110,12 +109,9 @@ class AddressEditor extends Component {
 
         if (rmask('countryArea') && requiredFields.includes('countryArea')) {
             items.push(
-                <Validator
-                    component={Select}
+                <Select
+                    required={!!country}
                     disabled={!wmask('countryArea')}
-                    validate={value => {
-                        if (country && !value) throw { error: locale.requiredField };
-                    }}
                     class="address-editor-line"
                     key="countryArea"
                     value={value.countryArea}
@@ -133,32 +129,35 @@ class AddressEditor extends Component {
             if (!allowedFields.includes(k) || !rmask(k)) continue;
             const isRequired = requiredFields.includes(k);
             const isUpper = upperFields.includes(k);
-            items.push(<Validator
-                component={TextField}
-                validate={value => {
-                    if (country && !value && isRequired) throw { error: locale.requiredField };
+            items.push(
+                <Field>
+                    <ValidatedTextField
+                        validate={value => {
+                            if (country && !value && isRequired) return locale.requiredField;
 
-                    if (k === 'postalCode' && postalCodeMatchers.length) {
-                        for (const matcher of postalCodeMatchers) {
-                            if (!value.match(matcher)) {
-                                throw { error: locale.address.invalidPostalCode };
+                            if (k === 'postalCode' && postalCodeMatchers.length) {
+                                for (const matcher of postalCodeMatchers) {
+                                    if (!value.match(matcher)) {
+                                        return locale.address.invalidPostalCode;
+                                    }
+                                }
                             }
-                        }
-                    }
-                }}
-                disabled={!wmask(k)}
-                class="address-editor-line"
-                key={k}
-                value={value[k]}
-                maxLength={maxLengthMap[k]}
-                label={isRequired
-                    ? <Required>{locale.addressFields[k]}</Required>
-                    : locale.addressFields[k]}
-                onChange={onChangeField(k, e => {
-                    const v = e.target.value || null;
-                    if (isUpper) return v ? v.toUpperCase() : v;
-                    else return v;
-                })} />);
+                        }}
+                        disabled={!wmask(k)}
+                        class="address-editor-line"
+                        key={k}
+                        value={value[k]}
+                        maxLength={maxLengthMap[k]}
+                        label={isRequired
+                            ? <Required>{locale.addressFields[k]}</Required>
+                            : locale.addressFields[k]}
+                        onChange={onChangeField(k, e => {
+                            const v = e.target.value || null;
+                            if (isUpper) return v ? v.toUpperCase() : v;
+                            else return v;
+                        })} />
+                </Field>
+            );
         }
 
         return <div class="data address-editor">{items}</div>;

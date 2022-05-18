@@ -1,0 +1,20 @@
+.form-validator {
+    display: inline-block;
+
+    &.is-debug-deprecated {
+        // deprecated
+        outline: 4px solid orange;
+        animation: fv-deprecated 1s infinite;
+    }
+}
+@keyframes fv-deprecated {
+    0% {
+        outline: 4px solid transparent;
+    }
+    50% {
+        outline: 4px solid orange;
+    }
+    100% {
+        outline: 4px solid transparent;
+    }
+}

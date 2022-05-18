@@ -10,7 +10,7 @@ import { connect, coreContext } from '../../../core/connection';
 import { connectPerms as connectPermsInner } from '../../../perms';
 import { LinkButton } from '../../../router';
 import { codeholders as locale, data as dataLocale } from '../../../locale';
-import { Validator } from '../../../components/form';
+import { ValidatedTextField } from '../../../components/form';
 import {
     ueaCode,
     date,
@@ -120,8 +120,7 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                             ...(editor.props || {}),
                         })
                     ) : (
-                        <Validator
-                            component={(editor.props && editor.props.maxLength) ? LimitedTextField : TextField}
+                        <ValidatedTextField
                             disabled={!editor.hasPerm}
                             helperLabel={!editor.hasPerm && locale.fieldEditorInsufficientPerms}
                             validate={editor.validate || (() => {})}
@@ -150,7 +149,7 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
 const validators = {
     required: (prev = (() => {})) => value => {
         prev(value);
-        if (!value) throw { error: dataLocale.requiredField };
+        if (!value) return dataLocale.requiredField;
     },
 };
 

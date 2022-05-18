@@ -5,7 +5,7 @@ import DoneIcon from '@material-ui/icons/Done';
 import { coreContext } from '../../core/connection';
 import { deepEq } from '../../../util';
 import { detail as locale } from '../../locale';
-import Form from '../form';
+import { Form } from '../form';
 import DisplayError from '../utils/error';
 import './detail-shell.less';
 

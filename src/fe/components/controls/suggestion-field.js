@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { useState, useEffect, Fragment, createPortal } from 'preact/compat';
-import { TextField, Button, globalAnimator } from 'yamdl';
+import { Button, globalAnimator } from 'yamdl';
+import { ValidatedTextField } from '../form';
 import fuzzaldrin from 'fuzzaldrin';
 import './suggestion-field.less';
 
@@ -157,7 +158,7 @@ class SuggestionFieldRender extends Component {
 
         return (
             <Fragment>
-                <TextField {...textFieldProps} ref={view => {
+                <ValidatedTextField {...textFieldProps} ref={view => {
                     this.textField = view;
                     if (textFieldProps.ref) textFieldProps.ref(view);
                 }} />

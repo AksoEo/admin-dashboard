@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { lazy, Suspense, useEffect, useRef } from 'preact/compat';
 import { CircularProgress, TextField } from 'yamdl';
 import TaskDialog from '../../../components/tasks/task-dialog';
-import { Field, Validator } from '../../../components/form';
+import { Field } from '../../../components/form';
 import DetailShell from '../../../components/detail/detail-shell';
 import ChangedFields from '../../../components/tasks/changed-fields';
 import Segmented from '../../../components/controls/segmented';
@@ -47,6 +47,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="congresses-task-create-congress"
                         open={open}
                         onClose={() => task.drop()}
                         title={locale.create.title}
@@ -55,23 +56,19 @@ export default {
                             routerContext.navigate(`/kongresoj/${id}`);
                         })}>
                         <Field>
-                            <Validator
+                            <TextField
+                                required
                                 component={TextField}
-                                validate={value => {
-                                    if (!value) throw { error: dataLocale.requiredField };
-                                }}
                                 outline
                                 label={locale.fields.name}
                                 value={task.parameters.name || ''}
                                 onChange={e => task.update({ name: e.target.value })} />
                         </Field>
                         {hasTejo && hasUea && (
-                            <Field>
-                                <Validator
-                                    component={Segmented}
-                                    validate={() => {
-                                        if (!task.parameters.org) throw { error: dataLocale.requiredField };
-                                    }}
+                            <Field validate={() => {
+                                if (!task.parameters.org) return dataLocale.requiredField;
+                            }}>
+                                <Segmented
                                     selected={task.parameters.org}
                                     onSelect={org => task.update({ org })}>
                                     {[
@@ -84,7 +81,7 @@ export default {
                                             label: <UeaIcon />,
                                         },
                                     ]}
-                                </Validator>
+                                </Segmented>
                             </Field>
                         )}
                     </TaskDialog>
@@ -125,7 +122,7 @@ export default {
         const fields = CREATE_INSTANCE_FIELDS.map(id => {
             const Component = INSTANCE_FIELDS[id].component;
             return (
-                <Field key={id}>
+                <Field key={id} validate={INSTANCE_FIELDS[id].validate}>
                     <Component
                         slot="create"
                         editing value={task.parameters[id]}
@@ -199,12 +196,10 @@ export default {
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${id}`);
                         })}>
-                        <Field>
-                            <Validator
-                                component={Segmented}
-                                validate={() => {
-                                    if (!task.parameters.type) throw { error: dataLocale.requiredField };
-                                }}
+                        <Field class="location-type" validate={() => {
+                            if (!task.parameters.type) return dataLocale.requiredField;
+                        }}>
+                            <Segmented
                                 selected={task.parameters.type}
                                 onSelect={type => {
                                     task.update({ type });
@@ -219,7 +214,7 @@ export default {
                                     id: k,
                                     label: locationLocale.fields.types[k],
                                 }))}
-                            </Validator>
+                            </Segmented>
                         </Field>
                         <LocationEditor
                             isCreation
@@ -290,14 +285,11 @@ export default {
                             routerContext.navigate(`/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`);
                         })}>
                         <Field>
-                            <Validator
+                            <TextField
+                                required
                                 class="name-field"
-                                component={TextField}
                                 outline
                                 label={<Required>{programLocale.fields.title}</Required>}
-                                validate={value => {
-                                    if (!value) throw { error: dataLocale.requiredField };
-                                }}
                                 value={task.parameters.title || ''}
                                 onChange={e => task.update({ title: e.target.value })} />
                         </Field>
@@ -316,28 +308,22 @@ export default {
                                 onChange={e => task.update({ owner: e.target.value || null })} />
                         </Field>
                         <Field>
-                            <Validator
+                            <timestamp.editor
+                                required
                                 class="date-field"
-                                component={timestamp.editor}
                                 zone={task.options.tz}
                                 outline
                                 label={<Required>{programLocale.fields.timeFrom}</Required>}
-                                validate={value => {
-                                    if (!value) throw { error: dataLocale.requiredField };
-                                }}
                                 value={task.parameters.timeFrom || null}
                                 onChange={timeFrom => task.update({ timeFrom })} />
                         </Field>
                         <Field>
-                            <Validator
+                            <timestamp.editor
+                                required
                                 class="date-field"
-                                component={timestamp.editor}
                                 zone={task.options.tz}
                                 outline
                                 label={<Required>{programLocale.fields.timeTo}</Required>}
-                                validate={value => {
-                                    if (!value) throw { error: dataLocale.requiredField };
-                                }}
                                 value={task.parameters.timeTo || null}
                                 onChange={timeTo => task.update({ timeTo })} />
                         </Field>

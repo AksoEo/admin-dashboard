@@ -3,7 +3,7 @@ import { Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import LimitedTextField from '../../../../../components/controls/limited-text-field';
 import MdField from '../../../../../components/controls/md-field';
-import { magazineToc as locale } from '../../../../../locale';
+import { magazineToc as locale, data as dataLocale } from '../../../../../locale';
 import './fields.less';
 
 export const FIELDS = {
@@ -16,6 +16,7 @@ export const FIELDS = {
                 return (
                     <TextField
                         outline
+                        required
                         type="number"
                         label={locale.fields.page}
                         value={Number.isFinite(value) ? `${value}` : ''}
@@ -39,6 +40,9 @@ export const FIELDS = {
                 value={value || ''}
                 maxLength={500}
                 onChange={value => onChange(value || null)} />;
+        },
+        validate: ({ value }) => {
+            if (!value) return dataLocale.requiredField;
         },
     },
     author: {

@@ -11,7 +11,7 @@ import ChangedFields from '../../../components/tasks/changed-fields';
 import CodeholderPicker from '../../../components/pickers/codeholder-picker';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import LimitedTextField from '../../../components/controls/limited-text-field';
-import { Field, Validator } from '../../../components/form';
+import { Field, ValidatedTextField } from '../../../components/form';
 import { country, ueaCode, date } from '../../../components/data';
 import { createDialog, updateDialog, deleteDialog } from '../../../components/tasks/task-templates';
 import { connect } from '../../../core/connection';
@@ -60,25 +60,27 @@ export default {
             // HACK: to make suggestionfield work
             const mapChangeEvent = component === TextField ? (e => e.target.value) : (e => e);
             return (
-                <Validator
-                    key={fieldId}
-                    component={component}
-                    class="form-field text-field"
-                    {...extra}
-                    outline
-                    label={locale.nameSubfields[fieldId] + (isOptional ? '' : '*')}
-                    value={(task.parameters.name || {})[fieldId]}
-                    onChange={e => task.update({
-                        name: {
-                            ...(task.parameters.name || {}),
-                            [fieldId]: mapChangeEvent(e),
-                        },
-                    })}
-                    disabled={task.running}
-                    validate={value => {
-                        if (isOptional) return;
-                        if (!value || !value.trim()) throw { error: locale.createNoName };
-                    }} />
+                <Field>
+                    <ValidatedTextField
+                        key={fieldId}
+                        component={component}
+                        class="form-field text-field"
+                        {...extra}
+                        outline
+                        label={locale.nameSubfields[fieldId] + (isOptional ? '' : '*')}
+                        value={(task.parameters.name || {})[fieldId]}
+                        onChange={e => task.update({
+                            name: {
+                                ...(task.parameters.name || {}),
+                                [fieldId]: mapChangeEvent(e),
+                            },
+                        })}
+                        disabled={task.running}
+                        validate={value => {
+                            if (isOptional) return;
+                            if (!value || !value.trim()) return locale.createNoName;
+                        }} />
+                </Field>
             );
         };
 
@@ -96,39 +98,42 @@ export default {
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/membroj/${id}`);
                         })}>
-                        <Validator
-                            component={Segmented}
-                            class="form-field"
-                            selected={task.parameters.type}
-                            onSelect={type => task.update({ type })}
-                            disabled={task.running}
-                            validate={() => true}>
-                            {[
-                                { id: 'human', label: locale.fields.types.human },
-                                { id: 'org', label: locale.fields.types.org },
-                            ]}
-                        </Validator>
+                        <Field>
+                            <Segmented
+                                class="form-field"
+                                selected={task.parameters.type}
+                                onSelect={type => task.update({ type })}
+                                disabled={task.running}
+                                validate={() => true}>
+                                {[
+                                    { id: 'human', label: locale.fields.types.human },
+                                    { id: 'org', label: locale.fields.types.org },
+                                ]}
+                            </Segmented>
+                        </Field>
                         <DynamicHeightDiv useFirstHeight>
                             {nameFields.map((field, isOptional) => (
                                 // we assume only the first field is required, so !!index == isOptional
                                 renderNameField(field, isOptional)
                             ))}
                         </DynamicHeightDiv>
-                        <Validator
-                            component={ueaCode.editor}
-                            class="form-field text-field"
-                            outline
-                            value={(task.parameters.code || {}).new}
-                            required
-                            suggestionParameters={task.parameters}
-                            onChange={newCode => task.update({ code: { new: newCode } })}
-                            disabled={task.running}
-                            id={-1} // pass nonsense id to just check if it’s taken
-                            validate={value => {
+                        <Field
+                            validate={() => {
+                                const value = (task.parameters.code || {}).new;
                                 if (!UEACode.validate(value) || (new UEACode(value)).type !== 'new') {
-                                    throw { error: locale.invalidUEACode };
+                                    return locale.invalidUEACode;
                                 }
-                            }} />
+                            }}>
+                            <ueaCode.editor
+                                class="form-field text-field"
+                                outline
+                                value={(task.parameters.code || {}).new}
+                                required
+                                suggestionParameters={task.parameters}
+                                onChange={newCode => task.update({ code: { new: newCode } })}
+                                id={-1} // pass nonsense id to just check if it’s taken
+                                disabled={task.running} />
+                        </Field>
                         <DynamicHeightDiv useFirstHeight>
                             {nameFieldsAfter.map(field => renderNameField(field, true))}
                         </DynamicHeightDiv>
@@ -203,44 +208,47 @@ export default {
                 onClose={() => task.drop()}
                 actionLabel={locale.membership.add}
                 run={() => task.runOnce()}>
-                <Validator
-                    component={Select}
-                    outline
-                    validate={() => {}}
-                    class="category-select form-field"
-                    value={task.parameters.category}
-                    onChange={category => task.update({ category })}
-                    items={categories ? Object.values(categories).map(({
-                        id,
-                        nameAbbrev,
-                        name,
-                        availableFrom,
-                        availableTo,
-                    }) => ({
-                        value: id,
-                        label: `${name} (${nameAbbrev})` + (
-                            availableFrom && availableTo ? (
-                                ` (${availableFrom}–${availableTo})`
-                            ) : availableFrom ? (
-                                ` (${locale.membership.availableFrom} ${availableFrom})`
-                            ) : availableTo ? (
-                                ` (${locale.membership.availableTo} ${availableTo})`
-                            ) : ''
-                        ),
-                    })) : []} />
-                <Validator
-                    component={TextField}
-                    outline
-                    class="form-field text-field"
-                    type="number"
-                    label={locale.membership.year}
-                    min={yearMin}
-                    max={yearMax}
-                    value={task.parameters.year}
-                    onChange={e => task.update({ year: e.target.value })}
-                    validate={value => {
-                        if (+value != value) throw { error: locale.membership.notAYear };
-                    }} />
+                <Field validate={() => {
+                    if (!task.parameters.category) return dataLocale.requiredField;
+                }}>
+                    <Select
+                        outline
+                        class="category-select form-field"
+                        value={task.parameters.category}
+                        onChange={category => task.update({ category })}
+                        items={categories ? Object.values(categories).map(({
+                            id,
+                            nameAbbrev,
+                            name,
+                            availableFrom,
+                            availableTo,
+                        }) => ({
+                            value: id,
+                            label: `${name} (${nameAbbrev})` + (
+                                availableFrom && availableTo ? (
+                                    ` (${availableFrom}–${availableTo})`
+                                ) : availableFrom ? (
+                                    ` (${locale.membership.availableFrom} ${availableFrom})`
+                                ) : availableTo ? (
+                                    ` (${locale.membership.availableTo} ${availableTo})`
+                                ) : ''
+                            ),
+                        })) : []} />
+                </Field>
+                <Field>
+                    <ValidatedTextField
+                        outline
+                        class="form-field text-field"
+                        type="number"
+                        label={locale.membership.year}
+                        min={yearMin}
+                        max={yearMax}
+                        value={task.parameters.year}
+                        onChange={e => task.update({ year: e.target.value })}
+                        validate={value => {
+                            if (+value != value || +value < yearMin || +value > yearMax) return locale.membership.notAYear;
+                        }} />
+                </Field>
                 <div class="canuto-field">
                     <Checkbox
                         id={canutoId}
@@ -367,26 +375,23 @@ export default {
                         </div>
                     </div>
                 </div>
-                <Validator
-                    component={TextField}
-                    validate={value => {
-                        if (!value) {
-                            throw { error: dataLocale.requiredField };
-                        }
-                    }}
-                    label={locale.fileName}
-                    maxLength={50}
-                    value={task.parameters.name}
-                    disabled={task.running}
-                    onChange={e => task.update({ name: e.target.value })} />
-                <Validator
-                    component={TextField}
-                    validate={() => {}}
-                    label={locale.fileDescription}
-                    maxLength={300}
-                    value={task.parameters.description}
-                    disabled={task.running}
-                    onChange={e => task.update({ description: e.target.value })} />
+                <Field>
+                    <TextField
+                        required
+                        label={locale.fileName}
+                        maxLength={50}
+                        value={task.parameters.name}
+                        disabled={task.running}
+                        onChange={e => task.update({ name: e.target.value })} />
+                </Field>
+                <Field>
+                    <TextField
+                        label={locale.fileDescription}
+                        maxLength={300}
+                        value={task.parameters.description}
+                        disabled={task.running}
+                        onChange={e => task.update({ description: e.target.value })} />
+                </Field>
             </TaskDialog>
         );
     },
@@ -415,13 +420,10 @@ export default {
                 actionLabel={locale.addrLabelGen.presets.create.button}
                 run={() => task.runOnce()}>
                 <Field>
-                    <Validator
-                        component={TextField}
+                    <TextField
+                        required
                         value={task.parameters.name}
                         onChange={e => task.update({ name: e.target.value })}
-                        validate={value => {
-                            if (!value) throw { error: dataLocale.requiredField };
-                        }}
                         outline
                         label={locale.addrLabelGen.presets.name} />
                 </Field>
@@ -437,13 +439,10 @@ export default {
                 actionLabel={locale.addrLabelGen.presets.update.button}
                 run={() => task.runOnce()}>
                 <Field>
-                    <Validator
-                        component={TextField}
+                    <TextField
+                        required
                         value={task.parameters.name}
                         onChange={e => task.update({ name: e.target.value })}
-                        validate={value => {
-                            if (!value) throw { error: dataLocale.requiredField };
-                        }}
                         outline
                         label={locale.addrLabelGen.presets.name} />
                 </Field>
@@ -554,49 +553,40 @@ function makeRoleEditor (type) {
                 onClose={() => task.drop()}
                 actionLabel={locale.role[type]}
                 run={() => task.runOnce()}>
-                <Validator
-                    component={Select}
-                    outline
-                    validate={() => {}}
-                    class="category-select form-field"
-                    value={task.parameters.role}
-                    onChange={role => task.update({ role })}
-                    items={roles && Object.values(roles).sort((a, b) => a.name.localeCompare(b.name)).map(({
-                        id,
-                        name,
-                    }) => ({
-                        value: id,
-                        label: name,
-                    }))} />
+                <Field>
+                    <Select
+                        outline
+                        validate={() => {}}
+                        class="category-select form-field"
+                        value={task.parameters.role}
+                        onChange={role => task.update({ role })}
+                        items={roles && Object.values(roles).sort((a, b) => a.name.localeCompare(b.name)).map(({
+                            id,
+                            name,
+                        }) => ({
+                            value: id,
+                            label: name,
+                        }))} />
+                </Field>
                 <p class="add-role-description">
                     {locale.role.description}
                 </p>
-                <Validator
-                    component={date.editor}
-                    outline
-                    class="form-field text-field"
-                    label={locale.role.durationFrom}
-                    value={task.parameters.durationFrom}
-                    onChange={date => task.update({ durationFrom: date })}
-                    validate={value => {
-                        if (!value) return;
-                        if (!Number.isFinite(new Date(value).getDate())) {
-                            throw { error: locale.role.notADate };
-                        }
-                    }} />
-                <Validator
-                    component={date.editor}
-                    outline
-                    class="form-field text-field"
-                    label={locale.role.durationTo}
-                    value={task.parameters.durationTo}
-                    onChange={date => task.update({ durationTo: date })}
-                    validate={value => {
-                        if (!value) return;
-                        if (!Number.isFinite(new Date(value).getDate())) {
-                            throw { error: locale.role.notADate };
-                        }
-                    }} />
+                <Field>
+                    <date.editor
+                        outline
+                        class="form-field text-field"
+                        label={locale.role.durationFrom}
+                        value={task.parameters.durationFrom}
+                        onChange={date => task.update({ durationFrom: date })} />
+                </Field>
+                <Field>
+                    <date.editor
+                        outline
+                        class="form-field text-field"
+                        label={locale.role.durationTo}
+                        value={task.parameters.durationTo}
+                        onChange={date => task.update({ durationTo: date })} />
+                </Field>
                 <div class="additional-options">
                     <div class="opt-item">
                         <label>{locale.role.dataCountry}</label>

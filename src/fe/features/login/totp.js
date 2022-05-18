@@ -1,8 +1,8 @@
 import { h, Component } from 'preact';
 import { lazy, Suspense, Fragment } from 'preact/compat';
-import { Checkbox, CircularProgress, Button, TextField, Spring } from 'yamdl';
+import { Checkbox, CircularProgress, Button, Spring } from 'yamdl';
 import { LoginAuthStates } from '../../../protocol';
-import Form, { Validator } from '../../components/form';
+import { Form, Field, ValidatedTextField } from '../../components/form';
 import { login as locale } from '../../locale';
 
 const TotpSetup = lazy(() => import(/* webpackChunkName: "totp-setup" */ './totp-setup'));
@@ -48,7 +48,7 @@ export default class TotpPage extends Component {
             }
 
             this.#codeValidator.shake();
-            this.#codeValidator.setError({ error });
+            this.#codeField.setError(error);
         }).finally(() => {
             this.#submitting = false;
         });
@@ -62,33 +62,34 @@ export default class TotpPage extends Component {
                 <p>
                     {locale.totpDescription}
                 </p>
-                <Validator component={TextField}
-                    class="form-field totp-input"
-                    ref={view => this.#codeValidator = view}
-                    innerRef={view => this.#codeField = view}
-                    outline
-                    center
-                    label={locale.totp}
-                    value={this.state.code}
-                    placeholder="000000"
-                    // \d* seems to be the only way to get a numpad input on iOS
-                    pattern="\d*"
-                    type="number"
-                    onKeyDown={e => {
-                        if (e.ctrlKey || e.altKey || e.metaKey) return;
-                        if (!e.key.match(/\d/) && !e.key.match(/^[A-Z]/)) {
-                            e.preventDefault();
-                        }
-                        if (e.key === 'Enter') this.#onSubmit();
-                    }}
-                    onChange={e => this.setState({
-                        code: e.target.value.replace(/\D/g, '').substr(0, 6),
-                    })}
-                    validate={value => {
-                        if (!value || !value.match(/^\d{6}$/)) {
-                            throw { error: locale.invalidTotpFormat };
-                        }
-                    }} />
+                <Field ref={view => this.#codeValidator = view}>
+                    <ValidatedTextField
+                        class="form-field totp-input"
+                        ref={view => this.#codeField = view}
+                        outline
+                        center
+                        label={locale.totp}
+                        value={this.state.code}
+                        placeholder="000000"
+                        // \d* seems to be the only way to get a numpad input on iOS
+                        pattern="\d*"
+                        type="number"
+                        onKeyDown={e => {
+                            if (e.ctrlKey || e.altKey || e.metaKey) return;
+                            if (!e.key.match(/\d/) && !e.key.match(/^[A-Z]/)) {
+                                e.preventDefault();
+                            }
+                            if (e.key === 'Enter') this.form.submit();
+                        }}
+                        onChange={e => this.setState({
+                            code: e.target.value.replace(/\D/g, '').substr(0, 6),
+                        })}
+                        validate={() => {
+                            if (!this.state.code || !this.state.code.match(/^\d{6}$/)) {
+                                return locale.invalidTotpFormat;
+                            }
+                        }} />
+                </Field>
                 <TotpRememberSwitch
                     value={this.state.remember}
                     onChange={remember => this.setState({ remember })}

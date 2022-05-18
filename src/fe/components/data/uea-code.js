@@ -6,7 +6,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
 import { connect, coreContext } from '../../core/connection';
 import { data as locale } from '../../locale';
-import { Validator } from '../form';
 import SuggestionField from '../controls/suggestion-field';
 import TinyProgress from '../controls/tiny-progress';
 import './style';
@@ -133,9 +132,8 @@ class UEACodeEditor extends Component {
             extraProps.error = locale.ueaCode.codeTaken;
         }
 
-        return <Validator
+        return <SuggestionField
             class={className}
-            component={SuggestionField}
             value={value}
             suggestions={suggestions || []}
             onChange={onChange}
@@ -148,10 +146,10 @@ class UEACodeEditor extends Component {
                     const code = new AKSOUEACode(value);
                     if (code.type !== 'new') throw 0;
                 } catch (_) {
-                    throw { error: locale.ueaCode.invalidUEACode };
+                    return locale.ueaCode.invalidUEACode;
                 }
                 if (this.state.takenState === 'taken') {
-                    throw { error: locale.ueaCode.codeTaken };
+                    return locale.ueaCode.codeTaken;
                 }
             }}
             trailing={trailing}

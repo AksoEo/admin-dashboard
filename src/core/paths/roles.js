@@ -1,10 +1,8 @@
-import { util } from '@tejo/akso-client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
 import { crudList, crudGet, crudCreate, crudUpdate, crudDelete } from '../templates';
-import { deepMerge } from '../../util';
 
 /// Data store path.
 export const ROLES = 'codeholder_roles';

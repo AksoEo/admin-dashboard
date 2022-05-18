@@ -1,9 +1,7 @@
-import { util } from '@tejo/akso-client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
 import { crudList, crudGet, crudCreate, crudUpdate, crudDelete } from '../templates';
-import { deepMerge } from '../../util';
 import JSON5 from 'json5';
 
 export const LISTS = 'lists';
@@ -45,7 +43,7 @@ export const tasks = {
         map: delta => {
             if ('filters' in delta) {
                 // convert back from JSON5 syntax
-                opts.filters = parameters.filters.map(filter => JSON.stringify(JSON5.parse(filter)));
+                delta.filters = delta.filters.map(filter => JSON.stringify(JSON5.parse(filter)));
             }
         },
         storePath: ({ id }) => [LISTS, id],
@@ -54,9 +52,8 @@ export const tasks = {
     delete: crudDelete({
         apiPath: ({ id }) => `/lists/${id}`,
         storePath: ({ id }) => [LISTS, id],
-        signalPath: ({ id }) => [LISTS, SIG_LISTS],
+        signalPath: () => [LISTS, SIG_LISTS],
     }),
-    //
     /// lists/codeholders: lists codeholders that are part of a list
     codeholders: async ({ id }, { offset, limit }) => {
         const client = await asyncClient;

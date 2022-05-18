@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, PureComponent } from 'preact/compat';
-import { Button, Dialog, Slider, TextField } from 'yamdl';
+import { Button, Dialog, Slider } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Brightness1Icon from '@material-ui/icons/Brightness1';
@@ -49,7 +49,7 @@ import SvgIcon from '../../../../../components/svg-icon';
 import LimitedTextField from '../../../../../components/controls/limited-text-field';
 import { layoutContext } from '../../../../../components/layout/dynamic-height-div';
 import { date, time } from '../../../../../components/data';
-import { Validator } from '../../../../../components/form';
+import { ValidatedTextField } from '../../../../../components/form';
 import { connect } from '../../../../../core/connection';
 import { congressLocations as locale } from '../../../../../locale';
 import LatLonEditor from '../../ll-editor';
@@ -124,14 +124,12 @@ export const FIELDS = {
         slot: 'title',
         component ({ value, editing, onChange }) {
             if (editing) {
-                return <Validator
+                return <LimitedTextField
+                    required
                     outline
                     label={locale.fields.name}
                     component={LimitedTextField}
                     maxLength={50}
-                    validate={value => {
-                        if (!value) throw { error: locale.fields.nameRequired };
-                    }}
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }
@@ -241,12 +239,11 @@ export const FIELDS = {
             if (editing) {
                 editor = (
                     <span class="rating-editor">
-                        <Validator
-                            component={TextField}
-                            validate={value => {
-                                if (Number.isNaN(rating)) return;
-                                if (!Number.isFinite(value)) throw { error: locale.fields.ratingInvalid };
-                                if (value < 0 || value > max) throw { error: locale.fields.ratingInvalid };
+                        <ValidatedTextField
+                            validate={() => {
+                                if (Number.isNaN(rating)) return; // no value
+                                if (!Number.isFinite(rating)) return locale.fields.ratingInvalid;
+                                if (rating < 0 || rating > max) return locale.fields.ratingInvalid;
                             }}
                             outline
                             type="number"
@@ -258,11 +255,10 @@ export const FIELDS = {
                                 ? onChange({ type, rating: +e.target.value, max })
                                 : onChange(null)} />
                         <span class="editor-infix">{locale.fields.ratingInfixOf}</span>
-                        <Validator
-                            component={TextField}
-                            validate={value => {
-                                if (!Number.isFinite(+value) || value < 1 || value > 10) {
-                                    throw { error: locale.fields.ratingInvalid };
+                        <ValidatedTextField
+                            validate={() => {
+                                if (!Number.isFinite(+max) || max < 1 || max > 10) {
+                                    return locale.fields.ratingInvalid;
                                 }
                             }}
                             outline

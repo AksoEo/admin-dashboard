@@ -11,7 +11,7 @@ import { country, timestamp } from '../../../../components/data';
 import CountryPicker from '../../../../components/pickers/country-picker';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import Segmented from '../../../../components/controls/segmented';
-import { Validator } from '../../../../components/form';
+import { ValidatedTextField } from '../../../../components/form';
 import Select from '../../../../components/controls/select';
 import TextArea from '../../../../components/controls/text-area';
 import DiffAuthor from '../../../../components/diff-author';
@@ -338,12 +338,11 @@ export const FIELDS = {
                             value.psProfileURL ? (
                                 <a target="_blank" rel="nofollow noreferrer" href={value.psProfileURL}>{value.psProfileURL}</a>
                             ) : '—',
-                            <Validator
-                                component={TextField}
+                            <ValidatedTextField
                                 validate={value => {
                                     if (!value) return;
                                     if (!value.match(/^https:\/\/www\.pasportaservo\.org\/ejo\/\d+\/?$/)) {
-                                        throw { error: locale.hosting.psProfileURLInvalid };
+                                        return locale.hosting.psProfileURLInvalid;
                                     }
                                 }}
                                 type="url"

@@ -24,11 +24,11 @@ export default connectPerms(class Role extends Page {
 
     #commitTask = null;
     onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return;
+        if (!this.props.editing || this.#commitTask) return Promise.resolve();
         if (!changedFields.length) {
             // nothing changed, so we can just pop the editing state
             this.props.editing.pop(true);
-            return;
+            return Promise.resolve();
         }
 
         return new Promise(resolve => {

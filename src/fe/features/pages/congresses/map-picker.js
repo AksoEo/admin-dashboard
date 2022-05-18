@@ -48,7 +48,7 @@ export default class MapPicker extends PureComponent {
         this.props.onChange([e.latlng.lat, e.latlng.lng]);
     };
 
-    render ({ value, onChange, nullable, icon, address }) {
+    render ({ value, onChange, nullable, icon, address, required }) {
         const markers = [];
 
         if (value) {
@@ -81,7 +81,7 @@ export default class MapPicker extends PureComponent {
                         zoom={this.initialZoom}
                         markers={markers}
                         whenReady={map => this.#map = map.target}
-                        onClick={this.#onMapClick} />
+                        eventHandlers={{ click: this.#onMapClick }} />
                     <div class={'map-picker-pick-banner' + (value ? ' is-hidden' : '')}>
                         {locale.mapPicker.pickPrompt}
                     </div>
@@ -90,6 +90,7 @@ export default class MapPicker extends PureComponent {
                     </div>
                 </div>
                 <LatLonEditor
+                    required={required}
                     value={value}
                     editing={true}
                     onChange={onChange}

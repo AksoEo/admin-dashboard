@@ -27,8 +27,6 @@ export const magazines = {
         menuItem: 'Redakti',
         title: 'Redakti revuon',
         button: 'Aktualigi',
-
-        nameRequired: 'Necesas nomo',
     },
     delete: {
         menuItem: 'Forigi',

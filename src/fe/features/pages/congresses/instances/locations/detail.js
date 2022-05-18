@@ -25,11 +25,11 @@ export default connectPerms(class LocationPage extends Page {
 
     #commitTask = null;
     onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return;
+        if (!this.props.editing || this.#commitTask) return Promise.resolve();
         if (!changedFields.length) {
             // nothing changed, so we can just pop the editing state
             this.props.editing.pop(true);
-            return;
+            return Promise.resolve();
         }
 
         return new Promise(resolve => {
@@ -247,6 +247,7 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                     )}
                     {editing ? (
                         <MapPicker
+                            required
                             value={ll}
                             onChange={ll => onItemChange({ ...item, ll })}
                             address={item.address}

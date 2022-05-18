@@ -1,14 +1,14 @@
 import { h } from 'preact';
 import { useRef } from 'preact/compat';
-import { Dialog, TextField, CircularProgress, Button } from 'yamdl';
+import { Dialog, CircularProgress, Button } from 'yamdl';
 import { UEACode } from '@tejo/akso-client';
-import Form, { Validator } from '../../components/form';
+import { Form, Field, ValidatedTextField } from '../../components/form';
 import { login as locale } from '../../locale';
 import './style';
 
 export default {
     initCreatePassword: ({ open, core, task }) => {
-        const buttonValidator = useRef(null);
+        const buttonContainer = useRef(null);
 
         const { create } = task.options;
         const { login } = task.parameters;
@@ -31,35 +31,35 @@ export default {
                                 : locale.resetPasswordSent,
                         });
                     }).catch(() => {
-                        buttonValidator.current.shake();
+                        buttonContainer.current.shake();
                     });
                 }}>
                     <p>
                         {description}
                     </p>
-                    <Validator
-                        component={TextField}
-                        class="form-field"
-                        outline
-                        label={locale.login}
-                        type={login.includes('@') ? 'email' : 'text'}
-                        autocapitalize="none"
-                        spellcheck="false"
-                        value={login}
-                        onChange={e => task.update({ login: e.target.value })}
-                        validate={value => {
-                            if (!value.includes('@') && !UEACode.validate(value)) {
-                                throw { error: locale.invalidUEACode };
-                            }
-                        }} />
-                    <footer class="form-footer">
+                    <Field>
+                        <ValidatedTextField
+                            class="form-field"
+                            outline
+                            label={locale.login}
+                            type={login.includes('@') ? 'email' : 'text'}
+                            autocapitalize="none"
+                            spellcheck="false"
+                            value={login}
+                            onChange={e => task.update({ login: e.target.value })}
+                            validate={value => {
+                                if (!value.includes('@') && !UEACode.validate(value)) {
+                                    return locale.invalidUEACode;
+                                }
+                            }} />
+                    </Field>
+                    <Field ref={buttonContainer} class="form-footer">
                         <span class="footer-spacer" />
-                        <Validator
+                        <Button
                             component={Button}
                             raised
                             type="submit"
                             disabled={task.running}
-                            ref={buttonValidator}
                             validate={() => {}}>
                             <CircularProgress
                                 class="progress-overlay"
@@ -70,8 +70,8 @@ export default {
                                     ? locale.sendPasswordSetup
                                     : locale.sendPasswordReset}
                             </span>
-                        </Validator>
-                    </footer>
+                        </Button>
+                    </Field>
                 </Form>
             </Dialog>
         );

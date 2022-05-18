@@ -5,7 +5,7 @@ import { Button, Checkbox, Dialog, MenuIcon, TextField } from 'yamdl';
 import { base32 } from 'rfc4648';
 import Select from '../../../components/controls/select';
 import Segmented from '../../../components/controls/segmented';
-import Form, { Validator, Field } from '../../../components/form';
+import { Form, Validator, Field } from '../../../components/form';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import StaticOverviewList from '../../../components/lists/overview-list-static';
 import OverviewListItem from '../../../components/lists/overview-list-item';

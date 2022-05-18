@@ -11,7 +11,7 @@ import JSONEditor from '../../../components/controls/json-editor';
 import CodeholderPicker from '../../../components/pickers/codeholder-picker';
 import RearrangingList from '../../../components/lists/rearranging-list';
 import { timestamp } from '../../../components/data';
-import { Validator } from '../../../components/form';
+import { Field } from '../../../components/form';
 import { IdUEACode } from '../../../components/data/uea-code';
 import { votes as locale } from '../../../locale';
 import Rational from './rational';
@@ -21,20 +21,19 @@ function validateJSON (value) {
     try {
         JSON5.parse(value);
     } catch {
-        throw { error: true };
+        return true;
     }
 }
 
 export function voterCodeholders ({ value, onChange, editing, item }) {
     if (editing && item.state.isActive) return locale.cannotEditActive;
     return (
-        <Validator
-            component={JSONEditor}
-            validatorProps={{ class: 'block-validator' }}
-            value={value}
-            onChange={onChange}
-            disabled={!editing}
-            validate={validateJSON} />
+        <Field validate={() => validateJSON(value)}>
+            <JSONEditor
+                value={value}
+                onChange={onChange}
+                disabled={!editing} />
+        </Field>
     );
 }
 
@@ -56,13 +55,12 @@ export function viewerCodeholders ({ value, onChange, editing }) {
                 </label>
             </div>
             {value !== 'null' ? (
-                <Validator
-                    component={JSONEditor}
-                    validatorProps={{ class: 'block-validator' }}
-                    value={value}
-                    onChange={onChange}
-                    disabled={!editing}
-                    validate={validateJSON} />
+                <Field validate={() => validateJSON(value)}>
+                    <JSONEditor
+                        value={value}
+                        onChange={onChange}
+                        disabled={!editing} />
+                </Field>
             ) : ''}
         </div>
     );
@@ -92,15 +90,9 @@ const timeBound = (isStart) => function TimeBoundEditor ({ value, onChange, edit
     if (!editing) return <timestamp.renderer value={value} />;
     if (isStart && item.state.isActive) return locale.cannotEditActive;
     return (
-        <Validator
-            component={timestamp.editor}
+        <timestamp.editor
             value={value}
-            onChange={onChange}
-            validate={value => {
-                if (!Number.isFinite(new Date(value * 1000).getDate())) {
-                    throw { error: true };
-                }
-            }} />
+            onChange={onChange} />
     );
 };
 export const timeStart = timeBound(true);
@@ -195,20 +187,10 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
                 </span>
             )}
             {relationLabel && ' '}
-            <Validator
-                component={Rational}
+            <Rational
                 value={value}
                 onChange={onChange}
-                editing={editing}
-                validate={value => {
-                    if (Array.isArray(value)) {
-                        if (!Number.isFinite(+value[0]) || !Number.isFinite(+value[1])) {
-                            throw { error: true };
-                        }
-                    } else if (!Number.isFinite(+value)) {
-                        throw { error: true };
-                    }
-                }} />
+                editing={editing} />
             {inclusiveCheckbox}
         </div>
     );
@@ -225,16 +207,11 @@ export function numChosenOptions ({ value, onChange, editing }) {
     if (!editing) return '' + value;
 
     return (
-        <Validator
-            component={TextField}
+        <TextField
+            required
             type="number"
             value={value}
-            onChange={e => onChange(e.target.value)}
-            validate={value => {
-                if (!Number.isFinite(+value)) {
-                    throw { error: locale.numberRequired };
-                }
-            }} />
+            onChange={e => onChange(e.target.value)} />
     );
 }
 
@@ -246,49 +223,33 @@ export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
     if (item.state.isActive) return locale.cannotEditActive;
 
     return (
-        <Validator
+        <TextField
+            required
             component={TextField}
             type="number"
             value={value || ''}
             placeholder={locale.config.noMaxOptions}
-            onChange={e => onChange(+e.target.value || null)}
-            validate={value => {
-                if (!Number.isFinite(value)) {
-                    throw { error: locale.numberRequired };
-                }
-            }} />
+            onChange={e => onChange(+e.target.value || null)} />
     );
 }
 
 export function tieBreakerCodeholder ({ value, onChange, editing }) {
     if (!editing) return <IdUEACode id={value} />;
     return (
-        <Validator
-            component={CodeholderPicker}
-            value={[value].filter(x => x !== null)}
-            onChange={value => onChange(+value[0] || null)}
-            validate={() => {
-                if (value === null) {
-                    throw { error: true };
-                }
-            }}
-            limit={1} />
+        <Field validate={() => {
+            if (!value) return locale.config.tieBreakerRequired;
+        }}>
+            <CodeholderPicker
+                component={CodeholderPicker}
+                value={[value].filter(x => x !== null)}
+                onChange={value => onChange(+value[0] || null)}
+                limit={1} />
+        </Field>
     );
 }
 
 export const publishVoters = inactiveBool;
 export const publishVotersPercentage = bool;
-
-function ErrorableDiv ({ error, children, ...props }) {
-    return (
-        <div {...props}>
-            {children}
-            <div class="error-message-container">
-                {error}
-            </div>
-        </div>
-    );
-}
 
 export const options = class OptionsEditor extends Component {
     /// These keys are used to identify options while editing the list.
@@ -413,11 +374,10 @@ export const options = class OptionsEditor extends Component {
             );
 
             return (
-                <Validator
-                    component={ErrorableDiv}
+                <Field
                     validate={() => {
-                        if (!value.length) {
-                            throw { error: locale.optionsRequired };
+                        if (value.length < 2) {
+                            return locale.optionsRequired;
                         }
                     }}>
                     <RearrangingList
@@ -435,7 +395,7 @@ export const options = class OptionsEditor extends Component {
                         }}>
                         {items}
                     </RearrangingList>
-                </Validator>
+                </Field>
             );
         }
 

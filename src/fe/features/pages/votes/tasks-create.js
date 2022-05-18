@@ -4,7 +4,8 @@ import { Button, TextField } from 'yamdl';
 import DialogSheet from '../../../components/tasks/dialog-sheet';
 import ProgressIndicator from '../../../components/dialog-progress-indicator';
 import AutosizingPageView from '../../../components/layout/autosizing-page-view';
-import Form, { Validator } from '../../../components/form';
+import DisplayError from '../../../components/utils/error';
+import { Form, Field } from '../../../components/form';
 import { TejoIcon, UeaIcon, UeaColorIcon } from '../../../components/org-icon';
 import { timestamp } from '../../../components/data';
 import { votes as locale } from '../../../locale';
@@ -29,17 +30,6 @@ function WizardPage ({ children, next }) {
     );
 }
 
-function ErrorableDiv ({ error, children, ...props }) {
-    return (
-        <div {...props}>
-            {children}
-            <div class="error-message-container">
-                {error}
-            </div>
-        </div>
-    );
-}
-
 function WizardSection ({ title }) {
     return (
         <div class="wizard-title">
@@ -50,13 +40,10 @@ function WizardSection ({ title }) {
 
 function WizardSelector ({ value, onChange, items, vertical }) {
     return (
-        <Validator
-            component={ErrorableDiv}
-            validatorProps={{ class: 'wizard-selector-validator' }}
-            value={null}
+        <Field
             validate={() => {
                 if (value === null) {
-                    throw { error: locale.create.requiresSelection };
+                    return locale.create.requiresSelection;
                 }
             }}
             class={'votes-wizard-selector' + (vertical ? ' is-vertical' : '')}>
@@ -75,7 +62,7 @@ function WizardSelector ({ value, onChange, items, vertical }) {
                     </Button>
                 ))}
             </div>
-        </Validator>
+        </Field>
     );
 }
 
@@ -121,30 +108,24 @@ function TypePicker ({ value, onChange }) {
 
 function TimespanEditor ({ value, onChange }) {
     return (
-        <div class="timespan-editor">
+        <Field class="timespan-editor" validate={() => {
+            if (value.start >= value.end) return locale.create.emptyTimespan;
+        }}>
             <WizardSection title={locale.fields.timeStart} />
-            <Validator
-                component={timestamp.editor}
+            <timestamp.editor
+                required
                 outline
                 value={value.start}
-                onChange={start => onChange({ ...value, start })}
-                validate={v => {
-                    if (!v) throw { error: true };
-                    if (v >= value.end) throw { error: locale.create.emptyTimespan };
-                }} />
+                onChange={start => onChange({ ...value, start })} />
             <br />
             <br />
             <WizardSection title={locale.fields.timeEnd} />
-            <Validator
-                component={timestamp.editor}
+            <timestamp.editor
+                required
                 outline
                 value={value.end}
-                onChange={end => onChange({ ...value, end })}
-                validate={v => {
-                    if (!v) throw { error: true };
-                    if (v <= value.start) throw { error: locale.create.emptyTimespan };
-                }} />
-        </div>
+                onChange={end => onChange({ ...value, end })} />
+        </Field>
     );
 }
 
@@ -164,27 +145,22 @@ const templatePage = () => ({
         return (
             <WizardPage next={next}>
                 <WizardSection title={locale.fields.name} />
-                <Validator
-                    class="name-editor"
-                    validatorProps={{ class: 'block-validator' }}
-                    component={TextField}
-                    outline
-                    value={value.name}
-                    onChange={e => onChange({ ...value, name: e.target.value })}
-                    validate={value => {
-                        if (!value) {
-                            throw { error: locale.create.nameRequired };
-                        }
-                    }} />
+                <Field>
+                    <TextField
+                        required
+                        class="name-editor"
+                        outline
+                        value={value.name}
+                        onChange={e => onChange({ ...value, name: e.target.value })} />
+                </Field>
                 <WizardSection title={locale.fields.description} />
-                <Validator
-                    class="name-editor"
-                    validatorProps={{ class: 'block-validator' }}
-                    component={TextField}
-                    outline
-                    value={value.description}
-                    onChange={e => onChange({ ...value, description: e.target.value || null })}
-                    validate={() => {}} />
+                <Field>
+                    <TextField
+                        class="name-editor"
+                        outline
+                        value={value.description}
+                        onChange={e => onChange({ ...value, description: e.target.value || null })} />
+                </Field>
                 {hasTejo && hasUea ? (
                     <OrgPicker
                         value={value.org}
@@ -211,18 +187,12 @@ const generalPage = (isTemplate) => ({
         return (
             <WizardPage next={next}>
                 <WizardSection title={locale.fields.name} />
-                <Validator
+                <TextField
+                    required
                     class="name-editor"
-                    validatorProps={{ class: 'block-validator' }}
-                    component={TextField}
                     outline
                     value={value.name}
-                    onChange={e => onChange({ ...value, name: e.target.value })}
-                    validate={value => {
-                        if (!value) {
-                            throw { error: locale.create.nameRequired };
-                        }
-                    }} />
+                    onChange={e => onChange({ ...value, name: e.target.value })} />
                 {hasTejo && hasUea && !isTemplate ? (
                     <OrgPicker
                         value={value.org}
@@ -436,7 +406,7 @@ export default function makeCreateTask (isTemplate) {
                     </AutosizingPageView>
                     {this.state.error ? (
                         <div class="error-message-container">
-                            {'' + this.state.error}
+                            <DisplayError error={this.state.error} />
                         </div>
                     ) : null}
                 </DialogSheet>

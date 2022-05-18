@@ -34,7 +34,7 @@ const DETAIL_FIELDS = {
     },
 };
 
-export default connectPerms(class VoteDetailpage extends Page {
+export default connectPerms(class VoteDetailPage extends Page {
     static contextType = coreContext;
 
     state = {
@@ -50,11 +50,11 @@ export default connectPerms(class VoteDetailpage extends Page {
 
     #commitTask = null;
     onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return;
+        if (!this.props.editing || this.#commitTask) return Promise.resolve();
         if (!changedFields.length) {
             // nothing changed, so we can just pop the editing state
             this.props.editing.pop(true);
-            return;
+            return Promise.resolve();
         }
 
         return new Promise(resolve => {
