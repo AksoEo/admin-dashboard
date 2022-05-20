@@ -1047,6 +1047,14 @@ export const spec = [
 
 /*
 Missing permissions:
+newsletters:
+    <org>:
+        create
+        read
+        update
+        delete
+        send
+
 magazines:
     snapshots:
         create: <org>
