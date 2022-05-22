@@ -437,13 +437,13 @@ const PAGE_CHANGE_COOLDOWN = 400; // ms
 function ListHeader ({ fields, selectedFields, setFieldSorting, locale, selection }) {
     const style = lineLayout(fields, selectedFields, selection);
 
-    const cells = selectedFields.map(({ id, sorting }) => {
+    const cells = selectedFields.map(({ id, sorting, transient }) => {
         const sortable = fields[id].sortable && setFieldSorting;
 
         return (
             <div
                 key={id}
-                class={'list-header-cell' + (sortable ? ' is-sortable' : '')}
+                class={'list-header-cell' + (sortable ? ' is-sortable' : '') + (transient ? ' is-transient' : '')}
                 onClick={() => {
                     if (!sortable) return;
                     const newSorting = sorting === 'asc' ? 'desc' : sorting === 'desc' ? 'none' : 'asc';

@@ -47,6 +47,7 @@ const taskViews = {
     intermediaries: lazyPath(() => import(/* webpackChunkName: "intermediaries-tasks" */ './features/pages/intermediaries/intermediaries/tasks')),
     memberships: lazyPath(() => import(/* webpackChunkName: "memberships-tasks" */ './features/pages/memberships/tasks')),
     magazines: lazyPath(() => import(/* webpackChunkName: "magazines-tasks" */ './features/pages/magazines/tasks')),
+    newsletters: lazyPath(() => import(/* webpackChunkName: "newsletters-tasks" */ './features/pages/newsletters/tasks')),
     notifTemplates: lazyPath(() => import(/* webpackChunkName: "notif-templates-tasks" */ './features/pages/notif-templates/tasks')),
     roles: lazyPath(() => import(/* webpackChunkName: "roles-tasks" */ './features/pages/roles/tasks')),
     payments: lazyPath(() => import(/* webpackChunkName: "payments-tasks" */ './features/pages/payments/tasks')),

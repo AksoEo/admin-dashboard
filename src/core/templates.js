@@ -21,6 +21,7 @@ export function crudList ({
             fields: defaultFields,
             order: fieldsToOrder(fields),
         };
+        const transientFields = [];
         if (search && search.query) {
             const transformedQuery = util.transformSearch(search.query);
             if (transformedQuery.length < 3) {
@@ -30,6 +31,7 @@ export function crudList ({
                 throw { code: 'invalid-search-query', message: 'invalid search query' };
             }
             apiOptions.search = { cols: [search.field], str: transformedQuery };
+            if (defaultFields.includes(search.field)) transientFields.push(search.field);
         }
 
         const apiFilter = filterDefs ? filtersToAPI(filterDefs, filters) : null;
@@ -43,9 +45,11 @@ export function crudList ({
             const existing = store.get(storePath(options, item));
             store.insert(storePath(options, item), deepMerge(existing, item));
         }
+
         return {
             items: res.body.map(x => x.id),
             total: +res.res.headers.get('x-total-items'),
+            transientFields,
             stats: { time: res.resTime, filtered: false },
         };
     };

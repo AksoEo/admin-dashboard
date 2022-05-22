@@ -37,7 +37,6 @@ export const FIELDS = {
             if (editing) {
                 return <TextField
                     class="magazine-field-name"
-                    component={TextField}
                     outline
                     label={slot === 'create' ? locale.fields.name : null}
                     required

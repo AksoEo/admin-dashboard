@@ -39,6 +39,7 @@ export * from './delegations';
 export * from './intermediaries';
 export * from './memberships';
 export * from './magazines';
+export * from './newsletters';
 export * from './notif-templates';
 export * from './roles';
 export * from './payments';

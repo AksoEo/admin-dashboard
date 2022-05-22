@@ -401,8 +401,26 @@ export default [
             {
                 id: 'newsletters',
                 icon: MarkunreadMailboxIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "newsletters" */ './newsletters')),
                 path: 'bultenoj',
-                hasPerm: () => true,
+                hasPerm: perms => perms.hasPerm('newsletters.uea.read') || perms.hasPerm('newsletters.tejo.read'),
+                paths: [
+                    {
+                        match: /^(\d+)$/,
+                        matchKey: 'newsletter',
+                        component: elazy(() =>
+                            import(/* webpackChunkName: "newsletters" */ './newsletters/detail')),
+                        type: 'stack',
+                        paths: [
+                            {
+                                path: 'redakti',
+                                type: 'state',
+                                state: 'editing',
+                            },
+                        ],
+                    },
+                ],
             },
             /* { // future features
                 id: 'reports',
