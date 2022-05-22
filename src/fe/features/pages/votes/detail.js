@@ -146,7 +146,7 @@ const makeHeader = (owner) => function Header ({ item, editing }) {
                 {item.name}
             </h1>
             {item && item.state.hasResults ? (
-                <LinkButton target={`/vochdonado/${item.id}/rezultoj`}>
+                <LinkButton target={`/vochdonoj/${item.id}/rezultoj`}>
                     {locale.results.link}
                 </LinkButton>
             ) : null}

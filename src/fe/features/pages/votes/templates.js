@@ -111,7 +111,7 @@ export default connectPerms(class VoteTemplates extends Page {
                     updateView={['votes/sigVoteTemplates']}
                     parameters={parameters}
                     fields={fields}
-                    onGetItemLink={id => `/vochdonado/shablonoj/${id}`}
+                    onGetItemLink={id => `/vochdonoj/shablonoj/${id}`}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}
                     locale={locale.fields} />

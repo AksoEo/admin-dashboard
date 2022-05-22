@@ -354,9 +354,9 @@ export default function makeCreateTask (isTemplate) {
                         } : this.state.vote);
                         task.runOnce().then(id => {
                             if (isTemplate) {
-                                this.context.navigate(`/vochdonado/shablonoj/${id}`);
+                                this.context.navigate(`/vochdonoj/shablonoj/${id}`);
                             } else {
-                                this.context.navigate(`/vochdonado/${id}`);
+                                this.context.navigate(`/vochdonoj/${id}`);
                             }
                         }).catch(error => {
                             this.setState({ error });

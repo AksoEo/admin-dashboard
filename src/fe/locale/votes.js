@@ -1,7 +1,7 @@
 export const votes = {
-    title: 'Voĉdonadoj',
+    title: 'Voĉdonoj',
     templatesTitle: 'Ŝablonoj',
-    detailTitle: 'Voĉdonado',
+    detailTitle: 'Voĉdono',
     templateDetailTitle: 'Ŝablono',
     templates: {
         menuItem: 'Ŝablonoj',
@@ -66,8 +66,8 @@ export const votes = {
     },
     state: {
         hasNotStarted: 'Ankoraŭ ne komenciĝis',
-        isActive: 'Voĉdonado malfermita',
-        hasEnded: 'Voĉdonado finiĝis,\natendas rezultojn',
+        isActive: 'Voĉdono malfermita',
+        hasEnded: 'Voĉdono finiĝis,\natendas rezultojn',
         hasResults: 'Rezultoj pretas',
         hasResultsTiebreaker: 'Rezultoj pretas,\nuzis egalecrompanton',
     },
@@ -177,6 +177,6 @@ export const votes = {
         description: 'Ĉu vi certas, ke vi volas forigi la voĉdonon? Ne eblas malfari tiun ĉi agon.',
         templateDescription: 'Ĉu vi certas, ke vi volas forigi la ŝablonon? Ne eblas malfari tiun ĉi agon.',
     },
-    csvFilename: 'vochdonadoj',
+    csvFilename: 'vochdonoj',
 };
 

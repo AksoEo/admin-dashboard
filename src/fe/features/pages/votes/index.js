@@ -140,7 +140,7 @@ export default connect('votes/filters')(data => ({
                     updateView={['votes/sigVotes']}
                     parameters={parameters}
                     fields={FIELDS}
-                    onGetItemLink={id => `/vochdonado/${id}`}
+                    onGetItemLink={id => `/vochdonoj/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                     onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}

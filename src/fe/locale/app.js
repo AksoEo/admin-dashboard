@@ -34,7 +34,7 @@ export const pages = {
     email: 'Amasmesaĝoj',
     magazines: 'Revuoj',
     congresses: 'Kongresoj',
-    votes: 'Voĉdonado',
+    votes: 'Voĉdonoj',
     newsletters: 'Bultenoj',
     payments: 'AKSO-Pago',
     'payment-intents': 'Pagoj',
