@@ -7,7 +7,7 @@ import Select from '../../../components/controls/select';
 import ChangedFields from '../../../components/tasks/changed-fields';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import { currencyAmount } from '../../../components/data';
-import { Validator, Field } from '../../../components/form';
+import { Field } from '../../../components/form';
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import {
@@ -33,16 +33,16 @@ export default {
 
         if (hasTejo && hasUea) {
             orgSelector = (
-                <Validator
-                    component={Segmented}
-                    value={task.parameters.org}
-                    validate={value => {
-                        if (!value) throw {};
-                    }}
-                    selected={task.parameters.org}
-                    onSelect={org => task.update({ org })}>
-                    {Object.entries(orgLocale.create.orgs).map(([k, v]) => ({ id: k, label: v }))}
-                </Validator>
+                <Field validate={() => {
+                    if (!task.parameters.org) return dataLocale.requiredField;
+                }}>
+                    <Segmented
+                        value={task.parameters.org}
+                        selected={task.parameters.org}
+                        onSelect={org => task.update({ org })}>
+                        {Object.entries(orgLocale.create.orgs).map(([k, v]) => ({ id: k, label: v }))}
+                    </Segmented>
+                </Field>
             );
         } else if (!task.parameters.org) {
             task.update({ org: hasTejo ? 'tejo' : 'uea' });
@@ -61,11 +61,8 @@ export default {
                         })}>
                         {orgSelector}
                         <Field>
-                            <Validator
-                                component={TextField}
-                                validate={value => {
-                                    if (!value) throw { error: orgLocale.update.nameRequired };
-                                }}
+                            <TextField
+                                required
                                 label={orgLocale.fields.name}
                                 value={task.parameters.name || ''}
                                 onChange={e => task.update({ name: e.target.value })} />
@@ -97,11 +94,8 @@ export default {
                             routerContext.navigate(`/aksopago/organizoj/${org}/aldonebloj/${id}`);
                         })}>
                         <Field>
-                            <Validator
-                                component={TextField}
-                                validate={value => {
-                                    if (!value) throw { error: addonLocale.update.nameRequired };
-                                }}
+                            <TextField
+                                required
                                 label={addonLocale.fields.name}
                                 value={task.parameters.name || ''}
                                 onChange={e => task.update({ name: e.target.value })} />
@@ -129,7 +123,10 @@ export default {
             const Component = field.component;
 
             fields.push(
-                <Field key={f}>
+                <Field key={f} validate={() => field.validate && field.validate({
+                    value: item[f],
+                    item,
+                })}>
                     {field.wantsCreationLabel ? (
                         <label class="creation-label">
                             {methodLocale.fields[f]}
@@ -189,11 +186,7 @@ export default {
 
         fields.push(
             <Field key="customer.name">
-                <Validator
-                    component={TextField}
-                    validate={value => {
-                        if (!value) throw { error: dataLocale.requiredField };
-                    }}
+                <TextField
                     outline
                     required
                     label={intentLocale.fields.customerName}
@@ -203,13 +196,9 @@ export default {
         );
         fields.push(
             <Field key="customer.email">
-                <Validator
-                    component={TextField}
+                <TextField
                     type="email"
                     required
-                    validate={value => {
-                        if (!value) throw { error: dataLocale.requiredField };
-                    }}
                     outline
                     label={intentLocale.fields.customerEmail}
                     value={customer.email}
@@ -535,16 +524,16 @@ export default {
                     {intentLocale.actions.markRefunded.description}
                 </div>
 
-                <Field class="input-container">
-                    <Validator
+                <Field class="input-container" validate={() => {
+                    const value = task.parameters.amount;
+                    if (value < 0) return intentLocale.actions.markRefunded.lowerBound;
+                    if (value > task.options._max) {
+                        return intentLocale.actions.markRefunded.upperBound;
+                    }
+                }}>
+                    <currencyAmount.editor
                         component={currencyAmount.editor}
                         outline
-                        validate={value => {
-                            if (value < 0) throw { error: intentLocale.actions.markRefunded.lowerBound };
-                            if (value > task.options._max) {
-                                throw { error: intentLocale.actions.markRefunded.upperBound };
-                            }
-                        }}
                         label={intentLocale.actions.markRefunded.amount}
                         value={task.parameters.amount}
                         onChange={amount => task.update({ amount })}
@@ -631,12 +620,9 @@ export default {
                 run={() => task.runOnce()}>
                 {intentLocale.resendReceipt.description}
                 <Field class="input-container">
-                    <Validator
+                    <TextField
                         outline
-                        component={TextField}
-                        validate={value => {
-                            if (!value) throw { error: intentLocale.resendReceipt.noEmail };
-                        }}
+                        required
                         label={intentLocale.resendReceipt.email}
                         value={task.parameters.email || ''}
                         onChange={e => task.update(e.target.value || null)} />

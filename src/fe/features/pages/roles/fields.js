@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import { Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
-import { Validator } from '../../../components/form';
 import TextArea from '../../../components/controls/text-area';
 import { roles as locale } from '../../../locale';
 
@@ -11,13 +10,10 @@ export const FIELDS = {
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (editing) {
-                return <Validator
-                    component={TextField}
+                return <TextField
+                    required
                     outline={slot === 'create'}
                     label={slot === 'create' ? locale.fields.name : null}
-                    validate={value => {
-                        if (!value) throw { error: locale.update.nameRequired };
-                    }}
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }

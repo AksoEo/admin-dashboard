@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { TextField } from 'yamdl';
 import SavePerms from '../perms-editor/save';
 import { adminGroups as locale } from '../../../../locale';
-import { Field, Validator } from '../../../../components/form';
+import { Field } from '../../../../components/form';
 import TaskDialog from '../../../../components/tasks/task-dialog';
 import ChangedFields from '../../../../components/tasks/changed-fields';
 import { routerContext } from '../../../../router';
@@ -21,24 +21,19 @@ export default {
                             routerContext.navigate(`/administrado/grupoj/${id}`);
                         })}>
                         <Field>
-                            <Validator
+                            <TextField
+                                required
                                 outline
-                                component={TextField}
                                 label={locale.fields.name}
                                 value={task.parameters.name || ''}
-                                onChange={e => task.update({ name: e.target.value })}
-                                validate={name => {
-                                    if (!name) throw { error: locale.nameRequired };
-                                }} />
+                                onChange={e => task.update({ name: e.target.value })} />
                         </Field>
                         <Field>
-                            <Validator
+                            <TextField
                                 outline
-                                component={TextField}
                                 label={locale.fields.description}
                                 value={task.parameters.description || ''}
-                                onChange={e => task.update({ description: e.target.value })}
-                                validate={() => {}} />
+                                onChange={e => task.update({ description: e.target.value })} />
                         </Field>
                     </TaskDialog>
                 )}

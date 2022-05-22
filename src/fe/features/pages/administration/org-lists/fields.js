@@ -6,7 +6,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
-import { Form, Validator } from '../../../../components/form';
+import { Form, Field, ValidatedTextField } from '../../../../components/form';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { orgLists as locale } from '../../../../locale';
 import { Link } from '../../../../router';
@@ -147,21 +147,22 @@ function AddTagDialogContents ({ onAdd, taken }) {
     const [tag, setTag] = useState('');
     return (
         <Form onSubmit={() => onAdd(tag)}>
-            <Validator
-                component={TextField}
-                outline
-                validatorProps={{ class: 'label-name-input-container' }}
-                class="label-name-input"
-                label={locale.fields.listAddTag.label}
-                maxLength={48}
-                value={tag}
-                validate={value => {
-                    if (!value) throw { error: locale.fields.listAddTag.labelEmpty };
-                    if (taken.includes(value)) {
-                        throw { error: locale.fields.listAddTag.labelTaken };
-                    }
-                }}
-                onChange={e => setTag(e.target.value)} />
+            <Field class="label-name-input-container">
+                <ValidatedTextField
+                    component={TextField}
+                    outline
+                    class="label-name-input"
+                    label={locale.fields.listAddTag.label}
+                    maxLength={48}
+                    value={tag}
+                    validate={value => {
+                        if (!value) return locale.fields.listAddTag.labelEmpty;
+                        if (taken.includes(value)) {
+                            return locale.fields.listAddTag.labelTaken;
+                        }
+                    }}
+                    onChange={e => setTag(e.target.value)} />
+            </Field>
             <div class="org-list-add-tag-footer">
                 <Button raised type="submit">
                     {locale.fields.listAddTag.confirm}

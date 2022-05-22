@@ -1,8 +1,6 @@
 import { h } from 'preact';
-import { Validator } from '../../../../components/form';
 import { TextField } from 'yamdl';
 import OrgIcon from '../../../../components/org-icon';
-import { paymentOrgs as locale } from '../../../../locale';
 
 export const FIELDS = {
     org: {
@@ -22,11 +20,8 @@ export const FIELDS = {
         slot: 'title',
         component ({ value, editing, onChange }) {
             if (editing) {
-                return <Validator
-                    component={TextField}
-                    validate={value => {
-                        if (!value) throw { error: locale.update.nameRequired };
-                    }}
+                return <TextField
+                    required
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }

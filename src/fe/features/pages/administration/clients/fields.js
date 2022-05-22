@@ -2,7 +2,6 @@ import { h } from 'preact';
 import { Button, TextField } from 'yamdl';
 import { CopyIcon } from '../../../../components/icons';
 import { apiKey, email } from '../../../../components/data';
-import { Validator } from '../../../../components/form';
 import { clients as locale } from '../../../../locale';
 
 export const FIELDS = {
@@ -12,11 +11,8 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return (
-                    <Validator
-                        component={TextField}
-                        validate={value => {
-                            if (!value) throw { error: locale.nameRequired };
-                        }}
+                    <TextField
+                        required
                         outline
                         label={slot === 'create' ? locale.fields.name : null}
                         value={value}
@@ -61,11 +57,8 @@ export const FIELDS = {
         component ({ value, onChange, editing, slot }) {
             if (!editing) return value;
             return (
-                <Validator
-                    component={TextField}
-                    validate={value => {
-                        if (!value) throw { error: locale.ownerNameRequired };
-                    }}
+                <TextField
+                    required
                     outline
                     label={slot === 'create' ? locale.fields.ownerName : null}
                     value={value}
@@ -82,11 +75,8 @@ export const FIELDS = {
                 return <email.inlineRenderer value={value} />;
             }
             return (
-                <Validator
-                    component={TextField}
-                    validate={value => {
-                        if (!value) throw { error: locale.ownerEmailRequired };
-                    }}
+                <TextField
+                    required
                     outline
                     label={slot === 'create' ? locale.fields.ownerEmail : null}
                     type="email"

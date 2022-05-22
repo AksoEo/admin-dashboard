@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
 import TaskDialog from '../../../components/tasks/task-dialog';
-import { Field, Validator } from '../../../components/form';
+import { Field } from '../../../components/form';
 import { lists as locale } from '../../../locale';
 import { routerContext } from '../../../router';
 import './tasks.less';
@@ -24,24 +24,19 @@ export default {
                             {locale.create.warning}
                         </p>
                         <Field>
-                            <Validator
+                            <TextField
                                 outline
-                                component={TextField}
+                                required
                                 label={locale.fields.name}
                                 value={task.parameters.name || ''}
-                                onChange={e => task.update({ name: e.target.value })}
-                                validate={name => {
-                                    if (!name) throw { error: locale.nameRequired };
-                                }} />
+                                onChange={e => task.update({ name: e.target.value })} />
                         </Field>
                         <Field>
-                            <Validator
+                            <TextField
                                 outline
-                                component={TextField}
                                 label={locale.fields.description}
                                 value={task.parameters.description || ''}
-                                onChange={e => task.update({ description: e.target.value || null })}
-                                validate={() => {}} />
+                                onChange={e => task.update({ description: e.target.value || null })} />
                         </Field>
                     </TaskDialog>
                 )}

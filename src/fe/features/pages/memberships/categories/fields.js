@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import { Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
-import { Validator } from '../../../../components/form';
 import LimitedTextField from '../../../../components/controls/limited-text-field';
 import MdField from '../../../../components/controls/md-field';
 import { membershipCategories as locale } from '../../../../locale';
@@ -14,14 +13,11 @@ export const FIELDS = {
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (editing) {
-                return <Validator
-                    component={LimitedTextField}
+                return <LimitedTextField
+                    required
                     maxLength={15}
                     outline={slot === 'create'}
                     label={slot === 'create' ? locale.fields.nameAbbrev : null}
-                    validate={value => {
-                        if (!value) throw { error: locale.update.nameRequired };
-                    }}
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }
@@ -34,14 +30,11 @@ export const FIELDS = {
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
             if (editing) {
-                return <Validator
-                    component={LimitedTextField}
+                return <LimitedTextField
+                    required
                     maxLength={50}
                     outline={slot === 'create'}
                     label={slot === 'create' ? locale.fields.name : null}
-                    validate={value => {
-                        if (!value) throw { error: locale.update.nameRequired };
-                    }}
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }

@@ -3,13 +3,12 @@ import { PureComponent } from 'preact/compat';
 import { Checkbox, TextField } from 'yamdl';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 import CheckIcon from '@material-ui/icons/Check';
-import { Validator } from '../../../../../components/form';
 import Segmented from '../../../../../components/controls/segmented';
 import Select from '../../../../../components/controls/select';
 import { StripeIcon } from '../../../../../components/icons';
 import MdField from '../../../../../components/controls/md-field';
 import { currencyAmount, timespan } from '../../../../../components/data';
-import { paymentMethods as locale, currencies } from '../../../../../locale';
+import { paymentMethods as locale, currencies, data as dataLocale } from '../../../../../locale';
 import PricesEditor from './prices';
 import './fields.less';
 
@@ -61,12 +60,9 @@ export const FIELDS = {
         shouldHide: (_, editing) => !editing,
         component ({ value, editing, onChange, isCreation, slot }) {
             if (editing) {
-                return <Validator
-                    component={TextField}
+                return <TextField
+                    required
                     label={isCreation ? locale.fields.name : null}
-                    validate={value => {
-                        if (!value) throw { error: locale.update.nameRequired };
-                    }}
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }
@@ -176,6 +172,9 @@ export const FIELDS = {
 
             // FIXME: prettify
             return value && value.join(', ');
+        },
+        validate: ({ value }) => {
+            if (!value?.length) return dataLocale.requiredField;
         },
     },
     prices: {

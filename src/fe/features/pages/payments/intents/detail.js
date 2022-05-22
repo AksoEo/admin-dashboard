@@ -18,7 +18,7 @@ import ProfilePicture from '../../../../components/profile-picture';
 import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import MdField from '../../../../components/controls/md-field';
-import { Field, Validator } from '../../../../components/form';
+import { Field } from '../../../../components/form';
 import { currencyAmount, email, timestamp } from '../../../../components/data';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { FIELDS as METHOD_FIELDS } from '../orgs/methods/fields';
@@ -28,7 +28,6 @@ import { connect, coreContext } from '../../../../core/connection';
 import { IntermediaryEditor } from './fields';
 import {
     paymentIntents as locale,
-    data as dataLocale,
     paymentMethods as methodsLocale,
 } from '../../../../locale';
 import { Link, LinkButton } from '../../../../router';
@@ -500,24 +499,18 @@ function Customer ({ item, editing, onItemChange }) {
 
         customerName = (
             <Field>
-                <Validator
+                <TextField
                     label={locale.fields.customerName}
-                    component={TextField}
-                    validate={value => {
-                        if (!value) throw { error: dataLocale.requiredField };
-                    }}
+                    required
                     value={item.customer.name}
                     onChange={e => onCustomerChange({ ...item.customer, name: e.target.value })} />
             </Field>
         );
         customerEmail = (
-            <Validator
+            <TextField
                 label={locale.fields.customerEmail}
-                component={TextField}
                 type="email"
-                validate={value => {
-                    if (!value) throw { error: dataLocale.requiredField };
-                }}
+                required
                 value={item.customer.email}
                 onChange={e => onCustomerChange({ ...item.customer, email: e.target.value })} />
         );

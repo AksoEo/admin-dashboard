@@ -2,9 +2,9 @@ import { h } from 'preact';
 import { TextField } from 'yamdl';
 import TaskDialog from '../../../../components/tasks/task-dialog';
 import ChangedFields from '../../../../components/tasks/changed-fields';
-import { Validator, Field } from '../../../../components/form';
+import { ValidatedTextField, Field } from '../../../../components/form';
 import { routerContext } from '../../../../router';
-import { countries as locale, countryGroups as groupsLocale, data as dataLocale } from '../../../../locale';
+import { countries as locale, countryGroups as groupsLocale } from '../../../../locale';
 
 export default {
     update ({ open, task }) {
@@ -43,11 +43,10 @@ export default {
                             routerContext.navigate(`/administrado/landaroj/${task.parameters.code}`);
                         })}>
                         <Field>
-                            <Validator
-                                component={TextField}
+                            <ValidatedTextField
                                 validate={value => {
                                     if (!value.match(/^x[\w]{2}$/)) {
-                                        throw { error: groupsLocale.create.invalidCode };
+                                        return groupsLocale.create.invalidCode;
                                     }
                                 }}
                                 label={groupsLocale.fields.code}
@@ -55,11 +54,8 @@ export default {
                                 onChange={e => task.update({ code: fixCodeValue(e.target.value) })} />
                         </Field>
                         <Field>
-                            <Validator
-                                component={TextField}
-                                validate={value => {
-                                    if (!value) throw { error: dataLocale.requiredField };
-                                }}
+                            <TextField
+                                required
                                 label={groupsLocale.fields.name}
                                 value={task.parameters.name || ''}
                                 onChange={e => task.update({ name: e.target.value })} />

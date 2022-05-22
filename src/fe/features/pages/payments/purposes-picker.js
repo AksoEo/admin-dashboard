@@ -5,7 +5,7 @@ import { Button, Checkbox, Dialog, MenuIcon, TextField } from 'yamdl';
 import { base32 } from 'rfc4648';
 import Select from '../../../components/controls/select';
 import Segmented from '../../../components/controls/segmented';
-import { Form, Validator, Field } from '../../../components/form';
+import { Form, ValidatedTextField, Field } from '../../../components/form';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import StaticOverviewList from '../../../components/lists/overview-list-static';
 import OverviewListItem from '../../../components/lists/overview-list-item';
@@ -14,7 +14,6 @@ import { currencyAmount } from '../../../components/data';
 import {
     paymentIntents as locale,
     paymentAddons as addonLocale,
-    data as dataLocale,
     currencies,
 } from '../../../locale';
 import { FIELDS as ADDON_FIELDS } from './orgs/addons/fields';
@@ -321,16 +320,11 @@ class AddPurposeDialog extends PureComponent {
 
         const nameField = () => (
             <Field>
-                <Validator
-                    component={TextField}
+                <TextField
+                    required
                     label={locale.purposesPicker.manual.title}
                     outline
                     value={manualTitle}
-                    validate={value => {
-                        if (!value) {
-                            throw { error: dataLocale.requiredField };
-                        }
-                    }}
                     onChange={e => this.setState({ manualTitle: e.target.value })}/>
             </Field>
         );
@@ -396,21 +390,18 @@ class AddPurposeDialog extends PureComponent {
                     {nameField()}
                     {descField()}
                     <Field>
-                        <Validator
+                        <ValidatedTextField
                             outline
                             label={locale.purposesPicker.dataId}
-                            component={TextField}
                             validate={value => {
                                 if (this.state.triggerType === 'congress_registration') {
                                     // 12 bytes = 24 hex chars
-                                    if (!value.match(/[0-9a-f]{24}/i)) throw {
-                                        error: locale.purposesPicker.invalidDataId,
-                                    };
+                                    if (!value.match(/[0-9a-f]{24}/i)) return locale.purposesPicker.invalidDataId;
                                 } else if (this.state.triggerType === 'registration_entry') {
                                     try {
                                         base32.parse(value);
                                     } catch {
-                                        throw { error: locale.purposesPicker.invalidDataId };
+                                        return locale.purposesPicker.invalidDataId;
                                     }
                                 }
                             }}
