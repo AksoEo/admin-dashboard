@@ -418,6 +418,21 @@ export default [
                                 type: 'state',
                                 state: 'editing',
                             },
+                            {
+                                path: 'malabonoj',
+                                component: elazy(() =>
+                                    import(/* webpackChunkName: "newsletters" */ './newsletters/unsubscriptions')),
+                                type: 'stack',
+                                paths: [
+                                    {
+                                        match: /^(\d+)$/,
+                                        matchKey: 'unsubscription',
+                                        component: elazy(() =>
+                                            import(/* webpackChunkName: "newsletters" */ './newsletters/unsubscriptions/detail')),
+                                        type: 'stack',
+                                    },
+                                ],
+                            },
                         ],
                     },
                 ],

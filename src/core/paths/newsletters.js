@@ -1,10 +1,9 @@
 import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, simpleDataView } from '../templates';
 import { createStoreObserver } from '../view';
-import asyncClient from '../client';
-import * as store from '../store';
 
 const NEWSLETTERS = 'newsletters';
 const SIG_NEWSLETTERS = '!newsletters';
+const NEWSLETTER_UNSUBS = 'newsletter_unsubs';
 
 export const tasks = {
     list: crudList({
@@ -46,6 +45,29 @@ export const tasks = {
         storePath: ({ id }) => [NEWSLETTERS, id],
         signalPath: () => [NEWSLETTERS, SIG_NEWSLETTERS],
     }),
+
+    listUnsubscriptions: crudList({
+        apiPath: ({ newsletter }) => `/newsletters/${newsletter}/unsubscriptions`,
+        fields: [
+            'id',
+            'reason',
+            'description',
+            'time',
+            'subscriberCount',
+        ],
+        storePath: ({ newsletter }, item) => [NEWSLETTER_UNSUBS, newsletter, item.id],
+    }),
+    unsubscription: crudGet({
+        apiPath: ({ newsletter, id }) => `/newsletters/${newsletter}/unsubscriptions/${id}`,
+        fields: [
+            'id',
+            'reason',
+            'description',
+            'time',
+            'subscriberCount',
+        ],
+        storePath: ({ newsletter, id }) => [NEWSLETTER_UNSUBS, newsletter, id],
+    }),
 };
 
 export const views = {
@@ -55,4 +77,10 @@ export const views = {
         canBeLazy: true,
     }),
     sigNewsletters: createStoreObserver([NEWSLETTERS, SIG_NEWSLETTERS]),
+
+    unsubscription: simpleDataView({
+        storePath: ({ id }) => [NEWSLETTER_UNSUBS, id],
+        get: ({ id }) => tasks.unsubscription({ id }),
+        canBeLazy: true,
+    }),
 };

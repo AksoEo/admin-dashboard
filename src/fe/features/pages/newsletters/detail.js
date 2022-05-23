@@ -3,7 +3,7 @@ import { Fragment } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailPage from '../../../components/detail/detail-page';
 import DetailView from '../../../components/detail/detail';
-import { newsletters as locale } from '../../../locale';
+import { newsletters as locale, newsletterUnsubs as unsubsLocale } from '../../../locale';
 import { FIELDS } from './fields';
 
 export default class Newsletter extends DetailPage {
@@ -26,6 +26,11 @@ export default class Newsletter extends DetailPage {
 
     renderActions ({ perms }, { org }) {
         const actions = [];
+
+        actions.push({
+            label: unsubsLocale.title,
+            action: () => this.props.push('malabonoj'),
+        });
 
         if (perms.hasPerm(`newsletters.${org}.update`)) {
             actions.push({
