@@ -30,6 +30,13 @@ export const newsletters = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi bultenon? Ne eblas malfari tiun ĉi agon.',
     },
+    send: {
+        button: '[[Send a newsletter]]',
+        description: '[[To send a newsletter, please go to notif templates and create a notif template, maybe by copying the appropriate notif template^2 (i imagine youll have templates for this...). Then come back here to send it.]]',
+        pick: '[[Select notif template]]',
+        pickSearchPlaceholder: '[[Search names…]]',
+        send: '[[Send newsletter]]',
+    },
 };
 
 export const newsletterUnsubs = {

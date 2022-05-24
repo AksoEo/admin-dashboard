@@ -10,7 +10,7 @@ import './notif-templates.less';
 const NotifTemplatePicker = lazy(() => import('./notif-template-picker'));
 
 export default class NotifTemplates extends PureComponent {
-    render ({ options, open, onClose, lvIsCursed }) {
+    render ({ options, open, onClose, lvIsCursed, isNewsletter }) {
         return (
             <CardStackItem
                 open={open}
@@ -27,7 +27,8 @@ export default class NotifTemplates extends PureComponent {
                 <Contents
                     options={options}
                     onClose={onClose}
-                    lvIsCursed={lvIsCursed} />
+                    lvIsCursed={lvIsCursed}
+                    isNewsletter={isNewsletter} />
             </CardStackItem>
         );
     }
@@ -37,7 +38,7 @@ const Contents = connectPerms(class Contents extends PureComponent {
     state = {
         template: null,
         templateOrg: null,
-        deleteOnComplete: false,
+        deleteOnComplete: this.props.isNewsletter,
     };
 
     static contextType = coreContext;
@@ -52,7 +53,7 @@ const Contents = connectPerms(class Contents extends PureComponent {
         });
     };
 
-    render ({ perms, lvIsCursed }, { template, templateOrg }) {
+    render ({ perms, lvIsCursed, isNewsletter }, { template, templateOrg }) {
         const contents = [];
         if (template && templateOrg && perms.hasPerm(`notif_templates.delete.${templateOrg}`)) {
             const checkboxId = Math.random().toString(36);
@@ -88,7 +89,11 @@ const Contents = connectPerms(class Contents extends PureComponent {
                     {locale.notifTemplates.cursedNotice}
                 </div> : null}
                 <p class="templates-description">
-                    {locale.notifTemplates.description}
+                    {isNewsletter ? (
+                        locale.notifTemplates.descriptionNewsletter
+                    ) : (
+                        locale.notifTemplates.description
+                    )}
                 </p>
                 <Suspense fallback={(
                     <div class="notif-template-picker-loading">

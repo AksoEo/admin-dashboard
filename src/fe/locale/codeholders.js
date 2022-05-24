@@ -377,6 +377,7 @@ export const codeholders = {
     notifTemplates: {
         cursedNotice: 'Oraj rezultoj ne ricevos mesaĝon.',
         description: 'Mesaĝoj estos senditaj al ĉiuj membroj laŭ via nuna filtrilo.',
+        descriptionNewsletter: 'Mesaĝoj estos senditaj al ĉiuj membroj [[who are subscribed to the newsletter]].',
         menuItem: 'Sendi amasmesaĝon',
         title: 'Sendi amasmesaĝon',
         empty: 'Estas neniuj ŝablonoj kun la celo “membro”',
