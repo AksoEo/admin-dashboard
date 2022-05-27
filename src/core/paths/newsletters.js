@@ -1,3 +1,4 @@
+import asyncClient from '../client';
 import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, simpleDataView } from '../templates';
 import { createStoreObserver } from '../view';
 
@@ -68,6 +69,14 @@ export const tasks = {
         ],
         storePath: ({ newsletter, id }) => [NEWSLETTER_UNSUBS, newsletter, id],
     }),
+
+    send: async ({ newsletter }, { template, deleteOnComplete }) => {
+        const client = await asyncClient;
+        await client.post(`/newsletters/${newsletter}/!send_notif_template`, {
+            notifTemplateId: template,
+            deleteTemplateOnComplete: deleteOnComplete,
+        }, {});
+    },
 };
 
 export const views = {

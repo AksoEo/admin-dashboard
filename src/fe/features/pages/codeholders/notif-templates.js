@@ -10,7 +10,7 @@ import './notif-templates.less';
 const NotifTemplatePicker = lazy(() => import('./notif-template-picker'));
 
 export default class NotifTemplates extends PureComponent {
-    render ({ options, open, onClose, lvIsCursed, isNewsletter }) {
+    render ({ options, open, onClose, lvIsCursed, isNewsletter, task }) {
         return (
             <CardStackItem
                 open={open}
@@ -25,6 +25,7 @@ export default class NotifTemplates extends PureComponent {
                         priority={9} />
                 }>
                 <Contents
+                    task={task}
                     options={options}
                     onClose={onClose}
                     lvIsCursed={lvIsCursed}
@@ -44,7 +45,9 @@ const Contents = connectPerms(class Contents extends PureComponent {
     static contextType = coreContext;
 
     onSubmit = () => {
-        const task = this.context.createTask('codeholders/sendNotifTemplate', this.props.options, {
+        let taskName = 'codeholders/sendNotifTemplate';
+        if (this.props.task) taskName = this.props.task;
+        const task = this.context.createTask(taskName, this.props.options, {
             template: this.state.template,
             deleteOnComplete: this.state.deleteOnComplete,
         });

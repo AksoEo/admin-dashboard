@@ -36,6 +36,12 @@ export const newsletters = {
         pick: '[[Select notif template]]',
         pickSearchPlaceholder: '[[Search names…]]',
         send: '[[Send newsletter]]',
+        task: {
+            title: '[[Send newsletter]]',
+            confirm: '[[Send]]',
+            description: '[[This will send the newsletter. Continue?]]',
+            descriptionDelete: '[[This will send the newsletter and delete the notif template. Continue?]]',
+        },
     },
 };
 

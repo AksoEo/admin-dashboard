@@ -77,15 +77,6 @@ export default class Newsletter extends DetailPage {
 
 function Footer ({ item }) {
     const [sending, setSending] = useState(false);
-    const options = {
-        jsonFilter: {
-            filter: {
-                $newsletterSubscriptions: {
-                    id: item.id,
-                },
-            },
-        },
-    };
 
     return (
         <div class="newsletter-send">
@@ -96,8 +87,9 @@ function Footer ({ item }) {
                 {locale.send.button}
             </Button>
             <NotifTemplates
+                task="newsletters/send"
                 isNewsletter
-                options={options}
+                options={{ newsletter: item.id }}
                 open={sending}
                 onClose={() => setSending(false)} />
         </div>
