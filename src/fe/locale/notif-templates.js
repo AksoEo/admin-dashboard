@@ -46,6 +46,7 @@ export const notifTemplates = {
     },
     intents: {
         codeholder: 'membro',
+        newsletter: '[[newsletter]]',
     },
     sendIntent: 'Sendi mesaĝon',
     preview: {

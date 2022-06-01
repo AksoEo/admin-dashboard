@@ -7,6 +7,7 @@ const STRING = 's';
 
 export function getFormVarsForIntent (intent) {
     if (intent === 'codeholder') return spec2Vars(CODEHOLDER_SPEC);
+    else if (intent === 'newsletter') return spec2Vars(CODEHOLDER_SPEC);
     return [];
 }
 
