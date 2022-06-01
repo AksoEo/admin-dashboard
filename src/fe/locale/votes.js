@@ -87,7 +87,7 @@ export const votes = {
         options: 'Opcioj',
 
         noMaxOptions: 'Bv. indiki la maksimuman kvanton de elekteblaj opcioj',
-        tieBreakerRequired: '[[Tie breaker required]]',
+        tieBreakerRequired: 'Necesas egalecrompanto',
     },
     inclusive: 'Inkluziva', // checkbox label
     options: {

@@ -70,8 +70,8 @@ export const index = {
         title: 'Asisto',
         description: 'Se vi spertas problemojn pri AKSO-Administranto, vi ĉiam povas sendi retmesaĝon al helpo@akso.org. Bonvolu indiki detale la problemon, eventuale aldonante ekranfotojn.',
         systemInfo: {
-            title: '[[System Information]]',
-            copy: '[[Copy]]',
+            title: 'Informoj pri via sistemo',
+            copy: 'Kopii',
         },
     },
     notices: {

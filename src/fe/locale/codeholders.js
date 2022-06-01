@@ -30,7 +30,7 @@ export const codeholders = {
             country: 'Lando',
             birthdate: 'Naskiĝtago',
             hasPassword: 'Kreis konton',
-            addressInvalid: '[[AddressInvalid]]',
+            addressInvalid: 'Poŝtadreso nevalida',
             membership: 'Membreckategorioj',
             roles: 'Roloj',
             isActiveMember: 'Aktiva membro iam en',
@@ -122,7 +122,7 @@ export const codeholders = {
         addressLatin: 'Adreso latinigita',
         addressCity: 'Urbo',
         addressCountryArea: 'Regiono',
-        addressInvalid: '[[AddressInvalid]]',
+        addressInvalid: 'Poŝtadreso nevalida',
         codeholderDisabledTitle: 'malŝaltita',
         codeholderDeadTitle: 'mortinta',
         notes: 'Notoj',
@@ -178,8 +178,8 @@ export const codeholders = {
     profilePictureHashSome: 'Havas bildon',
     profilePictureHashNone: 'Havas neniun bildon',
     addressInvalid: {
-        title: '[[Address was marked invalid]]',
-        description: '[[Meow meow meow meowm oewm oewmo emwfdjhgjrk eghsjk hgsj hetghjh gdfhjkg dfhjkdgfsjhkgdfjkgfd]]',
+        title: 'Tiu ĉi adreso estis markita kiel nevalida',
+        description: 'Dum adreso estas markita kiel nevalida, la membro ne ricevos poŝtaĵojn.',
     },
     csvFields: {
         membership: 'Membreco (resumo)',
@@ -325,7 +325,7 @@ export const codeholders = {
     addrLabelGen: {
         menuItem: 'Krei adresetikedojn',
         title: 'Kreado de adresetikedoj',
-        description: '[[Here you can create address labels for all codeholders with addresses in the current search results. You will receive them by email.]]',
+        description: 'Per tiu ĉi formularo eblas generi adresetikedojn en PDF-formato por ĉiuj rezultoj nun montrataj al vi. Ili estos senditaj al vi per retpoŝto aŭ Telegramo.',
         labels: {
             language: 'Lingvo',
             latin: 'Latinigita',
@@ -372,12 +372,12 @@ export const codeholders = {
                 button: 'Ĝisdatigi',
             },
         },
-        filterInvalidAddresses: '[[Filter out invalid addresses]]',
+        filterInvalidAddresses: 'Elfiltri nevalidajn adresojn',
     },
     notifTemplates: {
         cursedNotice: 'Oraj rezultoj ne ricevos mesaĝon.',
         description: 'Mesaĝoj estos senditaj al ĉiuj membroj laŭ via nuna filtrilo.',
-        descriptionNewsletter: 'Mesaĝoj estos senditaj al ĉiuj membroj [[who are subscribed to the newsletter]].',
+        descriptionNewsletter: 'Mesaĝoj estos senditaj al ĉiuj abonantoj de la bulteno.',
         menuItem: 'Sendi amasmesaĝon',
         title: 'Sendi amasmesaĝon',
         empty: 'Estas neniuj ŝablonoj kun la celo “membro”',

@@ -302,11 +302,11 @@ export const paymentIntents = {
             button: 'Indiki',
         },
         intermediary: {
-            cancel: '[[Cancel]]',
+            cancel: 'Nuligi spezfolion',
             markDisputed: '[[Mark disputed]]',
             markRefunded: '[[Mark refunded]]',
-            markSucceeded: '[[Mark succeeded]]',
-            submit: '[[Submit]]',
+            markSucceeded: 'Akcepti spezfolion',
+            submit: 'Ensendi',
         },
     },
     transitionUnavailabilityReasons: {
@@ -425,12 +425,12 @@ export const paymentIntents = {
         button: 'Konservi',
     },
     resendReceipt: {
-        menuItem: '[[Re-send Receipt]]',
-        title: '[[Re-send Receipt]]',
-        description: '[[You can re-send the receipt for whatever reason.]]',
-        email: '[[Customer email]]',
-        noEmail: '[[Email is required]]',
-        button: '[[Send]]',
+        menuItem: 'Resendi kvitancon',
+        title: 'Resendado de AKSO-pago-kvitanco',
+        description: 'Se la kliento ne ricevis sian kvitancon aŭ se tiu petis novan kvitancon, vi povas resendi ĝin.',
+        email: 'Anstataŭa ricevanta retpoŝtadreso',
+        noEmail: 'Retpoŝtadreso estas deviga',
+        button: 'Sendi',
     },
 
     report: {
