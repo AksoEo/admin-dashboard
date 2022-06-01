@@ -1053,6 +1053,7 @@ newsletters:
         read
         update
         delete
+        send
 
 magazines:
     snapshots:
