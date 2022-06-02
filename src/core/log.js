@@ -13,7 +13,20 @@ export function any (f, ...args) {
         ...args
     );
 }
+
+let debugEnabledState = [0, false];
+function isDebugEnabled () {
+    const now = Date.now();
+    if (now - debugEnabledState[0] > 10000) {
+        try {
+            debugEnabledState[1] = sessionStorage.coreDebug;
+        } catch {}
+    }
+    return debugEnabledState[1];
+}
+
 export function debug (...args) {
+    if (!isDebugEnabled()) return;
     any('debug', ...args);
 }
 export function warn (...args) {
