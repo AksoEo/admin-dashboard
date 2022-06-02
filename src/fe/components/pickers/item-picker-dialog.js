@@ -103,15 +103,20 @@ function DialogInner ({
 
     const selection = {
         add: id => {
-            if (value.includes(+id)) return;
-            onChange(value.concat([+id]));
+            const idValue = !Number.isNaN(+id) ? +id : id;
+            if (value.includes(idValue)) return;
+            onChange(value.concat([idValue]));
             if (value.length + 1 >= limit) onClose();
         },
-        has: id => value.includes(+id),
+        has: id => {
+            const idValue = !Number.isNaN(+id) ? +id : id;
+            return value.includes(idValue);
+        },
         delete: id => {
-            if (!value.includes(+id)) return;
+            const idValue = !Number.isNaN(+id) ? +id : id;
+            if (!value.includes(idValue)) return;
             const newValue = value.slice();
-            newValue.splice(value.indexOf(+id), 1);
+            newValue.splice(value.indexOf(idValue), 1);
             onChange(newValue);
         },
     };
@@ -147,12 +152,13 @@ function DialogInner ({
                 onSetOffset={setOffset}
                 selection={limit === 1 ? null : selection}
                 onItemClick={id => {
+                    const idValue = !Number.isNaN(+id) ? +id : id;
                     if (limit === 1) {
-                        onChange([+id]);
+                        onChange([idValue]);
                         onClose();
                         return;
                     }
-                    if (value.includes(+id)) {
+                    if (value.includes(idValue)) {
                         selection.delete(id);
                     } else {
                         selection.add(id);

@@ -3,7 +3,7 @@ import { TextField } from 'yamdl';
 import Segmented from '../../../../components/controls/segmented';
 import TextArea from '../../../../components/controls/text-area';
 import OrgIcon from '../../../../components/org-icon';
-import { delegationSubjects as locale } from '../../../../locale';
+import { delegationSubjects as locale, data as dataLocale } from '../../../../locale';
 
 export const FIELDS = {
     org: {
@@ -23,6 +23,9 @@ export const FIELDS = {
             }
             return <OrgIcon org={value} />;
         },
+        validate: ({ value }) => {
+            if (!value) return dataLocale.requiredField;
+        },
     },
     name: {
         weight: 0.5,
@@ -31,6 +34,7 @@ export const FIELDS = {
             if (editing) {
                 return (
                     <TextField
+                        required
                         label={slot === 'create' ? locale.fields.name : null}
                         outline
                         value={value}

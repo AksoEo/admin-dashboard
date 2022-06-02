@@ -218,7 +218,7 @@ export default {
     },
     enabled: {
         default () {
-            return { enabled: false, value: true };
+            return { enabled: true, value: true };
         },
         editor: tripleSwitch(
             'all',

@@ -1166,7 +1166,7 @@ function FactoidsEditor ({ value, editing, onChange }) {
             onDelete={() => {
                 const newKeys = keys.slice();
                 newKeys.splice(newKeys.indexOf(key), 1);
-                onChange(Object.fromEntries(newKeys.map(k => [k, value[k]])));
+                onChange(newKeys.length ? Object.fromEntries(newKeys.map(k => [k, value[k]])) : null);
             }} />
     ));
 

@@ -89,6 +89,8 @@ export default {
                         })}>
                         <TextField
                             outline
+                            required
+                            pattern="\d+"
                             label={optionsLocale.create.year}
                             value={task.parameters.year}
                             onChange={e => task.update({ year: e.target.value })} />

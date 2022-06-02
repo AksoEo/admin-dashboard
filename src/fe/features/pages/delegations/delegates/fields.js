@@ -15,7 +15,7 @@ import { ValidatedTextField } from '../../../../components/form';
 import Select from '../../../../components/controls/select';
 import TextArea from '../../../../components/controls/text-area';
 import DiffAuthor from '../../../../components/diff-author';
-import { delegations as locale, delegationSubjects as subjectsLocale } from '../../../../locale';
+import { delegations as locale, delegationSubjects as subjectsLocale, data as dataLocale } from '../../../../locale';
 import { Link, routerContext } from '../../../../router';
 import { connectPerms } from '../../../../perms';
 import { makeCodeholderFilterQuery } from '../applications/filters';
@@ -41,6 +41,9 @@ export const FIELDS = {
             }
             return <OrgIcon org={value} />;
         },
+        validate: ({ value }) => {
+            if (!value) return dataLocale.requiredField;
+        },
     },
     codeholderId: {
         sortable: true,
@@ -61,6 +64,9 @@ export const FIELDS = {
                 return <Link class="delegation-codeholder" target={`/membroj/${value}`} outOfTree><IdUEACode id={value} /></Link>;
             }
             return <IdUEACode id={value} />;
+        },
+        validate: ({ value }) => {
+            if (!value) return dataLocale.requiredField;
         },
     },
     approvedBy: {
@@ -145,6 +151,9 @@ export const FIELDS = {
                     ) : null}
                 </div>
             );
+        },
+        validate: ({ value }) => {
+            if (!value || !value.length) return dataLocale.requiredField;
         },
     },
     countries: {
