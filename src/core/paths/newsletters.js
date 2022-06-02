@@ -58,17 +58,6 @@ export const tasks = {
         ],
         storePath: ({ newsletter }, item) => [NEWSLETTER_UNSUBS, newsletter, item.id],
     }),
-    unsubscription: crudGet({
-        apiPath: ({ newsletter, id }) => `/newsletters/${newsletter}/unsubscriptions/${id}`,
-        fields: [
-            'id',
-            'reason',
-            'description',
-            'time',
-            'subscriberCount',
-        ],
-        storePath: ({ newsletter, id }) => [NEWSLETTER_UNSUBS, newsletter, id],
-    }),
 
     send: async ({ newsletter }, { template, deleteOnComplete }) => {
         const client = await asyncClient;
@@ -88,8 +77,7 @@ export const views = {
     sigNewsletters: createStoreObserver([NEWSLETTERS, SIG_NEWSLETTERS]),
 
     unsubscription: simpleDataView({
-        storePath: ({ id }) => [NEWSLETTER_UNSUBS, id],
-        get: ({ id }) => tasks.unsubscription({ id }),
+        storePath: ({ newsletter, id }) => [NEWSLETTER_UNSUBS, newsletter, id],
         canBeLazy: true,
     }),
 };

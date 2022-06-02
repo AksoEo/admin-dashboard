@@ -12,6 +12,7 @@ export const FIELDS = {
         component ({ value }) {
             return locale.reasons[value];
         },
+        isEmpty: () => false,
     },
     description: {
         component ({ value }) {

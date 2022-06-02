@@ -34,7 +34,6 @@ export default class NewsletterUnsubscriptions extends OverviewPage {
                 view="newsletters/unsubscription"
                 useDeepCmp options={{ newsletter: this.newsletter }}
                 viewOptions={{ newsletter: this.newsletter }}
-                updateView={['newsletters/sigUnsubscriptions']}
                 parameters={parameters}
                 fields={FIELDS}
                 onGetItemLink={id => `/bultenoj/${this.newsletter}/malabonoj/${id}`}

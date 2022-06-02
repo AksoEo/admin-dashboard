@@ -8,6 +8,10 @@ import { FIELDS } from './fields';
 export default class NewsletterUnsubscription extends DetailPage {
     locale = locale;
 
+    get newsletter () {
+        return +this.props.matches.newsletter[1];
+    }
+
     get id () {
         return +this.props.match[1];
     }
@@ -21,6 +25,7 @@ export default class NewsletterUnsubscription extends DetailPage {
             <Fragment>
                 <DetailView
                     view="newsletters/unsubscription"
+                    options={{ newsletter: this.newsletter }}
                     id={this.id}
                     fields={FIELDS}
                     locale={locale}
