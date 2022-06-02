@@ -1,8 +1,11 @@
 # AKSO Bus Problem Prevention Initiative
-The AKSO admin frontend consists of two parts: the core (`core/`) and the web frontend (`fe/`). To use MVC as an analogy, the core is the model (and controller) and the frontend is the view (and controller).
+The AKSO admin frontend consists of two parts: the core (`core/`) and the web frontend (`fe/`).
+The core handles all communication with the backend API and provides an easier interface for the web frontend.
 
 ## The Core
-The application core communicates with the frontend via IPC (or, in web terminology, “Web Worker API”) and mainly deals with two abstract components: tasks and data views. Tasks represent failable actions that have multiple inputs and one output, and data views simply allow a live view of some data.
+The application core is a web worker and contains two primitives: tasks and data views.
+Tasks represent failable actions (usually an API request), and data views are a live view of some data in the cache.
+This is a web worker so logging out and deleting the cache is very easy.
 
 Both tasks and data views are identified by a path such as `login/hasPassword` (which might check if a user has a password). Path scopes may be lazy-loaded (see `src/core/paths/index.js`).
 
@@ -15,9 +18,12 @@ Tasks have a very specific lifecycle:
     - if it succeeds, it will return the result and drop itself (dropping: see memory management)
     - if it fails, it will return to step 2
 
-In code, tasks are simply async functions that will be called by *the system* with the given options and parameters. The immutable options/mutable parameters distinction exists to facilitate semantics for task views (see frontend).
+In code, tasks are simply async functions that will be called by *the system* with the given options and parameters.
+The immutable options/mutable parameters distinction exists to facilitate semantics for task views (see frontend).
 
 Unknown options or parameters will be ignored (this can be used e.g. to pass user data to task views).
+
+When implementing tasks, try using the task templates provided in `templates.js` as they cover almost all use cases.
 
 ### Views
 Views act like React props in that they are simply observed data that might change over time and can’t be mutated directly (to mutate the data, one would use a task).
@@ -25,6 +31,8 @@ Views act like React props in that they are simply observed data that might chan
 In general, views should be kept lean and shouldn’t be responsible for too much data—for example, a list of some complex data would use one view with the list item identifiers and the properties of the list items would be read from several other views, one for each item. A decent heuristic for this might be that if subdata (e.g. a list item) can be mutated on its own, it might warrant having its own view.
 
 In code, views are instances of classes that extend EventEmitter and emit `update` events containing data.
+
+When implementing views, try using the view templates provided in `templates.js` as they cover almost all use cases.
 
 ### The Data Store
 The data store is a big in-memory database of all session data such as login state, caches, and other things. This is usually where data views might get their data from.
@@ -96,6 +104,22 @@ Usually, the file structure is as follows:
 - `index.js` (overview page)
 - `detail.js` (detail page)
 - `fields.js` (field renderers)
+- `filters.js` (filters in the overview page)
+
+#### Fields
+Fields are specified in a big object and identified by their name.
+Common properties of a field include:
+
+- `component`: the React component that renders or edits the field. Is often passed following props:
+    - `value`: value of the field
+    - `item`: the whole object that this is a field of
+    - `editing`: if true, the item is being edited
+    - `onChange`: callback to update the value when editing
+    - `onItemChange`: callback to update the whole object when editing
+- `stringify`: like `component`, but used for CSV export. See code for function argument order
+- `validate`: same props as `component`. Should return an error if validation fails. Otherwise, it should return something falsy.
+- `isEmpty`: if this function returns true, this field will be grayed out and sorted to the bottom in detail views
+- `shouldHide`: if this function returns true, this field will be hidden in detail views
 
 ### Searchable List Views
 AKSO contains a lot of searchable lists. In the interest of DRY, these have been abstracted to the One True List View:
@@ -149,10 +173,13 @@ A simplified version of OverviewList that manages its own state, intended for pi
 This component will render a core data view.
 
 #### Form
-A submittable form. Use with `Validator`.
+A submittable form. Provides a React context for custom validation. Will refuse to submit if anything that was registered in the form context returns a validation error.
 
-##### Validator
-A field validator. This is very old and should probably be refactored (e.g. it uses `throw` to pass state which is generally a bad idea), but it's used in a lot of places. A `Form` will refuse to submit if a validator throws, and the validator will play a shaking animation.
+##### Field
+Provides layout and optionally validation.
+
+##### ValidatedTextField
+Special-case validator for text fields.
 
 #### Segmented, Select
 Various kinds of selection fields.
