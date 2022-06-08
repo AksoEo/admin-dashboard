@@ -14,13 +14,15 @@ export function any (f, ...args) {
     );
 }
 
-let debugEnabledState = [0, false];
+const debugEnabledState = [0, false];
 function isDebugEnabled () {
     const now = Date.now();
     if (now - debugEnabledState[0] > 10000) {
         try {
             debugEnabledState[1] = sessionStorage.coreDebug;
-        } catch {}
+        } catch {
+            /* nothing */
+        }
     }
     return debugEnabledState[1];
 }

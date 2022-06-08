@@ -222,8 +222,6 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
                     </div>
                     <div class="header-info">
                         <DetailField field="base" item={item} />
-                        {locale.fields.intent}
-                        {': '}
                         <DetailField field="intent" item={item} />
                     </div>
                     <div class="detail-description">

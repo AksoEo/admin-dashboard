@@ -1,12 +1,16 @@
 @import '../../../prelude';
 
-.notif-template-base {
+.notif-template-base, .notif-template-intent {
     font-size: small;
     font-weight: 600;
     text-transform: uppercase;
     padding: 2px 4px;
     border-radius: 4px;
     border: 1px solid @separator;
+}
+.notif-template-intent {
+    background: @text-fade-10;
+    border-color: transparent;
 }
 
 .notif-template-domain-email-editor {
@@ -53,6 +57,10 @@
 
             .markdown-text-field {
                 flex: 1;
+            }
+
+            img {
+                max-width: 100%;
             }
         }
         .text-button {
