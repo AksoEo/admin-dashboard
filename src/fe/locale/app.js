@@ -68,7 +68,18 @@ export const index = {
     },
     admin: {
         title: 'Asisto',
-        description: 'Se vi spertas problemojn pri AKSO-Administranto, vi ĉiam povas sendi retmesaĝon al helpo@akso.org. Bonvolu indiki detale la problemon, eventuale aldonante ekranfotojn.',
+        description:
+`Se vi spertas problemojn pri AKSO-Administranto, vi ĉiam povas sendi retmesaĝon al [helpo@akso.org](mailto:helpo@akso.org).
+Bonvolu indiki detale la problemon, prefere aldonante ekranfotojn. Se tio sencas, bonvolu respondu ĉiujn jenajn demandojn:
+
+1. Kion vi faris por atingi la problemon? Eventuale aldonu la URL-on de la paĝo kie okazis la problemo.
+2. Kion vi atendis, ke okazus?
+3. Kio fakte okazis?
+4. Se vi ricevis erarmesaĝon de la sistemo, metu ĝin ĉi tie.
+5. Ĉu la problemo okazas ĉiufoje?
+
+
+En la mesaĝo vi nepre ĉiam aldonu la ĉi-subajn sistemajn informojn.`,
         systemInfo: {
             title: 'Informoj pri via sistemo',
             copy: 'Kopii',

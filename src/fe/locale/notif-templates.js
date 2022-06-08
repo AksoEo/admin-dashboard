@@ -46,7 +46,7 @@ export const notifTemplates = {
     },
     intents: {
         codeholder: 'membro',
-        newsletter: '[[newsletter]]',
+        newsletter: 'bulteno',
     },
     sendIntent: 'Sendi mesaĝon',
     preview: {
