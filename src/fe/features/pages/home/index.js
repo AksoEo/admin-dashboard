@@ -1,13 +1,13 @@
 import { h } from 'preact';
 import { PureComponent, Fragment, useRef } from 'preact/compat';
-import { Button, LinearProgress } from 'yamdl';
+import { Button, CircularProgress, LinearProgress } from 'yamdl';
 import PaymentIcon from '@material-ui/icons/Payment';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import Page from '../../../components/page';
 import DisplayError from '../../../components/utils/error';
 import MdField from '../../../components/controls/md-field';
 import { IdUEACode } from '../../../components/data/uea-code';
-import Tabs from '../../../components/controls/tabs';
+import Select from '../../../components/controls/select';
 import {
     index as locale,
     paymentIntents as intentLocale,
@@ -101,8 +101,12 @@ class HomeTasks extends PureComponent {
     load () {
         this.setState({ loading: true });
         this.context.createTask('tasks/list', {}).runOnceAndDrop().then(tasks => {
-            const resPromises = [Promise.resolve(tasks)];
-            if (tasks.aksopay) {
+            const loaders = {};
+
+            const loader = (fn) => fn;
+
+            // we check for existence of fields since they'll be filtered depending on perms
+            if (tasks?.aksopay) {
                 const params = {
                     fields: [
                         { id: 'customer', sorting: 'none' },
@@ -116,7 +120,7 @@ class HomeTasks extends PureComponent {
                     offset: 0,
                     limit: 10,
                 };
-                resPromises.push(this.context.createTask('payments/listIntents', {}, {
+                loaders.aksopay = loader(() => this.context.createTask('payments/listIntents', {}, {
                     ...params,
                     jsonFilter: {
                         filter: {
@@ -124,9 +128,9 @@ class HomeTasks extends PureComponent {
                             status: { $in: ['disputed', 'submitted'] },
                         },
                     },
-                }).runOnceAndDrop().then(data => ({ aksopay: data.items })));
+                }).runOnceAndDrop().then(data => data.items));
 
-                resPromises.push(this.context.createTask('payments/listIntents', {}, {
+                loaders.intermediary = loader(() => this.context.createTask('payments/listIntents', {}, {
                     ...params,
                     jsonFilter: {
                         filter: {
@@ -134,10 +138,10 @@ class HomeTasks extends PureComponent {
                             status: { $in: ['disputed', 'submitted'] },
                         },
                     },
-                }).runOnceAndDrop().then(data => ({ intermediary: data.items })));
+                }).runOnceAndDrop().then(data => data.items));
             }
-            if ('registration' in tasks) {
-                resPromises.push(this.context.createTask('memberships/listEntries', {}, {
+            if (tasks?.registration) {
+                loaders.registration = loader(() => this.context.createTask('memberships/listEntries', {}, {
                     fields: [
                         { id: 'codeholderData', sorting: 'none' },
                         { id: 'year', sorting: 'none' },
@@ -151,10 +155,10 @@ class HomeTasks extends PureComponent {
                     },
                     offset: 0,
                     limit: 10,
-                }).runOnceAndDrop().then(data => ({ registration: data.items })));
+                }).runOnceAndDrop().then(data => data.items));
             }
-            if (tasks.codeholderChangeRequests) {
-                resPromises.push(this.context.createTask('codeholders/changeRequests', {}, {
+            if (tasks?.codeholderChangeRequests) {
+                loaders.changeRequests = loader(() => this.context.createTask('codeholders/changeRequests', {}, {
                     fields: [
                         { id: 'time', sorting: 'asc' },
                     ],
@@ -165,22 +169,56 @@ class HomeTasks extends PureComponent {
                     },
                     offset: 0,
                     limit: 10,
-                }).runOnceAndDrop().then(data => ({ changeRequests: data.items })));
+                }).runOnceAndDrop().then(data => data.items));
             }
-            const res = Promise.all(resPromises);
+            if (tasks?.delegates) {
+                loaders.delegateApplications = loader(() => this.context.createTask('delegations/listApplications', {}, {
+                    jsonFilter: {
+                        filter: {
+                            status: 'pending',
+                        },
+                    },
+                    offset: 0,
+                    limit: 10,
+                }).runOnceAndDrop().then(data => data.items));
+            }
 
-            res.then(([tasks, ...items]) => {
-                const itemsJoined = {};
-                for (const i of items) Object.assign(itemsJoined, i);
+            if (tasks?.delegates?.missingGeodbCities) {
+                loaders.delegateMissingCities = loader(() => this.context.createTask('delegations/listDelegates', {}, {
+                    jsonFilter: {
+                        filter: {
+                            cities: {
+                                $hasAny: tasks.delegates.missingGeodbCities.map(id => +id.substr(1)),
+                            },
+                        },
+                    },
+                    offset: 0,
+                    limit: 10,
+                }).runOnceAndDrop().then(data => data.items));
+            }
 
-                this.setState({
-                    loading: false,
-                    tasks,
-                    items: itemsJoined,
-                    error: null,
-                });
-            }).catch(error => {
-                this.setState({ loading: false, items: null, error });
+            if (tasks?.magazines?.paperNoAddress) {
+                loaders.magPaperNoAddress = loader(() => this.context.createTask('codeholders/list', {}, {
+                    fields: [
+                        { id: 'name', sorting: 'none' },
+                    ],
+                    jsonFilter: {
+                        filter: {
+                            $magazineSubscriptions: {
+                                paperVersion: true,
+                            },
+                        },
+                    },
+                    offset: 0,
+                    limit: 10,
+                }).runOnceAndDrop().then(data => data.items));
+            }
+
+            this.setState({
+                loading: false,
+                tasks,
+                itemLoaders: loaders,
+                error: null,
             });
         });
     }
@@ -189,31 +227,27 @@ class HomeTasks extends PureComponent {
         this.load();
     }
 
-    render (_, { loading, tasks, items, error }) {
-        if (items && !Object.keys(items).length) {
+    render (_, { loading, tasks, itemLoaders, error }) {
+        if (itemLoaders && !Object.keys(itemLoaders).length) {
             // no tabs visible
             return null;
         }
 
-        let contents = null;
+        let contents = <div class="loading-placeholder-padding" />;
         if (error) {
             contents = <DisplayError error={error} />;
-        } else if (items) {
+        } else if (itemLoaders) {
             const renderTabItems = (key, Component) => {
-                if (!(key in items)) {
+                if (!(key in itemLoaders)) {
                     // no permission
                     return null;
                 }
-                const tabItems = [];
-                for (const id of (items[key] || [])) {
-                    tabItems.push(<Component key={id} id={id} />);
-                }
-                if (!tabItems.length) tabItems.push(
-                    <div class="tasks-empty">
-                        {locale.tasks.empty}
-                    </div>
+                return (
+                    <HomeTabLazyItems
+                        key={key}
+                        loader={itemLoaders[key]}
+                        component={Component} />
                 );
-                return tabItems;
             };
 
             const tabs = {
@@ -221,6 +255,9 @@ class HomeTasks extends PureComponent {
                 intermediary: renderTabItems('intermediary', IntermediaryTaskItem),
                 registration: renderTabItems('registration', RegistrationTaskItem),
                 changeRequests: renderTabItems('changeRequests', ChangeRequestTaskItem),
+                delegateApplications: renderTabItems('delegateApplications', DelegateApplicationTaskItem),
+                delegateMissingCities: renderTabItems('delegateMissingCities', DelegateMissingCityItem),
+                magPaperNoAddress: renderTabItems('magPaperNoAddress', MagPaperNoAddressItem),
             };
 
             const countTaskItems = k => {
@@ -233,20 +270,37 @@ class HomeTasks extends PureComponent {
                 intermediary: tasks?.aksopay?.intermediary,
                 registration: countTaskItems('registration'),
                 changeRequests: countTaskItems('codeholderChangeRequests'),
+                delegateApplications: tasks?.delegates?.pendingApplications,
+                delegateMissingCities: tasks?.delegates?.missingGeodbCities?.length,
+                magPaperNoAddress: tasks?.magazines?.paperNoAddress,
             };
+
+            const otherTabsCount = Object.keys(tabItemCounts)
+                .filter(k => k != this.state.tab)
+                .map(k => tabItemCounts[k])
+                .reduce((a, b) => a + b, 0);
 
             contents = (
                 <Fragment>
-                    <Tabs
-                        class="task-tabs"
-                        tabs={Object.fromEntries(Object.keys(locale.tasks.tabs).filter(k => k in items).map(k => [k, (
-                            <span class="task-tab-label" key={k}>
-                                <span class="inner-label">{locale.tasks.tabs[k]}</span>
-                                <span class="task-badge" data-n={tabItemCounts[k]}>{tabItemCounts[k]}</span>
-                            </span>
-                        )]))}
-                        value={this.state.tab}
-                        onChange={tab => this.setState({ tab })} />
+                    <div class="home-tasks-header">
+                        <Select
+                            value={this.state.tab}
+                            onChange={tab => this.setState({ tab })}
+                            rendered
+                            items={Object.keys(locale.tasks.tabs).filter(k => k in itemLoaders).map(k => ({
+                                value: k,
+                                label: (
+                                    <span class="home-task-tab-label" key={k}>
+                                        <span class="task-badge" data-n={tabItemCounts[k]}>{tabItemCounts[k]}</span>
+                                        <span class="inner-label">{locale.tasks.tabs[k]}</span>
+                                    </span>
+                                ),
+                            }))} />
+                        <div class="additional-count">
+                            <span class="task-badge" data-n={otherTabsCount}>{otherTabsCount}</span>
+                            {locale.tasks.otherTabs(otherTabsCount)}
+                        </div>
+                    </div>
                     {tabs[this.state.tab]}
                 </Fragment>
             );
@@ -258,11 +312,57 @@ class HomeTasks extends PureComponent {
                     {locale.tasks.title}
                 </div>
                 <div class="home-tasks">
-                    <LinearProgress style={{ width: '100%' }} indeterminate={loading} hideIfNone />
+                    <LinearProgress class="tasks-loading" indeterminate={loading} hideIfNone />
                     {contents}
                 </div>
             </div>
         );
+    }
+}
+
+class HomeTabLazyItems extends PureComponent {
+    state = {
+        loading: false,
+        items: [],
+        error: null,
+    };
+
+    componentDidMount () {
+        this.load();
+    }
+
+    load () {
+        this.setState({ loading: true, error: null });
+        this.props.loader().then(items => {
+            this.setState({ loading: false, items });
+        }).catch(error => {
+            this.setState({ loading: false, error });
+        });
+    }
+
+    render () {
+        const { loading, error, items } = this.state;
+
+        if (loading) {
+            return (
+                <div class="tasks-list-loading">
+                    <CircularProgress indeterminate />
+                </div>
+            );
+        } else if (error) {
+            return <DisplayError error={error} />;
+        }
+
+        const tabItems = [];
+        for (const id of (items || [])) {
+            tabItems.push(<this.props.component key={id} id={id} />);
+        }
+        if (!tabItems.length) tabItems.push(
+            <div class="tasks-empty">
+                {locale.tasks.empty}
+            </div>
+        );
+        return tabItems;
     }
 }
 
@@ -367,6 +467,73 @@ const ChangeRequestTaskItem = connect(({ id }) => ['codeholders/changeRequest', 
                 <span class="task-badge">
                     {chgReqLocale.fields.statuses[data.status]}
                 </span>
+            </div>
+            <div class="task-alt-icon">
+                <ChevronRightIcon />
+            </div>
+        </LinkButton>
+    );
+});
+
+const DelegateApplicationTaskItem = connect(({ id }) => ['delegations/application', {
+    id,
+    lazyFetch: true,
+}])(data => ({ data }))(function DelegateApplicationTaskItem ({ id, data }) {
+    if (!data) return null;
+
+    // TODO: show more info
+
+    return (
+        <LinkButton class="home-task" target={`/delegitoj/kandidatighoj/${id}`}>
+            <div class="task-details">
+                <div class="task-title">
+                    <IdUEACode id={data.codeholderId} />
+                </div>
+            </div>
+            <div class="task-alt-icon">
+                <ChevronRightIcon />
+            </div>
+        </LinkButton>
+    );
+});
+
+const DelegateMissingCityItem = connect(({ id }) => ['delegations/delegate', {
+    id,
+    lazyFetch: true,
+}])(data => ({ data }))(function DelegateMissingCityItem ({ id, data }) {
+    if (!data) return null;
+
+    // TODO: show more info
+
+    return (
+        <LinkButton class="home-task" target={`/delegitoj/${id}`}>
+            <div class="task-details">
+                <div class="task-title">
+                    <IdUEACode id={data.codeholderId} />
+                </div>
+            </div>
+            <div class="task-alt-icon">
+                <ChevronRightIcon />
+            </div>
+        </LinkButton>
+    );
+});
+
+const MagPaperNoAddressItem = connect(({ id }) => ['codeholders/codeholder', {
+    id,
+    lazyFetch: true,
+    fields: [],
+}])(data => ({ data }))(function MagPaperNoAddressItem ({ id, data }) {
+    if (!data) return null;
+
+    // TODO: show more info
+
+    return (
+        <LinkButton class="home-task" target={`/membroj/${id}`}>
+            <div class="task-details">
+                <div class="task-title">
+                    <IdUEACode id={data.id} />
+                </div>
             </div>
             <div class="task-alt-icon">
                 <ChevronRightIcon />

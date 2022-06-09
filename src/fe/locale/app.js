@@ -64,7 +64,11 @@ export const index = {
             intermediary: 'Spezfolioj',
             registration: 'Aliĝoj',
             changeRequests: 'Ŝanĝopetoj',
+            delegateApplications: '[[Delegate Applications]]',
+            delegateMissingCities: '[[Delegate Missing Cities]]',
+            magPaperNoAddress: '[[Magazine PaperNoAddress]]',
         },
+        otherTabs: n => `alia${n === 1 ? '' : 'j'} tasko${n === 1 ? '' : 'j'}`,
     },
     admin: {
         title: 'Asisto',

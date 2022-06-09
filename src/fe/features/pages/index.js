@@ -632,6 +632,7 @@ export default [
                 id: 'delegations',
                 icon: BadgeIcon,
                 path: 'delegitoj',
+                badge: tasks => (tasks?.delegates?.pendingApplications | 0) + (tasks?.delegates?.missingGeodbCities | 0),
                 component: elazy(() =>
                     import(/* webpackChunkName: "delegates" */ './delegations/delegates')),
                 hasPerm: perms => perms.hasPerm('codeholders.read') && perms.hasPerm('codeholders.delegations.read.uea'),
