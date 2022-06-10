@@ -42,7 +42,7 @@ export default class MembershipOptions extends OverviewPage {
                 updateView={['memberships/sigOptions']}
                 parameters={parameters}
                 fields={FIELDS}
-                onGetItemLink={id => `/membreco/agordoj/${id}`}
+                onGetItemLink={id => `/membreco/alighiloj/${id}`}
                 onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                 onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}
                 onSetLimit={limit => this.setState({ parameters: { ...parameters, limit }})}

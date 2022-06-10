@@ -28,7 +28,7 @@ export const pages = {
     statistics: 'Statistiko',
     membership: 'Membreco',
     'membership-categories': 'Kategorioj',
-    'membership-registration': 'Agordoj',
+    'membership-registration': 'Aliĝiloj',
     'membership-entries': 'Aliĝoj',
     roles: 'Roloj',
     email: 'Amasmesaĝoj',

@@ -694,7 +694,7 @@ export const spec = [
         children: [
             {
                 type: 'switch',
-                name: 'Agordoj',
+                name: 'Aliĝiloj',
                 options: [
                     {
                         name: 'Legi',

@@ -2,7 +2,7 @@ export const memberships = {
     title: 'Membreco',
     pages: {
         categories: 'Membrecoj',
-        options: 'Agordoj',
+        options: 'Aliĝiloj',
     },
 };
 
@@ -44,8 +44,8 @@ export const membershipCategories = {
 };
 
 export const membershipOptions = {
-    title: 'Agordoj',
-    detailTitle: 'Agordoj',
+    title: 'Aliĝiloj',
+    detailTitle: 'Aliĝilo',
     fields: {
         year: 'Jaro',
         enabled: 'Ŝaltita',
@@ -86,7 +86,7 @@ export const membershipOptions = {
     },
     create: {
         menuItem: 'Krei',
-        title: 'Krei agordojn',
+        title: 'Krei aliĝilo',
         button: 'Krei',
         year: 'Jaro',
     },
@@ -97,14 +97,14 @@ export const membershipOptions = {
     },
     update: {
         menuItem: 'Redakti',
-        title: 'Redakti agordojn',
+        title: 'Redakti aliĝilon',
         button: 'Aktualigi',
     },
     delete: {
         menuItem: 'Forigi',
-        title: 'Forigi agordojn',
+        title: 'Forigi aliĝilon',
         button: 'Forigi',
-        description: 'Ĉu vi certas, ke vi volas forigi la agordoj por ĉi tiun jaron? Ne eblas malfari tiun ĉi agon.',
+        description: 'Ĉu vi certas, ke vi volas forigi la aliĝilon por ĉi tiun jaron? Ne eblas malfari tiun ĉi agon.',
     },
 };
 

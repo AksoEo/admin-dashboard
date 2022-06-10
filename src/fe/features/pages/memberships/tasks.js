@@ -85,7 +85,7 @@ export default {
                         title={optionsLocale.create.title}
                         actionLabel={optionsLocale.create.button}
                         run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/membreco/agordoj/${id}/redakti`);
+                            routerContext.navigate(`/membreco/alighiloj/${id}/redakti`);
                         })}>
                         <TextField
                             outline
@@ -109,7 +109,7 @@ export default {
                         title={optionsLocale.duplicate.title}
                         actionLabel={optionsLocale.duplicate.button}
                         run={() => task.runOnce().then(id => {
-                            routerContext.navigate(`/membreco/agordoj/${id}`);
+                            routerContext.navigate(`/membreco/alighiloj/${id}`);
                         })}>
                         <TextField
                             outline

@@ -744,7 +744,7 @@ export default [
             },
             {
                 id: 'membership-registration',
-                path: 'agordoj',
+                path: 'alighiloj',
                 icon: ConfigMembershipIcon,
                 type: 'bottom',
                 component: elazy(() =>
