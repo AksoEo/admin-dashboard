@@ -116,6 +116,10 @@ export const paymentMethods = {
         paymentValidityWarning: 'Ni rekomendas ŝalti eksvalidiĝon',
 
         prices: 'Kotizoj',
+
+        maxAmount: '[[MaxAmount]]',
+        maxAmountEnable: '[[Use max amount]]',
+        maxAmountErrMinAmount: '[[Must be at least 1 USD]]',
     },
     prices: {
         addYear: 'Aldoni jaron',

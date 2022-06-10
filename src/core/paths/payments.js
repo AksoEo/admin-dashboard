@@ -339,7 +339,7 @@ export const tasks = {
                 'id', 'type', 'stripeMethods', 'name', 'internalDescription',
                 'description', 'currencies', 'paymentValidity', 'isRecommended',
                 'stripePublishableKey', 'feePercent', 'feeFixed.val', 'feeFixed.cur',
-                'internal', 'prices',
+                'internal', 'prices', 'maxAmount',
             ],
         });
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];

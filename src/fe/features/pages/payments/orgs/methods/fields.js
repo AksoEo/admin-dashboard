@@ -264,6 +264,40 @@ export const FIELDS = {
             else return feeFixed;
         },
     },
+    maxAmount: {
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                const chkId = Math.random().toString(36);
+                return (
+                    <div class="payment-method-max-amount-editor">
+                        <Checkbox
+                            id={chkId}
+                            checked={value !== null}
+                            onChange={checked => onChange(checked ? 100 : null)} />
+                        {' '}
+                        <label for={chkId}>
+                            {locale.fields.maxAmountEnable}
+                        </label>
+                        {(value !== null) && (
+                            <currencyAmount.editor
+                                class="inner-currency-editor"
+                                outline
+                                currency="USD"
+                                value={value}
+                                onChange={onChange} />
+                        )}
+                    </div>
+                );
+            }
+            return <currencyAmount.renderer value={value} currency="USD" />;
+        },
+        validate: ({ value }) => {
+            if (value < 100) {
+                // must be at least 1 USD!
+                return locale.fields.maxAmountErrMinAmount;
+            }
+        },
+    },
     stripePublishableKey: {
         component ({ value, editing, onChange }) {
             if (editing) {
