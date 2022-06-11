@@ -92,7 +92,7 @@ export default class Field extends PureComponent {
                         {this.state.error}
                     </div>
                 );
-            } else {
+            } else if (error) {
                 error = (
                     <div class="form-field-container-error">
                         <DisplayError error={this.state.error} />

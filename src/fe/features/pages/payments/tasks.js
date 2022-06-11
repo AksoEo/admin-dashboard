@@ -175,8 +175,9 @@ export default {
         const method = task.parameters.method || {};
         const [availableCurrencies, setCurrencies] = useState([]);
 
-        const [shouldImmediatelySubmit, setShouldImmediatelySubmit] = useState(false);
-        const [isIntermediary, setIsIntermediary] = useState(false);
+        const [methodInfo, setMethodInfo] = useState(null);
+        const [exchangeRates, setExchangeRates] = useState({});
+        const [usdExchangeRates, setUsdExchangeRates] = useState({});
 
         fields.push(
             <div key="customer" class="create-intent-subtitle">
@@ -276,14 +277,26 @@ export default {
                     }}
                     onItemData={data => {
                         if (data) {
-                            setShouldImmediatelySubmit(data.type === 'manual');
-                            setIsIntermediary(data.type === 'intermediary');
+                            setMethodInfo(data);
+                            if (data.feeFixed?.cur) {
+                                core.createTask('payments/exchangeRates', {
+                                    base: data.feeFixed.cur,
+                                }).runOnceAndDrop().then(result => {
+                                    setExchangeRates(result);
+                                });
+                            }
+
+                            core.createTask('payments/exchangeRates', {
+                                base: 'USD',
+                            }).runOnceAndDrop().then(result => {
+                                setUsdExchangeRates(result);
+                            });
                         }
                     }} />
             </Field>
         );
 
-        if (method.id && isIntermediary) {
+        if (method.id && methodInfo?.type === 'intermediary') {
             fields.push(
                 <div key="intermediary-title" class="create-intent-subtitle">
                     {intentLocale.fields.intermediary}
@@ -342,8 +355,25 @@ export default {
         const ready = task.parameters.currency && task.parameters.purposes && task.parameters.purposes.length;
 
         let total = 0;
+        let overMaxAmount = false;
         if (task.parameters.purposes) {
             total = task.parameters.purposes.map(p => p.amount).reduce((a, b) => a + b, 0);
+        }
+        if (methodInfo) {
+            if (methodInfo.feePercent) {
+                total *= 1 + methodInfo.feePercent;
+            }
+            if (methodInfo.feeFixed) {
+                total += exchangeRates[task.parameters.currency] * methodInfo.feeFixed.val;
+            }
+
+            let maxAmount;
+            if (methodInfo.maxAmount) {
+                maxAmount = usdExchangeRates[task.parameters.currency] * methodInfo.maxAmount;
+            } else {
+                maxAmount = usdExchangeRates[task.parameters.currency] * intentLocale.create.hardMaxAmountUsd;
+            }
+            overMaxAmount = total > maxAmount;
         }
 
         if (ready) {
@@ -357,9 +387,18 @@ export default {
                     <div class="total-note">
                         {intentLocale.create.totalNote}
                     </div>
+                    {overMaxAmount && (
+                        <Field class="total-above-max-amount" validate={() => {
+                            throw null;
+                        }}>
+                            {intentLocale.create.totalOverMaxAmount}
+                        </Field>
+                    )}
                 </div>
             );
         }
+
+        const actuallyReady = ready && !overMaxAmount;
 
         return (
             <routerContext.Consumer>
@@ -371,11 +410,11 @@ export default {
                         fullScreen={width => width < 400}
                         onClose={() => task.drop()}
                         title={intentLocale.create.title}
-                        actionLabel={!!ready && intentLocale.create.button}
+                        actionLabel={!!actuallyReady && intentLocale.create.button}
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/aksopago/pagoj/${id}`);
                             // immediately submit
-                            if (shouldImmediatelySubmit) {
+                            if (methodInfo?.type === 'manual') {
                                 core.createTask('payments/submitIntent', { id }).run();
                             }
                         })}>

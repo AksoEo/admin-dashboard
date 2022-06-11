@@ -422,6 +422,8 @@ export const paymentIntents = {
         purposes: 'Pagceloj',
         total: 'Sumo',
         totalNote: 'La sumo estas supozo, la ver valoro estos la ekvivalento de minimume 1 USD/maksimume 500.000 USD',
+        totalOverMaxAmount: '[[The total amount is above the max amount allowed for this payment method.]]',
+        hardMaxAmountUsd: 50000000,
     },
     update: {
         menuItem: 'Redakti',

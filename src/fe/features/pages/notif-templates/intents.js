@@ -8,6 +8,7 @@ const STRING = 's';
 export function getFormVarsForIntent (intent) {
     if (intent === 'codeholder') return spec2Vars(CODEHOLDER_SPEC);
     else if (intent === 'newsletter') return spec2Vars(CODEHOLDER_SPEC);
+    else if (intent === 'newsletter_magazine') return spec2Vars(NEWSLETTER_MAGAZINE_SPEC);
     return [];
 }
 
@@ -33,4 +34,10 @@ function spec2Vars (spec) {
 
 const CODEHOLDER_SPEC = {
     codeholder: examples.codeholder,
+};
+
+const NEWSLETTER_MAGAZINE_SPEC = {
+    magazine: examples.magazine,
+    edition: examples.edition,
+    toc: examples.toc,
 };

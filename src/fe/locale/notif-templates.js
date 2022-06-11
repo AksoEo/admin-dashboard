@@ -47,6 +47,7 @@ export const notifTemplates = {
     intents: {
         codeholder: 'membro',
         newsletter: 'bulteno',
+        newsletter_magazine: '[[newsletter_magazine]]',
     },
     sendIntent: 'Sendi mesaĝon',
     preview: {
@@ -120,5 +121,26 @@ export const notifTemplateIntentExamples = {
         cellphone: null,
         officePhone: null,
         landlinePhone: null,
+    },
+    magazine: {
+        id: 3,
+        org: 'uea',
+        name: 'Esperanto',
+        description: 'Esperanto estas la **ĉefa** revuo de UEA.',
+        issn: '00140635',
+        magazineURL: 'https://uea.org/revuoj/revuo/3',
+    },
+    edition: {
+        id: 7,
+        idHuman: 'julio-aŭgusto',
+        date: '2021-07-01',
+        thumbnailURL: 'https://uea.org/_/revuo/bildo?m=3&e=7&s=512px',
+        description: '[[aaaa]]',
+        editionURL: 'https://uea.org/revuoj/revuo/3/numero/7',
+    },
+    toc: {
+        md: '[[uhhhh]]',
+        html: '[[uhhhh]]',
+        text: '[[uhhhh]]',
     },
 };
