@@ -17,7 +17,7 @@ import Meta from '../../meta';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
 import AddrLabelGen from './addr-label-gen';
-import NotifTemplates from './notif-templates';
+import SendNotifTemplate from '../notif-templates/send';
 import GlobalFilterNotice from './global-filter-notice';
 import './style';
 
@@ -43,7 +43,7 @@ const connectToEverything = a => connect('codeholders/fields')(res => ({
 /// # Props
 /// - query/onQueryChange: url query handling
 /// - addrLabelGen: label gen state (see navigation)
-/// - sendNotifTemplates: notif templates state (see navigation)
+/// - sendNotifTemplate: notif templates state (see navigation)
 export default connectToEverything(class CodeholdersPage extends Page {
     state = {
         options: {
@@ -198,7 +198,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
 
     render ({
         addrLabelGen,
-        sendNotifTemplates,
+        sendNotifTemplate,
         perms,
         fields: availableFields,
         filters: availableFilters,
@@ -242,7 +242,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     overflow: true,
                 });
             }
-            if (!sendNotifTemplates) {
+            if (!sendNotifTemplate) {
                 menu.push({
                     icon: <EmailIcon style={{ verticalAlign: 'middle' }} />,
                     label: locale.notifTemplates.menuItem,
@@ -349,11 +349,13 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     lvIsCursed={this.state.currentResultIsCursed}
                     options={this.state.options}
                     onClose={() => addrLabelGen.pop()} />
-                <NotifTemplates
-                    open={sendNotifTemplates}
+                <SendNotifTemplate
+                    task="codeholders/sendNotifTemplate"
+                    jsonFilter={{ intent: 'codeholder' }}
+                    open={sendNotifTemplate}
                     lvIsCursed={this.state.currentResultIsCursed}
                     options={this.state.options}
-                    onClose={() => sendNotifTemplates.pop()} />
+                    onClose={() => sendNotifTemplate.pop()} />
             </div>
         );
     }

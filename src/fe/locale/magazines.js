@@ -66,6 +66,7 @@ export const magazines = {
 };
 
 export const magazineEditions = {
+    title: 'Revuaj numeroj',
     detailTitle: 'Revua numero',
     search: {
         fields: {
@@ -118,6 +119,10 @@ export const magazineEditions = {
         upload: 'Alŝuti',
         download: 'Elŝuti',
         downloads: n => `${n} elŝuto${n == 1 ? '' : 'j'}`,
+    },
+    picker: {
+        prompt: '[[Pick Magazine Edition]]',
+        editionPrompt: '[[Pick Edition]]',
     },
 };
 

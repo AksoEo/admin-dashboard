@@ -10,7 +10,7 @@ export default class DetailPage extends Page {
     constructor (...args) {
         super(...args);
 
-        this.setState({ edit: null });
+        this.state = { ...this.state, edit: null };
     }
 
     onBeginEdit = () => {

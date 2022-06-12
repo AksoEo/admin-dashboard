@@ -148,7 +148,7 @@ export const data = {
 Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
                 `,
                 heading: `
-## Kiel uzi titolojn
+### Kiel uzi titolojn
 \`\`\`
 # saluton
 ## mondo
@@ -157,31 +157,75 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
 [[todo]]
                 `,
                 emphasis: `
-## How to use emphasis
+### How to use emphasis
+\`\`\`
+*meow* **meow**
+\`\`\`
+*meow* **meow**
 [[todo]]
                 `,
                 strikethrough: `
-## How to use strikethrough
+### How to use strikethrough
+\`\`\`
+~~meow~~
+\`\`\`
+~~meow~~
 [[todo]]
                 `,
                 backticks: `
-## How to use back ticks
+### How to use back ticks
+\`\`\`
+\`meow\`
+\`\`\`
+\`meow\`
 [[todo]]
                 `,
                 table: `
-## how to use tables
+### how to use tables
+\`\`\`
+| meow | meow |
+| ---- | ---- |
+| meow | meow meow |
+\`\`\`
+| meow | meow |
+| ---- | ---- |
+| meow | meow meow |
 [[todo]]
                 `,
                 link: `
-## how to use links
+### how to use links
+\`\`\`
+[meow](https://example.com)
+\`\`\`
+[meow](https://example.com)
 [[todo]]
                 `,
                 image: `
-## how to use images
+### how to use images
+\`\`\`
+![priskribo](https://example.com/img.jpg)
+\`\`\`
+![priskribo](/assets/logo.svg)
 [[todo]]
                 `,
                 list: `
-## How to use lists
+### How to use lists
+\`\`\`
+- meow
+- meow
+    - meow
+
+1. meow
+2. meow
+3. meow
+\`\`\`
+- meow
+- meow
+    - meow
+
+1. meow
+2. meow
+3. meow
 [[todo]]
                 `,
             },
@@ -227,12 +271,7 @@ export const search = {
     json: {
         help: {
             title: 'JSON-helpo',
-            content: `[[json help content goes here. if you would like this to be raw html\
-            that can be arranged (it’s not like we’re going to html inject ourselves though\
-            this locale object isn’t immutable so technically that is a possibility but who\
-            would even do that)\
-            if this is going to be interactive (api doc browser?) that too can be\
-            arranged]]`,
+            content: `[[json help content goes here]]`,
         },
     },
     stats: (count, filtered, total, time) => {

@@ -375,25 +375,7 @@ export const codeholders = {
         filterInvalidAddresses: 'Elfiltri nevalidajn adresojn',
     },
     notifTemplates: {
-        cursedNotice: 'Oraj rezultoj ne ricevos mesaĝon.',
-        description: 'Mesaĝoj estos senditaj al ĉiuj membroj laŭ via nuna filtrilo.',
-        descriptionNewsletter: 'Mesaĝoj estos senditaj al ĉiuj abonantoj de la bulteno.',
         menuItem: 'Sendi amasmesaĝon',
-        title: 'Sendi amasmesaĝon',
-        empty: 'Estas neniuj ŝablonoj kun la celo “membro”',
-        emptyWithQuery: 'Estas neniuj ŝablonoj kun la celo “membro” kiuj plenumas vian filtrilon',
-        deleteOnComplete: 'Forigi la ŝablonon post sendado',
-        send: {
-            button: 'Al konfirma paŝo',
-
-            title: 'Sendi amasmesaĝon',
-            confirm: 'Sendi',
-
-            messagePre: 'Sendas mesaĝon al',
-            messagePost: n => `${n} membro${n === 1 ? '' : 'j'}`,
-            messagePostIndeterminate: 'membroj',
-            messagePostUnknown: '... kalkulas',
-        },
     },
     publicity: {
         private: 'Privata',

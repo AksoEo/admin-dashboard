@@ -59,11 +59,12 @@ export const tasks = {
         storePath: ({ newsletter }, item) => [NEWSLETTER_UNSUBS, newsletter, item.id],
     }),
 
-    send: async ({ newsletter }, { template, deleteOnComplete }) => {
+    send: async ({ newsletter }, { template, deleteOnComplete, additionalParams }) => {
         const client = await asyncClient;
         await client.post(`/newsletters/${newsletter}/!send_notif_template`, {
             notifTemplateId: template,
             deleteTemplateOnComplete: deleteOnComplete,
+            ...(additionalParams || {}),
         }, {});
     },
 };

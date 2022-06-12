@@ -57,6 +57,7 @@ export const FIELDS = {
         },
     },
     intent: {
+        slot: 'title',
         component ({ value }) {
             return <span class="notif-template-intent">{locale.intents[value]}</span>;
         },

@@ -1,6 +1,8 @@
 import { h } from 'preact';
 import { Checkbox } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
+import PublicIcon from '@material-ui/icons/Public';
+import LockIcon from '@material-ui/icons/Lock';
 import moment from 'moment';
 import LimitedTextField from '../../../../components/controls/limited-text-field';
 import MdField from '../../../../components/controls/md-field';
@@ -83,9 +85,13 @@ export const FIELDS = {
     published: {
         slot: 'icon',
         weight: 0.5,
-        component ({ value, editing, onChange }) {
+        component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <Checkbox checked={value} onChange={onChange} />;
+            }
+            if (slot === 'icon') {
+                if (value) return <PublicIcon value={{ verticalAlign: 'middle' }} />;
+                return <LockIcon value={{ verticalAlign: 'middle' }} />;
             }
             if (value) return <CheckIcon value={{ verticalAlign: 'middle' }} />;
             return '—';

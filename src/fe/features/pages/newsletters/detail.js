@@ -6,7 +6,7 @@ import DetailPage from '../../../components/detail/detail-page';
 import DetailView from '../../../components/detail/detail';
 import { newsletters as locale, newsletterUnsubs as unsubsLocale } from '../../../locale';
 import { FIELDS } from './fields';
-import NotifTemplates from '../codeholders/notif-templates';
+import SendNotifTemplate from '../notif-templates/send';
 import './detail.less';
 
 export default class Newsletter extends DetailPage {
@@ -86,9 +86,15 @@ function Footer ({ item }) {
             <Button raised onClick={() => setSending(true)}>
                 {locale.send.button}
             </Button>
-            <NotifTemplates
+            <SendNotifTemplate
                 task="newsletters/send"
                 isNewsletter
+                jsonFilter={{
+                    org: item.org,
+                    intent: {
+                        $in: ['newsletter', 'newsletter_magazine'],
+                    },
+                }}
                 options={{ newsletter: item.id }}
                 open={sending}
                 onClose={() => setSending(false)} />

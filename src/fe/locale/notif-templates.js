@@ -93,6 +93,33 @@ export const notifTemplates = {
         description: 'Por sendi amasmesaĝon al membroj, unue elektu la ricevontojn per filtrilo. Poste elektu “Sendi amasmesaĝon” en la menuo en la supra, dekstra angulo.',
         ok: 'Bone',
     },
+
+    send: {
+        title: 'Sendi amasmesaĝon',
+        cursedNotice: 'Oraj rezultoj ne ricevos mesaĝon.',
+        descriptionCodeholder: 'Mesaĝoj estos senditaj al ĉiuj membroj laŭ via nuna filtrilo.',
+        descriptionNewsletter: 'Mesaĝoj estos senditaj al ĉiuj abonantoj de la bulteno.',
+        empty: 'Estas neniuj ŝablonoj kun la celo “membro”',
+        emptyWithQuery: 'Estas neniuj ŝablonoj kun la celo “membro” kiuj plenumas vian filtrilon',
+        deleteOnComplete: 'Forigi la ŝablonon post sendado',
+        send: {
+            button: 'Al konfirma paŝo',
+
+            title: 'Sendi amasmesaĝon',
+            confirm: 'Sendi',
+
+            messagePre: 'Sendas mesaĝon al',
+            messagePost: n => `${n} membro${n === 1 ? '' : 'j'}`,
+            messagePostIndeterminate: 'membroj',
+            messagePostUnknown: '... kalkulas',
+
+            sent: '[[Messages sent.]]',
+        },
+
+        intentDescriptions: {
+            newsletterMagazine: '[[This notif template is used for magazine notifications or something and requires you to specify a magazine edition.]]',
+        },
+    },
 };
 
 export const notifTemplateIntentExamples = {

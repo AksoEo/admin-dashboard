@@ -10,32 +10,30 @@ import { notifTemplates, codeholders as locale } from '../../../locale';
 
 const SELECTED_FIELDS = [
     { id: 'org', sorting: 'none' },
+    { id: 'intent', sorting: 'none' },
     { id: 'name', sorting: 'asc' },
     { id: 'description', sorting: 'none' },
 ];
 const REDUCED_FIELDS = {
     org: FIELDS.org,
+    intent: FIELDS.intent,
     name: FIELDS.name,
     description: FIELDS.description,
 };
 
-// TODO: maybe refactor this into a generic component if this is used elsewhere?
-
 /// Big notif template picker used in the "send notification" page.
-///
-/// Will only show notifs with intent "codeholder".
 export default class NotifTemplatePicker extends PureComponent {
-    render ({ value, onChange, onChangeOrg }) {
+    render ({ value, onChange, onLoadData, jsonFilter }) {
         const onRemove = () => {
             onChange(null);
-            onChangeOrg(null);
+            onLoadData(null);
         };
 
         let contents = null;
         if (value) {
-            contents = <TemplatePreview id={value} onRemove={onRemove} onLoadOrg={onChangeOrg} />;
+            contents = <TemplatePreview id={value} onRemove={onRemove} onLoadData={onLoadData} />;
         } else {
-            contents = <TemplatePicker onChange={onChange} />;
+            contents = <TemplatePicker onChange={onChange} jsonFilter={jsonFilter} />;
         }
 
         return (
@@ -46,9 +44,12 @@ export default class NotifTemplatePicker extends PureComponent {
     }
 }
 
-function TemplatePreview ({ id, onLoadOrg, onRemove }) {
+function TemplatePreview ({ id, onLoadData, onRemove }) {
     return (
         <div class="notif-template-picked">
+            <Button icon small class="remove-picked" onClick={onRemove}>
+                <CloseIcon style={{ verticalAlign: 'middle' }} />
+            </Button>
             <OverviewListItem
                 doFetch compact
                 view="notifTemplates/template"
@@ -58,15 +59,12 @@ function TemplatePreview ({ id, onLoadOrg, onRemove }) {
                 fields={FIELDS}
                 index={0}
                 locale={notifTemplates.fields}
-                onData={data => onLoadOrg(data.org)} />
-            <Button class="remove-picked" onClick={onRemove}>
-                <CloseIcon style={{ verticalAlign: 'middle' }} />
-            </Button>
+                onData={data => onLoadData(data)} />
         </div>
     );
 }
 
-function TemplatePicker ({ onChange }) {
+function TemplatePicker ({ onChange, jsonFilter }) {
     const [offset, setOffset] = useState(0);
     const [query, setQuery] = useState('');
 
@@ -88,9 +86,7 @@ function TemplatePicker ({ onChange }) {
                 fields={REDUCED_FIELDS}
                 sorting={{ name: 'asc' }}
                 search={{ field: 'name', query }}
-                jsonFilter={{
-                    intent: 'codeholder',
-                }}
+                jsonFilter={jsonFilter}
                 offset={offset}
                 onSetOffset={setOffset}
                 limit={10}
