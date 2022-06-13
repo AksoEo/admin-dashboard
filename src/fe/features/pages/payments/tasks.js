@@ -669,4 +669,33 @@ export default {
             </TaskDialog>
         );
     },
+    setIntentPurposeValidity ({ open, task }) {
+        return (
+            <TaskDialog
+                class="payments-task-set-purpose-validity"
+                open={open}
+                onClose={() => task.drop()}
+                title={intentLocale.setPurposeValidity.title}
+                actionLabel={intentLocale.setPurposeValidity.button}
+                run={() => task.runOnce()}>
+                <div class="inner-field">
+                    {intentLocale.setPurposeValidity.description}
+                    <Select
+                        class="inner-value"
+                        value={task.parameters.invalid ? 'invalid' : 'valid'}
+                        onChange={value => task.update({ invalid: value === 'invalid' })}
+                        items={[
+                            {
+                                value: 'invalid',
+                                label: intentLocale.setPurposeValidity.optInvalid,
+                            },
+                            {
+                                value: 'valid',
+                                label: intentLocale.setPurposeValidity.optValid,
+                            },
+                        ]} />
+                </div>
+            </TaskDialog>
+        );
+    },
 };

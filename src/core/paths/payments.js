@@ -539,6 +539,17 @@ export const tasks = {
             email,
         });
     },
+    setIntentPurposeValidity: async ({ intent, purpose }, { invalid }) => {
+        const client = await asyncClient;
+        await client.post(`/aksopay/payment_intents/${intent}/!set_purpose_validity`, {
+            purposeIndex: purpose,
+            invalid,
+        });
+        // reset purposes field
+        store.insert([PAYMENT_INTENTS, intent, 'purposes'], undefined);
+        // update
+        tasks.getIntent({ id: intent }, { fields: ['purposes'] }).catch(() => {});
+    },
 
     report: async (_, { time, currency }) => {
         const client = await asyncClient;

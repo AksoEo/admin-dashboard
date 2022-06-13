@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import { Button, TextField } from 'yamdl';
+import { PureComponent, useState } from 'preact/compat';
+import { Button, Menu, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
 import AnnouncementIcon from '@material-ui/icons/Announcement';
@@ -10,6 +10,7 @@ import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 import HourglassFullIcon from '@material-ui/icons/HourglassFull';
 import AssignmentTurnedInIcon from '@material-ui/icons/AssignmentTurnedIn';
 import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail/detail';
 import OrgIcon from '../../../../components/org-icon';
@@ -218,7 +219,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                 {!editing && (
                     <div class="intent-purposes">
                         {(purposes || [])
-                            .map((purpose, i) => <Purpose key={i} purpose={purpose} item={item} />)}
+                            .map((purpose, i) => <Purpose key={i} purpose={purpose} index={i} item={item} />)}
                     </div>
                 )}
                 {!editing && <IntentActions item={item} />}
@@ -258,7 +259,10 @@ const PaymentOrgName = connect(({ id }) => ['payments/org', {
     return <Link target={`/aksopago/organizoj/${id}`} outOfTree>{name}</Link>;
 });
 
-function Purpose ({ purpose, item }) {
+function Purpose ({ purpose, item, index }) {
+    const [optionsOpen, setOptionsOpen] = useState(false);
+    const [optionsPos, setOptionsPos] = useState([0, 0]);
+
     let title = '';
     let description = '';
     let trigger = null;
@@ -277,13 +281,18 @@ function Purpose ({ purpose, item }) {
     }
 
     return (
-        <div class="intent-split-card">
+        <div class={'intent-split-card' + (purpose.invalid ? ' is-invalid' : '')}>
             <div class="card-id">
                 <span class="purpose-type">
                     {locale.fields.purposeTypes[purpose.type]}
                 </span>
             </div>
             <div class="card-details">
+                {purpose.invalid && (
+                    <div class="card-invalid">
+                        {locale.fields.purpose.invalid}
+                    </div>
+                )}
                 <div class="card-title">
                     {title}
                 </div>
@@ -297,6 +306,43 @@ function Purpose ({ purpose, item }) {
             <div class="card-after">
                 <div class="purpose-amount">
                     <currencyAmount.renderer value={purpose.amount} currency={item.currency} />
+                </div>
+                <div class="purpose-options">
+                    <Button icon small class="options-button" onClick={e => {
+                        setOptionsOpen(true);
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setOptionsPos([
+                            rect.right - rect.width / 4,
+                            rect.top + rect.height / 4,
+                        ]);
+                    }}>
+                        <MoreVertIcon />
+                    </Button>
+                    <coreContext.Consumer>
+                        {core => (
+                            <Menu
+                                open={optionsOpen}
+                                position={optionsPos}
+                                anchor={[1, 0]}
+                                onClose={() => setOptionsOpen(false)}
+                                items={[
+                                    {
+                                        label: purpose.invalid
+                                            ? locale.fields.purpose.menu.validate
+                                            : locale.fields.purpose.menu.invalidate,
+                                        action: () => {
+                                            core.createTask('payments/setIntentPurposeValidity', {
+                                                intent: item.id,
+                                                purpose: index,
+                                            }, {
+                                                invalid: !purpose.invalid,
+                                            });
+                                            setOptionsOpen(false);
+                                        },
+                                    },
+                                ]} />
+                        )}
+                    </coreContext.Consumer>
                 </div>
             </div>
         </div>

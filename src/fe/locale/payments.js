@@ -252,12 +252,17 @@ export const paymentIntents = {
             addon: 'Aldoneblo',
         },
         purpose: {
+            invalid: '[[Invalidated]]',
             triggerAmount: 'Ŝaltota monsumo',
             originalAmount: 'Nerabatita prezo',
             triggerStatuses: {
                 awaiting: 'Atendas sukcesan pagon',
                 processing: 'Traktas AKSO-agon',
                 triggered: 'Fintraktita',
+            },
+            menu: {
+                invalidate: '[[Set invalid]]',
+                validate: '[[Set as valid]]',
             },
         },
     },
@@ -437,6 +442,13 @@ export const paymentIntents = {
         email: 'Anstataŭa ricevanta retpoŝtadreso',
         noEmail: 'Retpoŝtadreso estas deviga',
         button: 'Sendi',
+    },
+    setPurposeValidity: {
+        title: '[[Set Purpose Validity]]',
+        description: '[[Set purpose validity to]]',
+        optValid: '[[valid]]',
+        optInvalid: '[[invalid]]',
+        button: '[[Apply]]',
     },
 
     report: {
