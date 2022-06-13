@@ -1,8 +1,13 @@
 import { h, Component } from 'preact';
-import { Button } from 'yamdl';
+import { lazy, Suspense, useState } from 'preact/compat';
+import { Button, Dialog } from 'yamdl';
 import SearchIcon from '@material-ui/icons/Search';
+import HelpIcon from '@material-ui/icons/Help';
 import Select from '../controls/select';
+import { search as locale } from '../../locale';
 import './search-input.less';
+
+const MdField = lazy(() => import('../controls/md-field'));
 
 export default class SearchInputFocusable extends Component {
     #node;
@@ -59,6 +64,8 @@ function SearchInput ({
     inputRef,
     compact,
 }) {
+    const [showingHelp, setShowHelp] = useState(false);
+
     return (
         <div class={'search-input' + (compact ? ' is-compact' : '')} ref={innerRef}>
             {!!searchFields && (
@@ -88,6 +95,19 @@ function SearchInput ({
                 <Button
                     icon
                     small
+                    class="search-action search-help"
+                    onClick={() => setShowHelp(true)}>
+                    <HelpIcon />
+                    <Dialog
+                        title={locale.searchHelp.title}
+                        open={showingHelp}
+                        onClose={() => setShowHelp(false)}>
+                        <SearchHelpContents />
+                    </Dialog>
+                </Button>
+                <Button
+                    icon
+                    small
                     class="search-action search-submit"
                     tabIndex={-1} // submit with enter
                     onClick={onSubmit}>
@@ -95,5 +115,15 @@ function SearchInput ({
                 </Button>
             </div>
         </div>
+    );
+}
+
+function SearchHelpContents () {
+    return (
+        <Suspense fallback={'...'}>
+            <MdField
+                value={locale.searchHelp.contents}
+                rules={['emphasis', 'strikethrough', 'backticks', 'list']} />
+        </Suspense>
     );
 }

@@ -310,6 +310,19 @@ export const search = {
         sortingDescription: 'La rezultoj estas ordigitaj laŭ la ordo de la kampoj, de supro al malsupro',
         ok: 'Bone',
     },
+    searchHelp: {
+        title: '[[Search Help]]',
+        contents: `
+Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon:
+
+- \`*\` post vorto por permesi ajnajn sekvantajn signojn post la vorto
+- \`+\` antaŭ vorto por postuli ĝian ekziston
+- \`-\` antaŭ vorto por postuli ĝian malekziston
+- \`""\`-citilojn ĉirkaŭ frazo aŭ vorto por postuli la ekzaktan kombinon de la vortoj
+
+Serĉoj kun kontrolsignoj ne rajtas enhavi vortojn malpli longajn ol tri signoj.
+        `,
+    },
 };
 
 export const detail = {
