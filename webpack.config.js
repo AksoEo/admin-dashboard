@@ -12,14 +12,10 @@ const webpack = require('webpack');
 const pkg = require('./package.json');
 
 const browserTargets = {
-    // because Web Worker API
-    edge: '18',
-    // because CSS grid
-    chrome: '57',
-    // ?
-    firefox: '63',
-    // because CSS grid
-    safari: '10',
+    // >1% on 2022-06-12
+    chrome: '97',
+    firefox: '96',
+    safari: '14',
 };
 
 const aksoBase = process.env['AKSO_BASE'] || 'https://api.akso.org';
@@ -47,7 +43,7 @@ module.exports = function (env, argv) {
         mode: prod ? 'production' : 'development',
         entry,
         output: {
-            filename: prod ? '[name].[hash].js' : '[name].js',
+            filename: prod ? '[name].[fullhash].js' : '[name].js',
             chunkFilename: (prod && !analyze) ? '[id].[chunkhash].js' : '[name].js',
             globalObject: 'this',
         },
@@ -99,8 +95,8 @@ module.exports = function (env, argv) {
                 Buffer: ['buffer', 'Buffer'],
             }),
             new MiniCssExtractPlugin({
-                filename: prod ? '[name].[hash].css' : '[name].css',
-                chunkFilename: prod ? '[id].[hash].css' : '[name].css',
+                filename: prod ? '[name].[fullhash].css' : '[name].css',
+                chunkFilename: prod ? '[id].[fullhash].css' : '[name].css',
                 ignoreOrder: true,
             }),
             new HtmlWebpackPlugin({

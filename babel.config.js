@@ -1,14 +1,10 @@
 const pkg = require('./package.json');
 
 const browserTargets = {
-    // because Web Worker API
-    edge: '18',
-    // because CSS grid
-    chrome: '57',
-    // ?
-    firefox: '63',
-    // because CSS grid
-    safari: '10',
+    // >1% on 2022-06-12
+    chrome: '97',
+    firefox: '96',
+    safari: '14',
 };
 
 module.exports = {

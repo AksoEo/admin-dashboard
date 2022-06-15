@@ -16,22 +16,33 @@ var extraMessage = '';
 
 var minVersion = '';
 
+var browserTargets = {
+    // >1% on 2022-06-12
+    chrome: '97',
+    firefox: '96',
+    safari: '14',
+};
+
 if (msEdgeVersion) {
-    minVersion = 18;
+    minVersion = 19;
     isSupported = +msEdgeVersion[2] >= minVersion;
     browserName = 'Microsoft Edge ' + msEdgeVersion[2];
+}
+
+if (msEdgeVersion && !isSupported) {
+    // we do this so that newer edge falls through to chrome
 } else if (chromiumVersion) {
-    minVersion = 57;
+    minVersion = +browserTargets.chrome;
     isSupported = +chromiumVersion[2] >= minVersion;
     browserName = chromiumVersion[1] + ' ' + chromiumVersion[2];
     updateLink = googleLink;
 } else if (firefoxVersion) {
-    minVersion = 63;
+    minVersion = +browserTargets.firefox;
     isSupported = +firefoxVersion[2] >= minVersion;
     browserName = firefoxVersion[1] + ' ' + firefoxVersion[2];
     updateLink = firefoxLink;
 } else if (safariVersion) {
-    minVersion = 10;
+    minVersion = +browserTargets.safari;
     isSupported = +safariVersion[2] >= minVersion;
     browserName = 'Safari ' + safariVersion[2];
 }
