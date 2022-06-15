@@ -64,9 +64,9 @@ export const index = {
             intermediary: 'Spezfolioj',
             registration: 'Aliĝoj',
             changeRequests: 'Ŝanĝopetoj',
-            delegateApplications: '[[Delegate Applications]]',
-            delegateMissingCities: '[[Delegate Missing Cities]]',
-            magPaperNoAddress: '[[Magazine PaperNoAddress]]',
+            delegateApplications: 'Delegitaj kandidatiĝoj',
+            delegateMissingCities: 'Malaperintaj delegiturboj',
+            magPaperNoAddress: 'Revuaj abonantoj sen adreso',
         },
         otherTabs: n => `alia${n === 1 ? '' : 'j'} tasko${n === 1 ? '' : 'j'}`,
     },
@@ -83,7 +83,7 @@ Bonvolu indiki detale la problemon, prefere aldonante ekranfotojn. Se tio sencas
 5. Ĉu la problemo okazas ĉiufoje?
 
 
-En la mesaĝo vi nepre ĉiam aldonu la ĉi-subajn sistemajn informojn.`,
+En la mesaĝo vi nepre ĉiam aldonu eventualajn erarmesaĝojn donitajn al vi de la sistemo kaj la ĉi-subajn sistemajn informojn.`,
         systemInfo: {
             title: 'Informoj pri via sistemo',
             copy: 'Kopii',

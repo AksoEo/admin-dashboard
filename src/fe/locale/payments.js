@@ -117,9 +117,9 @@ export const paymentMethods = {
 
         prices: 'Kotizoj',
 
-        maxAmount: '[[MaxAmount]]',
-        maxAmountEnable: '[[Use max amount]]',
-        maxAmountErrMinAmount: '[[Must be at least 1 USD]]',
+        maxAmount: 'Maksimuma sumo',
+        maxAmountEnable: 'Uzi maksimuman sumon',
+        maxAmountErrMinAmount: 'La maksimuma sumo ne rajtas esti malpli ol 1 USD.',
     },
     prices: {
         addYear: 'Aldoni jaron',
@@ -252,7 +252,7 @@ export const paymentIntents = {
             addon: 'Aldoneblo',
         },
         purpose: {
-            invalid: '[[Invalidated]]',
+            invalid: 'Nevalidigita',
             triggerAmount: 'Ŝaltota monsumo',
             originalAmount: 'Nerabatita prezo',
             triggerStatuses: {
@@ -261,8 +261,8 @@ export const paymentIntents = {
                 triggered: 'Fintraktita',
             },
             menu: {
-                invalidate: '[[Set invalid]]',
-                validate: '[[Set as valid]]',
+                invalidate: 'Nevalidigi',
+                validate: 'Revalidigi',
             },
         },
     },
@@ -312,8 +312,6 @@ export const paymentIntents = {
         },
         intermediary: {
             cancel: 'Nuligi spezfolion',
-            markDisputed: '[[Mark disputed]]',
-            markRefunded: '[[Mark refunded]]',
             markSucceeded: 'Akcepti spezfolion',
             submit: 'Ensendi',
         },
@@ -427,7 +425,7 @@ export const paymentIntents = {
         purposes: 'Pagceloj',
         total: 'Sumo',
         totalNote: 'La sumo estas supozo, la ver valoro estos la ekvivalento de minimume 1 USD/maksimume 500.000 USD',
-        totalOverMaxAmount: '[[The total amount is above the max amount allowed for this payment method.]]',
+        totalOverMaxAmount: 'La pagenda sumo estas pli granda ol la maksimuma sumo de tiu ĉi pagmaniero. Bonvolu elekti alian pagmanieron.',
         hardMaxAmountUsd: 50000000,
     },
     update: {
@@ -444,11 +442,11 @@ export const paymentIntents = {
         button: 'Sendi',
     },
     setPurposeValidity: {
-        title: '[[Set Purpose Validity]]',
-        description: '[[Set purpose validity to]]',
-        optValid: '[[valid]]',
-        optInvalid: '[[invalid]]',
-        button: '[[Apply]]',
+        title: 'Agordi validecon de pagcelo',
+        description: 'Agordos la validecon de la pagcelo kiel',
+        optValid: 'valida',
+        optInvalid: 'nevalida',
+        button: 'Konservi',
     },
 
     report: {

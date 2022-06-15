@@ -121,8 +121,8 @@ export const magazineEditions = {
         downloads: n => `${n} elŝuto${n == 1 ? '' : 'j'}`,
     },
     picker: {
-        prompt: '[[Pick Magazine Edition]]',
-        editionPrompt: '[[Pick Edition]]',
+        prompt: 'Elekti revuan numeron',
+        editionPrompt: 'Elekti revuan numeron',
     },
 };
 

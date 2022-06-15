@@ -47,7 +47,7 @@ export const notifTemplates = {
     intents: {
         codeholder: 'membro',
         newsletter: 'bulteno',
-        newsletter_magazine: '[[newsletter_magazine]]',
+        newsletter_magazine: 'revua bulteno',
     },
     sendIntent: 'Sendi mesaĝon',
     preview: {
@@ -113,11 +113,11 @@ export const notifTemplates = {
             messagePostIndeterminate: 'membroj',
             messagePostUnknown: '... kalkulas',
 
-            sent: '[[Messages sent.]]',
+            sent: 'Sendis mesaĝojn.',
         },
 
         intentDescriptions: {
-            newsletterMagazine: '[[This notif template is used for magazine notifications or something and requires you to specify a magazine edition.]]',
+            newsletterMagazine: 'Tiu ĉi amasmesaĝa ŝablono estas por dissendado de bultenoj anoncantaj novan numeron de revuo. Pro tio, vi devas elekti la numeron de tiu revuo kiun ĝi anoncu.',
         },
     },
 };
@@ -162,12 +162,12 @@ export const notifTemplateIntentExamples = {
         idHuman: 'julio-aŭgusto',
         date: '2021-07-01',
         thumbnailURL: 'https://uea.org/_/revuo/bildo?m=3&e=7&s=512px',
-        description: '[[aaaa]]',
+        description: 'La plej nova numero de la revuo Esperanto enhavas interalie …',
         editionURL: 'https://uea.org/revuoj/revuo/3/numero/7',
     },
     toc: {
-        md: '[[uhhhh]]',
-        html: '[[uhhhh]]',
-        text: '[[uhhhh]]',
+        md: 'Enhavo aperos tie ĉi.',
+        html: '<p>Enhavo aperos tie ĉi.</p>',
+        text: 'Enhavo aperos tie ĉi.',
     },
 };

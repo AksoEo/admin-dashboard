@@ -153,81 +153,68 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
 # saluton
 ## mondo
 \`\`\`
-
-[[todo]]
-                `,
+# saluton
+## mondo`,
                 emphasis: `
-### How to use emphasis
+### Kiel uzi emfazon
 \`\`\`
-*meow* **meow**
+*saluton* **mondo**
 \`\`\`
-*meow* **meow**
-[[todo]]
-                `,
+*saluton* **mondo**,
                 strikethrough: `
-### How to use strikethrough
+### Kiel uzi trastrekon
 \`\`\`
-~~meow~~
+~~saluton mondo~~
 \`\`\`
-~~meow~~
-[[todo]]
-                `,
+~~saluton mondo~~`,
                 backticks: `
-### How to use back ticks
+### Kiel uzi kodekzemplojn unuliniajn
 \`\`\`
-\`meow\`
+\`saluton mondo\`
 \`\`\`
-\`meow\`
-[[todo]]
-                `,
+\`saluton mondo\``,
                 table: `
-### how to use tables
+### Kiel uzi tabelojn
 \`\`\`
-| meow | meow |
-| ---- | ---- |
-| meow | meow meow |
+| saluton | mondo     |
+| ------- | --------- |
+| kiel    | vi fartas |
 \`\`\`
-| meow | meow |
+| saluton | mondo |
 | ---- | ---- |
-| meow | meow meow |
-[[todo]]
-                `,
+| kiel | vi fartas |`,
                 link: `
-### how to use links
+### Kiel uzi ligilojn
 \`\`\`
-[meow](https://example.com)
+[alklaku min](https://uea.org)
 \`\`\`
-[meow](https://example.com)
-[[todo]]
-                `,
+[alklaku min](https://uea.org)`,
                 image: `
-### how to use images
+### Kiel uzi bildojn
 \`\`\`
-![priskribo](https://example.com/img.jpg)
+![Mi aperas se la bildo ne funkcias](https://uea.org/bildo.jpg)
 \`\`\`
-![priskribo](/assets/logo.svg)
-[[todo]]
-                `,
+![Mi aperas se la bildo ne funkcias](/assets/logo.svg) `,
                 list: `
-### How to use lists
+### Kiel uzi listojn
 \`\`\`
-- meow
-- meow
-    - meow
+- saluton
+- mondo
+    - kaj mondanoj
 
-1. meow
-2. meow
-3. meow
+1. mi
+2. pli
+3. gravas
+4. ol mi
 \`\`\`
-- meow
-- meow
-    - meow
+- saluton
+- mondo
+    - kaj mondanoj
 
-1. meow
-2. meow
-3. meow
-[[todo]]
-                `,
+1. mi
+2. pli
+3. gravas
+4. ol mi`,
             },
         },
     },
