@@ -160,7 +160,7 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
 \`\`\`
 *saluton* **mondo**
 \`\`\`
-*saluton* **mondo**,
+*saluton* **mondo**`,
                 strikethrough: `
 ### Kiel uzi trastrekon
 \`\`\`
