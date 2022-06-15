@@ -3,6 +3,7 @@ import { PureComponent, Fragment } from 'preact/compat';
 import ErrorIcon from '@material-ui/icons/Error';
 import { connect } from '../../../../core/connection';
 import TinyProgress from '../../../../components/controls/tiny-progress';
+import DisplayError from '../../../../components/utils/error';
 import { country } from '../../../../components/data';
 import { data as locale } from '../../../../locale';
 import './geo-city.less';
@@ -12,10 +13,22 @@ export default connect(
     ['id']
 )((data, _, err) => ({ data, err }))(class GeoCity extends PureComponent {
     render ({ data, err, short, ...extra }) {
-        if (err) return <ErrorIcon style={{ verticalAlign: 'middle' }}/>;
-        if (!data) return <TinyProgress />;
-
         extra.class = (extra.class || '') + ' delegate-geo-city';
+
+        if (err) {
+            extra.class += ' is-error';
+            return (
+                <span {...extra}>
+                    <span class="inner-icon">
+                        <ErrorIcon style={{ verticalAlign: 'middle' }}/>
+                    </span>
+                    <span class="inner-error">
+                        <DisplayError error={err} />
+                    </span>
+                </span>
+            );
+        }
+        if (!data) return <TinyProgress />;
 
         return (
             <span title={`WikiData ${data.id}`} {...extra}>
