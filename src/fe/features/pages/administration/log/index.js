@@ -162,6 +162,7 @@ export default class APILogListView extends Page {
                     parameters={parameters}
                     expanded={expanded}
                     fields={FIELDS}
+                    waitUntilFiltersLoaded
                     onGetItemLink={id => `/administrado/protokolo/${id}`}
                     onSetFields={fields => this.setState({ parameters: { ...parameters, fields }})}
                     onSetOffset={offset => this.setState({ parameters: { ...parameters, offset }})}

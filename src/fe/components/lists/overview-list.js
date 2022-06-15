@@ -53,6 +53,7 @@ function scrollToNode (node) {
 /// - compact: if true, will force compact view
 /// - compactItems: if true, will force compact view, but only for items
 /// - userData: user data to pass to fields
+/// - waitUntilFiltersLoaded: delay first load until after filters have loaded
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
@@ -128,7 +129,7 @@ export default class OverviewList extends PureComponent {
     }
 
     #reloadTimeout;
-    #skipNextDebounce = true;
+    #skipNextDebounce = !this.props.waitUntilFiltersLoaded;
 
     /// Might trigger a reload.
     maybeReload () {
@@ -178,7 +179,6 @@ export default class OverviewList extends PureComponent {
         const paramsDidChange = this.props.useDeepCmp
             ? !deepEq(prevProps.options, this.props.options) || !deepEq(prevProps.parameters, this.props.parameters)
             : prevProps.options !== this.props.options || prevProps.parameters !== this.props.parameters;
-
 
         if (paramsDidChange || (prevProps.task !== this.props.task)) {
             this.#stale = true;

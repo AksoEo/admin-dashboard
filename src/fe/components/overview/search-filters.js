@@ -48,6 +48,7 @@ export default class SearchFilters extends PureComponent {
         if (!this.props.filters || !Object.keys(this.props.filters).length) return;
         const newValue = { ...this.props.value };
         if (!newValue.filters) newValue.filters = {};
+        else newValue.filters = { ...newValue.filters };
         let didChange = false;
         for (const filterId in this.props.filters) {
             if (!(filterId in newValue.filters)) {
@@ -141,7 +142,7 @@ export default class SearchFilters extends PureComponent {
         const filtersEnabled = value.filters && !value.filters._disabled;
         for (const filterId in filters) {
             // TODO: filter constaints
-            if (!value.filters[filterId]) continue; // handled above
+            if (!value.filters || !value.filters[filterId]) continue; // handled above
             const isEnabled = value.filters[filterId].enabled;
             const filterIsHidden = !filtersEnabled || (!isEnabled && !expanded);
             items.push({
@@ -223,7 +224,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
 }) {
     const [pickerOpen, setPickerOpen] = useState(false);
 
-    const filterType = value.filters._disabled ? 'json' : 'normal';
+    const filterType = value.filters?._disabled ? 'json' : 'normal';
     const onFilterTypeChange = type => {
         const json = type === 'json';
         const _savedFilter = json
@@ -429,6 +430,8 @@ const FilterPicker = connectPerms(function FilterPicker ({ category, open, onClo
 });
 
 function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData, expanded }) {
+    const [nextCommit] = useState({ filter: null });
+
     const FilterEditor = spec.editor;
 
     let filterSwitch;
@@ -460,12 +463,30 @@ function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData, e
                 filter={filter}
                 onFilterChange={onFilterChange}
                 value={filter.value}
-                // SUPER HACKY: allow batched calls to onChange/onEnabledChange by also writing
-                // to the filter prop
-                onChange={value => onFilterChange(filter = { ...filter, value })}
+                // SUPER HACKY: allow batched calls to onChange/onEnabledChange by delaying the
+                // commit
+                onChange={value => {
+                    const shouldRequestFrame = !!nextCommit.filter;
+                    nextCommit.filter = { ...(nextCommit.filter || filter), value };
+                    if (shouldRequestFrame) {
+                        requestAnimationFrame(() => {
+                            onFilterChange(nextCommit.filter);
+                            nextCommit.filter = null;
+                        });
+                    }
+                }}
                 enabled={filter.enabled}
                 hidden={hidden}
-                onEnabledChange={enabled => onFilterChange(filter = { ...filter, enabled })}
+                onEnabledChange={enabled => {
+                    const shouldRequestFrame = !!nextCommit.filter;
+                    nextCommit.filter = { ...(nextCommit.filter || filter), enabled };
+                    if (shouldRequestFrame) {
+                        requestAnimationFrame(() => {
+                            onFilterChange(nextCommit.filter);
+                            nextCommit.filter = null;
+                        });
+                    }
+                }}
                 expanded={expanded}
                 userData={userData} />
         </div>

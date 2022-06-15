@@ -316,6 +316,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     parameters={options}
                     expanded={expanded}
                     fields={FIELDS}
+                    waitUntilFiltersLoaded
                     onGetItemLink={id => `/membroj/${id}`}
                     onSetFields={fields => this.setState({ options: { ...options, fields }})}
                     onSetOffset={offset => this.setState({ options: { ...options, offset }})}
