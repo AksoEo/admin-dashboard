@@ -258,7 +258,7 @@ export const search = {
     json: {
         help: {
             title: 'Helpo pri JSON-filtriloj',
-            content: `Por lerni kiel uzi JSON-filtrilojn, bonvolu legi [tiun ĉi manlibreton](https://github.com/AksoEo/docs/blob/master/jsonfilters-eo.md).`,
+            content: `Por lerni kiel uzi JSON-filtrilojn, bonvolu legi [tiun ĉi manlibreton](https://github.com/AksoEo/docs/blob/master/jsonfilters-eo.md#kio-estas-json-filtriloj-kaj-kiel-ili-uzeblas).`,
         },
     },
     stats: (count, filtered, total, time) => {
