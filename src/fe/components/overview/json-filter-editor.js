@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { lazy, Suspense, PureComponent } from 'preact/compat';
 import CodeMirror from 'codemirror';
 import { Controlled as RCodeMirror } from 'react-codemirror2';
 import JSON5 from 'json5';
@@ -11,6 +11,8 @@ import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import { search as locale } from '../../locale';
 import './json-filter-editor.less';
+
+const MdField = lazy(() => import('../controls/md-field'));
 
 const DEFAULT_VALUE = '{\n\t\n}'; // must be equal to {}
 
@@ -211,11 +213,14 @@ export default class JSONFilterEditor extends PureComponent {
                     onBeforeChange={(editor, data, value) => this.onChange(value)} />
                 <Dialog
                     open={this.state.helpOpen}
-                    backdrop
                     onClose={() => this.setState({ helpOpen: false })}
                     fullScreen={width => width < 500}
                     title={locale.json.help.title}>
-                    {locale.json.help.content}
+                    <Suspense fallback="…">
+                        <MdField
+                            rules={['link', 'list', 'image']}
+                            value={locale.json.help.content} />
+                    </Suspense>
                 </Dialog>
             </div>
         );

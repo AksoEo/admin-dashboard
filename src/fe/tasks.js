@@ -32,7 +32,6 @@ export function openExternalLink ({ open, task }) {
             backdrop
             open={open}
             onClose={() => task.drop()}
-            title={locale.openExternalLink.title}
             actions={[
                 {
                     label: locale.cancel,
@@ -50,6 +49,7 @@ export function openExternalLink ({ open, task }) {
                     },
                 },
             ]}>
+            <div class="inner-description">{locale.openExternalLink.title}</div>
             <code>{task.options.link}</code>
         </Dialog>
     );

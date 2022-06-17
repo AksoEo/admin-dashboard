@@ -466,24 +466,32 @@ function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData, e
                 // SUPER HACKY: allow batched calls to onChange/onEnabledChange by delaying the
                 // commit
                 onChange={value => {
-                    const shouldRequestFrame = !!nextCommit.filter;
+                    const shouldCommit = !nextCommit.filter;
                     nextCommit.filter = { ...(nextCommit.filter || filter), value };
-                    if (shouldRequestFrame) {
+                    if (shouldCommit) {
                         requestAnimationFrame(() => {
-                            onFilterChange(nextCommit.filter);
+                            const filter = nextCommit.filter;
+                            if (!filter) {
+                                throw new Error('filter commit is null! this should not happen');
+                            }
                             nextCommit.filter = null;
+                            onFilterChange(filter);
                         });
                     }
                 }}
                 enabled={filter.enabled}
                 hidden={hidden}
                 onEnabledChange={enabled => {
-                    const shouldRequestFrame = !!nextCommit.filter;
+                    const shouldCommit = !nextCommit.filter;
                     nextCommit.filter = { ...(nextCommit.filter || filter), enabled };
-                    if (shouldRequestFrame) {
+                    if (shouldCommit) {
                         requestAnimationFrame(() => {
-                            onFilterChange(nextCommit.filter);
+                            const filter = nextCommit.filter;
+                            if (!filter) {
+                                throw new Error('filter commit is null! this should not happen');
+                            }
                             nextCommit.filter = null;
+                            onFilterChange(filter);
                         });
                     }
                 }}
