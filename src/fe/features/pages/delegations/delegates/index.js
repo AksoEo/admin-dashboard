@@ -131,7 +131,9 @@ export default connectPerms(class DelegatesPage extends Page {
                     }}
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
-                    inputRef={view => this.#searchInput = view} />
+                    inputRef={view => this.#searchInput = view}
+                    category="delegations"
+                    filtersToAPI="delegations/delegateFiltersToAPI" />
                 <OverviewList
                     task={this.codeholderId ? 'codeholders/listDelegations' : 'delegations/listDelegates'}
                     options={this.codeholderId ? { id: this.codeholderId } : null}

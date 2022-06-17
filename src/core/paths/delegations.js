@@ -1,4 +1,5 @@
 import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, simpleDataView } from '../templates';
+import { filtersToAPI } from '../list';
 import { createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
@@ -81,6 +82,9 @@ export const tasks = {
             item.id = item.codeholderId + '~' + item.org;
         },
     }),
+    delegateFiltersToAPI: async ({ filters }) => {
+        return filtersToAPI(delegateFilters, filters);
+    },
 
     // hack: used in export
     listDelegatesExt: crudList({
@@ -148,6 +152,9 @@ export const tasks = {
         ],
         storePath: (_, { id }) => [DELEGATION_APPLICATIONS, id],
     }),
+    applicationFiltersToAPI: async ({ filters }) => {
+        return filtersToAPI(applicationFilters, filters);
+    },
     application: crudGet({
         apiPath: ({ id }) => `/delegations/applications/${id}`,
         fields: [

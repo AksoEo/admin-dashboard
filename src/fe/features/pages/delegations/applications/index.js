@@ -99,7 +99,9 @@ export default connectPerms(class DelegateApplicationsPage extends Page {
                     }}
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
-                    inputRef={view => this.#searchInput = view} />
+                    inputRef={view => this.#searchInput = view}
+                    category="delegationsappl"
+                    filtersToAPI="delegations/applicationFiltersToAPI" />
                 <OverviewList
                     task={'delegations/listApplications'}
                     updateView={['delegations/sigApplications']}
