@@ -257,8 +257,8 @@ export const search = {
     filtersDisclosure: 'Filtriloj',
     json: {
         help: {
-            title: 'JSON-helpo',
-            content: `[[json help content goes here]]`,
+            title: 'Helpo pri JSON-filtriloj',
+            content: `Por lerni kiel uzi JSON-filtrilojn, bonvolu legi [tiun ĉi manlibreton](https://github.com/AksoEo/docs/blob/master/jsonfilters-eo.md).`,
         },
     },
     stats: (count, filtered, total, time) => {
@@ -298,7 +298,7 @@ export const search = {
         ok: 'Bone',
     },
     searchHelp: {
-        title: '[[Search Help]]',
+        title: 'Kiel bone serĉi en AKSO',
         contents: `
 Eblas uzi la jenajn kontrolsignojn por fari malsimplan serĉon:
 
