@@ -20,9 +20,16 @@ const AKSO_REPR = 'org.akso.admin.v1';
 
 const EXPR_DELIM = '\x91';
 
-// TODO: maybe derive this data from the other filters when the user switches for the first time?
-// TODO: some way of adding EXPR_DELIM to json
-// TODO: improve editing of expr/delims (make them atomic?)
+const EXPRS = {
+    currentYear: () => new Date().getFullYear().toString(),
+    lastYear: () => (new Date().getFullYear() - 1).toString(),
+    nextYear: () => (new Date().getFullYear() + 1).toString(),
+};
+
+function evalExpr (expr) {
+    if (expr in EXPRS) return EXPRS[expr]();
+    return '0';
+}
 
 // TODO: use custom JSON highlighter instead so templates don’t break the rest of the highlighting
 CodeMirror.defineMode('akso-json-template', () => ({
@@ -55,6 +62,7 @@ CodeMirror.defineMode('akso-json-template', () => ({
 /// - onCollapse: callback
 /// - disabled: disabled state
 /// - suppressInitialRoundTrip: set to true to prevent onChange when initializing
+/// - enableTemplates: bool - true to enable templating variables
 export default class JSONFilterEditor extends PureComponent {
     state = {
         helpOpen: false,
@@ -99,8 +107,7 @@ export default class JSONFilterEditor extends PureComponent {
         const jsonString = source.map(({ type, value }) => {
             if (type === 'text') return value;
             else if (type === 'expr') {
-                // TODO: parse expr
-                return '0';
+                return evalExpr(value);
             }
         }).join('');
         const filter = this.validateJSON(jsonString) || {};
@@ -114,9 +121,62 @@ export default class JSONFilterEditor extends PureComponent {
         });
     }
 
+    onInsertExpr = (expr) => {
+        this.editor.replaceSelection(EXPR_DELIM + expr + EXPR_DELIM);
+    };
+
     lastErrorLine = -1;
     lastWidget = null;
     editor = null;
+    templateMarkings = [];
+
+    updateTemplateMarkings () {
+        for (const marking of this.templateMarkings) marking.clear();
+        this.templateMarkings = [];
+
+        this.editor.doc.eachLine(line => {
+            const lineNo = line.lineNo();
+
+            let exprState = null;
+            for (let i = 0; i < line.text.length; i++) {
+                const ch = line.text[i];
+
+                if (exprState) {
+                    if (ch === EXPR_DELIM) {
+                        exprState.end = { line: lineNo, ch: i + 1 };
+
+                        const node = document.createElement('span');
+                        if (EXPRS[exprState.text]) {
+                            node.className = 'akso-json-marked-atom';
+                            node.textContent = locale.json.exprs[exprState.text];
+                        } else {
+                            node.className = 'akso-json-marked-atom is-invalid';
+                            node.textContent = `?${exprState.text}?`;
+                        }
+
+                        const marking = this.editor.doc.markText(
+                            exprState.start,
+                            exprState.end,
+                            {
+                                className: 'akso-json-marked-template',
+                                replacedWith: node,
+                            },
+                        );
+                        this.templateMarkings.push(marking);
+
+                        exprState = null;
+                    } else {
+                        exprState.text += ch;
+                    }
+                    continue;
+                }
+
+                if (ch === EXPR_DELIM) {
+                    exprState = { start: { line: lineNo, ch: i }, text: '' };
+                }
+            }
+        });
+    }
 
     validateJSON (value) {
         let error = null;
@@ -176,6 +236,7 @@ export default class JSONFilterEditor extends PureComponent {
         this.editor = editor;
         editor.on('keydown', this.onKeyDown);
         editor.addOverlay('akso-json-template');
+        this.updateTemplateMarkings();
 
         if (!this.props.suppressInitialRoundTrip) {
             // update template variables and detect errors by doing a round-trip
@@ -184,7 +245,7 @@ export default class JSONFilterEditor extends PureComponent {
     };
 
     render () {
-        const { value, disabled } = this.props;
+        const { value, disabled, enableTemplates } = this.props;
         const cmSource = this.toCMSource(value);
 
         return (
@@ -210,7 +271,15 @@ export default class JSONFilterEditor extends PureComponent {
                         // autoCloseBrackets: true, // glitchy for some reason
                     }}
                     editorDidMount={this.onEditorMount}
-                    onBeforeChange={(editor, data, value) => this.onChange(value)} />
+                    onBeforeChange={(editor, data, value) => this.onChange(value)}
+                    onChange={() => {
+                        this.updateTemplateMarkings();
+                    }} />
+                {enableTemplates && (
+                    <div class="json-templates-container">
+                        <JsonTemplates onInsert={this.onInsertExpr} />
+                    </div>
+                )}
                 <Dialog
                     open={this.state.helpOpen}
                     onClose={() => this.setState({ helpOpen: false })}
@@ -225,4 +294,26 @@ export default class JSONFilterEditor extends PureComponent {
             </div>
         );
     }
+}
+
+function JsonTemplates ({ onInsert }) {
+    return (
+        <div class="json-templates">
+            <div class="inner-title">
+                {locale.json.exprs.title}
+            </div>
+            <div class="inner-buttons">
+                {Object.keys(EXPRS).map(id => (
+                    <Button
+                        key={id}
+                        onClick={() => {
+                            onInsert(id);
+                        }}
+                        class="expr-button">
+                        {locale.json.exprs[id]}
+                    </Button>
+                ))}
+            </div>
+        </div>
+    );
 }

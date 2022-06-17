@@ -180,6 +180,7 @@ export default class SearchFilters extends PureComponent {
                     {locale.loadingJSONEditor}
                 </div>}>
                     <JSONFilterEditor
+                        enableTemplates
                         value={value.jsonFilter}
                         onChange={jsonFilter => onChange({ ...value, jsonFilter, offset: 0 })}
                         expanded={expanded}
@@ -333,7 +334,8 @@ const FiltersBar = connectPerms(function FiltersBar ({
                                         _disabled: true,
                                     },
                                     jsonFilter: {
-                                        filter: item.query,
+                                        source: item.query?.source,
+                                        filter: item.query?.filter,
                                         _disabled: false,
                                     },
                                     _savedFilter: item,
@@ -343,13 +345,15 @@ const FiltersBar = connectPerms(function FiltersBar ({
 
                         {(filterType === 'json' || filtersToAPITask) && canSaveFilters ? (
                             <Button class="tiny-button" disabled={hidden} onClick={async () => {
-                                let filter;
+                                let source, filter;
                                 if (filterType === 'normal' && filtersToAPITask) {
+                                    source = null;
                                     // we need to save the api representation
                                     filter = await core.createTask(filtersToAPITask, {
                                         filters: value.filters,
                                     }).runOnceAndDrop();
                                 } else {
+                                    source = value.jsonFilter.source;
                                     filter = value.jsonFilter.filter;
                                 }
 
@@ -361,7 +365,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                                     }, {
                                         name: value._savedFilter.name,
                                         description: value._savedFilter.description,
-                                        query: filter,
+                                        query: { source, filter },
                                     });
                                 } else {
                                     task = core.createTask('queries/add', {
@@ -369,7 +373,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                                     }, {
                                         name: '',
                                         description: null,
-                                        query: filter,
+                                        query: { source, filter },
                                     });
                                 }
                                 task.on('success', id => {
@@ -377,6 +381,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                                         ...value,
                                         filters: { ...value.filters, _disabled: true },
                                         jsonFilter: {
+                                            source,
                                             filter,
                                             _disabled: false,
                                         },

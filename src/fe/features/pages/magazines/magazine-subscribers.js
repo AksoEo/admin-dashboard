@@ -193,7 +193,6 @@ function MagazinePermsFilter ({ value, editing, onChange }) {
 function MagazinePermsFilterControl ({ value, editing, onChange }) {
     const [source, setSource] = useState(null);
 
-    // FIXME: maaaaybe don't use the filter editor, since that has extra templating stuff
     return (
         <div class="filter-control">
             {editing ? (

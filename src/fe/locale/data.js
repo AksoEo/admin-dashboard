@@ -260,6 +260,12 @@ export const search = {
             title: 'Helpo pri JSON-filtriloj',
             content: `Por lerni kiel uzi JSON-filtrilojn, bonvolu legi [tiun ĉi manlibreton](https://github.com/AksoEo/docs/blob/master/jsonfilters-eo.md#kio-estas-json-filtriloj-kaj-kiel-ili-uzeblas).`,
         },
+        exprs: {
+            title: '[[Insert Template Variable]]',
+            currentYear: 'nuna jaro',
+            lastYear: '[[last year]]',
+            nextYear: '[[next year]]',
+        },
     },
     stats: (count, filtered, total, time) => {
         const plural = n => n === 1 ? '' : 'j';
