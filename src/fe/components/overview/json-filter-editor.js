@@ -100,15 +100,25 @@ export default class JSONFilterEditor extends PureComponent {
     }
 
     onChange (cmSource) {
-        const source = cmSource.split(EXPR_DELIM).map((value, i) => ({
+        let source = cmSource.split(EXPR_DELIM).map((value, i) => ({
             type: i % 2 === 0 ? 'text' : 'expr',
             value,
         }));
+
+        if (!this.props.enableTemplates) {
+            // convert all templates to regular text if they're not enabled
+            source = [{
+                type: 'text',
+                value: source.map(({ type, value }) => {
+                    if (type === 'text') return value;
+                    else if (type === 'expr') return evalExpr(value);
+                }).join(''),
+            }];
+        }
+
         const jsonString = source.map(({ type, value }) => {
             if (type === 'text') return value;
-            else if (type === 'expr') {
-                return evalExpr(value);
-            }
+            else if (type === 'expr') return evalExpr(value);
         }).join('');
         const filter = this.validateJSON(jsonString) || {};
         this.props.onChange({
