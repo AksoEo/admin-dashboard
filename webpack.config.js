@@ -217,10 +217,12 @@ module.exports = function (env, argv) {
             },
             magicHtml: false,
             historyApiFallback: true,
-            onBeforeSetupMiddleware (server) {
+            setupMiddlewares (middlewares, server) {
                 server.app.use('/assets', express.static('assets'));
                 server.app.use('/notices', express.static('notices'));
                 server.app.use('/apple-touch-icon.png', express.static('assets/apple-touch-icon.png'));
+
+                return middlewares;
             }
         },
     };
