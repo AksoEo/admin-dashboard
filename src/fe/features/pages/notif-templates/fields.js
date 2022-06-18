@@ -556,7 +556,10 @@ class ImageModule extends PureComponent {
 
 const HANDLEBARS_CHARACTERS = '#/';
 
-const cmValidateTemplate = item => editor => {
+const cmValidateTemplate = (item, templateMarkings) => editor => {
+    for (const marking of templateMarkings) marking.clear();
+    templateMarkings.splice(0); // clear
+
     const knownVars = new Set();
     for (const fv of getFormVarsForIntent(item.intent)) knownVars.add('@' + fv.name);
     if (item.script) for (const k in item.script) {
@@ -580,18 +583,46 @@ const cmValidateTemplate = item => editor => {
             const m = remaining.match(/\{\{(.*?)\}\}/);
             if (m) {
                 ch += m.index;
+                const templateRange = [{ line: ln, ch }, { line: ln, ch: ch + m[0].length }];
 
                 const contents = m[1];
                 if (!HANDLEBARS_CHARACTERS.includes(contents[0])) {
                     if (!knownVars.has(contents)) {
                         error = locale.raw.unknownVar(contents);
-                        errorRange = [{ line: ln, ch }, { line: ln, ch: ch + m[0].length }];
+                        errorRange = templateRange;
                         break;
                     }
                 }
 
                 remaining = remaining.substr(m.index + m[0].length);
                 ch += m[0].length;
+
+                const node = document.createElement('span');
+                node.className = 'akso-notif-template-cm-marked-atom';
+
+                if (contents.startsWith('@')) {
+                    node.className += ' is-form-var';
+                    node.textContent = locale.templateVars[contents.substr(1)];
+                } else {
+                    node.className += ' is-script-var';
+                    node.textContent = contents;
+                }
+
+                const marking = editor.doc.markText(
+                    {
+                        line: templateRange[0].line,
+                        ch: templateRange[0].ch + 2,
+                    },
+                    {
+                        line: templateRange[1].line,
+                        ch: templateRange[1].ch - 2,
+                    },
+                    {
+                        className: 'akso-notif-template-cm-marked-template',
+                        replacedWith: node,
+                    },
+                );
+                templateMarkings.push(marking);
             } else {
                 break;
             }
@@ -661,6 +692,7 @@ class TemplatedCodeMirror extends PureComponent {
     static contextType = TemplatingContext;
 
     editor = null;
+    templateMarkings = [];
 
     onFocus = () => {
         this.context.didFocus(this);
@@ -680,6 +712,7 @@ class TemplatedCodeMirror extends PureComponent {
                 editorDidMount={editor => {
                     this.editor = editor;
                     editor.addOverlay('akso-notif-template');
+                    cmValidateTemplate(item, this.templateMarkings)(editor);
                 }}
                 onFocus={this.onFocus}
                 onBlur={this.onBlur}
@@ -692,7 +725,7 @@ class TemplatedCodeMirror extends PureComponent {
                     matchBrackets: true,
                     lineWrapping: true,
                 }}
-                onChange={cmValidateTemplate(item)}
+                onChange={cmValidateTemplate(item, this.templateMarkings)}
                 onBeforeChange={(editor, data, value) => onChange(value)} />
         );
     }
@@ -702,6 +735,7 @@ class TemplatedMdField extends PureComponent {
     static contextType = TemplatingContext;
 
     editor = null;
+    templateMarkings = [];
 
     onFocus = () => {
         this.context.didFocus(this);
@@ -720,8 +754,9 @@ class TemplatedMdField extends PureComponent {
                 editorDidMount={editor => {
                     editor.addOverlay('akso-notif-template');
                     this.editor = editor;
+                    cmValidateTemplate(item, this.templateMarkings)(editor);
                 }}
-                onCMChange={cmValidateTemplate(item)}
+                onCMChange={cmValidateTemplate(item, this.templateMarkings)}
                 onFocus={this.onFocus}
                 onBlur={this.onBlur}
                 {...props} />
