@@ -252,7 +252,7 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
 
 export const search = {
     normalFilter: 'Facilaj filtriloj',
-    jsonFilter: 'JSON-filtriloj',
+    jsonFilter: 'JSON-filtrilo',
     loadingJSONEditor: 'Ŝarĝas...',
     filtersDisclosure: 'Filtriloj',
     json: {
@@ -265,6 +265,7 @@ export const search = {
             currentYear: 'nuna jaro',
             lastYear: '[[last year]]',
             nextYear: '[[next year]]',
+            currentDate: '[[today’s date]]',
         },
     },
     stats: (count, filtered, total, time) => {

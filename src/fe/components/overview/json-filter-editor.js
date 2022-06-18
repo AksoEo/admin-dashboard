@@ -16,14 +16,22 @@ const MdField = lazy(() => import('../controls/md-field'));
 
 const DEFAULT_VALUE = '{\n\t\n}'; // must be equal to {}
 
+// ID string used to identify our filter source format
+// -- SOURCE FORMAT --
+// source: { repr: AKSO_REPR, fragments: <fragments> }
+// where <fragments> is an array of objects like { type: string, value: string }
+// - type 'text': contains regular source text
+// - type 'expr': contains a template expression
 const AKSO_REPR = 'org.akso.admin.v1';
-
+// delimiter we use in our CodeMirror source string to delimit templates
 const EXPR_DELIM = '\x91';
 
+// template expressions { [expression]: value }
 const EXPRS = {
     currentYear: () => new Date().getFullYear().toString(),
     lastYear: () => (new Date().getFullYear() - 1).toString(),
     nextYear: () => (new Date().getFullYear() + 1).toString(),
+    currentDate: () => "'" + new Date().toISOString().split('T')[0] + "'",
 };
 
 function evalExpr (expr) {
