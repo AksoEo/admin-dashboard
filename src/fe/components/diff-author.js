@@ -16,7 +16,7 @@ export default function DiffAuthor ({ author, interactive }) {
         if (interactive) {
             return <Link target={`/membroj/${chId}`} class="diff-author-link" outOfTree><IdUEACode id={chId} /></Link>;
         } else {
-            <IdUEACode id={chId} />;
+            return <IdUEACode id={chId} />;
         }
     } else if (author.startsWith('app:')) {
         const appId = author.substr(4);

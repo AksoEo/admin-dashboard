@@ -22,10 +22,13 @@ import {
     detail as detailLocale,
     codeholderChgReqs as chgReqLocale,
     delegations as delegationsLocale,
+    errors as errLocale,
 } from '../../../locale';
 import { FIELDS as DELEGATION_FIELDS } from '../delegations/delegates/fields';
 import { FileThumbnail, FileSize, Mime } from '../../../components/files';
 import './style';
+
+const MAX_FILE_SIZE = 6 * 1000 * 1000;
 
 export default {
     create ({ open, task }) {
@@ -355,6 +358,8 @@ export default {
     },
 
     uploadFile ({ open, task }) {
+        const canUploadFile = task.parameters.file.size <= MAX_FILE_SIZE;
+
         return (
             <TaskDialog
                 sheet
@@ -362,8 +367,15 @@ export default {
                 open={open}
                 onClose={() => task.drop()}
                 title={locale.uploadFile}
-                actionLabel={locale.uploadThisFile}
-                run={() => task.runOnce()}>
+                actionLabel={!!canUploadFile && locale.uploadThisFile}
+                run={() => {
+                    if (!canUploadFile) {
+                        const err = new Error('file too large');
+                        err.code = 'payload-too-large';
+                        return Promise.reject(err);
+                    }
+                    return task.runOnce();
+                }}>
                 <div class="file-preview">
                     <FileThumbnail file={task.parameters.file} />
                     <div class="file-preview-details">
@@ -373,25 +385,34 @@ export default {
                         <div>
                             <FileSize bytes={task.parameters.file.size} />
                         </div>
+                        <div class="file-too-large">
+                            {!canUploadFile && (
+                                errLocale['payload-too-large']
+                            )}
+                        </div>
                     </div>
                 </div>
-                <Field>
-                    <TextField
-                        required
-                        label={locale.fileName}
-                        maxLength={50}
-                        value={task.parameters.name}
-                        disabled={task.running}
-                        onChange={e => task.update({ name: e.target.value })} />
-                </Field>
-                <Field>
-                    <TextField
-                        label={locale.fileDescription}
-                        maxLength={300}
-                        value={task.parameters.description}
-                        disabled={task.running}
-                        onChange={e => task.update({ description: e.target.value })} />
-                </Field>
+                {canUploadFile && (
+                    <Field>
+                        <TextField
+                            required
+                            label={locale.fileName}
+                            maxLength={50}
+                            value={task.parameters.name}
+                            disabled={task.running}
+                            onChange={e => task.update({ name: e.target.value })} />
+                    </Field>
+                )}
+                {canUploadFile && (
+                    <Field>
+                        <TextField
+                            label={locale.fileDescription}
+                            maxLength={300}
+                            value={task.parameters.description}
+                            disabled={task.running}
+                            onChange={e => task.update({ description: e.target.value })} />
+                    </Field>
+                )}
             </TaskDialog>
         );
     },

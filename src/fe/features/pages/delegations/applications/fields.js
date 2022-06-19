@@ -38,7 +38,7 @@ export const FIELDS = {
                     {locale.status[value]}
                     {(slot === 'detail' && item.statusBy) ? (
                         <div class="status-by">
-                            {locale.status.changedBy}: <DiffAuthor author={item.statusBy} />
+                            {locale.status.changedBy}: <DiffAuthor author={item.statusBy} interactive />
                         </div>
                     ) : null}
                     {(slot === 'detail' && item.statusTime) ? (
