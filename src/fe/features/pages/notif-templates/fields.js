@@ -341,11 +341,15 @@ class ModulesEditor extends PureComponent {
         if (editing && value.length < MAX_MODULE_COUNT) {
             items.push(
                 <div key="~add" class="add-template-module">
-                    <Button icon onClick={this.addTextItem}>
+                    <Button onClick={this.addTextItem}>
                         <PostAddIcon style={{ verticalAlign: 'middle' }} />
+                        {' '}
+                        {locale.modules.addText}
                     </Button>
-                    <Button icon onClick={this.addImageItem}>
+                    <Button onClick={this.addImageItem}>
                         <AddPhotoIcon style={{ verticalAlign: 'middle' }} />
+                        {' '}
+                        {locale.modules.addImage}
                     </Button>
                 </div>
             );
@@ -446,11 +450,21 @@ class TextModule extends PureComponent {
                         ) : <span />}
                         <div class="module-settings">
                             {!value.button && (
-                                <Button icon small onClick={addButton}>
+                                <Button
+                                    icon
+                                    small
+                                    onClick={addButton}
+                                    title={locale.modules.addButton}>
                                     <AddButtonIcon style={{ verticalAlign: 'middle' }} />
                                 </Button>
                             )}
-                            <Button icon small onClick={switchColumnCount}>
+                            <Button
+                                icon
+                                small
+                                onClick={switchColumnCount}
+                                title={valueColumns.length === 2
+                                    ? locale.modules.setOneColumn
+                                    : locale.modules.setTwoColumns}>
                                 <ColumnsIcon style={{ verticalAlign: 'middle' }} />
                             </Button>
                         </div>

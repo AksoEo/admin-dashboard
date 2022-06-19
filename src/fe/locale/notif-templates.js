@@ -43,6 +43,12 @@ export const notifTemplates = {
         textButtonLabel: 'Etikedo',
         imageUrl: 'Retadreso',
         imageAlt: 'Priskribo de bildo',
+
+        addText: '[[Add Text]]',
+        addImage: '[[Add Image]]',
+        addButton: '[[Add Button]]',
+        setOneColumn: '[[Switch to one column]]',
+        setTwoColumns: '[[Switch to two columns]]',
     },
     intents: {
         codeholder: 'membro',
