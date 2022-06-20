@@ -5,6 +5,7 @@ import Sidebar from './features/sidebar';
 import Navigation from './features/navigation';
 import FatalError from './features/fatal-error';
 import EventProxy from './components/utils/event-proxy';
+import Notifications from './notif';
 import { connect } from './core/connection';
 import permsContext from './perms';
 import './app.less';
@@ -84,7 +85,7 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
         return { error };
     }
 
-    render ({ tasks }) {
+    render ({ tasks, errors }) {
         let className = 'akso-app';
         if (this.props.animateIn) className += ' animate-in';
 
@@ -118,6 +119,7 @@ export default connect('perms/perms')(perms => ({ perms }))(class App extends Co
                             perms={this.perms} />
                         {tasks}
                     </AppBarProvider>
+                    <Notifications errors={errors} />
                 </div>
             </permsContext.Provider>
         );

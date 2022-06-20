@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import JSON5 from 'json5';
-import { useState, Fragment } from 'preact/compat';
+import { useContext, useState, Fragment } from 'preact/compat';
 import { Dialog } from 'yamdl';
 import Page from '../../../components/page';
 import ObjectViewer from '../../../components/object-viewer';
@@ -22,6 +22,7 @@ export default class DebugPage extends Page {
                 <CodeholderFiltersViewer />
                 <RequestRunner />
                 <TaskRunner />
+                <SimulateError />
                 <br />
                 <Link target="/debug/launchpad_mcquack.jpg">open launchpad_mcquack.jpg</Link>
                 <br />
@@ -180,3 +181,26 @@ function TaskRunnerInner ({ core }) {
 const TaskRunner = makeDialog('create task', () => (
     <coreContext.Consumer>{core => <TaskRunnerInner core={core} />}</coreContext.Consumer>
 ));
+
+function SimulateError () {
+    const [code, setCode] = useState('service-unavailable');
+    const [message, setMessage] = useState('error');
+    const core = useContext(coreContext);
+
+    return (
+        <details>
+            <summary>simulate error</summary>
+            <div>
+                <label>code</label>
+                <input value={code} onChange={e => setCode(e.target.value)} />
+            </div>
+            <div>
+                <label>message</label>
+                <input value={message} onChange={e => setMessage(e.target.value)} />
+            </div>
+            <button onClick={() => {
+                core.createTask('debug/error', { code, message }).runOnceAndDrop();
+            }}>boop</button>
+        </details>
+    );
+}

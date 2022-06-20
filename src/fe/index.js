@@ -1,6 +1,7 @@
 import { h, render, Component } from 'preact';
 import { Fragment } from 'preact/compat';
 import { CircularProgress } from 'yamdl';
+import EventEmitter from 'events';
 import { LoginAuthStates } from '../protocol';
 import isSpecialPage from './features/login/is-special-page';
 import { Worker } from './core';
@@ -113,6 +114,7 @@ class Session extends Component {
         this.loadApp();
     }
 
+    errorEmitter = new EventEmitter();
     createCore () {
         if (this.loginView) this.loginView.drop();
         if (this.tasksView) this.tasksView.drop();
@@ -124,6 +126,9 @@ class Session extends Component {
 
         this.tasksView = this.core.createDataView('#tasks');
         this.tasksView.on('update', this.#onTasksUpdate);
+
+        this.core.on('task-error', (...args) => this.errorEmitter.emit('task-error', ...args));
+        this.core.on('unhandled-rejection', (...args) => this.errorEmitter.emit('unhandled-rejection', ...args));
     }
 
     #hideLoginTimeout = null;
@@ -233,7 +238,13 @@ class Session extends Component {
 
         if (loggedIn && App) {
             // also pass tasks because those need some contexts only available in the app
-            app = <App animateIn={wasLoggedOut} ref={view => this.#appRef = view} tasks={tasks} />;
+            app = (
+                <App
+                    animateIn={wasLoggedOut}
+                    ref={view => this.#appRef = view}
+                    tasks={tasks}
+                    errors={this.errorEmitter} />
+            );
             renderTasksHere = false;
         }
 

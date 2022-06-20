@@ -17,6 +17,15 @@ export const app = {
     dirtyConfirmation: {
         description: 'Estas nekonservitaj ŝanĝoj. Ĉu vi certas ke vi volas forlasi la paĝon kaj perdi la malneton?',
     },
+
+    globalErrors: {
+        serviceUnavailable: {
+            title: '[[AKSO down for maintenance]]',
+            description: `[[AKSO is currently unavailable and you should try again later. Please refer to the status page for updates.]]`,
+            openStatusPage: '[[Open Status Page]]',
+            statusPage: 'https://status.akso.org',
+        },
+    },
 };
 
 export const pages = {

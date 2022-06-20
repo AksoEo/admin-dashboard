@@ -16,6 +16,9 @@ export const tasks = {
             status: res.res.status,
         };
     },
+    error: async ({ code, message }) => {
+        throw { code, message };
+    },
 };
 
 export const views = {

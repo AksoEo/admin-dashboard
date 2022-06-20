@@ -12,6 +12,7 @@ export default class WorkerInterface extends EventEmitter {
         this.worker = new Worker();
         this.worker.addEventListener('message', this.#onMessage);
         this.worker.addEventListener('unhandledrejection', this.#onUnhandledRejection);
+        this.worker.addEventListener('error', this.#onUnhandledRejection);
     }
 
     /// Terminates the worker.
@@ -102,5 +103,6 @@ export default class WorkerInterface extends EventEmitter {
 
     #onUnhandledRejection = ({ promise, reason }) => {
         console.error('[core] unhandled rejection!', promise, reason); // eslint-disable-line no-console
+        this.emit('unhandled-rejection', promise, reason);
     };
 }

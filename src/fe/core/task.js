@@ -74,6 +74,8 @@ export default class Task extends EventEmitter {
         const error = { code, message, ...extra, valueOf: () => `Error (${code}): ${message}` };
         this.emit('failure', error);
         this.emit('result', 'failure', error);
+
+        this.worker.emit('task-error', code);
     }
 
     onSuccess (result) {
