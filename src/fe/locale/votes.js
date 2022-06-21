@@ -48,7 +48,7 @@ export const votes = {
             none: 'ne gravas',
         },
         stateTypes: {
-            pending: 'Ankoraŭ ne komenciĝis',
+            pending: 'ankoraŭ ne komenciĝis',
             active: 'aktiva',
             ended: 'finiĝis',
             none: 'ne gravas',

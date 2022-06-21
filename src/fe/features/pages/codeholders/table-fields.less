@@ -32,6 +32,8 @@
 
 .codeholder-name {
     display: inline-block;
+    position: relative;
+    overflow: hidden;
     white-space: nowrap;
     justify-content: flex-start;
     max-width: 100%;
@@ -42,10 +44,15 @@
         overflow: hidden;
     }
 
-    &.is-dead,
-    &.is-dead * {
-        text-decoration-line: line-through;
-        text-decoration-color: @error;
+    &.is-dead {
+        &::before {
+            content: '';
+            position: absolute;
+            bottom: 50%;
+            background: @danger;
+            height: 1px;
+            width: 100%;
+        }
     }
 }
 

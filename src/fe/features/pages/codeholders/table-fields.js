@@ -101,9 +101,12 @@ export default {
         weight: 2,
         slot: 'title',
         component: class Name extends PureComponent {
+            state = {
+                truncatingMaxWidth: 999,
+            };
+
             node = null;
             prefixName = null;
-            truncatingName = null;
             fixedName = null;
 
             resizeObserver = new ResizeObserver(() => {
@@ -111,8 +114,9 @@ export default {
                 const containerWidth = this.node.offsetWidth;
                 const prefixWidth = this.prefixName ? this.prefixName.offsetWidth : 0;
                 const fixedWidth = this.fixedName.offsetWidth;
-                this.truncatingName.style.maxWidth = (containerWidth - fixedWidth
-                    - prefixWidth) + 'px';
+                this.setState({
+                    truncatingMaxWidth: containerWidth - fixedWidth - prefixWidth,
+                });
             });
 
             render ({ value, item }) {
@@ -142,7 +146,9 @@ export default {
                             }}>
                                 {honorific ? honorific + '\u00a0' : ''}
                             </span>
-                            <span class="first-name" ref={node => this.truncatingName = node}>
+                            <span class="first-name" style={{
+                                maxWidth: Math.max(8, this.state.truncatingMaxWidth),
+                            }}>
                                 {first}
                             </span> <span class="last-name" ref={node => {
                                 this.fixedName = node;
