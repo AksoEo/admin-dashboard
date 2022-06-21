@@ -3,7 +3,7 @@ import { useEffect } from 'preact/compat';
 import { Button, TextField } from 'yamdl';
 import DialogSheet from '../../../components/tasks/dialog-sheet';
 import ProgressIndicator from '../../../components/dialog-progress-indicator';
-import AutosizingPageView from '../../../components/layout/autosizing-page-view';
+import FadingPageView from '../../../components/layout/fading-page-view';
 import DisplayError from '../../../components/utils/error';
 import { Form, Field } from '../../../components/form';
 import { TejoIcon, UeaIcon, UeaColorIcon } from '../../../components/org-icon';
@@ -401,9 +401,9 @@ export default function makeCreateTask (isTemplate) {
                     }}>
                         {pageTitles}
                     </ProgressIndicator>
-                    <AutosizingPageView eager alwaysOverflow selected={page}>
+                    <FadingPageView selected={page}>
                         {pageContents}
-                    </AutosizingPageView>
+                    </FadingPageView>
                     {this.state.error ? (
                         <div class="error-message-container">
                             <DisplayError error={this.state.error} />

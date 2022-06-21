@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { useState } from 'preact/compat';
 import JSON5 from 'json5';
 import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
@@ -7,7 +8,7 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import { Button, Checkbox, TextField } from 'yamdl';
 import Select from '../../../components/controls/select';
 import Segmented from '../../../components/controls/segmented';
-import JSONEditor from '../../../components/controls/json-editor';
+import JSONFilterEditor from '../../../components/overview/json-filter-editor';
 import CodeholderPicker from '../../../components/pickers/codeholder-picker';
 import RearrangingList from '../../../components/lists/rearranging-list';
 import { timestamp } from '../../../components/data';
@@ -23,6 +24,24 @@ function validateJSON (value) {
     } catch {
         return true;
     }
+}
+
+function JSONEditor ({ value, onChange, disabled }) {
+    const [source, setSource] = useState(null);
+
+    return (
+        <JSONFilterEditor
+            expanded
+            disabled={disabled}
+            value={{
+                source,
+                filter: JSON5.parse(value),
+            }}
+            onChange={({ source, filter }) => {
+                setSource(source);
+                onChange(JSON5.stringify(filter, undefined, 4));
+            }} />
+    );
 }
 
 export function voterCodeholders ({ value, onChange, editing, item }) {
