@@ -15,7 +15,7 @@ export default function PhoneNumberEditor ({ value, onChange, outline }) {
         if (num.country) {
             trailing = <CountryFlag country={num.country.toLowerCase()} />;
         }
-    } catch (_) {
+    } catch {
         // this comment exists because eslint
     }
 
@@ -27,7 +27,7 @@ export default function PhoneNumberEditor ({ value, onChange, outline }) {
         class="data phone-number-editor"
         value={value}
         outline={outline}
-        onChange={e => onChange({ ...wholeValue, value: e.target.value || null })}
+        onChange={e => onChange({ ...wholeValue, value: e.target.value.replace(/[^+\d]/g, '') || null })}
         type="tel"
         placeholder="+"
         maxLength="50"
