@@ -20,10 +20,10 @@ export const app = {
 
     globalErrors: {
         serviceUnavailable: {
-            title: '[[AKSO down for maintenance]]',
-            description: `[[AKSO is currently unavailable and you should try again later. Please refer to the status page for updates.]]`,
-            openStatusPage: '[[Open Status Page]]',
-            statusPage: 'https://status.akso.org',
+            title: 'AKSO estas nealirebla pro bontenado',
+            description: `Ni nun prizorgas bontenadon de AKSO. Pro tio ĝi nun ne estas alirebla. Kutime nealireblaj periodoj daŭras mallonge. Eventuale kontrolu la statuspaĝon por ĝisdatigoj.`,
+            openStatusPage: 'Malfermi statuspaĝon',
+            statusPage: 'https://viva.akso.org',
         },
     },
 };

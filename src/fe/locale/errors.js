@@ -24,7 +24,7 @@ export const errors = {
     'conflict': 'Okazis interna konflikto, bonvolu reprovi vian agon.',
     'payload-too-large': 'La alŝutita dosiero estis tro granda, bonvolu reprovi kun malpli granda dosiero.',
     'internal-server-error': 'Okazis interna eraro. Bonvolu reŝarĝi la paĝon.',
-    'service-unavailable': '[[AKSO is down for maintenance. Please try again later.]]',
+    'service-unavailable': 'AKSO estas nealirebla pro bontenado. Bonvolu reprovi je posta momento.',
     'object-exists': 'Jam ekzistas resurso kun tiu nomo. Bonvolu reiri por reprovi.',
 
     // see payments/createIntent

@@ -261,11 +261,11 @@ export const search = {
             content: `Por lerni kiel uzi JSON-filtrilojn, bonvolu legi [tiun ĉi manlibreton](https://github.com/AksoEo/docs/blob/master/jsonfilters-eo.md#kio-estas-json-filtriloj-kaj-kiel-ili-uzeblas).`,
         },
         exprs: {
-            title: '[[Insert Template Variable]]',
-            currentYear: 'nuna jaro',
-            lastYear: '[[last year]]',
-            nextYear: '[[next year]]',
-            currentDate: '[[today’s date]]',
+            title: 'Aldoni ŝablonan variablon',
+            currentYear: 'la nuna jaro',
+            lastYear: 'la antaŭa jaro',
+            nextYear: 'la venonta jaro',
+            currentDate: 'la hodiaŭa dato',
         },
     },
     stats: (count, filtered, total, time) => {
