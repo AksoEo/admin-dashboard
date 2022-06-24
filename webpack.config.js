@@ -18,7 +18,7 @@ const browserTargets = {
     safari: '14',
 };
 
-const aksoBase = process.env['AKSO_BASE'] || 'https://api.akso.org';
+const aksoBase = process.env['AKSO_BASE'] || 'https://api.akso.org/v1/';
 const isDevServer = process.env.WEBPACK_SERVE;
 
 console.log(`\x1b[32mAKSO_BASE: ${aksoBase}\x1b[m`);
