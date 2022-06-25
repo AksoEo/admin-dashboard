@@ -15,7 +15,7 @@ export default class FileView extends Component {
 
     getFileURL () {
         const { id, file } = this.props;
-        return new URL(`/codeholders/${id}/files/${file}`, config.base).toString();
+        return new URL(`codeholders/${id}/files/${file}`, config.base).toString();
     }
 
     load () {

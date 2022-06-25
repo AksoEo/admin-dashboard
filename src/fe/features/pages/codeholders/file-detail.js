@@ -32,7 +32,7 @@ export default connectPerms(class FileDetailPage extends Page {
             icon: <DownloadIcon style={{ verticalAlign: 'middle' }} />,
             label: locale.downloadFile,
             action: () => {
-                const downloadURL = new URL(`/codeholders/${codeholderId}/files/${id}`, config.base).toString();
+                const downloadURL = new URL(`codeholders/${codeholderId}/files/${id}`, config.base).toString();
                 const anchor = document.createElement('a');
                 anchor.rel = 'noopener noreferrer';
                 // open in a new tab because some browsers just insist on not downloading the file

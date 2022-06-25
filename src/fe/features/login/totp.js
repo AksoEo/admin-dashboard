@@ -73,7 +73,8 @@ export default class TotpPage extends Component {
                         placeholder="000000"
                         // \d* seems to be the only way to get a numpad input on iOS
                         pattern="\d*"
-                        type="number"
+                        inputmode="numeric"
+                        type="text"
                         onKeyDown={e => {
                             if (e.ctrlKey || e.altKey || e.metaKey) return;
                             if (!e.key.match(/\d/) && !e.key.match(/^[A-Z]/)) {
