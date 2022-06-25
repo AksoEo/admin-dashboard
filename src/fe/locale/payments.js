@@ -111,7 +111,7 @@ export const paymentMethods = {
         noCurrenciesSelected: 'Neniu valuto estis elektita',
         paymentValidityTypes: {
             limited: 'Validas dum ...',
-            forever: 'Neniam ekvalidiĝas',
+            forever: 'Neniam eksvalidiĝas',
         },
         paymentValidityWarning: 'Ni rekomendas ŝalti eksvalidiĝon',
 
