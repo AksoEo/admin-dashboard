@@ -74,7 +74,7 @@ export default {
                         onChange={e => task.update({
                             name: {
                                 ...(task.parameters.name || {}),
-                                [fieldId]: mapChangeEvent(e),
+                                [fieldId]: mapChangeEvent(e) || undefined,
                             },
                         })}
                         required={!isOptional}
