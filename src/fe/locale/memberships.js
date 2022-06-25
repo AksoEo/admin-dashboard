@@ -55,7 +55,7 @@ export const membershipOptions = {
     },
     paymentOrg: {
         pick: 'Elekti pagorganizon',
-        pickEmpty: 'Estas neniuj pagorganizoj',
+        pickEmpty: 'Estas neniu pagorganizo',
         pickNote: 'Bv. noti, ke se vi ŝanĝas pagorganizon, ĉiuj ekzistantaj aldonebloj ne plu estos validaj kaj tial estu anstataŭigitaj aŭ forigitaj.',
     },
     offers: {
@@ -165,7 +165,7 @@ export const membershipEntries = {
         add: {
             button: 'Aldoni oferton',
             title: 'Aldoni oferton',
-            emptyGroup: 'Estas neniuj ofertoj en tiu ĉi grupo',
+            emptyGroup: 'Estas neniu oferto en tiu ĉi grupo',
         },
         types: {
             addon: 'Aldoneblo',

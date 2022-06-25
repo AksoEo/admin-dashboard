@@ -260,7 +260,7 @@ export const codeholders = {
     invalidOrgCode: 'UEA-kodoj por organizoj devas komenciĝi je xx',
     createGenericError: 'Okazis neatendita eraro dum kreado de membro, bv. reprovi poste',
     memberships: 'Membrecoj',
-    noMemberships: 'Neniuj membrecoj',
+    noMemberships: 'Neniu membreco',
     addMembership: 'Aldoni membrecon',
     membership: {
         lifetime: {
@@ -280,7 +280,7 @@ export const codeholders = {
         add: 'Aldoni',
     },
     roles: 'Roloj',
-    noRoles: 'Neniuj roloj',
+    noRoles: 'Neniu rolo',
     addRole: 'Aldoni rolon',
     updateRole: 'Redakti rolon',
     role: {
@@ -302,7 +302,7 @@ export const codeholders = {
     filesButton: n => !n ? 'dosieroj' : n === 1 ? '1 dosiero' : `${n} dosieroj`,
     filesTitle: 'Dosieroj',
     fileTitle: 'Dosiero',
-    noFiles: 'Neniuj dosieroj',
+    noFiles: 'Neniu dosiero',
     editFile: 'Redakti dosieron',
     uploadFile: 'Alŝuti dosieron',
     uploadThisFile: 'Alŝuti',
@@ -359,7 +359,7 @@ export const codeholders = {
         presets: {
             load: 'Ŝarĝi',
             pick: 'Ŝarĝi ŝablonon',
-            empty: 'Estas neniuj ŝablonoj',
+            empty: 'Estas neniu ŝablono',
             name: 'Nomo',
             create: {
                 menuItem: 'Konservi',
@@ -384,7 +384,7 @@ export const codeholders = {
     },
     logins: {
         title: 'Historio de ensalutoj',
-        empty: 'Neniuj ensalutoj',
+        empty: 'Neniu ensaluto',
         inTimezone: 'en la horzono',
         viewInOSM: 'Montri ĉirkaŭaĵon sur mapo',
         osmLink: (area, lat, lon) => {
@@ -421,7 +421,7 @@ export const codeholders = {
             tejo: 'TEJO',
             akso: 'AKSO',
         },
-        send: 'Sciigo',
+        send: 'Sciigi',
         success: 'Sciigo sendita',
     },
     resetTotp: {

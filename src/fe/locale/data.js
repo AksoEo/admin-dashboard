@@ -115,7 +115,7 @@ export const data = {
         },
         data: {
             title: 'Simplaj permesoj',
-            empty: 'Neniuj permesoj',
+            empty: 'Neniu permeso',
         },
     },
     mdEditor: {
@@ -219,7 +219,7 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
         },
     },
     mapList: {
-        empty: 'Neniuj lokoj',
+        empty: 'Neniu loko',
         searchPlaceholder: 'Serĉi…',
     },
     mapPicker: {
@@ -229,7 +229,7 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
         searchingForAddr: 'Serĉas',
     },
     tagManager: {
-        noTags: 'Neniuj etikedoj',
+        noTags: 'Neniu etikedo',
         searchPlaceholder: 'Serĉi…',
         dialogTitle: 'Mastrumi etikedojn',
         addTag: 'Aldoni etikedon',
@@ -287,11 +287,11 @@ export const search = {
     saveFilter: 'Konservi',
     pickFilter: 'Ŝargi filtrilon',
     saveFilterTitle: 'Konservi filtrilon',
-    noFilters: 'Neniuj konservitaj filtriloj',
+    noFilters: 'Neniu konservita filtrilo',
     savedFilterName: 'Nomo',
     savedFilterDesc: 'Priskribo',
     csvExport: 'Elporti kiel CSV',
-    noFieldsSelected: 'Neniuj kampoj elektitaj',
+    noFieldsSelected: 'Neniu kampo elektita',
     sorting: {
         none: 'ne ordigata',
         asc: 'kreskanta',
@@ -300,7 +300,7 @@ export const search = {
     fieldPicker: {
         title: 'Montrotaj kampoj',
         searchPlaceholder: 'Serĉi kampon',
-        noFieldsAvailable: 'Neniuj kampoj estas elekteblaj',
+        noFieldsAvailable: 'Neniu kampo estas elektebla',
         sortingDescription: 'La rezultoj estas ordigitaj laŭ la ordo de la kampoj, de supro al malsupro',
         ok: 'Bone',
     },

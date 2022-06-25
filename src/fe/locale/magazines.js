@@ -49,7 +49,7 @@ export const magazines = {
         members: 'Membroj',
         membersDesc: 'IMoj kiuj povas aliri la revuon',
         membersAll: 'Ĉiuj IMoj',
-        membersNone: 'Neniuj IMoj',
+        membersNone: 'Neniu IMo',
         membersFilter: 'Laŭ filtrilo',
 
         membersIncludeLastYear: 'Eksmembra alirdaŭro',

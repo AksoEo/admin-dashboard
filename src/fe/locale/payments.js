@@ -397,7 +397,7 @@ export const paymentIntents = {
             title: 'Titolo',
             description: 'Priskribo',
         },
-        noAddons: 'Tiu ĉi pagorganizo havas neniujn aldoneblojn',
+        noAddons: 'Tiu ĉi pagorganizo havas neniun aldoneblon',
         dataId: 'Aliĝidentigilo',
         invalidDataId: 'Nevalida aliĝidentigilo',
     },
@@ -411,8 +411,8 @@ export const paymentIntents = {
             congress_registration: 'Elekti kongresan aliĝon',
         },
         empty: {
-            registration_entry: 'Neniuj aliĝoj',
-            congress_registration: 'Neniuj kongresaj aliĝoj',
+            registration_entry: 'Neniu aliĝo',
+            congress_registration: 'Neniu kongresa aliĝo',
         },
     },
     create: {

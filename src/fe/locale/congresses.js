@@ -211,7 +211,7 @@ export const congressPrograms = {
         location: 'Loko',
     },
     timeline: {
-        empty: 'Okazas neniuj programeroj en tiu ĉi tago',
+        empty: 'Okazas neniu programero en tiu ĉi tago',
     },
     create: {
         menuItem: 'Krei',

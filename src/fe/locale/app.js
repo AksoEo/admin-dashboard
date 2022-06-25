@@ -8,7 +8,7 @@ export const app = {
     genericErrorReload: 'Reŝarĝi la paĝon',
     genericErrorViewDetails: 'Montri teĥnikajn detalojn',
 
-    notFound: 'Ni ne sukcesis trovi tiun ĉi paĝon. Eventaule kontrolu ĉu vi mistajpis adreson.',
+    notFound: 'Ni ne sukcesis trovi tiun ĉi paĝon. Eventuale kontrolu ĉu vi mistajpis adreson.',
     forbidden: 'Vi ne rajtas aliri tiun ĉi paĝon.',
     goHome: 'Hejmen',
 
@@ -67,7 +67,7 @@ export const pages = {
 export const index = {
     tasks: {
         title: 'Taskoj',
-        empty: 'Neniuj taskoj',
+        empty: 'Neniu tasko',
         tabs: {
             aksopay: 'AKSO-Pago',
             intermediary: 'Spezfolioj',
