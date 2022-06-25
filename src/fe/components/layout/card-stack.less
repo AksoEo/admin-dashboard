@@ -52,6 +52,9 @@
             0% {
                 transform: translateY(100%);
             }
+            100% {
+                transform: translateY(0);
+            }
         }
 
         .card-stack-item-contents {
@@ -70,6 +73,9 @@
             pointer-events: none;
 
             @keyframes card-stack-item-out {
+                0% {
+                    transform: translateY(0);
+                }
                 100% {
                     transform: translateY(100%);
                 }
@@ -86,6 +92,9 @@
             @keyframes card-stack-item-in-fs {
                 0% {
                     transform: translateX(100%);
+                }
+                100% {
+                    transform: translateX(0);
                 }
             }
 
