@@ -28,6 +28,7 @@ export const tasks = {
             result = await client.logIn(login, password);
         } catch (err) {
             if (err.statusCode === 409) {
+                store.insert(AUTH_STATE, LoginAuthStates.LOGGED_OUT);
                 throw { code: 'needs-password-setup', message: err.toString() };
             }
 

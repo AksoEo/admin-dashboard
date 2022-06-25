@@ -71,7 +71,7 @@ export default connectPerms(class Clients extends Page {
             actions.push({
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.add,
-                action: () => this.context.createTask('clients/create'),
+                action: () => this.context.createTask('clients/create', {}),
             });
         }
 

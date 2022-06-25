@@ -58,15 +58,14 @@ export default {
 
         const renderNameField = (field, isOptional) => {
             const fieldId = field?.id || field;
-            const component = field?.component || TextField;
+            const Component = field?.component || TextField;
             const extra = field?.extra || {};
             // HACK: to make suggestionfield work
-            const mapChangeEvent = component === TextField ? (e => e.target.value) : (e => e);
+            const mapChangeEvent = Component === TextField ? (e => e.target.value) : (e => e);
             return (
                 <Field>
-                    <ValidatedTextField
+                    <Component
                         key={fieldId}
-                        component={component}
                         class="form-field text-field"
                         {...extra}
                         outline
@@ -78,11 +77,8 @@ export default {
                                 [fieldId]: mapChangeEvent(e),
                             },
                         })}
-                        disabled={task.running}
-                        validate={value => {
-                            if (isOptional) return;
-                            if (!value || !value.trim()) return locale.createNoName;
-                        }} />
+                        required={!isOptional}
+                        disabled={task.running} />
                 </Field>
             );
         };
