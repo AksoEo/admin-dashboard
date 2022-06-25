@@ -72,7 +72,6 @@
 
     &.timespan-editor {
         display: inline-block;
-        font-size: small;
         border: 1px solid @separator;
         border-radius: 4px;
 
@@ -91,7 +90,8 @@
                 margin: 0;
                 background: none;
                 color: inherit;
-                max-width: 5em;
+                max-width: 3em;
+                transition: opacity 0.3s;
 
                 // hide spinner
                 -moz-appearance: textfield;
@@ -102,6 +102,10 @@
                 &:focus {
                     outline: none;
                 }
+            }
+
+            &.is-none {
+                opacity: 0.5;
             }
 
             margin-right: 8px;

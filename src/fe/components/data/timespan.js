@@ -55,7 +55,7 @@ class TimespanUnitEditor extends PureComponent {
     };
 
     componentDidUpdate (prevProps) {
-        if (this.props.value !== prevProps.value) {
+        if (!Number.isNaN(this.props.value) && this.props.value !== prevProps.value) {
             if (this.state.editing) {
                 this.setState({ editingValue: this.getValue() });
             }
@@ -72,7 +72,6 @@ class TimespanUnitEditor extends PureComponent {
                 }
             }
         }
-
 
         if (this.committing) {
             this.committing = false;
@@ -141,7 +140,9 @@ class TimespanUnitEditor extends PureComponent {
         const max = mod ? mod : Math.floor(2147483647 / fac);
 
         return (
-            <span class="te-field" style={{ transform: `scale(${1 - this.bounceY.value / 30})` }}>
+            <span
+                class={'te-field' + ((!inputValue && !editing) ? ' is-none' : '')}
+                style={{ transform: `scale(${1 - this.bounceY.value / 30})` }}>
                 <input
                     ref={this.inputNode}
                     class="te-field-input"
@@ -200,9 +201,9 @@ export function IsoDuration ({ value }) {
     let days = 0;
     let match;
     if ((match = (value || '').match(/^P(?:(\d\d?)Y)?(?:(\d\d?)M)?(?:(\d\d?)D)?$/))) {
-        years = +match[1];
-        months = +match[2];
-        days = +match[3];
+        years = +match[1] | 0;
+        months = +match[2] | 0;
+        days = +match[3] | 0;
     }
 
     const out = [];
@@ -220,9 +221,9 @@ export function IsoDurationEditor ({ value, onChange }) {
     let days = 0;
     let match;
     if ((match = (value || '').match(/^P(?:(\d\d?)Y)?(?:(\d\d?)M)?(?:(\d\d?)D)?$/))) {
-        years = +match[1];
-        months = +match[2];
-        days = +match[3];
+        years = +match[1] | 0;
+        months = +match[2] | 0;
+        days = +match[3] | 0;
     }
 
     const commit = (y, m, d) => {
