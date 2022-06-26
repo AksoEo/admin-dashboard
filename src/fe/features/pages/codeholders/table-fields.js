@@ -190,8 +190,8 @@ export default {
             const { type } = item;
             if (type === 'human') {
                 const { first, firstLegal, last, lastLegal, honorific } = value;
-                const f = first || firstLegal;
-                const l = last || lastLegal;
+                const f = first || firstLegal || '';
+                const l = last || lastLegal || '';
                 return `${(honorific ? (honorific + ' ') : '')}${f} ${l}`;
             } else if (type === 'org') {
                 return value.full + (value.abbrev ? ` (${value.abbrev})` : '');

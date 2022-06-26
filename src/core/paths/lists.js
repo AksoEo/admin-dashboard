@@ -81,8 +81,7 @@ export const tasks = {
 
         return {
             items: res.body.map(id => codeholders[id]),
-            // FIXME: x-total-items is broken on the server side at the moment
-            total: 9999999, // +res.res.headers.get('x-total-items'),
+            total: Infinity, // not supported in API
         };
     },
 };
