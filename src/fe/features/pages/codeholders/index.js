@@ -198,7 +198,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
 
     render ({
         addrLabelGen,
-        sendNotifTemplate,
+        sendNotifTemplates,
         perms,
         fields: availableFields,
         filters: availableFilters,
@@ -242,7 +242,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     overflow: true,
                 });
             }
-            if (!sendNotifTemplate) {
+            if (!sendNotifTemplates) {
                 menu.push({
                     icon: <EmailIcon style={{ verticalAlign: 'middle' }} />,
                     label: locale.notifTemplates.menuItem,
@@ -353,10 +353,10 @@ export default connectToEverything(class CodeholdersPage extends Page {
                 <SendNotifTemplate
                     task="codeholders/sendNotifTemplate"
                     jsonFilter={{ intent: 'codeholder' }}
-                    open={sendNotifTemplate}
+                    open={sendNotifTemplates}
                     lvIsCursed={this.state.currentResultIsCursed}
                     options={this.state.options}
-                    onClose={() => sendNotifTemplate.pop()} />
+                    onClose={() => sendNotifTemplates.pop()} />
             </div>
         );
     }

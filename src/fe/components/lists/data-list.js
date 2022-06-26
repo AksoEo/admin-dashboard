@@ -63,6 +63,12 @@ export default class DataList extends PureComponent {
         }
         if (items.length > result.total) items.splice(result.total);
 
+        if (!Number.isFinite(result.total) && result.items.length < VLIST_CHUNK_SIZE) {
+            // if there's no total, assume we have all of them when we have received less than
+            // the requested number
+            result.total = items.length;
+        }
+
         this.setState({
             total: result.total,
             items,

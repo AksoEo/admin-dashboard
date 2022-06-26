@@ -882,7 +882,7 @@ export const spec = [
                     return {
                         type: 'switch',
                         name: 'Revuaj dosieroj de ' + name,
-                        requires: ['magazines.read'],
+                        requires: ['magazines.read.' + org],
                         options: [
                             {
                                 name: 'Redakti',
@@ -903,7 +903,7 @@ export const spec = [
                     return {
                         type: 'switch',
                         name: 'Revuaj sondosieroj de ' + name,
-                        requires: ['magazines.read'],
+                        requires: ['magazines.read.' + org],
                         options: [
                             {
                                 name: 'Redakti',
@@ -924,7 +924,7 @@ export const spec = [
                     return {
                         type: 'switch',
                         name: 'Simplaj abonoj de ' + name,
-                        requires: ['magazines.read'],
+                        requires: ['magazines.read.' + org],
                         options: [
                             {
                                 name: 'Legi',

@@ -15,7 +15,10 @@ export default function PhoneNumber ({ value, allowInteractive }) {
             trailing = <CountryFlag country={parsed.country.toLowerCase()} />;
         }
     } catch {
-        number = (value?.value || value).toString(); // close enough, probably
+        if (!value?.value) {
+            number = '—';
+            allowInteractive = false;
+        } else number = (value?.value || value).toString(); // close enough, probably
     }
 
     return allowInteractive
