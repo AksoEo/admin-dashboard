@@ -949,6 +949,37 @@ export const spec = [
                     };
                 }),
             },
+            {
+                type: 'group',
+                children: Object.entries(baseOrgs).map(([org, name]) => {
+                    return {
+                        type: 'switch',
+                        name: 'Abonantaj listoj de revuoj de' + name,
+                        requires: ['magazines.read', 'codeholders.read'],
+                        options: [
+                            {
+                                name: 'Legi',
+                                id: 'magazines.snapshots.read.' + org,
+                            },
+                            {
+                                name: 'Redakti',
+                                id: 'magazines.snapshots.update.' + org,
+                                implies: ['magazines.snapshots.read.' + org],
+                            },
+                            {
+                                name: 'Krei',
+                                id: 'magazines.snapshots.create.' + org,
+                                implies: ['magazines.snapshots.update.' + org],
+                            },
+                            {
+                                name: 'Forigi',
+                                id: 'magazines.snapshots.delete.' + org,
+                                implies: ['magazines.snapshots.create.' + org],
+                            },
+                        ],
+                    };
+                }),
+            },
         ],
     },
     {
@@ -1043,41 +1074,81 @@ export const spec = [
             };
         }),
     },
+    {
+        type: 'category',
+        name: 'Bultenoj',
+        children: Object.entries(baseOrgs).map(([org, name]) => {
+            return {
+                type: 'switch',
+                name: 'Bultenoj de ' + name,
+                options: [
+                    {
+                        name: 'Legi',
+                        id: 'newsletters.' + org + '.read',
+                    },
+                    {
+                        name: 'Redakti',
+                        id: 'newsletters.' + org + '.update',
+                        implies: ['newsletters.' + org + '.read'],
+                    },
+                    {
+                        name: 'Krei',
+                        id: 'newsletters.' + org + '.create',
+                        implies: ['newsletters.' + org + '.update'],
+                    },
+                    {
+                        name: 'Forigi',
+                        id: 'newsletters.' + org + '.delete',
+                        implies: ['newsletters.' + org + '.create'],
+                    },
+                    {
+                        name: 'Sendi',
+                        id: 'newsletters.' + org + '.send',
+                        implies: ['newsletters.' + org + '.read'],
+                    },
+                ],
+            };
+        }),
+    },
+    {
+        type: 'switch',
+        name: 'Reteja listo de perantoj',
+        options: [
+            {
+                name: 'Legi',
+                id: 'intermediaries.read',
+            },
+            {
+                name: 'Krei kaj redakti',
+                id: 'intermediaries.update',
+                implies: ['intermediaries.read'],
+            },
+            {
+                name: 'Forigi',
+                id: 'intermediaries.delete',
+                implies: ['intermediaries.update'],
+            },
+        ],
+    },
+    {
+        type: 'category',
+        name: 'Bultenoj',
+        children: Object.entries({uea: 'UEA'}).map(([org, name]) => {
+            return {
+                type: 'perm.country',
+                name: 'Submeti spezfoliojn de ' + name + ' por specifa lando',
+                id: 'pay.payment_intents.intermediary.' + org,
+            };
+        },
+    },
+    {
+        type: 'perm.country',
+        name: 'Krei aliĝojn por specifa lando',
+        id: 'registration.entries.intermediary',
+    },
 ];
 
 /*
-Missing permissions:
-newsletters:
-    <org>:
-        create
-        read
-        update
-        delete
-        send
-
-magazines:
-    snapshots:
-        create: <org>
-        read: <org>
-        update: <org>
-        delete: <org>
-
-pay:
-    payment_intents:
-        intermediary:
-            <org>:
-                <country>
-
-registration:
-    entries:
-        intermediary:
-            <country>
-
-intermediaries:
-    read
-    update
-    delete
-
 TODO: Missing fields
 
 */
