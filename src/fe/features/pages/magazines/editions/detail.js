@@ -122,7 +122,7 @@ export default class MagazineEdition extends DetailPage {
                         onDelete={(core, format) => {
                             core.createTask('magazines/deleteEditionFile', { magazine, id }, { format });
                         }}
-                        downloadURL={f => `/magazines/${magazine}/editions/${id}/files/${f}`} />
+                        downloadURL={f => `magazines/${magazine}/editions/${id}/files/${f}`} />
                 )}
 
                 {!editing && (
