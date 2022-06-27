@@ -26,10 +26,10 @@ export default class OrgListPage extends DetailPage {
     renderActions ({ perms }) {
         const actions = [];
 
-        if (perms.hasPerm('countries.lists.update')) {
+        if (perms.hasPerm('org_lists.update')) {
             actions.push({
                 label: locale.create.duplicateMenuItem,
-                action: () => this.context.createTask('countryLists/createList', {
+                action: () => this.context.createTask('orgLists/createList', {
                     _duplicate: true,
                 }, {
                     list: this._data.list,
@@ -38,7 +38,7 @@ export default class OrgListPage extends DetailPage {
             });
         }
 
-        if (perms.hasPerm('countries.lists.update')) {
+        if (perms.hasPerm('org_lsits.update')) {
             actions.push({
                 label: detailLocale.edit,
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
@@ -46,10 +46,10 @@ export default class OrgListPage extends DetailPage {
             });
         }
 
-        if (perms.hasPerm('countries.lists.delete')) {
+        if (perms.hasPerm('org_lists.delete')) {
             actions.push({
                 label: detailLocale.delete,
-                action: () => this.context.createTask('countryLists/deleteList', { id: this.id }),
+                action: () => this.context.createTask('orgLists/deleteList', { id: this.id }),
                 overflow: true,
             });
         }

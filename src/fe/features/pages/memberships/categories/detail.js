@@ -10,7 +10,7 @@ export default class Membership extends DetailPage {
 
     createCommitTask (changedFields, edit) {
         return this.context.createTask('memberships/updateCategory', {
-            id: this.getId(),
+            id: this.id,
             _changedFields: changedFields,
         }, edit);
     }

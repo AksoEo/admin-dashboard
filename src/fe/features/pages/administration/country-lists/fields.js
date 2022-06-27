@@ -6,16 +6,22 @@ import SearchIcon from '@material-ui/icons/Search';
 import RemoveIcon from '@material-ui/icons/Remove';
 import fuzzaldrin from 'fuzzaldrin';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
+import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
 import { WithCountries, CountryFlag } from '../../../../components/data/country';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { countryLists as locale } from '../../../../locale';
 import { Link } from '../../../../router';
 import './fields.less';
 
-export function Header ({ item }) {
+export function Header ({ item, editing }) {
     return (
         <div class="country-org-list-header">
             <h1 class="list-title">{item.name}</h1>
+            <DynamicHeightDiv lazy>
+                {editing && (
+                    <div class="name-not-editable-note">{locale.fields.nameNotEditable}</div>
+                )}
+            </DynamicHeightDiv>
         </div>
     );
 }

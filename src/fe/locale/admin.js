@@ -218,6 +218,8 @@ export const countryLists = {
         name: 'Nomo',
         list: 'Listo',
 
+        nameNotEditable: 'Ne eblas redakti la nomojn de listoj de landoj asocioj. Anstataŭe iru al la menuo plej supre dekstre kaj kopii ĝin.',
+
         listSearch: 'Serĉi landojn',
         listEmpty: 'La listo estas malplena',
         listAddCountry: {
@@ -255,6 +257,8 @@ export const orgLists = {
     fields: {
         name: 'Nomo',
         list: 'Asocioj',
+
+        nameNotEditable: 'Ne eblas redakti la nomojn de listoj de asocioj. Anstataŭe iru al la menuo plej supre dekstre kaj kopii ĝin.',
 
         listSearch: 'Serĉi fakajn asociojn',
         listEmpty: 'La listo estas malplena',
