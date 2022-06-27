@@ -663,8 +663,13 @@ export const tasks = {
 
         let itemToPrepend = null;
         if (!parameters.skipCursed && prependedUeaCodeSearch) {
+            let filter = prependedUeaCodeSearch;
+            if (options.filter && Object.keys(options.filter).length) {
+                filter = { $and: [options.filter, prependedUeaCodeSearch] };
+            }
+
             itemToPrepend = (await client.get('/codeholders', {
-                filter: prependedUeaCodeSearch,
+                filter,
                 // only need to know about its existence on later pages
                 fields: options.offset === 0 ? options.fields : [],
                 limit: 1,
