@@ -954,8 +954,8 @@ export const spec = [
                 children: Object.entries(baseOrgs).map(([org, name]) => {
                     return {
                         type: 'switch',
-                        name: 'Abonantaj listoj de revuoj de' + name,
-                        requires: ['magazines.read', 'codeholders.read'],
+                        name: 'Abonantaj listoj de revuoj de ' + name,
+                        requires: ['magazines.read.' + org, 'codeholders.read'],
                         options: [
                             {
                                 name: 'Legi',
@@ -1139,7 +1139,7 @@ export const spec = [
                 name: 'Submeti spezfoliojn de ' + name + ' por specifa lando',
                 id: 'pay.payment_intents.intermediary.' + org,
             };
-        },
+        }),
     },
     {
         type: 'perm.country',
