@@ -32,6 +32,7 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (slot === 'title') return <b>{value}</b>;
             return <MdField
+                ignoreLiveUpdates
                 class={'magazine-toc-entry-title' + (!editing ? ' is-preview' : '')}
                 inline={slot !== 'detail'}
                 singleLine

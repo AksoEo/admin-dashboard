@@ -43,6 +43,7 @@ function orderPortalContainerFront () {
 /// - inline: if true, will try to style it without line breaks
 /// - singleLine: if true, will not allow line breaks
 /// - editorDidMount, onCMChange: forwarded to codeMirror
+/// - ignoreLiveUpdates: ignores props.value while the user is typing to combat latency
 export default class MarkdownTextField extends PureComponent {
     static contextType = layoutContext;
 
@@ -225,7 +226,8 @@ export default class MarkdownTextField extends PureComponent {
                         onCMChange={this.props.onCMChange}
                         onMount={this.#onEditorMount}
                         onFocus={this.#onFocus}
-                        onBlur={this.#onBlur} />
+                        onBlur={this.#onBlur}
+                        ignoreLiveUpdates={this.state.focused && this.props.ignoreLiveUpdates} />
 
                     <div class={'preview-flourish' + (!preview ? ' is-hidden' : '')} />
                     <div class={'preview-container' + (!preview ? ' is-hidden' : '')}>
@@ -353,10 +355,23 @@ class EditorBarPortal extends PureComponent {
     }
 }
 
-function InnerEditor ({ value, onChange, disabled, singleLine, maxLength, onMount, onFocus, onBlur, onCMChange }) {
+function InnerEditor ({
+    value,
+    onChange,
+    disabled,
+    singleLine,
+    maxLength,
+    onMount,
+    onFocus,
+    onBlur,
+    onCMChange,
+    ignoreLiveUpdates,
+}) {
+    const [localValue, setLocalValue] = useState(value);
+
     return (
         <RCodeMirror
-            value={value}
+            value={ignoreLiveUpdates ? localValue : value}
             options={{
                 mode: 'text/markdown',
                 theme: 'akso',
@@ -368,13 +383,18 @@ function InnerEditor ({ value, onChange, disabled, singleLine, maxLength, onMoun
                 lineWrapping: true,
             }}
             editorDidMount={onMount}
-            onFocus={onFocus}
+            onFocus={() => {
+                setLocalValue(value);
+                onFocus();
+            }}
             onBlur={onBlur}
             onChange={onCMChange}
             onBeforeChange={(editor, data, value) => {
                 if (maxLength && value.length > maxLength) value = value.substr(0, maxLength);
-                if (singleLine) onChange(value.replace(/\n/g, ''));
-                else onChange(value);
+                if (singleLine) value = value.replace(/\n/g, '');
+
+                setLocalValue(value);
+                onChange(value);
             }} />
     );
 }
