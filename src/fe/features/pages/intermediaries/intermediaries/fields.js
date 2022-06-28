@@ -50,6 +50,7 @@ export const FIELDS = {
         component ({ value, editing, onChange }) {
             return (
                 <MdField
+                    ignoreLiveUpdates
                     rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
                     value={value}
                     editing={editing}

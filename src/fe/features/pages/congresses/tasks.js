@@ -284,18 +284,24 @@ export default {
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`);
                         })}>
-                        <Field>
-                            <TextField
-                                required
+                        <Field validate={() => {
+                            if (!task.parameters.title) return dataLocale.requiredField;
+                        }}>
+                            <label class="field-label"><Required>{programLocale.fields.title}</Required></label>
+                            <MdField
+                                ignoreLiveUpdates
                                 class="name-field"
-                                outline
-                                label={<Required>{programLocale.fields.title}</Required>}
                                 value={task.parameters.title || ''}
-                                onChange={e => task.update({ title: e.target.value })} />
+                                onChange={title => task.update({ title })}
+                                maxLength={100}
+                                editing
+                                singleLine
+                                rules={['emphasis', 'strikethrough']} />
                         </Field>
                         <Field>
                             <label class="field-label">{programLocale.fields.description}</label>
                             <MdField
+                                ignoreLiveUpdates
                                 editing value={task.parameters.description || null}
                                 onChange={value => task.update({ description: value || null })}
                                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table', 'image']} />

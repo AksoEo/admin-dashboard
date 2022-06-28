@@ -54,6 +54,7 @@ export const FIELDS = {
         weight: 2,
         component ({ value, editing, onChange, slot }) {
             return <MdField
+                ignoreLiveUpdates
                 inline={slot !== 'detail'}
                 editing={editing}
                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}

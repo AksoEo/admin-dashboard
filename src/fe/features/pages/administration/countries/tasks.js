@@ -29,8 +29,6 @@ export default {
             return codeValue;
         };
 
-        // TODO: validators
-
         return (
             <routerContext.Consumer>
                 {routerContext => (
@@ -45,7 +43,7 @@ export default {
                         <Field>
                             <ValidatedTextField
                                 validate={value => {
-                                    if (!value.match(/^x[\w]{2}$/)) {
+                                    if (!value.match(/^x[a-z]{2}$/)) {
                                         return groupsLocale.create.invalidCode;
                                     }
                                 }}

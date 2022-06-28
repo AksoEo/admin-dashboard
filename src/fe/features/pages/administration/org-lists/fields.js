@@ -35,6 +35,7 @@ export const FIELDS = {
             if (slot === 'create') {
                 return (
                     <TextField
+                        required
                         outline
                         label={locale.fields.name}
                         value={value}

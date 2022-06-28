@@ -25,6 +25,7 @@ export default {
                         })}>
                         <Field>
                             <TextField
+                                required
                                 outline
                                 label={locale.fields.name}
                                 value={task.parameters.name}

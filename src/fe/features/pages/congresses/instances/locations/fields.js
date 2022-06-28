@@ -141,6 +141,7 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (!editing && !value) return null;
             return <MdField
+                ignoreLiveUpdates
                 class="congress-location-description"
                 value={value}
                 maxLength={200}

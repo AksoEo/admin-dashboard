@@ -97,6 +97,7 @@ export const FIELDS = {
         wantsCreationLabel: true,
         component ({ value, editing, onChange, isCreation, slot }) {
             return <MdField
+                ignoreLiveUpdates
                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
                 value={value}
                 editing={editing}
