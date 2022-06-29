@@ -7,6 +7,13 @@
     border-radius: 4px;
     white-space: nowrap;
 
+    @media (prefers-color-scheme: dark) {
+        // fix background in firefox
+        option {
+            background: @card-background;
+        }
+    }
+
     & > select, & > .multi-select {
         display: inline-block;
         background: none;
