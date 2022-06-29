@@ -77,17 +77,25 @@ export const FIELDS = {
         },
     },
     availableFrom: {
+        shouldHide: (_, editing) => !editing,
         component ({ value, editing, onChange }) {
             if (!editing) return '' + value;
             return <TextField
+                type="number"
+                pattern="\d+"
                 value={value || ''}
+                placeholder={locale.availability.placeholder}
                 onChange={e => onChange(+e.target.value || null)} />;
         },
     },
     availableTo: {
+        shouldHide: (_, editing) => !editing,
         component ({ value, editing, onChange }) {
             if (!editing) return '' + value;
             return <TextField
+                type="number"
+                pattern="\d+"
+                placeholder={locale.availability.placeholder}
                 value={value || ''}
                 onChange={e => onChange(+e.target.value || null)} />;
         },
@@ -95,22 +103,35 @@ export const FIELDS = {
     availability: {
         slot: 'body',
         skipLabel: true,
-        shouldHide: () => true,
-        component ({ item }) {
+        virtual: ['availableFrom', 'availableTo'],
+        isEmpty: () => false,
+        component ({ item, editing, slot }) {
             const avFrom = item.availableFrom;
             const avTo = item.availableTo;
+            let content;
+            let hideLabel = false;
+            let isError = false;
             if (!avFrom && !avTo) {
-                return <div class="membership-category-availability">{locale.availability.always}</div>;
+                hideLabel = true;
+                content = locale.availability.always;
+            } else if (!avFrom) {
+                content = locale.availability.until + ' ' + avTo;
+            } else if (!avTo) {
+                content = locale.availability.from + ' ' + avFrom;
+            } else if (editing && avFrom > avTo) {
+                isError = true;
+                content = locale.availability.rangeError;
+            } else {
+                content = avFrom + '–' + avTo;
             }
             return (
-                <div class="membership-category-availability">
-                    {locale.availability.label}
+                <div class={'membership-category-availability' + (isError ? ' is-error' : '')} data-slot={slot}>
+                    {slot !== 'detail' && !hideLabel && locale.availability.label}
                     {' '}
-                    {avFrom || ''}
-                    {'–'}
-                    {avTo || ''}
+                    {content}
                 </div>
             );
         },
     },
 };
+

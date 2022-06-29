@@ -17,10 +17,16 @@ export const membershipCategories = {
         lifetime: 'Dumviva',
         availableFrom: 'Uzebla ekde',
         availableTo: 'Uzebla ĝis',
+        availability: 'Uzebla',
     },
     availability: {
         always: 'Ĉiam uzebla',
-        label: 'Uzebla:',
+        label: 'Uzebla',
+        from: 'ekde',
+        until: 'ĝis',
+        placeholder: `Ekz. ${new Date().getFullYear()}`,
+
+        rangeError: 'Nevalida jarintervalo',
     },
     create: {
         menuItem: 'Krei',
