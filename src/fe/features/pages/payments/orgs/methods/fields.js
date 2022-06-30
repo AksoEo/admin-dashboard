@@ -180,6 +180,7 @@ export const FIELDS = {
     },
     prices: {
         wantsCreationLabel: true,
+        shouldHide: (item) => item?.type !== 'intermediary',
         component ({ value, editing, onChange, item }) {
             return (
                 <PricesEditor
@@ -228,7 +229,8 @@ export const FIELDS = {
             if (editing) {
                 return <Checkbox checked={value} onChange={onChange} />;
             }
-            return value && value.toString();
+            if (value) return <CheckIcon />;
+            return '—';
         },
     },
     fee: {
@@ -273,13 +275,13 @@ export const FIELDS = {
                     <div class="payment-method-max-amount-editor">
                         <Checkbox
                             id={chkId}
-                            checked={value !== null}
+                            checked={value !== null && value !== undefined}
                             onChange={checked => onChange(checked ? 100 : null)} />
                         {' '}
                         <label for={chkId}>
                             {locale.fields.maxAmountEnable}
                         </label>
-                        {(value !== null) && (
+                        {(value !== null && value !== undefined) && (
                             <currencyAmount.editor
                                 class="inner-currency-editor"
                                 outline
@@ -293,7 +295,7 @@ export const FIELDS = {
             return <currencyAmount.renderer value={value} currency="USD" />;
         },
         validate: ({ value }) => {
-            if (value < 100) {
+            if (value && value < 100) {
                 // must be at least 1 USD!
                 return locale.fields.maxAmountErrMinAmount;
             }
