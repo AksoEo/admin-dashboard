@@ -245,6 +245,7 @@ export default {
                         value={task.parameters.year}
                         onChange={e => task.update({ year: e.target.value })}
                         validate={value => {
+                            console.log(value); console.log(yearMin); console.log(yearMax);
                             if (+value != value || +value < yearMin || +value > yearMax) return locale.membership.notAYear;
                         }} />
                 </Field>
