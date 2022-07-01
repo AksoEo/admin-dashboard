@@ -246,7 +246,8 @@ export default {
                         onChange={e => task.update({ year: e.target.value })}
                         validate={value => {
                             if (+value != value) return locale.membership.notAYear;
-                            if (value !== null && (+value < yearMin || +value > yearMax)) return locale.membership.notAYear;
+                            if (yearMin !== null && +value < yearMin) return locale.membership.notAYear;
+                            if (yearMax !== null && +value < yearMax) return locale.membership.notAYear;
                         }} />
                 </Field>
                 <div class="canuto-field">
