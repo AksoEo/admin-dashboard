@@ -170,7 +170,7 @@ export const tasks = {
         const client = await asyncClient;
         const { options } = codeholdersPTRD({
             search,
-            fields: [{ id: 'code', sorting: 'asc' }, { id: 'name', sorting: 'asc' }],
+            fields: fields,
             order: fieldsToOrder(fields),
             offset,
             limit,

@@ -1,15 +1,12 @@
 import { h } from 'preact';
-import Page from '../../../../components/page';
-import SearchFilters from '../../../../components/overview/search-filters';
+import OverviewPage from '../../../../components/overview/overview-page';
 import OverviewList from '../../../../components/lists/overview-list';
 import CSVExport from '../../../../components/tasks/csv-export';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
-import Meta from '../../../meta';
 import { countries as locale, search as searchLocale } from '../../../../locale';
 import { FIELDS } from './fields';
 import './style';
 
-export default class CountriesPage extends Page {
+export default class CountriesPage extends OverviewPage {
     state = {
         parameters: {
             search: {
@@ -27,59 +24,22 @@ export default class CountriesPage extends Page {
         csvExportOpen: false,
     };
 
-    #searchInput;
-    #currentQuery = '';
+    searchFields = ['name_eo'];
+    locale = locale;
 
-    decodeURLQuery () {
-        this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
-        });
-        this.#currentQuery = this.props.query;
-    }
-
-    encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, {});
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
-
-    componentDidMount () {
-        this.decodeURLQuery();
-
-        this.#searchInput.focus(500);
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters) {
-            this.encodeURLQuery();
-        }
-    }
-
-    render (_, { parameters }) {
-        const actions = [
+    renderActions () {
+        return [
             {
                 label: searchLocale.csvExport,
                 action: () => this.setState({ csvExportOpen: true }),
                 overflow: true,
             },
         ];
+    }
 
+    renderContents (_, { parameters }) {
         return (
             <div class="countries-page">
-                <Meta
-                    title={locale.title}
-                    actions={actions} />
-                <SearchFilters
-                    value={parameters}
-                    onChange={parameters => this.setState({ parameters })}
-                    locale={{
-                        searchPlaceholders: locale.search.placeholders,
-                    }}
-                    inputRef={view => this.#searchInput = view} />
                 <OverviewList
                     task="countries/list"
                     view="countries/country"

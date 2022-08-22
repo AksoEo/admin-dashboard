@@ -1,14 +1,9 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
-import Page from '../../../../components/page';
-import SearchFilters from '../../../../components/overview/search-filters';
+import OverviewPage from '../../../../components/overview/overview-page';
 import OverviewList from '../../../../components/lists/overview-list';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
 import CSVExport from '../../../../components/tasks/csv-export';
-import Meta from '../../../meta';
 import { adminGroups as locale, search as searchLocale } from '../../../../locale';
-import { coreContext } from '../../../../core/connection';
-import { connectPerms } from '../../../../perms';
 
 const FIELDS = {
     name: {
@@ -29,7 +24,7 @@ const FIELDS = {
     },
 };
 
-export default connectPerms(class AdminGroups extends Page {
+export default class AdminGroups extends OverviewPage {
     state = {
         parameters: {
             search: {
@@ -46,41 +41,10 @@ export default connectPerms(class AdminGroups extends Page {
         csvExportOpen: false,
     };
 
-    static contextType = coreContext;
+    searchFields = ['name'];
+    locale = locale;
 
-    #searchInput;
-    #currentQuery = '';
-
-    decodeURLQuery () {
-        this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, {}), this.state.parameters),
-        });
-        this.#currentQuery = this.props.query;
-    }
-
-    encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, {});
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
-
-    componentDidMount () {
-        this.decodeURLQuery();
-
-        this.#searchInput.focus(500);
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters) {
-            this.encodeURLQuery();
-        }
-    }
-
-    render ({ perms }, { parameters }) {
+    renderActions ({ perms }) {
         const actions = [];
 
         if (perms.hasPerm('admin_groups.create')) {
@@ -97,18 +61,12 @@ export default connectPerms(class AdminGroups extends Page {
             overflow: true,
         });
 
+        return actions;
+    }
+
+    renderContents (_, { parameters }) {
         return (
             <div class="admin-groups-page">
-                <Meta
-                    title={locale.title}
-                    actions={actions} />
-                <SearchFilters
-                    value={parameters}
-                    onChange={parameters => this.setState({ parameters })}
-                    locale={{
-                        searchPlaceholders: locale.search.placeholders,
-                    }}
-                    inputRef={view => this.#searchInput = view} />
                 <OverviewList
                     task="adminGroups/list"
                     view="adminGroups/group"
@@ -134,4 +92,4 @@ export default connectPerms(class AdminGroups extends Page {
             </div>
         );
     }
-});
+}

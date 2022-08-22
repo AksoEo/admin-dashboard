@@ -68,7 +68,7 @@ function SearchInput ({
 
     return (
         <div class={'search-input' + (compact ? ' is-compact' : '')} ref={innerRef}>
-            {!!searchFields && (
+            {!!searchFields && searchFields.length > 1 && (
                 <Select
                     class="search-field"
                     value={value.field || ''}

@@ -287,6 +287,7 @@ export const search = {
     loadFilter: 'Ŝargi',
     saveFilter: 'Konservi',
     pickFilter: 'Ŝargi filtrilon',
+    addFilterTitle: 'Aldoni filtrilon',
     saveFilterTitle: 'Konservi filtrilon',
     noFilters: 'Neniu konservita filtrilo',
     savedFilterName: 'Nomo',

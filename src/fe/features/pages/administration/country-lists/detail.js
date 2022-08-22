@@ -1,56 +1,25 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
-import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail/detail';
-import Meta from '../../../meta';
-import { coreContext } from '../../../../core/connection';
 import { Header, FIELDS } from './fields';
 import { countryLists as locale, detail as detailLocale } from '../../../../locale';
-import { connectPerms } from '../../../../perms';
+import DetailPage from '../../../../components/detail/detail-page';
 
-export default connectPerms(class CountryListsPage extends Page {
-    static contextType = coreContext;
-
-    state = {
-        edit: null,
-    };
-
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
-
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return Promise.resolve();
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return Promise.resolve();
-        }
-
-        return new Promise(resolve => {
-            this.#commitTask = this.context.createTask('countryLists/updateList', {
-                id: this.props.match[1],
-                _changedFields: changedFields,
-            }, this.state.edit);
-            this.#commitTask.on('success', this.onEndEdit);
-            this.#commitTask.on('drop', () => {
-                this.#commitTask = null;
-                resolve();
-            });
-        });
-    };
-
-    componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
-    }
+export default class CountryListsPage extends DetailPage {
+    locale = locale;
 
     get id () {
         return this.props.match[1];
     }
 
-    render ({ perms, editing }, { edit }) {
+    createCommitTask = (changedFields, edit) => {
+        return this.context.createTask('countryLists/updateList', {
+            id: this.id,
+            _changedFields: changedFields,
+        }, edit);
+    };
+
+    renderActions ({ perms }) {
         const actions = [];
 
         if (perms.hasPerm('countries.lists.update')) {
@@ -81,26 +50,25 @@ export default connectPerms(class CountryListsPage extends Page {
             });
         }
 
+        return actions;
+    }
+
+    renderContents ({ editing }, { edit }) {
         return (
-            <div class="country-org-list-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
-                <DetailView
-                    view="countryLists/list"
-                    id={this.id}
-                    header={Header}
-                    fields={FIELDS}
-                    locale={locale}
-                    edit={edit}
-                    onData={data => this._data = data}
-                    onEditChange={edit => this.setState({ edit })}
-                    editing={editing}
-                    onEndEdit={this.onEndEdit}
-                    onCommit={this.onCommit}
-                    onDelete={this.props.pop}
-                    compact />
-            </div>
+            <DetailView
+                view="countryLists/list"
+                id={this.id}
+                header={Header}
+                fields={FIELDS}
+                locale={locale}
+                edit={edit}
+                onData={data => this._data = data}
+                onEditChange={edit => this.setState({ edit })}
+                editing={editing}
+                onEndEdit={this.onEndEdit}
+                onCommit={this.onCommit}
+                onDelete={this.props.pop}
+                compact />
         );
     }
-});
+}

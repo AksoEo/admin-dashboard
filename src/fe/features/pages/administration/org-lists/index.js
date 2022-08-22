@@ -9,7 +9,6 @@ import { connectPerms } from '../../../../perms';
 export default connectPerms(class OrgListsPage extends OverviewPage {
     state = {
         parameters: {
-            search: {},
             fields: [
                 { id: 'name', sorting: 'asc', fixed: true },
             ],

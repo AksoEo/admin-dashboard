@@ -49,7 +49,6 @@ const elazy = (inner, map) => lazy(() => inner().then(e => {
 /// IDs are `locale->pages[id]` keys and are also used to identify pages elsewhere.
 export default [
     {
-        // TODO: proper grouping
         id: 'undefined',
         contents: [
             {

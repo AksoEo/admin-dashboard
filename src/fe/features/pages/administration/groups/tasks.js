@@ -6,6 +6,7 @@ import { Field } from '../../../../components/form';
 import TaskDialog from '../../../../components/tasks/task-dialog';
 import ChangedFields from '../../../../components/tasks/changed-fields';
 import { routerContext } from '../../../../router';
+import './tasks.less';
 
 export default {
     create ({ open, task }) {
@@ -13,6 +14,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="admin-groups-task-create"
                         open={open}
                         onClose={() => task.drop()}
                         title={locale.add}
@@ -43,6 +45,7 @@ export default {
     update ({ open, task }) {
         return (
             <TaskDialog
+                class="admin-groups-task-update"
                 open={open}
                 onClose={() => task.drop()}
                 title={locale.editGroup}
@@ -60,6 +63,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="admin-groups-task-delete"
                         open={open}
                         onClose={() => task.drop()}
                         title={locale.delete}

@@ -5,7 +5,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import SearchIcon from '@material-ui/icons/Search';
 import { Button, Dialog, LinearProgress, TextField } from 'yamdl';
 import Tabs from '../../../../components/controls/tabs';
-import Page from '../../../../components/page';
+import DetailPage from '../../../../components/detail/detail-page';
 import CODEHOLDER_FIELDS from '../../codeholders/table-fields';
 import { FIELDS as CLIENT_FIELDS } from '../clients/fields';
 import DetailView from '../../../../components/detail/detail';
@@ -14,47 +14,28 @@ import OverviewList from '../../../../components/lists/overview-list';
 import StaticOverviewList from '../../../../components/lists/overview-list-static';
 import GlobalFilterNotice from '../../codeholders/global-filter-notice';
 import { PickerDialog as CodeholderPickerDialog } from '../../../../components/pickers/codeholder-picker';
-import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { LinkButton } from '../../../../router';
 import { adminGroups as locale, clients as clientsLocale, codeholders as codeholdersLocale } from '../../../../locale';
 import { connectPerms } from '../../../../perms';
 import './detail.less';
 
-export default connectPerms(class AdminGroupDetailPage extends Page {
+export default connectPerms(class AdminGroupDetailPage extends DetailPage {
     state = {
-        edit: null,
-        editing: false,
         tab: 'codeholders',
     };
 
-    static contextType = coreContext;
+    get id () {
+        return this.props.match[1];
+    }
 
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
+    locale = locale;
 
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return Promise.resolve();
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return Promise.resolve();
-        }
-
-        return new Promise(resolve => {
-            this.#commitTask = this.context.createTask('adminGroups/update', {
-                id: this.props.match[1],
-                _changedFields: changedFields,
-            }, this.state.edit);
-            this.#commitTask.on('success', this.onEndEdit);
-            this.#commitTask.on('drop', () => {
-                this.#commitTask = null;
-                resolve();
-            });
-        });
+    createCommitTask = (changedFields, edit) => {
+        return this.context.createTask('adminGroups/update', {
+            id: this.id,
+            _changedFields: changedFields,
+        }, edit);
     };
 
     componentDidUpdate () {
@@ -75,17 +56,8 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
         }
     }
 
-    componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
-    }
-
-    get id () {
-        return this.props.match[1];
-    }
-
-    render ({ perms, editing }, { tab, edit }) {
+    renderActions ({ perms }) {
         const actions = [];
-        const permsTarget = `/administrado/grupoj/${this.id}/permesoj`;
 
         if (perms.hasPerm('admin_groups.update')) {
             actions.push({
@@ -103,6 +75,11 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
             });
         }
 
+        return actions;
+    }
+
+    renderContents ({ perms, editing }, { tab, edit }) {
+        const permsTarget = `/administrado/grupoj/${this.id}/permesoj`;
         const showList = perms.hasPerm('clients.read') || perms.hasPerm('codeholders.read');
 
         // still show the other tab items to imply that they exist, but disable the ability to
@@ -114,9 +91,6 @@ export default connectPerms(class AdminGroupDetailPage extends Page {
 
         return (
             <div class="admin-group-detail-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
                 <DetailView
                     compact
                     view="adminGroups/group"

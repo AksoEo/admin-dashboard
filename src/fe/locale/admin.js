@@ -12,7 +12,9 @@ export const adminGroups = {
     deleteButton: 'Forigi',
     deleteAreYouSure: 'Ĉu vi certas, ke vi volas forigi tiun ĉi administran grupon? Ne eblas malfari tiun ĉi agon.',
     search: {
-        placeholders: 'Serĉi nomojn de grupoj',
+        placeholders: {
+            name: 'Serĉi nomojn de grupoj',
+        },
     },
     fields: {
         name: 'Nomo',
@@ -154,7 +156,9 @@ export const countries = {
     title: 'Landoj',
     detailTitle: 'Lando',
     search: {
-        placeholders: 'Serĉi landojn',
+        placeholders: {
+            name_eo: 'Serĉi landojn',
+        },
     },
     fields: {
         code: 'Landokodo',
