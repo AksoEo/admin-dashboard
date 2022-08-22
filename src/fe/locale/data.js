@@ -40,6 +40,7 @@ export const data = {
         invalidUEACode: 'Nevalida seslitera UEA-kodo',
         codeTaken: 'La UEA-kodo estas jam uzata',
         idFailed: 'Ne sukcesis ŝarĝi UEA-kodon',
+        bannedCode: '[[Code contains banned word]]',
     },
     deleteTitle: 'Forigi',
     deleteDescription: 'Ĉu vi certas, ke vi volas forigi tiun ĉi eron?',

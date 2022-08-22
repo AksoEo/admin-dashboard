@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { CircularProgress } from 'yamdl';
-import { UEACode as AKSOUEACode } from '@tejo/akso-client';
+import { UEACode as AKSOUEACode, bannedCodes } from '@tejo/akso-client';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
@@ -49,6 +49,13 @@ export const IdUEACode = connect(
         : (data && data.code) ? <UEACode value={data.code.new} /> : <TinyProgress />
 ));
 
+function isBannedCode (value) {
+    for (const bannedCode of bannedCodes) {
+        if (value.includes(bannedCode)) return true;
+    }
+    return false;
+}
+
 /// Also pass `id` to enable checking if it’s taken.
 /// Also pass an array to `suggestions` to show a list of suggestions.
 /// Alternatively, pass `suggestionParameters` to automatically suggest some codes.
@@ -68,7 +75,7 @@ class UEACodeEditor extends Component {
         } catch (_) {
             //
         }
-        if (!this.props.id || !isNewCode) {
+        if (!this.props.id || !isNewCode || isBannedCode(this.props.value)) {
             this.setState({ takenState: null });
             return;
         }
@@ -150,6 +157,9 @@ class UEACodeEditor extends Component {
                 }
                 if (this.state.takenState === 'taken') {
                     return locale.ueaCode.codeTaken;
+                }
+                if (isBannedCode(value)) {
+                    return locale.ueaCode.bannedCode;
                 }
             }}
             trailing={trailing}

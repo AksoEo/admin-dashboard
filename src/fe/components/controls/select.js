@@ -132,11 +132,11 @@ class MultiSelect extends Component {
         let label;
         if (multi) {
             label = value.length
-                ? value.map(v => keyedItems[v].shortLabel || keyedItems[v].label).join(', ')
+                ? value.map(v => keyedItems[v]?.shortLabel || keyedItems[v]?.label).join(', ')
                 : emptyLabel || '';
         } else {
             const v = value[0];
-            label = value.length ? keyedItems[v].shortLabel || keyedItems[v].label : emptyLabel;
+            label = value.length ? keyedItems[v]?.shortLabel || keyedItems[v]?.label : emptyLabel;
         }
 
         return (

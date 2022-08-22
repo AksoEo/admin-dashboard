@@ -260,6 +260,11 @@ class HomeTasks extends PureComponent {
                 magPaperNoAddress: renderTabItems('magPaperNoAddress', MagPaperNoAddressItem),
             };
 
+            let currentTab = this.state.tab;
+            if (!tabs[currentTab]) {
+                currentTab = Object.keys(tabs).filter(tab => !!tabs[tab])[0];
+            }
+
             const countTaskItems = k => {
                 if (!tasks || !tasks[k]) return 0;
                 return Object.values(tasks[k]).reduce((a, b) => a + b, 0);
@@ -276,15 +281,15 @@ class HomeTasks extends PureComponent {
             };
 
             const otherTabsCount = Object.keys(tabItemCounts)
-                .filter(k => k != this.state.tab)
-                .map(k => tabItemCounts[k])
+                .filter(k => k !== currentTab)
+                .map(k => tabItemCounts[k] | 0)
                 .reduce((a, b) => a + b, 0);
 
             contents = (
                 <Fragment>
                     <div class="home-tasks-header">
                         <Select
-                            value={this.state.tab}
+                            value={currentTab}
                             onChange={tab => this.setState({ tab })}
                             rendered
                             items={Object.keys(locale.tasks.tabs).filter(k => k in itemLoaders).map(k => ({
@@ -301,7 +306,7 @@ class HomeTasks extends PureComponent {
                             {locale.tasks.otherTabs(otherTabsCount)}
                         </div>
                     </div>
-                    {tabs[this.state.tab]}
+                    {tabs[currentTab]}
                 </Fragment>
             );
         }
