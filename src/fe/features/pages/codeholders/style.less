@@ -295,8 +295,16 @@
 }
 
 .codeholders-addr-label-gen {
+    .addr-label-gen-desc,
+    .search-query-notice,
     .cursed-notice {
-        padding: 16px;
+        margin: 16px;
+    }
+
+    .search-query-notice, .cursed-notice {
+        padding: 8px;
+        border-radius: 4px;
+        background: @text-fade-10;
     }
 
     .addr-label-gen-inner {
@@ -307,7 +315,7 @@
         }
 
         .gen-preview {
-            flex: 2;
+            flex: 1;
             max-width: 400px;
             padding: 16px;
             padding-left: 24px;
@@ -328,10 +336,24 @@
             padding-right: 8px;
 
             .gen-presets {
-                display: flex;
-                justify-content: space-between;
+                padding: 8px;
+                padding-bottom: 4px;
+                background: @text-fade-10;
+                border-radius: 4px;
                 margin-bottom: 8px;
                 --md-button-color: @gray-button-color;
+
+                .presets-title {
+                    font-size: smaller;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                }
+
+                .presets-inner {
+                    display: flex;
+                    justify-content: space-between;
+                }
 
                 .loaded-preset {
                     margin-right: 8px;
@@ -980,7 +1002,10 @@
     }
 }
 
-.codeholders-task-create, .codeholders-task-update, .codeholders-task-add-membership, .codeholders-task-add-role {
+.codeholders-task-create,
+.codeholders-task-update,
+.codeholders-task-add-membership,
+.codeholders-task-add-role {
     width: 400px;
     max-width: 100%;
 
@@ -1128,4 +1153,9 @@
     .paper-text-field {
         width: 100%;
     }
+}
+
+.codeholders-task-save-addr-label-preset {
+    width: 100%;
+    max-width: 300px;
 }

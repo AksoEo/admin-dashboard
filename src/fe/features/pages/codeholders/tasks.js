@@ -433,6 +433,7 @@ export default {
     createAddrLabelPreset ({ open, task }) {
         return (
             <TaskDialog
+                class="codeholders-task-save-addr-label-preset"
                 open={open}
                 onClose={() => task.drop()}
                 title={locale.addrLabelGen.presets.create.title}
@@ -452,6 +453,7 @@ export default {
     updateAddrLabelPreset ({ open, task }) {
         return (
             <TaskDialog
+                class="codeholders-task-save-addr-label-preset"
                 open={open}
                 onClose={() => task.drop()}
                 title={locale.addrLabelGen.presets.update.title}

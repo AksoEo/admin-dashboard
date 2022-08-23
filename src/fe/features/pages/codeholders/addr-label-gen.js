@@ -120,6 +120,9 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
             <div class="addr-label-gen-desc">
                 {locale.addrLabelGen.description}
             </div>
+            {options.search?.query ? <div class="search-query-notice">
+                {locale.addrLabelGen.searchQueryNotice}
+            </div> : null}
             {lvIsCursed ? <div class="cursed-notice">
                 {locale.addrLabelGen.cursedNotice}
             </div> : null}
@@ -181,6 +184,7 @@ const boundedNumber = (min, max, step, unit) => ({ value, onChange }) => {
             value={isFocused ? editingText : +value.toFixed(1)}
             onChange={e => {
                 setEditingText(e.target.value);
+                if (Number.isFinite(+e.target.value)) onChange(+e.target.value);
             }}
             onFocus={() => {
                 setFocused(true);
@@ -344,6 +348,7 @@ const GenPresets = connectPerms(function GenPresets ({ value, onChange, perms })
 
     const load = preset => {
         setLoadedPreset(preset);
+        setPickerOpen(false);
         const newValue = { ...value };
         for (const k in preset) if (k in newValue) newValue[k] = preset[k];
         onChange(newValue);
@@ -375,26 +380,33 @@ const GenPresets = connectPerms(function GenPresets ({ value, onChange, perms })
     return (
         <coreContext.Consumer>{core => (
             <div class="gen-presets">
-                {loaded ? loaded : (
-                    <Button
-                        class="load-preset"
-                        onClick={() => setPickerOpen(true)}>
-                        {locale.addrLabelGen.presets.load}
-                    </Button>
-                )}
-                {canSavePreset ? <Button
-                    class="store-preset"
-                    onClick={() => store(core)}>
+                <div class="presets-title">
                     {loaded
-                        ? locale.addrLabelGen.presets.update.menuItem
-                        : locale.addrLabelGen.presets.create.menuItem}
-                </Button> : null}
+                        ? locale.addrLabelGen.presets.titleLoaded
+                        : locale.addrLabelGen.presets.title}
+                </div>
+                <div class="presets-inner">
+                    {loaded ? loaded : (
+                        <Button
+                            class="load-preset"
+                            onClick={() => setPickerOpen(true)}>
+                            {locale.addrLabelGen.presets.load}
+                        </Button>
+                    )}
+                    {canSavePreset ? <Button
+                        class="store-preset"
+                        onClick={() => store(core)}>
+                        {loaded
+                            ? locale.addrLabelGen.presets.update.menuItem
+                            : locale.addrLabelGen.presets.create.menuItem}
+                    </Button> : null}
 
-                <PresetPicker
-                    open={pickerOpen}
-                    onClose={() => setPickerOpen(false)}
-                    onLoad={load}
-                    core={core} />
+                    <PresetPicker
+                        open={pickerOpen}
+                        onClose={() => setPickerOpen(false)}
+                        onLoad={load}
+                        core={core} />
+                </div>
             </div>
         )}</coreContext.Consumer>
     );
