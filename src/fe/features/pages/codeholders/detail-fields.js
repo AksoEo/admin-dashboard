@@ -802,7 +802,7 @@ export const fields = {
     }),
     creationTime: {
         component ({ value }) {
-            if (!value) return null;
+            if (!value) return '—';
             return <timestamp.renderer value={value} />;
         },
         shouldHide: (_, editing) => editing,
@@ -810,6 +810,7 @@ export const fields = {
     },
     isDead: {
         component: permsEditable('isDead', ({ value, editing, item, onItemChange }) => {
+            if (!editing && !value) return '—';
             return (
                 <Checkbox
                     class={!editing ? 'fixed-checkbox' : ''}
@@ -837,6 +838,8 @@ export const fields = {
                         onChange={onChange} />
                 );
             }
+
+            if (!value) return '—';
 
             const age = item.age && item.age.now !== null
                 ? locale.fields.ageFormat(item.age.now, item.age.atStartOfYear)
@@ -879,6 +882,7 @@ export const fields = {
                         }
                     }}/>;
             }
+            if (!value) return '—';
             return <date.renderer value={value} />;
         }),
         hasPerm: 'self',

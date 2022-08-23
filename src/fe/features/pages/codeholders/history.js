@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { CircularProgress } from 'yamdl';
+import InfoIcon from '@material-ui/icons/Info';
 import Page from '../../../components/page';
 import { coreContext } from '../../../core/connection';
 import Meta from '../../meta';
@@ -8,8 +9,6 @@ import DiffAuthor from '../../../components/diff-author';
 import { timestamp } from '../../../components/data';
 import { fields as detailFields } from './detail-fields';
 import './history.less';
-
-// TODO: add loading indicator
 
 export default class History extends Page {
     static contextType = coreContext;
@@ -42,7 +41,6 @@ export default class History extends Page {
     }
 
     componentDidUpdate (prevProps) {
-        // FIXME: does not check if codeholder id changed
         if (prevProps.query !== this.props.query) {
             this.load();
         }
@@ -53,10 +51,6 @@ export default class History extends Page {
     }
 
     render () {
-        const renderer = detailFields[this.props.query]
-            ? detailFields[this.props.query].component
-            : (() => 'eraro');
-
         const fieldName = (locale.fields[this.props.query] || '???').toLowerCase();
 
         return (
@@ -66,22 +60,32 @@ export default class History extends Page {
                     <div class="history-loading-container">
                         <CircularProgress indeterminate />
                     </div>
-                ) : null}
+                ) : (
+                    <div class="history-retention-note">
+                        <InfoIcon className="inner-icon" />
+                        <div class="inner-note">
+                            {locale.fieldHistory.dataRetentionNote}
+                        </div>
+                    </div>
+                )}
                 <div class="history-items">
                     {this.state.items.map(item => <FieldHistoryItem
                         key={item.id}
                         item={item}
-                        field={this.props.query}
-                        renderer={renderer} />)}
+                        field={this.props.query} />)}
                 </div>
             </div>
         );
     }
 }
 
-function FieldHistoryItem ({ item, field, renderer: Renderer }) {
+function FieldHistoryItem ({ item, field }) {
     let className = 'field-history-item';
     if (!item.author) className += ' initial';
+
+    if (!detailFields[field]) return `?${field}?`;
+
+    const Renderer = detailFields[field].component;
 
     return (
         <div class={className}>
