@@ -248,9 +248,18 @@ export const codeholders = {
         },
     },
     profilePicture: {
+        upload: 'Alŝuti',
+
         crop: 'Tondi profilfoton',
         cancel: 'Nuligi',
         set: 'Alŝuti',
+
+        remove: {
+            menuItem: 'Forigi',
+            title: 'Forigi profilfoton',
+            button: 'Forigi',
+            description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi profilfoton? Ne eblas malfari tiun ĉi agon.',
+        },
     },
     create: 'Aldoni membron',
     createNoName: 'Nomo estas deviga',

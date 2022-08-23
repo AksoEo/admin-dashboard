@@ -854,6 +854,16 @@ export const tasks = {
             log.error('failed to fetch new profile picture hash', err);
         });
     },
+    removeProfilePicture: async ({ id }) => {
+        const client = await asyncClient;
+        await client.delete(`/codeholders/${id}/profile_picture`);
+
+        const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
+        const existing = store.get([CODEHOLDERS, storeId]);
+        store.insert([CODEHOLDERS, storeId], deepMerge(existing, {
+            profilePictureHash: null,
+        }));
+    },
     /// codeholders/listFiles: lists files for a codeholder
     ///
     /// # Options and Parameters

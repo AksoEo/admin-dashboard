@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Button, Dialog, Slider, CircularProgress, Spring, globalAnimator } from 'yamdl';
+import { Button, Dialog, Menu, Slider, CircularProgress, Spring, globalAnimator } from 'yamdl';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { coreContext } from '../../../core/connection';
 import ProfilePicture from '../../../components/profile-picture';
@@ -21,7 +21,11 @@ export default class ProfilePictureEditor extends Component {
     state = {
         uploading: false,
         croppingFile: null,
+        showingMenu: false,
     };
+    menuPos = [0, 0];
+
+    static contextType = coreContext;
 
     beginUpload () {
         pickFile('image/png, image/jpeg', files => {
@@ -32,16 +36,40 @@ export default class ProfilePictureEditor extends Component {
         });
     }
 
+    removePicture () {
+        this.context.createTask('codeholders/removeProfilePicture', {
+            id: this.props.id,
+        });
+    }
+
     render () {
         return (
             <div class="member-picture-container">
                 <ProfilePicture {...this.props} />
                 {this.props.canEdit && (
-                    <Button icon class="edit-overlay" onClick={() => this.beginUpload()}>
+                    <Button icon class="edit-overlay" onClick={(e) => {
+                        this.menuPos = [e.clientX, e.clientY];
+                        this.setState({ showingMenu: true });
+                    }}>
                         <AddAPhotoIcon class="edit-icon" />
                     </Button>
                 )}
 
+                <Menu
+                    open={this.state.showingMenu}
+                    onClose={() => this.setState({ showingMenu: false })}
+                    position={this.menuPos}
+                    anchor={[0, 0]}
+                    items={[
+                        {
+                            label: locale.profilePicture.upload,
+                            action: () => this.beginUpload(),
+                        },
+                        this.props.profilePictureHash ? {
+                            label: locale.profilePicture.remove.menuItem,
+                            action: () => this.removePicture(),
+                        } : null,
+                    ].filter(x => x)}/>
                 <Dialog
                     class="member-picture-crop-dialog"
                     backdrop

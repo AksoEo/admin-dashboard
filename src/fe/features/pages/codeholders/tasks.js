@@ -493,6 +493,8 @@ export default {
         onCompletion: (task, routerContext) => routerContext.navigate(`/delegitoj/${task.parameters.codeholderId}/${task.parameters.org}`),
     }),
     deleteDelegations: deleteDialog({ locale: delegationsLocale.delete }),
+
+    removeProfilePicture: deleteDialog({ locale: locale.profilePicture.remove }),
 };
 
 class NotifTemplateMessage extends PureComponent {
