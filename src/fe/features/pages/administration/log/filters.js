@@ -122,7 +122,8 @@ export default {
         },
     },
     path: {
-        default: () => ({ enabled: false, value: '' }),
+        // filter out http log requests by default
+        default: () => ({ enabled: true, value: { type: 'invert', path: '/http_log' } }),
         serialize: ({ value }) => (value.type === 'invert'
             ? '!'
             : value.type === 'prefix' ? '^' : '') + value.path,
@@ -136,7 +137,7 @@ export default {
         }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
-                <div class="path-filter">
+                <div class="admin-http-log-path-filter">
                     <Select
                         class="path-filter-invert"
                         value={value.type}
@@ -197,7 +198,7 @@ export default {
         deserialize: value => ({ enabled: true, value: value.split('-').map(x => +x) }),
         editor ({ value, onChange, enabled, onEnabledChange, hidden }) {
             return (
-                <div class="res-time-filter">
+                <div class="admin-http-log-res-time-filter">
                     <RangeEditor
                         min={0}
                         tickDistance={100}

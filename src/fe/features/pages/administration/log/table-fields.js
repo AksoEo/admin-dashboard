@@ -59,7 +59,7 @@ export default {
         weight: 1.5,
         sortable: true,
         component ({ value }) {
-            return <code class="ip-address">{value}</code>;
+            return <code class="admin-http-log-ip-address">{value}</code>;
         },
         stringify: x => x ? x + '' : x,
     },

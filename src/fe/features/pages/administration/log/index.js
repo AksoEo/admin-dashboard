@@ -1,15 +1,10 @@
 import { h } from 'preact';
 import SortIcon from '@material-ui/icons/Sort';
-import SaveIcon from '@material-ui/icons/Save';
-import Page from '../../../../components/page';
-import SearchFilters from '../../../../components/overview/search-filters';
+import OverviewPage from '../../../../components/overview/overview-page';
 import OverviewList from '../../../../components/lists/overview-list';
 import FieldPicker from '../../../../components/pickers/field-picker';
-import { coreContext } from '../../../../core/connection';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
 import { httpLog as locale, search as searchLocale } from '../../../../locale';
 import CSVExport from '../../../../components/tasks/csv-export';
-import Meta from '../../../meta';
 import FILTERS from './filters';
 import FIELDS from './table-fields';
 import './style';
@@ -21,7 +16,7 @@ const searchableFields = [
 
 // TODO: permissions
 
-export default class APILogListView extends Page {
+export default class APILogListView extends OverviewPage {
     state = {
         parameters: {
             search: {
@@ -43,113 +38,39 @@ export default class APILogListView extends Page {
             offset: 0,
             limit: 10,
         },
-        expanded: false,
         csvExportOpen: false,
     };
 
-    static contextType = coreContext;
+    locale = locale;
+    searchFields = searchableFields;
+    filters = FILTERS;
+    category = 'http_log';
+    filtersToAPI = 'httpLog/filtersToAPI';
 
-    #searchInput;
+    renderActions () {
+        const actions = [];
 
-    // current url query state
-    #currentQuery = '';
-
-    decodeURLQuery () {
-        this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
+        actions.push({
+            label: searchLocale.csvExport,
+            action: () => this.setState({ csvExportOpen: true }),
+            overflow: true,
         });
-        this.#currentQuery = this.props.query;
-    }
 
-    encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, FILTERS);
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
-
-    componentDidMount () {
-        const originalQuery = this.props.query;
-        this.decodeURLQuery();
-
-        if (!originalQuery) {
-            // FIXME: extremely hacky: wait for state update
-            setTimeout(() => {
-                // fresh load; we can add default filters
-                if (!this.state.parameters.filters._disabled) {
-                    this.setState({
-                        parameters: {
-                            ...this.state.parameters,
-                            filters: {
-                                ...this.state.parameters.filters,
-                                path: {
-                                    // filter out http log requests by default
-                                    value: {
-                                        type: 'invert',
-                                        path: '/http_log',
-                                    },
-                                    enabled: true,
-                                },
-                            },
-                        },
-                    });
-                }
-            }, 10);
-        }
-
-        this.#searchInput.focus(500);
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters) {
-            this.encodeURLQuery();
-        }
-    }
-
-    render (_, { parameters, expanded }) {
-        const menu = [];
-
-        if (!expanded) {
-            menu.push({
-                icon: <SaveIcon style={{ verticalAlign: 'middle' }} />,
-                label: searchLocale.csvExport,
-                action: () => this.setState({ csvExportOpen: true }),
-                overflow: true,
-            });
-        }
-
-        menu.push({
+        actions.push({
             icon: <SortIcon style={{ verticalAlign: 'middle' }} />,
             label: searchLocale.pickFields,
             action: () => this.setState({ fieldPickerOpen: true }),
         });
 
+        return actions;
+    }
+
+    renderContents (_, { parameters, expanded }) {
         return (
-            <div class="administration-log-page" ref={node => this.node = node}>
-                <Meta title={locale.title} actions={menu} />
-                <SearchFilters
-                    value={parameters}
-                    onChange={parameters => this.setState({ parameters })}
-                    searchFields={searchableFields}
-                    fields={Object.keys(FIELDS)}
-                    filters={FILTERS}
-                    expanded={expanded}
-                    onExpandedChange={expanded => this.setState({ expanded })}
-                    locale={{
-                        searchFields: locale.fields,
-                        searchPlaceholders: locale.search.placeholders,
-                        filters: locale.search.filters,
-                    }}
-                    category="http_log"
-                    filtersToAPI="httpLog/filtersToAPI"
-                    inputRef={view => this.#searchInput = view} />
+            <div class="administration-log-page">
                 <FieldPicker
                     open={this.state.fieldPickerOpen}
                     onClose={() => this.setState({ fieldPickerOpen: false })}
-                    // TODO: use core views
                     available={Object.keys(FIELDS)}
                     sortables={Object.keys(FIELDS).filter(x => FIELDS[x].sortable)}
                     selected={parameters.fields}
