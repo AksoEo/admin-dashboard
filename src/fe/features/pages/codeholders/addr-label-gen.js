@@ -120,9 +120,6 @@ function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
             <div class="addr-label-gen-desc">
                 {locale.addrLabelGen.description}
             </div>
-            {options.search?.query ? <div class="search-query-notice">
-                {locale.addrLabelGen.searchQueryNotice}
-            </div> : null}
             {lvIsCursed ? <div class="cursed-notice">
                 {locale.addrLabelGen.cursedNotice}
             </div> : null}

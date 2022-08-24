@@ -102,6 +102,7 @@ export const notifTemplates = {
 
     send: {
         title: 'Sendi amasmesaĝon',
+        searchQueryNotice: '[[You currently have an active search query. Are you sure you intended this because I see this being useful for anything]]',
         cursedNotice: 'Oraj rezultoj ne ricevos mesaĝon.',
         descriptionCodeholder: 'Mesaĝoj estos senditaj al ĉiuj membroj laŭ via nuna filtrilo.',
         descriptionNewsletter: 'Mesaĝoj estos senditaj al ĉiuj abonantoj de la bulteno.',

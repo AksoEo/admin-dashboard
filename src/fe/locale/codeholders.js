@@ -359,7 +359,6 @@ export const codeholders = {
             LEGAL: 'Legal',
             EXECUTIVE: 'Executive',
         },
-        searchQueryNotice: '[[You currently have an active search query. Are you sure you intended this because I see this being useful for anything]]',
         cursedNotice: 'Rezultoj trovitaj laŭ UEA-kodo markitaj per ora koloro ne aperos en la adresetikedoj.',
         generate: 'Krei etikedojn',
         success: 'Komencis generadon de viaj etikedoj. Vi ricevos sciigon/retmesaĝon kun alkroĉaĵo laŭeble baldaŭ.',

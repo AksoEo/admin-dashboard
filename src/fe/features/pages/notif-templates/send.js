@@ -135,6 +135,9 @@ const Contents = connectPerms(class Contents extends PureComponent {
 
         return (
             <div class="codeholders-send-notif-template">
+                {this.props.options.search?.query ? <div class="search-query-notice">
+                    {locale.send.searchQueryNotice}
+                </div> : null}
                 {lvIsCursed ? <div class="cursed-notice">
                     {locale.send.cursedNotice}
                 </div> : null}
