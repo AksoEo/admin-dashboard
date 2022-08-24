@@ -644,7 +644,7 @@ export default class Navigation extends PureComponent {
 
             const isTop = i === state.stack.length - 1;
             const isBottom = i === 0;
-            const PageComponent = stackItem.route.component;
+            const PageComponent = stackItem.route.component || (() => null);
             const itemContents = (
                 <MetaProvider onUpdate={({ title, actions }) => {
                     const state = this.getNavState().clone();

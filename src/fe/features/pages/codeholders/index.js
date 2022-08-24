@@ -151,7 +151,12 @@ export default connectToEverything(class CodeholdersPage extends Page {
         }
         if (prevState.options !== this.state.options) {
             this.encodeURLQuery();
-            this.shouldFilterFields = true;
+
+            // prevent infinite loop by not filtering again if we just filtered
+            if (this.state.options !== this.ignoreOptionsChangeForOptions) {
+                this.shouldFilterFields = true;
+                this.ignoreOptionsChangeForOptions = null;
+            }
         }
 
         if (this.shouldFilterFields
@@ -163,6 +168,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
     }
 
     shouldFilterFields = true;
+    ignoreOptionsChangeForOptions = null;
 
     #filterFieldsWithPerms = () => {
         if (!this.props.perms._isDummy) {
@@ -189,10 +195,13 @@ export default connectToEverything(class CodeholdersPage extends Page {
             }
             if (newFilters) {
                 if (!newOptions) newOptions = this.state.options;
-                newOptions = { ...newOptions, newFilters };
+                newOptions = { ...newOptions, filters: newFilters };
             }
 
-            if (newOptions) this.setState({ options: newOptions });
+            if (newOptions) {
+                this.setState({ options: newOptions });
+                this.ignoreOptionsChangeForOptions = newOptions;
+            }
         }
     };
 
