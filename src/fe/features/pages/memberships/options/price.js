@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Button } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
+import InfoIcon from '@material-ui/icons/Info';
 import ScriptItem from '../../../../components/form-editor/script-item';
 import Select from '../../../../components/controls/select';
 import MdField from '../../../../components/controls/md-field';
@@ -93,6 +94,16 @@ export default class OfferPrice extends PureComponent {
                                 items={variables} />
                         )}
                     </div>
+                </div>
+                {editing && (
+                    <div class="price-variable-info">
+                        <InfoIcon className="info-icon" />
+                        <span class="info-text">{locale.offers.price.info}</span>
+                    </div>
+                )}
+                <div class="price-variable-info">
+                    <InfoIcon className="info-icon" />
+                    <span class="info-text">{locale.offers.price.info100}</span>
                 </div>
                 {!noDescription && (
                     <div class="price-description-label">

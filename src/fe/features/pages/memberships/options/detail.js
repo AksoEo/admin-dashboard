@@ -50,6 +50,7 @@ export default class RegistrationOptions extends DetailPage {
     renderContents ({ editing }, { edit }) {
         return (
             <DetailView
+                compact // wider offers editor
                 view="memberships/options"
                 id={this.id}
                 fields={FIELDS}

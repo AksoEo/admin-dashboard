@@ -87,6 +87,9 @@ export const membershipOptions = {
             description: 'Priskribo de prezkalkulo',
             varLabel: 'Variablo de prezo',
             na: 'La oferto ne estas elektebla pro manko de prezo',
+
+            info: '[[You can test price calculation in the script editor by inserting different values in the formulaj variabloj tab.]]',
+            info100: '[[For currencies except JPY, price values are read as cents. For example, 100 = 1,00 USD.]]',
         },
         paperVersion: 'Papera versio',
     },
