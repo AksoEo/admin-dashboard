@@ -140,7 +140,7 @@ function makePage (createTask, signal, listTask, deleteTask, fieldId, perm, rend
         static contextType = coreContext;
 
         render ({ perms }) {
-            const canEdit = perms.hasCodeholderField(perm, 'w');
+            const canEdit = perms.hasPerm('codeholders.update') && perms.hasCodeholderField(perm, 'w');
 
             // get codeholder id from the match above
             const id = +this.props.matches.codeholder[1];
