@@ -97,13 +97,11 @@ export default class TemplatingPopup extends PureComponent {
         const fabVisible = !this.state.open && this.state.visible && this.props.editing;
 
         const portal = createPortal(
-            <div class="notif-templates-templating-portal">
-                <ItemsSheet
-                    item={this.props.item}
-                    open={this.state.open}
-                    onClose={() => this.setState({ open: false })}
-                    onInsert={this.onInsert} />
-            </div>,
+            <ItemsSheet
+                item={this.props.item}
+                open={this.state.open}
+                onClose={() => this.setState({ open: false })}
+                onInsert={this.onInsert} />,
             document.body,
         );
 
@@ -153,18 +151,20 @@ class ItemsSheet extends PureComponent {
         const transform = `translateY(${((1 - this.#open.value) * 100).toFixed(3)}%)`;
 
         return (
-            <div class="items-sheet" style={{ transform }} onMouseDown={e => {
-                e.preventDefault(); // prevent stealing focus
-            }}>
-                <AppBar
-                    class="items-top-bar"
-                    menu={<Button icon small onClick={onClose}>
-                        <MenuIcon type="close" />
-                    </Button>}
-                    title={locale.templating.insertTitle} />
-                <Items
-                    item={item}
-                    onInsert={onInsert} />
+            <div class="notif-templates-templating-portal">
+                <div class="items-sheet" style={{ transform }} onMouseDown={e => {
+                    e.preventDefault(); // prevent stealing focus
+                }}>
+                    <AppBar
+                        class="items-top-bar"
+                        menu={<Button icon small onClick={onClose}>
+                            <MenuIcon type="close" />
+                        </Button>}
+                        title={locale.templating.insertTitle} />
+                    <Items
+                        item={item}
+                        onInsert={onInsert} />
+                </div>
             </div>
         );
     }
