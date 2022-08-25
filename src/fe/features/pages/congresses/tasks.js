@@ -3,7 +3,6 @@ import { lazy, Suspense, useEffect, useRef } from 'preact/compat';
 import { CircularProgress, TextField } from 'yamdl';
 import TaskDialog from '../../../components/tasks/task-dialog';
 import { Field } from '../../../components/form';
-import DetailShell from '../../../components/detail/detail-shell';
 import ChangedFields from '../../../components/tasks/changed-fields';
 import Segmented from '../../../components/controls/segmented';
 import { TejoIcon, UeaIcon } from '../../../components/org-icon';
@@ -23,6 +22,8 @@ import { routerContext } from '../../../router';
 import { FIELDS as INSTANCE_FIELDS } from './instances/fields';
 import { DetailInner as LocationEditor } from './instances/locations/detail';
 import LocationPicker from './instances/location-picker';
+import DisplayError from '../../../components/utils/error';
+import WithRegistrationForm from './instances/registration-form/with-form';
 import './tasks.less';
 
 const ParticipantEditor = lazy(async () => ({
@@ -398,7 +399,7 @@ export default {
         );
     },
 
-    createParticipant ({ open, task }) {
+    createParticipant ({ core, open, task }) {
         const { congress, instance } = task.options;
 
         return (
@@ -410,29 +411,47 @@ export default {
                 title={participantLocale.create.title}
                 actionLabel={participantLocale.create.button}
                 run={() => task.runOnce()}>
-                <DetailShell
-                    view="congresses/registrationForm"
-                    options={{ congress, instance }}
-                    id="irrelevant" // detail shell won't work without one
-                    fields={{}}
-                    locale={{}}>
-                    {registrationForm => registrationForm ? (
-                        <Suspense
-                            fallback={<CircularProgress indeterminate />}>
-                            <ParticipantEditor
-                                editing
-                                creating
-                                item={task.parameters}
-                                onItemChange={item => task.update(item)}
-                                userData={{
-                                    congress,
-                                    instance,
-                                    currency: registrationForm.price && registrationForm.currency,
-                                    registrationForm,
-                                }} />
-                        </Suspense>
-                    ) : <CircularProgress indeterminate />}
-                </DetailShell>
+                <WithRegistrationForm
+                    congress={congress}
+                    instance={instance}>
+                    {({ form, loaded, error }) => {
+                        if (!loaded) {
+                            return <CircularProgress indeterminate />;
+                        }
+                        if (error) {
+                            return <DisplayError error={error} />;
+                        }
+                        if (!form) {
+                            if (!task.dropped) {
+                                core.createTask('info', {
+                                    message: participantLocale.noParticipation,
+                                });
+                                task.drop();
+                            }
+                            return (
+                                <div class="no-form">
+                                    {participantLocale.noParticipation}
+                                </div>
+                            );
+                        }
+                        return (
+                            <Suspense
+                                fallback={<CircularProgress indeterminate />}>
+                                <ParticipantEditor
+                                    editing
+                                    creating
+                                    item={task.parameters}
+                                    onItemChange={item => task.update(item)}
+                                    userData={{
+                                        congress,
+                                        instance,
+                                        currency: form?.price?.currency,
+                                        registrationForm: form,
+                                    }} />
+                            </Suspense>
+                        );
+                    }}
+                </WithRegistrationForm>
             </TaskDialog>
         );
     },

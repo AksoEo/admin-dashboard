@@ -1056,7 +1056,7 @@ export const views = {
         }
     },
 
-    registrationForm: class ProgramView extends AbstractDataView {
+    registrationForm: class RegistrationFormView extends AbstractDataView {
         constructor (options) {
             super();
             this.congress = options.congress;

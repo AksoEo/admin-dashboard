@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import SearchIcon from '@material-ui/icons/Search';
+import { CircularProgress } from 'yamdl';
 import Page from '../../../../../components/page';
 import DetailShell from '../../../../../components/detail/detail-shell';
 import TaskButton from '../../../../../components/controls/task-button';
@@ -9,14 +10,15 @@ import { connectPerms } from '../../../../../perms';
 import { coreContext } from '../../../../../core/connection';
 import { congressParticipants as locale } from '../../../../../locale';
 import { LinkButton } from '../../../../../router';
+import DisplayError from '../../../../../components/utils/error';
 import { FIELDS } from './fields';
+import WithRegistrationForm from '../registration-form/with-form';
 import './detail.less';
 
 export default connectPerms(class ParticipantsPage extends Page {
     state = {
         edit: null,
         org: null,
-        registrationForm: null,
     };
 
     static contextType = coreContext;
@@ -64,7 +66,7 @@ export default connectPerms(class ParticipantsPage extends Page {
         return this.props.match[1];
     }
 
-    render ({ perms, editing }, { org, edit, registrationForm }) {
+    render ({ perms, editing }, { org, edit }) {
         const { congress, instance, id } = this;
 
         const actions = [];
@@ -89,10 +91,6 @@ export default connectPerms(class ParticipantsPage extends Page {
             });
         }
 
-        const currency = registrationForm && registrationForm.price
-            ? registrationForm.price.currency : null;
-        const userData = { org, congress, instance, currency, registrationForm };
-
         return (
             <div class="congress-participant-detail-page">
                 <Meta
@@ -115,12 +113,26 @@ export default connectPerms(class ParticipantsPage extends Page {
                     onCommit={this.onCommit}
                     onDelete={() => this.props.pop()}>
                     {data => (
-                        <Detail
-                            core={this.context}
-                            editing={editing}
-                            onItemChange={edit => this.setState({ edit })}
-                            item={this.state.edit || data}
-                            userData={userData} />
+                        <WithRegistrationForm
+                            congress={congress}
+                            instance={instance}>
+                            {({ form, loaded, error }) => (
+                                <Detail
+                                    core={this.context}
+                                    editing={editing}
+                                    onItemChange={edit => this.setState({ edit })}
+                                    item={this.state.edit || data}
+                                    userData={{
+                                        org,
+                                        congress,
+                                        instance,
+                                        formLoaded: loaded,
+                                        formError: error,
+                                        currency: form?.price?.currency,
+                                        registrationForm: form,
+                                    }} />
+                            )}
+                        </WithRegistrationForm>
                     )}
                 </DetailShell>
                 <DetailShell
@@ -130,14 +142,6 @@ export default connectPerms(class ParticipantsPage extends Page {
                     fields={{}}
                     locale={{}}
                     onData={data => data && this.setState({ org: data.org })} />
-                <DetailShell
-                    /* a hack to get the currency */
-                    view="congresses/registrationForm"
-                    options={{ congress, instance }}
-                    id="irrelevant" // detail shell won't work without one
-                    fields={{}}
-                    locale={{}}
-                    onData={data => this.setState({ registrationForm: data })} />
             </div>
         );
     }
@@ -160,6 +164,16 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
 
     return (
         <div class="congress-participant-detail">
+            {!userData.formLoaded && (
+                <div class="participant-form-loading">
+                    <CircularProgress indeterminate />
+                </div>
+            )}
+            {userData.formError && (
+                <div class="participant-form-error">
+                    <DisplayError error={userData.formError} />
+                </div>
+            )}
             <div class="participant-header">
                 {!creating && (
                     <div class="header-status">
