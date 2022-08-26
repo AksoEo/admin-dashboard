@@ -272,7 +272,7 @@ export const tasks = {
         storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, id],
         signalPath: ({ magazine, edition }) => [MAGAZINES, magazine, EDITIONS, edition, SNAPSHOTS, SIG_SNAPSHOTS],
     }),
-    snapshotCodeholders: async ({ magazine, edition, id, compare, idsOnly }, { offset, limit, countryLocale }) => {
+    snapshotCodeholders: async ({ magazine, edition, id, compare, idsOnly }, { offset, limit, countriesOnly, countryLocale }) => {
         const client = await asyncClient;
         const options = { offset, limit };
         if (compare) options.compare = compare;
@@ -294,27 +294,32 @@ export const tasks = {
                 limit: res.body.length,
                 fields: [],
             };
-            const chFields = [
-                'id',
-                'codeholderType',
-                'oldCode', 'newCode',
-                'firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific',
-                'fullName', 'fullNameLocal', 'nameAbbrev',
-                'address.country',
-                'address.countryArea',
-                'address.city',
-                'address.cityArea',
-                'address.streetAddress',
-                'address.postalCode',
-                'address.sortingCode',
-                'addressLatin.country',
-                'addressLatin.countryArea',
-                'addressLatin.city',
-                'addressLatin.cityArea',
-                'addressLatin.streetAddress',
-                'addressLatin.postalCode',
-                'addressLatin.sortingCode',
-            ];
+            let chFields;
+            if (countriesOnly) {
+                chFields = ['id', 'address.country'];
+            } else {
+                chFields = [
+                    'id',
+                    'codeholderType',
+                    'oldCode', 'newCode',
+                    'firstName', 'lastName', 'firstNameLegal', 'lastNameLegal', 'honorific',
+                    'fullName', 'fullNameLocal', 'nameAbbrev',
+                    'address.country',
+                    'address.countryArea',
+                    'address.city',
+                    'address.cityArea',
+                    'address.streetAddress',
+                    'address.postalCode',
+                    'address.sortingCode',
+                    'addressLatin.country',
+                    'addressLatin.countryArea',
+                    'addressLatin.city',
+                    'addressLatin.cityArea',
+                    'addressLatin.streetAddress',
+                    'addressLatin.postalCode',
+                    'addressLatin.sortingCode',
+                ];
+            }
             for (const f of chFields) {
                 if (await client.hasCodeholderField(f, 'r')) {
                     options.fields.push(f);
@@ -323,9 +328,11 @@ export const tasks = {
             const res2 = await client.get(`/codeholders`, options);
             for (const item of res2.body) codeholders[item.id] = codeholderFromAPI(item);
 
-            const res3 = await client.get(`/codeholders/${res.body.join(',')}/address/${countryLocale || 'eo'}`);
-            for (const id in res3.body) {
-                codeholders[id].formattedAddress = res3.body[id];
+            if (!countriesOnly) {
+                const res3 = await client.get(`/codeholders/${res.body.join(',')}/address/${countryLocale || 'eo'}`);
+                for (const id in res3.body) {
+                    codeholders[id].formattedAddress = res3.body[id];
+                }
             }
         }
 

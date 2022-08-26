@@ -257,4 +257,16 @@ export const magazineSnaps = {
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi momentan rigardon? Ne eblas malfari tiun ĉi agon.',
     },
     csvFilename: 'momenta_rigardo',
+    countryCount: {
+        menuItem: 'CSV de lando-kvantoj',
+        title: 'CSV de lando-kvantoj',
+        beginExport: 'Elporti',
+        download: 'Elŝuti CSV',
+        columns: {
+            countryName: 'Lando',
+            countryCode: 'Landokodo',
+            count: 'Kvanto',
+        },
+        filename: 'lando_kvantoj',
+    },
 };

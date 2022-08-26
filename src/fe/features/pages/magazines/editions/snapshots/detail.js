@@ -8,6 +8,7 @@ import CSVExport from '../../../../../components/tasks/csv-export';
 import { FIELDS, Footer } from './fields';
 import ORIG_CODEHOLDER_FIELDS from '../../../codeholders/table-fields';
 import AddrLabelGen from '../../../codeholders/addr-label-gen';
+import CSVCountryCount from './country-count';
 import {
     search as searchLocale,
     magazineSnaps as locale,
@@ -38,6 +39,11 @@ const CODEHOLDER_FIELDS = {
     formattedAddress: {
         stringify (value) {
             return value;
+        },
+    },
+    country: {
+        stringify (value) {
+            return value?.address || '';
         },
     },
 };
@@ -86,6 +92,12 @@ export default class Snapshot extends DetailPage {
         actions.push({
             label: searchLocale.csvExport,
             action: () => this.setState({ csvExportOpen: true }),
+            overflow: true,
+        });
+
+        actions.push({
+            label: locale.countryCount.menuItem,
+            action: () => this.setState({ countryCountOpen: true }),
             overflow: true,
         });
 
@@ -156,6 +168,7 @@ export default class Snapshot extends DetailPage {
                             'address',
                             'addressLatin',
                             'formattedAddress',
+                            'country',
                         ].map(id => ({ id })),
                         countryLocale,
                     })}
@@ -176,6 +189,12 @@ export default class Snapshot extends DetailPage {
                             default: 'eo',
                         },
                     }} />
+                <CSVCountryCount
+                    open={this.state.countryCountOpen}
+                    onClose={() => this.setState({ countryCountOpen: false })}
+                    magazine={this.magazine}
+                    edition={this.edition}
+                    snapshot={this.id} />
 
                 <AddrLabelGen
                     open={!!this.state.labelGenOptions}
