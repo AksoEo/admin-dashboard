@@ -47,8 +47,8 @@ export default class DisclosureArrow extends Component {
 
         return (
             <span class="disclosure-arrow">
-                <span class="da-line" style={line1}></span>
-                <span class="da-line" style={line2}></span>
+                <span class="da-line" style={line1} />
+                <span class="da-line" style={line2} />
             </span>
         );
     }

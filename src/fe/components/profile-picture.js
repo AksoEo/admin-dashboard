@@ -22,12 +22,14 @@ const DECARDINALIFY = id => [
 export default class ProfilePicture extends Component {
     state = {
         srcSet: '',
-        isIdenticon: false,
+        isIdenticon: null,
     };
 
     load () {
         const { id, self: isSelf, profilePictureHash } = this.props;
         if (!id) return;
+
+        this.unload();
 
         if (profilePictureHash) {
             const hash = Buffer.from(profilePictureHash).toString('base64');
@@ -44,7 +46,16 @@ export default class ProfilePicture extends Component {
             ], {
                 type: 'image/svg+xml',
             }));
-            this.setState({ imgSrcSet: `${blobURL} 128w`, isIdenticon: true });
+            this.setState({
+                imgSrcSet: `${blobURL} 128w`,
+                isIdenticon: blobURL,
+            });
+        }
+    }
+
+    unload () {
+        if (this.state.isIdenticon) {
+            URL.revokeObjectURL(this.state.isIdenticon);
         }
     }
 
@@ -55,6 +66,10 @@ export default class ProfilePicture extends Component {
     componentDidUpdate (prevProps) {
         if (prevProps.id !== this.props.id
             || prevProps.profilePictureHash !== this.props.profilePictureHash) this.load();
+    }
+
+    componentWillUnmount () {
+        this.unload();
     }
 
     render () {
