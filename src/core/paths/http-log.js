@@ -51,8 +51,19 @@ const clientFilters = {
             time: { $gte: (+a / 1e3) | 0, $lte: (+b / 1e3) | 0 },
         }),
     },
-    apiKey: { toAPI: value => ({ apiKey: value }) },
-    ip: { toAPI: value => ({ ip: Buffer.from(ipaddr.parse(value).toByteArray()) }) },
+    apiKey: {
+        toAPI: value => {
+            return {
+                apiKey: '==base64==' + Buffer.from(value, 'hex').toString('base64'),
+            };
+        },
+    },
+    ip: {
+        toAPI: value => {
+            const ipArray = ipaddr.parse(value).toByteArray();
+            return { ip: '==base64==' + Buffer.from(ipArray).toString('base64') };
+        },
+    },
     origin: { toAPI: value => ({ origin: value }) },
     method: { toAPI: value => ({ method: value }) },
     path: {
