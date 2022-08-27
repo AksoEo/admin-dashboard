@@ -38,8 +38,8 @@ export default class DelegationsButton extends PureComponent {
         const target = `/membroj/${this.props.id}/delegitoj`;
 
         return (
-            <span class="codeholder-delegations-button-container">
-                <LinkButton target={target} class="codeholder-delegations-button" raised>
+            <span class="info-button-container codeholder-delegations-button-container">
+                <LinkButton target={target} class="info-button codeholder-delegations-button" raised>
                     <span class="inner-icon-container">
                         <BadgeIcon />
                     </span>

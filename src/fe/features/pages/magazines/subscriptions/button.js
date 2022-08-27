@@ -38,8 +38,8 @@ export default class SubscriptionsButton extends PureComponent {
         const target = `/membroj/${this.props.id}/simplaj-abonoj`;
 
         return (
-            <span class="codeholder-magazine-subscriptions-button-container">
-                <LinkButton target={target} class="codeholder-subscriptions-button" raised>
+            <span class="info-button-container codeholder-magazine-subscriptions-button-container">
+                <LinkButton target={target} class="info-button codeholder-subscriptions-button" raised>
                     <span class="inner-icon-container">
                         <NewspaperIcon />
                     </span>

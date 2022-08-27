@@ -403,14 +403,16 @@ class FileCounter extends Component {
 
 function FilesButton ({ id }) {
     return (
-        <LinkButton class="member-files-button" target={`/membroj/${id}/dosieroj`} raised>
-            <span class="file-icon-container">
-                <FileIcon />
-            </span>
-            <FileCounter id={id}>
-                {fileCount => locale.filesButton(fileCount)}
-            </FileCounter>
-        </LinkButton>
+        <div class="info-button-container">
+            <LinkButton class="info-button member-files-button" target={`/membroj/${id}/dosieroj`} raised>
+                <span class="file-icon-container">
+                    <FileIcon />
+                </span>
+                <FileCounter id={id}>
+                    {fileCount => locale.filesButton(fileCount)}
+                </FileCounter>
+            </LinkButton>
+        </div>
     );
 }
 
@@ -488,32 +490,36 @@ export const Header = connectPerms(connect('login')(login => ({ login }))(functi
                             userData={userData} />
                         {!editing && createHistoryLink('code')}
                     </div>
-                    {!editing && perms.hasCodeholderField('membership', 'r') && (
-                        <MembershipInDetailView
-                            id={item.id}
-                            canEdit={perms.hasPerm('codeholders.update')} />
-                    )}
-                    {!editing && perms.hasCodeholderField('roles', 'r') && perms.hasPerm('codeholder_roles.read') && (
-                        <RolesInDetailView
-                            id={item.id}
-                            canEdit={perms.hasPerm('codeholder_roles.update')} />
-                    )}
-                    {!editing && perms.hasCodeholderField('files', 'r') && (
-                        <FilesButton id={item.id} />
-                    )}
-                    {!editing && perms.hasPerm('codeholders.change_requests.read') && (
-                        <ChangeRequestsButton id={userData?.isSelf ? 'self' : item.id} />
-                    )}
-                    {/* FIXME better perm check across orgs */}
-                    {!editing && perms.hasPerm('codeholders.delegations.read.uea') && (
-                        <DelegationsButton id={userData?.isSelf ? 'self' : item.id} />
-                    )}
-                    {!editing
-                        && perms.hasCodeholderField('roles', 'r')
-                        && (perms.hasPerm('magazines.subscriptions.read.uea')
-                        || perms.hasPerm('magazines.subscriptions.read.tejo')) && (
-                        <SubscriptionsButton id={userData?.isSelf ? 'self' : item.id} />
-                    )}
+                    <div class="info-membership-roles">
+                        {!editing && perms.hasCodeholderField('membership', 'r') && (
+                            <MembershipInDetailView
+                                id={item.id}
+                                canEdit={perms.hasPerm('codeholders.update')} />
+                        )}
+                        {!editing && perms.hasCodeholderField('roles', 'r') && perms.hasPerm('codeholder_roles.read') && (
+                            <RolesInDetailView
+                                id={item.id}
+                                canEdit={perms.hasPerm('codeholder_roles.update')} />
+                        )}
+                    </div>
+                    <div class="info-buttons">
+                        {!editing && perms.hasCodeholderField('files', 'r') && (
+                            <FilesButton id={item.id} />
+                        )}
+                        {!editing && perms.hasPerm('codeholders.change_requests.read') && (
+                            <ChangeRequestsButton id={userData?.isSelf ? 'self' : item.id} />
+                        )}
+                        {/* FIXME better perm check across orgs */}
+                        {!editing && perms.hasPerm('codeholders.delegations.read.uea') && (
+                            <DelegationsButton id={userData?.isSelf ? 'self' : item.id} />
+                        )}
+                        {!editing
+                            && perms.hasCodeholderField('roles', 'r')
+                            && (perms.hasPerm('magazines.subscriptions.read.uea')
+                            || perms.hasPerm('magazines.subscriptions.read.tejo')) && (
+                            <SubscriptionsButton id={userData?.isSelf ? 'self' : item.id} />
+                        )}
+                    </div>
                 </div>
                 <div class="decorative-flourish" />
             </div>

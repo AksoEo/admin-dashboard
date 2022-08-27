@@ -41,8 +41,8 @@ export default class ChangeRequestsButton extends PureComponent {
 
     render ({ id }) {
         return (
-            <div class="codeholder-change-requests-button-container">
-                <LinkButton class="change-reqs-button" raised target={`/membroj/${id}/shanghopetoj`}>
+            <div class="info-button-container codeholder-change-requests-button-container">
+                <LinkButton class="info-button change-reqs-button" raised target={`/membroj/${id}/shanghopetoj`}>
                     <span class="reqs-icon-container">
                         {this.state.count ? <ChangeRequestNewIcon class="req-icon" /> : <ChangeRequestIcon class="req-icon" />}
                     </span>
