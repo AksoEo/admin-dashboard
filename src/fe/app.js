@@ -17,8 +17,10 @@ import 'moment/locale/eo';
 moment.locale('eo');
 moment.tz.setDefault('UTC');
 
+/// width at which we'll show the sidebar permanently instead of having it slide out
 const PERMA_SIDEBAR_WIDTH = 900;
 
+/// dummy permissions are used until actual permissions have been loaded from the server
 function createDummyPerms () {
     const perms = new Perms();
     perms.load({
