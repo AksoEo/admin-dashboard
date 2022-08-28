@@ -27,15 +27,6 @@ import { connectPerms } from '../../../../perms';
 import { fields as CODEHOLDER_FIELDS } from '../../codeholders/detail-fields';
 import './fields.less';
 
-const portalContainer = document.createElement('div');
-portalContainer.id = 'registration-entry-offer-picker-container';
-document.body.appendChild(portalContainer);
-
-function orderPortalContainerFront () {
-    document.body.removeChild(portalContainer);
-    document.body.appendChild(portalContainer);
-}
-
 const CODEHOLDER_DATA_FIELDS = Object.fromEntries([
     'name', 'address', 'feeCountry', 'email', 'birthdate', 'cellphone',
 ].map(id => ([id, CODEHOLDER_FIELDS[id]])));
@@ -256,7 +247,6 @@ export const FIELDS = {
                                     class="add-offer-button"
                                     onClick={e => {
                                         e.preventDefault();
-                                        orderPortalContainerFront();
                                         setAddOfferOpen(true);
                                     }}>
                                     <AddIcon style={{ verticalAlign: 'middle' }} />
@@ -268,7 +258,6 @@ export const FIELDS = {
                         {editing && (
                             <Dialog
                                 class="registration-entry-offers-add-offer-dialog"
-                                container={portalContainer}
                                 title={locale.offers.add.title}
                                 open={addOfferOpen}
                                 backdrop

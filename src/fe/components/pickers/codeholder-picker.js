@@ -14,15 +14,6 @@ import './codeholder-picker.less';
 const REDUCED_FIELD_IDS = ['type', 'code', 'name'];
 const REDUCED_FIELDS = Object.fromEntries(REDUCED_FIELD_IDS.map(id => [id, FIELDS[id]]));
 
-const portalContainer = document.createElement('div');
-portalContainer.id = 'codeholder-picker-portal-container';
-document.body.appendChild(portalContainer);
-
-function orderPortalContainerFront () {
-    document.body.removeChild(portalContainer);
-    document.body.appendChild(portalContainer);
-}
-
 /// Picks a codeholder and displays their UEA code.
 ///
 /// # Props
@@ -75,7 +66,6 @@ export default class CodeholderPicker extends Component {
 
     open () {
         this.setState({ addDialogOpen: true });
-        orderPortalContainerFront();
     }
 
     render ({ value, onChange, limit, disabled, jsonFilter }, { addDialogOpen }) {
@@ -129,7 +119,6 @@ export default class CodeholderPicker extends Component {
                     <PickerDialog
                         limit={this.props.limit}
                         open={canAddMore && addDialogOpen}
-                        container={portalContainer}
                         filter={jsonFilter}
                         value={value}
                         onChange={onChange}
@@ -140,14 +129,13 @@ export default class CodeholderPicker extends Component {
     }
 }
 
-export function PickerDialog ({ value, onChange, limit, container, open, onClose, filter, ...extra }) {
+export function PickerDialog ({ value, onChange, limit, open, onClose, filter, ...extra }) {
     return (
         <Dialog
             class="codeholder-picker-add-dialog"
             backdrop
             fullScreen={width => width < 600}
             title={limit === 1 ? locale.picker.addOne : locale.picker.add}
-            container={container}
             open={open}
             onClose={onClose}
             actions={onClose && [{ label: locale.picker.done, action: onClose }]}

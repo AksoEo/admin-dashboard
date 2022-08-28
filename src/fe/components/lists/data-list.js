@@ -9,16 +9,6 @@ import TaskDialog from '../tasks/task-dialog';
 import DisplayError from '../utils/error';
 import './data-list.less';
 
-// nested portals cause bugs when they end up in the same container
-const menuContainer = document.createElement('div');
-menuContainer.id = 'data-list-nested-menu-container';
-document.body.appendChild(menuContainer);
-
-function orderMenuContainerToFront () {
-    document.body.removeChild(menuContainer);
-    document.body.appendChild(menuContainer);
-}
-
 const VLIST_CHUNK_SIZE = 100;
 
 // TODO: this might need a refactor
@@ -112,9 +102,6 @@ export default class DataList extends PureComponent {
         if (!item) return;
 
         this.setState({ deleteItem: item, deleteItemOpen: true });
-        // FIXME: hack: reorder menuContainer to the end of the child list in <body> so it’s
-        // z-ordered above the dialog that might be containing this data list
-        orderMenuContainerToFront();
     }
 
     deleteItem (item) {
@@ -256,8 +243,7 @@ export default class DataList extends PureComponent {
                     onClose={() => this.setState({ deleteItemOpen: false })}
                     title={locale.deleteTitle}
                     actionLabel={locale.delete}
-                    run={() => this.deleteItem(this.state.deleteItem)}
-                    container={menuContainer}>
+                    run={() => this.deleteItem(this.state.deleteItem)}>
                     {locale.deleteDescription}
                 </TaskDialog>
             </div>
@@ -284,7 +270,6 @@ function ListItemOverflow ({ renderMenu, item, core, onDelete }) {
                 onClose={() => setMenuOpen(false)}
                 position={menuPos}
                 anchor={[1, 0]}
-                container={menuContainer}
                 items={[...additionalMenu, {
                     label: locale.delete,
                     action: onDelete,

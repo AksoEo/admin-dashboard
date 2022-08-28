@@ -3,13 +3,12 @@ import { delegationSubjects as locale } from '../../../../locale';
 import ItemPickerDialog from '../../../../components/pickers/item-picker-dialog';
 import { FIELDS } from './fields';
 
-export default function PickerDialog ({ value, onChange, container, limit, open, onClose, filter, ...extra }) {
+export default function PickerDialog ({ value, onChange, limit, open, onClose, filter, ...extra }) {
     return (
         <ItemPickerDialog
             class="subject-picker-dialog"
             fullScreenWidth={600}
             title={locale.picker.pick}
-            container={container}
             open={open}
             onClose={onClose}
             value={value}

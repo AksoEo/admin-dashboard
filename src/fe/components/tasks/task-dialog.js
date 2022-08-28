@@ -15,7 +15,6 @@ import './task-dialog.less';
 /// - actionLabel: label string for the action button
 /// - run: run closure; must return a promise. success will not be handled
 /// - running: if true, will consider the task to be running
-/// - container: will be passed to Dialog
 export default class TaskDialog extends Component {
     state = {
         loading: false,
@@ -45,7 +44,6 @@ export default class TaskDialog extends Component {
         onClose,
         actionLabel,
         running,
-        container,
         sheet,
         ...extra
     }, { loading: loadingState, error }) {
@@ -61,8 +59,7 @@ export default class TaskDialog extends Component {
                 backdrop
                 open={open}
                 title={title}
-                onClose={onClose}
-                container={container}>
+                onClose={onClose}>
                 <Form class="task-dialog-form" onSubmit={this.#run}>
                     {this.props.children}
                     <Field class="task-dialog-footer" ref={view => this.#buttonField = view}>

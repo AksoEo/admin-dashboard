@@ -1,17 +1,7 @@
 import { h } from 'preact';
-import { createPortal, PureComponent } from 'preact/compat';
-import { globalAnimator, Spring } from 'yamdl';
+import { PureComponent } from 'preact/compat';
+import { globalAnimator, Spring, ModalPortal } from 'yamdl';
 import './lightbox.less';
-
-const portalContainer = document.createElement('div');
-portalContainer.id = 'lightbox-portal-container';
-document.body.appendChild(portalContainer);
-
-function orderPortalContainerFront () {
-    document.body.removeChild(portalContainer);
-    document.body.appendChild(portalContainer);
-}
-
 
 /// An image lightbox.
 ///
@@ -41,8 +31,6 @@ export default class Lightbox extends PureComponent {
     #closeTarget = null;
 
     #didOpen = () => {
-        orderPortalContainerFront();
-
         if (this.#openFromImage) {
             const rect = this.#openFromImage.getBoundingClientRect();
 
@@ -144,25 +132,26 @@ export default class Lightbox extends PureComponent {
     }
 
     render ({ src, open, onClose }) {
-        if (this.#open.value <= 0.01) return null;
         const x = this.#x.value;
         const y = this.#y.value;
         const imageOpacity = Math.max(0, Math.min(this.#open.value * 30, 1));
 
-        return createPortal((
-            <div class={'lightbox-portal' + (open ? ' is-open' : '')} onClick={onClose}>
-                <div
-                    class="lightbox-backdrop"
-                    style={{ opacity: Math.max(0, Math.min(this.#open.value, 1)) }} />
-                <div class="lightbox-image-container" style={{
-                    transform: `translate(${x}px, ${y}px)`,
-                    width: this.#w.value,
-                    height: this.#h.value,
-                    opacity: imageOpacity,
-                }}>
-                    <img src={src} />
+        return (
+            <ModalPortal mounted={this.#open.value > 0.01} onCancel={onClose}>
+                <div class={'lightbox-portal' + (open ? ' is-open' : '')} onClick={onClose}>
+                    <div
+                        class="lightbox-backdrop"
+                        style={{ opacity: Math.max(0, Math.min(this.#open.value, 1)) }} />
+                    <div class="lightbox-image-container" style={{
+                        transform: `translate(${x}px, ${y}px)`,
+                        width: this.#w.value,
+                        height: this.#h.value,
+                        opacity: imageOpacity,
+                    }}>
+                        <img src={src} />
+                    </div>
                 </div>
-            </div>
-        ), portalContainer);
+            </ModalPortal>
+        );
     }
 }

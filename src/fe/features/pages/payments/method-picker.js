@@ -11,15 +11,6 @@ import OverviewListItem from '../../../components/lists/overview-list-item';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import './method-picker.less';
 
-const portalContainer = document.createElement('div');
-portalContainer.id = 'payment-method-picker-portal-container';
-document.body.appendChild(portalContainer);
-
-function orderPortalContainerFront () {
-    document.body.removeChild(portalContainer);
-    document.body.appendChild(portalContainer);
-}
-
 const METHOD_FIELD_IDS = [{ id: 'type' }, { id: 'name' }, { id: 'internalDescription' }];
 const REDUCED_METHOD_FIELDS = Object.fromEntries(METHOD_FIELD_IDS
     .map(({ id }) => [id, METHOD_FIELDS[id]]));
@@ -41,7 +32,6 @@ export default class PaymentMethodPicker extends PureComponent {
     static contextType = coreContext;
 
     #open = () => {
-        orderPortalContainerFront();
         this.setState({ pickerOpen: true });
     };
 
@@ -135,7 +125,6 @@ export default class PaymentMethodPicker extends PureComponent {
                 </DynamicHeightDiv>
                 <Dialog
                     class="payment-method-picker-dialog"
-                    container={portalContainer}
                     backdrop
                     title={methodLocale.methodPicker.title}
                     fullScreen={width => width < 400}

@@ -3,12 +3,6 @@ import CheckIcon from '@material-ui/icons/Check';
 import { Menu, globalAnimator } from 'yamdl';
 import './select.less';
 
-// appending directly to document.body causes weird glitches when a select is inside
-// a dialog
-const selectPortalContainer = document.createElement('div');
-selectPortalContainer.id = 'select-portal-container';
-document.body.appendChild(selectPortalContainer);
-
 /// A <select>.
 ///
 /// # Props
@@ -151,7 +145,6 @@ class MultiSelect extends Component {
                     open={open}
                     persistent={multi}
                     onClose={this.#close}
-                    container={selectPortalContainer}
                     selectionIcon={<CheckIcon style={{ verticalAlign: 'middle' }} />}
                     position={[clientX, clientY]}
                     items={items.map(item => ({

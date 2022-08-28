@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { Fragment, createPortal } from 'preact/compat';
 import moment from 'moment';
-import { globalAnimator, TextField, DatePicker } from 'yamdl';
+import { globalAnimator, TextField, DatePicker, RootContext } from 'yamdl';
 import { data as locale } from '../../locale';
 import './style';
 
@@ -15,10 +15,6 @@ const MIN_DATE = new Date(1900, 0, 1);
 const MAX_DATE = new Date(2147482647 * 1000);
 
 const APPROX_DATE_EDITOR_HEIGHT = 300; // for deciding whether to show above or below
-
-const dateEditorPortalContainer = document.createElement('div');
-dateEditorPortalContainer.id = 'data-date-editor-portal-container';
-document.body.appendChild(dateEditorPortalContainer);
 
 function stringifyDate (date) {
     if (date && Number.isNaN(new Date(date).getSeconds())) return '';
@@ -61,6 +57,8 @@ function tryParseDate (input) {
 
 /// Edits a date. Value must be formatted as YYYY-MM-DD.
 class DateEditor extends Component {
+    static contextType = RootContext;
+
     state = {
         // popout screen pos
         popoutX: 0,
@@ -202,7 +200,7 @@ class DateEditor extends Component {
                             this.setState({ inputText: stringifyDate(newDate) });
                         }} />
                 </div>,
-                dateEditorPortalContainer,
+                this.context || document.body,
             );
         }
 

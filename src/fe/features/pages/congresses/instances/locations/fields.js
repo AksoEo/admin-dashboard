@@ -312,15 +312,6 @@ export const FIELDS = {
     },
 };
 
-const portalContainer = document.createElement('div');
-portalContainer.id = 'congress-location-icon-picker-portal-container';
-document.body.appendChild(portalContainer);
-
-function orderPortalContainerFront () {
-    document.body.removeChild(portalContainer);
-    document.body.appendChild(portalContainer);
-}
-
 function IconPicker ({ value, onChange }) {
     const [open, setOpen] = useState(false);
 
@@ -331,7 +322,6 @@ function IconPicker ({ value, onChange }) {
             e.stopPropagation();
             e.preventDefault();
             setOpen(true);
-            orderPortalContainerFront();
         }}>
             {value ? (
                 <span class="picker-preview">
@@ -350,7 +340,6 @@ function IconPicker ({ value, onChange }) {
 
             <Dialog
                 class="congress-location-icon-picker-dialog"
-                container={portalContainer}
                 backdrop
                 title={locale.iconPicker.pick}
                 open={open}

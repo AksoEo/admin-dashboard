@@ -212,11 +212,6 @@ Almost all JS-driven animation is performed by springs and the global animator (
 To use springs, simply call `globalAnimator.register(this)`, make sure to have an instance method `update(deltaTime)`, and call `globalAnimator.deregister(this)` when done (especially in `componentWillUnmount`).
 In `update(dt)`, call `spring.update(dt)` to update the spring, and `spring.wantsUpdate()` to check if the animation can be stopped.
 
-### Portal Containers
-Many dialog-like views in `components` have associated `portalContainer` variables, which, in essence, contain the dialog container div. These exist because preact glitches weirdly if you have a portal inside another portal in the same container ([preact issue](https://github.com/preactjs/preact/issues/2613)).
-
-Feel free to remove these if that bug is ever fixed.
-
 ### Useful Components
 #### Data Fields
 There should probably be more of these (refactor!). Located in `components/data`. These are renderers and editors for various kinds of data.

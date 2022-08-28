@@ -9,15 +9,6 @@ import { WithCountries } from '../../../components/data/country';
 import { osmAddressSearchEndpoint, data as locale } from '../../../locale';
 import './map-picker.less';
 
-const portalContainer = document.createElement('div');
-portalContainer.id = 'congress-map-picker-portal-container';
-document.body.appendChild(portalContainer);
-
-function orderPortalContainerFront () {
-    document.body.removeChild(portalContainer);
-    document.body.appendChild(portalContainer);
-}
-
 /// Picks a location on a map.
 ///
 /// - value/onChange: lat/lon tuple (number[2])
@@ -70,7 +61,6 @@ export default class MapPicker extends PureComponent {
                     onClick={e => {
                         e.preventDefault();
                         this.setState({ addressSearchOpen: true });
-                        orderPortalContainerFront();
                     }}>
                     {locale.mapPicker.fromAddress}
                 </Button>
@@ -102,7 +92,6 @@ export default class MapPicker extends PureComponent {
                     fullScreen={width => width < 900}
                     onClose={() => this.setState({ addressSearchOpen: false })}
                     backdrop
-                    container={portalContainer}
                     title={locale.mapPicker.fromAddress}>
                     <WithCountries>
                         {countries => (

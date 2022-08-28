@@ -1,6 +1,7 @@
 import { h } from 'preact';
-import { createPortal, useState } from 'preact/compat';
+import { createPortal, useContext, useState } from 'preact/compat';
 import moment from 'moment';
+import { RootContext } from 'yamdl';
 import {
     timestampFormat, timestampTzFormat, timestampFormatToday, timestampTzFormatToday,
 } from '../../locale';
@@ -37,11 +38,8 @@ function TimestampFormatter ({ value, zone }) {
     return stringify(value, zone);
 }
 
-const timestampPortal = document.createElement('div');
-timestampPortal.id = 'data-timestamp-portal-container';
-document.body.appendChild(timestampPortal);
-
 function TimestampRenderer ({ value, zone }) {
+    const rootContext = useContext(RootContext);
     const [popoverOpen, setPopoverOpen] = useState(false);
     const onMouseOver = (e) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -65,7 +63,7 @@ function TimestampRenderer ({ value, zone }) {
                             <TimestampFormatter value={value} zone="local" />
                         </div>
                     </div>,
-                    timestampPortal,
+                    rootContext || document.body,
                 )
             ) : null}
         </span>

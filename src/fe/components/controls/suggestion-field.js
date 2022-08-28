@@ -1,15 +1,9 @@
 import { h, Component } from 'preact';
 import { useState, useEffect, Fragment, createPortal } from 'preact/compat';
-import { Button, globalAnimator } from 'yamdl';
+import { Button, globalAnimator, RootContext } from 'yamdl';
 import { ValidatedTextField } from '../form';
 import fuzzaldrin from 'fuzzaldrin';
 import './suggestion-field.less';
-
-// appending directly to document.body causes weird glitches when a suggestion field is inside
-// a dialog
-const suggestionFieldRootContainer = document.createElement('div');
-suggestionFieldRootContainer.id = 'suggestion-field-root-container';
-document.body.appendChild(suggestionFieldRootContainer);
 
 /// A text field with suggestions that behaves like a typical browser address bar.
 ///
@@ -110,6 +104,8 @@ export default function SuggestionField ({
 }
 
 class SuggestionFieldRender extends Component {
+    static contextType = RootContext;
+
     state = { x: 0, y: 0, maxHeight: 10000 };
 
     update () {
@@ -152,7 +148,7 @@ class SuggestionFieldRender extends Component {
                     onMouseDown={e => e.preventDefault()}>
                     {popoutContents}
                 </div>,
-                suggestionFieldRootContainer,
+                this.context || document.body,
             );
         }
 

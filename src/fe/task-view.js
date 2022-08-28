@@ -2,6 +2,9 @@ import { h, Component } from 'preact';
 
 /// A task view container.
 ///
+/// Used to hold task views, which are GUI dialogs to interact with core tasks.
+/// See index for usage.
+///
 /// # Props
 /// - id: task id
 /// - path: task path

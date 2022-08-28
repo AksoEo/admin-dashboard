@@ -1,7 +1,7 @@
 import Markdown from 'markdown-it';
 import { h } from 'preact';
 import { createPortal, createRef, PureComponent, useState } from 'preact/compat';
-import { globalAnimator, Button, Dialog, TextField } from 'yamdl';
+import { globalAnimator, Button, Dialog, TextField, RootContext } from 'yamdl';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
 import FormatStrikethroughIcon from '@material-ui/icons/FormatStrikethrough';
@@ -23,15 +23,6 @@ import { coreContext } from '../../core/connection';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown';
 import './md-field.less';
-
-const portalContainer = document.createElement('div');
-portalContainer.id = 'md-field-portal-container';
-document.body.appendChild(portalContainer);
-
-function orderPortalContainerFront () {
-    document.body.removeChild(portalContainer);
-    document.body.appendChild(portalContainer);
-}
 
 /// Renders a markdown text field.
 ///
@@ -91,7 +82,6 @@ export default class MarkdownTextField extends PureComponent {
 
     #onFocus = () => {
         this.setState({ focused: true });
-        orderPortalContainerFront();
         if (this.props.onFocus) this.props.onFocus();
     };
 
@@ -255,7 +245,6 @@ export default class MarkdownTextField extends PureComponent {
                     <Dialog
                         class="markdown-text-field-help-dialog"
                         backdrop
-                        container={portalContainer}
                         fullScreen={width => width < 900}
                         open={helpOpen}
                         onClose={() => this.setState({ helpOpen: false })}
@@ -286,6 +275,8 @@ export default class MarkdownTextField extends PureComponent {
 }
 
 class EditorBarPortal extends PureComponent {
+    static contextType = RootContext;
+
     state = {
         posX: 0,
         posY: 0,
@@ -350,7 +341,7 @@ class EditorBarPortal extends PureComponent {
                     </div>
                 ) : null}
             </div>,
-            portalContainer,
+            this.context || document.body,
         );
     }
 }

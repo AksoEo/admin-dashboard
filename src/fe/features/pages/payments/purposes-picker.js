@@ -20,15 +20,6 @@ import { FIELDS as ADDON_FIELDS } from './orgs/addons/fields';
 import TriggerPicker from './trigger-picker';
 import './purposes-picker.less';
 
-const portalContainer = document.createElement('div');
-portalContainer.id = 'payment-purposes-picker-portal-container';
-document.body.appendChild(portalContainer);
-
-function orderPortalContainerFront () {
-    document.body.removeChild(portalContainer);
-    document.body.appendChild(portalContainer);
-}
-
 const ADDON_FIELD_IDS = Object.keys(ADDON_FIELDS).map(id => ({ id }));
 const REDUCED_ADDON_FIELDS = ADDON_FIELDS;
 
@@ -39,7 +30,6 @@ export default class PurposesPicker extends PureComponent {
 
     #open = () => {
         this.setState({ pickerOpen: true });
-        orderPortalContainerFront();
     };
 
     render ({ org, value, onChange, currency }, { pickerOpen }) {
@@ -428,7 +418,6 @@ class AddPurposeDialog extends PureComponent {
         return (
             <Dialog
                 class="payment-purposes-picker-dialog"
-                container={portalContainer}
                 backdrop
                 title={locale.purposesPicker.addTitle}
                 open={open}

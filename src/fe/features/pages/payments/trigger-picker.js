@@ -14,10 +14,6 @@ import { FIELDS as INSTANCE_FIELDS } from '../congresses/instances/fields';
 import { FIELDS as PARTICIPANT_FIELDS } from '../congresses/instances/participants/fields';
 import './trigger-picker.less';
 
-const dialogRootContainer = document.createElement('div');
-dialogRootContainer.id = 'payments-trigger-picker-container';
-document.body.appendChild(dialogRootContainer);
-
 const REDUCED_ENTRY_FIELDS = Object.fromEntries(['id', 'timeSubmitted', 'year', 'codeholderData', 'status'].map(x => ([x, ENTRY_FIELDS[x]])));
 const REDUCED_INSTANCE_FIELDS = Object.fromEntries(['humanId', 'name'].map(x => ([x, INSTANCE_FIELDS[x]])));
 const REDUCED_PARTICIPANT_FIELDS = Object.fromEntries(['dataId', 'createdTime'].map(x => ([x, PARTICIPANT_FIELDS[x]])));
@@ -93,7 +89,6 @@ export default class TriggerPicker extends PureComponent {
             <Button icon small class="payment-trigger-picker" onClick={this.onOpenPicker}>
                 <AddIcon style={{ verticalAlign: 'middle' }} />
                 <Dialog
-                    container={dialogRootContainer}
                     class="payment-trigger-picker-dialog"
                     backdrop
                     title={locale.triggerPicker.titles[type]}

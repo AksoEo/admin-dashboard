@@ -31,12 +31,16 @@ export default class DialogSheet extends Dialog {
 
     onContainerClick = e => {
         if (e.target === this.containerNode && this.props.onClose) {
-            const button = this.closeButton.button;
-            button.classList.add('highlight-focus');
-            setTimeout(() => {
-                button.classList.remove('highlight-focus');
-            }, 500);
+            this.onCancel();
         }
+    };
+
+    onCancel = () => {
+        const button = this.closeButton.button;
+        button.classList.add('highlight-focus');
+        setTimeout(() => {
+            button.classList.remove('highlight-focus');
+        }, 500);
     };
 
     componentDidUpdate (prevProps) {

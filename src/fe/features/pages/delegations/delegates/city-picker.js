@@ -30,7 +30,7 @@ const FIELDS = {
     },
 };
 
-export default function PickerDialog ({ value, onChange, limit, container, open, onClose, filter, ...extra }) {
+export default function PickerDialog ({ value, onChange, limit, open, onClose, filter, ...extra }) {
     return (
         <ItemPickerDialog
             class="city-picker-dialog"
@@ -41,8 +41,7 @@ export default function PickerDialog ({ value, onChange, limit, container, open,
             fields={FIELDS}
             sorting={{ code: 'asc' }}
             locale={locale.cityPicker.fields}
-            title={limit === 1 ? locale.cityPicker.pickone : locale.cityPicker.pick}
-            container={container}
+            title={limit === 1 ? locale.cityPicker.pickOne : locale.cityPicker.pick}
             filter={filter}
             value={value}
             onChange={onChange}

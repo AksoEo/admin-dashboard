@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent, useState } from 'preact/compat';
+import { useState } from 'preact/compat';
 import { Dialog } from 'yamdl';
 import SearchIcon from '@material-ui/icons/Search';
 import StaticOverviewList from '../lists/overview-list-static';
@@ -25,60 +25,58 @@ import './item-picker-dialog.less';
 /// - noCloseButton: will not show a close button
 /// - extraListOptions: additional props that will be passed to OverviewList
 /// - ...extra: additional props for the dialog
-export default class ItemPicker extends PureComponent {
-    render ({
-        open,
-        onClose,
-        defaultWidth,
-        fullScreenWidth,
-        limit,
-        value,
-        onChange,
-        task,
-        view,
-        options,
-        viewOptions,
-        emptyLabel,
-        filter,
-        fields,
-        locale,
-        search,
-        sorting,
-        noCloseButton,
-        extraListOptions,
-        ...extra
-    }) {
-        extra.class = (extra.class || '') + ' item-picker-dialog';
-        extra.style = (extra.style || {});
-        extra.style['--picker-width'] = (defaultWidth || 400) + 'px';
+export default function ItemPicker ({
+    open,
+    onClose,
+    defaultWidth,
+    fullScreenWidth,
+    limit,
+    value,
+    onChange,
+    task,
+    view,
+    options,
+    viewOptions,
+    emptyLabel,
+    filter,
+    fields,
+    locale,
+    search,
+    sorting,
+    noCloseButton,
+    extraListOptions,
+    ...extra
+}) {
+    extra.class = (extra.class || '') + ' item-picker-dialog';
+    extra.style = (extra.style || {});
+    extra.style['--picker-width'] = (defaultWidth || 400) + 'px';
 
-        return (
-            <Dialog
-                backdrop
-                fullScreen={width => width < (fullScreenWidth || 400)}
-                open={open}
-                actions={onClose && !noCloseButton && [{ label: dataLocale.picker.done, action: onClose }]}
+    return (
+        <Dialog
+            backdrop
+            fullScreen={width => width < (fullScreenWidth || 400)}
+            open={open}
+            actions={onClose && !noCloseButton && [{ label: dataLocale.picker.done, action: onClose }]}
+            onClose={onClose}
+            {...extra}>
+            <DialogInner
+                value={value}
+                onChange={onChange}
+                limit={limit}
                 onClose={onClose}
-                {...extra}>
-                <DialogInner
-                    value={value}
-                    onChange={onChange}
-                    limit={limit}
-                    onClose={onClose}
-                    task={task}
-                    view={view}
-                    options={options}
-                    viewOptions={viewOptions}
-                    searchDef={search}
-                    emptyLabel={emptyLabel}
-                    extraListOptions={extraListOptions}
-                    fields={fields}
-                    sorting={sorting}
-                    fieldsLocale={locale}
-                    filter={filter} />
-            </Dialog>
-        );
-    }
+                task={task}
+                view={view}
+                options={options}
+                viewOptions={viewOptions}
+                searchDef={search}
+                emptyLabel={emptyLabel}
+                extraListOptions={extraListOptions}
+                fields={fields}
+                sorting={sorting}
+                fieldsLocale={locale}
+                filter={filter} />
+        </Dialog>
+    );
 }
 
 function DialogInner ({
