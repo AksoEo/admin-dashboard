@@ -33,7 +33,8 @@ export const data = {
     },
     address: {
         countryEmpty: '- Elektu landon -',
-        invalidPostalCode: 'Nevalida poŝtkodo',
+        invalidField: field => `Nevalida ${field}`,
+        postalExample: example => `Ekz. ${example}`,
     },
     ueaCode: {
         newCode: 'Seslitera UEA-kodo',

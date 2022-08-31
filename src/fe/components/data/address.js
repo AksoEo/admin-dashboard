@@ -1,6 +1,5 @@
 import { h, Component } from 'preact';
 import { getValidationRules } from '@cpsdqs/google-i18n-address';
-import Select from '../controls/select';
 import { data as locale } from '../../locale';
 import { Field, ValidatedTextField } from '../form';
 import countryField, { WithCountries } from './country';
@@ -50,35 +49,41 @@ function BasicAddressRenderer ({ value }) {
 /// - readableMask/editableMask: array - if set, only allows viewing/editing the given fields
 class AddressEditor extends Component {
     state = {
+        validating: false,
         validationRules: null,
     };
 
-    #reloadTimeout;
+    cityChoicesId = 'cities-' + Math.random().toString(36);
+    cityAreaChoicesId = 'city-areas-' + Math.random().toString(36);
+    countryAreaChoicesId = 'country-areas-' + Math.random().toString(36);
 
-    /// Loads validation rules for the current locale.
-    loadValidationRules () {
+    /// Validates current input.
+    validate () {
         if (!this.props.value) return;
-        this.setState({ validationRules: null });
-        getValidationRules({ countryCode: this.props.value.country }).then(rules => {
-            this.setState({ validationRules: rules });
+        this.setState({ validating: true });
+        getValidationRules({
+            ...this.props.value,
+            countryCode: this.props.value.country,
+        }).then(rules => {
+            this.setState({
+                validationRules: rules,
+                validating: false,
+            });
         }).catch(err => {
+            // oh well
             console.error(err); // eslint-disable-line no-console
-            this.#reloadTimeout = setTimeout(() => this.loadValidationRules(), 1000);
+            this.setState({ validationRules: null, validating: false });
         });
     }
 
     componentDidMount () {
-        this.loadValidationRules();
+        this.validate();
     }
 
     componentDidUpdate (prevProps) {
-        if (!prevProps.value || prevProps.value.country !== this.props.value.country) {
-            this.loadValidationRules();
+        if (prevProps.value !== this.props.value || prevProps.value.country !== this.props.value.country) {
+            this.validate();
         }
-    }
-
-    componentWillUnmount () {
-        clearTimeout(this.#reloadTimeout);
     }
 
     render ({ value, onChange, readableMask, editableMask }) {
@@ -92,12 +97,14 @@ class AddressEditor extends Component {
         const items = [];
         if (rmask('country')) {
             items.push(
-                <countryField.editor
-                    key="country"
-                    emptyLabel={locale.address.countryEmpty}
-                    value={country && country.toLowerCase()}
-                    onChange={onChangeField('country')}
-                    disabled={!wmask('country')} />
+                <Field>
+                    <countryField.editor
+                        key="country"
+                        emptyLabel={locale.address.countryEmpty}
+                        value={country && country.toLowerCase()}
+                        onChange={onChangeField('country')}
+                        disabled={!wmask('country')} />
+                </Field>
             );
         }
 
@@ -106,26 +113,72 @@ class AddressEditor extends Component {
         const allowedFields = rules.allowedFields || [];
         const upperFields = rules.upperFields || [];
         const postalCodeMatchers = rules.postalCodeMatchers || [];
+        const postalCodeExamples = rules.postalCodeExamples || [];
 
-        if (rmask('countryArea') && requiredFields.includes('countryArea')) {
+        const isInChoices = (q, choices, field) => {
+            q = q.toLowerCase();
+            if (!choices.length) return null;
+            let found = false;
+            for (const [name, label] of choices) {
+                if (q === name.toLowerCase() || q === label.toLowerCase()) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return locale.address.invalidField(field.toLowerCase());
+        };
+
+        const validators = {
+            countryArea: () => {
+                const err = isInChoices(value.countryArea, rules.countryAreaChoices, locale.addressFields.countryArea);
+                if (err) return err;
+            },
+            cityArea: () => {
+                const err = isInChoices(value.cityArea, rules.cityAreaChoices, locale.addressFields.cityArea);
+                if (err) return err;
+            },
+            city: () => {
+                const err = isInChoices(value.city, rules.cityChoices, locale.addressFields.city);
+                if (err) return err;
+            },
+            postalCode: () => {
+                if (postalCodeMatchers.length) {
+                    for (const matcher of postalCodeMatchers) {
+                        if (!value.postalCode.match(matcher)) {
+                            return locale.address.invalidField(locale.addressFields.postalCode.toLowerCase());
+                        }
+                    }
+                }
+            },
+        };
+
+        const lists = {
+            city: this.cityChoicesId,
+            cityArea: this.cityAreaChoicesId,
+            countryArea: this.countryAreaChoicesId,
+        };
+        for (const k in lists) {
+            const options = new Set();
+            for (const item of (rules[k + 'Choices'] || [])) {
+                options.add(item[0]);
+            }
+
             items.push(
-                <Select
-                    required={!!country}
-                    disabled={!wmask('countryArea')}
-                    class="address-editor-line"
-                    key="countryArea"
-                    value={value.countryArea}
-                    onChange={onChangeField('countryArea', value => value || null)}
-                    items={[{ value: '', label: '—' }].concat(rules.countryAreaChoices
-                        .sort((a, b) => a[1].localeCompare(b[1])) // sort by name
-                        .map(([id, area]) => ({
-                            value: id,
-                            label: `${id} - ${area}`,
-                        })))} />
+                <datalist id={lists[k]}>
+                    {[...options].map((option, i) => (
+                        <option key={i} value={option} />
+                    ))}
+                </datalist>
             );
         }
 
-        for (const k of ['streetAddress', 'city', 'cityArea', 'postalCode', 'sortingCode']) {
+        const placeholders = {
+            postalCode: postalCodeExamples.length
+                ? locale.address.postalExample(postalCodeExamples[0])
+                : '',
+        };
+
+        for (const k of ['streetAddress', 'city', 'cityArea', 'postalCode', 'sortingCode', 'countryArea']) {
             if (!allowedFields.includes(k) || !rmask(k)) continue;
             const isRequired = requiredFields.includes(k);
             const isUpper = upperFields.includes(k);
@@ -134,19 +187,14 @@ class AddressEditor extends Component {
                     <ValidatedTextField
                         validate={value => {
                             if (country && !value && isRequired) return locale.requiredField;
-
-                            if (k === 'postalCode' && postalCodeMatchers.length) {
-                                for (const matcher of postalCodeMatchers) {
-                                    if (!value.match(matcher)) {
-                                        return locale.address.invalidPostalCode;
-                                    }
-                                }
-                            }
+                            if (validators[k]) return validators[k]();
                         }}
+                        placeholder={placeholders[k]}
                         disabled={!wmask(k)}
                         class="address-editor-line"
                         key={k}
                         value={value[k]}
+                        list={lists[k]}
                         maxLength={maxLengthMap[k]}
                         label={isRequired
                             ? <Required>{locale.addressFields[k]}</Required>
