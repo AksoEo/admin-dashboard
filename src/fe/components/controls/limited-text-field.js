@@ -3,11 +3,13 @@ import { PureComponent } from 'preact/compat';
 import { TextField } from 'yamdl';
 import './limited-text-field.less';
 
-/// Renders a text field with a counter for the max length.
-///
-/// # Props
-/// - maxLength: max content length (using Javascript string length, i.e. UTF-16 code points)
-/// - other props will be forwarded to TextField
+/**
+ * Renders a text field with a counter for the max length.
+ *
+ * # Props
+ * - maxLength: max content length (using Javascript string length, i.e. UTF-16 code points)
+ * - other props will be forwarded to TextField
+ */
 export default class LimitedTextField extends PureComponent {
     render ({ maxLength, value, ...props }) {
         let isAtLimit = false;

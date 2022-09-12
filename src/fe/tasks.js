@@ -3,7 +3,7 @@ import { Dialog } from 'yamdl';
 import { generic as locale } from './locale';
 import './tasks.less';
 
-/// Shows a single info dialog.
+/** Shows a single info dialog. */
 export function info ({ open, task }) {
     if (!task.options) return null;
     const { title, message } = task.options;

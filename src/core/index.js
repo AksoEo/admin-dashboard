@@ -13,7 +13,7 @@ setInterval(() => {
     gc([CODEHOLDERS]);
 }, 120000);
 
-/// Handlers for messages from the FE.
+/** Handlers for messages from the FE. */
 const messageHandlers = {
     'create-task' ({ id, task: taskPath, options, parameters = {} }) {
         if (get([TASKS, id])) {

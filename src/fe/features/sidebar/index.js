@@ -4,29 +4,33 @@ import { Spring, globalAnimator } from 'yamdl';
 import SidebarContents from './contents';
 import './style';
 
-/// Width of the region at the left screen edge from which the sidebar may be dragged out.
+/** Width of the region at the left screen edge from which the sidebar may be dragged out. */
 const EDGE_DRAG_WIDTH = 50;
 
-/// After holding down on the edge for this long, the sidebar will peek out and start a dragging
-/// action.
+/**
+ * After holding down on the edge for this long, the sidebar will peek out and start a dragging
+ * action.
+ */
 const PEEK_TIMEOUT = 0.2;
 
-/// Renders the sidebar.
-///
-/// # Props
-/// - permanent: Whether or not the sidebar should be permanent and inline or slide out temporarily.
-///   If this is true, `open` will be ignored.
-/// - open/onOpen/onClose: open state
-/// - currentPage: Current page identifier passed to the SidebarContents
-/// - locked: if true, will lock the sidebar to user interactions
+/**
+ * Renders the sidebar.
+ *
+ * # Props
+ * - permanent: Whether or not the sidebar should be permanent and inline or slide out temporarily.
+ *   If this is true, `open` will be ignored.
+ * - open/onOpen/onClose: open state
+ * - currentPage: Current page identifier passed to the SidebarContents
+ * - locked: if true, will lock the sidebar to user interactions
+ */
 export default class Sidebar extends PureComponent {
     node = null;
     backdropNode = null;
 
-    /// The spring used to animate the sidebar’s X position.
+    /** The spring used to animate the sidebar’s X position. */
     position = new Spring(1, 0.5);
 
-    /// Called when the sidebar drag ends, by the sidebar drag handler.
+    /** Called when the sidebar drag ends, by the sidebar drag handler. */
     onDragEnd = (open) => {
         if (open && this.props.onOpen) this.props.onOpen();
         else if (!open && this.props.onClose) this.props.onClose();
@@ -34,7 +38,7 @@ export default class Sidebar extends PureComponent {
 
     sidebarDragHandler = new SidebarDragHandler(this, this.position, this.onDragEnd);
 
-    /// Updates the spring target; called when the `open` property changes.
+    /** Updates the spring target; called when the `open` property changes. */
     updateSpringTarget () {
         this.position.target = this.props.permanent || this.props.open ? 1 : 0;
         this.position.locked = false;
@@ -51,7 +55,7 @@ export default class Sidebar extends PureComponent {
         }
     }
 
-    /// Called when the position spring updates.
+    /** Called when the position spring updates. */
     onSpringUpdate = (position) => {
         position = Math.max(0, position);
         if (position <= 1) {
@@ -74,7 +78,7 @@ export default class Sidebar extends PureComponent {
         globalAnimator.register(this);
     }
 
-    /// Will animate the sidebar sliding in.
+    /** Will animate the sidebar sliding in. */
     animateIn (delay) {
         this.position.value = 0;
         this.onSpringUpdate(0);
@@ -149,45 +153,47 @@ export default class Sidebar extends PureComponent {
     }
 }
 
-/// Handles sidebar touch-dragging.
+/** Handles sidebar touch-dragging. */
 class SidebarDragHandler {
-    /// True if a touch drag may turn into a sidebar drag.
+    /** True if a touch drag may turn into a sidebar drag. */
     mayDrag = false;
 
-    /// True if the sidebar is currently being dragged.
+    /** True if the sidebar is currently being dragged. */
     isDragging = false;
 
-    /// Temporarily stores the sidebar width.
+    /** Temporarily stores the sidebar width. */
     sidebarWidth = 0;
 
-    /// Initial touch position X.
+    /** Initial touch position X. */
     startTouchX = 0;
-    /// Initial touch position Y.
+    /** Initial touch position Y. */
     startTouchY = 0;
-    /// Previous touch position.
+    /** Previous touch position. */
     lastTouchX = 0;
-    /// Initial spring value offset.
+    /** Initial spring value offset. */
     startTouchOffset = 0;
-    /// Previous event timestamp.
+    /** Previous event timestamp. */
     lastTouchTime = 0;
 
-    /// # Parameters
-    /// - owner: { update: number => void } - update target
-    /// - sidebarSpring: Spring - the sidebar spring. Should be 0 when closed and 1 when open.
-    /// - onEnd: `(bool) => void` - called when the user ends the drag with whether or not the
-    ///   sidebar should be considered open or not.
+    /**
+     * # Parameters
+     * - owner: { update: number => void } - update target
+     * - sidebarSpring: Spring - the sidebar spring. Should be 0 when closed and 1 when open.
+     * - onEnd: `(bool) => void` - called when the user ends the drag with whether or not the
+     *   sidebar should be considered open or not.
+     */
     constructor (owner, sidebarSpring, onEnd) {
         this.owner = owner;
         this.spring = sidebarSpring;
         this.onEnd = onEnd;
     }
 
-    /// Sets the sidebar node.
+    /** Sets the sidebar node. */
     setSidebarNode (sidebarNode) {
         this.sidebarNode = sidebarNode;
     }
 
-    /// Binds global event handlers.
+    /** Binds global event handlers. */
     bind () {
         window.addEventListener('touchstart', this.onTouchStart);
         window.addEventListener('touchmove', this.onTouchMove, { passive: false });
@@ -195,7 +201,7 @@ class SidebarDragHandler {
         window.addEventListener('touchcancel', this.onTouchCancel);
     }
 
-    /// Unbinds global event handlers.
+    /** Unbinds global event handlers. */
     unbind () {
         window.removeEventListener('touchstart', this.onTouchStart);
         window.removeEventListener('touchmove', this.onTouchMove);
@@ -203,10 +209,12 @@ class SidebarDragHandler {
         window.removeEventListener('touchcancel', this.onTouchCancel);
     }
 
-    /// Returns true if a touch event should be ignored, e.g. because the target is a button.
-    ///
-    /// # Parameters
-    /// - target: Node
+    /**
+     * Returns true if a touch event should be ignored, e.g. because the target is a button.
+     *
+     * # Parameters
+     * - target: Node
+     */
     shouldIgnoreEventFor (target) {
         if (!target) return false;
         if (target.tagName === 'BUTTON') return true;

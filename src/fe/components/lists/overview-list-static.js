@@ -10,22 +10,24 @@ import DisplayError from '../utils/error';
 import { data as dataLocale, search as searchLocale } from '../../locale';
 import './overview-list-static.less';
 
-/// Because the OverviewList component is very unwieldy, this is a variant that is specifically
-/// meant for being embedded. This does not have any fancy `parameters` integration or anything
-/// like that.
-///
-/// # Props
-/// - task, view, options, viewOptions, locale: same as OL
-/// - fields: same as OL, but all of them will be shown (in order)
-/// - sorting: optional object { [field]: sorting }
-/// - jsonFilter: optional JSON filter
-/// - search: same as parameters.search in OL
-/// - offset/onSetOffset: list offset
-/// - limit: page limit
-/// - emptyLabel: empty label
-/// - onItemClick: callback (id) => void
-/// - compact: bool
-/// - selection: same as OL
+/**
+ * Because the OverviewList component is very unwieldy, this is a variant that is specifically
+ * meant for being embedded. This does not have any fancy `parameters` integration or anything
+ * like that.
+ *
+ * # Props
+ * - task, view, options, viewOptions, locale: same as OL
+ * - fields: same as OL, but all of them will be shown (in order)
+ * - sorting: optional object { [field]: sorting }
+ * - jsonFilter: optional JSON filter
+ * - search: same as parameters.search in OL
+ * - offset/onSetOffset: list offset
+ * - limit: page limit
+ * - emptyLabel: empty label
+ * - onItemClick: callback (id) => void
+ * - compact: bool
+ * - selection: same as OL
+ */
 export default class StaticOverviewList extends PureComponent {
     static contextType = coreContext;
 

@@ -20,22 +20,24 @@ const accessSessionStorage = (withStorage, onFailure) => {
     }
 };
 
-/// Login view.
+/** Login view. */
 export default connect('login')((data, core) => ({ ...data, core }))(class Login extends Component {
     state = {
-        /// Whether or not non-admins are allowed to log into the admin dashboard.
-        /// This is off by default, but can be enabled for testing purposes if the user enters
-        /// the konami code.
-        /// Bugs related to this property being true shouldn’t be considered issues.
+        /**
+         * Whether or not non-admins are allowed to log into the admin dashboard.
+         * This is off by default, but can be enabled for testing purposes if the user enters
+         * the konami code.
+         * Bugs related to this property being true shouldn’t be considered issues.
+         */
         allowsNonAdmin: accessSessionStorage(storage => storage._debug_ana, () => false),
 
-        /// The current login name; this is here because it’s shared across many login pages.
+        /** The current login name; this is here because it’s shared across many login pages. */
         login: '',
 
-        /// Login mode; used to identify “create password” pages and such.
+        /** Login mode; used to identify “create password” pages and such. */
         mode: Mode.NORMAL,
 
-        /// Password creation token taken from the URL (if it exists)
+        /** Password creation token taken from the URL (if it exists) */
         token: null,
 
         apiVersion: null,

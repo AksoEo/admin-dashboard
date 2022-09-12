@@ -17,10 +17,10 @@ import 'moment/locale/eo';
 moment.locale('eo');
 moment.tz.setDefault('UTC');
 
-/// width at which we'll show the sidebar permanently instead of having it slide out
+/** width at which we'll show the sidebar permanently instead of having it slide out */
 const PERMA_SIDEBAR_WIDTH = 900;
 
-/// dummy permissions are used until actual permissions have been loaded from the server
+/** dummy permissions are used until actual permissions have been loaded from the server */
 function createDummyPerms () {
     const perms = new Perms();
     perms.load({
@@ -34,8 +34,10 @@ function createDummyPerms () {
     return perms;
 }
 
-/// The application component.
-/// This contains everything pertaining to a logged-in session.
+/**
+ * The application component.
+ * This contains everything pertaining to a logged-in session.
+ */
 export default connect('perms/perms')(perms => ({ perms }))(class App extends Component {
     state = {
         permaSidebar: window.innerWidth >= PERMA_SIDEBAR_WIDTH,

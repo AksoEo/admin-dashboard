@@ -174,7 +174,7 @@ class PrintAction extends PureComponent {
     }
 }
 
-/// This function should be pure because we're also using it to render the printed version
+/** This function should be pure because we're also using it to render the printed version */
 function ReportRender ({ data, currency, print }) {
     return (
         <div class="payments-report">

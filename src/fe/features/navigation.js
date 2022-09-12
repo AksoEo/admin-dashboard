@@ -37,25 +37,25 @@ const USE_LOCAL_MENU = false;
 //   - at page load
 //   - on a popstate event
 
-/// A navigation stack item (see explanation above)
+/** A navigation stack item (see explanation above) */
 class NavigationStackItem {
-    /// The view path of this item, i.e. excluding state. (e.g. /view1/view2)
+    /** The view path of this item, i.e. excluding state. (e.g. /view1/view2) */
     viewPath = '/';
-    /// Only the state path of this item (e.g. /state1)
+    /** Only the state path of this item (e.g. /state1) */
     statePath = '/';
-    /// The result of matching the path component.
+    /** The result of matching the path component. */
     match = [];
-    /// All matches in the *path* stack for this item.
+    /** All matches in the *path* stack for this item. */
     matches = {};
-    /// URL state items.
+    /** URL state items. */
     state = {};
-    /// The query string of this item (without leading question mark)
+    /** The query string of this item (without leading question mark) */
     query = '';
-    /// Arbitrary data associated with this item (saved as history state).
+    /** Arbitrary data associated with this item (saved as history state). */
     data = {};
-    /// The route item in the page tree.
+    /** The route item in the page tree. */
     route = null;
-    /// arbitrary metadata
+    /** arbitrary metadata */
     meta = {};
 
     clone () {
@@ -123,7 +123,7 @@ const NOT_FOUND_ROUTE = {
     component: NotFoundPage,
 };
 
-/// Parses a full URL using the page tree
+/** Parses a full URL using the page tree */
 function parseTreeURL (url, state, perms) {
     url = new URL(url);
 
@@ -230,7 +230,7 @@ function parseTreeURL (url, state, perms) {
     };
 }
 
-/// Copies state from stack a to stack b if the items match.
+/** Copies state from stack a to stack b if the items match. */
 function copyMatchingNavStackState (a, b, onlyMeta) {
     for (let i = 0; i < a.length && i < b.length; i++) {
         const itemA = a[i];
@@ -247,9 +247,9 @@ function copyMatchingNavStackState (a, b, onlyMeta) {
 
 class NavigationState {
     stack = [];
-    /// full url location (starting with the path). may be longer than the URL length limit
+    /** full url location (starting with the path). may be longer than the URL length limit */
     fullLocation = '';
-    /// URL location shown in the navigation bar
+    /** URL location shown in the navigation bar */
     urlLocation = '';
     pathname = '';
     query = '';
@@ -320,23 +320,27 @@ class NavigationState {
     }
 }
 
-/// these browsers will yell if you replaceState too often
+/** these browsers will yell if you replaceState too often */
 const SLOW_SAVE_STATE = navigator.userAgent.includes('Safari/');
 
-/// Interval at which state will be saved. This includes writing the query string to the URL and
-/// replacing window.history state.
+/**
+ * Interval at which state will be saved. This includes writing the query string to the URL and
+ * replacing window.history state.
+ */
 const SAVE_STATE_INTERVAL = SLOW_SAVE_STATE ? 2100 : 500; // ms
 
 const ENABLE_FORCE_RELOAD = true;
 
-/// Navigation controller sort of thing.
-///
-/// # Props
-/// - onNavigate: emitted when the URL changes
-/// - permaSidebar: bool
-/// - onOpenMenu: fires when the menu icon is pressed
-/// - onCurrentPageChange: fired when the current page id changes
-/// - perms: permissions
+/**
+ * Navigation controller sort of thing.
+ *
+ * # Props
+ * - onNavigate: emitted when the URL changes
+ * - permaSidebar: bool
+ * - onOpenMenu: fires when the menu icon is pressed
+ * - onCurrentPageChange: fired when the current page id changes
+ * - perms: permissions
+ */
 export default class Navigation extends PureComponent {
     state = {
         state: new NavigationState(),
@@ -430,7 +434,7 @@ export default class Navigation extends PureComponent {
         this.readStateFromURL(document.location.href, e.state);
     };
 
-    /// Navigates with an href.
+    /** Navigates with an href. */
     navigate = (href, replace, pushOutOfTree) => {
         if (this.promptCancelNavigationSync()) return;
         this.saveState();
@@ -440,7 +444,7 @@ export default class Navigation extends PureComponent {
         });
     };
 
-    /// Called when a page changes its query.
+    /** Called when a page changes its query. */
     onQueryChange (stackIndex, newQuery) {
         const state = this.getNavState().clone();
         if (state.stack[stackIndex].query !== newQuery) {
@@ -460,7 +464,7 @@ export default class Navigation extends PureComponent {
         }
     }
 
-    /// Replaces all stack items above the given index with the given path.
+    /** Replaces all stack items above the given index with the given path. */
     pushStackAt (stackIndex, path, replace) {
         const state = this.getNavState().clone();
         state.stack.splice(stackIndex + 1);
@@ -470,7 +474,7 @@ export default class Navigation extends PureComponent {
         this.navigate(pathname, replace);
     }
 
-    /// Removes all stack items at and above the given index.
+    /** Removes all stack items at and above the given index. */
     popStackAt (stackIndex, replace) {
         if (this.promptCancelNavigationSync()) return;
         const state = this.getNavState().clone();

@@ -18,12 +18,14 @@ function reduceFrac ([n, d]) {
     return [n, d];
 }
 
-/// Renders a rational number: either a tuple (numerator, denominator) or a float.
-///
-/// # Props
-/// - value: number value
-/// - onChange: onChange handler
-/// - editing: if true, will be editable
+/**
+ * Renders a rational number: either a tuple (numerator, denominator) or a float.
+ *
+ * # Props
+ * - value: number value
+ * - onChange: onChange handler
+ * - editing: if true, will be editable
+ */
 export default class Rational extends Component {
     #numInputRef;
     #denInputRef;

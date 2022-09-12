@@ -8,13 +8,13 @@ export const LISTS = 'lists';
 export const SIG_LISTS = '!lists';
 
 export const tasks = {
-    /// lists/list: lists lists
+    /** lists/list: lists lists */
     list: crudList({
         apiPath: () => '/lists',
         fields: ['id', 'name', 'description'],
         storePath: (_, item) => [LISTS, item.id],
     }),
-    /// lists/item: fetches a single list
+    /** lists/item: fetches a single list */
     item: crudGet({
         apiPath: ({ id }) => `/lists/${id}`,
         fields: ['id', 'name', 'description', 'filters', 'memberFilter'],
@@ -30,14 +30,14 @@ export const tasks = {
         },
         storePath: ({ id }) => [LISTS, id],
     }),
-    /// lists/create: creates a list
+    /** lists/create: creates a list */
     create: crudCreate({
         apiPath: () => `/lists`,
         fields: ['name', 'description', 'filters'],
         storePath: (_, id) => [LISTS, id],
         signalPath: () => [LISTS, SIG_LISTS],
     }),
-    /// lists/update: updates a list
+    /** lists/update: updates a list */
     update: crudUpdate({
         apiPath: ({ id }) => `/lists/${id}`,
         map: delta => {
@@ -48,13 +48,13 @@ export const tasks = {
         },
         storePath: ({ id }) => [LISTS, id],
     }),
-    /// lists/delete: deletes a list
+    /** lists/delete: deletes a list */
     delete: crudDelete({
         apiPath: ({ id }) => `/lists/${id}`,
         storePath: ({ id }) => [LISTS, id],
         signalPath: () => [LISTS, SIG_LISTS],
     }),
-    /// lists/codeholders: lists codeholders that are part of a list
+    /** lists/codeholders: lists codeholders that are part of a list */
     codeholders: async ({ id }, { offset, limit }) => {
         const client = await asyncClient;
         const res = await client.get(`/lists/${id}/codeholders`, {
@@ -87,7 +87,7 @@ export const tasks = {
 };
 
 export const views = {
-    /// lists/list: data view of a single list
+    /** lists/list: data view of a single list */
     list: class ListView extends AbstractDataView {
         constructor (options) {
             super();
@@ -115,6 +115,6 @@ export const views = {
         }
     },
 
-    /// lists/sigLists: emits a signal when the list of lists may have changed
+    /** lists/sigLists: emits a signal when the list of lists may have changed */
     sigLists: createStoreObserver([LISTS, SIG_LISTS]),
 };

@@ -30,10 +30,12 @@ function stringify (value, zone) {
     return null;
 }
 
-/// Renders a formatted timestamp (not editable). Use prop `value` (in seconds).
-///
-/// # Additional Props
-/// - zone: time zone
+/**
+ * Renders a formatted timestamp (not editable). Use prop `value` (in seconds).
+ *
+ * # Additional Props
+ * - zone: time zone
+ */
 function TimestampFormatter ({ value, zone }) {
     return stringify(value, zone);
 }
@@ -70,10 +72,12 @@ function TimestampRenderer ({ value, zone }) {
     );
 }
 
-/// Edits a timestamp.
-///
-/// # Props
-/// - value (in seconds)
+/**
+ * Edits a timestamp.
+ *
+ * # Props
+ * - value (in seconds)
+ */
 function TimestampEditor ({ label, value, onChange, disabled, error, outline, zone, required }) {
     const applyZone = value => {
         if (zone) return value.tz(zone);

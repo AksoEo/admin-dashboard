@@ -5,19 +5,21 @@ import DisplayError from '../utils/error';
 import { connect } from '../../core/connection';
 import './spreadsheet.less';
 
-/// Renders a spreadsheet. Supports using core data views for rows.
-///
-/// # Props
-/// - columnCount: number
-/// - rowCount: number
-/// - loadedRowCount: number - number of rows (from the top) that are loaded
-/// - columnName: index => name
-/// - initialColumnSize: index => number (pixels)
-/// - cellView: (column) => Component
-/// - onCellClick: (row, coll, data, event) => void
-/// - rowData: index => any.
-///   If the result is an array, will load a core data view with [name, opts, params]; otherwise
-///   it will just be passed to the cells directly.
+/**
+ * Renders a spreadsheet. Supports using core data views for rows.
+ *
+ * # Props
+ * - columnCount: number
+ * - rowCount: number
+ * - loadedRowCount: number - number of rows (from the top) that are loaded
+ * - columnName: index => name
+ * - initialColumnSize: index => number (pixels)
+ * - cellView: (column) => Component
+ * - onCellClick: (row, coll, data, event) => void
+ * - rowData: index => any.
+ *   If the result is an array, will load a core data view with [name, opts, params]; otherwise
+ *   it will just be passed to the cells directly.
+ */
 export default class Spreadsheet extends PureComponent {
     state = {
         columnSizes: [],

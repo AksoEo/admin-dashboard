@@ -5,13 +5,15 @@ import LargeMultiSelect from './large-multi-select';
 import { data as locale } from '../../locale';
 import './country-picker.less';
 
-/// Renders a country picker.
-///
-/// # Props
-/// - value/onChange: array of strings
-/// - hideGroups: if false, will hide country groups
-/// - shouldHideItem: (id) => bool will hide individual items
-/// - hidden: if true, will disable tab focusing
+/*8
+ * Renders a country picker.
+ *
+ * # Props
+ * - value/onChange: array of strings
+ * - hideGroups: if false, will hide country groups
+ * - shouldHideItem: (id) => bool will hide individual items
+ * - hidden: if true, will disable tab focusing
+ */
 export default function CountryPicker (props) {
     return (
         <WithCountries>

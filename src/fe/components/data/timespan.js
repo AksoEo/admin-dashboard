@@ -3,7 +3,7 @@ import { PureComponent, createRef } from 'preact/compat';
 import { Spring, globalAnimator } from 'yamdl';
 import { data as locale } from '../../locale';
 
-/// Renders a duration.
+/** Renders a duration. */
 function TimespanRenderer ({ value }) {
     if (typeof value !== 'number') return null;
 
@@ -214,7 +214,7 @@ export function IsoDuration ({ value }) {
     return out.join(', ');
 }
 
-/// value: ISO8601 duration (Y M D)
+/** value: ISO8601 duration (Y M D) */
 export function IsoDurationEditor ({ value, onChange }) {
     let years = 0;
     let months = 0;

@@ -22,21 +22,25 @@ function formatTime (n) {
     return pad2(hours(n)) + locale.timeSeparator + pad2(minutes(n));
 }
 
-/// Renders time. Does not display seconds.
-///
-/// # Props
-/// - value: number of seconds
+/**
+ * Renders time. Does not display seconds.
+ *
+ * # Props
+ * - value: number of seconds
+ */
 function TimeRenderer ({ value }) {
     if (!Number.isFinite(value)) return null;
     return formatTime(value);
 }
 
-/// Edits time (hh:mm). Does not edit seconds.
-///
-/// # Props
-/// - value/onChange: number of seconds
-/// - useFmtValue: if true, will use strings like `12:45` instead of number of seconds
-/// - nullable: if true, will return null for empty input
+/**
+ * Edits time (hh:mm). Does not edit seconds.
+ *
+ * # Props
+ * - value/onChange: number of seconds
+ * - useFmtValue: if true, will use strings like `12:45` instead of number of seconds
+ * - nullable: if true, will return null for empty input
+ */
 class TimeEditor extends PureComponent {
     state = {
         editingValue: '',

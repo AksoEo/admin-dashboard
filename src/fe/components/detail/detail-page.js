@@ -4,7 +4,7 @@ import Meta from '../../features/meta';
 import permsContext from '../../perms';
 import { coreContext } from '../../core/connection';
 
-/// An abstract page type to be subclassed for use in detail views.
+/** An abstract page type to be subclassed for use in detail views. */
 export default class DetailPage extends Page {
     static contextType = coreContext;
 

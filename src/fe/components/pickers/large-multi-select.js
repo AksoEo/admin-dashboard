@@ -11,21 +11,23 @@ import './large-multi-select.less';
 
 const LI_HEIGHT = 48;
 
-/// Renders a large multi-select, featuring: a single-line preview of the items, and a big picker
-/// dialog box.
-///
-/// # Props
-/// - value/onChange: array of strings
-/// - renderItemContents: ({ id, selected }) => Node, renders item contents
-/// - renderItem: ({id, selected, onClick}) => Node,
-///               component to render an item. Prefer renderItemContents
-/// - renderPreviewItem: ({ id }) => Node, optional fn to render a special preview version of an
-///                      item. required when using renderItem
-/// - itemName: (id) => string, maps items to names (for searching)
-/// - items: array of available item ids
-/// - title: will be shown as dialog title and placeholder
-/// - placeholder: optional placeholder override
-/// - disabled: bool
+/**
+ * Renders a large multi-select, featuring: a single-line preview of the items, and a big picker
+ * dialog box.
+ *
+ * # Props
+ * - value/onChange: array of strings
+ * - renderItemContents: ({ id, selected }) => Node, renders item contents
+ * - renderItem: ({id, selected, onClick}) => Node,
+ *               component to render an item. Prefer renderItemContents
+ * - renderPreviewItem: ({ id }) => Node, optional fn to render a special preview version of an
+ *                      item. required when using renderItem
+ * - itemName: (id) => string, maps items to names (for searching)
+ * - items: array of available item ids
+ * - title: will be shown as dialog title and placeholder
+ * - placeholder: optional placeholder override
+ * - disabled: bool
+ */
 export default class LargeMultiSelect extends PureComponent {
     state = {
         dialogOpen: false,

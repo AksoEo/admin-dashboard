@@ -4,7 +4,7 @@ import './card-stack.less';
 const CONTEXT_KEY = 'akso-card-stack-provider';
 export const FULL_SCREEN_LAYOUT_MAX_WIDTH = 1100;
 
-/// Interface between CardStackRenderers and CardStackItems that provides the card stack context.
+/** Interface between CardStackRenderers and CardStackItems that provides the card stack context. */
 export class CardStackProvider extends Component {
     getChildContext () {
         return {
@@ -62,7 +62,7 @@ export class CardStackProvider extends Component {
 // FIXME: sometimes this causes infinite loops because all stack items are rendered simultaneously
 // even though they’re nested, and because every stack item will run register(..) and update the
 // renderer, this will cause all stack items to be re-rendered and may cause an infinite loop
-/// A card stack renderer.
+/** A card stack renderer. */
 export class CardStackRenderer extends Component {
     state = {
         stack: [],
@@ -168,15 +168,17 @@ export class CardStackRenderer extends Component {
     }
 }
 
-/// A card stack item.
-///
-/// # Props
-/// - `children`: children that will be proxied
-/// - `depth`: stack depth
-/// - `open`: open state
-/// - `onClose`: onClose handler
-/// - `scrollViewRef`: refs the card stack item’s scroll view
-/// - `appBar`: special slot for an app bar proxy to handle closing correctly
+/**
+ * A card stack item.
+ *
+ * # Props
+ * - `children`: children that will be proxied
+ * - `depth`: stack depth
+ * - `open`: open state
+ * - `onClose`: onClose handler
+ * - `scrollViewRef`: refs the card stack item’s scroll view
+ * - `appBar`: special slot for an app bar proxy to handle closing correctly
+ */
 export class CardStackItem extends Component {
     id = Math.random().toString();
 

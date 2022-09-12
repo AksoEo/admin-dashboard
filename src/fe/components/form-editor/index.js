@@ -14,12 +14,14 @@ import { formEditor as locale } from '../../locale';
 import './index.less';
 
 export class ScriptContextProvider extends PureComponent {
-    /// Opens the AKSO Script Editor in full screen.
-    ///
-    /// - defs: akso script definitions object
-    /// - options:
-    ///     - previousNodes: array of { defs, formVars } to be able to use variables from other
-    ///       scripts and such
+    /**
+     * Opens the AKSO Script Editor in full screen.
+     *
+     * - defs: akso script definitions object
+     * - options:
+     *     - previousNodes: array of { defs, formVars } to be able to use variables from other
+     *       scripts and such
+     */
     openScriptEditor = (defs, options = {}) => new Promise(resolve => {
         const editor = new AKSOScriptEditor();
 
@@ -44,7 +46,7 @@ export class ScriptContextProvider extends PureComponent {
         this.attachScriptEditor(editor);
     });
 
-    /// Opens the AKSO Script Editor for editing only a single expression.
+    /** Opens the AKSO Script Editor for editing only a single expression. */
     openScriptExprEditor = (expr, options) => new Promise(resolve => {
         const editor = new AKSOScriptEditor();
 
@@ -118,29 +120,31 @@ export class ScriptContextProvider extends PureComponent {
 // TODO: add Reset button to reset to default values etc
 // TODO: add Validate Form button
 
-/// The Form Editor is the component used to edit e.g. registration forms.
-/// It allows editing both the form data (i.e. like a user would) and editing the form itself.
-///
-/// The implementation will generally assume that form data and the form itself will not be edited
-/// simultaneously, so there may be weird states caused by entering form data and then editing the
-/// form.
-///
-/// If editingFormData is set to true, this will also interact with FormContext to validate the form
-/// before submission.
-///
-/// # Props
-/// - isEditingContext: bool - whether to show internal details
-/// - editing: bool
-/// - value: { allowUse, allowGuests, ..., form } object (see API docs)
-/// - onChange: (value) => void callback
-/// - formData/onFormDataChange: optional form data
-/// - editingFormData: set to false to disable
-/// - skipSettings: TEMPORARY for not rendering settings
-/// - skipNonInputs: will not render modules that aren't inputs
-/// - disableValidation: bool
+/**
+ * The Form Editor is the component used to edit e.g. registration forms.
+ * It allows editing both the form data (i.e. like a user would) and editing the form itself.
+ *
+ * The implementation will generally assume that form data and the form itself will not be edited
+ * simultaneously, so there may be weird states caused by entering form data and then editing the
+ * form.
+ *
+ * If editingFormData is set to true, this will also interact with FormContext to validate the form
+ * before submission.
+ *
+ * # Props
+ * - isEditingContext: bool - whether to show internal details
+ * - editing: bool
+ * - value: { allowUse, allowGuests, ..., form } object (see API docs)
+ * - onChange: (value) => void callback
+ * - formData/onFormDataChange: optional form data
+ * - editingFormData: set to false to disable
+ * - skipSettings: TEMPORARY for not rendering settings
+ * - skipNonInputs: will not render modules that aren't inputs
+ * - disableValidation: bool
+ */
 export default class FormEditor extends PureComponent {
     state = {
-        /// Form input name -> form input value
+        /** Form input name -> form input value */
         formData: {},
     };
 
@@ -184,7 +188,7 @@ export default class FormEditor extends PureComponent {
 
 class FormEditorItems extends PureComponent {
     state = {
-        /// Item key that is currently being edited
+        /** Item key that is currently being edited */
         editingItem: null,
     };
 
@@ -209,9 +213,11 @@ class FormEditorItems extends PureComponent {
     };
 
     #itemKeys = [];
-    /// >> which item is at which index?
-    /// we keep track of items using random ids so when rearranging we can assign the correct
-    /// key again
+    /**
+     * >> which item is at which index?
+     * we keep track of items using random ids so when rearranging we can assign the correct
+     * key again
+     */
     getItemKey (index) {
         if (!this.#itemKeys[index]) this.#itemKeys[index] = Math.random().toString(36);
         return this.#itemKeys[index];

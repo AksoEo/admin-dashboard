@@ -5,20 +5,22 @@ import EventProxy from '../utils/event-proxy';
 
 export const layoutContext = createContext();
 
-/// Animates changes in height to fit children.
-///
-/// # Caveats
-/// Assumes all children will be laid out vertically without overlapping.
-/// Does not support children with margins.
-/// Does not always detect children resizing (especially 2nd-order children). Use the layoutContext
-/// to signal changes if necessary.
-///
-/// # Props
-/// - useCooldown: bool
-///    - lastChangeTime: number
-///    - cooldown: cooldown time
-/// - useFirstHeight: bool
-/// - lazy: bool - if true, will not add a `height` style if no animation is happening
+/**
+ * Animates changes in height to fit children.
+ *
+ * # Caveats
+ * Assumes all children will be laid out vertically without overlapping.
+ * Does not support children with margins.
+ * Does not always detect children resizing (especially 2nd-order children). Use the layoutContext
+ * to signal changes if necessary.
+ *
+ * # Props
+ * - useCooldown: bool
+ *    - lastChangeTime: number
+ *    - cooldown: cooldown time
+ * - useFirstHeight: bool
+ * - lazy: bool - if true, will not add a `height` style if no animation is happening
+ */
 export default class DynamicHeightDiv extends PureComponent {
     static contextType = layoutContext;
 

@@ -3,16 +3,18 @@ import CheckIcon from '@material-ui/icons/Check';
 import { Menu, globalAnimator } from 'yamdl';
 import './select.less';
 
-/// A <select>.
-///
-/// # Props
-/// - `value`: currently selected value
-/// - `onChange`: (value) => void
-/// - `items`: select items { value, label, shortLabel?, disabled? }
-/// - `outline`: pass true for outline style
-/// - `multi`: pass true for multi-select. Value must be an array
-/// - `rendered`: pass true for rendered select (i.e. not the native element)
-/// - `emptyLabel`: label to use in multi-select mode when empty
+/**
+ * A <select>.
+ *
+ * # Props
+ * - `value`: currently selected value
+ * - `onChange`: (value) => void
+ * - `items`: select items { value, label, shortLabel?, disabled? }
+ * - `outline`: pass true for outline style
+ * - `multi`: pass true for multi-select. Value must be an array
+ * - `rendered`: pass true for rendered select (i.e. not the native element)
+ * - `emptyLabel`: label to use in multi-select mode when empty
+ */
 export default class Select extends Component {
     state = {
         focused: false,

@@ -17,12 +17,14 @@ export class MetaProvider extends PureComponent {
     }
 }
 
-/// Provides page metadata to the navigation controller.
-///
-/// # Props
-/// - title: title string
-/// - actions: list of app bar actions.
-///            will only update if length changes or if item keys change.
+/**
+ * Provides page metadata to the navigation controller.
+ *
+ * # Props
+ * - title: title string
+ * - actions: list of app bar actions.
+ *            will only update if length changes or if item keys change.
+ */
 export default class Meta extends PureComponent {
     static contextType = metaContext;
 

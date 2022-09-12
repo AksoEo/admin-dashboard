@@ -1,34 +1,37 @@
-/// Global permissions config
+//! Global permissions config
+
 const baseOrgs = {'uea': 'UEA', 'tejo': 'TEJO'};
 
-/// Specification for the permissions editor.
-///
-/// Each node is an object with a type:
-///
-/// - type `perm`: shows a simple permission checkbox. Has a `name` (string)
-///   and `id` (permission string).
-/// - type `perm.country` shows a country picker. Has a `name` (string)
-//    and `id` (permission string prefix). The final permissions will look like `id`.<country code>.
-//    `id` should not end in a wildcard!
-/// - type `category`: a category of permissions. has a `name` (string)
-/// - type `group`: identical to category except in presentation
-///   and `children` (list of nodes)
-/// - type `switch`: a switch, mainly for read/write/create/delete permission escalation.
-///   Has a `name` (string) and `options`, which are objects with a `name` and `id`.
-///
-/// Every node may additionally have a field `implies` that contains a list of permissions that will
-/// also be activated by this node (requirements, sort of), and `requires`, which will disable the
-/// node until all requirements are met.
-///
-/// The `impliesFields` field works like `implies`, except it implies member fields for member
-/// restrictions (if enabled).
-///
-/// There are also three special nodes:
-/// - `{ type: '!memberRestrictionsSwitch', name: string }` which will show a switch to enable or
-///   disable member restrictions
-/// - `'!memberFieldsEditor'` and `'!memberFilterEditor'`, which will show their namesake
-///
-/// The `id` of a node must be unique across the entire spec.
+/**
+ * Specification for the permissions editor.
+ *
+ * Each node is an object with a type:
+ *
+ * - type `perm`: shows a simple permission checkbox. Has a `name` (string)
+ *   and `id` (permission string).
+ * - type `perm.country` shows a country picker. Has a `name` (string)
+ *   and `id` (permission string prefix). The final permissions will look like `id`.<country code>.
+ *   `id` should not end in a wildcard!
+ * - type `category`: a category of permissions. has a `name` (string)
+ * - type `group`: identical to category except in presentation
+ *   and `children` (list of nodes)
+ * - type `switch`: a switch, mainly for read/write/create/delete permission escalation.
+ *   Has a `name` (string) and `options`, which are objects with a `name` and `id`.
+ *
+ * Every node may additionally have a field `implies` that contains a list of permissions that will
+ * also be activated by this node (requirements, sort of), and `requires`, which will disable the
+ * node until all requirements are met.
+ *
+ * The `impliesFields` field works like `implies`, except it implies member fields for member
+ * restrictions (if enabled).
+ *
+ * There are also three special nodes:
+ * - `{ type: '!memberRestrictionsSwitch', name: string }` which will show a switch to enable or
+ *   disable member restrictions
+ * - `'!memberFieldsEditor'` and `'!memberFilterEditor'`, which will show their namesake
+ *
+ * The `id` of a node must be unique across the entire spec.
+ */
 export const spec = [
     {
         type: 'perm',
@@ -1177,7 +1180,7 @@ export const memberFieldsAll = 'Ĉiuj kampoj';
 export const memberFieldsRead = 'Vidi';
 export const memberFieldsWrite = 'Redakti';
 
-/// List of member fields. Some member fields may correspond to multiple API fields.
+/** List of member fields. Some member fields may correspond to multiple API fields. */
 export const memberFields = {
     birthdate: { name: 'Naskiĝtago', fields: ['birthdate'] },
     code: { name: 'Kodo', fields: ['newCode', 'oldCode'] },
@@ -1235,8 +1238,10 @@ export const memberFields = {
     roles: { name: 'Roloj', fields: ['roles'] },
 };
 
-/// Builds a map from permission id to node.
-/// Also sifts down requirements.
+/**
+ * Builds a map from permission id to node.
+ * Also sifts down requirements.
+ */
 function buildReverseMap (spec, mapping, path = [], reqs = []) {
     if (spec.type === 'category' || spec.type === 'group') {
         reqs = reqs.concat(spec.requires || []);

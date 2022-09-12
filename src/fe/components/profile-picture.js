@@ -10,15 +10,17 @@ const DECARDINALIFY = id => [
     `${id} vershajne parolas Esperanton (auh estas organizo)`,
 ][(id | 0) % 4];
 
-/// Renders a member’s profile picture.
-///
-/// # Props
-/// - `id`: member ID
-/// - `self`: set to true to indicate that id is self
-/// - `profilePictureHash`: if given, will load the profile picture; will show an identicon
-///   otherwise
-/// - `profilePictureURL`: optional override function that maps a codeholder id to the appropriate
-///   path
+/**
+ * Renders a member’s profile picture.
+ *
+ * # Props
+ * - `id`: member ID
+ * - `self`: set to true to indicate that id is self
+ * - `profilePictureHash`: if given, will load the profile picture; will show an identicon
+ *   otherwise
+ * - `profilePictureURL`: optional override function that maps a codeholder id to the appropriate
+ *   path
+ */
 export default class ProfilePicture extends Component {
     state = {
         srcSet: '',

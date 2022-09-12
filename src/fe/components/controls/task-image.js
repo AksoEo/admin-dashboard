@@ -10,18 +10,20 @@ import './task-image.less';
 
 // TODO: add a crop dialog or something
 
-/// Renders an image.
-///
-/// # Props
-/// - `sizes`: available image sizes (sorted ascending!)
-/// - `task`: the task that fetches the image. Should return a blob and take a `size` parameter.
-/// - `options`: task options
-/// - `editing`: bool - editing state
-/// - `hash`: if not none, will re-fetch when this changes
-/// - `onUpdate`: (Blob, core) => Promise<void, any>
-/// - `contain`: bool - if true, image will use object-fit: contain instead of cover
-/// - `lightbox`: bool - if true, will allow tapping to open a lightbox
-/// - `placeholder`: VNode - placeholder to show if there is no image
+/**
+ * Renders an image.
+ *
+ * # Props
+ * - `sizes`: available image sizes (sorted ascending!)
+ * - `task`: the task that fetches the image. Should return a blob and take a `size` parameter.
+ * - `options`: task options
+ * - `editing`: bool - editing state
+ * - `hash`: if not none, will re-fetch when this changes
+ * - `onUpdate`: (Blob, core) => Promise<void, any>
+ * - `contain`: bool - if true, image will use object-fit: contain instead of cover
+ * - `lightbox`: bool - if true, will allow tapping to open a lightbox
+ * - `placeholder`: VNode - placeholder to show if there is no image
+ */
 export default class TaskImage extends PureComponent {
     state = {
         loading: false,

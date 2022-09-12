@@ -73,7 +73,7 @@ export default connectPerms(class VoteTemplateDetailpage extends Page {
         if (this.#commitTask) this.#commitTask.drop();
     }
 
-    /// Mildly hacky function for getting the org so we can check for perms
+    /** Mildly hacky function for getting the org so we can check for perms */
     setOrg (org) {
         if (this.state.org !== org) this.setState({ org });
     }

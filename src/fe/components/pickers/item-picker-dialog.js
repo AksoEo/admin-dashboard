@@ -6,25 +6,27 @@ import StaticOverviewList from '../lists/overview-list-static';
 import { data as dataLocale } from '../../locale';
 import './item-picker-dialog.less';
 
-/// Picks items from a list
-///
-/// # Props
-/// - open/onClose
-/// - defaultWidth: default picker width, or 400
-/// - fullScreenWidth: screen width at which picker will go full screen, or 400
-/// - limit: max. selected items
-/// - value/onChange: id[] selected items
-/// - task: list task
-/// - view: item view
-/// - filter: JSON filter
-/// - fields: field spec object
-/// - locale: field names
-/// - search: { field: string, placeholder: string } optional, to enable search
-/// - sorting: optional object { [field]: string }
-/// - emptyLabel: shown when no items exist
-/// - noCloseButton: will not show a close button
-/// - extraListOptions: additional props that will be passed to OverviewList
-/// - ...extra: additional props for the dialog
+/**
+ * Picks items from a list
+ *
+ * # Props
+ * - open/onClose
+ * - defaultWidth: default picker width, or 400
+ * - fullScreenWidth: screen width at which picker will go full screen, or 400
+ * - limit: max. selected items
+ * - value/onChange: id[] selected items
+ * - task: list task
+ * - view: item view
+ * - filter: JSON filter
+ * - fields: field spec object
+ * - locale: field names
+ * - search: { field: string, placeholder: string } optional, to enable search
+ * - sorting: optional object { [field]: string }
+ * - emptyLabel: shown when no items exist
+ * - noCloseButton: will not show a close button
+ * - extraListOptions: additional props that will be passed to OverviewList
+ * - ...extra: additional props for the dialog
+ */
 export default function ItemPicker ({
     open,
     onClose,

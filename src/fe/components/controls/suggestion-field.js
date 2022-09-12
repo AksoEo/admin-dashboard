@@ -5,15 +5,17 @@ import { ValidatedTextField } from '../form';
 import fuzzaldrin from 'fuzzaldrin';
 import './suggestion-field.less';
 
-/// A text field with suggestions that behaves like a typical browser address bar.
-///
-/// # Props
-/// - `value`, `onChange`: as expected
-/// - `onSelect`: pass to handle/validate suggestions. Should return true if suggestion should be
-///   passed to onChange.
-/// - `suggestions`: array of strings or any object with `toString`
-/// - `alwaysHighlight`: set to true to always highlight an item
-/// - `skipFilter`: to skip fuzzaldrin filtering
+/**
+ * A text field with suggestions that behaves like a typical browser address bar.
+ *
+ * # Props
+ * - `value`, `onChange`: as expected
+ * - `onSelect`: pass to handle/validate suggestions. Should return true if suggestion should be
+ *   passed to onChange.
+ * - `suggestions`: array of strings or any object with `toString`
+ * - `alwaysHighlight`: set to true to always highlight an item
+ * - `skipFilter`: to skip fuzzaldrin filtering
+ */
 export default function SuggestionField ({
     value, onChange, onSelect, suggestions, alwaysHighlight, skipFilter, ...extraProps
 }) {

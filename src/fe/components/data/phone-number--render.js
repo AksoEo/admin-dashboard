@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { CountryFlag } from './country';
 import { parsePhoneNumber } from 'libphonenumber-js';
 
-/// Renderer that uses libphonenumber (this is a separate module to allow lazy-loading).
+/** Renderer that uses libphonenumber (this is a separate module to allow lazy-loading). */
 export default function PhoneNumber ({ value, allowInteractive }) {
     let number, trailing;
     try {

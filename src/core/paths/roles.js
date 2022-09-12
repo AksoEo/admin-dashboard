@@ -4,11 +4,11 @@ import * as log from '../log';
 import * as store from '../store';
 import { crudList, crudGet, crudCreate, crudUpdate, crudDelete } from '../templates';
 
-/// Data store path.
+/** Data store path. */
 export const ROLES = 'codeholder_roles';
 export const SIG_ROLES = '!roles';
 
-/// Loads all roles because there won’t be too many for that to be a problem
+/** Loads all roles because there won’t be too many for that to be a problem */
 async function loadAllRoles () {
     if (store.get([ROLES])) return;
 
@@ -76,7 +76,7 @@ export const tasks = {
 };
 
 export const views = {
-    /// roles/roles: a view of all roles
+    /** roles/roles: a view of all roles */
     roles: class Roles extends AbstractDataView {
         constructor () {
             super();

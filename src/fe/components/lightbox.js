@@ -3,18 +3,22 @@ import { PureComponent } from 'preact/compat';
 import { globalAnimator, Spring, ModalPortal } from 'yamdl';
 import './lightbox.less';
 
-/// An image lightbox.
-///
-/// # Props
-/// - open/onClose: bool
-/// - src: image source
+/**
+ * An image lightbox.
+ *
+ * # Props
+ * - open/onClose: bool
+ * - src: image source
+ */
 export default class Lightbox extends PureComponent {
     #openFromImage = null;
 
-    /// If this is set before open is set to true, then the given image element will be used to
-    /// animate the lightbox into view.
-    ///
-    /// - img: DOM Node
+    /**
+     * If this is set before open is set to true, then the given image element will be used to
+     * animate the lightbox into view.
+     *
+     * - img: DOM Node
+     */
     setOpenFromImage (img) {
         this.#openFromImage = img;
     }

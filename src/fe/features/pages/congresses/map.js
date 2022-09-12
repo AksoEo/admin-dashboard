@@ -6,10 +6,12 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './map.less';
 
-/// Renders a map.
-///
-/// # Props
-/// - markers: { key: string?, location: coords, icon: Node }[]
+/**
+ * Renders a map.
+ *
+ * # Props
+ * - markers: { key: string?, location: coords, icon: Node }[]
+ */
 export default function AMap ({
     markers,
     eventHandlers,

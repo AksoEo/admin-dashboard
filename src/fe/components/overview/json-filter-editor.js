@@ -62,21 +62,23 @@ CodeMirror.defineMode('akso-json-template', () => ({
     },
 }));
 
-/// JSON editor for advanced search filters.
-///
-/// # Props
-/// - value/onChange: object value
-/// - expanded: bool
-/// - onCollapse: callback
-/// - disabled: disabled state
-/// - suppressInitialRoundTrip: set to true to prevent onChange when initializing
-/// - enableTemplates: bool - true to enable templating variables
+/**
+ * JSON editor for advanced search filters.
+ *
+ * # Props
+ * - value/onChange: object value
+ * - expanded: bool
+ * - onCollapse: callback
+ * - disabled: disabled state
+ * - suppressInitialRoundTrip: set to true to prevent onChange when initializing
+ * - enableTemplates: bool - true to enable templating variables
+ */
 export default class JSONFilterEditor extends PureComponent {
     state = {
         helpOpen: false,
     };
 
-    /// Serializes the object value into a string value.
+    /** Serializes the object value into a string value. */
     loadStringValue () {
         const value = { ...this.props.value };
         delete value._disabled;

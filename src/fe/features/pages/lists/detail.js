@@ -158,8 +158,10 @@ function Header ({ item, editing, onItemChange }) {
 }
 
 class Filters extends Component {
-    /// These keys are used to identify filters while editing the list.
-    /// This is necessary to enable rearranging that doesn’t look confusing.
+    /**
+     * These keys are used to identify filters while editing the list.
+     * This is necessary to enable rearranging that doesn’t look confusing.
+     */
     editFilterKeys = [];
 
     render ({ item, editing, onItemChange }) {

@@ -12,16 +12,18 @@ import { congressLocations as locale } from '../../../../locale';
 import { FIELDS } from './locations/fields';
 import './location-picker.less';
 
-/// Location picker.
-///
-/// # Props
-/// - congress, instance: ids
-/// - externalOnly: will only show external locations if set
-/// - value/onChange: id
-/// - editing: editing state
-/// - disabled: will disable interaction
-/// - adding: if true, will show + instead of "nowhere v" if empty, and the value cannot
-///   be edited without removing it first.
+/**
+ * Location picker.
+ *
+ * # Props
+ * - congress, instance: ids
+ * - externalOnly: will only show external locations if set
+ * - value/onChange: id
+ * - editing: editing state
+ * - disabled: will disable interaction
+ * - adding: if true, will show + instead of "nowhere v" if empty, and the value cannot
+ *   be edited without removing it first.
+ */
 export default class LocationPicker extends PureComponent {
     state = {
         pickerOpen: false,

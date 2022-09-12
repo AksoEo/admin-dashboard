@@ -51,8 +51,10 @@ function AddTemplatingIcon (props) {
     );
 }
 
-/// Renders a FAB in the bottom right corner that appears if the user has focused a text input that
-/// supports notif templating, and lets them insert templating constructs.
+/**
+ * Renders a FAB in the bottom right corner that appears if the user has focused a text input that
+ * supports notif templating, and lets them insert templating constructs.
+ */
 export default class TemplatingPopup extends PureComponent {
     state = {
         visible: false,

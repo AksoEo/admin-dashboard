@@ -15,7 +15,7 @@ import * as log from './log';
 
 const GET_AUTH_TRIES = [LOGIN, 'getAuthTries'];
 
-/// runs GET /auth
+/** runs GET /auth */
 const getAuth = async () => {
     let tries = 1;
 
@@ -47,7 +47,7 @@ const getAuth = async () => {
     }
 };
 
-/// Initial GET /auth result
+/** Initial GET /auth result */
 export const initialAuth = getAuth();
 
 store.insert(AUTH_STATE, LoginAuthStates.UNKNOWN);

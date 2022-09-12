@@ -5,11 +5,13 @@ import DisplayError from '../utils/error';
 import FormContext from './context';
 import './validated-text-field.less';
 
-/// A validated text field is a text field that integrates with the <Form> component.
-/// It inherits all props from TextField.
-///
-/// # Additional Props
-/// - validate: (value) => any error | null
+/**
+ * A validated text field is a text field that integrates with the <Form> component.
+ * It inherits all props from TextField.
+ *
+ * # Additional Props
+ * - validate: (value) => any error | null
+ */
 export default class ValidatedTextField extends PureComponent {
     state = {
         error: null,

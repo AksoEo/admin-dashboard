@@ -6,11 +6,13 @@ import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../compon
 import { congressInstances as locale } from '../../../../locale';
 import { FIELDS } from './fields';
 
-/// Shows an overview over instances
-///
-/// # Props
-/// - congress: congress id
-/// - query/onQueryChange: query
+/**
+ * Shows an overview over instances
+ *
+ * # Props
+ * - congress: congress id
+ * - query/onQueryChange: query
+ */
 export default class InstancesView extends PureComponent {
     state = {
         parameters: {

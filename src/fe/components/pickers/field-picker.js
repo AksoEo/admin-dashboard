@@ -9,18 +9,20 @@ import DynamicHeightDiv from '../layout/dynamic-height-div';
 import { search as locale } from '../../locale';
 import './field-picker.less';
 
-/// Width below which the field picker will be a full-screen modal.
+/** Width below which the field picker will be a full-screen modal. */
 const FULLSCREEN_WIDTH = 600;
 
-/// Displays a modal for picking, ordering, and setting sorting for a list of fields.
-///
-/// # Props
-/// - available: string[] of available fields
-/// - sortables: string[] of sortable fields
-/// - selected: { id, sorting }[] of selected fields
-/// - onAddField, onRemoveField, onSetFieldSorting, onMoveField OR onChange: callbacks
-/// - open/onClose: open state
-/// - locale: locale object
+/**
+ * Displays a modal for picking, ordering, and setting sorting for a list of fields.
+ *
+ * # Props
+ * - available: string[] of available fields
+ * - sortables: string[] of sortable fields
+ * - selected: { id, sorting }[] of selected fields
+ * - onAddField, onRemoveField, onSetFieldSorting, onMoveField OR onChange: callbacks
+ * - open/onClose: open state
+ * - locale: locale object
+ */
 export default class FieldPicker extends PureComponent {
     state = {
         search: '',
@@ -179,11 +181,13 @@ export default class FieldPicker extends PureComponent {
     }
 }
 
-/// Lets the user click through sorting types for a field.
-///
-/// # Props
-/// - value/onChange: Sorting value
-/// - hideLabel: if true, will hide the label explaining the current state
+/**
+ * Lets the user click through sorting types for a field.
+ *
+ * # Props
+ * - value/onChange: Sorting value
+ * - hideLabel: if true, will hide the label explaining the current state
+ */
 export class SortingControl extends PureComponent {
     onClick = () => {
         if (this.props.value === 'none') this.props.onChange('asc');

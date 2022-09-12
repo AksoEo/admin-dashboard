@@ -3,13 +3,15 @@ import { PureComponent } from 'preact/compat';
 import { Button, CircularProgress } from 'yamdl';
 import './task-button.less';
 
-/// A task button is a button that can show an loading animation.
-///
-/// # Props
-/// - run: () => Promise<void>
-/// - innerRef: inner button ref
-/// - children: button label
-/// - any other prop will be forwarded to Button
+/**
+ * A task button is a button that can show an loading animation.
+ *
+ * # Props
+ * - run: () => Promise<void>
+ * - innerRef: inner button ref
+ * - children: button label
+ * - any other prop will be forwarded to Button
+ */
 export default class TaskButton extends PureComponent {
     state = {
         loading: false,

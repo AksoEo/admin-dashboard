@@ -14,35 +14,37 @@ import { coreContext } from '../../core/connection';
 import JSONFilterEditor from './json-filter-editor';
 import './search-filters.less';
 
-/// This component encapsulates search and filters and serves to abstract dealing with field search,
-/// json filters, regular filters, saved filters, etc. for the core APIs.
-///
-/// # Props
-/// - value/onChange: core parameters (see e.g. docs for codeholders/list for details)
-///   additional fields:
-///   _savedFilter: null or object { id, name, description } if loaded
-/// - searchFields: string[] or null
-/// - filters: object mapping all available filter ids to their editor spec. An editor spec
-///   contains:
-///   - `default() -> Filter` where `typedef Filter { enabled: bool, value: any, ...other }`
-///   - `serialize(Filter) -> string` to serialize the filter for the URL;
-///     with invariant `enabled == true`
-///   - `deserialize(string) -> Filter` to deserialize the filter from the URL
-///   - `editor: Component { filter: Filter, onFilterChange }` editor component
-///     May return a fragment. First fragment item may be displayed inline.
-///     Additional convenience props: `value`, `onChange`, `enabled`, `onEnabledChange`
-///   - `applyConstraints(Filter, filters: Filter[]) -> Filter` applies constraints given the other
-///     filters. Optional.
-///   - `needsSwitch: bool` if true, the filter will have an on/off switch that controls its
-///     `enabled` property
-///
-///   Serialize and deserialize may be omitted for simple filter value types (i.e. primitives).
-/// - expanded/onExpandedChange: bool
-/// - locale: object with `{ searchFields, searchPlaceholders, filters }`
-/// - category: category id for saved filters
-/// - filtersToAPI: name of a task that will convert client filters to an api filter
-/// - compact: if true, forces compact view
-/// - userData: will be passed to filters
+/**
+ * This component encapsulates search and filters and serves to abstract dealing with field search,
+ * json filters, regular filters, saved filters, etc. for the core APIs.
+ *
+ * # Props
+ * - value/onChange: core parameters (see e.g. docs for codeholders/list for details)
+ *   additional fields:
+ *   _savedFilter: null or object { id, name, description } if loaded
+ * - searchFields: string[] or null
+ * - filters: object mapping all available filter ids to their editor spec. An editor spec
+ *   contains:
+ *   - `default() -> Filter` where `typedef Filter { enabled: bool, value: any, ...other }`
+ *   - `serialize(Filter) -> string` to serialize the filter for the URL;
+ *     with invariant `enabled == true`
+ *   - `deserialize(string) -> Filter` to deserialize the filter from the URL
+ *   - `editor: Component { filter: Filter, onFilterChange }` editor component
+ *     May return a fragment. First fragment item may be displayed inline.
+ *     Additional convenience props: `value`, `onChange`, `enabled`, `onEnabledChange`
+ *   - `applyConstraints(Filter, filters: Filter[]) -> Filter` applies constraints given the other
+ *     filters. Optional.
+ *   - `needsSwitch: bool` if true, the filter will have an on/off switch that controls its
+ *     `enabled` property
+ *
+ *   Serialize and deserialize may be omitted for simple filter value types (i.e. primitives).
+ * - expanded/onExpandedChange: bool
+ * - locale: object with `{ searchFields, searchPlaceholders, filters }`
+ * - category: category id for saved filters
+ * - filtersToAPI: name of a task that will convert client filters to an api filter
+ * - compact: if true, forces compact view
+ * - userData: will be passed to filters
+ */
 export default class SearchFilters extends PureComponent {
     ensureFiltersExist () {
         if (!this.props.filters || !Object.keys(this.props.filters).length) return;
@@ -214,7 +216,7 @@ function FiltersDisclosure ({ expanded, onExpandedChange }) {
     );
 }
 
-/// Renders the json/normal switch and saved filters stuff
+/** Renders the json/normal switch and saved filters stuff */
 const FiltersBar = connectPerms(function FiltersBar ({
     category,
     filtersToAPITask,

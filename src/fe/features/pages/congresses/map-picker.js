@@ -9,12 +9,14 @@ import { WithCountries } from '../../../components/data/country';
 import { osmAddressSearchEndpoint, data as locale } from '../../../locale';
 import './map-picker.less';
 
-/// Picks a location on a map.
-///
-/// - value/onChange: lat/lon tuple (number[2])
-/// - nullable: if true, will allow clearing
-/// - icon: optional marker icon
-/// - address/onAddressChange: this will not be displayed on the map, but is used for address search
+/**
+ * Picks a location on a map.
+ *
+ * - value/onChange: lat/lon tuple (number[2])
+ * - nullable: if true, will allow clearing
+ * - icon: optional marker icon
+ * - address/onAddressChange: this will not be displayed on the map, but is used for address search
+ */
 export default class MapPicker extends PureComponent {
     constructor (props) {
         super(props);

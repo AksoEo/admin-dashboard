@@ -5,16 +5,18 @@ import { Spring, globalAnimator } from 'yamdl';
 import ResizeObserver from 'resize-observer-polyfill';
 import './rearranging-list.less';
 
-/// Material list with drag controls.
-///
-/// # Props
-/// - children: array of elements
-/// - isItemDraggable: fn(index) -> bool
-/// - canMove: fn(toPos) -> bool
-/// - onMove: fn(fromPos, toPos)
-/// - spacing: vertical spacing between items
-/// - itemHeight: item height override. If not set, will use dynamic height. This prop is expected
-///   to be constant, and weird things may happen if it changes between dynamic/non-dynamic height.
+/**
+ * Material list with drag controls.
+ *
+ * # Props
+ * - children: array of elements
+ * - isItemDraggable: fn(index) -> bool
+ * - canMove: fn(toPos) -> bool
+ * - onMove: fn(fromPos, toPos)
+ * - spacing: vertical spacing between items
+ * - itemHeight: item height override. If not set, will use dynamic height. This prop is expected
+ *   to be constant, and weird things may happen if it changes between dynamic/non-dynamic height.
+ */
 export default class RearrangingList extends PureComponent {
     itemData = new Map();
     observer = new ResizeObserver(entries => {
@@ -125,8 +127,10 @@ export default class RearrangingList extends PureComponent {
         amount: 1,
     };
 
-    /// Returns the height of the item at the given index. Ignores drag state.
-    /// If the index is out of bounds, will approximate something that seems reasonable.
+    /**
+     * Returns the height of the item at the given index. Ignores drag state.
+     * If the index is out of bounds, will approximate something that seems reasonable.
+     */
     getItemHeight (index) {
         if (this.props.itemHeight) return this.props.itemHeight;
 
@@ -144,7 +148,7 @@ export default class RearrangingList extends PureComponent {
         return this.props.spacing || 0;
     }
 
-    /// Converts a (possibly float) index to a y offset. Ignores drag state.
+    /** Converts a (possibly float) index to a y offset. Ignores drag state. */
     indexToYOffset (index) {
         let offset = 0;
         for (let i = 0; i < index; i++) {
@@ -157,7 +161,7 @@ export default class RearrangingList extends PureComponent {
         return offset;
     }
 
-    /// Returns a (float) index for a y offset. Ignores drag state.
+    /** Returns a (float) index for a y offset. Ignores drag state. */
     indexFromYOffset (offset) {
         if (offset < 0) return 0;
         let o = 0, p = 0;

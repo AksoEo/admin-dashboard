@@ -7,19 +7,21 @@ export const TaskState = {
     ENDED: 'ended',
 };
 
-/// Represents a failable task, such as logging in or uploading a file.
-///
-/// Tasks are initialized with a set of immutable options. They also contain a set of mutable
-/// parameters for the user to modify, and can then be run (or canceled). When a task is run, it may
-/// either succeed or fail. If it fails, it goes back to being idle.
-///
-/// This object **must be dropped manually** because it subscribes to an object in another thread.
-///
-/// # Events
-/// - `success`: emitted on success with the result
-/// - `failure`: emitted on failure with the error
-/// - `result`: emitted when there is a result with the type ('success'/'failure') and the
-///   result/error
+/**
+ * Represents a failable task, such as logging in or uploading a file.
+ *
+ * Tasks are initialized with a set of immutable options. They also contain a set of mutable
+ * parameters for the user to modify, and can then be run (or canceled). When a task is run, it may
+ * either succeed or fail. If it fails, it goes back to being idle.
+ *
+ * This object **must be dropped manually** because it subscribes to an object in another thread.
+ *
+ * # Events
+ * - `success`: emitted on success with the result
+ * - `failure`: emitted on failure with the error
+ * - `result`: emitted when there is a result with the type ('success'/'failure') and the
+ *   result/error
+ */
 export default class Task extends EventEmitter {
     constructor (worker, type, options, parameters = {}) {
         super();
@@ -53,7 +55,7 @@ export default class Task extends EventEmitter {
         return this;
     }
 
-    /// Returns a promise with the result after running this task once.
+    /** Returns a promise with the result after running this task once. */
     runOnce () {
         return new Promise((resolve, reject) => {
             this.once('result', (type, res) => {

@@ -69,43 +69,45 @@ class DataLoader {
     }
 }
 
-/// A list with a map, for items that each have a location.
-///
-/// # Props
-/// - task: task name
-/// - options: task options
-/// - view: item view
-/// - viewOptions: view options
-/// - updateView: update view parameters
-/// - item: item component. Will be passed the following props: { id, item }
-/// - detail: if not none, will display an overlay over the list
-/// - itemToMarker: should either turn an item into a marker or return something falsy
-/// - searchFields: array of fields to use for searching
-/// - itemParent: (item_data) => id or null. Use to create sub-items. Only supports one level.
-/// - onItemClick: (id) => void
-/// - markers: additional markers
-/// - onCloseMap: if set, will show a close button on the map
-/// - listContainerRef
-/// - header
-///
-/// # Alternate Props
-/// For small lists which do not use tasks and views:
-///
-/// - items: object { [id]: {data} }
-/// - loading/error: for display only
+/**
+ * A list with a map, for items that each have a location.
+ *
+ * # Props
+ * - task: task name
+ * - options: task options
+ * - view: item view
+ * - viewOptions: view options
+ * - updateView: update view parameters
+ * - item: item component. Will be passed the following props: { id, item }
+ * - detail: if not none, will display an overlay over the list
+ * - itemToMarker: should either turn an item into a marker or return something falsy
+ * - searchFields: array of fields to use for searching
+ * - itemParent: (item_data) => id or null. Use to create sub-items. Only supports one level.
+ * - onItemClick: (id) => void
+ * - markers: additional markers
+ * - onCloseMap: if set, will show a close button on the map
+ * - listContainerRef
+ * - header
+ *
+ * # Alternate Props
+ * For small lists which do not use tasks and views:
+ *
+ * - items: object { [id]: {data} }
+ * - loading/error: for display only
+ */
 export default class MapList extends PureComponent {
     state = {
-        /// If not null, then this is an instanceof DataLoader, loading data.
+        /** If not null, then this is an instanceof DataLoader, loading data. */
         loading: null,
-        /// If not null, then an error has occurred while loading.
+        /** If not null, then an error has occurred while loading. */
         error: null,
-        /// List of loaded items, by id.
+        /** List of loaded items, by id. */
         items: [],
 
-        /// If not null, the id of a highlighted item.
+        /** If not null, the id of a highlighted item. */
         highlighted: null,
 
-        /// hacky way of coalescing force updates by incrementing this variable
+        /** hacky way of coalescing force updates by incrementing this variable */
         coalescedForceUpdate: 0,
 
         mapOpen: false,
@@ -151,7 +153,7 @@ export default class MapList extends PureComponent {
 
     #isFirstLoad = true;
 
-    /// update the map viewport to frame all markers, if this is the first load
+    /** update the map viewport to frame all markers, if this is the first load */
     frameMarkers = () => {
         if (!this.#map) return;
         let markers;

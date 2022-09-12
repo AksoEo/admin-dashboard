@@ -2,11 +2,13 @@ import { h } from 'preact';
 import { detail as locale } from '../../locale';
 import './changed-fields.less';
 
-/// Renders a list of changed fields for use in update task dialogs.
-///
-/// # Props
-/// - changedFields: list of changed fields
-/// - locale: localized field names
+/**
+ * Renders a list of changed fields for use in update task dialogs.
+ *
+ * # Props
+ * - changedFields: list of changed fields
+ * - locale: localized field names
+ */
 export default function ChangedFields ({ changedFields, locale: localizedFields }) {
     if (!changedFields) return;
     return (

@@ -13,12 +13,14 @@ import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import './index.less';
 
-/// Shows an overview over programs, with a map
-///
-/// # Props
-/// - congress: congress id
-/// - instance: instance id
-/// - push: proxy for navigation API
+/**
+ * Shows an overview over programs, with a map
+ *
+ * # Props
+ * - congress: congress id
+ * - instance: instance id
+ * - push: proxy for navigation API
+ */
 export default class ProgramsView extends PureComponent {
     state = {
         parameters: {

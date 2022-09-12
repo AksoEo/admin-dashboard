@@ -58,7 +58,7 @@ const progClientFilters = {
     },
 };
 
-/// Reads a congress participant's dataId into a string.
+/** Reads a congress participant's dataId into a string. */
 function pReadId (idBuffer) {
     return Buffer.from(idBuffer).toString('hex');
 }

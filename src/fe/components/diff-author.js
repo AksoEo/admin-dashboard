@@ -4,11 +4,13 @@ import { IdUEACode } from './data/uea-code';
 import { connect } from '../core/connection';
 import './diff-author.less';
 
-/// Renders a diff author, like `ch:1234` or `app:0123456abcdef`, with their proper name.
-///
-/// # Props
-/// - author: author string
-/// - interactive: bool
+/**
+ * Renders a diff author, like `ch:1234` or `app:0123456abcdef`, with their proper name.
+ *
+ * # Props
+ * - author: author string
+ * - interactive: bool
+ */
 export default function DiffAuthor ({ author, interactive }) {
     if (typeof author !== 'string') return null;
     if (author.startsWith('ch:')) {

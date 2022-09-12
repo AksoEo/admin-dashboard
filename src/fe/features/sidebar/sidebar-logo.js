@@ -17,8 +17,10 @@ function loadParticles () {
     }
 }
 
-/// # Props
-/// - onClick
+/**
+ * # Props
+ * - onClick
+ */
 export default class SidebarLogo extends PureComponent {
     static contextType = routerContext;
 

@@ -20,7 +20,7 @@ const FLAGS = [
     'manualApproval',
 ];
 
-/// Renders a control with general form settings (TODO: generalize; this is for congresses!).
+/** Renders a control with general form settings (TODO: generalize; this is for congresses!). */
 export default class FormEditorSettings extends PureComponent {
     state = { expanded: false };
 

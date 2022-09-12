@@ -1,11 +1,13 @@
 import { createStoreObserver } from '../view';
 import { TASKS } from '../store';
 
-/// Turns a path lazy by making it a function that returns a promise with the actual object when
-/// called.
-///
-/// - f: the () => import(...) closure
-/// - map: maps on the result of f
+/**
+ * Turns a path lazy by making it a function that returns a promise with the actual object when
+ * called.
+ *
+ * @param f - the () => import(...) closure
+ * @param map - maps on the result of f
+ */
 const lazyPath = (f, map) => {
     let promise;
     function lazy () {
@@ -48,10 +50,10 @@ const tasks_ = () => import(/* webpackChunkName: 'core-tasks' */ './tasks');
 const votes = () => import(/* webpackChunkName: 'core-votes' */ './votes');
 const debug = () => import(/* webpackChunkName: 'core-debug' */ './debug');
 
-/// Task definitions.
+/** Task definitions. */
 export const tasks = {
     // generic tasks for generic dialogs, which will be dropped as soon as they’re run
-    /// info: takes title and message options (strings probably)
+    /** info: takes title and message options (strings probably) */
     info: async () => {},
     openExternalLink: async () => {},
 
@@ -81,7 +83,7 @@ export const tasks = {
     debug: lazyPath(debug, mapTasks),
 };
 
-/// View definitions.
+/** View definitions. */
 export const views = {
     clients: lazyPath(clients, mapViews),
     codeholders: lazyPath(codeholders, mapViews),
@@ -107,7 +109,7 @@ export const views = {
     votes: lazyPath(votes, mapViews),
     debug: lazyPath(debug, mapViews),
 
-    /// #tasks: a map of all current tasks to their paths; used for task views in the FE
+    /** #tasks: a map of all current tasks to their paths; used for task views in the FE */
     [TASKS]: createStoreObserver([TASKS], tasks => {
         const data = {};
         for (const id in tasks) {

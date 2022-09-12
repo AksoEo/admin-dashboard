@@ -7,18 +7,20 @@ const lerp = (a, b, x) => (b - a) * x + a;
 
 const VLIST_CHUNK_SIZE = 100;
 
-/// Renders multiple columns with fixed order, with items able to be animated in between.
-///
-/// # Props (required)
-/// - pick one:
-///     - `children`: array of items: `{ key: (identifier), column: (index), node: (vnode) }`
-///     - `onGetChunk`: async (column, offset, limit) =>
-///       { items: [{ key, column, id }], total: number }
-///        - `renderItem`: id => vnode
-///        - `columnAge`: (optional) array of numbers, pass to invalidate entire columns by changing
-///          their age
-/// - `columns`: number of columns
-/// - `itemHeight`: height of a single item
+/**
+ * Renders multiple columns with fixed order, with items able to be animated in between.
+ *
+ * # Props (required)
+ * - pick one:
+ *     - `children`: array of items: `{ key: (identifier), column: (index), node: (vnode) }`
+ *     - `onGetChunk`: async (column, offset, limit) =>
+ *       { items: [{ key, column, id }], total: number }
+ *        - `renderItem`: id => vnode
+ *        - `columnAge`: (optional) array of numbers, pass to invalidate entire columns by changing
+ *          their age
+ * - `columns`: number of columns
+ * - `itemHeight`: height of a single item
+ */
 export default class MulticolList extends PureComponent {
     itemData = new Map();
     columnRefs = [];

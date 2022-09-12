@@ -6,24 +6,26 @@ import { deepEq } from '../../../util';
 import TinyProgress from '../controls/tiny-progress';
 import './detail-fields.less';
 
-/// Renders a detail view's fields in a table.
-///
-/// # Props
-/// - data: loaded data
-/// - editing: editing state
-/// - edit/onEditChange: editing copy. Is not necessarily synchronized with `editing`
-/// - fields: object { [client field id]: field spec }, with field spec being an object:
-///    - component: field editor component { value, onChange, editing, item }
-///    - isEmpty: (optional) (field value, item) => bool
-///    - virtual: (optional) list of actual fields this virtual field corresponds to
-/// - header: like a field editor component, but without value, and with onItemChange
-/// - footer: like header
-/// - locale: object { fields: { field names... } }
-/// - makeHistoryLink: if set, should be a callback that returns the url for the given field’s
-///   history
-/// - compact: force compact
-/// - userData: arbitrary user data passed to fields
-/// - wideExtra: bool, if true will make extra space wider
+/**
+ * Renders a detail view's fields in a table.
+ *
+ * # Props
+ * - data: loaded data
+ * - editing: editing state
+ * - edit/onEditChange: editing copy. Is not necessarily synchronized with `editing`
+ * - fields: object { [client field id]: field spec }, with field spec being an object:
+ *    - component: field editor component { value, onChange, editing, item }
+ *    - isEmpty: (optional) (field value, item) => bool
+ *    - virtual: (optional) list of actual fields this virtual field corresponds to
+ * - header: like a field editor component, but without value, and with onItemChange
+ * - footer: like header
+ * - locale: object { fields: { field names... } }
+ * - makeHistoryLink: if set, should be a callback that returns the url for the given field’s
+ *   history
+ * - compact: force compact
+ * - userData: arbitrary user data passed to fields
+ * - wideExtra: bool, if true will make extra space wider
+ */
 export default function DetailFields ({
     data,
     editing,

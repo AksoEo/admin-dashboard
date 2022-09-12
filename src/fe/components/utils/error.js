@@ -2,7 +2,7 @@ import { h } from 'preact';
 import './error.less';
 import { errors as locale } from '../../locale';
 
-/// Renders an error.
+/** Renders an error. */
 export default function DisplayError ({ error, class: className, ...extra }) {
     if (error.code === 'invalid-search-query') {
         return (

@@ -16,12 +16,14 @@ const State = {
     isIdle: state => state !== State.RUNNING,
 };
 
-/// # Props
-/// - open: bool
-/// - pxTask: string
-/// - mrTask: string
-/// - task: object
-/// - core: object
+/**
+ * # Props
+ * - open: bool
+ * - pxTask: string
+ * - mrTask: string
+ * - task: object
+ * - core: object
+ */
 export default class SaveTask extends Component {
     state = {
         px: null,

@@ -15,13 +15,15 @@ const METHOD_FIELD_IDS = [{ id: 'type' }, { id: 'name' }, { id: 'internalDescrip
 const REDUCED_METHOD_FIELDS = Object.fromEntries(METHOD_FIELD_IDS
     .map(({ id }) => [id, METHOD_FIELDS[id]]));
 
-/// Picker for payment methods.
-///
-/// # Props
-/// - value/onChange
-/// - org/onOrgChange
-/// - onGetCurrencies
-/// - jsonFilter
+/**
+ * Picker for payment methods.
+ *
+ * # Props
+ * - value/onChange
+ * - org/onOrgChange
+ * - onGetCurrencies
+ * - jsonFilter
+ */
 export default class PaymentMethodPicker extends PureComponent {
     state = {
         pickerOpen: false,

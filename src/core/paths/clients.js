@@ -11,7 +11,7 @@ export const CLIENT_PERMS = 'clientPerms';
 export const SIG_CLIENTS = '!clients';
 
 export const tasks = {
-    /// clients/list: lists clients
+    /** clients/list: lists clients */
     list: async (_, { search, offset, limit, fields, jsonFilter }) => {
         const client = await asyncClient;
 
@@ -64,7 +64,7 @@ export const tasks = {
         };
     },
 
-    /// clients/client: returns a single client
+    /** clients/client: returns a single client */
     client: async ({ id }) => {
         const client = await asyncClient;
 
@@ -80,7 +80,7 @@ export const tasks = {
         return item;
     },
 
-    /// clients/create: creates a client
+    /** clients/create: creates a client */
     create: async (_, { name, ownerName, ownerEmail }) => {
         const client = await asyncClient;
         const res = await client.post('/clients', { name, ownerName, ownerEmail });
@@ -93,7 +93,7 @@ export const tasks = {
     // dummy for UI
     _createdSecret: async () => {},
 
-    /// clients/update: updates a client
+    /** clients/update: updates a client */
     update: async ({ id }, { name, ownerName, ownerEmail }) => {
         const client = await asyncClient;
         await client.patch(`/clients/${id}`, { name, ownerName, ownerEmail });
@@ -104,7 +104,7 @@ export const tasks = {
         store.signal([CLIENTS, id]);
     },
 
-    /// clients/delete: deletes a client
+    /** clients/delete: deletes a client */
     delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/clients/${id}`);
@@ -112,7 +112,7 @@ export const tasks = {
         store.signal([CLIENTS, SIG_CLIENTS]);
     },
 
-    /// clients/permissions: returns permissions of a client
+    /** clients/permissions: returns permissions of a client */
     permissions: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/clients/${id}/permissions`);
@@ -151,7 +151,7 @@ export const tasks = {
         return permData;
     },
     setPermissions: () => {}, // dummy for UI
-    /// clients/setPermissionsPX: sets client permissions (ONLY sends permissions to server)
+    /** clients/setPermissionsPX: sets client permissions (ONLY sends permissions to server) */
     setPermissionsPX: async ({ id }, { permissions }) => {
         const client = await asyncClient;
         await client.put(`/clients/${id}/permissions`, permissions.permissions);
@@ -160,7 +160,7 @@ export const tasks = {
             permissions: permissions.permissions,
         }));
     },
-    /// clients/setPermissionsMR: sets client permissions (ONLY sends MR to server)
+    /** clients/setPermissionsMR: sets client permissions (ONLY sends MR to server) */
     setPermissionsMR: async ({ id }, { permissions }) => {
         const client = await asyncClient;
         const existing = store.get([CLIENT_PERMS, id]);
@@ -189,11 +189,13 @@ export const tasks = {
 };
 
 export const views = {
-    /// clients/client: data view of a client.
-    ///
-    /// # Options
-    /// - id: client id
-    /// - noFetch: if true, will not fetch any new data
+    /**
+     * clients/client: data view of a client.
+     *
+     * # Options
+     * - id: client id
+     * - noFetch: if true, will not fetch any new data
+     */
     client: class ClientView extends AbstractDataView {
         constructor (options) {
             super();
@@ -220,11 +222,13 @@ export const views = {
             store.unsubscribe([CLIENTS, this.id], this.#onUpdate);
         }
     },
-    /// clients/permissions: views a client’s permissions
-    ///
-    /// # Options
-    /// - id: client id
-    /// - noFetch: if true, will not fetch any new data
+    /**
+     * clients/permissions: views a client’s permissions
+     *
+     * # Options
+     * - id: client id
+     * - noFetch: if true, will not fetch any new data
+     */
     permissions: class ClientPerms extends AbstractDataView {
         constructor ({ id, noFetch }) {
             super();

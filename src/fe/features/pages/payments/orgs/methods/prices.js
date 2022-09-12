@@ -16,7 +16,7 @@ import {
 } from '../../../../../locale';
 import './prices.less';
 
-/// Edits the “prices” field on payment methods.
+/** Edits the “prices” field on payment methods. */
 export default function Prices ({ value, editing, onChange, isIntermediary }) {
     const [addingYear, setAddingYear] = useState(false);
 

@@ -15,15 +15,17 @@ import './tag-manager.less';
 
 // TODO: error handling
 
-/// Lets you manage and attach tags to a node.
-///
-/// - list/selected: tasks used to list all/selected tags
-/// - options: task options
-/// - view: tag view
-/// - viewOptions: view options
-/// - taskOptions: options used for all other tasks
-/// - addTask/updateTask/deleteTask: tasks used to add or delete tags
-/// - attachTask/removeTask: tasks used to attach or remove tags from this node
+/**
+ * Lets you manage and attach tags to a node.
+ *
+ * - list/selected: tasks used to list all/selected tags
+ * - options: task options
+ * - view: tag view
+ * - viewOptions: view options
+ * - taskOptions: options used for all other tasks
+ * - addTask/updateTask/deleteTask: tasks used to add or delete tags
+ * - attachTask/removeTask: tasks used to attach or remove tags from this node
+ */
 export default class TagManager extends PureComponent {
     state = {
         all: [], // all tags

@@ -8,20 +8,24 @@ function stringify (value, currency) {
     return stdlib.currency_fmt.apply(null, [currency || '?', value | 0]);
 }
 
-/// Displays a currency amount.
-///
-/// - value: amount in smallest currency unit
-/// - currency: currency id
+/**
+ * Displays a currency amount.
+ *
+ * - value: amount in smallest currency unit
+ * - currency: currency id
+ */
 function CurrencyAmount ({ value, currency }) {
     return stringify(value, currency);
 }
 
-/// Edits a currency value.
-///
-/// # Props
-/// - value/onChange: currency value
-/// - min/max/step
-/// - currency: currency id
+/**
+ * Edits a currency value.
+ *
+ * # Props
+ * - value/onChange: currency value
+ * - min/max/step
+ * - currency: currency id
+ */
 class CurrencyEditor extends PureComponent {
     state = {
         // is the editor focused?
@@ -72,7 +76,7 @@ class CurrencyEditor extends PureComponent {
         }
     };
 
-    /// Restricts the given value according to min, max, and step.
+    /** Restricts the given value according to min, max, and step. */
     clamp (value) {
         if (Number.isFinite(this.props.min)) {
             value = Math.max(value, this.props.min);
@@ -86,7 +90,7 @@ class CurrencyEditor extends PureComponent {
         return value;
     }
 
-    /// Formats the given value for the user according to the current currency (e.g. 102 -> "1,02")
+    /** Formats the given value for the user according to the current currency (e.g. 102 -> "1,02") */
     format (value) {
         const { currency } = this.props;
         const fractValue = currency ? (value | 0) / currencies[currency] : (value | 0);

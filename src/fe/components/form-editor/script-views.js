@@ -4,9 +4,11 @@ import { Window, ExprView, DefsView, RenderViewRoot, viewPool, model } from '@te
 import ResizeObserver from 'resize-observer-polyfill';
 import './script-views.less';
 
-/// Mounts an ASCE view root in a react component.
-/// - init: () => ViewRoot
-/// - deinit: optional (ViewRoot) => void
+/**
+ * Mounts an ASCE view root in a react component.
+ * - init: () => ViewRoot
+ * - deinit: optional (ViewRoot) => void
+ */
 class MountedViewRoot extends PureComponent {
     mountPoint = createRef(null);
 
@@ -30,12 +32,14 @@ class MountedViewRoot extends PureComponent {
     }
 }
 
-/// Shows an expression.
-///
-/// # Props
-/// - expr: expression to show. Should be a raw AKSO Script expression (i.e. not an editor expr)
-/// - editorExpr: ctx => expr, editor expression to show (override)
-/// - init/deinit: callbacks
+/**
+ * Shows an expression.
+ *
+ * # Props
+ * - expr: expression to show. Should be a raw AKSO Script expression (i.e. not an editor expr)
+ * - editorExpr: ctx => expr, editor expression to show (override)
+ * - init/deinit: callbacks
+ */
 export class RawExprView extends PureComponent {
     getEditorExpr () {
         if (this.props.editorExpr) return this.props.editorExpr(this.modelCtx);
@@ -131,10 +135,12 @@ export class RawExprView extends PureComponent {
     }
 }
 
-/// Shows the name of a ref.
-///
-/// - name: string
-/// - def: bool
+/**
+ * Shows the name of a ref.
+ *
+ * - name: string
+ * - def: bool
+ */
 export class RefNameView extends PureComponent {
     init = (exprView) => {
         this.exprView = exprView;
@@ -160,11 +166,13 @@ export class RefNameView extends PureComponent {
     }
 }
 
-/// Shows a preview of defs in the given script object.
-///
-/// # Props
-/// - script: raw script object
-/// - previousNodes: previous nodes
+/**
+ * Shows a preview of defs in the given script object.
+ *
+ * # Props
+ * - script: raw script object
+ * - previousNodes: previous nodes
+ */
 export class DefsPreview extends PureComponent {
     init = () => {
         this.root = new RenderViewRoot();

@@ -13,34 +13,34 @@ import {
     reverseRequirementGraph,
 } from '../../../../permissions';
 
-/// Pops an item from the permission path.
+/** Pops an item from the permission path. */
 export function pop (perm) {
     return perm.substr(0, perm.lastIndexOf('.'));
 }
 
-/// Pushes an item to the permission path.
+/** Pushes an item to the permission path. */
 function push (perm, part) {
     if (!perm) return part;
     return perm + '.' + part;
 }
 
-/// Clones xperms.
+/** Clones xperms. */
 function clone (xperms) {
     return new Set([...xperms]);
 }
 
-/// Decodes an xperms-encoded field. Returns the field and the read or write flag.
+/** Decodes an xperms-encoded field. Returns the field and the read or write flag. */
 function xpDecodeField (id) {
     if (!id.startsWith('@.')) throw new Error('invalid argument to xpDecodeField: should start with @.');
     const parts = id.split('.');
     return [parts.slice(1, parts.length - 1).join('.'), parts[parts.length - 1]];
 }
-/// Encodes a field in the xperms format.
+/** Encodes a field in the xperms format. */
 function xpEncodeField (field, flag) {
     return `@.${field}.${flag}`;
 }
 
-/// Converts regular perms and member fields to xperms.
+/** Converts regular perms and member fields to xperms. */
 function toXPerms (perms, fields) {
     const xperms = new Set();
     for (const p of perms) xperms.add(p);
@@ -56,7 +56,7 @@ function toXPerms (perms, fields) {
     }
     return xperms;
 }
-/// Converts xperms to regular perms and member fields.
+/** Converts xperms to regular perms and member fields. */
 function fromXPerms (xperms) {
     const perms = [];
     const fields = xperms.has('@.*') ? null : {};
@@ -79,12 +79,12 @@ function fromXPerms (xperms) {
     return [perms, fields];
 }
 
-/// Returns true if the given permission is a wildcard.
+/** Returns true if the given permission is a wildcard. */
 function isWildcard (id) {
     return id.split('.').pop() === '*';
 }
 
-/// Returns all wildcards that could affect the given perm.
+/** Returns all wildcards that could affect the given perm. */
 function wildcardCandidates (id) {
     const candidates = [];
     while (id) {
@@ -94,7 +94,7 @@ function wildcardCandidates (id) {
     return candidates;
 }
 
-/// Returns true if the given permission is currently active.
+/** Returns true if the given permission is currently active. */
 function isActive (xperms, id) {
     if (xperms.has(id)) return true;
     if (id.startsWith('@.')) {
@@ -112,7 +112,7 @@ function isActive (xperms, id) {
     }
 }
 
-/// Returns a set of permissions that are currently directly implying the given permission.
+/** Returns a set of permissions that are currently directly implying the given permission. */
 function reverseImplications (xperms, id, includeWildcards = true) {
     const revImplies = new Set();
     if (id.startsWith('@.')) {
@@ -146,10 +146,12 @@ function reverseImplications (xperms, id, includeWildcards = true) {
     return revImplies;
 }
 
-/// Explodes a wildcard into its components, i.e. all permissions that would be granted
-/// automatically by a wildcard are now granted manually. The wildcard is removed.
-/// This action is a no-op if the wildcard permission isn’t present.
-/// Sub-wildcards will remain sub-wildcards.
+/**
+ * Explodes a wildcard into its components, i.e. all permissions that would be granted
+ * automatically by a wildcard are now granted manually. The wildcard is removed.
+ * This action is a no-op if the wildcard permission isn’t present.
+ * Sub-wildcards will remain sub-wildcards.
+ */
 function explodeWildcard (xperms, id) {
     if (!xperms.has(id)) return xperms; // skip everything if the wildcard isn’t present
     xperms = clone(xperms);
@@ -167,9 +169,11 @@ function explodeWildcard (xperms, id) {
     return xperms;
 }
 
-/// Returns all perms in the reverseMap that match the given prefix path.
-///
-/// for a prefix `a.b`, this includes permissions like `a.b.*`, `a.b.c.d`, but not `a.b`.
+/**
+ * Returns all perms in the reverseMap that match the given prefix path.
+ *
+ * for a prefix `a.b`, this includes permissions like `a.b.*`, `a.b.c.d`, but not `a.b`.
+ */
 function permsByPrefix (prefix) {
     const perms = [];
     for (const k in reverseMap) {
@@ -180,7 +184,7 @@ function permsByPrefix (prefix) {
     return perms;
 }
 
-/// Deletes all perms that would match the given prefix. Also see permsByPrefix.
+/** Deletes all perms that would match the given prefix. Also see permsByPrefix. */
 function deleteByPrefix (xperms, prefix, ignoreFields) {
     xperms = clone(xperms);
     for (const p of [...xperms]) {
@@ -192,7 +196,7 @@ function deleteByPrefix (xperms, prefix, ignoreFields) {
     return xperms;
 }
 
-/// Checks that all requirements for a node are met, and if not, removes it.
+/** Checks that all requirements for a node are met, and if not, removes it. */
 function checkRequirements (xperms, id) {
     const mapItem = reverseMap[id];
     let broken = false;
@@ -208,7 +212,7 @@ function checkRequirements (xperms, id) {
     return xperms;
 }
 
-/// Adds a permission.
+/** Adds a permission. */
 function add (xperms, id) {
     xperms = clone(xperms);
 
@@ -256,7 +260,7 @@ function add (xperms, id) {
     return xperms;
 }
 
-/// Removes a permission.
+/** Removes a permission. */
 function remove (xperms, id) {
     xperms = clone(xperms);
 
@@ -295,7 +299,7 @@ function remove (xperms, id) {
     return xperms;
 }
 
-/// Adds a permission.
+/** Adds a permission. */
 export function addPermission (permissions, memberFields, perm) {
     if (perm.startsWith('@.')) throw new Error('Malformed permission: cannot start with @.');
     let xperms = toXPerms(permissions, memberFields);
@@ -303,7 +307,7 @@ export function addPermission (permissions, memberFields, perm) {
     return fromXPerms(xperms);
 }
 
-/// Removes a permission.
+/** Removes a permission. */
 export function removePermission (permissions, memberFields, perm) {
     if (perm.startsWith('@.')) throw new Error('Malformed permission: cannot start with @.');
     let xperms = toXPerms(permissions, memberFields);
@@ -311,19 +315,19 @@ export function removePermission (permissions, memberFields, perm) {
     return fromXPerms(xperms);
 }
 
-/// Returns whether or not a permission is active.
+/** Returns whether or not a permission is active. */
 export function hasPermission (permissions, memberFields, perm) {
     return isActive(toXPerms(permissions, memberFields), perm);
 }
 
-/// Returns true if the given permission is not known to the permissions tree.
+/** Returns true if the given permission is not known to the permissions tree. */
 export function isPermissionUnknown (perm) {
     // check the reverse map
     // special case for perm.country: we will ignore all children, since they're proobably a country
     return !reverseMap[perm] && reverseMap[pop(perm) + '.*']?.node?.type !== 'perm.country';
 }
 
-/// Adds a member field.
+/** Adds a member field. */
 export function addMemberField (permissions, memberFields, field, flags) {
     let xperms = toXPerms(permissions, memberFields);
     const fieldSpec = fieldsSpec[field];
@@ -335,7 +339,7 @@ export function addMemberField (permissions, memberFields, field, flags) {
     return fromXPerms(xperms);
 }
 
-/// Removes a member field.
+/** Removes a member field. */
 export function removeMemberField (permissions, memberFields, field, flags) {
     let xperms = toXPerms(permissions, memberFields);
     const fieldSpec = fieldsSpec[field];
@@ -347,7 +351,7 @@ export function removeMemberField (permissions, memberFields, field, flags) {
     return fromXPerms(xperms);
 }
 
-/// Returns whether the given member field permissions are fully fulfilled for the given flag.
+/** Returns whether the given member field permissions are fully fulfilled for the given flag. */
 export function hasMemberField (permissions, memberFields, field, flags) {
     const xperms = toXPerms(permissions, memberFields);
     const fieldSpec = fieldsSpec[field];

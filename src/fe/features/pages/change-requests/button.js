@@ -6,7 +6,7 @@ import { coreContext } from '../../../core/connection';
 import { LinkButton } from '../../../router';
 import './button.less';
 
-/// Shows codeholder change requests.
+/** Shows codeholder change requests. */
 export default class ChangeRequestsButton extends PureComponent {
     state = {
         loading: false,

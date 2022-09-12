@@ -6,7 +6,7 @@ import countryField, { WithCountries } from './country';
 import Required from './required';
 import './style';
 
-/// Max char lengths for each of the fields.
+/** Max char lengths for each of the fields. */
 const maxLengthMap = {
     countryArea: 50,
     city: 50,
@@ -15,7 +15,7 @@ const maxLengthMap = {
     sortingCode: 20,
 };
 
-/// Renders an address without regarding a specific locale’s format.
+/** Renders an address without regarding a specific locale’s format. */
 function BasicAddressRenderer ({ value }) {
     if (!value) return null;
 
@@ -44,9 +44,11 @@ function BasicAddressRenderer ({ value }) {
     );
 }
 
-/// Edits an address. Also handles locale-based validation.
-///
-/// - readableMask/editableMask: array - if set, only allows viewing/editing the given fields
+/**
+ * Edits an address. Also handles locale-based validation.
+ *
+ * - readableMask/editableMask: array - if set, only allows viewing/editing the given fields
+ */
 class AddressEditor extends Component {
     state = {
         validating: false,
@@ -57,7 +59,7 @@ class AddressEditor extends Component {
     cityAreaChoicesId = 'city-areas-' + Math.random().toString(36);
     countryAreaChoicesId = 'country-areas-' + Math.random().toString(36);
 
-    /// Validates current input.
+    /** Validates current input. */
     validate () {
         if (!this.props.value) return;
         this.setState({ validating: true });

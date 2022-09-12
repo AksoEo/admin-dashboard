@@ -14,15 +14,17 @@ import { FILTERS } from './filters';
 import MapList from '../../map-list';
 import './index.less';
 
-/// Shows an overview over locations, with a map
-///
-/// # Props
-/// - congress: congress id
-/// - congressAddress: optional congress address
-/// - congressLocation: optional congress location
-/// - instance: instance id
-/// - query/onQueryChange: query
-/// - push: proxy for navigation API
+/**
+ * Shows an overview over locations, with a map
+ *
+ * # Props
+ * - congress: congress id
+ * - congressAddress: optional congress address
+ * - congressLocation: optional congress location
+ * - instance: instance id
+ * - query/onQueryChange: query
+ * - push: proxy for navigation API
+ */
 export default class LocationsView extends PureComponent {
     state = {
         parameters: {

@@ -209,12 +209,14 @@ function makePieHLabelLine (label, centerX, centerY, radius) {
     );
 }
 
-/// Draws a pie chart
-///
-/// # Props
-/// - layers: Slice[][] where Slice is an object:
-///
-///   `Slice { phantom: bool, value: number, class: string, label: string }`
+/**
+ * Draws a pie chart
+ *
+ * # Props
+ * - layers: Slice[][] where Slice is an object:
+ *
+ *   `Slice { phantom: bool, value: number, class: string, label: string }`
+ */
 function Pie ({ layers }) {
     const labels = [];
 
@@ -318,12 +320,14 @@ function Pie ({ layers }) {
     );
 }
 
-/// Draws a bar chart.
-///
-/// # Props
-/// - ymax: max y
-/// - items: Item[] where `Item { name: Node, value: number, chosen: bool, description: Node }`
-/// - showPercentage: if true, will show percentage
+/**
+ * Draws a bar chart.
+ *
+ * # Props
+ * - ymax: max y
+ * - items: Item[] where `Item { name: Node, value: number, chosen: bool, description: Node }`
+ * - showPercentage: if true, will show percentage
+ */
 function Bar ({ ymax, items, showPercentage }) {
     const contents = [];
 
@@ -353,7 +357,7 @@ function Bar ({ ymax, items, showPercentage }) {
     );
 }
 
-/// Renders the name of a vote option.
+/** Renders the name of a vote option. */
 function VoteOptionName ({ option }) {
     if (option.type === 'codeholder') {
         return <IdUEACode id={option.codeholderId} />;
@@ -361,13 +365,15 @@ function VoteOptionName ({ option }) {
     return option.name;
 }
 
-/// Renders rounds.
-///
-/// # Props
-/// - type: vote type
-/// - ballots: ballot count
-/// - rounds: rounds data
-/// - options: vote options
+/**
+ * Renders rounds.
+ *
+ * # Props
+ * - type: vote type
+ * - ballots: ballot count
+ * - rounds: rounds data
+ * - options: vote options
+ */
 function Rounds ({ type, ballots, rounds, options }) {
     const [round, setRound] = useState(0);
 
@@ -414,7 +420,7 @@ function Rounds ({ type, ballots, rounds, options }) {
     );
 }
 
-/// Renders a single stv round.
+/** Renders a single stv round. */
 function STVRound ({ ballots, round, options }) {
     const items = [];
 
@@ -441,7 +447,7 @@ function STVRound ({ ballots, round, options }) {
     );
 }
 
-/// Renders a single ranked-pairs round.
+/** Renders a single ranked-pairs round. */
 function RPRound ({ round, options, rankedPairs }) {
     return (
         <div class="result-round">
@@ -475,7 +481,7 @@ function RPRound ({ round, options, rankedPairs }) {
     );
 }
 
-/// Renders the lock graph and ranked pairs info for a round.
+/** Renders the lock graph and ranked pairs info for a round. */
 class LockGraph extends Component {
     state = {
         nodes: [],
@@ -487,7 +493,7 @@ class LockGraph extends Component {
 
     layoutLock = 0;
 
-    /// Performs graph layout.
+    /** Performs graph layout. */
     async layout (lock) {
         const core = this.context;
 

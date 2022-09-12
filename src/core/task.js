@@ -2,7 +2,7 @@ import { remove, TASKS } from './store';
 import { transformError } from './list';
 import * as log from './log';
 
-/// Abstract task container.
+/** Abstract task container. */
 export default class Task {
     running = false;
     error = null;
@@ -16,7 +16,7 @@ export default class Task {
         this.parameters = parameters;
     }
 
-    /// Yells at the user if this task has been dropped but they’re trying to perform an action.
+    /** Yells at the user if this task has been dropped but they’re trying to perform an action. */
     dropCheck (action) {
         if (this.isDropped) {
             this.self.postMessage({
@@ -31,16 +31,16 @@ export default class Task {
         }
     }
 
-    /// Updates task parameters.
+    /** Updates task parameters. */
     update (parameters) {
         if (this.dropCheck('update')) return;
         this.parameters = parameters;
     }
 
-    /// Run implementation.
+    /** Run implementation. */
     async run () {}
 
-    /// Run wrapper that handles IPC and stuff.
+    /** Run wrapper that handles IPC and stuff. */
     async $run () {
         if (this.dropCheck('run')) return;
         if (this.running) return;
@@ -69,7 +69,7 @@ export default class Task {
         }
     }
 
-    /// Drops the task.
+    /** Drops the task. */
     drop () {
         if (this.dropCheck('drop (don’t drop twice)')) return;
         this.isDropped = true;

@@ -86,9 +86,11 @@ const parametersToRequestData = makeParametersToRequestData({
 const clientFromAPI = makeClientFromAPI(clientFields);
 
 export const tasks = {
-    /// httpLog/list: fetches log items
-    ///
-    /// See codeholders/list for parameters and return value format.
+    /**
+     * httpLog/list: fetches log items
+     *
+     * See codeholders/list for parameters and return value format.
+     */
     list: async (_, parameters) => {
         const client = await asyncClient;
 
@@ -115,20 +117,22 @@ export const tasks = {
             },
         };
     },
-    /// httpLog/filtersToAPI: converts client filters to API filters
+    /** httpLog/filtersToAPI: converts client filters to API filters */
     filtersToAPI: async ({ filters }) => {
         return filtersToAPI(clientFilters, filters);
     },
 };
 
 export const views = {
-    /// httpLog/request: observes (and fetches) a request
-    ///
-    /// # Options
-    /// - id: request id
-    /// - fields: list of field ids to consider the minimal required set (will be fetched)
-    /// - noFetch: if true, will not fetch
-    /// - lazyFetch: if true, will only fetch if the data is missing
+    /**
+     * httpLog/request: observes (and fetches) a request
+     *
+     * # Options
+     * - id: request id
+     * - fields: list of field ids to consider the minimal required set (will be fetched)
+     * - noFetch: if true, will not fetch
+     * - lazyFetch: if true, will only fetch if the data is missing
+     */
     request: class RequestView extends AbstractDataView {
         constructor (options) {
             super();

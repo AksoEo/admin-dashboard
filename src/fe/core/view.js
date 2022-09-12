@@ -1,11 +1,13 @@
 import EventEmitter from 'events';
 import { v4 as uuidv4 } from 'uuid';
 
-/// A data view provides asynchronous access to API objects.
-/// It is initialized with a set of immutable options and will receive updates and errors
-/// as the data loads.
-///
-/// This object **must be dropped manually** because it subscribes to an object in another thread.
+/**
+ * A data view provides asynchronous access to API objects.
+ * It is initialized with a set of immutable options and will receive updates and errors
+ * as the data loads.
+ *
+ * This object **must be dropped manually** because it subscribes to an object in another thread.
+ */
 export default class DataView extends EventEmitter {
     data = null;
 

@@ -27,21 +27,23 @@ import {
 import './style';
 
 
-/// Permissions editor.
-/// Also edits member filter and member fields.
-///
-/// ```
-/// struct PermsData {
-///     permissions: string[],
-///     mrEnabled: bool,
-///     mrFilter: string,
-///     mrFields: { [string]: string? } | null,
-/// }
-/// ```
-///
-/// # Props
-/// - value/onChange: PermsData
-/// - editable: if false, will not show as editable
+/**
+ * Permissions editor.
+ * Also edits member filter and member fields.
+ *
+ * ```
+ * struct PermsData {
+ *     permissions: string[],
+ *     mrEnabled: bool,
+ *     mrFilter: string,
+ *     mrFields: { [string]: string? } | null,
+ * }
+ * ```
+ *
+ * # Props
+ * - value/onChange: PermsData
+ * - editable: if false, will not show as editable
+ */
 export default class PermsEditor extends Component {
     state = {
         showImplied: null,
@@ -147,7 +149,7 @@ export default class PermsEditor extends Component {
     }
 }
 
-/// Renders a human-readable name for a given permission.
+/** Renders a human-readable name for a given permission. */
 function PermName ({ id }) {
     if (!reverseMap[id]) return id;
     const item = reverseMap[id];

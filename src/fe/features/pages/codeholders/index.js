@@ -38,12 +38,14 @@ const connectToEverything = a => connect('codeholders/fields')(res => ({
     filters,
 }))(connectPerms(a)));
 
-/// The codeholders list page.
-///
-/// # Props
-/// - query/onQueryChange: url query handling
-/// - addrLabelGen: label gen state (see navigation)
-/// - sendNotifTemplate: notif templates state (see navigation)
+/**
+ * The codeholders list page.
+ *
+ * # Props
+ * - query/onQueryChange: url query handling
+ * - addrLabelGen: label gen state (see navigation)
+ * - sendNotifTemplate: notif templates state (see navigation)
+ */
 export default connectToEverything(class CodeholdersPage extends Page {
     state = {
         options: {

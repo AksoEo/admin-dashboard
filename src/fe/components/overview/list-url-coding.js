@@ -100,7 +100,7 @@ function deserializeFilterValue (value) {
     return value;
 }
 
-/// Returns an encoded string.
+/** Returns an encoded string. */
 export function encodeURLQuery (state, filters) {
     let data = '';
     if (state.search?.query) {
@@ -160,7 +160,7 @@ export function encodeURLQuery (state, filters) {
     return data;
 }
 
-/// Decodes and returns a (partial, and possibly invalid) parameters object.
+/** Decodes and returns a (partial, and possibly invalid) parameters object. */
 export function decodeURLQuery (data, filters) {
     const parameters = {};
     while (data.length) {
@@ -231,7 +231,7 @@ export function decodeURLQuery (data, filters) {
     return parameters;
 }
 
-/// Applies the decoded partial parameters to a parameters object.
+/** Applies the decoded partial parameters to a parameters object. */
 export function applyDecoded (decoded, parameters, softInitial) {
     parameters = { ...parameters };
     if (decoded.search) parameters.search = decoded.search;

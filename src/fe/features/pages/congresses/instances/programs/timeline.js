@@ -10,12 +10,14 @@ import { congressPrograms as locale } from '../../../../../locale';
 import { OVERVIEW_FIELDS } from './fields';
 import './timeline.less';
 
-/// Renders a timeline of program items.
-///
-/// # Props
-/// - congress/instance: ids
-/// - dateFrom/dateTo: congress date bounds
-/// - tz: time zone
+/**
+ * Renders a timeline of program items.
+ *
+ * # Props
+ * - congress/instance: ids
+ * - dateFrom/dateTo: congress date bounds
+ * - tz: time zone
+ */
 export default class ProgramTimeline extends PureComponent {
     state = {
         date: null,

@@ -1,12 +1,14 @@
 import { PureComponent } from 'preact/compat';
 
-/// An event proxy---essentially just binds events for the lifetime of the preact node.
-///
-/// # Props
-/// - target: target EventEmitter
-/// - dom: bool, if true will use addEventListener/removeEventListener instead of on/removeListener
-//    (must be invariant)
-/// - on(.*): binds the given function to (1)
+/**
+ * An event proxy---essentially just binds events for the lifetime of the preact node.
+ *
+ * # Props
+ * - target: target EventEmitter
+ * - dom: bool, if true will use addEventListener/removeEventListener instead of on/removeListener
+ *   (must be invariant)
+ * - on(.*): binds the given function to (1)
+ */
 export default class EventProxy extends PureComponent {
     #previousTarget;
     #eventHandlers = new Map();

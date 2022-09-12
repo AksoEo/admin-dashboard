@@ -26,63 +26,65 @@ function scrollToNode (node) {
     node.scrollIntoView && node.scrollIntoView({ behavior: 'smooth' });
 }
 
-/// Renders an overview list over the items given by the specified task.
-///
-/// # Props
-/// - task: task name. Output should adhere to a specific format (see e.g. codeholders/list)
-/// - view: view name for detail views.
-/// - options: task options
-/// - parameters: task parameters. should adhere to a specific format (See e.g. codeholders/list)
-///     - fields: objects may also have a `fixed` property to indicate fixed fields.
-/// - viewOptions: view options
-/// - expanded: bool, whether search/filters are expanded
-/// - fields: field renderers
-/// - onGetItemLink: should return a link to an item’s detail view
-/// - outOfTree: will use out-of-tree navigation to open detail views
-/// - onSetFields: callback for changing fields. If set, will show inline sorting controls.
-///     - Make sure to also set sortable: true on field renderers wher esorting is supported
-/// - onSetOffset: callback for changing the current page
-/// - onSetLimit: callback for changing the current items per page
-/// - onResult: result callback
-/// - locale: localized field names
-/// - notice: optional string to show below stats
-/// - selection: if given will show checkboxes for selection. should have the Set interface, i.e.
-///   add, delete, has
-/// - updateView: argument list to create a data view that emits updates (if available)
-/// - limits: available limit options. if not given, will use default
-/// - compact: if true, will force compact view
-/// - compactItems: if true, will force compact view, but only for items
-/// - userData: user data to pass to fields
-/// - waitUntilFiltersLoaded: delay first load until after filters have loaded
+/**
+ * Renders an overview list over the items given by the specified task.
+ *
+ * # Props
+ * - task: task name. Output should adhere to a specific format (see e.g. codeholders/list)
+ * - view: view name for detail views.
+ * - options: task options
+ * - parameters: task parameters. should adhere to a specific format (See e.g. codeholders/list)
+ *     - fields: objects may also have a `fixed` property to indicate fixed fields.
+ * - viewOptions: view options
+ * - expanded: bool, whether search/filters are expanded
+ * - fields: field renderers
+ * - onGetItemLink: should return a link to an item’s detail view
+ * - outOfTree: will use out-of-tree navigation to open detail views
+ * - onSetFields: callback for changing fields. If set, will show inline sorting controls.
+ *     - Make sure to also set sortable: true on field renderers wher esorting is supported
+ * - onSetOffset: callback for changing the current page
+ * - onSetLimit: callback for changing the current items per page
+ * - onResult: result callback
+ * - locale: localized field names
+ * - notice: optional string to show below stats
+ * - selection: if given will show checkboxes for selection. should have the Set interface, i.e.
+ *   add, delete, has
+ * - updateView: argument list to create a data view that emits updates (if available)
+ * - limits: available limit options. if not given, will use default
+ * - compact: if true, will force compact view
+ * - compactItems: if true, will force compact view, but only for items
+ * - userData: user data to pass to fields
+ * - waitUntilFiltersLoaded: delay first load until after filters have loaded
+ */
 export default class OverviewList extends PureComponent {
     static contextType = coreContext;
 
     state = {
-        /// same as #stale; why is this not one variable? because setState is asynchronous
+        /** same as #stale; why is this not one variable? because setState is asynchronous */
         stale: true,
-        /// true if a task is being run
+        /** true if a task is being run */
         loading: false,
-        /// current error
+        /** current error */
         error: null,
-        /// current result
+        /** current result */
         result: null,
-        /// if true, will animate in backwards
+        /** if true, will animate in backwards */
         animateBackwards: false,
     };
 
-    /// whether the current data is stale (in relation to the options/parameters)
+    /** whether the current data is stale (in relation to the options/parameters) */
     #stale = true;
 
-    /// currently loading task
+    /** currently loading task */
     #currentTask = null;
 
-    /// last time expanded was set to false
+    /** last time expanded was set to false */
     #lastCollapseTime = 0;
 
-    /// last time a page change button was pressed
+    /** last time a page change button was pressed */
     #lastPageChangeTime = 0;
 
-    /// If true, will animate backwards and subsequently set this to false.
+    /** If true, will animate backwards and subsequently set this to false. */
     #nextLoadIsBackwards = false;
 
     // node to scroll to on next load
@@ -131,7 +133,7 @@ export default class OverviewList extends PureComponent {
     #reloadTimeout;
     #skipNextDebounce = !this.props.waitUntilFiltersLoaded;
 
-    /// Might trigger a reload.
+    /** Might trigger a reload. */
     maybeReload () {
         if (this.#stale && !this.props.expanded) {
             if (this.#skipNextDebounce) {

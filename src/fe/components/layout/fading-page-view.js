@@ -2,12 +2,14 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { globalAnimator, Spring } from 'yamdl';
 
-/// Container for multiple pages. Fades between pages.
-///
-/// # Props
-/// - selected: index into children
-/// - children: array of vnodes
-/// - onPageChange: callback for when the animation finishes
+/**
+ * Container for multiple pages. Fades between pages.
+ *
+ * # Props
+ * - selected: index into children
+ * - children: array of vnodes
+ * - onPageChange: callback for when the animation finishes
+ */
 export default class FadingPageView extends PureComponent {
     actualSelected = this.props.selected;
     opacity = new Spring(1, 0.2);

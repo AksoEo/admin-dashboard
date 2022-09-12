@@ -4,18 +4,20 @@ import { layoutContext } from './dynamic-height-div';
 import './autosizing-page-view.less';
 const lerp = (a, b, x) => (b - a) * x + a;
 
-/// Returns the height above which pages should be allowed to scroll vertically.
+/** Returns the height above which pages should be allowed to scroll vertically. */
 const OVERFLOW_HEIGHT = () => window.innerHeight - 120;
 
-/// Container for multiple pages of varying height and fixed width.
-/// Assumes fixed child count and mostly fixed child heights.
-///
-/// # Props
-/// - selected: number
-/// - children: array of vnodes
-/// - onPageChange: callback for when the animation finishes
-/// - eager: if true, will check page heights every update
-/// - alwaysOverflow: if true, will always allow overflow
+/**
+ * Container for multiple pages of varying height and fixed width.
+ * Assumes fixed child count and mostly fixed child heights.
+ *
+ * # Props
+ * - selected: number
+ * - children: array of vnodes
+ * - onPageChange: callback for when the animation finishes
+ * - eager: if true, will check page heights every update
+ * - alwaysOverflow: if true, will always allow overflow
+ */
 export default class AutosizingPageView extends Component {
     state = {
         x: 0,

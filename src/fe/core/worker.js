@@ -15,7 +15,7 @@ export default class WorkerInterface extends EventEmitter {
         this.worker.addEventListener('error', this.#onUnhandledRejection);
     }
 
-    /// Terminates the worker.
+    /** Terminates the worker. */
     drop () {
         this.worker.terminate();
     }
@@ -32,7 +32,7 @@ export default class WorkerInterface extends EventEmitter {
         return new Task(this, ...args);
     }
 
-    /// Creates a data view and destroys it after receiving either data or an error.
+    /** Creates a data view and destroys it after receiving either data or an error. */
     viewData (...args) {
         return new Promise((resolve, reject) => {
             const view = new DataView(this, ...args);

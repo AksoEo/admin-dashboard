@@ -13,20 +13,24 @@ import { connect } from '../../core/connection';
 
 // also see src/pages/index.js
 
-/// Renders a single item in the sidebar.
-///
-/// # Props
-/// - `id`: page id (for the localized name, among other things)
-/// - `icon`: page icon
-/// - `path`: page path
-/// - `category`: containing category to prepend the path of
-/// - `locked`: if true, this item will be disabled
-/// - `index`: item index in the sidebar list. Used for the cascade animation
+/**
+ * Renders a single item in the sidebar.
+ *
+ * # Props
+ * - `id`: page id (for the localized name, among other things)
+ * - `icon`: page icon
+ * - `path`: page path
+ * - `category`: containing category to prepend the path of
+ * - `locked`: if true, this item will be disabled
+ * - `index`: item index in the sidebar list. Used for the cascade animation
+ */
 class NavItem extends PureComponent {
-    /// normalized x transform (from -1 to 1, sort of) for animating in
+    /** normalized x transform (from -1 to 1, sort of) for animating in */
     offsetX = new Spring(1, 0.5);
-    /// time since initialization. This is used in conjunction with the index prop to cascade
-    /// the sidebar item animation
+    /**
+     * time since initialization. This is used in conjunction with the index prop to cascade
+     * the sidebar item animation
+     */
     initTime = 0;
 
     componentDidMount () {
@@ -112,11 +116,13 @@ class NavItem extends PureComponent {
     }
 }
 
-/// Contains the sidebar navigation items.
-///
-/// # Props
-/// - currentPage: current page id
-/// - locked: if true, the sidebar is locked and can’t be used
+/**
+ * Contains the sidebar navigation items.
+ *
+ * # Props
+ * - currentPage: current page id
+ * - locked: if true, the sidebar is locked and can’t be used
+ */
 const SidebarNav = connect('tasks/tasks')(tasks => ({ tasks }))(class SidebarNav extends Component {
     static contextType = permsContext;
 
@@ -169,11 +175,13 @@ const SidebarNav = connect('tasks/tasks')(tasks => ({ tasks }))(class SidebarNav
     }
 });
 
-/// Renders the sidebar contents.
-///
-/// # Props
-/// - currentPage: current page ID, use to highlight the corresponding sidebar item
-/// - locked: if true, the sidebar is disabled
+/**
+ * Renders the sidebar contents.
+ *
+ * # Props
+ * - currentPage: current page ID, use to highlight the corresponding sidebar item
+ * - locked: if true, the sidebar is disabled
+ */
 export default class SidebarContents extends PureComponent {
     static contextType = routerContext;
 
@@ -223,7 +231,7 @@ export default class SidebarContents extends PureComponent {
     }
 }
 
-/// The user card in the sidebar.
+/** The user card in the sidebar. */
 const SidebarUser = connect('codeholders/codeholder', {
     id: 'self',
     fields: ['name', 'type', 'profilePictureHash'],

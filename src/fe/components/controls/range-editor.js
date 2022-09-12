@@ -3,19 +3,21 @@ import { useState, useRef } from 'preact/compat';
 import { TextField, Slider } from 'yamdl';
 import './range-editor.less';
 
-/// A text editor optimized for editing integer range bounds.
-///
-/// # Props
-/// - `min`: the minimum value
-/// - `max`: the maximum value
-/// - `value`/`onChange`: the range bound value/change callback
-/// - `minSoftBound`: the minimum value at which changes will be committed while typing a number.
-///   Since numbers are typed digit-by-digit, their magnitude will usually increase from a very
-///   small value. However, if the user is editing the upper bound with a lower bound set to K,
-///   having the input *always* commit the values would be detrimental when the user starts typing
-///   and the value is momentarily less than K, thus clamping the lower bound. Hence, minSoftBound
-///   should be used on upper bounds to restrict the area in which they will live-update and thus
-///   prevent modifying the lower bound unnecessarily.
+/**
+ * A text editor optimized for editing integer range bounds.
+ *
+ * # Props
+ * - `min`: the minimum value
+ * - `max`: the maximum value
+ * - `value`/`onChange`: the range bound value/change callback
+ * - `minSoftBound`: the minimum value at which changes will be committed while typing a number.
+ *   Since numbers are typed digit-by-digit, their magnitude will usually increase from a very
+ *   small value. However, if the user is editing the upper bound with a lower bound set to K,
+ *   having the input *always* commit the values would be detrimental when the user starts typing
+ *   and the value is momentarily less than K, thus clamping the lower bound. Hence, minSoftBound
+ *   should be used on upper bounds to restrict the area in which they will live-update and thus
+ *   prevent modifying the lower bound unnecessarily.
+ */
 export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef, disabled }) {
     const [isFocused, setFocused] = useState(false);
     const [tmpValue, setTmpValue] = useState(value);
@@ -74,7 +76,7 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef
     );
 }
 
-/// Renders a range editor with inputs on either side.
+/** Renders a range editor with inputs on either side. */
 export default function RangeEditor ({ min, max, value, onChange, tickDistance, faded, disabled, transfer }) {
     const leftBound = useRef(null);
     const rightBound = useRef(null);

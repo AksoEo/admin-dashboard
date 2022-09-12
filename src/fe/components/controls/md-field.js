@@ -24,17 +24,19 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown';
 import './md-field.less';
 
-/// Renders a markdown text field.
-///
-/// # Props
-/// - value/onChange: string
-/// - editing: bool
-/// - maxLength: optional; will show a counter
-/// - rules: list of enabled rules
-/// - inline: if true, will try to style it without line breaks
-/// - singleLine: if true, will not allow line breaks
-/// - editorDidMount, onCMChange: forwarded to codeMirror
-/// - ignoreLiveUpdates: ignores props.value while the user is typing to combat latency
+/**
+ * Renders a markdown text field.
+ *
+ * # Props
+ * - value/onChange: string
+ * - editing: bool
+ * - maxLength: optional; will show a counter
+ * - rules: list of enabled rules
+ * - inline: if true, will try to style it without line breaks
+ * - singleLine: if true, will not allow line breaks
+ * - editorDidMount, onCMChange: forwarded to codeMirror
+ * - ignoreLiveUpdates: ignores props.value while the user is typing to combat latency
+ */
 export default class MarkdownTextField extends PureComponent {
     static contextType = layoutContext;
 
@@ -390,10 +392,12 @@ function InnerEditor ({
     );
 }
 
-/// Applies a wrapping formatting tag, such as bold or italic.
-/// - start: start tag
-/// - end: end tag
-/// - doc: document
+/**
+ * Applies a wrapping formatting tag, such as bold or italic.
+ * - start: start tag
+ * - end: end tag
+ * - doc: document
+ */
 function applyWrappingFormat (startTag, endTag, doc) {
     const selections = [];
     for (const { anchor, head } of doc.listSelections()) {
@@ -604,7 +608,7 @@ function EditorBar ({ visible, rules, doc, onChange, onPopout, onOpenHelp }) {
     );
 }
 
-/// Renders all help.
+/** Renders all help. */
 function AllHelp ({ rules }) {
     const sections = [];
     for (const rule in locale.mdEditor.help.rules) {

@@ -11,12 +11,14 @@ const DAMPING = 1;
 const RESPONSE = 0.4;
 const USE_SCALE = true;
 
-/// Renders a vertical array of animatable material paper.
-///
-/// # Props
-/// - children: array of objects with, uh, various properties (TODO: docs)
+/**
+ * Renders a vertical array of animatable material paper.
+ *
+ * # Props
+ * - children: array of objects with, uh, various properties (TODO: docs)
+ */
 export default class PaperList extends PureComponent {
-    /// ResizeObserver that observes all children.
+    /** ResizeObserver that observes all children. */
     resizeObserver = new ResizeObserver(() => globalAnimator.register(this));
 
     childNodes = [];
@@ -91,7 +93,7 @@ export default class PaperList extends PureComponent {
         }
     }
 
-    /// Returns the style object for a child at the given index.
+    /** Returns the style object for a child at the given index. */
     getChildStyle (index) {
         if (!this.childStates[index] || !this.childNodes[index]) return;
         const state = this.childStates[index];

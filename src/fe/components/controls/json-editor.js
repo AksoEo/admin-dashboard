@@ -8,12 +8,14 @@ import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
 import '../overview/json-filter-editor.less';
 
-/// This editor edits a raw JSON serialized string.
-///
-/// # Props
-/// - value/onChange: string value
-/// - disabled: if true, will be read-only
-/// - strict: if true, will use JSON instead of JSON5
+/**
+ * This editor edits a raw JSON serialized string.
+ *
+ * # Props
+ * - value/onChange: string value
+ * - disabled: if true, will be read-only
+ * - strict: if true, will use JSON instead of JSON5
+ */
 export default class JSONEditor extends Component {
     lastErrorLine = -1;
     lastWidget = null;

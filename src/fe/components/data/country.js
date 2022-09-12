@@ -6,19 +6,19 @@ import TinyProgress from '../controls/tiny-progress';
 import { connect } from '../../core/connection';
 import './style';
 
-/// Converts a letter to a regional indicator.
+/** Converts a letter to a regional indicator. */
 const toRI = v => String.fromCodePoint(v.toLowerCase().charCodeAt(0) - 0x60 + 0x1f1e5);
-/// Converts a two-letter country code to its corresponding emoji.
+/** Converts a two-letter country code to its corresponding emoji. */
 const countryCodeToEmoji = code => toRI(code[0]) + toRI(code[1]);
 
-/// Renders a country, flag given a country code. Use prop `country`.
+/** Renders a country, flag given a country code. Use prop `country`. */
 export function CountryFlag ({ country }) {
     // TODO: use twemoji
     if (!country) return null;
     return <span class="data country-flag">{countryCodeToEmoji(country)}</span>;
 }
 
-/// Renders its inner function (children) with countries and country groups as parameters.
+/** Renders its inner function (children) with countries and country groups as parameters. */
 export const WithCountries = connect('countries/countryGroups')(data => ({
     countryGroups: data,
 }))(connect('countries/countries')(data => ({
@@ -28,7 +28,7 @@ export const WithCountries = connect('countries/countryGroups')(data => ({
     return fallback || null;
 }));
 
-/// Renders a country flag and the name beside it.
+/** Renders a country flag and the name beside it. */
 function CountryRenderer ({ value }) {
     if (!value) return null;
     return (
@@ -38,7 +38,7 @@ function CountryRenderer ({ value }) {
     );
 }
 
-/// Renders a countries dropdown.
+/** Renders a countries dropdown. */
 export function CountryEditor ({ value, onChange, disabled, emptyLabel }) {
     return (
         <div class="data country-editor">

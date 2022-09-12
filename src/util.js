@@ -1,7 +1,9 @@
 //! Random utilities.
 
-/// merges like object.assign, but deep
-/// may or may not mutate a
+/**
+ * merges like object.assign, but deep
+ * may or may not mutate a
+ */
 export function deepMerge (a, b) {
     if (b === undefined) return a;
     if (a !== null && b !== null && typeof a === 'object' && typeof b === 'object') {

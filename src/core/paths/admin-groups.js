@@ -17,7 +17,7 @@ export const PERMISSIONS = 'permissions';
 export const SIG_LIST = '!list';
 
 export const tasks = {
-    /// adminGroups/list: lists admin groups
+    /** adminGroups/list: lists admin groups */
     list: async (_, { search, offset, fields, limit }) => {
         const client = await asyncClient;
 
@@ -53,7 +53,7 @@ export const tasks = {
             },
         };
     },
-    /// adminGroups/group: returns an admin group
+    /** adminGroups/group: returns an admin group */
     group: async ({ id }) => {
         const client = await asyncClient;
 
@@ -64,7 +64,7 @@ export const tasks = {
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, res.body));
         return res.body;
     },
-    /// adminGroups/create: creates an admin group
+    /** adminGroups/create: creates an admin group */
     create: async (_, { name, description, memberRestrictions }) => {
         const client = await asyncClient;
 
@@ -78,7 +78,7 @@ export const tasks = {
         store.signal([ADMIN_GROUPS, SIG_LIST]);
         return id;
     },
-    /// adminGroups/update: updates an admin group
+    /** adminGroups/update: updates an admin group */
     update: async ({ id }, { name, description }) => {
         const client = await asyncClient;
 
@@ -92,7 +92,7 @@ export const tasks = {
         store.insert([ADMIN_GROUPS, id], deepMerge(existing, options));
         store.signal([ADMIN_GROUPS, SIG_LIST]);
     },
-    /// adminGroups/delete: deletes an admin group
+    /** adminGroups/delete: deletes an admin group */
     delete: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${id}`);
@@ -100,7 +100,7 @@ export const tasks = {
         store.signal([ADMIN_GROUPS, SIG_LIST]);
     },
 
-    /// adminGroups/permissions: returns admin group perm data
+    /** adminGroups/permissions: returns admin group perm data */
     permissions: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/admin_groups/${id}/permissions`);
@@ -131,9 +131,11 @@ export const tasks = {
         return permData;
     },
     setPermissions: () => {}, // dummy for UI
-    /// adminGroups/setPermissionsPX: sets admin group permissions (ONLY sends permissions to
-    /// server).
-    /// consider also calling setPermissionsMR to complete the transaction.
+    /**
+     * adminGroups/setPermissionsPX: sets admin group permissions (ONLY sends permissions to
+     * server).
+     * consider also calling setPermissionsMR to complete the transaction.
+     */
     setPermissionsPX: async ({ id }, { permissions }) => {
         const client = await asyncClient;
         await client.put(`/admin_groups/${id}/permissions`, permissions.permissions);
@@ -142,8 +144,10 @@ export const tasks = {
             permissions: { permissions: permissions.permissions },
         }));
     },
-    /// adminGroups/setPermissionsMR: sets admin group permissions (ONLY sends MR to server).
-    /// consider also calling setPermissions to complete the transaction.
+    /**
+     * adminGroups/setPermissionsMR: sets admin group permissions (ONLY sends MR to server).
+     * consider also calling setPermissions to complete the transaction.
+     */
     setPermissionsMR: async ({ id }, { permissions }) => {
         const client = await asyncClient;
 
@@ -165,7 +169,7 @@ export const tasks = {
         }));
     },
 
-    /// adminGroups/listCodeholders: lists codeholders that are part of an admin group
+    /** adminGroups/listCodeholders: lists codeholders that are part of an admin group */
     listCodeholders: async ({ group }, { offset, limit, fields, search }) => {
         const client = await asyncClient;
         const { options } = codeholdersPTRD({
@@ -194,7 +198,7 @@ export const tasks = {
         };
     },
 
-    /// adminGroups/listClients: lists clients that are part of an admin group
+    /** adminGroups/listClients: lists clients that are part of an admin group */
     listClients: async ({ group }, { offset, limit, fields, search }) => {
         const client = await asyncClient;
 
@@ -242,26 +246,26 @@ export const tasks = {
     addClientsBatchTask: async () => {},
     removeClientsBatchTask: async () => {},
 
-    /// adminGroups/addCodeholder: adds a single codeholder
+    /** adminGroups/addCodeholder: adds a single codeholder */
     addCodeholder: async ({ group }, { codeholder }) => {
         const client = await asyncClient;
         await client.put(`/admin_groups/${group}/codeholders/${codeholder}`);
         store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
-    /// adminGroups/removeCodeholder: removes a single codeholder
+    /** adminGroups/removeCodeholder: removes a single codeholder */
     removeCodeholder: async ({ group }, { codeholder }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${group}/codeholders/${codeholder}`);
         store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
 
-    /// adminGroups/addClient: adds a single client
+    /** adminGroups/addClient: adds a single client */
     addClient: async ({ group }, { client: id }) => {
         const client = await asyncClient;
         await client.put(`/admin_groups/${group}/clients/${id}`);
         store.signal([ADMIN_GROUPS, group, SIG_LIST]);
     },
-    /// adminGroups/removeClient: removes a single client
+    /** adminGroups/removeClient: removes a single client */
     removeClient: async ({ group }, { client: id }) => {
         const client = await asyncClient;
         await client.delete(`/admin_groups/${group}/clients/${id}`);
@@ -270,12 +274,14 @@ export const tasks = {
 };
 
 export const views = {
-    /// adminGroups/group: observes an admin group
-    ///
-    /// # Parameters
-    /// - id: admin group id
-    /// - noFetch: if true, will not fetch
-    /// - fetchPerms: if true, will fetch perms
+    /**
+     * adminGroups/group: observes an admin group
+     *
+     * # Parameters
+     * - id: admin group id
+     * - noFetch: if true, will not fetch
+     * - fetchPerms: if true, will fetch perms
+     */
     group: class AdminGroupView extends AbstractDataView {
         constructor ({ id, noFetch, fetchPerms }) {
             super();
@@ -311,7 +317,7 @@ export const views = {
         }
     },
 
-    /// adminGroups/sigList: emits a signal when the list changes
+    /** adminGroups/sigList: emits a signal when the list changes */
     sigList: class AdminGroupListSignal extends AbstractDataView {
         constructor () {
             super();

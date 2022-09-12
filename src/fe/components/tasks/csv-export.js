@@ -12,31 +12,33 @@ import './csv-export.less';
 
 const LIMIT = 100;
 
-/// The CSV export dialog.
-///
-/// # Props
-/// - open/onClose: bool
-/// - task: task name
-/// - options: current task options
-/// - parameters: current task parameters. Is expected to confirm
-/// - detailView: view name. If not given, will assume the task already contains item data
-/// - detailViewOptions: id => options
-/// - filenamePrefix: file name prefix for the csv
-/// - locale: object like { fields: { ... } }
-/// - fields: field renderers (mainly, stringify)
-/// - userOptions:
-///   User-defined options for CSV export.
-///   Should be an object of `id => spec`, where spec is an object with a `type` field. Types:
-///   - `select`: will render a select with options given by the `options` field in the spec.
-///     Each option should be an (array) tuple like `[id, label]`.
-/// - extraOptions: extra options for CSV export, in addition to userOptions
-///
-/// # Strictly Optional Props
-/// - compileFields: (parameters, transientFields) => string[]
-/// - localizeFieldName: id => string?
-///     - if used, `locale` is no longer required
-/// - getFieldStringifier: id => Function
-///     - if used, `fields` is no longer required
+/**
+ * The CSV export dialog.
+ *
+ * # Props
+ * - open/onClose: bool
+ * - task: task name
+ * - options: current task options
+ * - parameters: current task parameters. Is expected to confirm
+ * - detailView: view name. If not given, will assume the task already contains item data
+ * - detailViewOptions: id => options
+ * - filenamePrefix: file name prefix for the csv
+ * - locale: object like { fields: { ... } }
+ * - fields: field renderers (mainly, stringify)
+ * - userOptions:
+ *   User-defined options for CSV export.
+ *   Should be an object of `id => spec`, where spec is an object with a `type` field. Types:
+ *   - `select`: will render a select with options given by the `options` field in the spec.
+ *     Each option should be an (array) tuple like `[id, label]`.
+ * - extraOptions: extra options for CSV export, in addition to userOptions
+ *
+ * # Strictly Optional Props
+ * - compileFields: (parameters, transientFields) => string[]
+ * - localizeFieldName: id => string?
+ *     - if used, `locale` is no longer required
+ * - getFieldStringifier: id => Function
+ *     - if used, `fields` is no longer required
+ */
 export default class CSVExport extends PureComponent {
     static contextType = coreContext;
 
@@ -103,7 +105,7 @@ export default class CSVExport extends PureComponent {
         this.setState({ exporting: false, error: null });
     };
 
-    /// Compiles selected fields
+    /** Compiles selected fields */
     compileFields () {
         const parameters = typeof this.props.parameters === 'function'
             ? this.props.parameters(this.state.options)
@@ -337,11 +339,13 @@ export default class CSVExport extends PureComponent {
     }
 }
 
-/// Renders user-defined options. See CSV Export docs above for details.
-///
-/// # Props
-/// - options
-/// - value/onChange
+/**
+ * Renders user-defined options. See CSV Export docs above for details.
+ *
+ * # Props
+ * - options
+ * - value/onChange
+ */
 class UserOptions extends PureComponent {
     componentDidMount () {
         this.updateValue();

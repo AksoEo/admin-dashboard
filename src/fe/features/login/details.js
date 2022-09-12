@@ -6,15 +6,17 @@ import { Form, Field, ValidatedTextField } from '../../components/form';
 import { login as locale } from '../../locale';
 import { Mode } from './is-special-page';
 
-/// Details page in the login dialog.
-///
-/// # Props
-/// - core: core ref
-/// - authState: core auth state
-/// - isAdmin: core isAdmin state
-/// - mode: login mode
-/// - token: password creation token (if given)
-/// - login/onLoginChange: login name
+/**
+ * Details page in the login dialog.
+ *
+ * # Props
+ * - core: core ref
+ * - authState: core auth state
+ * - isAdmin: core isAdmin state
+ * - mode: login mode
+ * - token: password creation token (if given)
+ * - login/onLoginChange: login name
+ */
 export default class DetailsPage extends Component {
     state = {
         password: '',

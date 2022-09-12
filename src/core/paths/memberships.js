@@ -8,7 +8,7 @@ import { clientFromAPI as codeholderFromAPI, clientToAPI as codeholderToAPI } fr
 import { deepMerge } from '../../util';
 import { crudList, crudCreate, crudGet, crudUpdate, crudDelete } from '../templates';
 
-/// Data store path.
+/** Data store path. */
 export const MEMBERSHIPS = 'memberships';
 export const MEMBERSHIP_CATEGORIES = [MEMBERSHIPS, 'categories'];
 export const MEMBERSHIP_CATEGORIES_LIST = [MEMBERSHIPS, 'all_categories'];
@@ -18,7 +18,7 @@ export const SIG_OPTIONS = [MEMBERSHIPS, 'options', '!options'];
 export const REGISTRATION_ENTRIES = [MEMBERSHIPS, 'entries'];
 export const SIG_ENTRIES = [MEMBERSHIPS, 'entries', '!entires'];
 
-/// Loads all membership categories because there won’t be too many for this to become a problem
+/** Loads all membership categories because there won’t be too many for this to become a problem */
 async function loadAllMembershipCategories () {
     if (store.get(MEMBERSHIP_CATEGORIES_LIST)) return;
 
@@ -360,8 +360,10 @@ export const tasks = {
 };
 
 export const views = {
-    /// memberships/categories: a view of all membership categories and their (significant)
-    /// properties
+    /**
+     * memberships/categories: a view of all membership categories and their (significant)
+     * properties
+     */
     categories: class Categories extends AbstractDataView {
         constructor () {
             super();

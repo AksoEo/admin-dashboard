@@ -5,29 +5,31 @@ import './segmented.less';
 
 const lerp = (a, b, x) => (b - a) * x + a;
 
-/// A segmented selection control (see iOS).
-/// Apparently these are not part of Material Design but they’re too convenient not to be used.
-///
-/// Pass an array of objects as its children like so:
-///
-/// ```js
-/// <Segmented>
-///     {[
-///         {
-///             id: 'option-1',
-///             label: 'Option 1',
-///         },
-///     ]}
-/// </Segmented>
-/// ```
-///
-/// # Props
-/// - children: a list of objects with the following properties:
-///   - `id`: a unique identifier that will be used for the `selected` prop
-///   - `label`: a label string or component
-///   - `disabled`: if true, will render it disabled
-/// - selected/onSelect: the selected option’s id
-/// - disabled: bool
+/**
+ * A segmented selection control (see iOS).
+ * Apparently these are not part of Material Design but they’re too convenient not to be used.
+ *
+ * Pass an array of objects as its children like so:
+ *
+ * ```js
+ * <Segmented>
+ *     {[
+ *         {
+ *             id: 'option-1',
+ *             label: 'Option 1',
+ *         },
+ *     ]}
+ * </Segmented>
+ * ```
+ *
+ * # Props
+ * - children: a list of objects with the following properties:
+ *   - `id`: a unique identifier that will be used for the `selected` prop
+ *   - `label`: a label string or component
+ *   - `disabled`: if true, will render it disabled
+ * - selected/onSelect: the selected option’s id
+ * - disabled: bool
+ */
 export default class Segmented extends PureComponent {
     state = {
         backgroundPos: 0,

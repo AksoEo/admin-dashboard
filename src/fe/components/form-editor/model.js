@@ -2,7 +2,7 @@
 import { evaluate } from '@tejo/akso-script';
 import { formEditor as locale } from '../../locale';
 
-/// Creates an input item of the given type.
+/** Creates an input item of the given type. */
 export function createInput (type) {
     let extra = {};
     if (type === 'number') extra = {
@@ -76,9 +76,11 @@ export function createInput (type) {
 }
 
 const MAX_EVAL_INVOCATIONS = 4096;
-/// Attempts to evaluate an AKSO Script expression.
-///
-/// - previousNodes: array of { formVars: { [name]: { type, value } }, defs: script obj }
+/**
+ * Attempts to evaluate an AKSO Script expression.
+ *
+ * - previousNodes: array of { formVars: { [name]: { type, value } }, defs: script obj }
+ */
 export function evalExpr (expr, previousNodes) {
     if (!expr) return undefined;
 
@@ -112,7 +114,7 @@ export function evalExpr (expr, previousNodes) {
     return result;
 }
 
-/// Returns “global” definitions (e.g. @@-vars)
+/** Returns “global” definitions (e.g. @@-vars) */
 export function getGlobalDefs (additionalVars) {
     return {
         defs: {},
@@ -132,11 +134,13 @@ export function getGlobalDefs (additionalVars) {
     };
 }
 
-/// Returns all AKSO Script definitions in the given form item and its value (if applicable).
-///
-/// Will return { defs: script defs, formVars: form vars object { [name]: { type, value } } }
-///
-/// Form vars are in the same format as the ASC Editor
+/**
+ * Returns all AKSO Script definitions in the given form item and its value (if applicable).
+ *
+ * Will return { defs: script defs, formVars: form vars object { [name]: { type, value } } }
+ *
+ * Form vars are in the same format as the ASC Editor
+ */
 export function getAscDefs (item, value) {
     if (item.el === 'script') {
         return { defs: item.script, formVars: [] };
@@ -169,7 +173,7 @@ export function getAscDefs (item, value) {
     }
 }
 
-/// Validates the form input value. Returns null if valid, or an error if not.
+/** Validates the form input value. Returns null if valid, or an error if not. */
 export function validateFormInput (item, previousNodes, value) {
     const props = ['default', 'required', 'disabled'];
     const resolved = {};

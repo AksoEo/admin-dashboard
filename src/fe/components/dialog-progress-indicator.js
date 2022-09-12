@@ -2,15 +2,17 @@ import { h, Component } from 'preact';
 import { Button, Spring } from 'yamdl';
 import './dialog-progress-indicator.less';
 
-/// Dialog progress indicator.
-/// Assumes that the children will never change.
-/// If `selected` is `-2`, will render `helpLabel`.
-///
-/// # Props
-/// - selected: number
-/// - children: list of vnodes
-/// - helpLabel: vnode
-/// - onBack: if set, will show a back button
+/**
+ * Dialog progress indicator.
+ * Assumes that the children will never change.
+ * If `selected` is `-2`, will render `helpLabel`.
+ *
+ * # Props
+ * - selected: number
+ * - children: list of vnodes
+ * - helpLabel: vnode
+ * - onBack: if set, will show a back button
+ */
 export default class DialogProgressIndicator extends Component {
     state = { offset: 0, currentNodeWidth: 0 };
     spring = new Spring(1, 0.5);
@@ -61,7 +63,7 @@ export default class DialogProgressIndicator extends Component {
         this.spring.stop();
     }
 
-    /// Returns styles for an item at the given index.
+    /** Returns styles for an item at the given index. */
     itemStyle (index) {
         const offset = index - this.state.offset;
         const nodeWidth = this.nodes[index] ? this.nodes[index].width : 0;

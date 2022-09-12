@@ -5,12 +5,14 @@ import './tabs.less';
 
 const ANIM_STAGGER_TIME = 0.1;
 
-/// Tabs
-///
-/// # Props
-/// - value/onChange: tab id
-/// - tabs: { [id]: label }
-/// - disabled: bool
+/**
+ * Tabs
+ *
+ * # Props
+ * - value/onChange: tab id
+ * - tabs: { [id]: label }
+ * - disabled: bool
+ */
 export default class Tabs extends PureComponent {
     scrollX = new Spring(1, 1);
 
@@ -27,7 +29,7 @@ export default class Tabs extends PureComponent {
 
     tabRefs = [];
 
-    /// moves the tab line to a target position
+    /** moves the tab line to a target position */
     moveLineTo (target) {
         const dir = this.linePos === null || target === null
             ? null

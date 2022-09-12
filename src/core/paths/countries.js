@@ -6,7 +6,7 @@ import asyncClient from '../client';
 import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 
-/// Data store path.
+/** Data store path. */
 export const COUNTRIES = 'countries';
 export const COUNTRIES_LIST = [COUNTRIES, 'countries'];
 export const COUNTRY_GROUPS_LIST = [COUNTRIES, 'countryGroups'];
@@ -19,12 +19,12 @@ store.subscribe([COUNTRIES], () => {}); // prevent GC
 
 export const SIG_LIST = '!list';
 
-/// available localization languages
+/** available localization languages */
 export const COUNTRY_LANGS = [
     'eo', 'en', 'fr', 'es', 'nl', 'pt', 'sk', 'zh', 'de',
 ];
 
-/// Loads all countries
+/** Loads all countries */
 async function loadCountries (locale) {
     if (!store.get(CACHED_LOCALES)) store.insert(CACHED_LOCALES, []);
     if (!store.get(LOCKED_LOCALES)) store.insert(LOCKED_LOCALES, []);
@@ -49,7 +49,7 @@ async function loadCountries (locale) {
     store.insert(CACHED_LOCALES, store.get(CACHED_LOCALES).concat([locale]));
 }
 
-/// Loads all country groups
+/** Loads all country groups */
 async function loadAllCountryGroups () {
     if (store.get(COUNTRY_GROUPS_LOCK)) return;
     store.insert(COUNTRY_GROUPS_LOCK, true);
@@ -90,7 +90,7 @@ async function loadAllCountryGroups () {
 }
 
 export const tasks = {
-    /// countries/list: lists countries
+    /** countries/list: lists countries */
     list: async (_, { search, offset, limit, fields }) => {
         const client = await asyncClient;
 
@@ -132,7 +132,7 @@ export const tasks = {
         };
     },
 
-    /// countries/listGroups: lists country groups
+    /** countries/listGroups: lists country groups */
     listGroups: async (_, { search, offset, limit, fields }) => {
         const client = await asyncClient;
 
@@ -170,7 +170,7 @@ export const tasks = {
         };
     },
 
-    /// countries/country: fetches a single country
+    /** countries/country: fetches a single country */
     country: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/countries/${id}`, {
@@ -186,7 +186,7 @@ export const tasks = {
         return item;
     },
 
-    /// countries/group: fetches a single country group
+    /** countries/group: fetches a single country group */
     group: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/country_groups/${id}`, {
@@ -199,7 +199,7 @@ export const tasks = {
         return item;
     },
 
-    /// countries/update: updates a single country
+    /** countries/update: updates a single country */
     update: async ({ id }, data) => {
         const client = await asyncClient;
         data = { ...data };
@@ -212,7 +212,7 @@ export const tasks = {
         store.insert(path, deepMerge(store.get(path), data));
     },
 
-    /// countries/createGroup: creates a single country group
+    /** countries/createGroup: creates a single country group */
     createGroup: async (_, { code, name }) => {
         const client = await asyncClient;
 
@@ -224,7 +224,7 @@ export const tasks = {
         store.signal(COUNTRY_GROUPS_LIST.concat([SIG_LIST]));
     },
 
-    /// countries/updateGroup: updates a country group
+    /** countries/updateGroup: updates a country group */
     updateGroup: async ({ id }, { name }) => {
         const client = await asyncClient;
 
@@ -234,7 +234,7 @@ export const tasks = {
         store.insert(path, deepMerge(store.get(path), { name }));
     },
 
-    /// countries/deleteGroup: deletes a country group
+    /** countries/deleteGroup: deletes a country group */
     deleteGroup: async (_, { id }) => {
         const client = await asyncClient;
         await client.delete(`/country_groups/${id}`);
@@ -243,7 +243,7 @@ export const tasks = {
         store.signal(COUNTRY_GROUPS_LIST.concat([SIG_LIST]));
     },
 
-    /// countries/addGroupCountry: adds a country to a country group
+    /** countries/addGroupCountry: adds a country to a country group */
     addGroupCountry: async ({ group }, { country }) => {
         const client = await asyncClient;
         await client.put(`/country_groups/${group}/countries/${country}`);
@@ -259,7 +259,7 @@ export const tasks = {
             store.insert(COUNTRY_GROUPS_LIST.concat([group]), groupData);
         }
     },
-    /// countries/removeGroupCountry: removes a country from a country group
+    /** countries/removeGroupCountry: removes a country from a country group */
     removeGroupCountry: async ({ group }, { country }) => {
         const client = await asyncClient;
         await client.delete(`/country_groups/${group}/countries/${country}`);
@@ -278,7 +278,7 @@ export const tasks = {
 };
 
 export const views = {
-    /// countries/country: data view of a single country
+    /** countries/country: data view of a single country */
     country: class Country extends AbstractDataView {
         constructor ({ id, noFetch }) {
             super();
@@ -295,7 +295,7 @@ export const views = {
             store.unsubscribe(COUNTRIES_LIST.concat([this.id]));
         }
     },
-    /// countries/group: data view of a single country group
+    /** countries/group: data view of a single country group */
     group: class Group extends AbstractDataView {
         constructor ({ id, noFetch }) {
             super();
@@ -312,14 +312,16 @@ export const views = {
             store.unsubscribe(COUNTRY_GROUPS_LIST.concat([this.id]));
         }
     },
-    /// countries/countries: lists all countries
-    ///
-    /// # Options
-    /// - locales: array of locales to fetch localized names in (e.g. `['eo', 'en']`)
-    ///   defaults to eo
-    ///
-    /// Data is an object mapping country codes to an object containing localized names, e.g.
-    /// `nl` ↦ `{ eo: 'Nederlando', en: 'Netherlands', ... }`
+    /**
+     * countries/countries: lists all countries
+     *
+     * # Options
+     * - locales: array of locales to fetch localized names in (e.g. `['eo', 'en']`)
+     *   defaults to eo
+     *
+     * Data is an object mapping country codes to an object containing localized names, e.g.
+     * `nl` ↦ `{ eo: 'Nederlando', en: 'Netherlands', ... }`
+     */
     countries: class Countries extends AbstractDataView {
         constructor ({ locales = ['eo'] } = {}) {
             super();
@@ -338,7 +340,7 @@ export const views = {
             store.unsubscribe(COUNTRIES_LIST, this.#onUpdate);
         }
     },
-    /// countries/countryGroups: lists all country groups
+    /** countries/countryGroups: lists all country groups */
     countryGroups: class CountryGroups extends AbstractDataView {
         constructor () {
             super();
@@ -353,6 +355,6 @@ export const views = {
         }
     },
 
-    /// countries/sigCountryGroups: emits a signal when the list of country groups may have changed
+    /** countries/sigCountryGroups: emits a signal when the list of country groups may have changed */
     sigCountryGroups: createStoreObserver(COUNTRY_GROUPS_LIST.concat([SIG_LIST])),
 };

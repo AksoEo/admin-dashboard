@@ -4,7 +4,7 @@ import DisplayError from '../../../components/utils/error';
 import { data as dataLocale, codeholders as locale } from '../../../locale';
 import config from '../../../../config.val';
 
-/// Previews a file.
+/** Previews a file. */
 export default class FileView extends Component {
     state = {
         invalid: false,

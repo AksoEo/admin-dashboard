@@ -7,13 +7,15 @@ import { login as locale } from '../../locale';
 
 const TotpSetup = lazy(() => import(/* webpackChunkName: "totp-setup" */ './totp-setup'));
 
-/// The TOTP code input page.
-///
-/// # Props
-/// - core: core ref
-/// - authState: core auth state
-/// - onHeightChange: callback called when the height changes
-/// - totpSetupRequired: bool
+/**
+ * The TOTP code input page.
+ *
+ * # Props
+ * - core: core ref
+ * - authState: core auth state
+ * - onHeightChange: callback called when the height changes
+ * - totpSetupRequired: bool
+ */
 export default class TotpPage extends Component {
     state = {
         secret: null,

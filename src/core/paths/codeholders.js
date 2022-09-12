@@ -58,7 +58,7 @@ import { CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS, delegateFilters } from './dele
 //! - addressCity: identical to addressLatin.city
 //! - addressCountryArea: identical to addressLatin.countryArea
 
-/// Data store path.
+/** Data store path. */
 export const CODEHOLDERS = 'codeholders';
 export const CODEHOLDER_PERMS = 'codeholderPerms';
 export const CODEHOLDER_FILES = 'codeholderFiles';
@@ -91,17 +91,19 @@ const phoneFormat = field => ({
     toAPI: (value) => value?.value !== undefined ? { [field]: value.value } : {},
 });
 
-/// Codeholder fields in the client-side representation.
-///
-/// - apiFields: corresponding API fields for this field
-///   this can either be a string (for 1:1 mapping) or an array (for other mappings)
-/// - fromAPI: maps an API codeholder to a value of this field. required fields can be assumed to
-///   exist in the API codeholder (if apiFields is a string, this is automatic)
-///   except in field history, required fields won’t be loaded there. use heuristics
-/// - toAPI: maps a value of this field to a partial API codeholder
-///   (if apiFields is a string, this is automatic)
-/// - requires: required client-side fields that must also be requested (for e.g. disambiguation)
-/// - sort: API field to sort by. If not given, use apiFields in the given order
+/**
+ * Codeholder fields in the client-side representation.
+ *
+ * - apiFields: corresponding API fields for this field
+ *   this can either be a string (for 1:1 mapping) or an array (for other mappings)
+ * - fromAPI: maps an API codeholder to a value of this field. required fields can be assumed to
+ *   exist in the API codeholder (if apiFields is a string, this is automatic)
+ *   except in field history, required fields won’t be loaded there. use heuristics
+ * - toAPI: maps a value of this field to a partial API codeholder
+ *   (if apiFields is a string, this is automatic)
+ * - requires: required client-side fields that must also be requested (for e.g. disambiguation)
+ * - sort: API field to sort by. If not given, use apiFields in the given order
+ */
 const clientFields = {
     id: 'id',
     type: {
@@ -306,7 +308,7 @@ const refetchFields = {
     birthdate: ['age'],
 };
 
-/// converts from API repr to client repr (see above)
+/** converts from API repr to client repr (see above) */
 export const clientFromAPI = makeClientFromAPI(clientFields);
 export const clientToAPI = makeClientToAPI(clientFields);
 
@@ -329,10 +331,12 @@ export const clientToAPI = makeClientToAPI(clientFields);
 //! - deathdate: array [lower bound year, upper bound year]
 //! - roles: object { roles: array of ids, date: date in RFC3339 }
 
-/// Client filter specs.
-///
-/// - toAPI: converts client repr to an API filter
-/// - fields: required API fields for this filter (wrt permissions)
+/**
+ * Client filter specs.
+ *
+ * - toAPI: converts client repr to an API filter
+ * - fields: required API fields for this filter (wrt permissions)
+ */
 const clientFilters = {
     type: {
         toAPI: value => ({ codeholderType: value }),
@@ -498,15 +502,17 @@ const clientFilters = {
     },
 };
 
-/// Transient client fields that will be selected for a given search field.
-///
-/// This is a list of exceptions; all other will be passed through as-is.
+/**
+ * Transient client fields that will be selected for a given search field.
+ *
+ * This is a list of exceptions; all other will be passed through as-is.
+ */
 const searchFieldToTransientFields = {
     nameOrCode: ['name', 'code'],
     searchAddress: ['address'],
 };
 
-/// Converts params to request options. See task codeholders/list for details.
+/** Converts params to request options. See task codeholders/list for details. */
 export const parametersToRequestData = makeParametersToRequestData({
     searchFieldToTransientFields,
     handleSearchFields: ({ query, field }) => {
@@ -546,9 +552,11 @@ export const parametersToRequestData = makeParametersToRequestData({
 });
 
 export const tasks = {
-    /// codeholders/fields: lists available fields according to permissions (it is recommended that
-    /// you use the corresponding view instead)
-    /// returns an array with field ids
+    /**
+     * codeholders/fields: lists available fields according to permissions (it is recommended that
+     * you use the corresponding view instead)
+     * returns an array with field ids
+     */
     fields: async () => {
         const client = await asyncClient;
         const fields = [];
@@ -594,9 +602,11 @@ export const tasks = {
         }
         return { fields, ownFields };
     },
-    /// codeholders/filters: lists available filters according to permissions (it is recommended
-    /// that you use the corresponding view instead)
-    /// returns an array with filter ids
+    /**
+     * codeholders/filters: lists available filters according to permissions (it is recommended
+     * that you use the corresponding view instead)
+     * returns an array with filter ids
+     */
     filters: async () => {
         const client = await asyncClient;
         const filters = [];
@@ -615,29 +625,31 @@ export const tasks = {
         }
         return filters;
     },
-    /// codeholders/filtersToAPI: converts filters to api repr
+    /** codeholders/filtersToAPI: converts filters to api repr */
     filtersToAPI: async ({ filters }) => {
         return filtersToAPI(clientFilters, filters);
     },
-    /// codeholders/list: fetches codeholders
-    /// options: none
-    /// parameters:
-    ///    - search: { field: string, query: string }
-    ///    - filters: object { [name]: { value, enabled } }
-    ///        - if key `_disabled` is set, will be disabled
-    ///    - jsonFilter: object { filter: object, error: string?, disabled: bool }
-    ///    - fields: [{ id: string, sorting: 'asc' | 'desc' | 'none' }]
-    ///    - offset: number
-    ///    - limit: number
-    ///    - skipCursed: bool - if true, will not add cursed items
-    /// returns:
-    ///    - items: [data store id list]
-    ///    - transientFields: [string]
-    ///    - total: number
-    ///    - cursed: array of cursed items or null
-    ///    - stats
-    ///        - filtered: bool
-    ///        - time: string
+    /**
+     * codeholders/list: fetches codeholders
+     * options: none
+     * parameters:
+     *    - search: { field: string, query: string }
+     *    - filters: object { [name]: { value, enabled } }
+     *        - if key `_disabled` is set, will be disabled
+     *    - jsonFilter: object { filter: object, error: string?, disabled: bool }
+     *    - fields: [{ id: string, sorting: 'asc' | 'desc' | 'none' }]
+     *    - offset: number
+     *    - limit: number
+     *    - skipCursed: bool - if true, will not add cursed items
+     * returns:
+     *    - items: [data store id list]
+     *    - transientFields: [string]
+     *    - total: number
+     *    - cursed: array of cursed items or null
+     *    - stats
+     *        - filtered: bool
+     *        - time: string
+     */
     list: async (_, parameters) => {
         const client = await asyncClient;
 
@@ -727,13 +739,15 @@ export const tasks = {
             },
         };
     },
-    /// codeholders/codeholder: gets a single codeholder and puts it in the data store
-    ///
-    /// # Options
-    /// - id: codeholder id or `self`
-    /// - fields: client field ids
-    ///
-    /// Returns the resolved id (i.e. always a number, never `self`)
+    /**
+     * codeholders/codeholder: gets a single codeholder and puts it in the data store
+     *
+     * # Options
+     * - id: codeholder id or `self`
+     * - fields: client field ids
+     *
+     * Returns the resolved id (i.e. always a number, never `self`)
+     */
     codeholder: async (_, { id, fields }) => {
         const client = await asyncClient;
 
@@ -765,10 +779,12 @@ export const tasks = {
 
         return id;
     },
-    /// codeholders/create: creates a codeholder
-    ///
-    /// # Parameters
-    /// - all codeholder fields, really
+    /**
+     * codeholders/create: creates a codeholder
+     *
+     * # Parameters
+     * - all codeholder fields, really
+     */
     create: async (_, data) => {
         const client = await asyncClient;
         const res = await client.post('/codeholders', clientToAPI(data));
@@ -777,10 +793,12 @@ export const tasks = {
         store.insert([CODEHOLDERS, id], data);
         return id;
     },
-    /// codeholders/delete: deletes a codeholder
-    ///
-    /// # Options
-    /// - id: codeholder id
+    /**
+     * codeholders/delete: deletes a codeholder
+     *
+     * # Options
+     * - id: codeholder id
+     */
     delete: async ({ id }) => {
         const client = await asyncClient;
         await client.delete(`/codeholders/${id}`);
@@ -789,14 +807,16 @@ export const tasks = {
         store.remove([CODEHOLDERS, storeId]);
         store.signal([CODEHOLDERS, SIG_CODEHOLDERS]);
     },
-    /// codeholders/update: updates a codeholder
-    ///
-    /// # Options
-    /// - id: codeholder id
-    ///
-    /// # Parameters
-    /// - updateComment: modCmt
-    /// - any codeholder fields; will be diffed
+    /**
+     * codeholders/update: updates a codeholder
+     *
+     * # Options
+     * - id: codeholder id
+     *
+     * # Parameters
+     * - updateComment: modCmt
+     * - any codeholder fields; will be diffed
+     */
     update: async ({ id }, data) => {
         const client = await asyncClient;
         const codeholderData = { ...data };
@@ -836,11 +856,13 @@ export const tasks = {
             tasks.codeholder({}, { id, fields: [refetch] }).catch(() => {});
         }
     },
-    /// codeholders/setProfilePicture: sets a codeholder’s profile picture
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id or `self`
-    /// - blob: file blob (which has an appropriate mime type)
+    /**
+     * codeholders/setProfilePicture: sets a codeholder’s profile picture
+     *
+     * # Options and Parameters
+     * - id: codeholder id or `self`
+     * - blob: file blob (which has an appropriate mime type)
+     */
     setProfilePicture: async ({ id }, { blob }) => {
         const client = await asyncClient;
         await client.put(`/codeholders/${id}/profile_picture`, null, {}, [{
@@ -864,13 +886,15 @@ export const tasks = {
             profilePictureHash: null,
         }));
     },
-    /// codeholders/listFiles: lists files for a codeholder
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - offset, limit
-    ///
-    /// Returns { items, total }
+    /**
+     * codeholders/listFiles: lists files for a codeholder
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - offset, limit
+     *
+     * Returns { items, total }
+     */
     listFiles: async ({ id }, { offset, limit }) => {
         const client = await asyncClient;
         const res = await client.get(`/codeholders/${id}/files`, {
@@ -896,13 +920,15 @@ export const tasks = {
         store.insert([CODEHOLDER_FILES, +storeId, +file], res.body[0]);
         return res.body[0].id;
     },
-    /// codeholders/uploadFile: uploads a file
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - name: file name
-    /// - description: optional file description
-    /// - file: blob
+    /**
+     * codeholders/uploadFile: uploads a file
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - name: file name
+     * - description: optional file description
+     * - file: blob
+     */
     uploadFile: async ({ id }, { name, description, file }) => {
         const client = await asyncClient;
         const options = { name };
@@ -916,11 +942,13 @@ export const tasks = {
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         store.signal([CODEHOLDERS, storeId, SIG_FILES]);
     },
-    /// codeholders/deleteFile: deletes a file
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - file: file id
+    /**
+     * codeholders/deleteFile: deletes a file
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - file: file id
+     */
     deleteFile: async ({ id, file }) => {
         const client = await asyncClient;
         await client.delete(`codeholders/${id}/files/${file}`);
@@ -928,13 +956,15 @@ export const tasks = {
         store.remove([CODEHOLDER_FILES, storeId, file]);
         store.signal([CODEHOLDERS, storeId, SIG_FILES]);
     },
-    /// codeholders/listMemberships: lists memberships for a codeholder
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - offset, limit
-    ///
-    /// Returns { items, total }
+    /**
+     * codeholders/listMemberships: lists memberships for a codeholder
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - offset, limit
+     *
+     * Returns { items, total }
+     */
     listMemberships: async ({ id }, { offset, limit, jsonFilter }) => {
         const client = await asyncClient;
         const res = await client.get(`/codeholders/${id}/membership`, {
@@ -957,12 +987,14 @@ export const tasks = {
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };
     },
-    /// codeholders/addMembership: adds a membership
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - category: category id
-    /// - year: year
+    /**
+     * codeholders/addMembership: adds a membership
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - category: category id
+     * - year: year
+     */
     addMembership: async ({ id }, { category, year, canuto }) => {
         const client = await asyncClient;
         await client.post(`/codeholders/${id}/membership`, {
@@ -980,11 +1012,13 @@ export const tasks = {
             log.error('failed to fetch new memberships', err);
         });
     },
-    /// codeholders/deleteMembership: deletes a membership
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - membership: membership id
+    /**
+     * codeholders/deleteMembership: deletes a membership
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - membership: membership id
+     */
     deleteMembership: async ({ id }, { membership }) => {
         const client = await asyncClient;
         await client.delete(`/codeholders/${id}/membership/${membership}`);
@@ -998,14 +1032,16 @@ export const tasks = {
             log.error('failed to fetch new memberships', err);
         });
     },
-    /// codeholders/listRoles: lists roles for a codeholder
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - offset, limit
-    /// - filter (optional): verbatim filter
-    ///
-    /// Returns { items, total }
+    /**
+     * codeholders/listRoles: lists roles for a codeholder
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - offset, limit
+     * - filter (optional): verbatim filter
+     *
+     * Returns { items, total }
+     */
     listRoles: async ({ id }, { offset, limit, filter }) => {
         const client = await asyncClient;
         const opts = {};
@@ -1031,12 +1067,14 @@ export const tasks = {
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };
     },
-    /// codeholders/addRole: adds a role
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - role: role id
-    /// - durationFrom/durationTo: nullable date bounds
+    /**
+     * codeholders/addRole: adds a role
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - role: role id
+     * - durationFrom/durationTo: nullable date bounds
+     */
     addRole: async ({ id }, { durationFrom, durationTo, role, ...extra }) => {
         const client = await asyncClient;
         await client.post(`/codeholders/${id}/roles`, {
@@ -1049,13 +1087,15 @@ export const tasks = {
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         store.signal([CODEHOLDERS, storeId, SIG_ROLES]);
     },
-    /// codeholders/updateRole: updates a role
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - entry: role id
-    /// - durationFrom/durationTo: nullable date bounds
-    /// - role: role id
+    /**
+     * codeholders/updateRole: updates a role
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - entry: role id
+     * - durationFrom/durationTo: nullable date bounds
+     * - role: role id
+     */
     updateRole: async ({ id, entry }, { durationFrom, durationTo, role, ...extra }) => {
         const client = await asyncClient;
         await client.patch(`/codeholders/${id}/roles/${entry}`, {
@@ -1068,11 +1108,13 @@ export const tasks = {
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         store.signal([CODEHOLDERS, storeId, SIG_ROLES]);
     },
-    /// codeholders/deleteRole: deletes a role
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - role: role entry id
+    /**
+     * codeholders/deleteRole: deletes a role
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - role: role entry id
+     */
     deleteRole: async ({ id }, { role }) => {
         const client = await asyncClient;
         await client.delete(`/codeholders/${id}/roles/${role}`);
@@ -1080,13 +1122,15 @@ export const tasks = {
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
         store.signal([CODEHOLDERS, storeId, SIG_ROLES]);
     },
-    /// codeholders/makeAddressLabels: spawns a task on the server
-    ///
-    /// # Options
-    /// see codeholders/list
-    ///
-    /// # Parameters
-    /// see api docs
+    /**
+     * codeholders/makeAddressLabels: spawns a task on the server
+     *
+     * # Options
+     * see codeholders/list
+     *
+     * # Parameters
+     * see api docs
+     */
     makeAddressLabels: async ({ search, filters, jsonFilter, fields, snapshot, snapshotCompare }, parameters) => {
         const client = await asyncClient;
         const { options } = parametersToRequestData({ search, filters, jsonFilter, fields });
@@ -1118,12 +1162,14 @@ export const tasks = {
 
         await client.post('/codeholders/!make_address_labels', roundParams(parameters), options);
     },
-    /// codeholders/address: gets a codeholder’s formatted address
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - lang: language (defaults to eo)
-    /// - postal: whether to format as postalLatin
+    /**
+     * codeholders/address: gets a codeholder’s formatted address
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - lang: language (defaults to eo)
+     * - postal: whether to format as postalLatin
+     */
     address: async ({ id }, { lang = 'eo', postal = false }) => {
         const client = await asyncClient;
         const res = await client.get(`/codeholders/${id}/address/${lang}`, {
@@ -1131,16 +1177,18 @@ export const tasks = {
         });
         return res.body[id];
     },
-    /// codeholders/fieldHistory: gets a codeholder field’s entire history
-    ///
-    /// Unlike the API, here mods contain the *new* value and not the *old* value.
-    ///
-    /// # Props
-    /// - id: codeholder id
-    /// - field: client field name
-    ///
-    /// # Returns
-    /// - items: modifications, sorted by time
+    /**
+     * codeholders/fieldHistory: gets a codeholder field’s entire history
+     *
+     * Unlike the API, here mods contain the *new* value and not the *old* value.
+     *
+     * # Props
+     * - id: codeholder id
+     * - field: client field name
+     *
+     * # Returns
+     * - items: modifications, sorted by time
+     */
     fieldHistory: async ({ id, field }) => {
         const client = await asyncClient;
 
@@ -1243,11 +1291,13 @@ export const tasks = {
             items: modsByTime.reverse().map(k => mods[k]),
         };
     },
-    /// codeholders/listLogins: lists login history
-    ///
-    /// # Options and Parameters
-    /// - id: codeholder id
-    /// - offset, limit
+    /**
+     * codeholders/listLogins: lists login history
+     *
+     * # Options and Parameters
+     * - id: codeholder id
+     * - offset, limit
+     */
     listLogins: async ({ id }, { offset, limit }) => {
         const client = await asyncClient;
         const res = await client.get(`/codeholders/${id}/logins`, {
@@ -1272,7 +1322,7 @@ export const tasks = {
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };
     },
-    /// codeholders/createPassword: sends a password creation email
+    /** codeholders/createPassword: sends a password creation email */
     createPassword: async ({ id }, { org }) => {
         // first, obtain the user’s uea code
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
@@ -1293,7 +1343,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.post(`/codeholders/${ueaCode}/!create_password`, { org });
     },
-    /// codeholders/resetPassword: sends a password reset email
+    /** codeholders/resetPassword: sends a password reset email */
     resetPassword: async ({ id }, { org }) => {
         // first, obtain the user’s uea code
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;
@@ -1470,7 +1520,7 @@ export const tasks = {
         }, options);
     },
 
-    /// Lists change requests.
+    /** Lists change requests. */
     changeRequests: crudList({
         apiPath: () => `/codeholders/change_requests`,
         fields: ['id', 'time', 'codeholderId', 'status', 'codeholderDescription', 'internalNotes'],
@@ -1616,7 +1666,7 @@ function flushCodeholders () {
     });
 }
 
-/// Fetches a codeholder’s details. Batches calls.
+/** Fetches a codeholder’s details. Batches calls. */
 function fetchCodeholderForView (id, fields) {
     if (id === 'self') {
         // can’t batch this one
@@ -1653,7 +1703,7 @@ export const views = {
     // FIXME: the following two views assume that permissions are **immutable**
     // however, this is not the case and we need to handle this at some point (maybe)
     // (edge cases don’t really seem to be a priority tbh so maybe never)
-    /// codeholders/fields: lists available fields according to permissions
+    /** codeholders/fields: lists available fields according to permissions */
     fields: class Fields extends AbstractDataView {
         constructor () {
             super();
@@ -1662,7 +1712,7 @@ export const views = {
                 .catch(err => this.emit('error', err));
         }
     },
-    /// codeholders/fields: lists available filters according to permissions
+    /** codeholders/fields: lists available filters according to permissions */
     filters: class Filters extends AbstractDataView {
         constructor () {
             super();
@@ -1671,13 +1721,15 @@ export const views = {
                 .catch(err => this.emit('error', err));
         }
     },
-    /// codeholders/codeholder: observes (and fetches) a codeholder
-    ///
-    /// # Options
-    /// - id: codeholder id
-    /// - fields: list of field ids to consider the minimal required set (will be fetched)
-    /// - noFetch: if true, will not fetch
-    /// - lazyFetch: if true, will only fetch if the data is missing
+    /**
+     * codeholders/codeholder: observes (and fetches) a codeholder
+     *
+     * # Options
+     * - id: codeholder id
+     * - fields: list of field ids to consider the minimal required set (will be fetched)
+     * - noFetch: if true, will not fetch
+     * - lazyFetch: if true, will only fetch if the data is missing
+     */
     codeholder: class CodeholderView extends AbstractDataView {
         constructor (options) {
             super();
@@ -1700,8 +1752,8 @@ export const views = {
                 }
             }
 
-            /// Note that this specifically uses the id argument and not this.id so that we’re
-            /// fetching `self` instead of the resolved id if id is set to `self`
+            // Note that this specifically uses the id argument and not this.id so that we’re
+            // fetching `self` instead of the resolved id if id is set to `self`
             if (shouldFetch) {
                 fetchCodeholderForView(id, fields).catch(err => this.emit('error', err));
             }
@@ -1773,23 +1825,29 @@ export const views = {
         get: tasks.delegations,
     }),
 
-    /// codeholders/sigCodeholders: observes codeholders for client-side changes
+    /** codeholders/sigCodeholders: observes codeholders for client-side changes */
     sigCodeholders: createStoreObserver([CODEHOLDERS, SIG_CODEHOLDERS]),
 
-    /// codeholders/codeholderSigFiles: observes codeholder files for client-side changes
-    ///
-    /// # Options
-    /// - id: codeholder id
+    /**
+     * codeholders/codeholderSigFiles: observes codeholder files for client-side changes
+     *
+     * # Options
+     * - id: codeholder id
+     */
     codeholderSigFiles: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_FILES]),
-    /// codeholders/codeholderSigMemberships: observes codeholder memberships for client-side changes
-    ///
-    /// # Options
-    /// - id: codeholder id
+    /**
+     * codeholders/codeholderSigMemberships: observes codeholder memberships for client-side changes
+     *
+     * # Options
+     * - id: codeholder id
+     */
     codeholderSigMemberships: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_MEMBERSHIPS]),
-    /// codeholders/codeholderSigRoles: observes codeholder roles for client-side changes
-    ///
-    /// # Options
-    /// - id: codeholder id
+    /**
+     * codeholders/codeholderSigRoles: observes codeholder roles for client-side changes
+     *
+     * # Options
+     * - id: codeholder id
+     */
     codeholderSigRoles: createStoreObserver(({ id }) => [CODEHOLDERS, id, SIG_ROLES]),
 
     sigDelegations: createStoreObserver([CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS]),

@@ -2,14 +2,16 @@ import { h } from 'preact';
 import { data as locale } from '../locale';
 import './membership-chip.less';
 
-/// Renders a small chip like [MA 2015] for a membership.
-///
-/// # Props
-/// - abbrev: membership abbreviation
-/// - name: membership name
-/// - year: year to show
-/// - givesMembership: bool
-/// - lifetime: bool
+/**
+ * Renders a small chip like [MA 2015] for a membership.
+ *
+ * # Props
+ * - abbrev: membership abbreviation
+ * - name: membership name
+ * - year: year to show
+ * - givesMembership: bool
+ * - lifetime: bool
+ */
 export default function MembershipChip ({
     abbrev,
     name,

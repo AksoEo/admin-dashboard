@@ -41,17 +41,19 @@ export default class SearchInputFocusable extends Component {
     }
 }
 
-/// Primary search field.
-///
-/// # Props
-/// - value/onChange: request params -> search
-///   looks like `{ field, query }`
-/// - searchFields: string[] or null: available search fields
-/// - expanded: bool
-/// - localizedFields: object
-/// - localizedPlaceholders: object, or string if no searchFields are given
-/// - onSubmit: submit callback
-/// - compact: if true, will use compact view
+/**
+ * Primary search field.
+ *
+ * # Props
+ * - value/onChange: request params -> search
+ *   looks like `{ field, query }`
+ * - searchFields: string[] or null: available search fields
+ * - expanded: bool
+ * - localizedFields: object
+ * - localizedPlaceholders: object, or string if no searchFields are given
+ * - onSubmit: submit callback
+ * - compact: if true, will use compact view
+ */
 function SearchInput ({
     value,
     onChange,

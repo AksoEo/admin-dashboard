@@ -3,7 +3,7 @@ import { transformError } from './list';
 import * as store from './store';
 import * as log from './log';
 
-/// Abstract view container.
+/** Abstract view container. */
 export default class DataView {
     isDropped = false;
 
@@ -75,7 +75,7 @@ export class AbstractDataView extends EventEmitter {
     drop () {}
 }
 
-/// Creates a data view that just shows the given data store path verbatim.
+/** Creates a data view that just shows the given data store path verbatim. */
 export const createStoreObserver = (path, map = (id => id)) => class StoreObserverDataView extends AbstractDataView {
     constructor (options) {
         super();

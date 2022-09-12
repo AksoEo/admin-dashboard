@@ -5,9 +5,11 @@ import { globalAnimator } from 'yamdl';
 const f = t => Math.sin(t * Math.PI);
 const g = t => 2 / (1 + Math.exp(-4 * t)) - 1;
 
-/// A tiny indeterminate progress indicator.
-///
-/// Bounces horizontally like the Firefox Quantum page load indicator.
+/**
+ * A tiny indeterminate progress indicator.
+ *
+ * Bounces horizontally like the Firefox Quantum page load indicator.
+ */
 export default class TinyProgress extends PureComponent {
     state = {
         time: 0,

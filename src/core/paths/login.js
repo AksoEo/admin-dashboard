@@ -15,7 +15,7 @@ import { LoginAuthStates } from '../../protocol';
 import { createStoreObserver } from '../view';
 
 export const tasks = {
-    /// login/login: performs login
+    /** login/login: performs login */
     login: async (_, { login, password, allowNonAdmin }) => {
         const client = await asyncClient;
         if (client.loggedIn) {
@@ -48,13 +48,15 @@ export const tasks = {
 
         return result;
     },
-    /// login/overrideIsAdmin: for testing purposes; allow overriding isAdmin
+    /** login/overrideIsAdmin: for testing purposes; allow overriding isAdmin */
     overrideIsAdmin: async ({ override }) => {
         store.insert(IS_ADMIN, override ? true : store.get(IS_ACTUALLY_ADMIN));
     },
-    /// login/totp: verifies the totp code
-    ///
-    /// pass a secret to set up TOTP instead
+    /**
+     * login/totp: verifies the totp code
+     *
+     * pass a secret to set up TOTP instead
+     */
     totp: async ({ secret }, { code, remember }) => {
         const client = await asyncClient;
         if (store.get(AUTH_STATE) !== LoginAuthStates.AUTHENTICATED) {
@@ -73,13 +75,15 @@ export const tasks = {
         }
         store.insert(AUTH_STATE, LoginAuthStates.LOGGED_IN);
     },
-    /// login/removeTotp: removes totp
+    /** login/removeTotp: removes totp */
     removeTotp: async () => {
         const client = await asyncClient;
         await client.totpRemove();
     },
-    /// login/logOut: logs the user out and purges the data store to get rid of PII and sensitive
-    /// data (though it should be noted that this is by no means secure)
+    /**
+     * login/logOut: logs the user out and purges the data store to get rid of PII and sensitive
+     * data (though it should be noted that this is by no means secure)
+     */
     logOut: async () => {
         const client = await asyncClient;
         if (!client.loggedIn) {
@@ -99,7 +103,7 @@ export const tasks = {
         store.insert(AUTH_STATE, LoginAuthStates.LOGGED_OUT);
         store.insert(COMPLETED, true);
     },
-    /// login/hasPassword: checks if the user has a password
+    /** login/hasPassword: checks if the user has a password */
     hasPassword: async (_, { login }) => {
         const client = await asyncClient;
 
@@ -117,7 +121,7 @@ export const tasks = {
             else throw { code: err.statusCode, message: err.toString() };
         }
     },
-    /// login/createPassword: creates a password
+    /** login/createPassword: creates a password */
     createPassword: async ({ login, token }, { password, allowNonAdmin }) => {
         const client = await asyncClient;
 
@@ -140,9 +144,11 @@ export const tasks = {
             throw { code: err.statusCode, message: err.toString() };
         }
     },
-    /// login/initCreatePassword: sends password reset email
-    ///
-    /// Set create to true if the codeholder doesn’t have a password yet.
+    /**
+     * login/initCreatePassword: sends password reset email
+     *
+     * Set create to true if the codeholder doesn’t have a password yet.
+     */
     initCreatePassword: async ({ create = false }, { login }) => {
         const client = await asyncClient;
 
@@ -173,5 +179,5 @@ export const tasks = {
     },
 };
 
-/// login: observes the entire login data store (it’s constant-sized that so this is fine)
+/** login: observes the entire login data store (it’s constant-sized that so this is fine) */
 export const views = createStoreObserver([LOGIN]);

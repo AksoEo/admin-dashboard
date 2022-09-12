@@ -13,18 +13,20 @@ const VLIST_CHUNK_SIZE = 100;
 
 // TODO: this might need a refactor
 
-/// Virtual list with auto-sorting and remove/load callbacks.
-///
-/// # Props
-/// - onLoad: async (offset, limit) -> { items: [item], total: number } callback (required)
-/// - renderItem: (item) -> VNode callback (required)
-/// - renderMenu: (item) -> menu items
-/// - onRemove: async (item) -> void callback
-/// - onItemClick: (item) -> void callback
-/// - itemHeight: fixed item height in pixels
-/// - emptyLabel: label to show when there are no items
-/// - updateView: argument list to create a data view that emits updates (if available)
-/// - useShowMore: if true, will use a “show more” button instead of scrollng magic
+/**
+ * Virtual list with auto-sorting and remove/load callbacks.
+ *
+ * # Props
+ * - onLoad: async (offset, limit) -> { items: [item], total: number } callback (required)
+ * - renderItem: (item) -> VNode callback (required)
+ * - renderMenu: (item) -> menu items
+ * - onRemove: async (item) -> void callback
+ * - onItemClick: (item) -> void callback
+ * - itemHeight: fixed item height in pixels
+ * - emptyLabel: label to show when there are no items
+ * - updateView: argument list to create a data view that emits updates (if available)
+ * - useShowMore: if true, will use a “show more” button instead of scrollng magic
+ */
 export default class DataList extends PureComponent {
     state = {
         items: [],

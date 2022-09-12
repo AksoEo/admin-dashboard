@@ -8,11 +8,13 @@ const lerp = (a, b, t) => (b - a) * t + a;
 // TODO: deduplicate with yamdl
 const DEFAULT_FULLSCREEN_WIDTH = 420;
 
-/// A more persistent and less transient dialog.
-///
-/// # Props
-/// - open/onClose
-/// - title
+/**
+ * A more persistent and less transient dialog.
+ *
+ * # Props
+ * - open/onClose
+ * - title
+ */
 export default class DialogSheet extends Dialog {
     _container = document.createElement('div');
 

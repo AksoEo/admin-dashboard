@@ -31,7 +31,7 @@ import {
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
 
-/// Lazily load a page and also have some basic error handling.
+/** Lazily load a page and also have some basic error handling. */
 const elazy = (inner, map) => lazy(() => inner().then(e => {
     if (map) return { default: map(e) };
     return e;
@@ -45,8 +45,10 @@ const elazy = (inner, map) => lazy(() => inner().then(e => {
     };
 }));
 
-/// Navigation hierarchy.
-/// IDs are `locale->pages[id]` keys and are also used to identify pages elsewhere.
+/**
+ * Navigation hierarchy.
+ * IDs are `locale->pages[id]` keys and are also used to identify pages elsewhere.
+ */
 export default [
     {
         id: 'undefined',

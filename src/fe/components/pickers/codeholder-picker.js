@@ -14,13 +14,15 @@ import './codeholder-picker.less';
 const REDUCED_FIELD_IDS = ['type', 'code', 'name'];
 const REDUCED_FIELDS = Object.fromEntries(REDUCED_FIELD_IDS.map(id => [id, FIELDS[id]]));
 
-/// Picks a codeholder and displays their UEA code.
-///
-/// # Props
-/// - value/onChange
-/// - limit: if set, will limit number of selectable codeholders
-/// - disabled
-/// - jsonFilter
+/**
+ * Picks a codeholder and displays their UEA code.
+ *
+ * # Props
+ * - value/onChange
+ * - limit: if set, will limit number of selectable codeholders
+ * - disabled
+ * - jsonFilter
+ */
 export default class CodeholderPicker extends Component {
     state = {
         addDialogOpen: false,

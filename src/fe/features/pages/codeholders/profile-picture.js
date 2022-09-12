@@ -11,12 +11,14 @@ import { codeholders as locale } from '../../../locale';
 const clamp = (x, l, h) => Math.max(l, Math.min(x, h));
 const lerp = (a, b, x) => (b - a) * x + a;
 
-/// Renders an editable codeholder profile picture or identicon.
-///
-/// # Props
-/// - `id`: the member ID
-/// - `profilePictureHash`: whether the identicon should be used or not
-/// - `canEdit`: bool
+/**
+ * Renders an editable codeholder profile picture or identicon.
+ *
+ * # Props
+ * - `id`: the member ID
+ * - `profilePictureHash`: whether the identicon should be used or not
+ * - `canEdit`: bool
+ */
 export default class ProfilePictureEditor extends Component {
     state = {
         uploading: false,

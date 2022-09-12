@@ -2,10 +2,12 @@ import { h, Component } from 'preact';
 import { Spring, globalAnimator } from 'yamdl';
 import './disclosure-arrow.less';
 
-/// Renders an animated disclosure arrow.
-///
-/// # Props
-/// - dir: Either 'up', 'down', or 'none'
+/**
+ * Renders an animated disclosure arrow.
+ *
+ * # Props
+ * - dir: Either 'up', 'down', or 'none'
+ */
 export default class DisclosureArrow extends Component {
     #dirSpring = new Spring(0.6, 0.3);
 

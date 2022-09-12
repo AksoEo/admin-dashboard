@@ -5,16 +5,18 @@ import { Form, Field } from '../form';
 import DisplayError from '../utils/error';
 import './task-dialog.less';
 
-/// A dialog that performs a failable action.
-/// Shows a loading spinner and stuff
-///
-/// # Props
-/// - open/onClose
-/// - sheet: if true, will use DialogSheet
-/// - title
-/// - actionLabel: label string for the action button
-/// - run: run closure; must return a promise. success will not be handled
-/// - running: if true, will consider the task to be running
+/**
+ * A dialog that performs a failable action.
+ * Shows a loading spinner and stuff
+ *
+ * # Props
+ * - open/onClose
+ * - sheet: if true, will use DialogSheet
+ * - title
+ * - actionLabel: label string for the action button
+ * - run: run closure; must return a promise. success will not be handled
+ * - running: if true, will consider the task to be running
+ */
 export default class TaskDialog extends Component {
     state = {
         loading: false,

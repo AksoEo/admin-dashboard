@@ -5,7 +5,7 @@ import { globalAnimator, TextField, DatePicker, RootContext } from 'yamdl';
 import { data as locale } from '../../locale';
 import './style';
 
-/// Renders a formatted date (not editable). Use prop `value`.
+/** Renders a formatted date (not editable). Use prop `value`. */
 function DateFormatter ({ value }) {
     return value ? moment(value).format('D[-a de] MMMM Y') : '';
 }
@@ -55,7 +55,7 @@ function tryParseDate (input) {
     return undefined;
 }
 
-/// Edits a date. Value must be formatted as YYYY-MM-DD.
+/** Edits a date. Value must be formatted as YYYY-MM-DD. */
 class DateEditor extends Component {
     static contextType = RootContext;
 

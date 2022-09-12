@@ -135,13 +135,15 @@ function GroupList ({ tab, id, editing, perms }) {
     }
 }
 
-/// Handles item list during editing.
-///
-/// - task: list task
-/// - addTask/deleteTask
-/// - type: type used in add/delete tasks
-/// - id: group id
-/// - editing
+/**
+ * Handles item list during editing.
+ *
+ * - task: list task
+ * - addTask/deleteTask
+ * - type: type used in add/delete tasks
+ * - id: group id
+ * - editing
+ */
 class WithItems extends PureComponent {
     state = {
         selection: [],

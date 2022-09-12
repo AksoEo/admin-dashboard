@@ -5,7 +5,7 @@ import * as store from '../store';
 const PERMS = ['perms'];
 
 export const tasks = {
-    /// perms/perms: fetches perms
+    /** perms/perms: fetches perms */
     perms: async () => {
         const client = await asyncClient;
         const res = await client.get('/perms');
@@ -22,7 +22,7 @@ let currentUpdater = null;
 let updaterRefCount = 0;
 
 export const views = {
-    /// perms/perms: fetches and views perms
+    /** perms/perms: fetches and views perms */
     perms: class Perms extends AbstractDataView {
         constructor () {
             super();

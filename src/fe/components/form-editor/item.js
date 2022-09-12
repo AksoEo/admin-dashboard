@@ -11,15 +11,17 @@ import { RefNameView } from './script-views';
 import { formEditor as locale } from '../../locale';
 import './item.less';
 
-/// A form editor item.
-///
-/// - item/onChange: the item
-/// - editing/onEditingChange: bool
-/// - editable: bool
-/// - isEditingContext: bool
-/// - disableValidation: bool
-/// - onRemove: fn
-/// - previousNodes: previous nodes' asc definitions (see getAscDefs in model)
+/**
+ * A form editor item.
+ *
+ * - item/onChange: the item
+ * - editing/onEditingChange: bool
+ * - editable: bool
+ * - isEditingContext: bool
+ * - disableValidation: bool
+ * - onRemove: fn
+ * - previousNodes: previous nodes' asc definitions (see getAscDefs in model)
+ */
 export default class FormEditorItem extends PureComponent {
     render ({
         item, editable, onChange, editing, onEditingChange, editingData, value, onValueChange,
@@ -62,7 +64,7 @@ export default class FormEditorItem extends PureComponent {
     }
 }
 
-/// The top bar on a form editor item.
+/** The top bar on a form editor item. */
 class ItemBar extends PureComponent {
     render ({ editable, el, name, editing, onStartEditing, onClose, onRemove }) {
         let button;

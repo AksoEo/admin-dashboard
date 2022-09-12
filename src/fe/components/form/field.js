@@ -7,11 +7,15 @@ import './field.less';
 
 export default class Field extends PureComponent {
     state = {
-        /// The set of error props.
-        /// @type {Object|null}
+        /**
+         * The set of error props.
+         * @type {Object|null}
+         */
         error: null,
-        /// If true, will continuously check validity instead of only when validation is triggered
-        /// externally (such as by the Form being submitted).
+        /**
+         * If true, will continuously check validity instead of only when validation is triggered
+         * externally (such as by the Form being submitted).
+         */
         continuous: false,
     };
 
@@ -20,7 +24,7 @@ export default class Field extends PureComponent {
     node = createRef();
     translateX = new Spring(0.4, 0.3);
 
-    /// Shakes the component to indicate an error.
+    /** Shakes the component to indicate an error. */
     shake () {
         this.translateX.velocity = 500;
         globalAnimator.register(this);
@@ -31,14 +35,16 @@ export default class Field extends PureComponent {
         });
     }
 
-    /// Manually sets an error.
+    /** Manually sets an error. */
     setError (error) {
         this.setState({ error, continuous: true });
     }
 
-    /// Validates the value using the `validate` prop.
-    /// @param {boolean} submitting - if true, will shake the component on error. Should be falsy
-    ///                               by default because the shaking animation is distracting.
+    /**
+     * Validates the value using the `validate` prop.
+     * @param {boolean} submitting - if true, will shake the component on error. Should be falsy
+     *                               by default because the shaking animation is distracting.
+     */
     validate (submitting) {
         try {
             if (this.props.validate) {

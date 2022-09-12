@@ -459,10 +459,12 @@ const ACTIONS = {
     },
 };
 
-/// Renders intent action buttons.
-/// - item: intent item
-/// - typeOnly: will hide buttons depending on the intent type instead of just greying them out
-/// - intermediary: will show labels for intermediary reports
+/**
+ * Renders intent action buttons.
+ * - item: intent item
+ * - typeOnly: will hide buttons depending on the intent type instead of just greying them out
+ * - intermediary: will show labels for intermediary reports
+ */
 export const IntentActions = connectPerms(function IntentActions ({ item, perms, typeOnly, intermediary }) {
     return (
         <coreContext.Consumer>{core => {
@@ -643,8 +645,10 @@ function Intermediary ({ item, editing, onItemChange }) {
     );
 }
 
-/// Renders a customer's profile picture.
-/// If profilePictureHash is given, will try fetch their actual picture.
+/**
+ * Renders a customer's profile picture.
+ * If profilePictureHash is given, will try fetch their actual picture.
+ */
 class CustomerProfilePicture extends PureComponent {
     static contextType = coreContext;
 

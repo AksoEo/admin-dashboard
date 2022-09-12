@@ -10,7 +10,7 @@ import SuggestionField from '../controls/suggestion-field';
 import TinyProgress from '../controls/tiny-progress';
 import './style';
 
-/// Renders a single UEA code. Props: `value`, `old`.
+/** Renders a single UEA code. Props: `value`, `old`. */
 export function UEACode ({ value, old, ...extra }) {
     if (!value) return null;
     if (old) {
@@ -32,10 +32,12 @@ function BothUEACodes ({ value, value2 }) {
     );
 }
 
-/// Renders a UEA code by ID.
-///
-/// # Props
-/// - id: codeholder id
+/**
+ * Renders a UEA code by ID.
+ *
+ * # Props
+ * - id: codeholder id
+ */
 export const IdUEACode = connect(
     ({ id }) => ['codeholders/codeholder', { id, fields: ['code'], lazyFetch: true }],
     ['id'],
@@ -56,10 +58,12 @@ function isBannedCode (value) {
     return false;
 }
 
-/// Also pass `id` to enable checking if it’s taken.
-/// Also pass an array to `suggestions` to show a list of suggestions.
-/// Alternatively, pass `suggestionParameters` to automatically suggest some codes.
-/// Also pass `keepSuggestions` to keep suggestions from being filtered above in suggestion params.
+/**
+ * Also pass `id` to enable checking if it’s taken.
+ * Also pass an array to `suggestions` to show a list of suggestions.
+ * Alternatively, pass `suggestionParameters` to automatically suggest some codes.
+ * Also pass `keepSuggestions` to keep suggestions from being filtered above in suggestion params.
+ */
 class UEACodeEditor extends Component {
     state = {
         takenState: null,

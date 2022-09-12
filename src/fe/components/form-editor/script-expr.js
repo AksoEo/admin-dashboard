@@ -9,8 +9,10 @@ function isProbablyExpr (value) {
     return value !== null && !Array.isArray(value) && typeof value === 'object';
 }
 
-/// A scriptable value. Always presents itself as an AKSO Script value regardless of actual
-/// representation. Will try to stick to normal JS values instead of AKSO Script if possible.
+/**
+ * A scriptable value. Always presents itself as an AKSO Script value regardless of actual
+ * representation. Will try to stick to normal JS values instead of AKSO Script if possible.
+ */
 export class ScriptableValue extends PureComponent {
     static contextType = ScriptContext;
 
@@ -95,7 +97,7 @@ export class ScriptableValue extends PureComponent {
     }
 }
 
-/// - value: bool or AKSO Script ref
+/** - value: bool or AKSO Script ref */
 export class ScriptableBool extends ScriptableValue {
     castValue (v) {
         // TODO: cast expr too

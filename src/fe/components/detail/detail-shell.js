@@ -9,24 +9,26 @@ import { Form } from '../form';
 import DisplayError from '../utils/error';
 import './detail-shell.less';
 
-/// The outer shell of a detail view. Does not handle fields.
-///
-/// This opens a connection to a core data view and optionally to a core task to edit the data.
-///
-/// # Props
-/// - view: data view name. The data view should expect an `id` option.
-///   The view may use the `extra` field and pass `'delete'` to trigger onDelete.
-/// - editing/onEndEdit: editing state
-/// - onCommit: should commit and end edit (or not, if the user cancels the task).
-///   will be passed an array of changed field ids
-/// - edit/onEditChange: editing copy. Is not necessarily synchronized with `editing`
-/// - id: detail view id
-/// - options: additional view options; will *not* cause a reload on update
-/// - onDelete: called when the item is deleted
-/// - onData: will be called with data when it loads
-/// - onError: will be called with data when it fails
-/// - children: (data, core) => Node
-/// - inline: if true, will use a smaller inline style
+/**
+ * The outer shell of a detail view. Does not handle fields.
+ *
+ * This opens a connection to a core data view and optionally to a core task to edit the data.
+ *
+ * # Props
+ * - view: data view name. The data view should expect an `id` option.
+ *   The view may use the `extra` field and pass `'delete'` to trigger onDelete.
+ * - editing/onEndEdit: editing state
+ * - onCommit: should commit and end edit (or not, if the user cancels the task).
+ *   will be passed an array of changed field ids
+ * - edit/onEditChange: editing copy. Is not necessarily synchronized with `editing`
+ * - id: detail view id
+ * - options: additional view options; will *not* cause a reload on update
+ * - onDelete: called when the item is deleted
+ * - onData: will be called with data when it loads
+ * - onError: will be called with data when it fails
+ * - children: (data, core) => Node
+ * - inline: if true, will use a smaller inline style
+ */
 export default class DetailShell extends PureComponent {
     static contextType = coreContext;
 
@@ -36,10 +38,10 @@ export default class DetailShell extends PureComponent {
         committing: false,
     };
 
-    /// current data view
+    /** current data view */
     #view;
 
-    /// current form ref
+    /** current form ref */
     #form;
 
     createView () {

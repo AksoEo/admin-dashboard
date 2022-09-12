@@ -432,7 +432,7 @@ export default class InputItem extends PureComponent {
         return !error;
     }
 
-    /// Evaluates any AKSO Script exprs in the item value.
+    /** Evaluates any AKSO Script exprs in the item value. */
     resolveValues () {
         // TODO: cache?
         const item = this.props.item;
@@ -506,7 +506,7 @@ export default class InputItem extends PureComponent {
     }
 }
 
-/// Just shows an error string. Scrolls itself into view when mounted in the DOM.
+/** Just shows an error string. Scrolls itself into view when mounted in the DOM. */
 class InputError extends PureComponent {
     node = createRef();
 

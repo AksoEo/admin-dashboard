@@ -15,14 +15,16 @@ function getIcon (type) {
     return () => {};
 }
 
-/// Field publicity indicator/editor.
-///
-/// # Props
-/// - value/onChange: one of 'private', 'members', 'public'
-/// - editing: bool
-/// - style: currently only 'icon'
-/// - disabled: bool
-/// - types: list of allowed types. Undefined for all
+/**
+ * Field publicity indicator/editor.
+ *
+ * # Props
+ * - value/onChange: one of 'private', 'members', 'public'
+ * - editing: bool
+ * - style: currently only 'icon'
+ * - disabled: bool
+ * - types: list of allowed types. Undefined for all
+ */
 export default function Publicity ({ value, editing, onChange, style, disabled, types: userTypes }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuPosition, setMenuPosition] = useState(null);

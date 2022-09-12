@@ -15,7 +15,7 @@ const notificationsContainer = document.createElement('div');
 notificationsContainer.className = 'notifier-container';
 document.body.appendChild(notificationsContainer);
 
-/// Displays notifications in the corner.
+/** Displays notifications in the corner. */
 export default class Notifications extends PureComponent {
     state = {
         notifs: [],

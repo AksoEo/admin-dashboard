@@ -1,16 +1,18 @@
 import { h, Component } from 'preact';
 
-/// A task view container.
-///
-/// Used to hold task views, which are GUI dialogs to interact with core tasks.
-/// See index for usage.
-///
-/// # Props
-/// - id: task id
-/// - path: task path
-/// - core: core ref
-/// - view: task view
-/// - isDead: whether or not this task is dead
+/**
+ * A task view container.
+ *
+ * Used to hold task views, which are GUI dialogs to interact with core tasks.
+ * See index for usage.
+ *
+ * # Props
+ * - id: task id
+ * - path: task path
+ * - core: core ref
+ * - view: task view
+ * - isDead: whether or not this task is dead
+ */
 export default class TaskView extends Component {
     constructor (props) {
         super(props);

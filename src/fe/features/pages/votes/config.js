@@ -271,8 +271,10 @@ export const publishVoters = inactiveBool;
 export const publishVotersPercentage = bool;
 
 export const options = class OptionsEditor extends Component {
-    /// These keys are used to identify options while editing the list.
-    /// This is necessary to enable rearranging that doesn’t look confusing.
+    /**
+     * These keys are used to identify options while editing the list.
+     * This is necessary to enable rearranging that doesn’t look confusing.
+     */
     optionKeys = [];
 
     render ({ value, onChange, editing }) {

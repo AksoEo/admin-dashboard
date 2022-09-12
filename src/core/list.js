@@ -58,6 +58,10 @@ export function fieldDiff (existing, changed) {
     return delta;
 }
 
+/**
+ * Converts client filters to an API JSON filter object.
+ * @returns {null|Object}
+ */
 export function filtersToAPI (clientFilters, pfilters) {
     const filters = [];
     if (pfilters && !pfilters._disabled) {
@@ -96,7 +100,7 @@ export function filtersToAPI (clientFilters, pfilters) {
     return null;
 }
 
-/// Returns the given JSON filter added to the given filter parameter.
+/** Returns the given JSON filter added to the given filter parameter. */
 export function addJSONFilter (filter, jsonFilter) {
     if (jsonFilter && !jsonFilter._disabled) {
         if (jsonFilter.error) throw jsonFilter.error;
@@ -108,7 +112,7 @@ export function addJSONFilter (filter, jsonFilter) {
     return filter;
 }
 
-/// Converts params to request options. See e.g. task codeholders/list for details.
+/** Converts params to request options. See e.g. task codeholders/list for details. */
 export const makeParametersToRequestData = ({
     searchFieldToTransientFields,
     mapSearchField,
@@ -197,7 +201,7 @@ export const makeParametersToRequestData = ({
     };
 };
 
-/// converts from API repr to client repr
+/** converts from API repr to client repr */
 export const makeClientFromAPI = (clientFields, strict) => (apiRepr, userData) => {
     const clientRepr = {};
     outer:
@@ -226,7 +230,7 @@ export function coerceToNull (value) {
     return value;
 }
 
-/// converts from client repr to api repr
+/** converts from client repr to api repr */
 export const makeClientToAPI = clientFields => (clientRepr) => {
     const apiRepr = {};
     if (!clientRepr) return apiRepr;

@@ -3,7 +3,7 @@ import { TextField } from 'yamdl';
 import { CountryFlag } from './country';
 import { parsePhoneNumber, AsYouType as AsYouTypePhoneFmt } from 'libphonenumber-js';
 
-/// Editor that uses libphonenumber (this is a separate module to allow lazy-loading).
+/** Editor that uses libphonenumber (this is a separate module to allow lazy-loading). */
 export default function PhoneNumberEditor ({ value, onChange, outline }) {
     if (!value || value.value === undefined) return null;
     const wholeValue = value;
