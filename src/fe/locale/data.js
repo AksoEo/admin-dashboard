@@ -33,6 +33,9 @@ export const data = {
     },
     address: {
         countryEmpty: '- Elektu landon -',
+        countryAreaEmpty: '- Elektu regionon -',
+        cityEmpty: '- Elektu urbon -',
+        cityAreaEmpty: '- Elektu urboparton -',
         invalidField: field => `Nevalida ${field}`,
         postalExample: example => `Ekz. ${example}`,
     },

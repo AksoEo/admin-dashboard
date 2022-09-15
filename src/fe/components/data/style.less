@@ -4,6 +4,24 @@
 
 .data {
     &.address-editor {
+        display: grid;
+
+        .inner-items, .loading-overlay {
+            grid-area: 1 / 1;
+        }
+        .loading-overlay {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            animation: data-address-editor-loading-overlay-in 1s;
+            @keyframes data-address-editor-loading-overlay-in  {
+                from {
+                    opacity: 0;
+                }
+            }
+        }
+
         .form-validator, .country-editor {
             display: block;
             margin-bottom: 16px;

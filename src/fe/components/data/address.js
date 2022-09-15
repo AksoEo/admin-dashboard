@@ -1,5 +1,7 @@
 import { h, Component } from 'preact';
 import { getValidationRules } from '@cpsdqs/google-i18n-address';
+import { CircularProgress } from 'yamdl';
+import Select from '../controls/select';
 import { data as locale } from '../../locale';
 import { Field, ValidatedTextField } from '../form';
 import countryField, { WithCountries } from './country';
@@ -97,6 +99,7 @@ class AddressEditor extends Component {
         const onChangeField = (key, map = (x => x)) => v => onChange({ ...value, [key]: map(v) });
 
         const items = [];
+
         if (rmask('country')) {
             items.push(
                 <Field>
@@ -118,6 +121,7 @@ class AddressEditor extends Component {
         const postalCodeExamples = rules.postalCodeExamples || [];
 
         const isInChoices = (q, choices, field) => {
+            if (!q) return null;
             q = q.toLowerCase();
             if (!choices.length) return null;
             let found = false;
@@ -163,6 +167,7 @@ class AddressEditor extends Component {
             const options = new Set();
             for (const item of (rules[k + 'Choices'] || [])) {
                 options.add(item[0]);
+                options.add(item[1]);
             }
 
             items.push(
@@ -180,37 +185,87 @@ class AddressEditor extends Component {
                 : '',
         };
 
-        for (const k of ['streetAddress', 'city', 'cityArea', 'postalCode', 'sortingCode', 'countryArea']) {
+        for (const k of ['countryArea', 'city', 'cityArea', 'streetAddress', 'postalCode', 'sortingCode']) {
             if (!allowedFields.includes(k) || !rmask(k)) continue;
             const isRequired = requiredFields.includes(k);
             const isUpper = upperFields.includes(k);
-            items.push(
-                <Field>
-                    <ValidatedTextField
-                        validate={value => {
-                            if (country && !value && isRequired) return locale.requiredField;
-                            if (validators[k]) return validators[k]();
-                        }}
-                        placeholder={placeholders[k]}
-                        disabled={!wmask(k)}
-                        class="address-editor-line"
-                        key={k}
-                        value={value[k]}
-                        list={lists[k]}
-                        maxLength={maxLengthMap[k]}
-                        label={isRequired
-                            ? <Required>{locale.addressFields[k]}</Required>
-                            : locale.addressFields[k]}
-                        onChange={onChangeField(k, e => {
-                            const v = e.target.value || null;
-                            if (isUpper) return v ? v.toUpperCase() : v;
-                            else return v;
-                        })} />
-                </Field>
-            );
+            let asSelect = !!(rules[k + 'Choices'] || []).length;
+
+            let selectValue = value[k];
+            if (asSelect) {
+                const lowerValue = (value[k] || '').toLowerCase();
+                let found = false;
+                for (const choice of rules[k + 'Choices']) {
+                    const choiceValues = choice.map(x => x.toLowerCase());
+                    if (choiceValues.includes(lowerValue)) {
+                        selectValue = choice[0];
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found && value[k]) {
+                    asSelect = false;
+                }
+            }
+
+            if (asSelect) {
+                items.push(
+                    <Field validate={() => {
+                        if (country && !value[k] && isRequired) return locale.requiredField;
+                        if (validators[k]) return validators[k]();
+                    }}>
+                        <Select
+                            value={selectValue}
+                            onChange={onChangeField(k, value =>
+                                (isUpper && value) ? value.toUpperCase() : (value || null))}
+                            items={[{
+                                value: '',
+                                label: locale.address[k + 'Empty'],
+                            }].concat(rules[k + 'Choices'].map(item => ({
+                                value: item[0],
+                                label: (item[1] !== item[0]) ? `${item[0]} - ${item[1]}` : item[0],
+                            })))} />
+                    </Field>
+                );
+            } else {
+                items.push(
+                    <Field>
+                        <ValidatedTextField
+                            validate={value => {
+                                if (country && !value && isRequired) return locale.requiredField;
+                                if (validators[k]) return validators[k]();
+                            }}
+                            placeholder={placeholders[k]}
+                            disabled={!wmask(k)}
+                            class="address-editor-line"
+                            key={k}
+                            value={value[k]}
+                            list={lists[k]}
+                            maxLength={maxLengthMap[k]}
+                            label={isRequired
+                                ? <Required>{locale.addressFields[k]}</Required>
+                                : locale.addressFields[k]}
+                            onChange={onChangeField(k, e => {
+                                const v = e.target.value || null;
+                                if (isUpper) return v ? v.toUpperCase() : v;
+                                else return v;
+                            })} />
+                    </Field>
+                );
+            }
         }
 
-        return <div class="data address-editor">{items}</div>;
+        return (
+            <div class="data address-editor">
+                <div class="inner-items">{items}</div>
+                {this.state.validating && (
+                    <div class="loading-overlay">
+                        <CircularProgress indeterminate />
+                    </div>
+                )}
+            </div>
+        );
     }
 }
 
