@@ -97,7 +97,7 @@ export const formEditor = {
         chAutofill: 'Sugesti membrodatumojn',
         chAutofillFields: {
             // note that these are slightly different from codeholders.fields
-            birthdate: 'Naskiĝtago',
+            birthdate: 'Naskiĝdato',
             email: 'Retpoŝtadreso',
             phone: 'Telefono',
             landlinePhone: 'Hejma telefono',

@@ -1182,7 +1182,7 @@ export const memberFieldsWrite = 'Redakti';
 
 /** List of member fields. Some member fields may correspond to multiple API fields. */
 export const memberFields = {
-    birthdate: { name: 'Naskiĝtago', fields: ['birthdate'] },
+    birthdate: { name: 'Naskiĝdato', fields: ['birthdate'] },
     code: { name: 'Kodo', fields: ['newCode', 'oldCode'] },
     codeholderType: { name: 'Membrospeco', fields: ['codeholderType'] },
     creationTime: { name: 'Horo de kreiĝo', fields: ['creationTime'] },

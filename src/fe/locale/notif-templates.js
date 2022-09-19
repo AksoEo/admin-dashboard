@@ -145,7 +145,7 @@ export const notifTemplates = {
         'codeholder.addressLatin.sortingCode': 'Membro.OrdigkodoLatina',
         'codeholder.feeCountry': 'Membro.Paglando',
         'codeholder.email': 'Membro.Retpoŝtadreso',
-        'codeholder.birthdate': 'Membro.Naskiĝtago',
+        'codeholder.birthdate': 'Membro.Naskiĝdato',
         'codeholder.age': 'Membro.Aĝo',
         'codeholder.agePrimo': 'Membro.AĝoJarkomence',
         'codeholder.cellphone': 'Membro.Poŝtelefono',

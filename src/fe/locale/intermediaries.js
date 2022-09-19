@@ -73,7 +73,7 @@ export const intermediaryReports = {
             'codeholderData.address': 'Membrodatumoj ▸ Adreso',
             'codeholderData.feeCountry': 'Membrodatumoj ▸ Paglando',
             'codeholderData.email': 'Membrodatumoj ▸ Retpoŝtadreso',
-            'codeholderData.birthdate': 'Membrodatumoj ▸ Naskiĝtago',
+            'codeholderData.birthdate': 'Membrodatumoj ▸ Naskiĝdato',
         },
     },
     addons: {
