@@ -845,7 +845,14 @@ export const tasks = {
         delete diff.profilePictureHash;
         delete codeholderData.profilePictureHash;
 
-        await client.patch(`/codeholders/${id}`, diff, options);
+        try {
+            await client.patch(`/codeholders/${id}`, diff, options);
+        } catch (err) {
+            if (err.statusCode === 400 && err.message.includes('email taken')) {
+                throw { code: 'email-taken', message: 'email taken' };
+            }
+            throw err;
+        }
 
         // also update data in store
         store.insert([CODEHOLDERS, storeId], deepMerge(existing, codeholderData));

@@ -98,7 +98,10 @@ export default class DetailShell extends PureComponent {
     }
 
     beginCommit () {
-        if (!this.#form.validate()) return;
+        this.#form.requestSubmit();
+    }
+
+    #performCommit () {
         if (this.state.committing) return;
         const changes = this.getChangedFields();
         this.setState({ committing: true }, () => {
@@ -154,7 +157,9 @@ export default class DetailShell extends PureComponent {
             <Form
                 ref={view => this.#form = view}
                 class={'detail-view' + (inline ? ' p-inline' : '')}
-                onSubmit={() => {}}>
+                onSubmit={() => {
+                    this.#performCommit();
+                }}>
                 {contents}
             </Form>
         );

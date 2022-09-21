@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, createRef } from 'preact';
 import { PureComponent } from 'preact/compat';
 import FormContext from './context';
 
@@ -26,6 +26,7 @@ import FormContext from './context';
  */
 export default class Form extends PureComponent {
     static contextType = FormContext;
+    node = createRef();
 
     /** Form fields registered using [FormContext]. */
     fields = new Set();
@@ -74,6 +75,10 @@ export default class Form extends PureComponent {
         }
     }
 
+    requestSubmit () {
+        this.node.current.requestSubmit();
+    }
+
     render () {
         return (
             <FormContext.Provider value={{
@@ -81,6 +86,7 @@ export default class Form extends PureComponent {
                 deregister: this.onDeregister,
             }}>
                 <form
+                    ref={this.node}
                     {...this.props}
                     onSubmit={this.onSubmit}>
                     {this.props.children}

@@ -26,6 +26,7 @@ export const errors = {
     'internal-server-error': 'Okazis interna eraro. Bonvolu reŝarĝi la paĝon.',
     'service-unavailable': 'AKSO estas nealirebla pro bontenado. Bonvolu reprovi je posta momento.',
     'object-exists': 'Jam ekzistas resurso kun tiu nomo. Bonvolu reiri por reprovi.',
+    'email-taken': '[[Email address is already taken.]]',
 
     // see payments/createIntent
     'payment-exceeds-max': 'Ne eblas krei pagojn por pli ol 500.000 USD',
