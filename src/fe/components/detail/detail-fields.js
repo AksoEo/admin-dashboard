@@ -3,6 +3,7 @@ import { Fragment } from 'preact/compat';
 import HistoryIcon from '@material-ui/icons/History';
 import { Link } from '../../router';
 import { deepEq } from '../../../util';
+import Field from '../form/field';
 import TinyProgress from '../controls/tiny-progress';
 import './detail-fields.less';
 
@@ -87,8 +88,8 @@ export default function DetailFields ({
             items.push(
                 <Fragment>
                     <div class="detail-fields-section-marker">{field.sectionMarkerAbove}</div>
-                    <div class="detail-fields-section-marker-pad"></div>
-                    <div class="detail-fields-section-marker-pad"></div>
+                    <div class="detail-fields-section-marker-pad" />
+                    <div class="detail-fields-section-marker-pad" />
                 </Fragment>
             );
             lastItemWasSectionMarker = true;
@@ -121,7 +122,12 @@ export default function DetailFields ({
             </div>
         );
         const itemContents = (
-            <div class="detail-field-editor" key={'e' + fieldId}>
+            <Field class="detail-field-editor" key={'e' + fieldId} validate={() => {
+                if (field.validate) return field.validate({
+                    value: itemData[fieldId],
+                    item: itemData,
+                });
+            }}>
                 {isNotLoaded ? (
                     <TinyProgress class="detail-field-loading" />
                 ) : isEmpty ? (
@@ -137,7 +143,7 @@ export default function DetailFields ({
                         }}
                         {...fieldProps} />
                 )}
-            </div>
+            </Field>
         );
 
         let fieldExtra;

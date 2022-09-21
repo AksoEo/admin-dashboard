@@ -456,7 +456,7 @@ export const fields = {
         isEmpty: (value) => value && value !== 'nothing',
         // used for CSV export: stringifier for this field.
         stringify: (value) => value,
-        // new API, currently only used in creation dialog:
+        // automatically bound in creation dialogs and detail page fields:
         // validate the field. If possible, use HTML validation like `required` instead.
         validate ({ value }) {
             if (value === 'invalid') return locale.someKindOfError;
