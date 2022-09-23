@@ -20,6 +20,7 @@ function MagazinePerms ({ value, editing, onChange, hasCopyableItems }) {
             if (value === 'complex') {
                 onChange({
                     members: true,
+                    membersFilterInner: null,
                     membersIncludeLastYear: null,
                     filter: null,
                     freelyAvailableAfter: null,
@@ -62,6 +63,24 @@ function MagazinePerms ({ value, editing, onChange, hasCopyableItems }) {
                     value={value.members}
                     editing={editing}
                     onChange={members => onChange({ ...value, members })} />
+            </div>
+            <div class="perms-field">
+                <div class="field-label">
+                    {locale.subscribers.membersFilterInner}
+                </div>
+                <div class="field-desc">
+                    {locale.subscribers.membersFilterInnerDesc}
+                </div>
+                <MagazinePermsFilter
+                    value={value.membersFilterInner || null}
+                    editing={editing}
+                    onChange={membersFilterInner => onChange({ ...value, membersFilterInner })}
+                    desc={locale.subscribers.membersFilterInnerFieldDesc} />
+                {!value.membersFilterInner && (
+                    <p class="field-desc">
+                        {locale.subscribers.membersFilterInnerDefault}
+                    </p>
+                )}
             </div>
             {(editing || value.membersIncludeLastYear) ? (
                 <div class="perms-field">
@@ -160,7 +179,7 @@ function MagazinePermsDuration ({ value, editing, onChange }) {
     );
 }
 
-function MagazinePermsFilter ({ value, editing, onChange }) {
+function MagazinePermsFilter ({ value, editing, onChange, desc }) {
     const chkId = Math.random().toString(36);
     return (
         <div class="filter-field">
@@ -182,6 +201,7 @@ function MagazinePermsFilter ({ value, editing, onChange }) {
             ) : null}
             {value !== null ? (
                 <MagazinePermsFilterControl
+                    desc={desc}
                     value={value}
                     editing={editing}
                     onChange={onChange} />
@@ -190,14 +210,14 @@ function MagazinePermsFilter ({ value, editing, onChange }) {
     );
 }
 
-function MagazinePermsFilterControl ({ value, editing, onChange }) {
+function MagazinePermsFilterControl ({ value, editing, onChange, desc }) {
     const [source, setSource] = useState(null);
 
     return (
         <div class="filter-control">
             {editing ? (
                 <div class="filter-control-desc">
-                    {locale.subscribers.filterFieldDesc}
+                    {desc || locale.subscribers.filterFieldDesc}
                 </div>
             ) : null}
             <JSONFilterEditor

@@ -52,6 +52,11 @@ export const magazines = {
         membersNone: 'Neniu IMo',
         membersFilter: 'Laŭ filtrilo',
 
+        membersFilterInner: '[[Membership]]',
+        membersFilterInnerDesc: '[[Additionally filter members by memberships. Note that this means all memberships, not just active ones!!]]',
+        membersFilterInnerFieldDesc: 'Vi povas akiri filtrilon el la sekcio “Membreco▸Kategorioj” alklakante je “Konverti al JSON-filtrilo”',
+        membersFilterInnerDefault: '[[Default filter: memberships will need givesMembership: true.]]',
+
         membersIncludeLastYear: 'Eksmembra alirdaŭro',
         membersIncludeLastYearNone: 'Nenio',
         membersIncludeLastYearDesc: 'Kiom longe IMoj kaj abonantoj de la pasinta jaro (kiuj ne jam re-aliĝis/reabonis) povas aliri la ĉi-jarajn revuojn.',
