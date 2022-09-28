@@ -147,7 +147,14 @@ const pClientFilters = {
         toAPI: canceled => ({ cancelledTime: canceled === 'true' ? { $neq: null } : null }),
     },
     createdTime: {
-        toAPI: range => ({ createdTime: { $range: range } }),
+        toAPI: ([a, b]) => ({
+            createdTime: {
+                $range: [
+                    +a / 1000,
+                    +b / 1000,
+                ],
+            },
+        }),
     },
     amountPaid: {
         toAPI: range => ({ amountPaid: { $range: range } }),

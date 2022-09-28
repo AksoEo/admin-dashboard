@@ -22,7 +22,9 @@ export function deepEq (a, b) {
     if (typeof a === 'object' && typeof b === 'object' && a !== null && b !== null) {
         if (a === b) return true; // we can skip all of this if it’s identical
 
-        if (isArrayLike(a) && isArrayLike(b)) {
+        if (a instanceof Date && b instanceof Date) {
+            return +a === +b;
+        } else if (isArrayLike(a) && isArrayLike(b)) {
             if (a.length !== b.length) return false;
             for (let i = 0; i < a.length; i++) {
                 if (!deepEq(a[i], b[i])) return false;
