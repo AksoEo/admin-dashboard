@@ -17,6 +17,7 @@ import { IdUEACode } from '../../../components/data/uea-code';
 import { votes as locale } from '../../../locale';
 import Rational from './rational';
 import './config.less';
+import { SavedFilterPickerButton } from '../../../components/overview/saved-filter-picker';
 
 function validateJSON (value) {
     try {
@@ -26,21 +27,31 @@ function validateJSON (value) {
     }
 }
 
-function JSONEditor ({ value, onChange, disabled }) {
+function JSONEditor ({ value, onChange, disabled, category }) {
     const [source, setSource] = useState(null);
 
     return (
-        <JSONFilterEditor
-            expanded
-            disabled={disabled}
-            value={{
-                source,
-                filter: JSON5.parse(value),
-            }}
-            onChange={({ source, filter }) => {
-                setSource(source);
-                onChange(JSON5.stringify(filter, undefined, 4));
-            }} />
+        <div>
+            {category && (
+                <SavedFilterPickerButton
+                    category={category}
+                    onLoad={q => {
+                        setSource(null);
+                        onChange(JSON5.stringify(q.query.filter, undefined, 4));
+                    }} />
+            )}
+            <JSONFilterEditor
+                expanded
+                disabled={disabled}
+                value={{
+                    source,
+                    filter: JSON5.parse(value),
+                }}
+                onChange={({ source, filter }) => {
+                    setSource(source);
+                    onChange(JSON5.stringify(filter, undefined, 4));
+                }} />
+        </div>
     );
 }
 
@@ -49,6 +60,7 @@ export function voterCodeholders ({ value, onChange, editing, item }) {
     return (
         <Field validate={() => validateJSON(value)}>
             <JSONEditor
+                category="codeholders"
                 value={value}
                 onChange={onChange}
                 disabled={!editing} />
@@ -76,6 +88,7 @@ export function viewerCodeholders ({ value, onChange, editing }) {
             {value !== 'null' ? (
                 <Field validate={() => validateJSON(value)}>
                     <JSONEditor
+                        category="codeholders"
                         value={value}
                         onChange={onChange}
                         disabled={!editing} />

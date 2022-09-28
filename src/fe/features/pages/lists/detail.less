@@ -36,6 +36,8 @@
             .elevation(4);
 
             .filter-item-header {
+                display: flex;
+                align-items: center;
                 padding: 8px 16px;
                 background: var(--editor-text-fade-10);
 
@@ -54,6 +56,11 @@
                 .filter-item-title {
                     font-weight: 600;
                     line-height: 24px;
+                    flex: 1;
+                }
+
+                .load-saved-filter-button {
+                    font-size: smaller;
                 }
             }
 

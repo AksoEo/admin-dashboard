@@ -17,6 +17,7 @@ import { connectPerms } from '../../../perms';
 import { Link } from '../../../router';
 import { lists as locale } from '../../../locale';
 import './detail.less';
+import { SavedFilterPickerButton } from '../../../components/overview/saved-filter-picker';
 
 export default connectPerms(class ListDetailPage extends Page {
     state = {
@@ -190,6 +191,16 @@ class Filters extends Component {
                             </span>
                         ) : null}
                         <span class="filter-item-title">{locale.filters.itemTitle(i)}</span>
+                        {editing ? (
+                            <SavedFilterPickerButton
+                                class="load-saved-filter-button"
+                                category="codeholders"
+                                onLoad={query => {
+                                    const newFilters = [...item.filters];
+                                    newFilters[index] = query.query.filter;
+                                    onItemChange({ ...item, filters: newFilters });
+                                }} />
+                        ) : null}
                     </div>
                     <JSONEditor
                         value={filter}
