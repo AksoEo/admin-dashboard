@@ -6,6 +6,7 @@ import { IsoDuration, IsoDurationEditor } from '../../../components/data/timespa
 import JSONFilterEditor from '../../../components/overview/json-filter-editor';
 import Segmented from '../../../components/controls/segmented';
 import './magazine-subscribers.less';
+import { SavedFilterPickerButton } from '../../../components/overview/saved-filter-picker';
 
 function MagazinePerms ({ value, editing, onChange, hasCopyableItems }) {
     if (!editing) {
@@ -110,7 +111,8 @@ function MagazinePerms ({ value, editing, onChange, hasCopyableItems }) {
                     <MagazinePermsFilter
                         value={value.filter}
                         editing={editing}
-                        onChange={filter => onChange({ ...value, filter })} />
+                        onChange={filter => onChange({ ...value, filter })}
+                        category="codeholders" />
                 </div>
             ) : null}
             {hasCopyableItems && (editing || value.freelyAvailableAfter) ? (
@@ -179,7 +181,7 @@ function MagazinePermsDuration ({ value, editing, onChange }) {
     );
 }
 
-function MagazinePermsFilter ({ value, editing, onChange, desc }) {
+function MagazinePermsFilter ({ value, editing, onChange, desc, category }) {
     const chkId = Math.random().toString(36);
     return (
         <div class="filter-field">
@@ -202,6 +204,7 @@ function MagazinePermsFilter ({ value, editing, onChange, desc }) {
             {value !== null ? (
                 <MagazinePermsFilterControl
                     desc={desc}
+                    category={category}
                     value={value}
                     editing={editing}
                     onChange={onChange} />
@@ -210,7 +213,7 @@ function MagazinePermsFilter ({ value, editing, onChange, desc }) {
     );
 }
 
-function MagazinePermsFilterControl ({ value, editing, onChange, desc }) {
+function MagazinePermsFilterControl ({ value, editing, onChange, category, desc }) {
     const [source, setSource] = useState(null);
 
     return (
@@ -218,6 +221,17 @@ function MagazinePermsFilterControl ({ value, editing, onChange, desc }) {
             {editing ? (
                 <div class="filter-control-desc">
                     {desc || locale.subscribers.filterFieldDesc}
+                </div>
+            ) : null}
+            {(editing && category) ? (
+                <div class="saved-filter-container">
+                    <SavedFilterPickerButton
+                        class="perms-pick-saved"
+                        category={category}
+                        onLoad={data => {
+                            setSource(null);
+                            onChange(data.query.filter);
+                        }} />
                 </div>
             ) : null}
             <JSONFilterEditor

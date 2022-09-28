@@ -296,6 +296,7 @@ export const search = {
     noFilters: 'Neniu konservita filtrilo',
     savedFilterName: 'Nomo',
     savedFilterDesc: 'Priskribo',
+    pickSavedFilter: 'Ŝargi konservitan filtrilon',
     csvExport: 'Elporti kiel CSV',
     noFieldsSelected: 'Neniu kampo elektita',
     sorting: {

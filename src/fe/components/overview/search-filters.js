@@ -1,9 +1,8 @@
 import { h } from 'preact';
 import { Suspense, useState, Fragment, PureComponent } from 'preact/compat';
-import { Checkbox, Button, Dialog } from 'yamdl';
+import { Checkbox, Button } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import PaperList from '../lists/paper-list';
-import DataList from '../lists/data-list';
 import SearchInput from './search-input';
 import Segmented from '../controls/segmented';
 import EventProxy from '../utils/event-proxy';
@@ -11,6 +10,7 @@ import DisclosureArrow from '../disclosure-arrow';
 import { search as locale } from '../../locale';
 import { connectPerms } from '../../perms';
 import { coreContext } from '../../core/connection';
+import { SavedFilterPicker } from './saved-filter-picker';
 import JSONFilterEditor from './json-filter-editor';
 import './search-filters.less';
 
@@ -323,7 +323,7 @@ const FiltersBar = connectPerms(function FiltersBar ({
                                 {locale.loadFilter}
                             </Button>
                         ) : null}
-                        <FilterPicker
+                        <SavedFilterPicker
                             open={pickerOpen}
                             onClose={() => setPickerOpen(false)}
                             category={category}
@@ -402,37 +402,6 @@ const FiltersBar = connectPerms(function FiltersBar ({
                 )}
             </coreContext.Consumer>
         </div>
-    );
-});
-
-const FilterPicker = connectPerms(function FilterPicker ({ category, open, onClose, core, onLoad, perms }) {
-    const canRemoveItem = perms.hasPerm('queries.delete');
-
-    return (
-        <Dialog
-            backdrop
-            open={open}
-            onClose={onClose}
-            title={locale.pickFilter}
-            class="search-filter-picker">
-            <DataList
-                onLoad={(offset, limit) => core.createTask('queries/list', { category }, {
-                    offset,
-                    limit,
-                }).runOnceAndDrop()}
-                itemHeight={56}
-                renderItem={item => (
-                    <div class="search-filter-item">
-                        <div>{item.name}</div>
-                        <div class="filter-item-description">{item.description}</div>
-                    </div>
-                )}
-                onItemClick={item => onLoad(item)}
-                onRemove={canRemoveItem
-                    ? (item => core.createTask('queries/delete', { id: item.id }).runOnceAndDrop())
-                    : null}
-                emptyLabel={locale.noFilters} />
-        </Dialog>
     );
 });
 
