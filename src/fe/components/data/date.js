@@ -74,11 +74,15 @@ class DateEditor extends Component {
 
     textField = null;
 
-    #onFocus = () => {
+    #onFocus = (e) => {
+        if (this.props.onFocus) this.props.onFocus(e);
+        if (e.defaultPrevented) return;
         this.setState({ focused: true });
         globalAnimator.register(this);
     };
-    #onBlur = () => {
+    #onBlur = (e) => {
+        if (this.props.onBlur) this.props.onBlur(e);
+        if (e.defaultPrevented) return;
         this.setState({
             focused: false,
             inputText: stringifyDate(this.props.value),
@@ -145,7 +149,7 @@ class DateEditor extends Component {
     }
 
     componentDidUpdate (prevProps) {
-        if (prevProps.value !== this.props.value && !this.state.focused) {
+        if (prevProps.value !== this.props.value && (!this.state.focused || !prevProps.value)) {
             this.setState({ inputText: stringifyDate(this.getDateValue()) });
         }
         if (this.props.disabled && this.state.focused) {

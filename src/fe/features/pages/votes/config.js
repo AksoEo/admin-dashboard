@@ -118,13 +118,20 @@ export function viewerCodeholdersMemberFilter ({ value, onChange, editing }) {
     );
 }
 
-const timeBound = (isStart) => function TimeBoundEditor ({ value, onChange, editing, item }) {
+const timeBound = (isStart) => function TimeBoundEditor ({ value, onChange, editing, item, copyFrom, ...extra }) {
     if (!editing) return <timestamp.renderer value={value} />;
-    if (isStart && item.state.isActive) return locale.cannotEditActive;
+    if (isStart && item.state?.isActive) return locale.cannotEditActive;
     return (
         <timestamp.editor
+            {...extra}
+            required
             value={value}
-            onChange={onChange} />
+            onChange={onChange}
+            onFocus={() => {
+                if (!value && copyFrom) {
+                    onChange(item[copyFrom]);
+                }
+            }} />
     );
 };
 export const timeStart = timeBound(true);

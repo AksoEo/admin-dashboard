@@ -7,10 +7,11 @@ import FadingPageView from '../../../components/layout/fading-page-view';
 import DisplayError from '../../../components/utils/error';
 import { Form, Field } from '../../../components/form';
 import { TejoIcon, UeaIcon, UeaColorIcon } from '../../../components/org-icon';
-import { timestamp } from '../../../components/data';
 import { votes as locale } from '../../../locale';
 import {
     config as Config,
+    timeStart as TimeStart,
+    timeEnd as TimeEnd,
     voterCodeholders as VoterCodeholders,
     viewerCodeholders as ViewerCodeholders,
 } from './config';
@@ -112,19 +113,20 @@ function TimespanEditor ({ value, onChange }) {
             if (value.start >= value.end) return locale.create.emptyTimespan;
         }}>
             <WizardSection title={locale.fields.timeStart} />
-            <timestamp.editor
-                required
-                outline
+            <TimeStart
+                editing outline
+                item={value}
                 value={value.start}
                 onChange={start => onChange({ ...value, start })} />
             <br />
             <br />
             <WizardSection title={locale.fields.timeEnd} />
-            <timestamp.editor
-                required
-                outline
+            <TimeEnd
+                editing outline
+                item={value}
                 value={value.end}
-                onChange={end => onChange({ ...value, end })} />
+                onChange={end => onChange({ ...value, end })}
+                copyFrom="start" />
         </Field>
     );
 }

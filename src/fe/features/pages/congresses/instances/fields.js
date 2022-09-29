@@ -20,13 +20,6 @@ const string100Editor = (label, props = {}) => ({
     },
 });
 
-const dateEditor = (label, props = {}) => ({
-    component ({ value, editing, onChange }) {
-        if (editing) return <date.editor outline label={label} value={value} onChange={onChange} {...props} />;
-        return <date.renderer value={value} />;
-    },
-});
-
 export const FIELDS = {
     humanId: {
         sortable: true,
@@ -47,8 +40,40 @@ export const FIELDS = {
         },
     },
     name: { ...string100Editor(locale.fields.name, { required: true }), sortable: true, weight: 2, slot: 'title' },
-    dateFrom: { ...dateEditor(locale.fields.dateFrom, { required: true }), sortable: true },
-    dateTo: { ...dateEditor(locale.fields.dateTo, { required: true }), sortable: true },
+    dateFrom: {
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return <date.editor
+                    outline
+                    label={locale.fields.dateFrom}
+                    value={value}
+                    onChange={onChange}
+                    required={true} />;
+            }
+            return <date.renderer value={value} />;
+        },
+        sortable: true,
+    },
+    dateTo: {
+        component ({ value, editing, onChange, item }) {
+            if (editing) {
+                return <date.editor
+                    outline
+                    label={locale.fields.dateTo}
+                    value={value}
+                    onChange={onChange}
+                    onFocus={() => {
+                        if (!value) {
+                            // default to begin date
+                            onChange(item.dateFrom);
+                        }
+                    }}
+                    required={true} />;
+            }
+            return <date.renderer value={value} />;
+        },
+        sortable: true,
+    },
     locationName: string100Editor(locale.fields.locationName),
     locationNameLocal: string100Editor(locale.fields.locationNameLocal),
     locationAddress: {

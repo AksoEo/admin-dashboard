@@ -91,9 +91,18 @@ export default {
 
             return (
                 <span class="vote-timespan">
-                    <TimeStart value={value.start} onChange={start => onChange({ ...value, start })} editing={editing} item={item} />
+                    <TimeStart
+                        value={value.start}
+                        onChange={start => onChange({ ...value, start })}
+                        editing={editing}
+                        item={item} />
                     {'–'}
-                    <TimeEnd value={value.end} onChange={end => onChange({ ...value, end })} editing={editing} item={item} />
+                    <TimeEnd
+                        value={value.end}
+                        onChange={end => onChange({ ...value, end })}
+                        editing={editing}
+                        item={item}
+                        copyFrom="start" />
                 </span>
             );
         },

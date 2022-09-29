@@ -78,7 +78,7 @@ function TimestampRenderer ({ value, zone }) {
  * # Props
  * - value (in seconds)
  */
-function TimestampEditor ({ label, value, onChange, disabled, error, outline, zone, required }) {
+function TimestampEditor ({ label, value, onChange, disabled, error, outline, zone, required, onFocus }) {
     const applyZone = value => {
         if (zone) return value.tz(zone);
         return value.utc();
@@ -97,27 +97,42 @@ function TimestampEditor ({ label, value, onChange, disabled, error, outline, zo
 
     return (
         <span class="timestamp-editor">
-            <date.editor label={label} outline={outline} disabled={disabled} value={dateValue} onChange={v => {
-                if (v === null) {
-                    onChange(null);
-                    return;
-                }
-                const newDate = parseZone(v + '$00:00:00', 'YYYY-MM-DD$HH:mm:ss');
-                newDate.seconds(timeValue);
-                const newValue = newDate.unix();
-                if (Number.isFinite(newValue)) onChange(newValue);
-            }} error={error} required={required} />
+            <date.editor
+                label={label}
+                outline={outline}
+                disabled={disabled}
+                value={dateValue}
+                onChange={v => {
+                    if (v === null) {
+                        onChange(null);
+                        return;
+                    }
+                    const newDate = parseZone(v + '$00:00:00', 'YYYY-MM-DD$HH:mm:ss');
+                    newDate.seconds(timeValue);
+                    const newValue = newDate.unix();
+                    if (Number.isFinite(newValue)) onChange(newValue);
+                }}
+                error={error}
+                required={required}
+                onFocus={onFocus} />
             {outline ? ' ' : ''}
-            <time.editor nullable outline={outline} disabled={disabled} value={timeValue} onChange={v => {
-                if (v === null) {
-                    onChange(null);
-                    return;
-                }
-                const newDate = parseZone(dateValue + '$00:00:00', 'YYYY-MM-DD$HH:mm:ss');
-                newDate.seconds(v);
-                const newValue = newDate.unix();
-                if (Number.isFinite(newValue)) onChange(newValue);
-            }} error={!!error} />
+            <time.editor
+                nullable
+                outline={outline}
+                disabled={disabled}
+                value={timeValue}
+                onChange={v => {
+                    if (v === null) {
+                        onChange(null);
+                        return;
+                    }
+                    const newDate = parseZone(dateValue + '$00:00:00', 'YYYY-MM-DD$HH:mm:ss');
+                    newDate.seconds(v);
+                    const newValue = newDate.unix();
+                    if (Number.isFinite(newValue)) onChange(newValue);
+                }}
+                error={!!error}
+                onFocus={onFocus} />
         </span>
     );
 }

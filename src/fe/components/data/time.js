@@ -110,7 +110,11 @@ class TimeEditor extends PureComponent {
         });
     };
 
-    onBlur = () => this.commitEditing();
+    onBlur = (e) => {
+        if (this.props.onBlur) this.props.onBlur(e);
+        if (e.defaultPrevented) return;
+        this.commitEditing();
+    };
 
     onKeyDown = e => {
         if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
