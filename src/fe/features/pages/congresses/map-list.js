@@ -250,9 +250,10 @@ export default class MapList extends PureComponent {
                 if (this.state.highlighted === id) {
                     m.highlighted = true;
                 }
-                if (!m.onMouseOver && !m.onMouseOut) {
-                    m.onMouseOut = () => this.setState({ highlighted: null });
-                    m.onMouseOver = () => this.setState({ highlighted: id });
+                if (!m.eventHandlers) m.eventHandlers = {};
+                if (!m.eventHandlers.mouseover && !m.eventHandlers.mouseout) {
+                    m.eventHandlers.mouseout = () => this.setState({ highlighted: null });
+                    m.eventHandlers.mouseover = () => this.setState({ highlighted: id });
                 }
                 markers.push(m);
             }

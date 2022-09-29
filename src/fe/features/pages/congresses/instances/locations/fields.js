@@ -208,7 +208,12 @@ export const FIELDS = {
             }
 
             const setRatingOnClick = index => () => {
-                onChange({ ...value, rating: index + 1 });
+                onChange({
+                    ...value,
+                    rating: index + 1,
+                    type,
+                    max,
+                });
             };
 
             const items = [];

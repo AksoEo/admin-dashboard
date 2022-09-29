@@ -218,8 +218,10 @@ export default class LocationsView extends PureComponent {
                         key: item.id,
                         location: item.ll,
                         icon: item.icon === 'GENERIC' ? null : <IconField value={item.icon} />,
-                        onClick: () => {
-                            this.context.navigate(`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${item.id}`);
+                        eventHandlers: {
+                            click: () => {
+                                this.context.navigate(`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${item.id}`);
+                            },
                         },
                     })}
                     onItemClick={id => {

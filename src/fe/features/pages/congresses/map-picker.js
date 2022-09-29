@@ -48,9 +48,11 @@ export default class MapPicker extends PureComponent {
             markers.push({
                 icon,
                 location: value,
-                onDragEnd: e => {
-                    const loc = e.target.getLatLng();
-                    onChange([loc.lat, loc.lng]);
+                eventHandlers: {
+                    dragend: e => {
+                        const loc = e.target.getLatLng();
+                        onChange([loc.lat, loc.lng]);
+                    },
                 },
             });
         }
