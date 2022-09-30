@@ -88,8 +88,8 @@ export const membershipOptions = {
             varLabel: 'Variablo de prezo',
             na: 'La oferto ne estas elektebla pro manko de prezo',
 
-            info: '[[You can test price calculation in the script editor by inserting different values in the formulaj variabloj tab.]]',
-            info100: '[[For currencies except JPY, price values are read as cents. For example, 100 = 1,00 USD.]]',
+            info: 'Eblas testi prezkalkuladon el la AKSO-skripto-redaktilo enmetante diversajn valorojn en la folio » formulaj variabloj «.',
+            info100: 'Ĉiuj valutoj indikas prezon en sia plej malgranda unuo (ekz. cendoj). Tiel 1,50 EUR skribiĝu kiel 150 kaj 900 JPY kiel 900.',
         },
         paperVersion: 'Papera versio',
     },

@@ -52,10 +52,10 @@ export const magazines = {
         membersNone: 'Neniu IMo',
         membersFilter: 'Laŭ filtrilo',
 
-        membersFilterInner: '[[Membership]]',
-        membersFilterInnerDesc: '[[Additionally filter members by memberships. Note that this means all memberships, not just active ones!!]]',
+        membersFilterInner: 'Ena membrofiltrilo',
+        membersFilterInnerDesc: 'Aldone filtru laŭ membreco',
         membersFilterInnerFieldDesc: 'Vi povas akiri filtrilon el la sekcio “Membreco▸Kategorioj” alklakante je “Konverti al JSON-filtrilo”',
-        membersFilterInnerDefault: '[[Default filter: memberships will need givesMembership: true.]]',
+        membersFilterInnerDefault: 'Defaŭlta valoro: nur membrokategorioj, kiuj estas membrecdonaj.',
 
         membersIncludeLastYear: 'Eksmembra alirdaŭro',
         membersIncludeLastYearNone: 'Nenio',

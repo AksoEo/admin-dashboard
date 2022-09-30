@@ -330,7 +330,7 @@ export const codeholders = {
         comment: 'Priskribo de ŝanĝoj',
         changedBy: 'Ŝanĝita de',
         initial: 'Origina datumo',
-        dataRetentionNote: '[[History is only retained for 60 days.]]',
+        dataRetentionNote: 'La historio estas konservata nur dum 60 tagoj.',
     },
     addrLabelGen: {
         menuItem: 'Krei adresetikedojn',
