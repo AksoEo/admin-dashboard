@@ -155,7 +155,7 @@ const eClientFilters = {
         toAPI: codeholders => ({
             $or: [
                 { newCodeholderId: { $in: codeholders } },
-                { $codeholderData: { $in: codeholders } },
+                ...codeholders.map(id => ({ $codeholderData: +id })),
             ],
         }),
     },
