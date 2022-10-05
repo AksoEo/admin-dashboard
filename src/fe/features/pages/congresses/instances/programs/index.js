@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button } from 'yamdl';
 import ListIcon from '@material-ui/icons/List';
-import TimelineIcon from '@material-ui/icons/Timeline';
+import TimelineIcon from '@material-ui/icons/DateRange';
+import RoomIcon from '@material-ui/icons/Room';
 import SearchFilters from '../../../../../components/overview/search-filters';
 import OverviewList from '../../../../../components/lists/overview-list';
 import DetailShell from '../../../../../components/detail/detail-shell';
@@ -12,6 +12,11 @@ import ProgramTimeline from './timeline';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import './index.less';
+import Segmented from '../../../../../components/controls/segmented';
+
+const TIMELINE_VIEW = 'timeline';
+const LIST_VIEW = 'list';
+const ROOM_VIEW = 'rooms';
 
 /**
  * Shows an overview over programs, with a map
@@ -46,7 +51,7 @@ export default class ProgramsView extends PureComponent {
         dateFrom: null,
         dateTo: null,
         tz: null,
-        listView: false,
+        view: TIMELINE_VIEW,
     };
 
     #searchInput;
@@ -89,9 +94,9 @@ export default class ProgramsView extends PureComponent {
     }
 
 
-    render ({ congress, instance }, { parameters, dateFrom, dateTo, tz, listView, expanded }) {
+    render ({ congress, instance }, { parameters, dateFrom, dateTo, tz, view, expanded }) {
         const contents = [];
-        if (listView) {
+        if (view === LIST_VIEW) {
             contents.push(
                 <SearchFilters
                     value={parameters}
@@ -126,10 +131,21 @@ export default class ProgramsView extends PureComponent {
                     locale={locale.fields}
                     userData={{ congress, instance, tz }} />,
             );
-        } else {
+        } else if (view === TIMELINE_VIEW) {
             contents.push(
                 <ProgramTimeline
                     key="timeline"
+                    congress={congress}
+                    instance={instance}
+                    dateFrom={dateFrom}
+                    dateTo={dateTo}
+                    tz={tz} />
+            );
+        } else if (view === ROOM_VIEW) {
+            contents.push(
+                <ProgramTimeline
+                    key="timeline-room"
+                    byRoom
                     congress={congress}
                     instance={instance}
                     dateFrom={dateFrom}
@@ -141,9 +157,16 @@ export default class ProgramsView extends PureComponent {
         return (
             <div class="congresses-instance-programs">
                 <div class="switch-button-container">
-                    <Button icon small onClick={() => this.setState({ listView: !listView })}>
-                        {listView ? <TimelineIcon /> : <ListIcon />}
-                    </Button>
+                    <Segmented
+                        class="smaller"
+                        selected={view}
+                        onSelect={view => this.setState({ view })}>
+                        {[
+                            { id: TIMELINE_VIEW, label: <TimelineIcon /> },
+                            { id: ROOM_VIEW, label: <RoomIcon /> },
+                            { id: LIST_VIEW, label: <ListIcon /> },
+                        ]}
+                    </Segmented>
                 </div>
                 {contents}
                 <DetailShell

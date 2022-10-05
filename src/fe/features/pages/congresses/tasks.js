@@ -59,7 +59,6 @@ export default {
                         <Field>
                             <TextField
                                 required
-                                component={TextField}
                                 outline
                                 label={locale.fields.name}
                                 value={task.parameters.name || ''}

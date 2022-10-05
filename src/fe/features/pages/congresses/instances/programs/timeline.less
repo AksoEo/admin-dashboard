@@ -29,13 +29,32 @@
         .day-view-bottom-padding {
             padding-bottom: 64px;
         }
-        
+
         .day-view-status {
             padding: 16px;
             text-align: center;
         }
 
         .day-view-contents {
+            &.is-scrollable {
+                overflow-x: scroll;
+                overflow-y: hidden;
+            }
+
+            .day-view-header {
+                position: relative;
+                height: 32px;
+                border-bottom: 1px solid @separator;
+
+                .location-header {
+                    position: absolute;
+                    height: 100%;
+                    font-weight: bold;
+                    padding: 4px;
+                    box-sizing: border-box;
+                }
+            }
+
             .day-view-region {
                 position: relative;
                 margin-bottom: 16px;
@@ -46,6 +65,24 @@
                     align-items: stretch;
                     border-left: 2px solid @secondary;
                     overflow: hidden;
+                    background: @text-fade-05;
+                }
+
+                .hour-item {
+                    position: absolute;
+                    display: flex;
+                    align-items: stretch;
+                    width: 100%;
+                    border-top: 1px solid @separator;
+                    pointer-events: none;
+
+                    .inner-label {
+                        padding: 4px;
+                        text-align: right;
+                        pointer-events: auto;
+                        box-sizing: border-box;
+                        border-right: 1px solid @separator;
+                    }
                 }
             }
         }

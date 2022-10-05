@@ -1,12 +1,16 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { Fragment, PureComponent } from 'preact/compat';
 import moment from 'moment';
 import { CircularProgress } from 'yamdl';
 import DynamicHeightDiv from '../../../../../components/layout/dynamic-height-div';
+import TinyProgress from '../../../../../components/controls/tiny-progress';
 import DisplayError from '../../../../../components/utils/error';
 import OverviewListItem from '../../../../../components/lists/overview-list-item';
 import { connect, coreContext } from '../../../../../core/connection';
-import { congressPrograms as locale } from '../../../../../locale';
+import {
+    congressPrograms as locale,
+    congressLocations as locationsLocale,
+} from '../../../../../locale';
 import { OVERVIEW_FIELDS } from './fields';
 import './timeline.less';
 
@@ -17,6 +21,7 @@ import './timeline.less';
  * - congress/instance: ids
  * - dateFrom/dateTo: congress date bounds
  * - tz: time zone
+ * - byRoom: bool
  */
 export default class ProgramTimeline extends PureComponent {
     state = {
@@ -39,6 +44,7 @@ export default class ProgramTimeline extends PureComponent {
                     dateTo={this.props.dateTo}
                     tz={tz} />
                 <TimelineDayView
+                    byRoom={this.props.byRoom}
                     congress={congress}
                     instance={instance}
                     date={date}
@@ -190,15 +196,15 @@ class TimelineDayView extends PureComponent {
         if (this.#updateView) this.#updateView.drop();
     }
 
-    // item id -> item time bounds
-    #itemBounds = new Map();
+    // item id -> item time bounds / location
+    #itemInfo = new Map();
 
-    getItemBounds (id) {
-        return this.#itemBounds.get(id);
+    getItemInfo (id) {
+        return this.#itemInfo.get(id);
     }
 
-    onLoadItemBounds (id, bounds) {
-        this.#itemBounds.set(id, bounds);
+    onLoadItemInfo (id, bounds) {
+        this.#itemInfo.set(id, bounds);
         this.scheduleLayout();
     }
 
@@ -210,7 +216,7 @@ class TimelineDayView extends PureComponent {
         }, 50);
     }
 
-    layout () {
+    layoutTimeline () {
         const { items } = this.state;
 
         // const refDate = moment.tz(this.props.date, this.props.tz);
@@ -234,7 +240,7 @@ class TimelineDayView extends PureComponent {
         };
         const missingItems = [];
         for (const id of items) {
-            const bounds = this.getItemBounds(id);
+            const bounds = this.getItemInfo(id);
             if (!bounds) {
                 missingItems.push(id);
                 continue;
@@ -289,12 +295,7 @@ class TimelineDayView extends PureComponent {
             for (const id of starting) {
                 // find a free column and occupy it
                 const freeCol = occupiedColumns.indexOf(null);
-                const bounds = this.getItemBounds(id);
-                // const startTime = moment(bounds.start * 1000);
-                // const endTime = moment(bounds.end * 1000);
-
-                // const startHour = startTime.diff(refDate) / 3600000;
-                // const endHour = endTime.diff(refDate) / 3600000;
+                const bounds = this.getItemInfo(id);
 
                 const start = splitsY.get(bounds.start);
                 const end = splitsY.get(bounds.end);
@@ -342,6 +343,65 @@ class TimelineDayView extends PureComponent {
         return { regions: outRegions, missingItems };
     }
 
+    layoutByRoom () {
+        const { items } = this.state;
+        const missingItems = [];
+
+        const locations = {};
+        let minBound = Infinity;
+        let maxBound = -Infinity;
+
+        for (const id of items) {
+            const info = this.getItemInfo(id);
+            if (!info) {
+                missingItems.push(id);
+                continue;
+            }
+
+            if (!locations[info.location]) locations[info.location] = [];
+            locations[info.location].push({ id, start: info.start, end: info.end });
+
+            if (info.start < minBound) minBound = info.start;
+            if (info.end > maxBound) maxBound = info.end;
+        }
+
+        for (const k in locations) {
+            locations[k].sort((a, b) => a.start - b.start);
+        }
+
+        const hourHeight = 40;
+
+        const region = {
+            items: [],
+            start: 0,
+            end: hourHeight * (maxBound - minBound) / 3600,
+            timeStart: minBound,
+            timeEnd: maxBound,
+            locs: Object.keys(locations),
+        };
+
+        for (const k in locations) {
+            const events = locations[k];
+            const col = [];
+            for (const event of events) {
+                col.push({
+                    id: event.id,
+                    start: hourHeight * (event.start - minBound) / 3600,
+                    end: hourHeight * (event.end - minBound) / 3600,
+                });
+            }
+            region.items.push(col);
+        }
+
+        const regions = [region];
+        return { regions, missingItems, isByRoom: true, hourHeight };
+    }
+
+    layout () {
+        if (this.props.byRoom) return this.layoutByRoom();
+        return this.layoutTimeline();
+    }
+
     renderContents () {
         if (!this.state.items.length) {
             return <div class="day-view-status">{locale.timeline.empty}</div>;
@@ -351,18 +411,62 @@ class TimelineDayView extends PureComponent {
 
         const contents = [];
 
-        const { regions, missingItems } = this.layout();
+        const { regions, missingItems, isByRoom, hourHeight } = this.layout();
+        const ROOMS_MIN_COL_WIDTH = 40;
+        const ROOMS_WEIGHT = 4;
+
+        if (isByRoom) {
+            const { locs } = regions[0];
+            contents.push(
+                <div class="day-view-header" style={{
+                    minWidth: (locs.length * ROOMS_WEIGHT + 1) * ROOMS_MIN_COL_WIDTH,
+                }}>
+                    {locs.map((loc, i) => {
+                        return (
+                            <LocationHeader
+                                key={i}
+                                col={1 + i * 4}
+                                cols={locs.length * ROOMS_WEIGHT + 1}
+                                weight={4}
+                                congress={congress}
+                                instance={instance}
+                                id={loc} />
+                        );
+                    })}
+                </div>
+            );
+        }
+
         for (const region of regions) {
             const regionNodes = [];
 
-            const cols = region.items.length;
+            let cols = region.items.length;
             let colIndex = 0;
+            let colWeight = 1;
+
+            if (isByRoom) {
+                colWeight = ROOMS_WEIGHT;
+                colIndex++;
+                cols = cols * colWeight + 1;
+
+                regionNodes.push(
+                    <HoursOfTheDay
+                        tz={tz}
+                        cols={cols}
+                        start={region.timeStart}
+                        end={region.timeEnd}
+                        hourHeight={hourHeight} />
+                );
+            }
+
             for (const col of region.items) {
                 for (const item of col) {
                     regionNodes.push(
                         <DayViewItem
+                            short={this.props.byRoom}
                             col={colIndex}
                             cols={cols}
+                            weight={colWeight}
                             start={item.start}
                             end={item.end}
                             congress={congress}
@@ -370,18 +474,19 @@ class TimelineDayView extends PureComponent {
                             key={item.id}
                             id={item.id}
                             tz={tz}
-                            onLoadBounds={bounds => this.onLoadItemBounds(item.id, bounds)}
+                            onLoadInfo={info => this.onLoadItemInfo(item.id, info)}
                             onGetItemLink={(id) => {
                                 return `/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`;
                             }} />
                     );
                 }
-                colIndex++;
+                colIndex += colWeight;
             }
 
+            const minWidth = isByRoom ? cols * ROOMS_MIN_COL_WIDTH : null;
             const height = region.end - region.start;
             contents.push(
-                <div class="day-view-region" style={{ height }}>
+                <div class="day-view-region" style={{ minWidth, height }}>
                     {regionNodes}
                 </div>
             );
@@ -394,7 +499,7 @@ class TimelineDayView extends PureComponent {
                     instance={instance}
                     key={id}
                     id={id}
-                    onLoadBounds={bounds => this.onLoadItemBounds(id, bounds)} />
+                    onLoadInfo={info => this.onLoadItemInfo(id, info)} />
             );
         }
 
@@ -413,7 +518,7 @@ class TimelineDayView extends PureComponent {
                         <DisplayError error={error} />
                     </div>
                 ) : items ? (
-                    <div class="day-view-contents">
+                    <div class={'day-view-contents' + (this.props.byRoom ? ' is-scrollable' : '')}>
                         {this.renderContents()}
                     </div>
                 ) : null}
@@ -431,19 +536,27 @@ const DayViewItem = connect(({ congress, instance, id }) =>
         const prevData = prevProps.data || {};
         const thisData = this.props.data || {};
         if (prevData.timeFrom !== thisData.timeFrom || prevData.timeTo !== thisData.timeTo) {
-            this.props.onLoadBounds({
+            this.props.onLoadInfo({
                 start: thisData.timeFrom,
                 end: thisData.timeTo,
+                location: thisData.location,
             });
         }
     }
 
-    render ({ congress, instance, id, tz, col, cols, start, end, data, onGetItemLink }) {
+    render ({
+        col, cols, weight,
+        congress,
+        instance,
+        id, tz,
+        start, end, data,
+        onGetItemLink,
+    }) {
         if (!data || !cols) return null;
 
         return (
             <div class="timeline-item" style={{
-                width: `${100 / cols}%`,
+                width: `${100 / cols * weight}%`,
                 left: `${(col / cols) * 100}%`,
                 top: start,
                 height: end - start,
@@ -453,7 +566,7 @@ const DayViewItem = connect(({ congress, instance, id }) =>
                     skipAnimation
                     id={id}
                     options={{ congress, instance }}
-                    selectedFields={SELECTED_FIELDS}
+                    selectedFields={this.props.short ? SELECTED_FIELDS_SHORT : SELECTED_FIELDS}
                     fields={OVERVIEW_FIELDS}
                     index={0}
                     locale={locale.fields}
@@ -465,3 +578,74 @@ const DayViewItem = connect(({ congress, instance, id }) =>
 });
 
 const SELECTED_FIELDS = ['title', 'timeLoc', 'description'].map(x => ({ id: x, sorting: 'none' }));
+const SELECTED_FIELDS_SHORT = ['title'].map(x => ({ id: x, sorting: 'none' }));
+
+function HoursOfTheDay ({ cols, start, end, hourHeight, tz }) {
+    const hours = [];
+    let current = Math.floor(start / 3600) * 3600;
+    let y = (current - start) / 3600 * hourHeight;
+
+    while (current <= end) {
+        hours.push(
+            <div class="hour-item" style={{
+                top: y,
+                height: hourHeight,
+            }}>
+                <div class="inner-label" style={{
+                    width: `${100 / cols}%`,
+                }}>
+                    {moment(current * 1000).tz(tz || 'UTC').format('HH:mm')}
+                </div>
+            </div>
+        );
+        current += 3600;
+        y += hourHeight;
+    }
+
+    return (
+        <Fragment>
+            {hours}
+        </Fragment>
+    );
+}
+
+function LocationHeader ({ congress, instance, id, col, cols, weight }) {
+    if (id === 'null') {
+        return (
+            <div class="location-header is-nowhere" style={{
+                left: `${(col / cols) * 100}%`,
+                width: `${100 / cols * weight}%`,
+            }}>
+                {locationsLocale.locatedWithinNowhere}
+            </div>
+        );
+    } else {
+        return (
+            <RealLocationHeader
+                congress={congress}
+                instance={instance}
+                id={id}
+                col={col}
+                cols={cols}
+                weight={weight} />
+        );
+    }
+}
+
+const RealLocationHeader = connect(({ congress, instance, id }) => [
+    'congresses/location', { congress, instance, id },
+])(data => ({ data }))(function LocationHeader ({ col, cols, weight, data }) {
+    let contents = <TinyProgress />;
+    if (data) {
+        contents = data.name;
+    }
+
+    return (
+        <div class="location-header" style={{
+            left: `${(col / cols) * 100}%`,
+            width: `${100 / cols * weight}%`,
+        }}>
+            {contents}
+        </div>
+    );
+});
