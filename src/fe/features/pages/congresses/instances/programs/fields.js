@@ -79,6 +79,28 @@ export const FIELDS = {
 
 export const OVERVIEW_FIELDS = {
     ...FIELDS,
+    time: {
+        slot: 'body',
+        skipLabel: true,
+        component ({ item, userData }) {
+            const { timeFrom, timeTo } = item;
+            const { tz } = userData;
+
+            const day = moment(timeFrom * 1000).tz(tz || 'UTC').startOf('d');
+            const secondsFrom = moment(timeFrom * 1000).diff(day, 's');
+            const secondsTo = moment(timeTo * 1000).diff(day, 's');
+
+            return (
+                <div class="congress-program-time-loc">
+                    <div class="ptl-time">
+                        <time.renderer value={secondsFrom} />
+                        {'–'}
+                        <time.renderer value={secondsTo} />
+                    </div>
+                </div>
+            );
+        },
+    },
     timeLoc: {
         slot: 'body',
         skipLabel: true,

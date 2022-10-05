@@ -460,15 +460,27 @@ class TimelineDayView extends PureComponent {
             }
 
             for (const col of region.items) {
+                let prevStart = null;
+                let prevEnd = null;
+                let overlap = 0;
+
                 for (const item of col) {
+                    const isOverlapping = item.start < prevEnd;
+                    if (isOverlapping) overlap++;
+                    else overlap = 0;
+                    const start = Math.max(item.start, prevStart + 10);
+                    prevStart = start;
+                    prevEnd = item.end;
+
                     regionNodes.push(
                         <DayViewItem
                             short={this.props.byRoom}
                             col={colIndex}
                             cols={cols}
                             weight={colWeight}
-                            start={item.start}
+                            start={start}
                             end={item.end}
+                            overlap={overlap}
                             congress={congress}
                             instance={instance}
                             key={item.id}
@@ -545,7 +557,7 @@ const DayViewItem = connect(({ congress, instance, id }) =>
     }
 
     render ({
-        col, cols, weight,
+        col, cols, weight, overlap,
         congress,
         instance,
         id, tz,
@@ -554,19 +566,31 @@ const DayViewItem = connect(({ congress, instance, id }) =>
     }) {
         if (!data || !cols) return null;
 
+        const height = end - start;
+
+        let fields = SELECTED_FIELDS;
+        if (this.props.short) {
+            fields = SELECTED_FIELDS_SHORT;
+            if (height > 40) {
+                fields = SELECTED_FIELDS_LESS_SHORT;
+            }
+        }
+
+        const dataCol = Math.floor(col / weight);
+
         return (
             <div class="timeline-item" style={{
-                width: `${100 / cols * weight}%`,
-                left: `${(col / cols) * 100}%`,
+                width: `calc(${100 / cols * weight}% - ${overlap * 20}px)`,
+                left: `calc(${(col / cols) * 100}% + ${overlap * 20}px)`,
                 top: start,
-                height: end - start,
-            }}>
+                height,
+            }} data-col={dataCol}>
                 <OverviewListItem
                     compact view="congresses/program"
                     skipAnimation
                     id={id}
                     options={{ congress, instance }}
-                    selectedFields={this.props.short ? SELECTED_FIELDS_SHORT : SELECTED_FIELDS}
+                    selectedFields={fields}
                     fields={OVERVIEW_FIELDS}
                     index={0}
                     locale={locale.fields}
@@ -579,6 +603,7 @@ const DayViewItem = connect(({ congress, instance, id }) =>
 
 const SELECTED_FIELDS = ['title', 'timeLoc', 'description'].map(x => ({ id: x, sorting: 'none' }));
 const SELECTED_FIELDS_SHORT = ['title'].map(x => ({ id: x, sorting: 'none' }));
+const SELECTED_FIELDS_LESS_SHORT = ['title', 'time'].map(x => ({ id: x, sorting: 'none' }));
 
 function HoursOfTheDay ({ cols, start, end, hourHeight, tz }) {
     const hours = [];

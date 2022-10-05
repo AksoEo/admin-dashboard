@@ -63,9 +63,30 @@
                     position: absolute;
                     display: flex;
                     align-items: stretch;
-                    border-left: 2px solid @secondary;
+                    border-left: 4px solid @secondary;
                     overflow: hidden;
-                    background: @text-fade-05;
+                    background: @secondary-fade-50;
+                    border-radius: 4px;
+                    box-sizing: border-box;
+
+                    .gen-col(@col, @color) {
+                        &[data-col="@{col}"] {
+                            --secondary: @color;
+                            --secondary-fade-50: fade(@color, 50%);
+                        }
+                        @col2: (@col + 8);
+                        &[data-col="@{col2}"] {
+                            --secondary: @color;
+                            --secondary-fade-50: fade(@color, 50%);
+                        }
+                    }
+                    .gen-col(1, #e7b);
+                    .gen-col(2, #a7e);
+                    .gen-col(3, #79e);
+                    .gen-col(4, #7ea);
+                    .gen-col(5, #be7);
+                    .gen-col(6, #ec7);
+                    .gen-col(7, #e87);
                 }
 
                 .hour-item {
@@ -84,6 +105,10 @@
                         border-right: 1px solid @separator;
                     }
                 }
+            }
+
+            &.is-scrollable .timeline-item .overview-list-item {
+                align-items: flex-start;
             }
         }
     }
