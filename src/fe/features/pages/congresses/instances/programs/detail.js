@@ -11,6 +11,7 @@ import { congressPrograms as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
 import TagManager from '../tag-manager';
 import './detail.less';
+import { CopyIcon } from '../../../../../components/icons';
 
 export default connectPerms(class ProgramPage extends Page {
     state = {
@@ -70,6 +71,25 @@ export default connectPerms(class ProgramPage extends Page {
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 action: () => push('redakti', true),
             }, {
+                icon: <CopyIcon style={{ verticalAlign: 'middle' }} />,
+                label: locale.create.duplicateMenuItem,
+                action: () => {
+                    // this viewData will likely be instantaneous since the program has already
+                    // been loaded by the detail view, so we probably don't need to show
+                    // any loading indicator
+                    this.context.viewData('congresses/program', {
+                        congress, instance, id,
+                    }).then(data => {
+                        this.context.createTask('congresses/createProgram', {
+                            congress, instance,
+                        }, data);
+                    }).catch(err => {
+                        // oh well
+                        console.error(err); // eslint-disable-line no-console
+                    });
+                },
+            },
+            {
                 label: locale.delete.menuItem,
                 overflow: true,
                 action: () => this.context.createTask('congresses/deleteProgram', {

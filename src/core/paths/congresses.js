@@ -13,6 +13,7 @@ import {
     makeClientToAPI,
 } from '../list';
 import { deepMerge } from '../../util';
+import { crudCreate } from '../templates';
 
 export const CONGRESSES = 'congresses';
 export const DATA = 'data';
@@ -649,14 +650,12 @@ export const tasks = {
         store.insert([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, item.id, DATA], deepMerge(existing, item));
         return store.get([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, item.id, DATA]);
     },
-    createProgram: async ({ congress, instance }, params) => {
-        const client = await asyncClient;
-        const res = await client.post(`/congresses/${congress}/instances/${instance}/programs`, params);
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA], { name });
-        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS]);
-        return id;
-    },
+    createProgram: crudCreate({
+        apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/programs`,
+        fields: ['title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
+        storePath: ({ congress, instance }, id) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA],
+        signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS],
+    }),
     deleteProgram: async ({ congress, instance, id }) => {
         const client = await asyncClient;
         await client.delete(`/congresses/${congress}/instances/${instance}/programs/${id}`);

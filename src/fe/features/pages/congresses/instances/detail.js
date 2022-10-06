@@ -134,6 +134,8 @@ export default connectPerms(class CongressInstancePage extends Page {
                         congress,
                         instance: id,
                         tz: this.state.tz,
+                    }, {
+                        timeFrom: Math.floor(new Date(this.state.dateFrom) / 1000),
                     }),
                 });
             } else if (tab === 'participants') {
@@ -178,7 +180,10 @@ export default connectPerms(class CongressInstancePage extends Page {
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
                     locale={locale}
-                    onData={data => data && this.setState({ tz: data.tz })}
+                    onData={data => data && this.setState({
+                        tz: data.tz,
+                        dateFrom: data.dateFrom,
+                    })}
                     onDelete={() => this.props.pop()}>
                     {data => (
                         <div class="instance-inner">

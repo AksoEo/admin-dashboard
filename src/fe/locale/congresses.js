@@ -215,6 +215,7 @@ export const congressPrograms = {
     },
     create: {
         menuItem: 'Krei',
+        duplicateMenuItem: 'Kopii',
         title: 'Krei programeron',
         button: 'Krei',
     },
