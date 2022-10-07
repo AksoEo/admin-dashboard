@@ -371,12 +371,18 @@ class FormEditorAddItem extends PureComponent {
                     });
                 }}>
                     <InputIcon style={{ verticalAlign: 'middle' }} />
+                    {' '}
+                    {locale.itemTypes.input}
                 </Button>
                 <Button onClick={addText}>
                     <TextIcon style={{ verticalAlign: 'middle' }} />
+                    {' '}
+                    {locale.itemTypes.text}
                 </Button>
                 <Button onClick={addScript}>
                     <ScriptIcon style={{ verticalAlign: 'middle' }} />
+                    {' '}
+                    {locale.itemTypes.script}
                 </Button>
             </div>
         );

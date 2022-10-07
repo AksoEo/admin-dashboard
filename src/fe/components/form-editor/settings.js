@@ -4,13 +4,15 @@ import { Button, Checkbox, TextField } from 'yamdl';
 import TuneIcon from '@material-ui/icons/Tune';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import { formEditor as locale, currencies } from '../../locale';
+import { formEditor as locale, currencies, data as dataLocale } from '../../locale';
 import { currencyAmount } from '../data';
 import { RefNameView } from './script-views';
+import { Field } from '../form';
 import { evalExpr } from './model';
 import Select from '../controls/select';
 import DynamicHeightDiv from '../layout/dynamic-height-div';
 import './settings.less';
+import FormContext from '../form/context';
 
 const FLAGS = [
     'allowUse',
@@ -23,6 +25,37 @@ const FLAGS = [
 /** Renders a control with general form settings (TODO: generalize; this is for congresses!). */
 export default class FormEditorSettings extends PureComponent {
     state = { expanded: false };
+
+    static contextType = FormContext;
+
+    componentDidMount () {
+        this.context.register(this);
+    }
+
+    componentWillUnmount () {
+        this.context.deregister(this);
+    }
+
+    validate (submitting) {
+        if (submitting) {
+            const err = this.getError();
+            if (err) {
+                this.setState({ expanded: true });
+            }
+            return !err;
+        }
+    }
+
+    getError () {
+        const { value } = this.props;
+
+        for (const v of VARIABLES) {
+            if (v.required && !value[v.key]) return dataLocale.requiredField;
+        }
+        if (value.price && !value.price.var) {
+            return dataLocale.requiredField;
+        }
+    }
 
     render ({ value, editing, onChange, previousNodes }, { expanded }) {
         let settings = null;
@@ -87,7 +120,7 @@ function Flag ({ flag, editing, value, onChange }) {
     const labelId = 'flag' + Math.random().toString(36);
 
     return (
-        <div class="settings-flag">
+        <Field class="settings-flag">
             <Checkbox
                 class="flag-checkbox"
                 disabled={!editing}
@@ -98,7 +131,7 @@ function Flag ({ flag, editing, value, onChange }) {
             <div class="flag-description">
                 {locale.settings.flags[flag + 'Desc']}
             </div>
-        </div>
+        </Field>
     );
 }
 
@@ -112,7 +145,10 @@ function Price ({ value, editing, onChange, previousNodes }) {
     const contents = [];
     if (value) {
         contents.push(
-            <div key="value" class="settings-item">
+            <Field key="value" class="settings-item"
+                validate={() => {
+                    if (!value.var) return dataLocale.requiredField;
+                }}>
                 <label class="settings-item-title">
                     {locale.settings.price.variable}
                 </label>
@@ -128,7 +164,7 @@ function Price ({ value, editing, onChange, previousNodes }) {
                     items={Object.keys(currencies).map(c => ({ value: c, label: currencies[c] }))}
                     value={value.currency}
                     onChange={currency => onChange({ ...value, currency })} />
-            </div>
+            </Field>
         );
 
         let priceValue = null;
@@ -137,7 +173,7 @@ function Price ({ value, editing, onChange, previousNodes }) {
         }
 
         contents.push(
-            <div key="preview" class="settings-item">
+            <Field key="preview" class="settings-item">
                 <span>{locale.settings.price.pricePreview}</span>
                 {' '}
                 {(typeof priceValue === 'number') ? (
@@ -148,10 +184,10 @@ function Price ({ value, editing, onChange, previousNodes }) {
                 ) : (
                     locale.settings.price.notANumber
                 )}
-            </div>
+            </Field>
         );
         contents.push(
-            <div key="min" class="settings-item">
+            <Field key="min" class="settings-item">
                 <currencyAmount.editor
                     outline
                     disabled={!editing}
@@ -159,7 +195,7 @@ function Price ({ value, editing, onChange, previousNodes }) {
                     label={locale.settings.price.minUpfront}
                     value={value.minUpfront || 0}
                     onChange={v => onChange({ ...value, minUpfront: v || null })} />
-            </div>
+            </Field>
         );
     }
 
@@ -191,18 +227,18 @@ function SequenceIds ({ value, editing, onChange }) {
     const contents = [];
     if (value) {
         contents.push(
-            <div key="startat" class="settings-item">
+            <Field key="startat" class="settings-item">
                 <TextField
                     outline
                     disabled={!editing}
                     label={locale.settings.sequenceIds.startAt}
                     value={value.startAt | 0}
                     onChange={e => onChange({ ...value, startAt: +e.target.value | 0 })} />
-            </div>
+            </Field>
         );
         const validId = 'flag' + Math.random().toString(36);
         contents.push(
-            <div key="reqvalid" class="settings-flag">
+            <Field key="reqvalid" class="settings-flag">
                 <Checkbox
                     id={validId}
                     disabled={!editing}
@@ -213,7 +249,7 @@ function SequenceIds ({ value, editing, onChange }) {
                 <div class="flag-description">
                     {locale.settings.sequenceIds.requireValidDesc}
                 </div>
-            </div>
+            </Field>
         );
     }
 
@@ -245,7 +281,12 @@ function Variables ({ previousNodes, editing, value, onChange }) {
     const variables = [];
     for (const v of VARIABLES) {
         variables.push(
-            <div key={v.key} class="settings-item settings-variable">
+            <Field key={v.key} class="settings-item settings-variable"
+                validate={() => {
+                    if (v.required && !value[v.key]) {
+                        return dataLocale.requiredField;
+                    }
+                }}>
                 <label class="settings-item-title">
                     {locale.settings.variables[v.key]}
                     {v.required ? ' *' : ''}
@@ -256,7 +297,7 @@ function Variables ({ previousNodes, editing, value, onChange }) {
                     editing={editing}
                     value={value[v.key]}
                     onChange={x => onChange({ ...value, [v.key]: x })} />
-            </div>
+            </Field>
         );
     }
 

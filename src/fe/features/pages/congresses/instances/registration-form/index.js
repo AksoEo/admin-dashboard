@@ -5,6 +5,7 @@ import Meta from '../../../../meta';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
 import Page from '../../../../../components/page';
+import { Form } from '../../../../../components/form';
 import DetailShell from '../../../../../components/detail/detail-shell';
 import FormEditor from '../../../../../components/form-editor';
 import { connect, coreContext } from '../../../../../core/connection';
@@ -105,8 +106,13 @@ const InnerEditor = connect(({ congress, instance }) => [
         });
     };
 
+    #form = createRef();
     #commitTask = null;
     beginCommit = () => {
+        this.#form.current.requestSubmit();
+    };
+
+    #performCommit = () => {
         this.#commitTask = this.props.core.createTask('congresses/setRegistrationForm', {
             congress: this.props.congress,
             instance: this.props.instance,
@@ -174,15 +180,19 @@ const InnerEditor = connect(({ congress, instance }) => [
                             action: () => this.beginCommit(),
                         },
                     ]} />
-                <FormEditor
-                    isEditingContext
-                    editing={!!edit}
-                    value={edit || data}
-                    onChange={edit => this.setState({ edit })}
-                    additionalVars={ADDITIONAL_VARS}
-                    editingFormData
-                    formData={this.state.formData}
-                    onFormDataChange={formData => this.setState({ formData })} />
+                <Form
+                    ref={this.#form}
+                    onSubmit={this.#performCommit}>
+                    <FormEditor
+                        isEditingContext
+                        editing={!!edit}
+                        value={edit || data}
+                        onChange={edit => this.setState({ edit })}
+                        additionalVars={ADDITIONAL_VARS}
+                        editingFormData
+                        formData={this.state.formData}
+                        onFormDataChange={formData => this.setState({ formData })} />
+                </Form>
             </div>
         );
     }

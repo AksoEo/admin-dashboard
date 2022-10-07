@@ -13,7 +13,7 @@ import TimeZoneEditor from '../controls/time-zone';
 import MdField from '../controls/md-field';
 import Select from '../controls/select';
 import TextArea from '../controls/text-area';
-import { FormContext } from '../form';
+import { FormContext, ValidatedTextField } from '../form';
 import { WithCountries } from '../data/country';
 import { date, time, timestamp, currencyAmount } from '../data';
 import { ScriptableValue, ScriptableBool } from './script-expr';
@@ -388,6 +388,7 @@ const TYPES = {
 
 export default class InputItem extends PureComponent {
     static contextType = FormContext;
+    node = createRef();
 
     state = {
         error: null,
@@ -427,7 +428,9 @@ export default class InputItem extends PureComponent {
         if (!error) {
             this.setState({ error: null });
         } else if (submitting || this.state.didInteract) {
-            this.setState({ error, didInteract: true });
+            this.setState({ error, didInteract: true }, () => {
+                this.node.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            });
         }
         return !error;
     }
@@ -452,7 +455,7 @@ export default class InputItem extends PureComponent {
     }
 
     render ({ editing, item, onChange, value, onValueChange, previousNodes, disableValidation }) {
-        let contents = null;
+        let contents;
         if (editing) {
             contents = <InputSettings
                 oldName={this.oldName}
@@ -499,7 +502,7 @@ export default class InputItem extends PureComponent {
         }
 
         return (
-            <div class="form-editor-input-item">
+            <div class="form-editor-input-item" ref={this.node}>
                 {contents}
             </div>
         );
@@ -602,12 +605,15 @@ const SETTINGS = {
 
         return (
             <Setting label={locale.inputFields.name} desc={locale.inputFields.nameDesc}>
-                <TextField
+                <ValidatedTextField
+                    class="wider-text-field"
                     outline
                     value={value}
                     pattern={NAME_PATTERN}
                     helperLabel={helperLabel}
-                    error={!NAME_REGEX.test(value) && locale.inputFields.namePatternError}
+                    validate={value => {
+                        if (!NAME_REGEX.test(value)) return locale.inputFields.namePatternError;
+                    }}
                     maxLength={20}
                     onChange={e => {
                         const newItem = { ...item, name: e.target.value };
@@ -621,6 +627,7 @@ const SETTINGS = {
         return (
             <Setting label={locale.inputFields.label} desc={locale.inputFields.labelDesc}>
                 <TextField
+                    class="wider-text-field"
                     outline
                     value={value}
                     onChange={e => onChange(e.target.value)} />
@@ -631,6 +638,7 @@ const SETTINGS = {
         return (
             <Setting stack label={locale.inputFields.description}>
                 <MdField
+                    class="input-description-field"
                     value={value || ''}
                     onChange={v => onChange(v || null)}
                     editing
