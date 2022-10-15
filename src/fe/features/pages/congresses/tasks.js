@@ -126,7 +126,9 @@ export default {
                     <Component
                         slot="create"
                         editing value={task.parameters[id]}
-                        onChange={value => task.update({ [id]: value })} />
+                        onChange={value => task.update({ [id]: value })}
+                        item={task.parameters}
+                        onItemChange={v => task.update(v)} />
                 </Field>
             );
         });

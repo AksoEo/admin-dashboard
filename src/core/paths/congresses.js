@@ -1,19 +1,16 @@
-import { util } from '@tejo/akso-client';
 import { evaluate } from '@tejo/akso-script';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import * as store from '../store';
 import {
     makeParametersToRequestData,
-    fieldsToOrder,
     fieldDiff,
     filtersToAPI,
-    addJSONFilter,
     makeClientFromAPI,
     makeClientToAPI,
 } from '../list';
 import { deepMerge } from '../../util';
-import { crudCreate } from '../templates';
+import { crudCreate, crudDelete, crudGet, crudList, crudUpdate } from '../templates';
 
 export const CONGRESSES = 'congresses';
 export const DATA = 'data';
@@ -194,150 +191,72 @@ const pClientToAPI = makeClientToAPI(pClientFields);
 // FIXME: needs a lot more DRY
 
 export const tasks = {
-    list: async (_, { search, offset, fields, limit }) => {
-        const client = await asyncClient;
+    list: crudList({
+        apiPath: () => `/congresses`,
+        fields: ['id', 'name', 'abbrev', 'org'],
+        storePath: (_, { id }) => [CONGRESSES, id, DATA],
+    }),
 
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name', 'abbrev', 'org'],
-            order: fieldsToOrder(fields),
-        };
-
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: [search.field], str: transformedQuery };
-        }
-
-        const res = await client.get('/congresses', opts);
-
-        for (const item of res.body) {
-            const existing = store.get([CONGRESSES, item.id, DATA]);
-            store.insert([CONGRESSES, item.id, DATA], deepMerge(existing, item));
-        }
-
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: {
-                filtered: false,
-                time: res.resTime,
-            },
-        };
-    },
-
-    congress: async ({ id }) => {
-        const client = await asyncClient;
-
-        const res = await client.get(`/congresses/${id}`, {
-            fields: ['id', 'name', 'abbrev', 'org'],
-        });
-        const item = res.body;
-
-        const existing = store.get([CONGRESSES, item.id, DATA]);
-        store.insert([CONGRESSES, item.id, DATA], deepMerge(existing, item));
-
-        return store.get([CONGRESSES, item.id, DATA]);
-    },
-
-    create: async (_, params) => {
-        const client = await asyncClient;
-        const res = await client.post('/congresses', params);
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([CONGRESSES, id, DATA], params);
-        store.signal([CONGRESSES, SIG_CONGRESSES]);
-        return id;
-    },
-    delete: async ({ id }) => {
-        const client = await asyncClient;
-        await client.delete(`/congresses/${id}`);
-        store.remove([CONGRESSES, id, DATA]);
-        store.remove([CONGRESSES, id]);
-        store.signal([CONGRESSES, SIG_CONGRESSES]);
-    },
-    update: async ({ id }, params) => {
-        const client = await asyncClient;
-        const existing = store.get([CONGRESSES, id, DATA]);
-        await client.patch(`/congresses/${id}`, fieldDiff(existing, params));
-        store.insert([CONGRESSES, id, DATA], deepMerge(existing, params));
-    },
+    congress: crudGet({
+        apiPath: ({ id }) => `/congresses/${id}`,
+        fields: ['id', 'name', 'abbrev', 'org'],
+        storePath: ({ id }) => [CONGRESSES, id, DATA],
+    }),
+    create: crudCreate({
+        apiPath: () => `/congresses`,
+        fields: ['name', 'abbrev', 'org'],
+        storePath: (_, id) => [CONGRESSES, id, DATA],
+        signalPath: () => [CONGRESSES, SIG_CONGRESSES],
+    }),
+    update: crudUpdate({
+        apiPath: ({ id }) => `/congresses/${id}`,
+        storePath: ({ id }) => [CONGRESSES, id, DATA],
+    }),
+    delete: crudDelete({
+        apiPath: ({ id }) => `/congresses/${id}`,
+        storePaths: ({ id }) => [
+            [CONGRESSES, id, DATA],
+            [CONGRESSES, id],
+        ],
+        signalPath: () => [CONGRESSES, SIG_CONGRESSES],
+    }),
 
     // MARK - instances
 
-    listInstances: async ({ congress }, { offset, limit, fields, search }) => {
-        const client = await asyncClient;
-
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name', 'humanId', 'dateFrom', 'dateTo', 'locationName'],
-            order: fieldsToOrder(fields),
-        };
-
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: [search.field], str: transformedQuery };
-        }
-
-        const res = await client.get(`/congresses/${congress}/instances`, opts);
-
-        for (const item of res.body) {
-            const existing = store.get([CONGRESSES, congress, INSTANCES, item.id, DATA]);
-            store.insert([CONGRESSES, congress, INSTANCES, item.id, DATA], deepMerge(existing, item));
-        }
-
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { filtered: false, time: res.resTime },
-        };
-    },
-    instance: async ({ congress, id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/congresses/${congress}/instances/${id}`, {
-            fields: [
-                'id', 'name', 'humanId', 'dateFrom', 'dateTo', 'locationName', 'locationNameLocal',
-                'locationCoords', 'locationAddress', 'tz',
-            ],
-        });
-        const item = res.body;
-        const existing = store.get([CONGRESSES, congress, INSTANCES, item.id, DATA]);
-        store.insert([CONGRESSES, congress, INSTANCES, item.id, DATA], deepMerge(existing, item));
-        return store.get([CONGRESSES, congress, INSTANCES, item.id, DATA]);
-    },
-    createInstance: async ({ congress }, params) => {
-        const client = await asyncClient;
-        const res = await client.post(`/congresses/${congress}/instances`, params);
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([CONGRESSES, congress, INSTANCES, id, DATA], params);
-        store.signal([CONGRESSES, congress, SIG_INSTANCES]);
-        return id;
-    },
-    deleteInstance: async ({ congress, id }) => {
-        const client = await asyncClient;
-        await client.delete(`/congresses/${congress}/instances/${id}`);
-        store.remove([CONGRESSES, congress, INSTANCES, id, DATA]);
-        store.remove([CONGRESSES, congress, INSTANCES, id]);
-        store.signal([CONGRESSES, congress, SIG_INSTANCES]);
-    },
-    updateInstance: async ({ congress, id }, params) => {
-        const client = await asyncClient;
-        const existing = store.get([CONGRESSES, congress, INSTANCES, id, DATA]);
-        await client.patch(`/congresses/${congress}/instances/${id}`, fieldDiff(existing, params));
-        store.insert([CONGRESSES, congress, INSTANCES, id, DATA], deepMerge(existing, params));
-    },
+    listInstances: crudList({
+        apiPath: ({ congress }) => `/congresses/${congress}/instances`,
+        fields: ['id', 'name', 'humanId', 'dateFrom', 'dateTo', 'locationName'],
+        storePath: ({ congress }, { id }) => [CONGRESSES, congress, INSTANCES, id, DATA],
+    }),
+    instance: crudGet({
+        apiPath: ({ congress, id }) => `/congresses/${congress}/instances/${id}`,
+        fields: [
+            'id', 'name', 'humanId', 'dateFrom', 'dateTo', 'locationName', 'locationNameLocal',
+            'locationCoords', 'locationAddress', 'tz',
+        ],
+        storePath: ({ congress, id }) => [CONGRESSES, congress, INSTANCES, id, DATA],
+    }),
+    createInstance: crudCreate({
+        apiPath: ({ congress }) => `/congresses/${congress}/instances`,
+        fields: [
+            'name', 'humanId', 'dateFrom', 'dateTo', 'locationName', 'locationNameLocal',
+            'locationCoords', 'locationAddress', 'tz',
+        ],
+        storePath: ({ congress }, id) => [CONGRESSES, congress, INSTANCES, id, DATA],
+        signalPath: ({ congress }) => [CONGRESSES, congress, SIG_INSTANCES],
+    }),
+    updateInstance: crudUpdate({
+        apiPath: ({ congress, id }) => `/congresses/${congress}/instances/${id}`,
+        storePath: ({ congress, id }) => [CONGRESSES, congress, INSTANCES, id, DATA],
+    }),
+    deleteInstance: crudDelete({
+        apiPath: ({ congress, id }) => `/congresses/${congress}/instances/${id}`,
+        storePaths: ({ congress, id }) => [
+            [CONGRESSES, congress, INSTANCES, id, DATA],
+            [CONGRESSES, congress, INSTANCES, id],
+        ],
+        signalPath: ({ congress }) => [CONGRESSES, congress, SIG_INSTANCES],
+    }),
     instanceMap: async ({ congress, id }) => {
         const client = await asyncClient;
         const res = await client.get(`/congresses/${congress}/instances/${id}/map`, {
@@ -351,135 +270,70 @@ export const tasks = {
 
     // MARK - location tags
 
-    listLocationTags: async ({ congress, instance }, { offset, limit, fields, search }) => {
-        const client = await asyncClient;
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name'],
-            order: fieldsToOrder(fields),
-        };
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: ['name'], str: transformedQuery };
-        }
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/location_tags`, opts);
-        for (const item of res.body) {
-            const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, item.id]);
-            store.insert([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, item.id], deepMerge(existing, item));
-        }
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { filtered: false, time: res.resTime },
-        };
-    },
-    locationTag: async ({ congress, instance, id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/location_tags/${id}`, {
-            fields: ['id', 'name'],
-        });
-        const item = res.body;
-        const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, item.id]);
-        store.insert([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, item.id], deepMerge(existing, item));
-        return store.get([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, item.id]);
-    },
-    createLocationTag: async ({ congress, instance }, { name }) => {
-        const client = await asyncClient;
-        const res = await client.post(`/congresses/${congress}/instances/${instance}/location_tags`, { name });
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id], { name });
-        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_LOC_TAGS]);
-        return id;
-    },
-    deleteLocationTag: async ({ congress, instance, id }) => {
-        const client = await asyncClient;
-        await client.delete(`/congresses/${congress}/instances/${instance}/location_tags/${id}`);
-        store.remove([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id]);
-        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_PROG_TAGS]);
-    },
-    updateLocationTag: async ({ congress, instance, id }, { name }) => {
-        const client = await asyncClient;
-        await client.patch(`/congresses/${congress}/instances/${instance}/location_tags/${id}`, { name });
-        const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id]);
-        store.insert([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id], deepMerge(existing, { name }));
-    },
+    listLocationTags: crudList({
+        apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/location_tags`,
+        fields: ['id', 'name'],
+        storePath: ({ congress, instance }, { id }) => [CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id],
+    }),
+    locationTag: crudGet({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/location_tags/${id}`,
+        fields: ['id', 'name'],
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id],
+    }),
+    createLocationTag: crudCreate({
+        apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/location_tags`,
+        fields: ['name'],
+        storePath: ({ congress, instance }, id) => [CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id],
+        signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOC_TAGS],
+    }),
+    updateLocationTag: crudUpdate({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/location_tags/${id}`,
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id],
+    }),
+    deleteLocationTag: crudDelete({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/location_tags/${id}`,
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id],
+        signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOC_TAGS],
+    }),
 
     // MARK - locations
 
-    listLocations: async ({ congress, instance, externalOnly }, { offset, limit, fields, filters, search }) => {
-        const client = await asyncClient;
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name', 'description', 'll', 'icon', 'address', 'type', 'externalLoc'],
-            order: fieldsToOrder(fields),
-        };
-        const apiFilter = filtersToAPI(locClientFilters, filters);
-        if (apiFilter) opts.filter = apiFilter;
-        if (externalOnly) {
-            if (opts.filter) opts.filter = { $and: [opts.filter, { type: 'external' }] };
-            else opts.filter = { type: 'external' };
-        }
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
+    listLocations: crudList({
+        apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/locations`,
+        fields: ['id', 'name', 'description', 'll', 'icon', 'address', 'type', 'externalLoc'],
+        filters: locClientFilters,
+        storePath: ({ congress, instance }, { id }) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA],
+        withApiOptions: (opts, { externalOnly }) => {
+            if (externalOnly) {
+                if (opts.filter) opts.filter = { $and: [opts.filter, { type: 'external' }] };
+                else opts.filter = { type: 'external' };
             }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: [search.field], str: transformedQuery };
-        }
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/locations`, opts);
-        for (const item of res.body) {
-            const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, item.id, DATA]);
-            store.insert([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, item.id, DATA], deepMerge(existing, item));
-        }
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { filtered: false, time: res.resTime },
-        };
-    },
-    location: async ({ congress, instance, id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/locations/${id}`, {
-            fields: ['id', 'name', 'description', 'll', 'icon', 'address', 'type', 'externalLoc',
-                'rating.rating', 'rating.max', 'rating.type', 'openHours'],
-        });
-        const item = res.body;
-        const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, item.id, DATA]);
-        store.insert([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, item.id, DATA], deepMerge(existing, item));
-        return store.get([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, item.id, DATA]);
-    },
-    createLocation: async ({ congress, instance }, params) => {
-        const client = await asyncClient;
-        const res = await client.post(`/congresses/${congress}/instances/${instance}/locations`, params);
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA], { name });
-        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_LOCATIONS]);
-        return id;
-    },
-    deleteLocation: async ({ congress, instance, id }) => {
-        const client = await asyncClient;
-        await client.delete(`/congresses/${congress}/instances/${instance}/locations/${id}`);
-        store.remove([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA]);
-        store.remove([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id]);
-        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_LOCATIONS]);
-    },
-    updateLocation: async ({ congress, instance, id }, params) => {
-        const client = await asyncClient;
-        const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA]);
-        await client.patch(`/congresses/${congress}/instances/${instance}/locations/${id}`, fieldDiff(existing, params));
-        store.insert([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA], deepMerge(existing, params));
-    },
+        },
+    }),
+    location: crudGet({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/locations/${id}`,
+        fields: ['id', 'name', 'description', 'll', 'icon', 'address', 'type', 'externalLoc',
+            'rating.rating', 'rating.max', 'rating.type', 'openHours'],
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA],
+    }),
+    createLocation: crudCreate({
+        apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/locations`,
+        fields: ['name', 'description', 'll', 'icon', 'address', 'type', 'externalLoc', 'rating', 'openHours'],
+        storePath: ({ congress, instance }, id) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA],
+        signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOCATIONS],
+    }),
+    updateLocation: crudUpdate({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/locations/${id}`,
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA],
+    }),
+    deleteLocation: crudDelete({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/locations/${id}`,
+        storePaths: ({ congress, instance, id }) => [
+            [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA],
+            [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id],
+        ],
+        signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOCATIONS],
+    }),
     locationThumbnail: async ({ congress, instance, id }, { size }) => {
         const client = await asyncClient;
         const res = await fetch(client.client.createURL(`/congresses/${congress}/instances/${instance}/locations/${id}/thumbnail/${size}`), {
@@ -505,35 +359,11 @@ export const tasks = {
 
     // MARK - tags of a location
 
-    listTagsOfLocation: async ({ congress, instance, location }, { offset, limit, fields, search }) => {
-        const client = await asyncClient;
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name'],
-            order: fieldsToOrder(fields),
-        };
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: ['name'], str: transformedQuery };
-        }
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/locations/${location}/tags`, opts);
-        for (const item of res.body) {
-            const existing = store.get([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, item.id]);
-            store.insert([CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, item.id], deepMerge(existing, item));
-        }
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { filtered: false, time: res.resTime },
-        };
-    },
+    listTagsOfLocation: crudList({
+        apiPath: ({ congress, instance, location }) => `/congresses/${congress}/instances/${instance}/locations/${location}/tags`,
+        fields: ['id', 'name'],
+        storePath: ({ congress, instance }, { id }) => [CONGRESSES, congress, INSTANCES, instance, LOC_TAGS, id],
+    }),
     addTagToLocation: async ({ congress, instance, location, id }) => {
         const client = await asyncClient;
         await client.put(`/congresses/${congress}/instances/${instance}/locations/${location}/tags/${id}`);
@@ -547,160 +377,71 @@ export const tasks = {
 
     // MARK - program tags
 
-    listProgramTags: async ({ congress, instance }, { offset, limit, fields, search }) => {
-        const client = await asyncClient;
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name'],
-            order: fieldsToOrder(fields),
-        };
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: ['name'], str: transformedQuery };
-        }
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/program_tags`, opts);
-        for (const item of res.body) {
-            const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, item.id]);
-            store.insert([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, item.id], deepMerge(existing, item));
-        }
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { filtered: false, time: res.resTime },
-        };
-    },
-    programTag: async ({ congress, instance, id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/program_tags/${id}`, {
-            fields: ['id', 'name'],
-        });
-        const item = res.body;
-        const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, item.id]);
-        store.insert([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, item.id], deepMerge(existing, item));
-        return store.get([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, item.id]);
-    },
-    createProgramTag: async ({ congress, instance }, { name }) => {
-        const client = await asyncClient;
-        const res = await client.post(`/congresses/${congress}/instances/${instance}/program_tags`, { name });
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id], { name });
-        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_PROG_TAGS]);
-        return id;
-    },
-    deleteProgramTag: async ({ congress, instance, id }) => {
-        const client = await asyncClient;
-        await client.delete(`/congresses/${congress}/instances/${instance}/program_tags/${id}`);
-        store.remove([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id]);
-        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_PROG_TAGS]);
-    },
-    updateProgramTag: async ({ congress, instance, id }, { name }) => {
-        const client = await asyncClient;
-        await client.patch(`/congresses/${congress}/instances/${instance}/program_tags/${id}`, { name });
-        const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id]);
-        store.insert([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id], deepMerge(existing, { name }));
-    },
+    listProgramTags: crudList({
+        apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/program_tags`,
+        fields: ['id', 'name'],
+        storePath: ({ congress, instance }, { id }) => [CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id],
+    }),
+    programTag: crudGet({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/program_tags/${id}`,
+        fields: ['id', 'name'],
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id],
+    }),
+    createProgramTag: crudCreate({
+        apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/program_tags`,
+        fields: ['name'],
+        storePath: ({ congress, instance }, id) => [CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id],
+        signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROG_TAGS],
+    }),
+    updateProgramTag: crudUpdate({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/program_tags/${id}`,
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id],
+    }),
+    deleteProgramTag: crudDelete({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/program_tags/${id}`,
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id],
+        signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROG_TAGS],
+    }),
 
     // MARK - programs
 
-    listPrograms: async ({ congress, instance }, { offset, limit, fields, filters, jsonFilter, search }) => {
-        const client = await asyncClient;
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
-            order: fieldsToOrder(fields),
-        };
-        const apiFilter = addJSONFilter(filtersToAPI(progClientFilters, filters), jsonFilter);
-        if (apiFilter) opts.filter = apiFilter;
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: [search.field], str: transformedQuery };
-        }
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/programs`, opts);
-        for (const item of res.body) {
-            const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, item.id, DATA]);
-            store.insert([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, item.id, DATA], deepMerge(existing, item));
-        }
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { filtered: false, time: res.resTime },
-        };
-    },
-    program: async ({ congress, instance, id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/programs/${id}`, {
-            fields: ['id', 'title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
-        });
-        const item = res.body;
-        const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, item.id, DATA]);
-        store.insert([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, item.id, DATA], deepMerge(existing, item));
-        return store.get([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, item.id, DATA]);
-    },
+    listPrograms: crudList({
+        apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/programs`,
+        fields: ['id', 'title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
+        filters: progClientFilters,
+        storePath: ({ congress, instance }, { id }) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA],
+    }),
+    program: crudGet({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/programs/${id}`,
+        fields: ['id', 'title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA],
+    }),
     createProgram: crudCreate({
         apiPath: ({ congress, instance }) => `/congresses/${congress}/instances/${instance}/programs`,
         fields: ['title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
         storePath: ({ congress, instance }, id) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA],
         signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS],
     }),
-    deleteProgram: async ({ congress, instance, id }) => {
-        const client = await asyncClient;
-        await client.delete(`/congresses/${congress}/instances/${instance}/programs/${id}`);
-        store.remove([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA]);
-        store.remove([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id]);
-        store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS]);
-    },
-    updateProgram: async ({ congress, instance, id }, params) => {
-        const client = await asyncClient;
-        const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA]);
-        await client.patch(`/congresses/${congress}/instances/${instance}/programs/${id}`, fieldDiff(existing, params));
-        store.insert([CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA], deepMerge(existing, params));
-    },
+    updateProgram: crudUpdate({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/programs/${id}`,
+        storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA],
+    }),
+    deleteProgram: crudDelete({
+        apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/programs/${id}`,
+        storePaths: ({ congress, instance, id }) => [
+            [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA],
+            [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id],
+        ],
+        signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS],
+    }),
 
     // MARK - tags of a program
 
-    listTagsOfProgram: async ({ congress, instance, program }, { offset, limit, fields, search }) => {
-        const client = await asyncClient;
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name'],
-            order: fieldsToOrder(fields),
-        };
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: ['name'], str: transformedQuery };
-        }
-        const res = await client.get(`/congresses/${congress}/instances/${instance}/programs/${program}/tags`, opts);
-        for (const item of res.body) {
-            const existing = store.get([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, item.id]);
-            store.insert([CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, item.id], deepMerge(existing, item));
-        }
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { filtered: false, time: res.resTime },
-        };
-    },
+    listTagsOfProgram: crudList({
+        apiPath: ({ congress, instance, program }) => `/congresses/${congress}/instances/${instance}/programs/${program}/tags`,
+        fields: ['id', 'name'],
+        storePath: ({ congress, instance }, { id }) => [CONGRESSES, congress, INSTANCES, instance, PROG_TAGS, id],
+    }),
     addTagToProgram: async ({ congress, instance, program, id }) => {
         const client = await asyncClient;
         await client.put(`/congresses/${congress}/instances/${instance}/programs/${program}/tags/${id}`);

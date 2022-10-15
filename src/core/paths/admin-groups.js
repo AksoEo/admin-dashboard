@@ -1,13 +1,14 @@
 import { util } from '@tejo/akso-client';
 import JSON5 from 'json5';
 import asyncClient from '../client';
-import { AbstractDataView } from '../view';
+import { AbstractDataView, createStoreObserver } from '../view';
 import { CLIENTS } from './clients';
 import {
     CODEHOLDERS,
     parametersToRequestData as codeholdersPTRD,
     clientFromAPI as codeholderFromAPI,
 } from './codeholders';
+import { crudCreate, crudDelete, crudGet, crudList, crudUpdate } from '../templates';
 import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import * as store from '../store';
@@ -18,87 +19,35 @@ export const SIG_LIST = '!list';
 
 export const tasks = {
     /** adminGroups/list: lists admin groups */
-    list: async (_, { search, offset, fields, limit }) => {
-        const client = await asyncClient;
-
-        const opts = { offset, limit };
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { cols: [search.field], str: transformedQuery };
-        }
-
-        const res = await client.get('/admin_groups', {
-            fields: ['id', 'name', 'description', 'memberRestrictions.filter', 'memberRestrictions.fields'],
-            order: fieldsToOrder(fields),
-            ...opts,
-        });
-
-        for (const item of res.body) {
-            const existing = store.get([ADMIN_GROUPS, item.id]);
-            store.insert([ADMIN_GROUPS, item.id], deepMerge(existing, item));
-        }
-
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: {
-                filtered: false,
-                time: res.resTime,
-            },
-        };
-    },
+    list: crudList({
+        apiPath: () => `/admin_groups`,
+        fields: ['id', 'name', 'description', 'memberRestrictions.filter', 'memberRestrictions.fields'],
+        storePath: (_, { id }) => [ADMIN_GROUPS, id],
+    }),
     /** adminGroups/group: returns an admin group */
-    group: async ({ id }) => {
-        const client = await asyncClient;
-
-        const res = await client.get(`/admin_groups/${id}`, {
-            fields: ['id', 'name', 'description'],
-        });
-        const existing = store.get([ADMIN_GROUPS, id]);
-        store.insert([ADMIN_GROUPS, id], deepMerge(existing, res.body));
-        return res.body;
-    },
+    group: crudGet({
+        apiPath: ({ id }) => `/admin_groups/${id}`,
+        fields: ['id', 'name', 'description'],
+        storePath: ({ id }) => [ADMIN_GROUPS, id],
+    }),
     /** adminGroups/create: creates an admin group */
-    create: async (_, { name, description, memberRestrictions }) => {
-        const client = await asyncClient;
-
-        const res = await client.post('/admin_groups', {
-            name,
-            description: description || null,
-            memberRestrictions,
-        });
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([ADMIN_GROUPS, id], { name, description, memberRestrictions });
-        store.signal([ADMIN_GROUPS, SIG_LIST]);
-        return id;
-    },
+    create: crudCreate({
+        apiPath: () => `/admin_groups`,
+        fields: ['name', 'description', 'memberRestrictions'],
+        storePath: (_, id) => [ADMIN_GROUPS, id],
+        signalPath: () => [ADMIN_GROUPS, SIG_LIST],
+    }),
     /** adminGroups/update: updates an admin group */
-    update: async ({ id }, { name, description }) => {
-        const client = await asyncClient;
-
-        const options = {};
-        if (name) options.name = name;
-        if (description !== undefined) options.description = description || null;
-
-        await client.patch(`/admin_groups/${id}`, options);
-
-        const existing = store.get([ADMIN_GROUPS, id]);
-        store.insert([ADMIN_GROUPS, id], deepMerge(existing, options));
-        store.signal([ADMIN_GROUPS, SIG_LIST]);
-    },
+    update: crudUpdate({
+        apiPath: ({ id }) => `/admin_groups/${id}`,
+        storePath: ({ id }) => [ADMIN_GROUPS, id],
+    }),
     /** adminGroups/delete: deletes an admin group */
-    delete: async (_, { id }) => {
-        const client = await asyncClient;
-        await client.delete(`/admin_groups/${id}`);
-        store.remove([ADMIN_GROUPS, id]);
-        store.signal([ADMIN_GROUPS, SIG_LIST]);
-    },
+    delete: crudDelete({
+        apiPath: ({ id }) => `/admin_groups/${id}`,
+        storePath: ({ id }) => [ADMIN_GROUPS, id],
+        signalPath: () => [ADMIN_GROUPS, SIG_LIST],
+    }),
 
     /** adminGroups/permissions: returns admin group perm data */
     permissions: async ({ id }) => {
@@ -150,7 +99,6 @@ export const tasks = {
      */
     setPermissionsMR: async ({ id }, { permissions }) => {
         const client = await asyncClient;
-
 
         await client.patch(`/admin_groups/${id}`, {
             memberRestrictions: permissions.mrEnabled ? {
@@ -318,16 +266,5 @@ export const views = {
     },
 
     /** adminGroups/sigList: emits a signal when the list changes */
-    sigList: class AdminGroupListSignal extends AbstractDataView {
-        constructor () {
-            super();
-            store.subscribe([ADMIN_GROUPS, SIG_LIST], this.#onUpdate);
-        }
-        #onUpdate = () => {
-            this.emit('update', null);
-        };
-        drop () {
-            store.unsubscribe([ADMIN_GROUPS, SIG_LIST], this.#onUpdate);
-        }
-    },
+    sigList: createStoreObserver([ADMIN_GROUPS, SIG_LIST]),
 };

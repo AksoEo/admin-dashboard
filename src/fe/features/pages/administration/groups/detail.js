@@ -71,7 +71,7 @@ export default connectPerms(class AdminGroupDetailPage extends DetailPage {
             actions.push({
                 overflow: true,
                 label: locale.delete,
-                action: () => this.context.createTask('adminGroups/delete', {}, { id: this.id }),
+                action: () => this.context.createTask('adminGroups/delete', { id: this.id }),
             });
         }
 
