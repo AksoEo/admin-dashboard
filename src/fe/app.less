@@ -208,6 +208,16 @@
                 border-top-left-radius: 8px;
                 border-top-right-radius: 8px;
             }
+            :where(.local-page-header) {
+                background: @card-background;
+                color: @text;
+                transition-property: all;
+                .elevation(1);
+
+                &.is-scrolled {
+                    .elevation(2);
+                }
+            }
             .page-app-bar-spacer {
                 height: 56px;
             }

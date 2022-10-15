@@ -1,5 +1,5 @@
-import { h } from 'preact';
-import { PureComponent, Suspense } from 'preact/compat';
+import { createRef, h } from 'preact';
+import { Fragment, PureComponent, Suspense } from 'preact/compat';
 import { Button, CircularProgress, AppBar, AppBarProxy, AppBarConsumer, MenuIcon } from 'yamdl';
 import EventProxy from '../components/utils/event-proxy';
 import { CardStackProvider, CardStackRenderer, CardStackItem } from '../components/layout/card-stack';
@@ -10,7 +10,7 @@ import { app as locale } from '../locale';
 import { LinkButton } from '../router';
 import FatalError from './fatal-error';
 
-const USE_LOCAL_MENU = false;
+const USE_LOCAL_MENU = true;
 
 // --- navigation model ---
 // notes:
@@ -57,6 +57,10 @@ class NavigationStackItem {
     route = null;
     /** arbitrary metadata */
     meta = {};
+    /** if stack item: content scroll view */
+    scrollView = createRef();
+    /** If true, content scroll view is scrolled */
+    isScrolled = false;
 
     clone () {
         const ns = new NavigationStackItem();
@@ -512,6 +516,19 @@ export default class Navigation extends PureComponent {
         });
     };
 
+    updateStackScrollAt (stackIndex) {
+        let state = this.getNavState();
+        const scrollView = state.stack[stackIndex].scrollView.current;
+        if (scrollView) {
+            const isScrolled = scrollView.scrollTop > 0;
+            if (state.stack[stackIndex].isScrolled !== isScrolled) {
+                state = state.clone();
+                state.stack[stackIndex].isScrolled = isScrolled;
+                this.setNavState(state);
+            }
+        }
+    }
+
     // - state saving
     #saveStateTimeout;
 
@@ -649,36 +666,49 @@ export default class Navigation extends PureComponent {
             const isTop = i === state.stack.length - 1;
             const isBottom = i === 0;
             const PageComponent = stackItem.route.component || (() => null);
-            const itemContents = (
-                <MetaProvider onUpdate={({ title, actions }) => {
-                    const state = this.getNavState().clone();
-                    state.stack[i] = state.stack[i].clone();
-                    state.stack[i].meta = { title, actions };
-                    this.setNavState(state);
-                }}>
-                    {(!globalMenu && !isBottom && isTop) ? (
-                        <AppBarConsumer
-                            onData={data => {
-                                this.setPageDirty(!!data?.dirty);
-                            }}
-                            class="app-header local-page-header" />
-                    ) : null}
-                    {(!globalMenu && !isBottom) ? (
-                        <AppBarProxy
-                            class="local-page-header"
-                            local={!isTop}
-                            priority={1}
-                            menu={(
-                                <Button icon small onClick={this.goBackOrOpenMenu}>
-                                    <MenuIcon type="back" />
-                                </Button>
-                            )}
-                            title={stackItem.meta?.title || ''}
-                            actions={stackItem.meta?.actions || []} />
-                    ) : null}
-                    {(!globalMenu && !isBottom) ? (
+
+            let localHeaderClassName = 'local-page-header';
+            if (stackItem.isScrolled) localHeaderClassName += ' is-scrolled';
+
+            const metaProviderOnUpdate = ({ title, actions }) => {
+                const state = this.getNavState().clone();
+                state.stack[i] = state.stack[i].clone();
+                state.stack[i].meta = { title, actions };
+                this.setNavState(state);
+            };
+
+            let itemHeader = null;
+            let itemAppBar = null;
+            if (!globalMenu && !isBottom) {
+                itemHeader = (
+                    <Fragment>
                         <div class="page-app-bar-spacer" />
-                    ) : null}
+                        {isTop ? (
+                            <AppBarConsumer
+                                onData={data => {
+                                    this.setPageDirty(!!data?.dirty);
+                                }}
+                                class={'app-header ' + localHeaderClassName} />
+                        ) : null}
+                    </Fragment>
+                );
+                itemAppBar = (
+                    <AppBarProxy
+                        class={localHeaderClassName}
+                        local={!isTop}
+                        priority={1}
+                        menu={(
+                            <Button icon small onClick={this.goBackOrOpenMenu}>
+                                <MenuIcon type="back" />
+                            </Button>
+                        )}
+                        title={stackItem.meta?.title || ''}
+                        actions={stackItem.meta?.actions || []} />
+                );
+            }
+
+            const itemContents = (
+                <MetaProvider onUpdate={metaProviderOnUpdate}>
                     <Suspense fallback={
                         <div class="page-loading-indicator">
                             <CircularProgress indeterminate class="page-loading-indicator-inner" />
@@ -714,7 +744,13 @@ export default class Navigation extends PureComponent {
             } else {
                 const itemIndex = i;
                 stackItems.push(
-                    <CardStackItem open onClose={() => this.popStackAt(itemIndex)}>
+                    <CardStackItem
+                        open
+                        onClose={() => this.popStackAt(itemIndex)}
+                        appBar={itemAppBar}
+                        header={itemHeader}
+                        scrollViewRef={stackItem.scrollView}
+                        onScroll={() => this.updateStackScrollAt(itemIndex)}>
                         {itemContents}
                     </CardStackItem>
                 );
@@ -751,7 +787,6 @@ export default class Navigation extends PureComponent {
                         onData={data => {
                             this.setPageDirty(!!data?.dirty);
                         }}
-                        // TODO: use this el for document.title
                         class="app-header" />
                 ) : null}
                 <div class="navigation-view">

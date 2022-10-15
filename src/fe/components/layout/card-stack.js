@@ -156,7 +156,12 @@ export class CardStackRenderer extends Component {
                                 style={style}
                                 key={'a' + i}>
                                 {!ageMarker ? item.appBar : null}
-                                <div class={className} ref={item.scrollViewRef}>
+                                {item.header ? (
+                                    <div class="card-stack-item-header">
+                                        {item.header}
+                                    </div>
+                                ) : null}
+                                <div class={className} ref={item.scrollViewRef} onScroll={item.onScroll}>
                                     {item.children}
                                 </div>
                             </div>,
@@ -173,11 +178,13 @@ export class CardStackRenderer extends Component {
  *
  * # Props
  * - `children`: children that will be proxied
+ * - `header`: extra header slot that will be shown outside the scroll view
  * - `depth`: stack depth
  * - `open`: open state
  * - `onClose`: onClose handler
  * - `scrollViewRef`: refs the card stack item’s scroll view
  * - `appBar`: special slot for an app bar proxy to handle closing correctly
+ * - `onScroll`: content scroll event
  */
 export class CardStackItem extends Component {
     id = Math.random().toString();

@@ -40,6 +40,8 @@
         left: 16px;
         right: 16px;
         bottom: 0;
+        display: flex;
+        flex-direction: column;
         margin: 0 auto;
         max-width: 800px;
         background: @card-background;
@@ -57,15 +59,20 @@
             }
         }
 
+        .card-stack-item-header {
+            flex-shrink: 0;
+        }
+
         .card-stack-item-contents {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            position: relative;
+            flex: 1;
             border-radius: inherit;
             overflow-x: hidden;
             overflow-y: auto;
+        }
+
+        .card-stack-item-header + .card-stack-item-contents {
+            border-radius: 0;
         }
 
         &.is-phantom {
