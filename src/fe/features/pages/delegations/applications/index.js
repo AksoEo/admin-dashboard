@@ -1,17 +1,12 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
-import Page from '../../../../components/page';
-import SearchFilters from '../../../../components/overview/search-filters';
+import OverviewPage from '../../../../components/overview/overview-page';
 import OverviewList from '../../../../components/lists/overview-list';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
-import Meta from '../../../meta';
 import { delegationApplications as locale } from '../../../../locale';
-import { coreContext } from '../../../../core/connection';
-import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 
-export default connectPerms(class DelegateApplicationsPage extends Page {
+export default class DelegateApplicationsPage extends OverviewPage {
     state = {
         parameters: {
             search: {
@@ -33,44 +28,15 @@ export default connectPerms(class DelegateApplicationsPage extends Page {
             offset: 0,
             limit: 10,
         },
-        expanded: false,
     };
 
-    static contextType = coreContext;
+    locale = locale;
+    filters = FILTERS;
+    searchFields = ['internalNotes'];
+    category = 'delegationsappl';
+    filtersToAPI = 'delegations/applicationFiltersToAPI';
 
-    #searchInput;
-    #currentQuery = '';
-
-    decodeURLQuery () {
-        this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
-        });
-        this.#currentQuery = this.props.query;
-    }
-
-    encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, FILTERS);
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
-
-    componentDidMount () {
-        this.decodeURLQuery();
-
-        this.#searchInput.focus(500);
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters) {
-            this.encodeURLQuery();
-        }
-    }
-
-    render ({ perms }, { parameters, expanded }) {
+    renderActions ({ perms }) {
         const actions = [];
 
         // TODO: better perm check across orgs?
@@ -82,26 +48,12 @@ export default connectPerms(class DelegateApplicationsPage extends Page {
             });
         }
 
+        return actions;
+    }
+
+    renderContents (_, { parameters, expanded }) {
         return (
             <div class="delegation-applications-page">
-                <Meta title={locale.title} actions={actions} />
-                <SearchFilters
-                    value={parameters}
-                    searchFields={[
-                        'internalNotes',
-                    ]}
-                    filters={FILTERS}
-                    onChange={parameters => this.setState({ parameters })}
-                    locale={{
-                        searchPlaceholders: locale.search.placeholders,
-                        searchFields: locale.search.fields,
-                        filters: locale.search.filters,
-                    }}
-                    expanded={expanded}
-                    onExpandedChange={expanded => this.setState({ expanded })}
-                    inputRef={view => this.#searchInput = view}
-                    category="delegationsappl"
-                    filtersToAPI="delegations/applicationFiltersToAPI" />
                 <OverviewList
                     task={'delegations/listApplications'}
                     updateView={['delegations/sigApplications']}
@@ -117,4 +69,4 @@ export default connectPerms(class DelegateApplicationsPage extends Page {
             </div>
         );
     }
-});
+}

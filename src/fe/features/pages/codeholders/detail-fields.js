@@ -1227,6 +1227,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
     } else if (v.type === 'text') {
         editor = <MdField
             outline
+            maxLength={1500}
             editing={editing}
             value={v.val}
             onChange={val => onValueChange({ ...v, val })}
@@ -1235,6 +1236,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
         if (editing) {
             editor = <TextField
                 outline
+                maxLength={1500}
                 type="number"
                 value={v.val}
                 onChange={e => {
@@ -1250,6 +1252,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
         if (editing) {
             editor = <TextField
                 outline
+                maxLength={1500}
                 type="email"
                 value={v.val}
                 onChange={e => onValueChange({ ...v, val: e.target.value })}
@@ -1261,6 +1264,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
         if (editing) {
             editor = <TextField
                 outline
+                maxLength={1500}
                 type="url"
                 value={v.val}
                 onChange={e => onValueChange({ ...v, val: e.target.value })}
@@ -1295,7 +1299,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
                                 setKeyDup(k);
                             }
                         }}
-                        maxLength={30} />
+                        maxLength={50} />
                 ) : (
                     <span class="factoid-label">
                         {k}

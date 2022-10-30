@@ -73,12 +73,12 @@ export default {
                                     onSelect={org => task.update({ org })}>
                                     {[
                                         {
-                                            id: 'tejo',
-                                            label: <TejoIcon />,
-                                        },
-                                        {
                                             id: 'uea',
                                             label: <UeaIcon />,
+                                        },
+                                        {
+                                            id: 'tejo',
+                                            label: <TejoIcon />,
                                         },
                                     ]}
                                 </Segmented>

@@ -1,56 +1,25 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
-import Page from '../../../../components/page';
+import DetailPage from '../../../../components/detail/detail-page';
 import DetailView from '../../../../components/detail/detail';
-import Meta from '../../../meta';
-import { connectPerms } from '../../../../perms';
-import { coreContext } from '../../../../core/connection';
 import { delegationApplications as locale } from '../../../../locale';
 import { FIELDS } from './fields';
 
-export default connectPerms(class DelegationApplication extends Page {
-    state = {
-        edit: null,
-    };
+export default class DelegationApplication extends DetailPage {
+    locale = locale;
 
-    static contextType = coreContext;
-
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
-
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return Promise.resolve();
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return Promise.resolve();
-        }
-
-        return new Promise(resolve => {
-            this.#commitTask = this.context.createTask('delegations/updateApplication', {
-                id: this.application,
-                _changedFields: changedFields,
-            }, this.state.edit);
-            this.#commitTask.on('success', this.onEndEdit);
-            this.#commitTask.on('drop', () => {
-                this.#commitTask = null;
-                resolve();
-            });
-        });
-    };
-
-    componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
+    createCommitTask (changedFields, edit) {
+        return this.context.createTask('delegations/updateApplication', {
+            id: this.application,
+            _changedFields: changedFields,
+        }, edit);
     }
 
     get application () {
         return +this.props.matches.application[1];
     }
 
-    render ({ perms, editing }, { edit }) {
+    renderActions ({ perms }) {
         const actions = [];
 
         if (perms.hasPerm(`delegations.applications.update.${this.org}`)) {
@@ -71,12 +40,12 @@ export default connectPerms(class DelegationApplication extends Page {
             });
         }
 
+        return actions;
+    }
+
+    renderContents ({ editing }, { edit }) {
         return (
             <div class="delegation-application-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
-
                 <DetailView
                     view="delegations/application"
                     id={this.application}
@@ -91,4 +60,4 @@ export default connectPerms(class DelegationApplication extends Page {
             </div>
         );
     }
-});
+}

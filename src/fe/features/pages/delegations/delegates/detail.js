@@ -1,51 +1,20 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
-import Page from '../../../../components/page';
+import DetailPage from '../../../../components/detail/detail-page';
 import DetailView from '../../../../components/detail/detail';
-import Meta from '../../../meta';
-import { connectPerms } from '../../../../perms';
-import { coreContext } from '../../../../core/connection';
 import { delegations as locale } from '../../../../locale';
 import { FIELDS } from './fields';
 
-export default connectPerms(class Delegations extends Page {
-    state = {
-        edit: null,
-    };
-
-    static contextType = coreContext;
-
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
-
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return Promise.resolve();
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return Promise.resolve();
-        }
-
-        return new Promise(resolve => {
-            this.#commitTask = this.context.createTask('codeholders/setDelegations', {
-                id: this.codeholder,
-                org: this.org,
-                _changedFields: changedFields,
-            }, this.state.edit);
-            this.#commitTask.on('success', this.onEndEdit);
-            this.#commitTask.on('drop', () => {
-                this.#commitTask = null;
-                resolve();
-            });
-        });
-    };
-
-    componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
+export default class Delegations extends DetailPage {
+    createCommitTask (changedFields, edit) {
+        return this.context.createTask('codeholders/setDelegations', {
+            id: this.codeholder,
+            org: this.org,
+            _changedFields: changedFields,
+        }, edit);
     }
+
+    locale = locale;
 
     get codeholder () {
         return +this.props.matches.codeholder[1];
@@ -55,12 +24,12 @@ export default connectPerms(class Delegations extends Page {
         return this.props.matches.org[1];
     }
 
-    render ({ perms, editing }, { edit }) {
+    renderActions ({ perms }) {
         const actions = [];
 
         if (perms.hasPerm(`codeholders.delegations.update.${this.org}`)) {
             actions.push({
-                icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
+                icon: <EditIcon style={{ verticalAlign: 'middle' }}/>,
                 label: locale.update.menuItem,
                 action: () => this.props.push('redakti', true),
             });
@@ -77,12 +46,12 @@ export default connectPerms(class Delegations extends Page {
             });
         }
 
+        return actions;
+    }
+
+    renderContents ({ editing }, { edit }) {
         return (
             <div class="delegations-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
-
                 <DetailView
                     view="codeholders/delegation"
                     id={this.codeholder}
@@ -98,4 +67,4 @@ export default connectPerms(class Delegations extends Page {
             </div>
         );
     }
-});
+}

@@ -1,22 +1,17 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
-import Page from '../../../../components/page';
-import SearchFilters from '../../../../components/overview/search-filters';
+import OverviewPage from '../../../../components/overview/overview-page';
 import OverviewList from '../../../../components/lists/overview-list';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../components/overview/list-url-coding';
-import Meta from '../../../meta';
 import {
     delegations as locale,
     delegationSubjects as subjectsLocale,
     delegationApplications as applicationsLocale,
 } from '../../../../locale';
-import { coreContext } from '../../../../core/connection';
-import { connectPerms } from '../../../../perms';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import ExportDialog from './export';
 
-export default connectPerms(class DelegatesPage extends Page {
+export default class DelegatesPage extends OverviewPage {
     state = {
         parameters: {
             search: {
@@ -38,49 +33,14 @@ export default connectPerms(class DelegatesPage extends Page {
             offset: 0,
             limit: 10,
         },
-        expanded: false,
         exportOpen: false,
     };
-
-    static contextType = coreContext;
-
-    #searchInput;
-    #currentQuery = '';
-
-    decodeURLQuery () {
-        this.setState({
-            parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
-        });
-        this.#currentQuery = this.props.query;
-    }
-
-    encodeURLQuery () {
-        const encoded = encodeURLQuery(this.state.parameters, FILTERS);
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
-
-    componentDidMount () {
-        this.decodeURLQuery();
-
-        this.#searchInput.focus(500);
-    }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters) {
-            this.encodeURLQuery();
-        }
-    }
 
     get codeholderId () {
         return this.props.matches.codeholder ? +this.props.matches.codeholder[1] : null;
     }
 
-    render ({ perms }, { parameters, expanded }) {
+    renderActions ({ perms }) {
         const actions = [];
 
         if (!this.codeholderId) {
@@ -112,28 +72,18 @@ export default connectPerms(class DelegatesPage extends Page {
             });
         }
 
+        return actions;
+    }
+
+    searchFields = ['hosting.description'];
+    filters = FILTERS;
+    locale = locale;
+    category = 'delegations';
+    filtersToAPI = 'delegations/delegateFiltersToAPI';
+
+    renderContents (_, { parameters, expanded }) {
         return (
             <div class="delegations-delegates-page">
-                <Meta
-                    title={this.codeholderId ? locale.titleInCodeholder : locale.title}
-                    actions={actions} />
-                <SearchFilters
-                    value={parameters}
-                    searchFields={[
-                        'hosting.description',
-                    ]}
-                    filters={FILTERS}
-                    onChange={parameters => this.setState({ parameters })}
-                    locale={{
-                        searchPlaceholders: locale.search.placeholders,
-                        searchFields: locale.search.fields,
-                        filters: locale.search.filters,
-                    }}
-                    expanded={expanded}
-                    onExpandedChange={expanded => this.setState({ expanded })}
-                    inputRef={view => this.#searchInput = view}
-                    category="delegations"
-                    filtersToAPI="delegations/delegateFiltersToAPI" />
                 <OverviewList
                     task={this.codeholderId ? 'codeholders/listDelegations' : 'delegations/listDelegates'}
                     options={this.codeholderId ? { id: this.codeholderId } : null}
@@ -157,4 +107,4 @@ export default connectPerms(class DelegatesPage extends Page {
             </div>
         );
     }
-});
+}
