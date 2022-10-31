@@ -133,6 +133,7 @@ const TYPES = {
                         outline
                         type={type}
                         disabled={disabled}
+                        required={item.required}
                         placeholder={item.placeholder}
                         value={value || ''}
                         pattern={item.pattern}
@@ -387,7 +388,6 @@ const TYPES = {
 };
 
 export default class InputItem extends PureComponent {
-    static contextType = FormContext;
     node = createRef();
 
     state = {
@@ -400,7 +400,7 @@ export default class InputItem extends PureComponent {
     componentDidMount () {
         this.oldName = this.props.item.name || null;
 
-        if (this.context) this.context.register(this);
+        if (this.props.registerTestInput) this.props.registerTestInput(this);
         this.setDefaultIfNone();
     }
 
@@ -416,7 +416,7 @@ export default class InputItem extends PureComponent {
     }
 
     componentWillUnmount () {
-        if (this.context) this.context.deregister(this);
+        if (this.props.deregisterTestInput) this.props.deregisterTestInput(this);
     }
 
     validate (submitting) {
@@ -432,7 +432,7 @@ export default class InputItem extends PureComponent {
                 this.node.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             });
         }
-        return !error;
+        return error;
     }
 
     /** Evaluates any AKSO Script exprs in the item value. */
@@ -454,7 +454,15 @@ export default class InputItem extends PureComponent {
         return resolved;
     }
 
-    render ({ editing, item, onChange, value, onValueChange, previousNodes, disableValidation }) {
+    render ({
+        editing,
+        item,
+        onChange,
+        value,
+        onValueChange,
+        previousNodes,
+        disableValidation,
+    }) {
         let contents;
         if (editing) {
             contents = <InputSettings
@@ -473,14 +481,21 @@ export default class InputItem extends PureComponent {
                             <Label required={resolved.required}>{item.label}</Label>
                             <Desc value={item.description} />
                         </div>
-                        <Renderer
-                            required={resolved.required}
-                            disabled={resolved.disabled}
-                            default={resolved.default}
-                            item={item}
-                            value={value}
-                            onChange={onValueChange}
-                            disableValidation={disableValidation} />
+                        <div class="input-preview-label">
+                            {locale.inputPreview}
+                        </div>
+                        <TestFormProxy
+                            registerTestInput={this.props.registerTestInput}
+                            deregisterTestInput={this.props.deregisterTestInput}>
+                            <Renderer
+                                required={resolved.required}
+                                disabled={resolved.disabled}
+                                default={resolved.default}
+                                item={item}
+                                value={value}
+                                onChange={onValueChange}
+                                disableValidation={disableValidation} />
+                        </TestFormProxy>
                         {this.state.error && (
                             <InputError>
                                 {this.state.error}
@@ -505,6 +520,46 @@ export default class InputItem extends PureComponent {
             <div class="form-editor-input-item" ref={this.node}>
                 {contents}
             </div>
+        );
+    }
+}
+
+class TestFormProxy extends PureComponent {
+    formNode = createRef();
+
+    componentDidMount () {
+        this.props.registerTestInput(this);
+    }
+    componentWillUnmount () {
+        this.props.deregisterTestInput(this);
+    }
+
+    validate (submitting) {
+        let valid;
+        if (submitting) valid = this.formNode.current.reportValidity();
+        else valid = this.formNode.current.checkValidity();
+        if (!valid) return true; // there's an error but we don't know what
+    }
+
+    register (input) {
+        this.props.registerTestInput(input);
+    }
+    deregister (input) {
+        this.props.deregisterTestInput(input);
+    }
+
+    render ({ children }) {
+        return (
+            <FormContext.Provider value={{
+                register: this.register,
+                deregister: this.deregister,
+            }}>
+                <form class="test-input-form" ref={this.formNode} onSubmit={e => {
+                    e.preventDefault();
+                }}>
+                    {children}
+                </form>
+            </FormContext.Provider>
         );
     }
 }

@@ -12,6 +12,68 @@
             }
         }
     }
+
+    .form-editor-test-inputs {
+        z-index: 10;
+        background: @card-background;
+        border-radius: 8px;
+        .elevation(2);
+        margin-bottom: 16px;
+        position: static;
+        top: 4px;
+        transition: all 0.3s @easing;
+        display: flex;
+        align-items: center;
+        opacity: 0.7;
+
+        .inner-title {
+            padding: 0 16px;
+            flex: 1;
+            font-weight: bolder;
+        }
+
+        &.is-active {
+            position: sticky;
+            opacity: 1;
+            .elevation(4);
+        }
+
+        .validate-button {
+            .inner-contents {
+                display: grid;
+            }
+            .inner-label, .inner-check {
+                grid-area: 1 / 1;
+            }
+            .inner-check {
+                opacity: 0;
+            }
+
+            &.did-validate {
+                background: @secondary;
+                --md-button-color: @text-on-primary;
+
+                .inner-label {
+                    opacity: 0;
+                }
+                .inner-check {
+                    opacity: 1;
+                    animation: form-editor-test-input-validated-check 0.4s 0.2s cubic-bezier(.5, 1.5, 0, 1) backwards;
+                    will-change: transform;
+                }
+                @keyframes form-editor-test-input-validated-check {
+                    0% {
+                        transform: scale(0);
+                        opacity: 0;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                }
+            }
+        }
+    }
 }
 
 .form-editor-script-node-root {

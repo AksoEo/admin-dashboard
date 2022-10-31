@@ -447,6 +447,7 @@ export default {
                                         congress,
                                         instance,
                                         currency: form?.price?.currency,
+                                        formLoaded: !!form,
                                         registrationForm: form,
                                     }} />
                             </Suspense>

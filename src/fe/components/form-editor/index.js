@@ -5,6 +5,7 @@ import AKSOScriptEditor from '@tejo/akso-script-editor';
 import InputIcon from '@material-ui/icons/Input';
 import TextIcon from '@material-ui/icons/Subject';
 import ScriptIcon from '@material-ui/icons/Code';
+import CheckIcon from '@material-ui/icons/Check';
 import FormEditorSettings from './settings';
 import RearrangingList from '../lists/rearranging-list';
 import FormEditorItem from './item';
@@ -276,6 +277,15 @@ class FormEditorItems extends PureComponent {
         }, 1);
     }
 
+    testInputs = new Set();
+
+    registerTestInput = (input) => {
+        this.testInputs.add(input);
+    };
+    deregisterTestInput = (input) => {
+        this.testInputs.delete(input);
+    };
+
     render ({
         editing, settings, onSettingsChange, items, onItemsChange, values, additionalVars,
         skipSettings, skipNonInputs, editingData, isEditingContext, disableValidation,
@@ -305,6 +315,8 @@ class FormEditorItems extends PureComponent {
                             newItems[index] = item;
                             onItemsChange(newItems);
                         }}
+                        registerTestInput={this.registerTestInput}
+                        deregisterTestInput={this.deregisterTestInput}
                         editingData={editingData}
                         value={values[name]}
                         onValueChange={value => this.batchValueChange(name, value)}
@@ -334,6 +346,10 @@ class FormEditorItems extends PureComponent {
                         onChange={onSettingsChange}
                         previousNodes={previousNodes} />
                 )}
+                <TestInputs
+                    inputs={this.testInputs}
+                    values={values}
+                    onValuesChange={this.props.onValuesChange} />
                 <RearrangingList
                     spacing={16}
                     isItemDraggable={index => editing && index < items.length}
@@ -345,6 +361,58 @@ class FormEditorItems extends PureComponent {
         );
     }
 }
+
+class TestInputs extends PureComponent {
+    state = {
+        didValidate: false,
+    };
+
+    validate = () => {
+        let passed = true;
+
+        for (const input of this.props.inputs) {
+            try {
+                const error = input.validate(true);
+                passed &&= !error;
+            } catch { /* */ }
+        }
+
+        if (passed) {
+            this.setState({ didValidate: true });
+            setTimeout(() => {
+                this.setState({ didValidate: false });
+            }, 1000);
+        }
+    };
+
+    clearInputs = () => {
+        this.props.onValuesChange({});
+    };
+
+    render ({ values }) {
+        const hasValues = !!Object.keys(values).find(k => values[k] !== null);
+
+        return (
+            <div class={'form-editor-test-inputs' + (hasValues ? ' is-active' : '')}>
+                <div class="inner-title">
+                    {locale.testInputsBar.title}
+                </div>
+                <Button onClick={this.validate} class={'validate-button' + (this.state.didValidate ? ' did-validate' : '')}>
+                    <span class="inner-contents">
+                        <span class="inner-label">
+                            {locale.testInputsBar.validate}
+                        </span>
+                        <span class="inner-check">
+                            <CheckIcon style={{ verticalAlign: 'middle' }} />
+                        </span>
+                    </span>
+                </Button>
+                <Button onClick={this.clearInputs}>{locale.testInputsBar.clear}</Button>
+            </div>
+        );
+    }
+}
+
 class FormEditorAddItem extends PureComponent {
     state = {
         addInputMenuPos: null,

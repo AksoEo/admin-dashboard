@@ -41,7 +41,13 @@ export default class FormEditorItem extends PureComponent {
 
         let contents;
         if (item.el === 'input') {
-            contents = <InputItem {...props} editingData={editingData} value={value} onValueChange={onValueChange} />;
+            contents = <InputItem
+                {...props}
+                editingData={editingData}
+                value={value}
+                onValueChange={onValueChange}
+                registerTestInput={this.props.registerTestInput}
+                deregisterTestInput={this.props.registerTestInput} />;
         } else if (item.el === 'text') {
             contents = <TextItem {...props} />;
         } else if (item.el === 'script') {

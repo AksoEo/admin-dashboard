@@ -55,6 +55,14 @@ export const formEditor = {
         text: 'Simpla teksto',
         script: 'Teksto de skripto',
     },
+
+    inputPreview: '[[Test Input]]',
+    testInputsBar: {
+        title: '[[Test Inputs]]',
+        validate: '[[Validate]]',
+        clear: '[[Clear]]',
+    },
+
     inputFields: {
         name: 'Kodnomo',
         nameDesc: 'La interna nomo de la kampo. Devas esti unika.',
