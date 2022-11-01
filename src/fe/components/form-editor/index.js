@@ -150,8 +150,15 @@ export default class FormEditor extends PureComponent {
     };
 
     render ({
-        skipSettings, skipNonInputs, value, editing, onChange, additionalVars, editingFormData,
-        isEditingContext, disableValidation,
+        skipSettings,
+        skipNonInputs,
+        value,
+        editing,
+        onChange,
+        additionalVars,
+        editingFormData,
+        isEditingContext,
+        disableValidation,
     }) {
         if (!value) return null;
 
@@ -346,10 +353,12 @@ class FormEditorItems extends PureComponent {
                         onChange={onSettingsChange}
                         previousNodes={previousNodes} />
                 )}
-                <TestInputs
-                    inputs={this.testInputs}
-                    values={values}
-                    onValuesChange={this.props.onValuesChange} />
+                {isEditingContext && (
+                    <TestInputs
+                        inputs={this.testInputs}
+                        values={values}
+                        onValuesChange={this.props.onValuesChange} />
+                )}
                 <RearrangingList
                     spacing={16}
                     isItemDraggable={index => editing && index < items.length}

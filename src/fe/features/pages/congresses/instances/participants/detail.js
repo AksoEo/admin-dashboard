@@ -5,10 +5,11 @@ import { CircularProgress } from 'yamdl';
 import Page from '../../../../../components/page';
 import DetailShell from '../../../../../components/detail/detail-shell';
 import TaskButton from '../../../../../components/controls/task-button';
+import { Field } from '../../../../../components/form';
 import Meta from '../../../../meta';
 import { connectPerms } from '../../../../../perms';
 import { coreContext } from '../../../../../core/connection';
-import { congressParticipants as locale } from '../../../../../locale';
+import { congressParticipants as locale, data as dataLocale } from '../../../../../locale';
 import { LinkButton } from '../../../../../router';
 import DisplayError from '../../../../../components/utils/error';
 import { FIELDS } from './fields';
@@ -204,7 +205,11 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
                                 userData={userData} />
                         </div>
                     )}
-                    <div class="field-codeholder">
+                    <Field class="field-codeholder" validate={() => {
+                        if (userData.registrationForm?.allowGuests === false && !item.identity) {
+                            return dataLocale.requiredField;
+                        }
+                    }}>
                         <span class="field-label">
                             {locale.fields.identity}
                             {':'}
@@ -216,7 +221,7 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
                             editing={editing}
                             onItemChange={onItemChange}
                             userData={userData} />
-                    </div>
+                    </Field>
                 </div>
             </div>
             {!creating && (

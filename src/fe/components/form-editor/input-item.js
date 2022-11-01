@@ -106,7 +106,7 @@ const TYPES = {
         },
     },
     text: {
-        render ({ disabled, item, value, onChange }) {
+        render ({ disabled, item, value, onChange, disableValidation }) {
             let error = null;
             const compiledPattern = new RegExp(item.pattern);
             if (!compiledPattern.test(value)) {
@@ -133,12 +133,12 @@ const TYPES = {
                         outline
                         type={type}
                         disabled={disabled}
-                        required={item.required}
+                        required={!disableValidation && item.required}
                         placeholder={item.placeholder}
                         value={value || ''}
-                        pattern={item.pattern}
-                        minLength={item.minLength}
-                        maxLength={item.maxLength}
+                        pattern={!disableValidation && item.pattern}
+                        minLength={!disableValidation && item.minLength}
+                        maxLength={!disableValidation && item.maxLength}
                         onChange={e => onChange(e.target.value)}
                         error={error} />
                     {extra}
@@ -388,6 +388,7 @@ const TYPES = {
 };
 
 export default class InputItem extends PureComponent {
+    static contextType = FormContext;
     node = createRef();
 
     state = {
@@ -400,7 +401,11 @@ export default class InputItem extends PureComponent {
     componentDidMount () {
         this.oldName = this.props.item.name || null;
 
-        if (this.props.registerTestInput) this.props.registerTestInput(this);
+        if (this.props.isEditingContext) {
+            if (this.props.registerTestInput) this.props.registerTestInput(this);
+        } else if (this.context) {
+            this.context.deregister(this);
+        }
         this.setDefaultIfNone();
     }
 
@@ -416,7 +421,11 @@ export default class InputItem extends PureComponent {
     }
 
     componentWillUnmount () {
-        if (this.props.deregisterTestInput) this.props.deregisterTestInput(this);
+        if (this.props.isEditingContext) {
+            if (this.props.deregisterTestInput) this.props.deregisterTestInput(this);
+        } else if (this.context) {
+            this.context.deregister(this);
+        }
     }
 
     validate (submitting) {
@@ -461,6 +470,7 @@ export default class InputItem extends PureComponent {
         value,
         onValueChange,
         previousNodes,
+        isEditingContext,
         disableValidation,
     }) {
         let contents;
@@ -474,6 +484,17 @@ export default class InputItem extends PureComponent {
         } else {
             const resolved = this.resolveValues();
             const Renderer = TYPES[item.type].render;
+            const rendered = (
+                <Renderer
+                    required={resolved.required}
+                    disabled={resolved.disabled}
+                    default={resolved.default}
+                    item={item}
+                    value={value}
+                    onChange={onValueChange}
+                    disableValidation={disableValidation} />
+            );
+
             contents = (
                 <div class="input-rendered-container">
                     <div class="input-rendered">
@@ -481,21 +502,20 @@ export default class InputItem extends PureComponent {
                             <Label required={resolved.required}>{item.label}</Label>
                             <Desc value={item.description} />
                         </div>
-                        <div class="input-preview-label">
-                            {locale.inputPreview}
-                        </div>
-                        <TestFormProxy
-                            registerTestInput={this.props.registerTestInput}
-                            deregisterTestInput={this.props.deregisterTestInput}>
-                            <Renderer
-                                required={resolved.required}
-                                disabled={resolved.disabled}
-                                default={resolved.default}
-                                item={item}
-                                value={value}
-                                onChange={onValueChange}
-                                disableValidation={disableValidation} />
-                        </TestFormProxy>
+                        {isEditingContext && (
+                            <div class="input-preview-label">
+                                {locale.inputPreview}
+                            </div>
+                        )}
+                        {isEditingContext ? (
+                            <TestFormProxy
+                                registerTestInput={this.props.registerTestInput}
+                                deregisterTestInput={this.props.deregisterTestInput}>
+                                {rendered}
+                            </TestFormProxy>
+                        ) : (
+                            rendered
+                        )}
                         {this.state.error && (
                             <InputError>
                                 {this.state.error}
