@@ -48,11 +48,25 @@ export default class FormEditorSettings extends PureComponent {
 
     getError () {
         const { value } = this.props;
+        const knownVars = findKnownVariables(this.props.previousNodes);
 
         for (const v of VARIABLES) {
             if (v.required && !value[v.key]) return dataLocale.requiredField;
+            if (value[v.key] && !knownVars.has(value[v.key])) {
+                this.props.onChange({ [v.key]: null, ...value });
+                return dataLocale.requiredField;
+            }
         }
         if (value.price && !value.price.var) {
+            return dataLocale.requiredField;
+        } else if (value.price && !knownVars.has(value.price.var)) {
+            this.props.onChange({
+                price: {
+                    ...value.price,
+                    var: null,
+                },
+                ...value,
+            });
             return dataLocale.requiredField;
         }
     }
@@ -311,8 +325,26 @@ function Variables ({ previousNodes, editing, value, onChange }) {
     );
 }
 
-function AscVarPicker ({ previousNodes, editing, value, onChange, optional }) {
+function findKnownVariables (previousNodes) {
     const knownVariables = new Set();
+    for (const item of previousNodes) {
+        if (item && item.defs) {
+            for (const name in item.defs) {
+                if (typeof name !== 'string' || name.startsWith('_')) continue;
+                knownVariables.add(name);
+            }
+            for (const v of item.formVars) {
+                if (!v.name || v.name.startsWith('@')) continue;
+                const name = '@' + v.name;
+                knownVariables.add(name);
+            }
+        }
+    }
+    return knownVariables;
+}
+
+function AscVarPicker ({ previousNodes, editing, value, onChange, optional }) {
+    const knownVariables = findKnownVariables(previousNodes);
     const ascVariables = [];
     if (optional) {
         ascVariables.push({
@@ -320,26 +352,11 @@ function AscVarPicker ({ previousNodes, editing, value, onChange, optional }) {
             label: '—',
         });
     }
-    for (const item of previousNodes) {
-        if (item && item.defs) {
-            for (const name in item.defs) {
-                if (typeof name !== 'string' || name.startsWith('_')) continue;
-                knownVariables.add(name);
-                ascVariables.push({
-                    value: name,
-                    label: <RefNameView class="form-editor-settings-var-ref" name={name} />,
-                });
-            }
-            for (const v of item.formVars) {
-                if (!v.name || v.name.startsWith('@')) continue;
-                const name = '@' + v.name;
-                knownVariables.add(name);
-                ascVariables.push({
-                    value: name,
-                    label: <RefNameView class="form-editor-settings-var-ref" name={name} />,
-                });
-            }
-        }
+    for (const name of knownVariables) {
+        ascVariables.push({
+            value: name,
+            label: <RefNameView class="form-editor-settings-var-ref" name={name} />,
+        });
     }
     const varValue = knownVariables.has(value) ? value : null;
     return (
