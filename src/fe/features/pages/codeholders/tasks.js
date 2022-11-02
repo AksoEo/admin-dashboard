@@ -632,7 +632,7 @@ function makeRoleEditor (type) {
                             outline
                             value={task.parameters.dataString}
                             onChange={e => task.update({ dataString: e.target.value || null })}
-                            maxLength={50} />
+                            maxLength={128} />
                     </div>
                 </div>
             </TaskDialog>
