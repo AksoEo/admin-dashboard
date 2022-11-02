@@ -331,6 +331,11 @@ export default {
                                 class="date-field"
                                 zone={task.options.tz}
                                 outline
+                                onFocus={() => {
+                                    if (!task.parameters.timeTo) task.update({
+                                        timeTo: task.parameters.timeFrom,
+                                    });
+                                }}
                                 label={<Required>{programLocale.fields.timeTo}</Required>}
                                 value={task.parameters.timeTo || null}
                                 onChange={timeTo => task.update({ timeTo })} />

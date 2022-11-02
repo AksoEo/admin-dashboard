@@ -421,6 +421,7 @@ export const tasks = {
         fields: ['title', 'description', 'owner', 'timeFrom', 'timeTo', 'location'],
         storePath: ({ congress, instance }, id) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, id, DATA],
         signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS],
+        omitNulls: true,
     }),
     updateProgram: crudUpdate({
         apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/programs/${id}`,

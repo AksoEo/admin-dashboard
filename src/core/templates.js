@@ -62,6 +62,7 @@ export function crudCreate ({
     storePath,
     signalPath,
     useAutoNull,
+    omitNulls,
     then,
     methodName = 'post',
     parseId = (id => +id),
@@ -73,6 +74,7 @@ export function crudCreate ({
 
         const apiOptions = {};
         for (const k of fields) {
+            if (omitNulls && params[k] === null) continue;
             if (useAutoNull) {
                 apiOptions[k] = (params[k] || params[k] === 0) ? params[k] : null;
             } else if (k in params) {
