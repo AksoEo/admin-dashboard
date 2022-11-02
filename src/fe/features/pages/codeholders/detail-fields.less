@@ -1,5 +1,19 @@
 @import '../../../prelude';
 
+.codeholder-validated-email-editor {
+    .trailing-validation-status {
+        width: 24px;
+        height: 24px;
+
+        .is-taken {
+            color: @danger;
+        }
+        .is-valid {
+            color: @positive;
+        }
+    }
+}
+
 .codeholder-address-invalid-warning {
     background: @warning;
     color: @text-on-warning;

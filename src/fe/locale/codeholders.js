@@ -168,6 +168,8 @@ export const codeholders = {
             factoids: 'Detalaj informoj',
             admin: 'Administrado',
         },
+
+        emailTakenError: '[[Email is taken]]',
     },
     fieldEditorInsufficientPerms: 'Vi ne havas redaktorajton',
     countryChangeNotice: {

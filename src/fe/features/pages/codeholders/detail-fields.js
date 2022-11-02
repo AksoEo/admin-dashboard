@@ -1,11 +1,13 @@
-import { h, Component } from 'preact';
-import { useState, Fragment } from 'preact/compat';
+import { h, Component, createRef } from 'preact';
+import { useState, Fragment, PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
 import RemoveIcon from '@material-ui/icons/Remove';
 import WarningIcon from '@material-ui/icons/Warning';
-import { Button, Checkbox, TextField, Dialog } from 'yamdl';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
+import { Button, CircularProgress, Checkbox, TextField, Dialog } from 'yamdl';
 import { connect, coreContext } from '../../../core/connection';
 import { connectPerms as connectPermsInner } from '../../../perms';
 import { LinkButton } from '../../../router';
@@ -69,7 +71,7 @@ const makeEditable = (Renderer, Editor, History) => function EditableField ({
 }) {
     if (isHistory && History) return <History value={value} item={item} />;
     if (!editing) return <Renderer value={value} />;
-    return <Editor value={value} onChange={onChange} />;
+    return <Editor value={value} item={item} onChange={onChange} />;
 };
 
 const makeDataEditable = (data, history) => makeEditable(data.renderer, data.editor, history);
@@ -732,6 +734,92 @@ function permsEditable (field, Component) {
     });
 }
 
+class ValidatedEmailEditor extends PureComponent {
+    state = {
+        checking: false,
+        taken: false,
+        error: false,
+    };
+
+    static contextType = coreContext;
+    textField = createRef();
+
+    checkId = 0;
+    checkTaken () {
+        const checkId = ++this.checkId;
+        this.setState({ checking: true, error: false });
+
+        if (!this.props.value || !this.textField.current?.inputNode?.checkValidity()) {
+            // show nothing
+            this.setState({ checking: false, error: true });
+            return;
+        }
+
+        this.context.createTask('codeholders/list', {}, {
+            jsonFilter: {
+                filter: {
+                    email: this.props.value,
+                },
+            },
+            limit: 1,
+        }).runOnceAndDrop().then(result => {
+            if (this.checkId !== checkId) return;
+            const taken = result.items.length && result.items[0] !== this.props.item.id;
+            this.setState({ checking: false, taken });
+        }).catch(err => {
+            if (this.checkId !== checkId) return;
+            console.error('failed to check email taken', err); // eslint-disable-line no-console
+            this.setState({ checking: false, error: true });
+        });
+    }
+
+    scheduledCheck = null;
+    scheduleCheckTaken () {
+        if (!this.scheduledCheck) {
+            this.scheduledCheck = setTimeout(() => {
+                this.scheduledCheck = null;
+                this.checkTaken();
+            }, 400);
+        }
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.value !== this.props.value) {
+            this.scheduleCheckTaken();
+        }
+    }
+
+    render ({ value, onChange }) {
+        let trailing, errorLabel;
+        if (this.state.checking) trailing = <CircularProgress small indeterminate />;
+        else if (this.state.error) trailing = null;
+        else if (this.state.taken) {
+            trailing = <CloseIcon className="is-taken" style={{ verticalAlign: 'middle' }} />;
+            errorLabel = locale.fields.emailTakenError;
+        } else {
+            trailing = <CheckIcon className="is-valid" style={{ verticalAlign: 'middle' }} />;
+        }
+
+        return <ValidatedTextField
+            ref={this.textField}
+            trailing={
+                <span class="trailing-validation-status">
+                    {trailing}
+                </span>
+            }
+            error={errorLabel}
+            validate={() => {
+                if (this.state.taken) {
+                    return locale.fields.emailTakenError;
+                }
+            }}
+            class="codeholder-validated-email-editor"
+            value={value}
+            onChange={e => onChange(e.target.value || null)}
+            type="email" />;
+    }
+}
+
 export const fields = {
     // for field history
     name: {
@@ -894,7 +982,11 @@ export const fields = {
         hasPerm: 'self',
         history: true,
     },
-    email: simpleField(permsEditable('email', makeDataEditable(email, ({ value, item }) => (
+    email: simpleField(permsEditable('email', makeDataEditable({
+        renderer: email.renderer,
+        inlineRenderer: email.inlineRenderer,
+        editor: ValidatedEmailEditor,
+    }, ({ value, item }) => (
         <Fragment>
             <Publicity value={item.emailPublicity} style="icon" />
             {' '}

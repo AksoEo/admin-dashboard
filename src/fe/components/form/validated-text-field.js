@@ -27,6 +27,10 @@ export default class ValidatedTextField extends PureComponent {
         return this.innerRef.current?.node;
     }
 
+    get inputNode () {
+        return this.innerRef.current?.inputNode;
+    }
+
     focus () {
         this.innerRef.current.focus();
     }
