@@ -1,14 +1,19 @@
-import { h } from 'preact';
+import { h, createRef } from 'preact';
 import { lazy, Suspense, PureComponent } from 'preact/compat';
-import CodeMirror from 'codemirror';
-import { Controlled as RCodeMirror } from 'react-codemirror2';
+import CodeMirror from '../codemirror-themed';
+import {
+    Decoration,
+    EditorView,
+    ViewPlugin,
+    MatchDecorator,
+    WidgetType,
+} from '@codemirror/view';
+import { EditorState, StateField, StateEffect } from '@codemirror/state';
+import { indentUnit } from '@codemirror/language';
+import { javascript } from '@codemirror/lang-javascript';
 import JSON5 from 'json5';
 import { Dialog, Button } from 'yamdl';
 import HelpIcon from '@material-ui/icons/Help';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/addon/edit/matchbrackets';
-import 'codemirror/addon/edit/closebrackets';
 import { search as locale } from '../../locale';
 import './json-filter-editor.less';
 
@@ -24,7 +29,8 @@ const DEFAULT_VALUE = '{\n\t\n}'; // must be equal to {}
 // - type 'expr': contains a template expression
 const AKSO_REPR = 'org.akso.admin.v1';
 // delimiter we use in our CodeMirror source string to delimit templates
-const EXPR_DELIM = '\x91';
+const EXPR_START = '<<<{';
+const EXPR_END = '}>>>';
 
 // template expressions { [expression]: value }
 const EXPRS = {
@@ -39,28 +45,90 @@ function evalExpr (expr) {
     return '0';
 }
 
-// TODO: use custom JSON highlighter instead so templates don’t break the rest of the highlighting
-CodeMirror.defineMode('akso-json-template', () => ({
-    token: stream => {
-        if (stream.peek() === EXPR_DELIM) {
-            // eat template
-            stream.next();
-            while (true) { // eslint-disable-line no-constant-condition
-                const next = stream.next();
-                if (next === EXPR_DELIM) break;
-                if (!next) break;
-            }
-            return 'akso-template';
+// template markings: additional syntax highlighting for AKSO JSON templates
+// (e.g. "this year")
+class TemplateMarkingWidget extends WidgetType {
+    constructor (expr) {
+        super();
+        this.expr = expr;
+    }
+
+    eq (other) {
+        return this.expr === other.expr;
+    }
+
+    toDOM () {
+        const node = document.createElement('span');
+        if (EXPRS[this.expr]) {
+            node.className = 'akso-json-marked-atom';
+            node.textContent = locale.json.exprs[this.expr];
         } else {
-            // eat garbage
-            while (true) { // eslint-disable-line no-constant-condition
-                if (stream.peek() === EXPR_DELIM) break;
-                if (!stream.next()) break;
-            }
-            return null;
+            node.className = 'akso-json-marked-atom is-invalid';
+            node.textContent = `?${this.expr}?`;
         }
+        return node;
+    }
+}
+
+const templateMarkingMatcher = new MatchDecorator({
+    regexp: new RegExp(EXPR_START + '(.*?)' + EXPR_END, 'g'),
+    decoration: match => Decoration.replace({
+        widget: new TemplateMarkingWidget(match[1]),
+    }),
+});
+
+const templateMarkings = ViewPlugin.fromClass(class {
+    constructor (view) {
+        this.markings = templateMarkingMatcher.createDeco(view);
+    }
+    update (update) {
+        this.markings = templateMarkingMatcher.updateDeco(update, this.markings);
+    }
+}, {
+    decorations: instance => instance.markings,
+    provide: plugin => EditorView.atomicRanges.of(view => {
+        return view.plugin(plugin)?.markings || Decoration.none;
+    }),
+});
+
+// inline errors
+const addLineErrorMarks = StateEffect.define();
+const clearLineErrorMarks = StateEffect.define();
+const lineErrorMarks = StateField.define({
+    create () {
+        return Decoration.none;
     },
-}));
+    update (value, tr) {
+        // don’t need to map because it’ll be overridden anyway
+        // value = value.map(tr.changes);
+        for (const effect of tr.effects) {
+            if (effect.is(addLineErrorMarks)) {
+                value = value.update({ add: effect.value, sort: true });
+            } else if (effect.is(clearLineErrorMarks)) {
+                value = value.update({ filter: () => false });
+            }
+        }
+        return value;
+    },
+    provide: f => EditorView.decorations.from(f),
+});
+class LineErrorWidget extends WidgetType {
+    constructor (error) {
+        super();
+        this.error = error;
+    }
+
+    eq (other) {
+        return this.error === other.error;
+    }
+
+    toDOM () {
+        const node = document.createElement('div');
+        node.className = 'json-error-message';
+        node.textContent = this.error.message;
+        return node;
+    }
+}
 
 /**
  * JSON editor for advanced search filters.
@@ -90,7 +158,7 @@ export default class JSONFilterEditor extends PureComponent {
     toCMSource (value) {
         let source;
         if (!value.source || value.source.repr !== AKSO_REPR) {
-            let stringified = JSON5.stringify(value.filter, undefined, 4);
+            let stringified = JSON5.stringify(value.filter, undefined, '\t');
             if (stringified === '{}') stringified = DEFAULT_VALUE;
             source = {
                 repr: AKSO_REPR,
@@ -105,15 +173,31 @@ export default class JSONFilterEditor extends PureComponent {
 
         return source.fragments.map(token => {
             if (token.type === 'text') return token.value;
-            else if (token.type === 'expr') return EXPR_DELIM + token.value + EXPR_DELIM;
+            else if (token.type === 'expr') return EXPR_START + token.value + EXPR_END;
         }).join('');
     }
 
     onChange (cmSource) {
-        let source = cmSource.split(EXPR_DELIM).map((value, i) => ({
-            type: i % 2 === 0 ? 'text' : 'expr',
-            value,
-        }));
+        let source = [];
+        let rest = cmSource;
+        let index;
+        while ((index = rest.indexOf(EXPR_START)) !== -1) {
+            const contentStart = index + EXPR_START.length;
+            const contentLen = rest.substring(contentStart).indexOf(EXPR_END);
+            if (contentLen === -1) {
+                // no end! oh well
+                source.push({ type: 'text', value: rest });
+                rest = '';
+            } else {
+                if (index) {
+                    source.push({ type: 'text', value: rest.substr(0, index) });
+                }
+                const exprContent = rest.substring(contentStart, contentStart + contentLen);
+                source.push({ type: 'expr', value: exprContent });
+                rest = rest.substring(contentStart + contentLen + EXPR_END.length);
+            }
+        }
+        if (rest) source.push({ type: 'text', value: rest });
 
         if (!this.props.enableTemplates) {
             // convert all templates to regular text if they're not enabled
@@ -142,61 +226,11 @@ export default class JSONFilterEditor extends PureComponent {
     }
 
     onInsertExpr = (expr) => {
-        this.editor.replaceSelection(EXPR_DELIM + expr + EXPR_DELIM);
+        const { view } = this.editor.current;
+        view.dispatch(view.state.replaceSelection(EXPR_START + expr + EXPR_END));
     };
 
-    lastErrorLine = -1;
-    lastWidget = null;
-    editor = null;
-    templateMarkings = [];
-
-    updateTemplateMarkings () {
-        for (const marking of this.templateMarkings) marking.clear();
-        this.templateMarkings = [];
-
-        this.editor.doc.eachLine(line => {
-            const lineNo = line.lineNo();
-
-            let exprState = null;
-            for (let i = 0; i < line.text.length; i++) {
-                const ch = line.text[i];
-
-                if (exprState) {
-                    if (ch === EXPR_DELIM) {
-                        exprState.end = { line: lineNo, ch: i + 1 };
-
-                        const node = document.createElement('span');
-                        if (EXPRS[exprState.text]) {
-                            node.className = 'akso-json-marked-atom';
-                            node.textContent = locale.json.exprs[exprState.text];
-                        } else {
-                            node.className = 'akso-json-marked-atom is-invalid';
-                            node.textContent = `?${exprState.text}?`;
-                        }
-
-                        const marking = this.editor.doc.markText(
-                            exprState.start,
-                            exprState.end,
-                            {
-                                className: 'akso-json-marked-template',
-                                replacedWith: node,
-                            },
-                        );
-                        this.templateMarkings.push(marking);
-
-                        exprState = null;
-                    } else {
-                        exprState.text += ch;
-                    }
-                    continue;
-                }
-
-                if (ch === EXPR_DELIM) {
-                    exprState = { start: { line: lineNo, ch: i }, text: '' };
-                }
-            }
-        });
-    }
+    editor = createRef();
 
     validateJSON (value) {
         let error = null;
@@ -216,53 +250,56 @@ export default class JSONFilterEditor extends PureComponent {
             };
         }
 
-        if (this.lastErrorLine >= 0) {
-            this.editor.doc.removeLineClass(this.lastErrorLine, 'background', 'json-error-line');
-            this.lastErrorLine = -1;
-        }
-        if (this.lastWidget) {
-            this.lastWidget.clear();
-            this.lastWidget = null;
-        }
+        const { view } = this.editor.current;
+
+        view.dispatch({
+            effects: clearLineErrorMarks.of(),
+        });
 
         if (error) {
-            this.lastErrorLine = error.position.line;
-            if (this.lastErrorLine >= 0) {
-                this.editor.doc.addLineClass(this.lastErrorLine, 'background', 'json-error-line');
+            let editorLine = view.state.doc.line(error.position.line + 1);
+            if (!editorLine) editorLine = view.state.doc.line(view.state.doc.lines);
+
+            if (error.position.line >= 0) {
+                const lineDec = Decoration.line({
+                    class: 'json-error-line',
+                });
+                const markDec = Decoration.mark({
+                    class: 'json-error-mark',
+                });
+                view.dispatch({
+                    effects: addLineErrorMarks.of([
+                        lineDec.range(editorLine.from, editorLine.from),
+                        markDec.range(
+                            editorLine.from + error.position.column,
+                            editorLine.from + error.position.column + 1,
+                        ),
+                    ]),
+                });
             }
 
-            const node = document.createElement('div');
-            node.classList.add('json-error-message');
-            node.textContent = error.message;
+            const widget = Decoration.widget({
+                block: true,
+                side: 1,
+                widget: new LineErrorWidget(error),
+            });
 
-            const widgetLine = this.lastErrorLine === -1
-                ? this.editor.doc.lastLine()
-                : this.lastErrorLine;
-            this.lastWidget = this.editor.doc.addLineWidget(widgetLine, node);
+            view.dispatch({
+                effects: addLineErrorMarks.of([
+                    widget.range(editorLine.to, editorLine.to),
+                ]),
+            });
         }
 
         return parsed;
     }
 
-    onKeyDown = (instance, e) => {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-            // submit on ⌃⏎ or ⌘⏎
-            e.preventDefault();
-            this.props.onCollapse();
-        }
-    };
-
-    onEditorMount = editor => {
-        this.editor = editor;
-        editor.on('keydown', this.onKeyDown);
-        editor.addOverlay('akso-json-template');
-        this.updateTemplateMarkings();
-
+    componentDidMount () {
         if (!this.props.suppressInitialRoundTrip) {
             // update template variables and detect errors by doing a round-trip
             this.onChange(this.toCMSource(this.props.value));
         }
-    };
+    }
 
     render () {
         const { value, disabled, enableTemplates } = this.props;
@@ -278,23 +315,26 @@ export default class JSONFilterEditor extends PureComponent {
                     onClick={() => this.setState({ helpOpen: true })}>
                     <HelpIcon />
                 </Button>
-                <RCodeMirror
+                <CodeMirror
+                    ref={this.editor}
                     value={cmSource}
-                    options={{
-                        mode: 'application/json',
-                        theme: 'akso',
-                        lineNumbers: true,
-                        indentWithTabs: true,
-                        indentUnit: 4,
-                        matchBrackets: true,
-                        readOnly: disabled,
-                        // autoCloseBrackets: true, // glitchy for some reason
+                    onChange={v => this.onChange(v)}
+                    forceDark
+                    readOnly={disabled}
+                    basicSetup={{
+                        // we're using javascript syntax but we don't want full JS autocompletion
+                        autocompletion: false,
+                        // this breaks selection for some reason
+                        highlightActiveLine: false,
                     }}
-                    editorDidMount={this.onEditorMount}
-                    onBeforeChange={(editor, data, value) => this.onChange(value)}
-                    onChange={() => {
-                        this.updateTemplateMarkings();
-                    }} />
+                    extensions={[
+                        javascript(),
+                        templateMarkings,
+                        lineErrorMarks,
+                        EditorState.tabSize.of(4),
+                        indentUnit.of('\t'),
+                        EditorView.lineWrapping,
+                    ]} />
                 {enableTemplates && (
                     <div class="json-templates-container">
                         <JsonTemplates onInsert={this.onInsertExpr} />

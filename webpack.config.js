@@ -61,6 +61,10 @@ module.exports = function (env, argv) {
                 'preact-debug-if-dev': prod
                     ? path.resolve(__dirname, 'src/nothing.js')
                     : 'preact/debug',
+
+                // importing 'process/browser' fails due to the fallback below!
+                // it’ll try to load process/browser/browser. so, stop doing that
+                'process/browser': require.resolve('process/browser'),
             },
             fallback: {
                 buffer: require.resolve('buffer/'),

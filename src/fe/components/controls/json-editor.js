@@ -1,12 +1,50 @@
-import { h, Component } from 'preact';
+import { h, createRef, Component } from 'preact';
 import JSON5 from 'json5';
-import 'codemirror';
-import { Controlled as RCodeMirror } from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/addon/edit/matchbrackets';
-import 'codemirror/addon/edit/closebrackets';
+import CodeMirror from '../codemirror-themed';
+import { Decoration, EditorView, WidgetType } from '@codemirror/view';
+import { EditorState, StateEffect, StateField } from '@codemirror/state';
+import { indentUnit } from '@codemirror/language';
+import { javascript } from '@codemirror/lang-javascript';
 import '../overview/json-filter-editor.less';
+
+// inline errors
+const addLineErrorMarks = StateEffect.define();
+const clearLineErrorMarks = StateEffect.define();
+const lineErrorMarks = StateField.define({
+    create () {
+        return Decoration.none;
+    },
+    update (value, tr) {
+        // don’t need to map because it’ll be overridden anyway
+        // value = value.map(tr.changes);
+        for (const effect of tr.effects) {
+            if (effect.is(addLineErrorMarks)) {
+                value = value.update({ add: effect.value, sort: true });
+            } else if (effect.is(clearLineErrorMarks)) {
+                value = value.update({ filter: () => false });
+            }
+        }
+        return value;
+    },
+    provide: f => EditorView.decorations.from(f),
+});
+class LineErrorWidget extends WidgetType {
+    constructor (error) {
+        super();
+        this.error = error;
+    }
+
+    eq (other) {
+        return this.error === other.error;
+    }
+
+    toDOM () {
+        const node = document.createElement('div');
+        node.className = 'json-error-message';
+        node.textContent = this.error.message;
+        return node;
+    }
+}
 
 /**
  * This editor edits a raw JSON serialized string.
@@ -17,9 +55,7 @@ import '../overview/json-filter-editor.less';
  * - strict: if true, will use JSON instead of JSON5
  */
 export default class JSONEditor extends Component {
-    lastErrorLine = -1;
-    lastWidget = null;
-    editor = null;
+    editor = createRef();
 
     validateJSON (value) {
         let error = null;
@@ -51,35 +87,47 @@ export default class JSONEditor extends Component {
             }
         }
 
-        if (this.lastErrorLine >= 0) {
-            this.editor.doc.removeLineClass(this.lastErrorLine, 'background', 'json-error-line');
-            this.lastErrorLine = -1;
-        }
-        if (this.lastWidget) {
-            this.lastWidget.clear();
-            this.lastWidget = null;
-        }
+        const { view } = this.editor.current;
+
+        view.dispatch({
+            effects: clearLineErrorMarks.of(),
+        });
 
         if (error) {
-            this.lastErrorLine = error.position.line;
-            if (this.lastErrorLine >= 0) {
-                this.editor.doc.addLineClass(this.lastErrorLine, 'background', 'json-error-line');
+            let editorLine = view.state.doc.line(error.position.line + 1);
+            if (!editorLine) editorLine = view.state.doc.line(view.state.doc.lines);
+
+            if (error.position.line >= 0) {
+                const lineDec = Decoration.line({
+                    class: 'json-error-line',
+                });
+                const markDec = Decoration.mark({
+                    class: 'json-error-mark',
+                });
+                view.dispatch({
+                    effects: addLineErrorMarks.of([
+                        lineDec.range(editorLine.from, editorLine.from),
+                        markDec.range(
+                            editorLine.from + error.position.column,
+                            editorLine.from + error.position.column + 1,
+                        ),
+                    ]),
+                });
             }
 
-            const node = document.createElement('div');
-            node.classList.add('json-error-message');
-            node.textContent = error.message;
+            const widget = Decoration.widget({
+                block: true,
+                side: 1,
+                widget: new LineErrorWidget(error),
+            });
 
-            const widgetLine = this.lastErrorLine === -1
-                ? this.editor.doc.lastLine()
-                : this.lastErrorLine;
-            this.lastWidget = this.editor.doc.addLineWidget(widgetLine, node);
+            view.dispatch({
+                effects: addLineErrorMarks.of([
+                    widget.range(editorLine.to, editorLine.to),
+                ]),
+            });
         }
     }
-
-    onEditorMount = editor => {
-        this.editor = editor;
-    };
 
     onChange (jsonString) {
         this.validateJSON(jsonString);
@@ -91,20 +139,25 @@ export default class JSONEditor extends Component {
             <div
                 class="json-editor"
                 onClick={e => e.stopPropagation()}>
-                <RCodeMirror
+                <CodeMirror
+                    ref={this.editor}
                     value={value}
-                    options={{
-                        mode: 'application/json',
-                        theme: 'akso',
-                        lineNumbers: true,
-                        indentWithTabs: true,
-                        indentUnit: 4,
-                        matchBrackets: true,
-                        readOnly: disabled,
-                        // autoCloseBrackets: true, // glitchy for some reason
+                    onChange={v => this.onChange(v)}
+                    forceDark
+                    readOnly={disabled}
+                    basicSetup={{
+                        // we're using javascript syntax but we don't want full JS autocompletion
+                        autocompletion: false,
+                        // this breaks selection for some reason
+                        highlightActiveLine: false,
                     }}
-                    editorDidMount={this.onEditorMount}
-                    onBeforeChange={(editor, data, value) => this.onChange(value)} />
+                    extensions={[
+                        javascript(),
+                        lineErrorMarks,
+                        EditorState.tabSize.of(4),
+                        indentUnit.of('\t'),
+                        EditorView.lineWrapping,
+                    ]} />
             </div>
         );
     }

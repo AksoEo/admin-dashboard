@@ -5,41 +5,27 @@ import PostAddIcon from '@material-ui/icons/PostAdd';
 import PhotoIcon from '@material-ui/icons/Photo';
 import AddPhotoIcon from '@material-ui/icons/AddPhotoAlternate';
 import RemoveIcon from '@material-ui/icons/Remove';
-import CodeMirror from 'codemirror';
-import { Controlled as RCodeMirror } from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/xml/xml';
 import TextArea from '../../../components/controls/text-area';
 import SvgIcon from '../../../components/svg-icon';
 import MdField from '../../../components/controls/md-field';
 import Select from '../../../components/controls/select';
 import OrgIcon from '../../../components/org-icon';
 import RearrangingList from '../../../components/lists/rearranging-list';
+import CodeMirror from '../../../components/codemirror-themed';
+import {
+    Decoration,
+    EditorView,
+    ViewPlugin,
+    WidgetType,
+} from '@codemirror/view';
+import { EditorState } from '@codemirror/state';
+import { indentUnit } from '@codemirror/language';
+import { html } from '@codemirror/lang-html';
 import { connect } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
 import { getFormVarsForIntent } from './intents';
 import { TemplatingContext } from './templating-popup';
 import './fields.less';
-
-CodeMirror.defineMode('akso-notif-template', () => ({
-    token: stream => {
-        if (stream.match('{{', true)) {
-            // eat template
-            while (true) { // eslint-disable-line no-constant-condition
-                if (stream.match('}}', true)) break;
-                if (!stream.next()) return null;
-            }
-            return 'akso-template';
-        } else {
-            // eat garbage
-            while (true) { // eslint-disable-line no-constant-condition
-                if (stream.match('{{', false)) break;
-                if (!stream.next()) break;
-            }
-            return null;
-        }
-    },
-}));
 
 // TODO: edit templating
 
@@ -154,7 +140,7 @@ export const FIELDS = {
         component ({ value, editing, onChange, item }) {
             if (editing) {
                 return <TemplatedCodeMirror
-                    mode="text/html"
+                    isHtml
                     item={item}
                     value={value}
                     onChange={onChange} />;
@@ -173,7 +159,6 @@ export const FIELDS = {
         component ({ value, editing, onChange, item }) {
             if (editing) {
                 return <TemplatedCodeMirror
-                    mode="text/plain"
                     item={item}
                     value={value}
                     onChange={onChange} />;
@@ -570,108 +555,6 @@ class ImageModule extends PureComponent {
 
 const HANDLEBARS_CHARACTERS = '#/';
 
-const cmValidateTemplate = (item, templateMarkings) => editor => {
-    for (const marking of templateMarkings) marking.clear();
-    templateMarkings.splice(0); // clear
-
-    const knownVars = new Set();
-    for (const fv of getFormVarsForIntent(item.intent)) knownVars.add('@' + fv.name);
-    if (item.script) for (const k in item.script) {
-        if (typeof k === 'string' && !k.startsWith('_')) knownVars.add(k);
-    }
-
-    let data = editor.notifTemplatesData;
-    if (!data) {
-        data = { lineErrors: {} };
-    }
-
-    for (let ln = 0; ln < editor.lineCount(); ln++) {
-        const line = editor.getLine(ln);
-
-        let error = null;
-        let errorRange = null;
-
-        let remaining = line;
-        let ch = 0;
-        while (remaining) {
-            const m = remaining.match(/\{\{(.*?)\}\}/);
-            if (m) {
-                ch += m.index;
-                const templateRange = [{ line: ln, ch }, { line: ln, ch: ch + m[0].length }];
-
-                const contents = m[1];
-                if (!HANDLEBARS_CHARACTERS.includes(contents[0])) {
-                    if (!knownVars.has(contents)) {
-                        error = locale.raw.unknownVar(contents);
-                        errorRange = templateRange;
-                        break;
-                    }
-                }
-
-                remaining = remaining.substr(m.index + m[0].length);
-                ch += m[0].length;
-
-                const node = document.createElement('span');
-                node.className = 'akso-notif-template-cm-marked-atom';
-
-                if (contents.startsWith('@')) {
-                    node.className += ' is-form-var';
-                    node.textContent = locale.templateVars[contents.substr(1)];
-                } else {
-                    node.className += ' is-script-var';
-                    node.textContent = contents;
-                }
-
-                const marking = editor.doc.markText(
-                    {
-                        line: templateRange[0].line,
-                        ch: templateRange[0].ch + 2,
-                    },
-                    {
-                        line: templateRange[1].line,
-                        ch: templateRange[1].ch - 2,
-                    },
-                    {
-                        className: 'akso-notif-template-cm-marked-template',
-                        replacedWith: node,
-                    },
-                );
-                templateMarkings.push(marking);
-            } else {
-                break;
-            }
-        }
-
-        if (data.lineErrors[ln] && data.lineErrors[ln].marking) {
-            data.lineErrors[ln].marking.clear();
-            data.lineErrors[ln].marking = null;
-        }
-
-        if (error && !data.lineErrors[ln]) {
-            const node = document.createElement('div');
-            node.classList.add('json-error-message');
-            const widget = editor.doc.addLineWidget(ln, node);
-            editor.doc.addLineClass(ln, 'background', 'json-error-line');
-
-            data.lineErrors[ln] = { widget, node };
-        } else if (data.lineErrors[ln] && !error) {
-            editor.doc.removeLineClass(ln, 'background', 'json-error-line');
-            data.lineErrors[ln].widget.clear();
-            data.lineErrors[ln] = null;
-        }
-
-
-        if (error) {
-            data.lineErrors[ln].marking = editor.doc.markText(errorRange[0], errorRange[1], {
-                className: 'cm-akso-error',
-            });
-            data.lineErrors[ln].node.textContent = error;
-        }
-    }
-
-    editor.notifTemplatesData = data;
-};
-
 class TemplatedTextField extends PureComponent {
     static contextType = TemplatingContext;
 
@@ -702,11 +585,124 @@ class TemplatedTextField extends PureComponent {
     }
 }
 
+// template markings: additional syntax highlighting for notif template variables
+class TemplateMarkingWidget extends WidgetType {
+    constructor (expr) {
+        super();
+        this.expr = expr;
+    }
+
+    eq (other) {
+        return this.expr === other.expr;
+    }
+
+    toDOM () {
+        const node = document.createElement('span');
+        node.className = 'akso-notif-template-cm-marked-atom';
+
+        const contents = this.expr;
+        if (contents.startsWith('@')) {
+            node.className += ' is-form-var';
+            node.textContent = locale.templateVars[contents.substr(1)];
+        } else {
+            node.className += ' is-script-var';
+            node.textContent = contents;
+        }
+
+        return node;
+    }
+}
+
+// inline errors
+function decoTemplateMarkings (item, view) {
+    const knownVars = new Set();
+    for (const fv of getFormVarsForIntent(item.intent)) knownVars.add('@' + fv.name);
+    if (item.script) for (const k in item.script) {
+        if (typeof k === 'string' && !k.startsWith('_')) knownVars.add(k);
+    }
+
+    const markings = [];
+
+    for (let ln = 1; ln <= view.state.doc.lines; ln++) {
+        const line = view.state.doc.line(ln);
+
+        let error = null;
+        let errorRange = null;
+
+        let remaining = line.text;
+        let ch = 0;
+        while (remaining) {
+            const m = remaining.match(/\{\{(.*?)\}\}/);
+            if (m) {
+                ch += m.index;
+                const templateRange = [line.from + ch, line.from + ch + m[0].length];
+
+                const contents = m[1];
+                if (!HANDLEBARS_CHARACTERS.includes(contents[0])) {
+                    if (!knownVars.has(contents)) {
+                        error = locale.raw.unknownVar(contents);
+                        errorRange = templateRange;
+                        break;
+                    }
+                }
+
+                remaining = remaining.substr(m.index + m[0].length);
+                ch += m[0].length;
+
+                const deco = Decoration.replace({
+                    widget: new TemplateMarkingWidget(contents),
+                });
+
+                markings.push(deco.range(templateRange[0], templateRange[1]));
+            } else {
+                break;
+            }
+        }
+
+        if (error) {
+            const markDec = Decoration.mark({
+                class: 'template-error-mark',
+            });
+            markings.push(
+                markDec.range(
+                    errorRange[0],
+                    errorRange[1],
+                ),
+            );
+        }
+    }
+
+    markings.sort((a, b) => a.from - b.from);
+
+    return Decoration.set(markings);
+}
+
+const templateMarkings = itemRef => ViewPlugin.fromClass(class {
+    constructor (view) {
+        this.markings = itemRef.current
+            ? decoTemplateMarkings(itemRef.current, view)
+            : Decoration.none;
+    }
+    update (update) {
+        if (update.docChanged || update.viewportChanged) {
+            this.markings = itemRef.current
+                ? decoTemplateMarkings(itemRef.current, update.view)
+                : Decoration.none;
+        }
+    }
+}, {
+    decorations: instance => instance.markings,
+    provide: plugin => EditorView.atomicRanges.of(view => {
+        return view.plugin(plugin)?.markings || Decoration.none;
+    }),
+});
+
 class TemplatedCodeMirror extends PureComponent {
     static contextType = TemplatingContext;
 
-    editor = null;
+    editor = createRef();
     templateMarkings = [];
+    itemRef = { current: null };
 
     onFocus = () => {
         this.context.didFocus(this);
@@ -716,31 +712,32 @@ class TemplatedCodeMirror extends PureComponent {
     };
 
     insertString (str) {
-        this.editor.replaceSelection(str);
+        const { view } = this.editor.current;
+        view.dispatch(view.state.replaceSelection(str));
     }
 
-    render ({ item, value, onChange, mode }) {
+    render ({ item, value, onChange, isHtml }) {
+        this.itemRef.current = item;
+
         return (
-            <RCodeMirror
+            <CodeMirror
+                class="cm-notif-template-editor"
+                ref={this.editor}
                 value={value}
-                editorDidMount={editor => {
-                    this.editor = editor;
-                    editor.addOverlay('akso-notif-template');
-                    cmValidateTemplate(item, this.templateMarkings)(editor);
-                }}
                 onFocus={this.onFocus}
                 onBlur={this.onBlur}
-                options={{
-                    mode,
-                    theme: 'akso',
-                    lineNumbers: true,
-                    indentWithTabs: true,
-                    indentUnit: 4,
-                    matchBrackets: true,
-                    lineWrapping: true,
+                basicSetup={{
+                    // this breaks selection for some reason
+                    highlightActiveLine: false,
                 }}
-                onChange={cmValidateTemplate(item, this.templateMarkings)}
-                onBeforeChange={(editor, data, value) => onChange(value)} />
+                extensions={[
+                    templateMarkings(this.itemRef),
+                    EditorState.tabSize.of(4),
+                    indentUnit.of('\t'),
+                    EditorView.lineWrapping,
+                    isHtml && html(),
+                ].filter(x => x)}
+                onChange={onChange} />
         );
     }
 }
@@ -748,8 +745,8 @@ class TemplatedCodeMirror extends PureComponent {
 class TemplatedMdField extends PureComponent {
     static contextType = TemplatingContext;
 
-    editor = null;
-    templateMarkings = [];
+    mdField = createRef();
+    itemRef = { current: null };
 
     onFocus = () => {
         this.context.didFocus(this);
@@ -759,18 +756,19 @@ class TemplatedMdField extends PureComponent {
     };
 
     insertString (str) {
-        this.editor.replaceSelection(str);
+        const { view } = this.mdField.current.editor.current;
+        view.dispatch(view.state.replaceSelection(str));
     }
 
     render ({ item, ...props }) {
+        this.itemRef.current = item;
+
         return (
             <MdField
-                editorDidMount={editor => {
-                    editor.addOverlay('akso-notif-template');
-                    this.editor = editor;
-                    cmValidateTemplate(item, this.templateMarkings)(editor);
-                }}
-                onCMChange={cmValidateTemplate(item, this.templateMarkings)}
+                ref={this.mdField}
+                extensions={[
+                    templateMarkings(this.itemRef),
+                ]}
                 onFocus={this.onFocus}
                 onBlur={this.onBlur}
                 {...props} />

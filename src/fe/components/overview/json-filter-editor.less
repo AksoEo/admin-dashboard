@@ -1,5 +1,4 @@
 @import '../../prelude';
-@import '../codemirror-style';
 
 .json-filter-editor, .json-editor {
     position: relative;
@@ -15,8 +14,27 @@
         transition: transform 0.4s @easing;
     }
 
+    .cm-editor {
+        height: 300px;
+
+        .cm-scroller {
+            font-family: @monospace;
+            font-size: 14px;
+        }
+    }
+
+    .json-error-line, .json-error-mark {
+        background: var(--editor-error-background);
+    }
+    .json-error-message {
+        background: var(--editor-error-background);
+        padding: 2px 4px;
+        font-family: Roboto, sans-serif;
+        font-size: smaller;
+    }
+
     &.collapsed {
-        .CodeMirror {
+        .cm-editor {
             height: 64px;
         }
 

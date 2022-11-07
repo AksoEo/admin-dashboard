@@ -22,7 +22,7 @@ export const tasks = {
             // try converting filters to JSON5 syntax
             item.filters = item.filters.map(filter => {
                 try {
-                    return JSON5.stringify(JSON.parse(filter), undefined, 4);
+                    return JSON5.stringify(JSON.parse(filter), undefined, '\t');
                 } catch {
                     return filter;
                 }

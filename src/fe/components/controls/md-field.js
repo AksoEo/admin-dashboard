@@ -1,6 +1,6 @@
 import Markdown from 'markdown-it';
 import { h } from 'preact';
-import { createPortal, createRef, PureComponent, useState } from 'preact/compat';
+import { createPortal, createRef, forwardRef, PureComponent, useState } from 'preact/compat';
 import { globalAnimator, Button, Dialog, TextField, RootContext } from 'yamdl';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
@@ -15,8 +15,11 @@ import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
 import HelpIcon from '@material-ui/icons/Help';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import CloseIcon from '@material-ui/icons/Close';
-import 'codemirror';
-import { Controlled as RCodeMirror } from 'react-codemirror2';
+import CodeMirror from '../codemirror-themed';
+import { EditorView } from '@codemirror/view';
+import { indentUnit } from '@codemirror/language';
+import { EditorState, EditorSelection } from '@codemirror/state';
+import { markdown } from '@codemirror/lang-markdown';
 import { layoutContext } from '../layout/dynamic-height-div';
 import { data as locale } from '../../locale';
 import { coreContext } from '../../core/connection';
@@ -34,8 +37,8 @@ import './md-field.less';
  * - rules: list of enabled rules
  * - inline: if true, will try to style it without line breaks
  * - singleLine: if true, will not allow line breaks
- * - editorDidMount, onCMChange: forwarded to codeMirror
  * - ignoreLiveUpdates: ignores props.value while the user is typing to combat latency
+ * - extensions: additional CodeMirror extensions
  */
 export default class MarkdownTextField extends PureComponent {
     static contextType = layoutContext;
@@ -49,8 +52,8 @@ export default class MarkdownTextField extends PureComponent {
 
     #node = createRef();
     #cachedHtml = null;
-    #document = { current: null };
     core = null;
+    editor = createRef();
 
     updateCache () {
         const md = new Markdown('zero');
@@ -76,12 +79,6 @@ export default class MarkdownTextField extends PureComponent {
         if (!this.props.editing && this.state.preview) this.setState({ preview: false });
     }
 
-    #onEditorMount = editor => {
-        this.editor = editor;
-        this.#document.current = this.editor.doc;
-        if (this.props.editorDidMount) this.props.editorDidMount(editor);
-    };
-
     #onFocus = () => {
         this.setState({ focused: true });
         if (this.props.onFocus) this.props.onFocus();
@@ -101,7 +98,7 @@ export default class MarkdownTextField extends PureComponent {
         this.setState({ editorBarPopoutClosing: true }, () => {
             setTimeout(() => {
                 this.setState({ editorBarPopout: null });
-                this.editor.focus();
+                this.editor.current.view.focus();
             }, 300);
         });
     };
@@ -117,7 +114,7 @@ export default class MarkdownTextField extends PureComponent {
     };
 
     render ({
-        value, editing, onChange, inline, disabled, rules, singleLine, maxLength, ...extra
+        value, editing, onChange, inline, disabled, rules, singleLine, maxLength, extensions, ...extra
     }, { focused, preview, editorBarPopout, helpOpen }) {
         let editorBar, charCounter;
 
@@ -145,7 +142,7 @@ export default class MarkdownTextField extends PureComponent {
                                 e.stopPropagation();
                                 e.preventDefault();
                                 this.setState({ preview: false }, () => {
-                                    this.editor && this.editor.focus();
+                                    this.editor.current?.view?.focus();
                                 });
                             }}>
                             {locale.mdEditor.previewOff}
@@ -175,7 +172,7 @@ export default class MarkdownTextField extends PureComponent {
                     <EditorBar
                         visible={focused || editorBarPopout}
                         rules={rules}
-                        doc={this.#document}
+                        view={this.editor.current?.view}
                         onChange={onChange}
                         onPopout={this.#onEditorBarPopout}
                         onOpenHelp={() => {
@@ -210,15 +207,15 @@ export default class MarkdownTextField extends PureComponent {
             contents = (
                 <div class="md-editor-inner">
                     <InnerEditor
+                        ref={this.editor}
                         value={value}
                         onChange={onChange}
                         singleLine={singleLine}
                         maxLength={maxLength}
                         disabled={disabled}
-                        onCMChange={this.props.onCMChange}
-                        onMount={this.#onEditorMount}
                         onFocus={this.#onFocus}
                         onBlur={this.#onBlur}
+                        extensions={extensions}
                         ignoreLiveUpdates={this.state.focused && this.props.ignoreLiveUpdates} />
 
                     <div class={'preview-flourish' + (!preview ? ' is-hidden' : '')} />
@@ -236,7 +233,7 @@ export default class MarkdownTextField extends PureComponent {
                             e.stopPropagation();
                             e.preventDefault();
                             this.setState({ preview: !preview }, () => {
-                                if (!this.state.preview) this.editor.focus();
+                                if (!this.state.preview) this.editor.current?.view?.focus();
                             });
                         }}>
                         {preview ? <CloseIcon /> : <VisibilityIcon />}
@@ -348,41 +345,47 @@ class EditorBarPortal extends PureComponent {
     }
 }
 
-function InnerEditor ({
+const InnerEditor = forwardRef(({
     value,
     onChange,
     disabled,
     singleLine,
     maxLength,
-    onMount,
     onFocus,
     onBlur,
-    onCMChange,
+    extensions,
     ignoreLiveUpdates,
-}) {
+}, ref) => {
     const [localValue, setLocalValue] = useState(value);
 
     return (
-        <RCodeMirror
+        <CodeMirror
+            ref={ref}
             value={ignoreLiveUpdates ? localValue : value}
-            options={{
-                mode: 'text/markdown',
-                theme: 'akso',
+            basicSetup={{
+                autocompletion: false,
                 lineNumbers: false,
-                indentWithTabs: true,
-                indentUnit: 4,
-                matchBrackets: true,
-                readOnly: disabled,
-                lineWrapping: true,
+                foldGutter: false,
+                closeBrackets: false,
+                allowMultipleSelections: false,
+                highlightSelectionMatches: false,
+                // this breaks selection for some reason
+                highlightActiveLine: false,
             }}
-            editorDidMount={onMount}
+            readOnly={disabled}
+            extensions={[
+                markdown(),
+                EditorState.tabSize.of(4),
+                indentUnit.of('\t'),
+                EditorView.lineWrapping,
+                ...(extensions || []),
+            ]}
             onFocus={() => {
                 setLocalValue(value);
                 onFocus();
             }}
             onBlur={onBlur}
-            onChange={onCMChange}
-            onBeforeChange={(editor, data, value) => {
+            onChange={value => {
                 if (maxLength && value.length > maxLength) value = value.substr(0, maxLength);
                 if (singleLine) value = value.replace(/\n/g, '');
 
@@ -390,70 +393,86 @@ function InnerEditor ({
                 onChange(value);
             }} />
     );
-}
+});
 
 /**
  * Applies a wrapping formatting tag, such as bold or italic.
  * - start: start tag
  * - end: end tag
- * - doc: document
+ * - view: editor view
  */
-function applyWrappingFormat (startTag, endTag, doc) {
-    const selections = [];
-    for (const { anchor, head } of doc.listSelections()) {
-        let start = anchor;
-        let end = head;
-        if (head.line < anchor.line || head.ch < anchor.ch) {
-            start = head;
-            end = anchor;
-        }
+function applyWrappingFormat (startTag, endTag, view) {
+    view.dispatch(view.state.changeByRange(range => {
+        const startMinusTag = range.from - startTag.length;
+        const endPlusTag = range.to + endTag.length;
 
-        const startMinus2 = { line: start.line, ch: start.ch - startTag.length };
-        const endPlus2 = { line: end.line, ch: end.ch + endTag.length };
+        const before = view.state.sliceDoc(startMinusTag, range.from);
+        const after = view.state.sliceDoc(range.to, endPlusTag);
 
-        const before = doc.getRange(startMinus2, start);
-        const after = doc.getRange(end, endPlus2);
         if (before === startTag && after === endTag) {
-            // remove emphasis
-            doc.replaceRange('', end, endPlus2);
-            doc.replaceRange('', startMinus2, start);
-            selections.push({
-                anchor: { line: start.line, ch: start.ch - startTag.length },
-                head: { line: end.line, ch: end.ch - startTag.length },
-            });
+            // tag already exists - remove it
+            return {
+                changes: [
+                    { from: startMinusTag, to: range.from, insert: '' },
+                    { from: range.to, to: endPlusTag, insert: '' },
+                ],
+                range: EditorSelection.range(range.from - startTag.length, range.to - startTag.length),
+            };
         } else {
-            // add emphasis
-            doc.replaceRange(endTag, end, end);
-            doc.replaceRange(startTag, start, start);
-            selections.push({
-                anchor: { line: start.line, ch: start.ch + startTag.length },
-                head: { line: end.line, ch: end.ch + startTag.length },
-            });
+            // add it
+            return {
+                changes: [
+                    { from: range.from, insert: startTag },
+                    { from: range.to, insert: endTag },
+                ],
+                range: EditorSelection.range(range.from + startTag.length, range.to + startTag.length),
+            };
         }
-    }
-    doc.setSelections(selections);
+    }));
 }
 
-function applyHeadings (doc) {
-    const { line: ln } = doc.getCursor();
-    let line = doc.getLine(ln);
-    const prefix = line.match(/^(#{1,6})(\s|$)/);
+function applyHeadings (view) {
+    view.dispatch(view.state.changeByRange(range => {
+        const affectedLines = new Map();
+        for (let i = range.from; i <= range.to; i++) {
+            const line = view.state.doc.lineAt(i);
+            affectedLines.set(line.number, line);
+        }
 
-    const prevLen = prefix ? prefix[0].length : 0;
-    let nextCount = 1;
+        let start = range.from;
+        let end = range.to;
+        const changes = [];
 
-    if (prefix) {
-        const count = prefix[1].length;
-        line = line.substr(count);
-        nextCount = count + 1;
-        if (nextCount > 6) nextCount = 0;
-    }
+        for (const line of affectedLines.values()) {
+            const prefix = line.text.match(/^(#{1,6})(\s|$)/);
+            const prevLen = prefix ? prefix[0].length : 0;
+            let nextCount = 1;
 
-    const newPrefix = nextCount
-        ? '#'.repeat(nextCount) + (prefix ? prefix[2] : ' ')
-        : '';
+            if (prefix) {
+                const count = prefix[1].length;
+                nextCount = count + 1;
+                if (nextCount > 6) nextCount = 0;
+            }
 
-    doc.replaceRange(newPrefix, { line: ln, ch: 0 }, { line: ln, ch: prevLen });
+            const newPrefix = nextCount
+                ? '#'.repeat(nextCount) + (prefix ? prefix[2] : ' ')
+                : '';
+
+            changes.push({
+                from: line.from,
+                to: line.from + prevLen,
+                insert: newPrefix,
+            });
+
+            start += newPrefix.length - prevLen;
+            end += newPrefix.length - prevLen;
+        }
+
+        return {
+            changes,
+            range: EditorSelection.range(start, end),
+        };
+    }));
 }
 
 const makeURLInputRequest = apply => function URLInputRequest ({ selection, onComplete }) {
@@ -487,41 +506,41 @@ const FORMAT_BUTTONS = {
     title: {
         icon: <TitleIcon />,
         rule: 'heading',
-        apply: doc => applyHeadings(doc),
+        apply: view => applyHeadings(view),
     },
     bold: {
         icon: <FormatBoldIcon />,
         rule: 'emphasis',
-        apply: doc => applyWrappingFormat('**', '**', doc),
+        apply: view => applyWrappingFormat('**', '**', view),
     },
     italic: {
         icon: <FormatItalicIcon />,
         rule: 'emphasis',
-        apply: doc => applyWrappingFormat('*', '*', doc),
+        apply: view => applyWrappingFormat('*', '*', view),
     },
     strike: {
         icon: <FormatStrikethroughIcon />,
         rule: 'strikethrough',
-        apply: doc => applyWrappingFormat('~~', '~~', doc),
+        apply: view => applyWrappingFormat('~~', '~~', view),
     },
     link: {
         icon: <InsertLinkIcon />,
         rule: 'link',
-        request: makeURLInputRequest((label, url) => doc => {
-            doc.replaceSelection(`[${label}](${url})`);
+        request: makeURLInputRequest((label, url) => view => {
+            view.dispatch(view.state.replaceSelection(`[${label}](${url})`));
         }),
     },
     image: {
         icon: <InsertPhotoIcon />,
         rule: 'image',
-        request: makeURLInputRequest((label, url) => doc => {
-            doc.replaceSelection(`![${label}](${url})`);
+        request: makeURLInputRequest((label, url) => view => {
+            view.dispatch(view.state.replaceSelection(`![${label}](${url})`));
         }),
     },
     code: {
         icon: <CodeIcon />,
         rule: 'backticks',
-        apply: doc => applyWrappingFormat('`', '`', doc),
+        apply: view => applyWrappingFormat('`', '`', view),
     },
     table: {
         icon: <TableChartIcon />,
@@ -541,18 +560,12 @@ const FORMAT_BUTTONS = {
     }, */
 };
 
-function EditorBar ({ visible, rules, doc, onChange, onPopout, onOpenHelp }) {
+function EditorBar ({ visible, rules, view, onChange, onPopout, onOpenHelp }) {
     const buttons = [];
 
     const applyAction = apply => {
-        // FIXME: this is very hacky, but mutating the document directly
-        // causes react-codemirror2 to do very strange things
-        const d = doc.current.copy();
-        apply(d);
-        onChange(d.getValue());
-        requestAnimationFrame(() => {
-            doc.current.setSelections(d.listSelections());
-        });
+        apply(view);
+        onChange(view.state.doc.toString());
     };
 
     for (const id in FORMAT_BUTTONS) {
@@ -569,12 +582,18 @@ function EditorBar ({ visible, rules, doc, onChange, onPopout, onOpenHelp }) {
                 onClick={() => {
                     if (btn.request) {
                         const Request = btn.request;
+
+                        const currentSelection = view.state.sliceDoc(
+                            view.state.selection.main.from,
+                            view.state.selection.main.to,
+                        );
+
                         onPopout(({ closing, onClose }) => (
                             <div class={'format-button-request-container'
                                 + (closing ? ' is-closing' : '')}>
                                 <div class="format-button-request">
                                     <Request
-                                        selection={doc.current.getSelection()}
+                                        selection={currentSelection}
                                         onComplete={apply => {
                                             onClose();
                                             applyAction(apply);

@@ -3,7 +3,7 @@
 Make sure the git submodules are present! If not, run `git submodule init && git submodule update`.
 
 ```sh
-npm install --dev --legacy-peer-deps
+npm install --dev
 npm run build
 ```
 Build output will be located at `/dist`.
