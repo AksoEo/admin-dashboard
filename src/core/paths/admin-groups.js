@@ -267,4 +267,7 @@ export const views = {
 
     /** adminGroups/sigList: emits a signal when the list changes */
     sigList: createStoreObserver([ADMIN_GROUPS, SIG_LIST]),
+
+    /** adminGroups/sigGroupList: emits a signal when members change */
+    sigGroupList: createStoreObserver(({ id }) => [ADMIN_GROUPS, id, SIG_LIST]),
 };

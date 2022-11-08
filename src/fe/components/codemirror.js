@@ -195,7 +195,7 @@ export const CodeMirror = forwardRef((props, ref) => {
         ...other
     } = props;
     const editor = useRef();
-    const { state, view, container } = useCodeMirror({
+    const { state, view, container, setContainer } = useCodeMirror({
         container: editor.current,
         root,
         value,
@@ -225,6 +225,14 @@ export const CodeMirror = forwardRef((props, ref) => {
         () => ({ editor: editor.current, state, view }),
         [editor, container, state, view],
     );
+
+    // sometimes this doesn't update properly on creation
+    useEffect(() => {
+        if (!container && editor.current) {
+            setContainer(editor.current);
+        }
+    });
+
     const defaultClassNames = 'cm-theme';
     return <div ref={editor} class={`${defaultClassNames} ${className || ''}`} {...other}></div>;
 });

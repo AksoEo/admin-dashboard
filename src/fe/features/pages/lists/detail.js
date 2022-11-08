@@ -233,7 +233,6 @@ class Filters extends Component {
             return (
                 <RearrangingList
                     class="detail-filters is-editing"
-                    itemHeight={256}
                     isItemDraggable={(index) => index < filters.length - 1}
                     canMove={(toPos) => toPos >= 0 && toPos < filters.length - 1}
                     onMove={(fromPos, toPos) => {

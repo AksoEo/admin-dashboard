@@ -345,7 +345,7 @@ function CodeholdersList ({ perms, id, editing }) {
                             onSetOffset={setOffset}
                             onSetLimit={limit => setParameters({ ...parameters, limit })}
                             onSetFields={fields => setParameters({ ...parameters, fields })}
-                            updateView={editing ? null : ['adminGroups/group', { id }]}
+                            updateView={['adminGroups/sigGroupList', { id }]}
                             locale={codeholdersLocale.fields} />
                     </div>
                 )}
@@ -416,7 +416,7 @@ function ClientsList ({ perms, id, editing }) {
                             onSetOffset={setOffset}
                             onSetLimit={limit => setParameters({ ...parameters, limit })}
                             onSetFields={fields => setParameters({ ...parameters, fields })}
-                            updateView={editing ? null : ['adminGroups/group', { id }]}
+                            updateView={['adminGroups/sigGroupList', { id }]}
                             locale={clientsLocale.fields} />
                     </div>
                 )}
