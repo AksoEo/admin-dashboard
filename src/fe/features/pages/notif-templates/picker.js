@@ -7,6 +7,7 @@ import { FIELDS } from '../notif-templates/fields';
 import StaticOverviewList from '../../../components/lists/overview-list-static';
 import OverviewListItem from '../../../components/lists/overview-list-item';
 import { notifTemplates, codeholders as locale } from '../../../locale';
+import './picker.less';
 
 const SELECTED_FIELDS = [
     { id: 'org', sorting: 'none' },
@@ -23,17 +24,19 @@ const REDUCED_FIELDS = {
 
 /// Big notif template picker used in the "send notification" page.
 export default class NotifTemplatePicker extends PureComponent {
-    render ({ value, onChange, onLoadData, jsonFilter }) {
+    render ({ value, disabled, onChange, onLoadData, jsonFilter }) {
         const onRemove = () => {
             onChange(null);
-            onLoadData(null);
+            onLoadData && onLoadData(null);
         };
 
         let contents = null;
         if (value) {
-            contents = <TemplatePreview id={value} onRemove={onRemove} onLoadData={onLoadData} />;
-        } else {
+            contents = <TemplatePreview id={value} disabled={disabled} onRemove={onRemove} onLoadData={onLoadData} />;
+        } else if (!disabled) {
             contents = <TemplatePicker onChange={onChange} jsonFilter={jsonFilter} />;
+        } else {
+            contents = <div class="empty-value">—</div>;
         }
 
         return (
@@ -44,12 +47,14 @@ export default class NotifTemplatePicker extends PureComponent {
     }
 }
 
-function TemplatePreview ({ id, onLoadData, onRemove }) {
+function TemplatePreview ({ id, onLoadData, onRemove, disabled }) {
     return (
         <div class="notif-template-picked">
-            <Button icon small class="remove-picked" onClick={onRemove}>
-                <CloseIcon style={{ verticalAlign: 'middle' }} />
-            </Button>
+            {!disabled && (
+                <Button icon small class="remove-picked" onClick={onRemove}>
+                    <CloseIcon style={{ verticalAlign: 'middle' }} />
+                </Button>
+            )}
             <OverviewListItem
                 doFetch compact
                 view="notifTemplates/template"
@@ -59,7 +64,7 @@ function TemplatePreview ({ id, onLoadData, onRemove }) {
                 fields={FIELDS}
                 index={0}
                 locale={notifTemplates.fields}
-                onData={data => onLoadData(data)} />
+                onData={data => onLoadData && onLoadData(data)} />
         </div>
     );
 }

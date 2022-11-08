@@ -251,6 +251,13 @@ export default class JSONFilterEditor extends PureComponent {
         }
 
         const { view } = this.editor.current;
+        if (!view) {
+            // try again later
+            requestAnimationFrame(() => {
+                this.validateJSON(value);
+            });
+            return;
+        }
 
         view.dispatch({
             effects: clearLineErrorMarks.of(),

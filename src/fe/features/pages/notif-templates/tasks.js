@@ -5,7 +5,7 @@ import Select from '../../../components/controls/select';
 import { TejoIcon, UeaIcon } from '../../../components/org-icon';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/tasks/changed-fields';
-import { notifTemplates as locale } from '../../../locale';
+import { notifTemplates as locale, data as dataLocale } from '../../../locale';
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import { FIELDS } from './fields';
@@ -21,7 +21,9 @@ export default {
         const createUea = perms.hasPerm('notif_templates.create.uea');
         if (createTejo && createUea) {
             fields.push(
-                <Field class="org-field" key="org">
+                <Field class="org-field" key="org" validate={() => {
+                    if (!task.parameters.org) return dataLocale.requiredField;
+                }}>
                     <Segmented
                         selected={task.parameters.org}
                         onSelect={org => task.update({ org })}>
@@ -106,7 +108,12 @@ export default {
                 label = <label class="field-label">{locale.fields[id]}</label>;
             }
             fields.push(
-                <Field key={id}>
+                <Field key={id} validate={() => {
+                    if (FIELDS[id].validate) FIELDS[id].validate({
+                        item: task.parameters,
+                        value: task.parameters[id],
+                    });
+                }}>
                     {label}
                     <Component
                         editing slot="create"

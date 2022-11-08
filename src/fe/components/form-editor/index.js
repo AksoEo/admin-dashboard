@@ -159,6 +159,7 @@ export default class FormEditor extends PureComponent {
         editingFormData,
         isEditingContext,
         disableValidation,
+        org,
     }) {
         if (!value) return null;
 
@@ -170,6 +171,7 @@ export default class FormEditor extends PureComponent {
             <div class="form-editor">
                 <ScriptContextProvider>
                     <FormEditorItems
+                        org={org}
                         skipSettings={skipSettings}
                         skipNonInputs={skipNonInputs}
                         editing={editing}
@@ -296,6 +298,7 @@ class FormEditorItems extends PureComponent {
     render ({
         editing, settings, onSettingsChange, items, onItemsChange, values, additionalVars,
         skipSettings, skipNonInputs, editingData, isEditingContext, disableValidation,
+        org,
     }, { editingItem }) {
         const listItems = [];
         const previousNodes = [getGlobalDefs(additionalVars)];
@@ -348,6 +351,7 @@ class FormEditorItems extends PureComponent {
             <div class="form-editor-items">
                 {!skipSettings && (
                     <FormEditorSettings
+                        org={org}
                         editing={editing}
                         value={settings}
                         onChange={onSettingsChange}

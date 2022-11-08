@@ -20,6 +20,10 @@ export const formEditor = {
             pricePreview: 'Nuna prezo laŭ skripto:',
             notANumber: 'ne estas nombro',
         },
+        confirmationNotifTemplateId: {
+            label: '[[Confirmation notif template]]',
+            description: '[[A confirmation email sent to people when they sign up. If not set, what happens? I dont know]]',
+        },
         sequenceIds: {
             enabled: 'Asigni kongresajn numerojn',
             startAt: 'Komenci je',

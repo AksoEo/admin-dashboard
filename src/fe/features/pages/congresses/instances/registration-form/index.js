@@ -8,6 +8,7 @@ import Page from '../../../../../components/page';
 import { Form } from '../../../../../components/form';
 import DetailShell from '../../../../../components/detail/detail-shell';
 import FormEditor from '../../../../../components/form-editor';
+import DisplayError from '../../../../../components/utils/error';
 import { connect, coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';
 import { congressRegistrationForm as locale } from '../../../../../locale';
@@ -66,6 +67,7 @@ export default connectPerms(class RegistrationFormPage extends Page {
                 <InnerEditor
                     ref={this.editor}
                     canEdit={canEdit}
+                    org={this.state.org}
                     onLoad={this.onEditorLoad}
                     congress={this.congress}
                     instance={this.instance} />
@@ -84,7 +86,7 @@ export default connectPerms(class RegistrationFormPage extends Page {
 const InnerEditor = connect(({ congress, instance }) => [
     'congresses/registrationForm',
     { congress, instance },
-])((data, core, err, loaded) => ({ core, data, loaded }))(class InnerEditor extends PureComponent {
+])((data, core, err, loaded) => ({ core, data, err, loaded }))(class InnerEditor extends PureComponent {
     state = {
         edit: null,
         formData: {},
@@ -133,8 +135,15 @@ const InnerEditor = connect(({ congress, instance }) => [
         if (this.#commitTask) this.#commitTask.drop();
     }
 
-    render ({ data, loaded, canEdit }, { edit }) {
+    render ({ data, err, loaded, canEdit }, { edit }) {
         if (!loaded) {
+            if (err) {
+                return (
+                    <div class="form-editor-loading">
+                        <DisplayError error={err} />
+                    </div>
+                );
+            }
             return (
                 <div class="form-editor-loading">
                     <CircularProgress indeterminate />
@@ -185,6 +194,7 @@ const InnerEditor = connect(({ congress, instance }) => [
                     onSubmit={this.#performCommit}>
                     <FormEditor
                         isEditingContext
+                        org={this.props.org}
                         editing={!!edit}
                         value={edit || data}
                         onChange={edit => this.setState({ edit })}

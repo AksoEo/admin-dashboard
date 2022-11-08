@@ -466,6 +466,7 @@ export const tasks = {
                     'editable',
                     'cancellable',
                     'manualApproval',
+                    'confirmationNotifTemplateId',
                     'sequenceIds.startAt',
                     'sequenceIds.requireValid',
                     'price.var',

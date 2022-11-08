@@ -54,6 +54,7 @@ export const notifTemplates = {
         codeholder: 'membro',
         newsletter: 'bulteno',
         newsletter_magazine: 'revua bulteno',
+        congress_registration: '[[congr. reg.]]',
     },
     sendIntent: 'Sendi mesaĝon',
     preview: {
@@ -216,5 +217,17 @@ export const notifTemplateIntentExamples = {
         md: 'Enhavo aperos tie ĉi.',
         html: '<p>Enhavo aperos tie ĉi.</p>',
         text: 'Enhavo aperos tie ĉi.',
+    },
+    registrationEntry: {
+        // TODO: proper test data
+        price: 999,
+        currency: 'USD',
+        sequenceId: 123,
+        createdTime: new Date(2022, 2, 24, 13, 50, 24),
+        canEdit: true,
+        dataId: '0123456789abcdef',
+        dataKeys: [],
+        dataMeta: [],
+        dataVals: [],
     },
 };

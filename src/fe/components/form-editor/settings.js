@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import { Fragment, PureComponent } from 'preact/compat';
-import { Button, Checkbox, TextField } from 'yamdl';
+import { lazy, Suspense, Fragment, PureComponent } from 'preact/compat';
+import { Button, CircularProgress, Checkbox, TextField } from 'yamdl';
 import TuneIcon from '@material-ui/icons/Tune';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
@@ -71,7 +71,7 @@ export default class FormEditorSettings extends PureComponent {
         }
     }
 
-    render ({ value, editing, onChange, previousNodes }, { expanded }) {
+    render ({ org, value, editing, onChange, previousNodes }, { expanded }) {
         let settings = null;
         if (expanded) {
             settings = (
@@ -94,6 +94,11 @@ export default class FormEditorSettings extends PureComponent {
                         value={value.sequenceIds}
                         editing={editing}
                         onChange={sequenceIds => onChange({ ...value, sequenceIds })} />
+                    <ConfirmationNotifTemplate
+                        org={org}
+                        value={value.confirmationNotifTemplateId}
+                        editing={editing}
+                        onChange={v => onChange({ ...value, confirmationNotifTemplateId: v })} />
                 </Fragment>
             );
         }
@@ -227,6 +232,25 @@ function Price ({ value, editing, onChange, previousNodes }) {
             <DynamicHeightDiv class="settings-flag-options">
                 {contents}
             </DynamicHeightDiv>
+        </div>
+    );
+}
+
+// TODO: *really* should be moving this outta here and into congresses
+const NotifTemplatePicker = lazy(() => import('../../features/pages/notif-templates/picker'));
+function ConfirmationNotifTemplate ({ org, value, editing, onChange }) {
+    return (
+        <div class="settings-confirmation-notif">
+            <label>
+                {locale.settings.confirmationNotifTemplateId.label}
+            </label>
+            <Suspense fallback={<CircularProgress indeterminate />}>
+                <NotifTemplatePicker
+                    disabled={!editing}
+                    jsonFilter={{ org, intent: 'congress_registration' }}
+                    value={value}
+                    onChange={onChange} />
+            </Suspense>
         </div>
     );
 }

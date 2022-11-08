@@ -54,6 +54,7 @@ export const FIELDS = {
         component ({ value, editing, onChange }) {
             if (editing) {
                 return <TextField
+                    required
                     class="template-name-editor"
                     label={locale.fields.name}
                     outline
@@ -87,6 +88,7 @@ export const FIELDS = {
                 return <TextField
                     class="template-subject-editor"
                     label={locale.fields.subject}
+                    required
                     outline
                     value={value}
                     maxLength={255}
@@ -101,6 +103,7 @@ export const FIELDS = {
         component ({ value, editing, onChange, item }) {
             if (editing) {
                 return <DomainEmailEditor
+                    required
                     value={value}
                     onChange={onChange}
                     org={item.org} />;
@@ -237,7 +240,7 @@ const DomainEmailEditor = connect('notifTemplates/emailDomains')(domains => ({
         this.setState({ domain }, () => this.postState());
     };
 
-    render ({ domains, org, placeholder }, { address, domain }) {
+    render ({ domains, org, placeholder, required }, { address, domain }) {
         const domainOptions = [];
         if (domains && domains[org]) {
             for (const domain of domains[org]) {
@@ -251,6 +254,7 @@ const DomainEmailEditor = connect('notifTemplates/emailDomains')(domains => ({
         return (
             <div class="notif-template-domain-email-editor">
                 <input
+                    required={required}
                     class="domain-email-editor-address"
                     value={address}
                     placeholder={placeholder}
@@ -258,6 +262,7 @@ const DomainEmailEditor = connect('notifTemplates/emailDomains')(domains => ({
                     onChange={this.onAddressChange} />
                 <span class="domain-email-editor-at-sign">@</span>
                 <Select
+                    required={required}
                     class="domain-email-editor-domain"
                     items={domainOptions}
                     value={domain}
