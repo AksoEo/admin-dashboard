@@ -33,19 +33,19 @@
     }
 
     .o-ident {
-        color: var(--editor-syntax-property);
+        color: white;
     }
     .o-string {
-        color: var(--editor-syntax-string);
+        color: @secondary;
     }
     .o-number, .o-array-index {
-        color: var(--editor-syntax-number);
+        color: #f90;
     }
     .o-boolean {
-        color: var(--editor-syntax-atom);
+        color: #f40
     }
     .o-array-comment {
-        color: var(--editor-syntax-comment);
+        color: #aaa;
     }
 
     .o-array-inline, .o-object-inline {
@@ -67,6 +67,15 @@
 
         & > li {
             padding-left: 2em;
+        }
+    }
+
+    @media (prefers-color-scheme: light) {
+        background: @text-fade-05;
+        color: black;
+
+        .o-ident {
+            color: black;
         }
     }
 }

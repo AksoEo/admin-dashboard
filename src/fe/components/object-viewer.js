@@ -12,7 +12,7 @@ import './object-viewer.less';
  */
 export default function ObjectViewer ({ value }) {
     return <div class="object-viewer">
-        <button class="obj-copy-button" onClick={() => {
+        <button type="button" class="obj-copy-button" onClick={() => {
             navigator.clipboard.writeText(JSON.stringify(value, undefined, 4)).catch(console.error); // eslint-disable-line no-console
         }}>{locale.copy}</button>
         <InnerObjectViewer value={value} />
@@ -24,7 +24,7 @@ const PREVIEW_LEN = 3;
 function InnerObjectViewer ({ value: obj, shallow }) {
     const [open, setOpen] = useState(false);
     const disclosure = (
-        <button class="obj-disclosure" onClick={() => setOpen(!open)}>
+        <button type="button" class="obj-disclosure" onClick={() => setOpen(!open)}>
             <DisclosureArrow dir={open ? 'up' : 'down'} />
         </button>
     );
