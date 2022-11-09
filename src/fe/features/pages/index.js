@@ -13,11 +13,9 @@ import HttpIcon from '@material-ui/icons/Http';
 import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
 import PublicIcon from '@material-ui/icons/Public';
 import LanguageIcon from '@material-ui/icons/Language';
-import StyleIcon from '@material-ui/icons/Style';
 import MoveToInboxIcon from '@material-ui/icons/MoveToInbox';
 import DescriptionIcon from '@material-ui/icons/Description';
 import {
-    TravelExploreIcon,
     BadgeIcon,
     ChangeRequestIcon,
     ChangeRequestNewIcon,
@@ -1089,54 +1087,6 @@ export default [
                         matchKey: 'group',
                         component: elazy(() =>
                             import(/* webpackChunkName: "admin-country-groups" */ './administration/country-groups/detail')),
-                        type: 'stack',
-                        paths: [
-                            {
-                                path: 'redakti',
-                                type: 'state',
-                                state: 'editing',
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                id: 'administration-country-lists',
-                icon: TravelExploreIcon,
-                component: elazy(() =>
-                    import(/* webpackChunkName: "admin-country-lists" */ './administration/country-lists')),
-                type: 'bottom',
-                path: 'landaj-asocioj',
-                hasPerm: perms => perms.hasPerm('countries.lists.read') && perms.hasPerm('codeholders.read'),
-                paths: [
-                    {
-                        match: /^(.+)$/,
-                        matchKey: 'list',
-                        component: elazy(() => import(/* webpackChunkName: "admin-country-lists" */ './administration/country-lists/detail')),
-                        type: 'stack',
-                        paths: [
-                            {
-                                path: 'redakti',
-                                type: 'state',
-                                state: 'editing',
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                id: 'administration-org-lists',
-                icon: StyleIcon,
-                component: elazy(() =>
-                    import(/* webpackChunkName: "admin-org-lists" */ './administration/org-lists')),
-                type: 'bottom',
-                path: 'fakaj-asocioj',
-                hasPerm: perms => perms.hasPerm('org_lists.read') && perms.hasPerm('codeholders.read'),
-                paths: [
-                    {
-                        match: /^(.+)$/,
-                        matchKey: 'list',
-                        component: elazy(() => import(/* webpackChunkName: "admin-org-lists" */ './administration/org-lists/detail')),
                         type: 'stack',
                         paths: [
                             {
