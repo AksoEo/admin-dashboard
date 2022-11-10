@@ -253,6 +253,12 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
     picker: {
         done: 'Bone',
     },
+    taskImageUpload: {
+        menuItem: 'Alŝuti',
+        delete: 'Forigi',
+        title: 'Alŝuti bildon',
+        button: 'Alŝuti',
+    },
 };
 
 export const search = {

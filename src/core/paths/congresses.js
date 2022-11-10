@@ -29,6 +29,7 @@ export const SIG_LOCATIONS = '!locations';
 export const SIG_PROG_TAGS = '!program_tags';
 export const SIG_PROGRAMS = '!programs';
 export const SIG_CONGRESS_PARTICIPANTS = '!participants';
+export const SIG_THUMBNAIL = '!thumbnail';
 
 const locClientFilters = {
     type: {
@@ -351,10 +352,12 @@ export const tasks = {
             type: thumbnail.type,
             value: thumbnail,
         }]);
+        store.signal([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, SIG_THUMBNAIL]);
     },
     deleteLocationThumbnail: async ({ congress, instance, id }) => {
         const client = await asyncClient;
         await client.delete(`/congresses/${congress}/instances/${instance}/locations/${id}/thumbnail`);
+        store.signal([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, SIG_THUMBNAIL]);
     },
 
     // MARK - tags of a location
@@ -875,6 +878,7 @@ export const views = {
     sigLocationTags: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOC_TAGS]),
     sigLocations: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOCATIONS]),
     sigTagsOfLocation: createStoreObserver(({ congress, instance, location }) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, location, SIG_LOC_TAGS]),
+    sigLocationThumbnail: createStoreObserver(({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, SIG_THUMBNAIL]),
     sigProgramTags: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROG_TAGS]),
     sigPrograms: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS]),
     sigTagsOfProgram: createStoreObserver(({ congress, instance, program }) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, program, SIG_PROG_TAGS]),

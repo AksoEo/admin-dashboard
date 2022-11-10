@@ -172,17 +172,22 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                 {!isCreation && <TaskImage
                     lightbox class="header-cover-image"
                     task="congresses/locationThumbnail"
+                    updateView={['congresses/sigLocationThumbnail', { congress, instance, id }]}
                     options={{ congress, instance, id }}
                     sizes={[32, 64, 128, 256, 512, 1024, 2048]}
                     id={id}
                     editing={editing}
                     onUpdate={(thumbnail, core) => {
-                        const task = core.createTask('congresses/updateLocationThumbnail', {
+                        return core.createTask('congresses/updateLocationThumbnail', {
                             congress, instance, id,
                         }, {
                             thumbnail,
+                        }).runOnceAndDrop();
+                    }}
+                    onDelete={core => {
+                        core.createTask('congresses/deleteLocationThumbnail', {
+                            congress, instance, id,
                         });
-                        return new Promise(resolve => task.on('drop', resolve));
                     }} />}
                 <div class="header-text-protection" />
                 <div class={'inner-header-container' + (editing ? ' is-editing' : '')}>

@@ -143,6 +143,7 @@ export function crudDelete ({
 
 export function getRawFile ({
     apiPath,
+    storePath,
 }) {
     return async (options, params) => {
         const client = await asyncClient;
@@ -152,7 +153,9 @@ export function getRawFile ({
         });
         if (res.status === 404) return null;
         if (!res.ok) throw { statusCode: res.status };
-        return await res.blob();
+        const blob = await res.blob();
+        if (storePath) store.insert(storePath(options), blob);
+        return blob;
     };
 }
 

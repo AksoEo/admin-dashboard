@@ -111,6 +111,11 @@ export const magazineEditions = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi numeron? Ne eblas malfari tiun ĉi agon.',
     },
+    deleteThumbnail: {
+        title: 'Forigi bildon',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la bildon? Ne eblas malfari tiun ĉi agon.',
+    },
     files: {
         update: {
             title: 'Alŝuti dosieron',

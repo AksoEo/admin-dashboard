@@ -36,6 +36,8 @@ export default {
     }),
     updateEdition: updateDialog({ locale: editionsLocale.update, fields: editionsLocale.fields }),
     deleteEdition: deleteDialog({ locale: editionsLocale.delete }),
+    deleteEditionThumbnail: deleteDialog({ locale: editionsLocale.deleteThumbnail }),
+
     createTocEntry: createDialog({
         locale: tocLocale,
         fieldNames: ['page', 'title'],

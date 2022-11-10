@@ -13,6 +13,7 @@ export function transformError (err) {
     else if (err.statusCode === 404) code = 'not-found';
     else if (err.statusCode === 409) code = 'conflict';
     else if (err.statusCode === 413) code = 'payload-too-large';
+    else if (err.statusCode === 415) code = 'unsupported-media-type';
     else if (err.statusCode === 500) code = 'internal-server-error';
     else if (err.statusCode === 502) code = 'service-unavailable';
     else if (err.statusCode === 503) code = 'service-unavailable';

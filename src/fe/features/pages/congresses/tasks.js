@@ -24,6 +24,7 @@ import { DetailInner as LocationEditor } from './instances/locations/detail';
 import LocationPicker from './instances/location-picker';
 import DisplayError from '../../../components/utils/error';
 import WithRegistrationForm from './instances/registration-form/with-form';
+import { deleteDialog } from '../../../components/tasks/task-templates';
 import './tasks.less';
 
 const ParticipantEditor = lazy(async () => ({
@@ -257,18 +258,7 @@ export default {
             </TaskDialog>
         );
     },
-    updateLocationThumbnail ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locationLocale.updateThumbnail.title}
-                actionLabel={locationLocale.updateThumbnail.button}
-                run={() => task.runOnce()}>
-                {/* TODO */}
-            </TaskDialog>
-        );
-    },
+    deleteLocationThumbnail: deleteDialog({ locale: locationLocale.deleteThumbnail }),
 
     createProgram ({ open, task }) {
         const { congress, instance } = task.options;

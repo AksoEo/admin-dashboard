@@ -12,6 +12,7 @@ export const M_DATA = 'mData';
 export const EDITIONS = 'editions';
 export const SIG_EDITIONS = '!editions';
 export const E_DATA = 'eData';
+export const SIG_THUMBNAIL = '!thumbnail';
 export const FILES = 'files';
 export const TOC = 'toc';
 export const SIG_TOC = '!toc';
@@ -179,13 +180,15 @@ export const tasks = {
         const path = [MAGAZINES, magazine, EDITIONS, id];
         const existing = store.get(path);
         store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
+        store.signal([MAGAZINES, magazine, EDITIONS, id, SIG_THUMBNAIL]);
     },
-    deleteMethodThumbnail: async ({ magazine, id }) => {
+    deleteEditionThumbnail: async ({ magazine, id }) => {
         const client = await asyncClient;
         await client.delete(`/magazines/${magazine}/editions/${id}/thumbnail`);
         const path = [MAGAZINES, magazine, EDITIONS, id];
         const existing = store.get(path);
         store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
+        store.signal([MAGAZINES, magazine, EDITIONS, id, SIG_THUMBNAIL]);
     },
 
     listTocEntries: crudList({
@@ -402,6 +405,7 @@ export const views = {
         get: tasks.edition,
     }),
     sigEditions: createStoreObserver(({ magazine }) => [MAGAZINES, magazine, EDITIONS, SIG_EDITIONS]),
+    sigThumbnail: createStoreObserver(({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, SIG_THUMBNAIL]),
     editionFiles: simpleDataView({
         storePath: ({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, FILES],
         get: tasks.editionFiles,

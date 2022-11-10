@@ -155,6 +155,11 @@ export const paymentMethods = {
         description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi pagmetodon?',
         button: 'Forigi',
     },
+    deleteThumbnail: {
+        title: 'Forigi bildon',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la bildon? Ne eblas malfari tiun ĉi agon.',
+    },
     methodPicker: {
         title: 'Elekti pagmetodon',
         orgsEmpty: 'Ekzistas neniu pagorganizo',

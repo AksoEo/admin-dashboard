@@ -6,6 +6,7 @@ import Segmented from '../../../components/controls/segmented';
 import Select from '../../../components/controls/select';
 import ChangedFields from '../../../components/tasks/changed-fields';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
+import { deleteDialog } from '../../../components/tasks/task-templates';
 import { currencyAmount } from '../../../components/data';
 import { Field } from '../../../components/form';
 import { connectPerms } from '../../../perms';
@@ -523,6 +524,7 @@ export default {
             </TaskDialog>
         );
     },
+    deleteMethodThumbnail: deleteDialog({ locale: methodLocale.deleteThumbnail }),
 
     cancelIntent ({ open, task }) {
         return (

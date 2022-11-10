@@ -181,9 +181,10 @@ export const congressLocations = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la lokon? Ne eblas malfari tiun ĉi agon.',
     },
-    updateThumbnail: {
-        title: 'Alŝuti bildon',
-        button: 'Alŝuti',
+    deleteThumbnail: {
+        title: 'Forigi bildon',
+        button: 'Forigi',
+        description: 'Ĉu vi certas, ke vi volas forigi la bildon? Ne eblas malfari tiun ĉi agon.',
     },
 };
 

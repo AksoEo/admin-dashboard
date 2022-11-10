@@ -159,6 +159,7 @@ function DetailContents ({ magazine, id, data, item, editing, onItemChange, maga
                     sizes={[32, 64, 128, 256, 512, 1024]}
                     task="magazines/editionThumbnail"
                     options={{ magazine, id }}
+                    updateView={['magazines/sigThumbnail', { magazine, id }]}
                     placeholder={<EditionPlaceholderThumbnail magazine={magazine} edition={item} />}
                     onUpdate={(thumbnail, core) => {
                         const task = core.createTask('magazines/updateEditionThumbnail', {
@@ -168,6 +169,12 @@ function DetailContents ({ magazine, id, data, item, editing, onItemChange, maga
                             thumbnail,
                         });
                         return task.runOnceAndDrop();
+                    }}
+                    onDelete={core => {
+                        core.createTask('magazines/deleteEditionThumbnail', {
+                            magazine,
+                            id,
+                        });
                     }} />
                 <div class="header-details">
                     <DetailFields

@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
+import PaymentIcon from '@material-ui/icons/Payment';
 import Page from '../../../../../components/page';
 import DetailView from '../../../../../components/detail/detail';
 import TaskImage from '../../../../../components/controls/task-image';
@@ -116,6 +117,12 @@ function Header ({ item, editing, userData }) {
                 contain lightbox
                 sizes={[32, 64, 128, 256, 512]}
                 task="payments/methodThumbnail"
+                placeholder={
+                    <div class="method-thumbnail-placeholder">
+                        <PaymentIcon className="inner-icon" />
+                    </div>
+                }
+                updateView={['payments/sigMethodThumbnail', { org: userData.org, id: userData.id }]}
                 options={{ org: userData.org, id: userData.id }}
                 onUpdate={(thumbnail, core) => {
                     const task = core.createTask('payments/updateMethodThumbnail', {
@@ -125,8 +132,14 @@ function Header ({ item, editing, userData }) {
                         thumbnail,
                     });
                     return task.runOnceAndDrop();
+                }}
+                onDelete={core => {
+                    core.createTask('payments/deleteMethodThumbnail', {
+                        org: userData.org,
+                        id: userData.id,
+                    });
                 }} />
-            {editing ? null : <div class="method-name">{item.name}</div>}
+            <div class="method-name">{item.name}</div>
         </div>
     );
 }

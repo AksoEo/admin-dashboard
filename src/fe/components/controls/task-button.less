@@ -17,4 +17,11 @@
     &.is-loading .task-button-label {
         opacity: 0;
     }
+
+    &.raised {
+        &.is-loading {
+            box-shadow: none;
+            background: rgb(var(--md-button-disabled-bg) / var(--md-button-disabled-bg-opacity));
+        }
+    }
 }

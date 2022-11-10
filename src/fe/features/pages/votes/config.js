@@ -32,7 +32,7 @@ function JSONEditor ({ value, onChange, disabled, category }) {
 
     return (
         <div>
-            {category && (
+            {!disabled && category && (
                 <SavedFilterPickerButton
                     category={category}
                     onLoad={q => {

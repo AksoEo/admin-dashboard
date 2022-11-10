@@ -14,6 +14,7 @@ export const PO_ADDONS = 'poAddons';
 export const SIG_PO_ADDONS = '!poAddons';
 export const PO_METHODS = 'poMethods';
 export const SIG_PO_METHODS = '!poMethods';
+export const SIG_THUMBNAIL = '!thumbnail';
 export const PAYMENT_INTENTS = 'paymentIntents';
 export const SIG_PAYMENT_INTENTS = '!paymentIntents';
 export const EXCHANGE_RATES = 'exchRates';
@@ -382,7 +383,7 @@ export const tasks = {
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];
         const existing = store.get(path);
         store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
-        store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
+        store.signal([PAYMENT_ORGS, org, PO_METHODS, id, SIG_THUMBNAIL]);
     },
     deleteMethodThumbnail: async ({ org, id }) => {
         const client = await asyncClient;
@@ -390,7 +391,7 @@ export const tasks = {
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];
         const existing = store.get(path);
         store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
-        store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
+        store.signal([PAYMENT_ORGS, org, PO_METHODS, id, SIG_THUMBNAIL]);
     },
 
     // MARK - INTENTS
@@ -703,5 +704,6 @@ export const views = {
     sigOrgs: createStoreObserver([PAYMENT_ORGS, SIG_PAYMENT_ORGS]),
     sigAddons: createStoreObserver(({ org }) => [PAYMENT_ORGS, org, SIG_PO_ADDONS]),
     sigMethods: createStoreObserver(({ org }) => [PAYMENT_ORGS, org, SIG_PO_METHODS]),
+    sigMethodThumbnail: createStoreObserver(({ org, id }) => [PAYMENT_ORGS, org, PO_METHODS, id, SIG_THUMBNAIL]),
     sigIntents: createStoreObserver([PAYMENT_INTENTS, SIG_PAYMENT_INTENTS]),
 };

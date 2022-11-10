@@ -1,11 +1,17 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import { Button, CircularProgress } from 'yamdl';
+import { PureComponent, useState, useEffect } from 'preact/compat';
+import { Button, CircularProgress, Menu } from 'yamdl';
 import ResizeObserver from 'resize-observer-polyfill';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
+import EditIcon from '@material-ui/icons/Edit';
 import { coreContext } from '../../core/connection';
+import { data as locale } from '../../locale';
 import pickFile from '../pick-file';
 import Lightbox from '../lightbox';
+import DialogSheet from '../tasks/dialog-sheet';
+import TaskButton from './task-button';
+import DisplayError from '../utils/error';
+import { FileThumbnail, Mime, FileSize } from '../files';
 import './task-image.less';
 
 // TODO: add a crop dialog or something
@@ -29,9 +35,11 @@ export default class TaskImage extends PureComponent {
         loading: false,
         error: null,
         image: null,
-        prevImage: null,
-        imageSeqId: 0,
         lightboxOpen: false,
+        editMenuOpen: false,
+        editMenuPosition: [0, 0],
+        uploading: false,
+        uploadingFile: null,
     };
 
     #size = null;
@@ -54,7 +62,7 @@ export default class TaskImage extends PureComponent {
 
     load () {
         if (!this.#size) return;
-        this.setState({ loading: true, error: null });
+        this.setState({ loading: true, image: null, error: null });
 
         const size = this.#size + 'px';
         const loadedSize = this.#size;
@@ -87,10 +95,7 @@ export default class TaskImage extends PureComponent {
             if (this.state.image) URL.revokeObjectURL(this.state.image);
             this.setState({
                 loading: false,
-                imageSeqId: this.state.imageSeqId + 1,
-                prevImage: this.state.image,
             });
-            this.scheduleDeletePrevImage(this.state.imageSeqId);
 
             this.setState({ image: url });
         }).catch(error => {
@@ -106,6 +111,8 @@ export default class TaskImage extends PureComponent {
 
     componentDidMount () {
         this.load();
+
+        this.createUpdateView();
     }
 
     componentDidUpdate (prevProps) {
@@ -114,16 +121,22 @@ export default class TaskImage extends PureComponent {
         }
     }
 
-    #scheduledDeletePrevImage;
-    scheduleDeletePrevImage (seqId) {
-        clearTimeout(this.#scheduledDeletePrevImage);
-        this.#scheduledDeletePrevImage = setTimeout(() => {
-            if (this.state.imageSeqId === seqId) this.setState({ prevImage: null });
-        }, 1000);
+    componentWillUnmount () {
+        this.deleteUpdateView();
     }
 
-    componentWillUnmount () {
-        clearTimeout(this.#scheduledDeletePrevImage);
+    #updateView;
+    createUpdateView () {
+        if (this.#updateView) this.deleteUpdateView();
+        if (this.props.updateView) {
+            this.#updateView = this.context.createDataView(...this.props.updateView);
+            this.#updateView.on('update', () => this.load());
+        }
+    }
+
+    deleteUpdateView () {
+        if (!this.#updateView) return;
+        this.#updateView.drop();
     }
 
     #sizeDidUpdate = (entries) => {
@@ -145,17 +158,32 @@ export default class TaskImage extends PureComponent {
         if (this.#size !== this.#loadedSize) this.load();
     };
 
-    #edit = () => {
+    #edit = (e) => {
+        if (this.state.image && this.props.onDelete) {
+            // image exists; show choice to upload or delete
+            this.setState({
+                editMenuOpen: true,
+                editMenuPosition: [e.clientX, e.clientY],
+            });
+        } else {
+            this.#doUpload();
+        }
+    };
+
+    #doUpload = () => {
         pickFile('image/png, image/jpeg', files => {
             const file = files[0];
             if (!file) return;
-            this.props.onUpdate(file, this.context).then(() => {
-                this.load();
-            }).catch((err) => {
-                console.error(err); // eslint-disable-line no-console
-                // TODO: proper error handling
+
+            this.setState({
+                uploading: true,
+                uploadingFile: file,
             });
         });
+    };
+
+    #doDelete = () => {
+        this.props.onDelete(this.context);
     };
 
     #lightbox = null;
@@ -172,14 +200,15 @@ export default class TaskImage extends PureComponent {
         options,
         hash,
         onUpdate,
+        onDelete,
         editing,
         lightbox,
         contain,
         placeholder,
+        updateView,
         ...extra
-    }, { loading, image, prevImage, imageSeqId }) {
-        void sizes, task, options, hash, onUpdate;
-        void prevImage;
+    }, { loading, image, imageSeqId }) {
+        void sizes, task, options, hash, onUpdate, onDelete, updateView;
 
         extra.class = (extra.class || '') + ' task-image';
         if (contain) extra.class += ' p-contain';
@@ -188,12 +217,6 @@ export default class TaskImage extends PureComponent {
         return (
             <div {...extra} ref={this.#onNodeRef}>
                 <CircularProgress class="image-loading-indicator" indeterminate={loading} />
-                {/* prevImage ? ( // this does not work properly so w/e
-                    <img
-                        class="inner-image is-prev-image"
-                        key={'i' + (imageSeqId - 1)}
-                        src={image} />
-                ) : null */}
                 {image ? (
                     <img
                         class="inner-image"
@@ -212,8 +235,39 @@ export default class TaskImage extends PureComponent {
                         fab
                         icon
                         onClick={this.#edit}>
-                        <AddAPhotoIcon />
+                        {(image && this.props.onDelete) ? (
+                            <EditIcon />
+                        ) : (
+                            <AddAPhotoIcon />
+                        )}
                     </Button>
+                ) : null}
+                {editing ? (
+                    <Menu
+                        open={this.state.editMenuOpen}
+                        onClose={() => this.setState({ editMenuOpen: false })}
+                        position={this.state.editMenuPosition}
+                        items={[
+                            {
+                                label: locale.taskImageUpload.menuItem,
+                                action: this.#doUpload,
+                            },
+                            {
+                                label: locale.taskImageUpload.delete,
+                                action: this.#doDelete,
+                            },
+                        ]} />
+                ) : null}
+                {editing ? (
+                    <UploadDialog
+                        open={this.state.uploading}
+                        file={this.state.uploadingFile}
+                        onUpdate={this.props.onUpdate}
+                        onDidUpdate={() => {
+                            this.load();
+                        }}
+                        core={this.context}
+                        onClose={() => this.setState({ uploading: false })} />
                 ) : null}
 
                 {lightbox ? (
@@ -228,3 +282,85 @@ export default class TaskImage extends PureComponent {
     }
 }
 
+function UploadDialog ({ open, onClose, file, onUpdate, onDidUpdate, core }) {
+    const [uploading, setUploading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // reset error when new file is selected
+    useEffect(() => setError(null), [file]);
+
+    const doUpload = async () => {
+        setError(null);
+        setUploading(true);
+
+        try {
+            await onUpdate(file, core);
+
+            onDidUpdate();
+            onClose();
+        } catch (err) {
+            console.error(err); // eslint-disable-line no-console
+            setError(err);
+        }
+
+        setUploading(false);
+    };
+
+    return (
+        <DialogSheet
+            class="task-image-upload-dialog"
+            backdrop
+            title={locale.taskImageUpload.title}
+            open={open}
+            onClose={uploading ? null : onClose}>
+            <UploaderContents file={file} upload={doUpload} error={error} />
+        </DialogSheet>
+    );
+}
+
+function UploaderContents ({ file, upload, error }) {
+    if (!file) return null;
+
+    return (
+        <div class="upload-preview">
+            <FilePreview class="image-preview" file={file} />
+            <div class="image-details">
+                <FileThumbnail file={file} />
+                <div class="inner-details">
+                    <div class="inner-file-type">
+                        <Mime mime={file.type} />
+                    </div>
+                    <div class="inner-file-size">
+                        <FileSize bytes={file.size || 0} />
+                    </div>
+                </div>
+                <TaskButton
+                    raised
+                    run={upload}
+                    class="upload-button">
+                    {locale.taskImageUpload.button}
+                </TaskButton>
+            </div>
+            {error && (
+                <div class="error-container">
+                    <DisplayError error={error} />
+                </div>
+            )}
+        </div>
+    );
+}
+
+function FilePreview ({ file, ...extra }) {
+    const [blobUrl, setBlobUrl] = useState(null);
+
+    useEffect(() => {
+        const objUrl = URL.createObjectURL(file);
+        setBlobUrl(objUrl);
+        return (() => {
+            URL.revokeObjectURL(objUrl);
+        });
+    }, [file]);
+
+    if (!blobUrl) return null;
+    return <img {...extra} src={blobUrl} />;
+}
