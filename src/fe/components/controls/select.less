@@ -46,7 +46,7 @@
     }
 
     &.p-outline {
-        border: 1px solid var(--md-text-field-idle);
+        border: 1px solid rgb(var(--md-text-field-idle) / var(--md-text-field-idle-opacity));
         padding: 1px;
 
         &.is-focused {
@@ -56,7 +56,7 @@
         }
 
         &.is-disabled {
-            border-color: var(--md-text-field-disabled);
+            border-color: rgb(var(--md-text-field-disabled) / var(--md-text-field-disabled-opacity));
             color: @text-fade-60;
         }
     }

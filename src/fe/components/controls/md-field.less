@@ -12,8 +12,8 @@
             text-transform: none;
             line-height: 1.2;
             font-weight: normal;
-            --md-button-color: @gray-button-color;
             vertical-align: middle;
+            .md-gray-button();
         }
 
         .editor-bar-preview-state {
@@ -33,7 +33,7 @@
 
     &.editing {
         position: relative;
-        border: 1px solid var(--md-text-field-idle);
+        border: 1px solid rgb(var(--md-text-field-idle) / var(--md-text-field-idle-opacity));
         border-radius: 4px;
         overflow: hidden;
 
@@ -112,7 +112,7 @@
             top: 8px;
             right: 8px;
             z-index: 6;
-            --md-button-color: @gray-button-color;
+            .md-gray-button();
         }
 
         .editor-char-counter {
@@ -266,7 +266,7 @@
                 line-height: auto;
                 border-radius: 6px;
 
-                --md-button-color: @gray-button-color;
+                .md-gray-button();
             }
         }
     }

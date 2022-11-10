@@ -1,39 +1,36 @@
 @import '../../yamdl/src/prelude';
 
-@__primary--internal: #004c3f;
-@__secondary--internal: #31a64f;
-@__warning--internal: #ffe330;
-@__danger--internal: #f44336;
+@__primary--internal: 0 76 63; // #004c3f
+@__secondary--internal: 49 166 79; // #31a64f
+@__warning--internal: 255 227 48; // #ffe330
+@__danger--internal: 244 67 54; // #f44336
+
+// TODO remove Legacy Variables
 
 .__gen-text(@text--internal, @text-on-primary--internal) {
     --text: @text--internal;
-    --text-fade-05: fade(@text--internal, 05%);
-    --text-fade-10: fade(@text--internal, 10%);
-    --text-fade-20: fade(@text--internal, 20%);
-    --text-fade-40: fade(@text--internal, 40%);
-    --text-fade-50: fade(@text--internal, 50%);
-    --text-fade-60: fade(@text--internal, 60%);
-    --text-fade-80: fade(@text--internal, 80%);
     --text-on-primary: @text-on-primary--internal;
-    --text-on-primary-fade-60: fade(@text-on-primary--internal, 60%);
+    --text-on-secondary: var(--text-on-primary);
 }
 
 .force-dark-theme() {
     .md-dark-theme(@__primary--internal, @__secondary--internal, @__danger--internal);
 
-    .__gen-text(white, white);
-    color: var(--text);
+    .__gen-text(255 255 255, 255 255 255);
+    color: var(--LV-text);
 
+    --LV-warning-text: rgb(@__warning--internal);
     --warning-text: @__warning--internal;
 
-    --page-background: #1a1a1a;
-    --card-background: #222;
-    --card1-background: #2a2a2a;
-    --card2-background: #333;
-    --sidebar-background: #222;
-    --sidebar-border: #333;
+    --LV-page-background: #1a1a1a;
+    --LV-card-background: #222;
+    --LV-card1-background: #2a2a2a;
+    --LV-card2-background: #333;
+    --LV-sidebar-background: #222;
+    --LV-sidebar-border: #333;
 
-    --gray-button-color: var(--text-fade-60);
+    --gray-button-color: var(--text);
+    --gray-button-color-opacity: 0.6;
 }
 
 :root, html, body {
@@ -41,33 +38,36 @@
     // *appended* to this stylesheet, meaning they get higher priority
 
     --primary: @__primary--internal;
+    --LV-primary: rgb(var(--primary));
     --secondary: @__secondary--internal;
-    --secondary-lighten-10: lighten(@__secondary--internal, 10%);
-    --secondary-fade-50: fade(@__secondary--internal, 50%);
-    --secondary-fade-20: fade(@__secondary--internal, 20%);
+    --LV-secondary-lighten-10: lighten(rgb(@__secondary--internal), 10%);
     --warning: @__warning--internal;
-    --text-on-warning: #000;
-    --warning-text: #cf9d20;
+    --LV-warning: rgb(var(--warning));
+    --LV-text-on-warning: #000;
+    --warning-text: 207 157 32;
+    --LV-warning-text: rgb(var(--warning-text));
     --danger: @__danger--internal;
-    --danger-fade-20: fade(@__danger--internal, 20%);
-    .__gen-text(black, white);
+    --LV-danger: rgb(var(--danger));
+    --LV-danger-fade-20: rgb(var(--danger) / .2);
+    .__gen-text(0 0 0, 255 255 255);
 
-    --page-background: #eee;
-    --card-background: #fff;
-    --card1-background: #fff;
-    --card2-background: #fff;
-    --sidebar-background: #f9f9f9;
-    --sidebar-border: #ddd;
-    --golden-background: fade(#fee12a, 20%);
+    --LV-page-background: #eee;
+    --LV-card-background: #fff;
+    --LV-card1-background: #fff;
+    --LV-card2-background: #fff;
+    --LV-sidebar-background: #f9f9f9;
+    --LV-sidebar-border: #ddd;
+    --LV-golden-background: fade(#fee12a, 20%);
 
-    --gray-button-color: var(--text-fade-40);
+    --gray-button-color: var(--text);
+    --gray-button-color-opacity: 0.4;
 
-    --membership-gives-membership-background: #51c64f;
-    --membership-is-lifetime-background: #ca891a;
-    --membership-gives-lifetime-membership-background: mix(#51c64f, #ca891a, 40%);
-    --membership-canuto-background: #716abf;
-    --rating-stars: #faaa44;
-    --rating-hearts: #fe3a43;
+    --LV-membership-gives-membership-background: #51c64f;
+    --LV-membership-is-lifetime-background: #ca891a;
+    --LV-membership-gives-lifetime-membership-background: mix(#51c64f, #ca891a, 40%);
+    --LV-membership-canuto-background: #716abf;
+    --LV-rating-stars: #faaa44;
+    --LV-rating-hearts: #fe3a43;
 
     .md-light-theme(@__primary--internal, @__secondary--internal, @__danger--internal);
 
@@ -86,6 +86,14 @@
 
     --editor-template-background: fade(#75f, 40%);
     --editor-template-delimiter: #77f;
+}
+
+.md-gray-button() {
+    --md-button-color: var(--gray-button-color);
+    --md-button-color-opacity: var(--gray-button-color-opacity);
+    --md-button-ripple-opacity: var(--gray-button-color-opacity);
+    --md-button-raised-ripple: var(--gray-button-color);
+    --md-button-raised-ripple-opacity: var(--gray-button-color-opacity);
 }
 
 .editor-text() {
@@ -119,50 +127,55 @@
     }
 }
 
-@primary: var(--primary);
-@secondary: var(--secondary);
-@secondary-lighten-10: var(--secondary-lighten-10);
-@secondary-fade-50: var(--secondary-fade-50);
-@warning: var(--warning);
-@text-on-warning: var(--text-on-warning);
-@warning-text: var(--warning-text);
-@danger: var(--danger);
+@primary: var(--LV-primary);
+@secondary: rgb(var(--secondary));
+@secondary-rgb: var(--secondary);
+@secondary-lighten-10: var(--LV-secondary-lighten-10);
+@secondary-fade-50: rgb(var(--secondary) / 0.5);
+@warning: var(--LV-warning);
+@text-on-warning: var(--LV-text-on-warning);
+@warning-text: var(--LV-warning-text);
+@warning-text-rgb: var(--warning-text);
+@danger: var(--LV-danger);
+@danger-rgb: var(--danger);
 @error: @danger;
-@danger-fade-20: var(--danger-fade-20);
+@danger-fade-20: var(--LV-danger-fade-20);
 @error-fade-20: @danger-fade-20;
 @positive: @secondary;
-@positive-fade-20: var(--secondary-fade-20);
-@positive-fade-50: var(--secondary-fade-50);
-@text: var(--text);
-@text-fade-05: var(--text-fade-05);
-@text-fade-10: var(--text-fade-10);
-@text-fade-40: var(--text-fade-40);
-@text-fade-20: var(--text-fade-20);
-@text-fade-50: var(--text-fade-50);
-@text-fade-60: var(--text-fade-60);
-@text-fade-80: var(--text-fade-80);
-@gray-button-color: var(--gray-button-color);
+@positive-fade-20: rgb(var(--secondary) / 0.2);
+@positive-fade-50: rgb(var(--secondary) / 0.5);
+@text: rgb(var(--text));
+@text-rgb: var(--text);
+@text-fade-05: rgb(var(--text) / .05);
+@text-fade-10: rgb(var(--text) / .1);
+@text-fade-20: rgb(var(--text) / .2);
+@text-fade-40: rgb(var(--text) / .4);
+@text-fade-50: rgb(var(--text) / .5);
+@text-fade-60: rgb(var(--text) / .6);
+@text-fade-80: rgb(var(--text) / .8);
+@text-on-secondary-rgb: var(--text-on-secondary);
+@gray-button-color: rgb(var(--gray-button-color) / var(--gray-button-opacity));
 @picture-outline: @text-fade-20;
-@text-on-primary: var(--text-on-primary);
-@text-on-primary-fade-60: var(--text-on-primary-fade-60);
+@text-on-primary: rgb(var(--text-on-primary));
+@text-on-primary-fade-60: rgb(var(--text-on-primary) / .6);
 @hover-background: @text-fade-10;
 @control-idle: @text-fade-50;
 @separator: @text-fade-20;
 @subtle-separator: @text-fade-10;
-@page-background: var(--page-background);
-@card-background: var(--card-background);
-@card1-background: var(--card1-background);
-@card2-background: var(--card2-background);
-@sidebar-background: var(--sidebar-background);
-@sidebar-border: var(--sidebar-border);
+@page-background: var(--LV-page-background);
+@card-background: var(--LV-card-background);
+@card1-background: var(--LV-card1-background);
+@card2-background: var(--LV-card2-background);
+@sidebar-background: var(--LV-sidebar-background);
+@sidebar-border: var(--LV-sidebar-border);
 @sidebar-text: inherit;
-@golden-background: var(--golden-background);
-@membership-gives-membership-background: var(--membership-gives-membership-background);
-@membership-is-lifetime-background: var(--membership-is-lifetime-background);
-@membership-gives-lifetime-membership-background: var(--membership-gives-lifetime-membership-background);
-@membership-canuto-background: var(--membership-canuto-background);
-@rating-stars: var(--rating-stars);
-@rating-hearts: var(--rating-hearts);
+@golden-background: var(--LV-golden-background);
+@membership-gives-membership-background: var(--LV-membership-gives-membership-background);
+@membership-is-lifetime-background: var(--LV-membership-is-lifetime-background);
+@membership-gives-lifetime-membership-background: var(--LV-membership-gives-lifetime-membership-background);
+@membership-canuto-background: var(--LV-membership-canuto-background);
+@rating-stars: var(--LV-rating-stars);
+@rating-hearts: var(--LV-rating-hearts);
 @monospace: Menlo, Roboto Mono, Consolas, monospace;
 
 @easing: cubic-bezier(0.2, 0.3, 0, 1);

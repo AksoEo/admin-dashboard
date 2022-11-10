@@ -38,10 +38,10 @@
 
         .wizard-selector-item {
             margin: 2px 8px;
-            border: 2px solid var(--md-button-color);
+            border: 2px solid @secondary;
 
             &:not(.selected) {
-                --md-button-color: @gray-button-color;
+                .md-gray-button();
                 border-color: transparent;
                 animation: none;
             }
@@ -52,7 +52,7 @@
                     border-color: transparent;
                 }
                 100% {
-                    border-color: var(--md-button-color);
+                    border-color: @secondary;
                 }
             }
 

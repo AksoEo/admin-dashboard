@@ -359,6 +359,7 @@ class Tab extends PureComponent {
     render ({ isActive, disabled, hasLine, children }) {
         return (
             <button
+                type="button"
                 ref={node => this.node = node}
                 disabled={disabled}
                 class={'p-tab' + (isActive ? ' p-active' : '') + (hasLine ? ' p-line' : '')}

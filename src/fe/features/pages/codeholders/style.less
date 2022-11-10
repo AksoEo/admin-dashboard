@@ -151,10 +151,10 @@
 
             .membership-remove {
                 float: left;
-                --md-button-color: @gray-button-color;
+                .md-gray-button();
 
                 &:hover {
-                    --md-button-color: @danger;
+                    --md-button-color: @danger-rgb;
                 }
             }
 
@@ -340,7 +340,7 @@
                 background: @text-fade-10;
                 border-radius: 4px;
                 margin-bottom: 8px;
-                --md-button-color: @gray-button-color;
+                .md-gray-button();
 
                 .presets-title {
                     font-size: smaller;
@@ -519,7 +519,7 @@
         }
 
         .membership-edit-button {
-            --md-button-color: @gray-button-color;
+            .md-gray-button();
             flex-shrink: 0;
             margin-top: -0.7em; // eyeballed
         }
@@ -640,7 +640,7 @@
                 padding: 0;
                 transition: opacity 0.1s;
                 background: fade(#000, 50%);
-                --md-button-color: #fff;
+                --md-button-color: 255 255 255;
                 --md-button-highlight-opacity: 0;
 
                 .edit-icon {
@@ -717,7 +717,7 @@
             }
 
             .member-files-button {
-                --md-button-color: @gray-button-color;
+                .md-gray-button();
                 color: inherit;
                 background: @card-background;
                 padding-left: 16px;
@@ -928,7 +928,7 @@
             width: 100%;
             height: 48px;
             box-sizing: border-box;
-            --md-button-color: #fff;
+            --md-button-color: 255 255 255;
             justify-content: space-between;
             align-items: center;
             padding: 0 16px;

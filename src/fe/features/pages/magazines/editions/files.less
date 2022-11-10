@@ -57,14 +57,14 @@
             .file-actions {
                 .upload-fab {
                     background: none;
-                    color: var(--md-button-color);
+                    color: rgb(var(--md-button-color));
                     --md-ripple-color: var(--md-button-color);
                     --md-ripple-highlight: var(--md-button-color);
                     --md-ripple-highlight-opacity: 0.15;
                 }
 
                 .file-replace, .file-delete {
-                    --md-button-color: @gray-button-color;
+                    .md-gray-button();
                 }
             }
         }

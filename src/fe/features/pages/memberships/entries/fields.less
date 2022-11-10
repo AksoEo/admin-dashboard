@@ -289,7 +289,7 @@
 
     .issue-fishy-check {
         margin-top: 8px;
-        --md-button-color: @warning-text;
+        --md-button-color: @warning-text-rgb;
 
         .fishy-marked-okay {
             display: inline-block;
@@ -297,7 +297,7 @@
         }
 
         &.is-okay {
-            --md-button-color: @gray-button-color;
+            .md-gray-button();
         }
     }
 }
