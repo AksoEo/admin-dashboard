@@ -498,6 +498,7 @@ export const tasks = {
     },
     setRegistrationForm: async ({ congress, instance }, { data }) => {
         const client = await asyncClient;
+        console.log(data);
         await client.put(`/congresses/${congress}/instances/${instance}/registration_form`, data);
         store.insert([CONGRESSES, congress, INSTANCES, instance, REG_FORM], data);
     },

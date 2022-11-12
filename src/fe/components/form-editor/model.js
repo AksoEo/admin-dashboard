@@ -33,7 +33,6 @@ export function createInput (type) {
         variant: 'select',
     };
     else if (type === 'country') extra = {
-        add: [],
         exclude: [],
         chAutofill: null,
     };

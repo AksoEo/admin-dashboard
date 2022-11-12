@@ -16,7 +16,7 @@ import HelpIcon from '@material-ui/icons/Help';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import CloseIcon from '@material-ui/icons/Close';
 import CodeMirror from '../codemirror-themed';
-import { EditorView } from '@codemirror/view';
+import { EditorView, placeholder as viewPlaceholder } from '@codemirror/view';
 import { indentUnit } from '@codemirror/language';
 import { EditorState, EditorSelection } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
@@ -39,6 +39,7 @@ import './md-field.less';
  * - singleLine: if true, will not allow line breaks
  * - ignoreLiveUpdates: ignores props.value while the user is typing to combat latency
  * - extensions: additional CodeMirror extensions
+ * - placeholder: placeholder text
  */
 export default class MarkdownTextField extends PureComponent {
     static contextType = layoutContext;
@@ -114,7 +115,7 @@ export default class MarkdownTextField extends PureComponent {
     };
 
     render ({
-        value, editing, onChange, inline, disabled, rules, singleLine, maxLength, extensions, ...extra
+        value, editing, onChange, inline, disabled, rules, singleLine, maxLength, extensions, placeholder, ...extra
     }, { focused, preview, editorBarPopout, helpOpen }) {
         let editorBar, charCounter;
 
@@ -216,6 +217,7 @@ export default class MarkdownTextField extends PureComponent {
                         onFocus={this.#onFocus}
                         onBlur={this.#onBlur}
                         extensions={extensions}
+                        placeholder={placeholder}
                         ignoreLiveUpdates={this.state.focused && this.props.ignoreLiveUpdates} />
 
                     <div class={'preview-flourish' + (!preview ? ' is-hidden' : '')} />
@@ -354,6 +356,7 @@ const InnerEditor = forwardRef(({
     onFocus,
     onBlur,
     extensions,
+    placeholder,
     ignoreLiveUpdates,
 }, ref) => {
     const [localValue, setLocalValue] = useState(value);
@@ -378,8 +381,9 @@ const InnerEditor = forwardRef(({
                 EditorState.tabSize.of(4),
                 indentUnit.of('\t'),
                 EditorView.lineWrapping,
+                placeholder && viewPlaceholder(placeholder),
                 ...(extensions || []),
-            ]}
+            ].filter(x => x)}
             onFocus={() => {
                 setLocalValue(value);
                 onFocus();

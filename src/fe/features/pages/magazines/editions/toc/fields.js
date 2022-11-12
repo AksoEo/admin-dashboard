@@ -33,6 +33,7 @@ export const FIELDS = {
             if (slot === 'title') return <b>{value}</b>;
             return <MdField
                 ignoreLiveUpdates
+                placeholder={slot === 'create' ? locale.fields.title : null}
                 class={'magazine-toc-entry-title' + (!editing ? ' is-preview' : '')}
                 inline={slot !== 'detail'}
                 singleLine

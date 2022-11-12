@@ -4,6 +4,7 @@
     position: relative;
     max-width: 800px;
     margin: 16px auto;
+    --editor-height: 300px;
 
     .json-editor-help-button {
         position: absolute;
@@ -14,13 +15,13 @@
         transition: transform 0.4s @easing;
     }
 
-    .cm-editor {
-        height: 300px;
+    .cm-theme, .cm-editor {
+        height: var(--editor-height);
+    }
 
-        .cm-scroller {
-            font-family: @monospace;
-            font-size: 14px;
-        }
+    .cm-scroller {
+        font-family: @monospace;
+        font-size: 14px;
     }
 
     .json-error-line, .json-error-mark {
@@ -34,9 +35,7 @@
     }
 
     &.collapsed {
-        .cm-editor {
-            height: 64px;
-        }
+        --editor-height: 64px;
 
         .json-editor-help-button {
             transform: scale(0);

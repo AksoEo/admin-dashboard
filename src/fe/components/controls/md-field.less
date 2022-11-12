@@ -1,7 +1,7 @@
 @import '../../prelude';
 
 .markdown-text-field {
-    @cm-height: 180px;
+    --editor-height: 180px;
 
     .md-editor-bar {
         position: relative;
@@ -36,15 +36,19 @@
         border: 1px solid rgb(var(--md-text-field-idle) / var(--md-text-field-idle-opacity));
         border-radius: 4px;
         overflow: hidden;
+        height: var(--editor-height);
 
         &:focus-within {
             border-color: @secondary;
             box-shadow: inset 0 0 0 1px @secondary;
         }
 
+        .md-editor-inner, .cm-theme, .cm-editor {
+            height: 100%;
+        }
+
         .cm-editor {
             background: none;
-            height: @cm-height;
             font: inherit;
             padding: 4px 8px;
             padding-right: 32px;
@@ -129,9 +133,14 @@
         }
 
         &.single-line {
+            height: auto;
+
+            .md-editor-inner, .cm-theme, .cm-editor {
+                height: auto;
+            }
+
             .cm-editor {
                 line-height: 32px;
-                height: auto;
                 padding-top: 0;
                 padding-bottom: 0;
                 padding-right: 64px;
