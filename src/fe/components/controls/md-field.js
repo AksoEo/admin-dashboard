@@ -23,8 +23,6 @@ import { markdown } from '@codemirror/lang-markdown';
 import { layoutContext } from '../layout/dynamic-height-div';
 import { data as locale } from '../../locale';
 import { coreContext } from '../../core/connection';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/mode/markdown/markdown';
 import './md-field.less';
 
 /**

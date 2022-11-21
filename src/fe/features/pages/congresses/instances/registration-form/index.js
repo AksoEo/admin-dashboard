@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import { createRef, PureComponent } from 'preact/compat';
-import { AppBarProxy, Button, CircularProgress, MenuIcon } from 'yamdl';
+import { createRef, Fragment, PureComponent, useState } from 'preact/compat';
+import { AppBarProxy, Button, CircularProgress, Dialog, LinearProgress, MenuIcon } from 'yamdl';
 import Meta from '../../../../meta';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
@@ -12,6 +12,7 @@ import DisplayError from '../../../../../components/utils/error';
 import { connect, coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';
 import { congressRegistrationForm as locale } from '../../../../../locale';
+import InstancePicker from '../instance-picker';
 import './index.less';
 
 const ADDITIONAL_VARS = [
@@ -42,11 +43,16 @@ export default connectPerms(class RegistrationFormPage extends Page {
         const actions = [];
 
         const canEdit = perms.hasPerm(`congress_instances.update.${org}`);
+
         if (canEdit && editorLoaded) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update.menuItem,
                 action: () => this.editor.current.beginEditing(),
+            }, {
+                overflow: true,
+                label: locale.copyFrom.menuItem,
+                action: () => this.editor.current.showCopyFromDialog(),
             }, {
                 overflow: true,
                 label: locale.delete.menuItem,
@@ -88,6 +94,7 @@ const InnerEditor = connect(({ congress, instance }) => [
     { congress, instance },
 ])((data, core, err, loaded) => ({ core, data, err, loaded }))(class InnerEditor extends PureComponent {
     state = {
+        copyFromPickerOpen: false,
         edit: null,
         formData: {},
     };
@@ -105,6 +112,12 @@ const InnerEditor = connect(({ congress, instance }) => [
                 cancellable: true,
                 form: [],
             },
+        });
+    };
+
+    showCopyFromDialog = () => {
+        this.setState({
+            copyFromPickerOpen: true,
         });
     };
 
@@ -158,6 +171,20 @@ const InnerEditor = connect(({ congress, instance }) => [
                         <Button raised onClick={this.createForm}>
                             {locale.create}
                         </Button>
+                        {' '}
+                        <Button raised onClick={this.showCopyFromDialog}>
+                            {locale.copyFrom.menuItem}
+                        </Button>
+                        <CopyFromDialog
+                            open={this.state.copyFromPickerOpen}
+                            onClose={() => this.setState({ copyFromPickerOpen: false })}
+                            onLoad={(data) => {
+                                this.setState({
+                                    edit: data,
+                                    formData: {},
+                                });
+                            }}
+                        />
                     </div>
                 );
             } else {
@@ -203,7 +230,65 @@ const InnerEditor = connect(({ congress, instance }) => [
                         formData={this.state.formData}
                         onFormDataChange={formData => this.setState({ formData })} />
                 </Form>
+                <CopyFromDialog
+                    open={this.state.copyFromPickerOpen}
+                    onClose={() => this.setState({ copyFromPickerOpen: false })}
+                    onLoad={(data) => {
+                        this.setState({
+                            edit: data,
+                            formData: {},
+                        });
+                    }}
+                />
             </div>
         );
     }
 });
+
+function CopyFromDialog ({ open, onClose, onLoad }) {
+    const [loading, setLoading] = useState(false);
+
+    return (
+        <coreContext.Consumer>
+            {core => (
+                <Fragment>
+                    <InstancePicker
+                        open={open}
+                        onClose={onClose}
+                        onPick={(congress, instance) => {
+                            setLoading(true);
+
+                            const formData = core
+                                .createTask('congresses/registrationForm', { congress, instance })
+                                .runOnceAndDrop();
+
+                            formData.then(data => {
+                                setLoading(false);
+                                if (!data) {
+                                    core.createTask('info', {
+                                        message: locale.copyFrom.hasNoForm,
+                                    });
+                                    return;
+                                }
+
+                                onLoad(data);
+                            }).catch(err => {
+                                setLoading(false);
+
+                                console.error(err); // eslint-disable-line no-console
+                                core.createTask('info', {
+                                    message: locale.copyFrom.unknownError,
+                                });
+                            });
+                        }} />
+                    <Dialog
+                        backdrop
+                        open={loading}>
+                        <LinearProgress indeterminate />
+                    </Dialog>
+                </Fragment>
+            )}
+        </coreContext.Consumer>
+    );
+}
+

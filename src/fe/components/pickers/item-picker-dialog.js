@@ -47,6 +47,7 @@ export default function ItemPicker ({
     sorting,
     noCloseButton,
     extraListOptions,
+    disableAutoClose,
     ...extra
 }) {
     extra.class = (extra.class || '') + ' item-picker-dialog';
@@ -66,6 +67,7 @@ export default function ItemPicker ({
                 onChange={onChange}
                 limit={limit}
                 onClose={onClose}
+                disableAutoClose={disableAutoClose}
                 task={task}
                 view={view}
                 options={options}
@@ -97,6 +99,7 @@ function DialogInner ({
     sorting,
     fields,
     fieldsLocale,
+    disableAutoClose,
 }) {
     const [offset, setOffset] = useState(0);
     const [search, setSearch] = useState('');
@@ -106,7 +109,7 @@ function DialogInner ({
             const idValue = !Number.isNaN(+id) ? +id : id;
             if (value.includes(idValue)) return;
             onChange(value.concat([idValue]));
-            if (value.length + 1 >= limit) onClose();
+            if (value.length + 1 >= limit && !disableAutoClose) onClose();
         },
         has: id => {
             const idValue = !Number.isNaN(+id) ? +id : id;
@@ -155,7 +158,7 @@ function DialogInner ({
                     const idValue = !Number.isNaN(+id) ? +id : id;
                     if (limit === 1) {
                         onChange([idValue]);
-                        onClose();
+                        if (!disableAutoClose) onClose();
                         return;
                     }
                     if (value.includes(idValue)) {

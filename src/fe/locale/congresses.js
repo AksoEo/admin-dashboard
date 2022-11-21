@@ -355,6 +355,14 @@ export const congressRegistrationForm = {
         title: 'Redakti aliĝilon',
         button: 'Aktualigi',
     },
+    copyFrom: {
+        menuItem: '[[Copy from…]]',
+        title: '[[Copy from…]]',
+        description: '[[Copy registration form from another congress. Will completely overwrite the current form.]]',
+        button: '[[Load]]',
+        unknownError: 'Nekonata eraro',
+        hasNoForm: '[[That congress instance has no registration form]]',
+    },
     delete: {
         menuItem: 'Forigi',
         title: 'Forigi aliĝilon',

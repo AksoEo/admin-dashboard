@@ -368,6 +368,7 @@ export default {
             </TaskDialog>
         );
     },
+
     setRegistrationForm ({ open, task }) {
         return (
             <TaskDialog
