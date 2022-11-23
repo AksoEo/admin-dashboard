@@ -7,6 +7,7 @@ import TextIcon from '@material-ui/icons/Subject';
 import ScriptIcon from '@material-ui/icons/Code';
 import CheckIcon from '@material-ui/icons/Check';
 import FormEditorSettings from './settings';
+import CustomFormVars from './custom-form-vars';
 import RearrangingList from '../lists/rearranging-list';
 import FormEditorItem from './item';
 import ScriptContext from './script-context';
@@ -188,6 +189,8 @@ export default class FormEditor extends PureComponent {
                                 this.props.onFormDataChange(values);
                             } else this.setState({ formData });
                         }}
+                        customVars={value.customFormVars}
+                        onCustomVarsChange={v => onChange({ ...value, customFormVars: v })}
                         additionalVars={additionalVars}
                         disableValidation={disableValidation} />
                 </ScriptContextProvider>
@@ -298,10 +301,27 @@ class FormEditorItems extends PureComponent {
     render ({
         editing, settings, onSettingsChange, items, onItemsChange, values, additionalVars,
         skipSettings, skipNonInputs, editingData, isEditingContext, disableValidation,
+        customVars, onCustomVarsChange,
         org,
     }, { editingItem }) {
         const listItems = [];
-        const previousNodes = [getGlobalDefs(additionalVars)];
+
+        const modelCustomVars = [];
+        for (const k in customVars) {
+            const type = ({
+                boolean: 'b',
+                number: 'n',
+                text: 's',
+            })[customVars[k].type];
+
+            modelCustomVars.push({
+                name: k.substring(1), // remove leading @
+                type,
+                value: customVars[k].default,
+            });
+        }
+
+        const previousNodes = [getGlobalDefs((additionalVars || []).concat(modelCustomVars))];
         for (let i = 0; i < items.length; i++) {
             const index = i;
             const key = this.getItemKey(index);
@@ -357,6 +377,10 @@ class FormEditorItems extends PureComponent {
                         onChange={onSettingsChange}
                         previousNodes={previousNodes} />
                 )}
+                <CustomFormVars
+                    editing={editing}
+                    vars={customVars}
+                    onVarsChange={onCustomVarsChange} />
                 {isEditingContext && (
                     <TestInputs
                         inputs={this.testInputs}

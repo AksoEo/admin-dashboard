@@ -479,6 +479,7 @@ export const tasks = {
                     'identifierEmail',
                     'identifierCountryCode',
                     'form',
+                    'customFormVars',
                 ],
             });
         } catch (err) {

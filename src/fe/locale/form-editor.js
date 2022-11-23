@@ -38,6 +38,23 @@ export const formEditor = {
             identifierCountryCode: 'Variablo kun landokodo',
         },
     },
+
+    customFormVars: {
+        title: '[[Custom Form Variables]]',
+        types: {
+            boolean: 'Buleo',
+            number: 'Nombro',
+            text: 'Teksto',
+        },
+        defaultValue: '[[Default]]',
+        useDefaultValue: '[[Use default value]]',
+        bool: {
+            false: 'ne',
+            true: 'jes',
+        },
+        emptyDefault: '[[No default value]]',
+    },
+
     itemTypes: {
         input: 'Eniga kampo',
         text: 'Teksto',
