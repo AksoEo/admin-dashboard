@@ -297,6 +297,7 @@ export const congressParticipants = {
         createdTime: 'Kreita je',
         editedTime: 'Laste redaktita je',
         data: 'Datumoj',
+        customFormVars: '[[Custom form vars]]',
 
         statuses: {
             pending: 'Atendanta',
@@ -317,6 +318,8 @@ export const congressParticipants = {
             approveManually: 'Permane aprobi',
             cancel: 'Nuligi',
         },
+
+        customFormVarsEmpty: '[[No overrides set]]',
     },
     spreadsheet: {
         title: 'Aliĝintoj',

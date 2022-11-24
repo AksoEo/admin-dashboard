@@ -133,13 +133,13 @@ const TYPES = {
                         outline
                         type={type}
                         disabled={disabled}
-                        required={!disableValidation && item.required}
+                        required={disableValidation ? null : item.required}
                         placeholder={item.placeholder}
                         value={value || ''}
-                        pattern={!disableValidation && item.pattern}
-                        minLength={!disableValidation && item.minLength}
-                        maxLength={!disableValidation && item.maxLength}
-                        onChange={e => onChange(e.target.value)}
+                        pattern={disableValidation ? null : item.pattern}
+                        minLength={disableValidation ? null : item.minLength}
+                        maxLength={disableValidation ? null : item.maxLength}
+                        onChange={e => onChange(e.target.value || null)}
                         error={error} />
                     {extra}
                 </div>
@@ -183,7 +183,7 @@ const TYPES = {
             let options = item.options.map(opt => ({
                 value: opt.value,
                 label: opt.name,
-                disabled: !disableValidation && opt.disabled,
+                disabled: disableValidation ? null : opt.disabled,
             }));
 
             let editor;

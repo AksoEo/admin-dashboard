@@ -75,7 +75,10 @@ export default class DetailShell extends PureComponent {
         }
 
         if (prevProps.edit !== this.props.edit && this.state.committing) {
-            this.setState({ committing: false });
+            // while we should technically be doing this; this causes incorrect behavior
+            // during commits. so, let's just accept for now that the visual edit might be slightly
+            // out of date
+            // this.setState({ committing: false });
         }
     }
 

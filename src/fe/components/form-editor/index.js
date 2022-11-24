@@ -262,8 +262,11 @@ class FormEditorItems extends PureComponent {
             }
         }
         for (const k in newValues) {
+            if (k === '@$disableValidation') continue; // special key used to disable validation
+
             if (!inputKeys.has(k)) delete newValues[k];
         }
+
         this.props.onValuesChange(newValues);
     }
 
@@ -377,10 +380,12 @@ class FormEditorItems extends PureComponent {
                         onChange={onSettingsChange}
                         previousNodes={previousNodes} />
                 )}
-                <CustomFormVars
-                    editing={editing}
-                    vars={customVars}
-                    onVarsChange={onCustomVarsChange} />
+                {isEditingContext && (
+                    <CustomFormVars
+                        editing={editing}
+                        vars={customVars}
+                        onVarsChange={onCustomVarsChange} />
+                )}
                 {isEditingContext && (
                     <TestInputs
                         inputs={this.testInputs}

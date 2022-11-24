@@ -4,11 +4,13 @@ import { Button, CircularProgress, Checkbox, TextField } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import { CopyIcon } from '../../../../../components/icons';
 import CodeholderPicker from '../../../../../components/pickers/codeholder-picker';
+import Segmented from '../../../../../components/controls/segmented';
 import TextArea from '../../../../../components/controls/text-area';
+import NumberField from '../../../../../components/controls/number-field';
 import { IdUEACode } from '../../../../../components/data/uea-code';
 import { LinkButton } from '../../../../../router';
 import { currencyAmount, timestamp } from '../../../../../components/data';
-import { congressParticipants as locale } from '../../../../../locale';
+import { congressParticipants as locale, formEditor as formLocale } from '../../../../../locale';
 import './fields.less';
 
 const FormEditor = lazy(() => import('../../../../../components/form-editor'));
@@ -267,6 +269,125 @@ export const FIELDS = {
                             onFormDataChange={onChange}
                             disableValidation={disableValidation} />
                     </Suspense>
+                </div>
+            );
+        },
+    },
+    customFormVars: {
+        component ({ value, editing, onChange, userData }) {
+            if (!value) return;
+
+            const form = userData?.registrationForm;
+            if (!form) return '??';
+
+            const items = [];
+            for (const k in form.customFormVars) {
+                const customFormVar = form.customFormVars[k];
+                const isSet = k in value;
+                const checkboxId = Math.random().toString(36);
+
+                if (!editing && !isSet) continue; // not set
+
+                let enableCheckbox = null;
+                let content = null;
+
+                if (!editing) {
+                    const varValue = value[k];
+
+                    if (varValue === null) {
+                        content = '—';
+                    } else if (customFormVar.type === 'boolean') {
+                        content = formLocale.customFormVars.bool[varValue];
+                    } else {
+                        content = varValue.toString();
+                    }
+                } else {
+                    let editor = null;
+
+                    if (customFormVar.type === 'boolean') {
+                        editor = (
+                            <Segmented
+                                selected={'' + value[k]}
+                                onSelect={v => {
+                                    if (v === 'null') onChange({ ...value, [k]: null });
+                                    if (v === 'true') onChange({ ...value, [k]: true });
+                                    if (v === 'false') onChange({ ...value, [k]: false });
+                                }}>
+                                {[
+                                    { id: 'null', label: formLocale.customFormVars.bool.null },
+                                    { id: 'false', label: formLocale.customFormVars.bool.false },
+                                    { id: 'true', label: formLocale.customFormVars.bool.true },
+                                ]}
+                            </Segmented>
+                        );
+                    } else if (customFormVar.type === 'number') {
+                        editor = (
+                            <NumberField
+                                class="inner-editor"
+                                outline
+                                value={value[k]}
+                                onChange={newValue => {
+                                    onChange({ ...value, [k]: newValue });
+                                }} />
+                        );
+                    } else if (customFormVar.type === 'text') {
+                        editor = (
+                            <TextField
+                                class="inner-editor"
+                                outline
+                                value={value[k]}
+                                onChange={e => {
+                                    onChange({ ...value, [k]: e.target.value || null });
+                                }} />
+                        );
+                    }
+
+                    enableCheckbox = (
+                        <Checkbox
+                            id={checkboxId}
+                            checked={isSet}
+                            onChange={isSet => {
+                                if (isSet) {
+                                    onChange({ ...value, [k]: null });
+                                } else {
+                                    const newValue = { ...value };
+                                    delete newValue[k];
+                                    onChange(newValue);
+                                }
+                            }} />
+                    );
+
+                    if (isSet) content = editor;
+                }
+
+                items.push(
+                    <div class={'custom-var-item' + (isSet ? ' is-enabled' : '')}>
+                        {enableCheckbox && (
+                            <div class="item-enabled">
+                                {enableCheckbox}
+                            </div>
+                        )}
+                        <label class="item-name" for={checkboxId}>
+                            {k}
+                        </label>
+                        <div class="item-value">
+                            {content}
+                        </div>
+                    </div>
+                );
+            }
+
+            if (!items.length) {
+                items.push(
+                    <div class="vars-empty">
+                        {locale.fields.customFormVarsEmpty}
+                    </div>
+                );
+            }
+
+            return (
+                <div class="congress-participant-custom-form-vars">
+                    {items}
                 </div>
             );
         },

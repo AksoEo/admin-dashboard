@@ -136,6 +136,7 @@ const pClientFields = {
             return { allowInvalidData: allowInvalidData || false, data: innerData };
         },
     },
+    customFormVars: 'customFormVars',
 };
 const DERIVED_PARTICIPANT_FIELDS = ['isValid', 'editedTime'];
 const pClientFilters = {

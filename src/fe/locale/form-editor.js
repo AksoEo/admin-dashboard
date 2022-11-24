@@ -49,6 +49,7 @@ export const formEditor = {
         defaultValue: '[[Default]]',
         useDefaultValue: '[[Use default value]]',
         bool: {
+            null: 'NUL',
             false: 'ne',
             true: 'jes',
         },

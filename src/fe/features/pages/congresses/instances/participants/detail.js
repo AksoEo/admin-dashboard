@@ -2,13 +2,11 @@ import { h } from 'preact';
 import EditIcon from '@material-ui/icons/Edit';
 import SearchIcon from '@material-ui/icons/Search';
 import { CircularProgress } from 'yamdl';
-import Page from '../../../../../components/page';
+import DetailPage from '../../../../../components/detail/detail-page';
 import DetailShell from '../../../../../components/detail/detail-shell';
 import TaskButton from '../../../../../components/controls/task-button';
 import { Field } from '../../../../../components/form';
-import Meta from '../../../../meta';
 import { connectPerms } from '../../../../../perms';
-import { coreContext } from '../../../../../core/connection';
 import { congressParticipants as locale, data as dataLocale } from '../../../../../locale';
 import { LinkButton } from '../../../../../router';
 import DisplayError from '../../../../../components/utils/error';
@@ -16,45 +14,18 @@ import { FIELDS } from './fields';
 import WithRegistrationForm from '../registration-form/with-form';
 import './detail.less';
 
-export default connectPerms(class ParticipantsPage extends Page {
+export default connectPerms(class ParticipantsPage extends DetailPage {
     state = {
-        edit: null,
         org: null,
     };
 
-    static contextType = coreContext;
-
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
-
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return Promise.resolve();
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return Promise.resolve();
-        }
-
-        return new Promise(resolve => {
-            this.#commitTask = this.context.createTask('congresses/updateParticipant', {
-                congress: this.congress,
-                instance: this.instance,
-                id: this.id,
-                _changedFields: changedFields,
-            }, this.state.edit);
-            this.#commitTask.on('success', this.onEndEdit);
-            this.#commitTask.on('drop', () => {
-                this.#commitTask = null;
-                resolve();
-            });
-        });
-    };
-
-    componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
+    createCommitTask (changedFields, edit) {
+        return this.context.createTask('congresses/updateParticipant', {
+            congress: this.congress,
+            instance: this.instance,
+            id: this.id,
+            _changedFields: changedFields,
+        }, edit);
     }
 
     get congress () {
@@ -67,9 +38,10 @@ export default connectPerms(class ParticipantsPage extends Page {
         return this.props.match[1];
     }
 
-    render ({ perms, editing }, { org, edit }) {
-        const { congress, instance, id } = this;
+    locale = locale;
 
+    renderActions ({ perms }, { org }) {
+        const { congress, instance, id } = this;
         const actions = [];
 
         if (perms.hasPerm(`congress_instances.participants.update.${org}`)) {
@@ -92,12 +64,14 @@ export default connectPerms(class ParticipantsPage extends Page {
             });
         }
 
+        return actions;
+    }
+
+    renderContents ({ editing }, { org, edit }) {
+        const { congress, instance, id } = this;
+
         return (
             <div class="congress-participant-detail-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
-
                 <DetailShell
                     view="congresses/participant"
                     options={{
@@ -304,6 +278,19 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
                         userData={userData} />
                 </div>
             </div>
+            {Object.keys(userData.registrationForm?.customFormVars || {}).length ? (
+                <div class="participant-data">
+                    <div class="data-title">
+                        {locale.fields.customFormVars}
+                    </div>
+                    <DetailField
+                        field="customFormVars"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+            ) : null}
             <div class="participant-data">
                 <div class="data-title">
                     {locale.fields.data}

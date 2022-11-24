@@ -68,3 +68,37 @@
         }
     }
 }
+
+.congress-participant-custom-form-vars {
+    .vars-empty {
+        text-align: center;
+        font-style: italic;
+        color: @text-fade-60;
+    }
+
+    .custom-var-item {
+        background: @text-fade-10;
+        border-radius: 8px;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+
+        .item-enabled {
+            flex-shrink: 0;
+        }
+
+        &.is-enabled .item-name {
+            font-weight: bold;
+        }
+
+        .item-name, .item-value {
+            flex: 1;
+        }
+
+        .inner-editor {
+            width: 100%;
+        }
+    }
+}
