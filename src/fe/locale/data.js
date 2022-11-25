@@ -222,6 +222,10 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
 4. ol mi`,
             },
         },
+
+        templating: {
+            unknownVar: v => `Nekonata variablo “${v}”`,
+        },
     },
     mapList: {
         empty: 'Neniu loko',

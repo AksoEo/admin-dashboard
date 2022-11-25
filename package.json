@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "env AKSO_BASE='https://apitest.akso.org' webpack serve",
     "build": "webpack --env prod",
-    "analyze": "webpack --env analyze"
+    "analyze": "webpack --env analyze",
+    "serve-prod": "env AKSO_BASE='https://apitest.akso.org' webpack serve --env prod"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.1.3",
