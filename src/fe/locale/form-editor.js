@@ -21,8 +21,8 @@ export const formEditor = {
             notANumber: 'ne estas nombro',
         },
         confirmationNotifTemplateId: {
-            label: '[[Confirmation notif template]]',
-            description: '[[A confirmation email sent to people when they sign up. If not set, what happens? I dont know]]',
+            label: 'Ŝablono por aliĝkonfirmilo',
+            description: 'Amasmesaĝa ŝablono sendata al ĉiuj novaj aliĝintoj.',
         },
         sequenceIds: {
             enabled: 'Asigni kongresajn numerojn',
@@ -40,20 +40,20 @@ export const formEditor = {
     },
 
     customFormVars: {
-        title: '[[Custom Form Variables]]',
+        title: 'Propraj variabloj',
         types: {
             boolean: 'Buleo',
             number: 'Nombro',
             text: 'Teksto',
         },
-        defaultValue: '[[Default]]',
-        useDefaultValue: '[[Use default value]]',
+        defaultValue: 'Defaŭlto',
+        useDefaultValue: 'Uzi defaŭlton',
         bool: {
             null: 'NUL',
             false: 'ne',
             true: 'jes',
         },
-        emptyDefault: '[[No default value]]',
+        emptyDefault: 'Neniu defaŭlto',
     },
 
     itemTypes: {
@@ -78,11 +78,11 @@ export const formEditor = {
         script: 'Teksto de skripto',
     },
 
-    inputPreview: '[[Test Input]]',
+    inputPreview: 'Test-valoro',
     testInputsBar: {
-        title: '[[Test Inputs]]',
-        validate: '[[Validate]]',
-        clear: '[[Clear]]',
+        title: 'Test-valoroj',
+        validate: 'Validigi',
+        clear: 'Forviŝi',
     },
 
     inputFields: {

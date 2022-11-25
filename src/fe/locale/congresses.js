@@ -297,7 +297,7 @@ export const congressParticipants = {
         createdTime: 'Kreita je',
         editedTime: 'Laste redaktita je',
         data: 'Datumoj',
-        customFormVars: '[[Custom form vars]]',
+        customFormVars: 'Propraj variabloj',
 
         statuses: {
             pending: 'Atendanta',
@@ -319,7 +319,7 @@ export const congressParticipants = {
             cancel: 'Nuligi',
         },
 
-        customFormVarsEmpty: '[[No overrides set]]',
+        customFormVarsEmpty: 'Neniu superskribo',
     },
     spreadsheet: {
         title: 'Aliĝintoj',
@@ -359,12 +359,12 @@ export const congressRegistrationForm = {
         button: 'Aktualigi',
     },
     copyFrom: {
-        menuItem: '[[Copy from…]]',
-        title: '[[Copy from…]]',
-        description: '[[Copy registration form from another congress. Will completely overwrite the current form.]]',
-        button: '[[Load]]',
+        menuItem: 'Kopii de ...',
+        title: 'Kopii aliĝilon de ...',
+        description: 'Tio ĉi kopios aliĝilon de alia kongresa okazigo. Farante tion, vi plene superskribos la aliĝilon de la nuna kongreso (se ekzistas).',
+        button: 'Ŝarĝi',
         unknownError: 'Nekonata eraro',
-        hasNoForm: '[[That congress instance has no registration form]]',
+        hasNoForm: 'Tiu kongresa okazigo ne havas aliĝilon.',
     },
     delete: {
         menuItem: 'Forigi',

@@ -54,7 +54,7 @@ export const notifTemplates = {
         codeholder: 'membro',
         newsletter: 'bulteno',
         newsletter_magazine: 'revua bulteno',
-        congress_registration: '[[congr. reg.]]',
+        congress_registration: 'kongresa aliĝo',
     },
     sendIntent: 'Sendi mesaĝon',
     preview: {

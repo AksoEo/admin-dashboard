@@ -27,7 +27,7 @@ export const errors = {
     'service-unavailable': 'AKSO estas nealirebla pro bontenado. Bonvolu reprovi je posta momento.',
     'object-exists': 'Jam ekzistas resurso kun tiu nomo. Bonvolu reiri por reprovi.',
     'email-taken': 'Tiu retpoŝtadreso estas jam uzata.',
-    'unsupported-media-type': '[[This file type is not supported here.]]',
+    'unsupported-media-type': 'Tiu tipo de dosiero ne estas subtenata.',
 
     // see payments/createIntent
     'payment-exceeds-max': 'Ne eblas krei pagojn por pli ol 500.000 USD',
