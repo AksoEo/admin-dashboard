@@ -1,1 +1,1 @@
-// this is a module that does nothing. see webpack.config.js for usage
+// this is a module that does nothing. see vite.config.js for usage
