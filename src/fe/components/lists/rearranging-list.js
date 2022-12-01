@@ -35,7 +35,7 @@ export default class RearrangingList extends PureComponent {
                 } else {
                     height = entry.contentRect.height;
                 }
-                this.itemData.get(keysByNode.get(entry.target)).height = height;
+                this.itemData.get(keysByNode.get(entry.target)).height = Math.ceil(height);
             }
         }
         this.beginAnimating();
@@ -46,7 +46,7 @@ export default class RearrangingList extends PureComponent {
         for (const item of this.itemData.values()) {
             if (!item.node) continue;
             if (item.height !== item.node.offsetHeight) {
-                item.height = item.node.offsetHeight;
+                item.height = Math.ceil(item.node.offsetHeight);
                 didUpdate = true;
             }
         }
@@ -132,14 +132,14 @@ export default class RearrangingList extends PureComponent {
      * If the index is out of bounds, will approximate something that seems reasonable.
      */
     getItemHeight (index) {
-        if (this.props.itemHeight) return this.props.itemHeight;
+        if (this.props.itemHeight) return Math.ceil(this.props.itemHeight);
 
         if (index < 0) index = 0;
         if (index >= this.props.children.length) index = this.props.children.length - 1;
         const child = this.props.children[index];
         if (child) {
             const data = this.itemData.get(child.key);
-            if (data) return data.height;
+            if (data) return Math.ceil(data.height);
         }
         return 0;
     }
