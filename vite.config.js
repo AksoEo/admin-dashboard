@@ -36,7 +36,7 @@ export default defineConfig(({ command, mode }) => {
                 'process/browser': 'process/browser',
                 'stream': 'stream-browserify',
                 'url': 'url/',
-                'util': path.resolve(dirname, 'src/compat/nodejs-util-esm.js'),
+                'util': 'util/',
             },
         },
         plugins: [
