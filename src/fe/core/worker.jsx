@@ -1,5 +1,4 @@
 import EventEmitter from 'events';
-import coreURL from '../../core?url';
 import DataView from './view';
 import Task from './task';
 
@@ -9,7 +8,10 @@ export default class WorkerInterface extends EventEmitter {
 
     constructor () {
         super();
-        this.worker = new Worker(coreURL, { type: 'module' });
+
+        // worker type module for vite dev
+        // has no effect in webpack prod
+        this.worker = new Worker(new URL('../../core', import.meta.url), { type: 'module' });
         this.worker.addEventListener('message', this.#onMessage);
         this.worker.addEventListener('unhandledrejection', this.#onUnhandledRejection);
         this.worker.addEventListener('error', this.#onUnhandledRejection);
