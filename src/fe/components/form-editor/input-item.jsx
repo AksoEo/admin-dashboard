@@ -472,6 +472,7 @@ export default class InputItem extends PureComponent {
         previousNodes,
         isEditingContext,
         disableValidation,
+        hasValues,
     }) {
         let contents;
         if (editing) {
@@ -526,6 +527,7 @@ export default class InputItem extends PureComponent {
                         <InputSettingsState
                             item={item}
                             resolved={resolved}
+                            showResolved={hasValues}
                             scriptCtx={{ previousNodes }}
                             onReset={e => {
                                 e.preventDefault();
@@ -1297,7 +1299,7 @@ function OptionsEditorItem ({ onRemove, value, onChange }) {
     );
 }
 
-function InputSettingsState ({ item, resolved, scriptCtx, onReset }) {
+function InputSettingsState ({ item, resolved, scriptCtx, onReset, showResolved }) {
     return (
         <div class="input-settings-state">
             <ScriptValueState
@@ -1305,24 +1307,27 @@ function InputSettingsState ({ item, resolved, scriptCtx, onReset }) {
                 label={locale.inputFields.default}
                 value={item.default}
                 resolved={resolved.default}
+                showResolved={showResolved}
                 scriptCtx={scriptCtx} />
             <ScriptValueState
                 hideIfNotComputed // redundant with required * in label
                 label={locale.inputFields.required}
                 value={item.required}
                 resolved={resolved.required}
+                showResolved={showResolved}
                 scriptCtx={scriptCtx} />
             <ScriptValueState
                 label={locale.inputFields.disabled}
                 value={item.disabled}
                 resolved={resolved.disabled}
+                showResolved={showResolved}
                 scriptCtx={scriptCtx} />
             <MinMaxStepState item={item} />
         </div>
     );
 }
 
-function ScriptValueState ({ label, value, isDefault, hideIfNotComputed, scriptCtx, resolved }) {
+function ScriptValueState ({ label, value, isDefault, hideIfNotComputed, scriptCtx, resolved, showResolved }) {
     let contents = null;
     let isComputed = false;
     let defaultReset = null;
@@ -1344,13 +1349,15 @@ function ScriptValueState ({ label, value, isDefault, hideIfNotComputed, scriptC
                         ctx={scriptCtx}
                         value={value} />
                 </div>
-                <div class="expr-result">
-                    <div class="er-pointer"></div>
-                    <ScriptableValue
-                        disabled
-                        ctx={scriptCtx}
-                        value={resolved} />
-                </div>
+                {showResolved ? (
+                    <div class="expr-result">
+                        <div class="er-pointer"></div>
+                        <ScriptableValue
+                            disabled
+                            ctx={scriptCtx}
+                            value={resolved} />
+                    </div>
+                ) : null}
             </div>
         );
         isComputed = true;

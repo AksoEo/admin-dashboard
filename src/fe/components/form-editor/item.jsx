@@ -66,7 +66,7 @@ export default class FormEditorItem extends PureComponent {
 
     render ({
         item, editable, onChange, editing, onEditingChange, editingData, value, onValueChange,
-        onRemove, isEditingContext, disableValidation,
+        onRemove, isEditingContext, disableValidation, hasValues,
     }) {
         if (!item) return null;
 
@@ -78,6 +78,7 @@ export default class FormEditorItem extends PureComponent {
             previousNodes: this.props.previousNodes,
             isEditingContext,
             disableValidation,
+            hasValues,
         };
 
         let contents;

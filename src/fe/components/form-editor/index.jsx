@@ -335,6 +335,8 @@ class FormEditorItems extends PureComponent {
             });
         }
 
+        const hasValues = !!Object.keys(values).find(k => values[k] !== null);
+
         const previousNodes = [getGlobalDefs((additionalVars || []).concat(modelCustomVars))];
         for (let i = 0; i < items.length; i++) {
             const index = i;
@@ -362,6 +364,7 @@ class FormEditorItems extends PureComponent {
                         registerTestInput={this.registerTestInput}
                         deregisterTestInput={this.deregisterTestInput}
                         editingData={editingData}
+                        hasValues={hasValues}
                         value={values[name]}
                         onValueChange={value => this.batchValueChange(name, value)}
                         onRemove={() => this.removeItem(i)} />

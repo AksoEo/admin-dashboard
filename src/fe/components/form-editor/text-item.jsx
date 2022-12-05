@@ -64,7 +64,7 @@ export default class TextItem extends PureComponent {
         view.dispatch(view.state.replaceSelection(str));
     }
 
-    render ({ item, onChange, editing, editable }) {
+    render ({ item, onChange, editing, editable, isEditingContext, hasValues }) {
         let contents = null;
         let knownItems = new Set();
 
@@ -80,6 +80,14 @@ export default class TextItem extends PureComponent {
                 value={item.text}
                 onChange={text => onChange({ ...item, text })}
                 extensions={this.extensions} />;
+        } else if (isEditingContext && !hasValues) {
+            contents = (
+                <MdField
+                    key="editor-preview"
+                    class="expr-preview"
+                    rules={RULES}
+                    value={item.text} />
+            );
         } else {
             const emptyString = Symbol('empty string');
             const emptyStringDefs = {

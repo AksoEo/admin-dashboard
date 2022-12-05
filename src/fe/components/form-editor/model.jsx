@@ -2,6 +2,10 @@
 import { evaluate } from '@tejo/akso-script';
 import { formEditor as locale } from '../../locale';
 
+// async import these (if it fails, oh well)
+import('@tejo/akso-script/dist-esm/country_fmt');
+import('@tejo/akso-script/dist-esm/phone_fmt');
+
 /** Creates an input item of the given type. */
 export function createInput (type) {
     let extra = {};
