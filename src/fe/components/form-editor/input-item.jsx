@@ -40,26 +40,26 @@ function Desc ({ value }) {
 // TODO: better rendering (show/respect more fields)
 const TYPES = {
     boolean: {
-        render ({ disabled, value, onChange }) {
+        render ({ disabled, editing, value, onChange }) {
             return (
                 <div class="form-input-boolean">
                     <Checkbox
                         checked={value}
                         onChange={onChange}
-                        disabled={disabled} />
+                        disabled={!editing || disabled} />
                 </div>
             );
         },
         settings: {},
     },
     number: {
-        render ({ disabled, item, value, onChange, disableValidation }) {
+        render ({ disabled, editing, item, value, onChange, disableValidation }) {
             const input = (
                 <div class="number-input">
                     <TextField
                         outline
                         placeholder={item.placeholder}
-                        disabled={disabled}
+                        disabled={!editing || disabled}
                         value={value}
                         onChange={e => {
                             if (e.target.value) onChange(+e.target.value);
@@ -106,7 +106,7 @@ const TYPES = {
         },
     },
     text: {
-        render ({ disabled, item, value, onChange, disableValidation }) {
+        render ({ disabled, editing, item, value, onChange, disableValidation }) {
             let error = null;
             const compiledPattern = new RegExp(item.pattern);
             if (!compiledPattern.test(value)) {
@@ -132,7 +132,7 @@ const TYPES = {
                     <Component
                         outline
                         type={type}
-                        disabled={disabled}
+                        disabled={!editing || disabled}
                         required={disableValidation ? null : item.required}
                         placeholder={item.placeholder}
                         value={value || ''}
@@ -156,11 +156,12 @@ const TYPES = {
         },
     },
     money: {
-        render ({ item, value, onChange, disableValidation }) {
+        render ({ disabled, item, editing, value, onChange, disableValidation }) {
             return (
                 <div class="form-input-money">
                     <currencyAmount.editor
                         outline
+                        disabled={!editing || disabled}
                         min={disableValidation ? null : item.min}
                         max={disableValidation ? null : item.max}
                         step={disableValidation ? null : item.step}
@@ -179,7 +180,7 @@ const TYPES = {
         },
     },
     enum: {
-        render ({ item, value, onChange, disableValidation }) {
+        render ({ disabled, editing, item, value, onChange, disableValidation }) {
             let options = item.options.map(opt => ({
                 value: opt.value,
                 label: opt.name,
@@ -192,8 +193,9 @@ const TYPES = {
                 editor = (
                     <Select
                         outline
+                        disabled={!editing || disabled}
                         value={value}
-                        onChange={onChange}
+                        onChange={editing && onChange}
                         items={options} />
                 );
             } else {
@@ -205,7 +207,7 @@ const TYPES = {
                         <li key={opt.value}>
                             <input
                                 type="radio"
-                                disabled={opt.disabled}
+                                disabled={!editing || disabled || opt.disabled}
                                 id={inputId}
                                 name={item.name}
                                 value={opt.value} />
@@ -230,7 +232,7 @@ const TYPES = {
         },
     },
     country: {
-        render ({ value, onChange, item, disableValidation }) {
+        render ({ disabled, editing, value, onChange, item, disableValidation }) {
             return (
                 <WithCountries>
                     {countries => {
@@ -246,6 +248,7 @@ const TYPES = {
                         return (
                             <Select
                                 outline
+                                disabled={!editing || disabled}
                                 value={value || ''}
                                 onChange={onChange}
                                 items={options} />
@@ -260,13 +263,14 @@ const TYPES = {
         },
     },
     date: {
-        render ({ value, onChange }) {
+        render ({ disabled, editing, value, onChange }) {
             return (
                 <div class="form-input-date">
                     <date.editor
                         outline
+                        disabled={!editing || disabled}
                         value={value}
-                        onChange={onChange} />
+                        onChange={editing && onChange} />
                 </div>
             );
         },
@@ -277,14 +281,15 @@ const TYPES = {
         },
     },
     time: {
-        render ({ value, onChange }) {
+        render ({ disabled, editing, value, onChange }) {
             return (
                 <div class="form-input-time">
                     <time.editor
                         outline
                         useFmtValue
+                        disabled={!editing || disabled}
                         value={value}
-                        onChange={onChange} />
+                        onChange={editing && onChange} />
                 </div>
             );
         },
@@ -294,13 +299,14 @@ const TYPES = {
         },
     },
     datetime: {
-        render ({ value, onChange }) {
+        render ({ disabled, editing, value, onChange }) {
             return (
                 <div class="form-input-datetime">
                     <timestamp.editor
                         outline
+                        disabled={!editing || disabled}
                         value={value}
-                        onChange={onChange} />
+                        onChange={editing && onChange} />
                 </div>
             );
         },
@@ -311,7 +317,7 @@ const TYPES = {
         },
     },
     boolean_table: {
-        render ({ item, value, onChange, disableValidation }) {
+        render ({ disabled, editing, item, value, onChange, disableValidation }) {
             const excludedCells = disableValidation ? []
                 : (item.excludeCells || []).map(([x, y]) => `${x},${y}`);
             const resizeValue = (value, rows, cols) => {
@@ -355,7 +361,7 @@ const TYPES = {
                     row.push(
                         <td key={x}>
                             <Checkbox
-                                disabled={isExcluded}
+                                disabled={!editing || disabled || isExcluded}
                                 checked={cellValue}
                                 onChange={onCellChange} />
                         </td>
@@ -470,6 +476,7 @@ export default class InputItem extends PureComponent {
         value,
         onValueChange,
         previousNodes,
+        editingData,
         isEditingContext,
         disableValidation,
         hasValues,
@@ -490,6 +497,7 @@ export default class InputItem extends PureComponent {
                     required={resolved.required}
                     disabled={resolved.disabled}
                     default={resolved.default}
+                    editing={editingData}
                     item={item}
                     value={value}
                     onChange={onValueChange}

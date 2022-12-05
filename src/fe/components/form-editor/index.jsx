@@ -170,8 +170,6 @@ export default class FormEditor extends PureComponent {
     }) {
         if (!value) return null;
 
-        // TODO: properly disable inputs if not editingFormData
-
         const formData = this.props.formData || this.state.formData;
 
         return (
