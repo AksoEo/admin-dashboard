@@ -174,6 +174,7 @@ export function getAscDefs (item, value) {
 
         return { defs: {}, formVars: [{ name: item.name, type, value }] };
     }
+    return { defs: {}, formVars: [] };
 }
 
 /** Validates the form input value. Returns null if valid, or an error if not. */
