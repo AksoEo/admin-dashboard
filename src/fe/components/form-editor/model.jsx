@@ -29,7 +29,7 @@ export function createInput (type) {
         currency: 'USD',
     };
     else if (type === 'enum') extra = {
-        options: [],
+        options: [{ name: '', value: '', disabled: false }],
         variant: 'select',
     };
     else if (type === 'country') extra = {

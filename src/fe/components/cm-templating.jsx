@@ -26,7 +26,7 @@ export class TemplateMarkingWidget extends WidgetType {
         const contents = this.expr;
         if (contents.startsWith('@')) {
             node.className += ' is-form-var';
-            node.textContent = this.varNames[contents.substr(1)];
+            node.textContent = this.varNames[contents.substr(1)] || contents.substr(1);
         } else {
             node.className += ' is-script-var';
             node.textContent = contents;

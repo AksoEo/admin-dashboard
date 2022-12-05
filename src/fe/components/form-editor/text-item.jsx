@@ -1,10 +1,12 @@
-import { h } from 'preact';
+import { createRef, h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import Segmented from '../controls/segmented';
 import MdField from '../controls/md-field';
 import { ScriptableString } from './script-expr';
 import { evalExpr } from './model';
 import { formEditor as locale } from '../../locale';
+import TemplatingPopup, { TemplatingContext } from '../cm-templating-popup';
+import { templateMarkings } from '../cm-templating';
 import './text-item.less';
 
 const RULES = [
@@ -30,61 +32,98 @@ export default class TextItem extends PureComponent {
         }
     };
 
+    templatingContext = TemplatingContext.create();
+    mdField = createRef();
+
+    getKnownVars = () => {
+        const knownVars = new Set();
+        for (const item of this.props.previousNodes) {
+            for (const k of Object.keys(item.defs)) {
+                if (k.startsWith('_')) continue;
+                knownVars.add(k);
+            }
+            for (const { name } of item.formVars) {
+                knownVars.add('@' + name);
+            }
+        }
+        return knownVars;
+    };
+
+    extensions = [templateMarkings({}, this.getKnownVars)];
+
+    onFocus = () => {
+        this.templatingContext.didFocus(this);
+    };
+
+    onBlur = () => {
+        this.templatingContext.didBlur(this);
+    };
+
+    insertString (str) {
+        const { view } = this.mdField.current.editor.current;
+        view.dispatch(view.state.replaceSelection(str));
+    }
+
     render ({ item, onChange, editing, editable }) {
-        let typeSwitch = null;
         let contents = null;
+        let knownItems = new Set();
 
         if (editing) {
-            typeSwitch = (
-                <Segmented
-                    class="text-item-type-switch smaller"
-                    selected={typeof item.text === 'string' ? 'text' : 'script'}
-                    onSelect={this.changeType}>
-                    {[
-                        { id: 'text', label: locale.textItemTypes.text },
-                        { id: 'script', label: locale.textItemTypes.script },
-                    ]}
-                </Segmented>
-            );
-        }
+            knownItems = this.getKnownVars();
 
-        if (typeof item.text === 'string') {
-            // markdown!
             contents = <MdField
+                ref={this.mdField}
+                onFocus={this.onFocus}
+                onBlur={this.onBlur}
                 editing={editing}
                 rules={RULES}
                 value={item.text}
-                onChange={text => onChange({ ...item, text })} />;
+                onChange={text => onChange({ ...item, text })}
+                extensions={this.extensions} />;
         } else {
-            contents = [];
-            contents.push(
-                <ScriptableString
-                    key="expr"
-                    disabled={!editable}
-                    ctx={{ previousNodes: this.props.previousNodes }}
-                    value={item.text}
-                    onChange={text => onChange({ ...item, text })} />
-            );
+            const emptyString = Symbol('empty string');
+            const emptyStringDefs = {
+                defs: { [emptyString]: { t: 's', v: '' } },
+                formVars: [],
+            };
 
-            if (!editing) {
-                const value = evalExpr(item.text, this.props.previousNodes);
-                if (typeof value === 'string') {
-                    contents.push(
-                        <MdField
-                            key="preview"
-                            class="expr-preview"
-                            rules={RULES}
-                            value={value} />
-                    );
-                }
-            }
+            const renderedText = (item.text || '')
+                .replace(/\{\{(\S+)\}\}/g, (m, a) => {
+                    const id = a;
+
+                    const expr = {
+                        t: 'c',
+                        f: '++',
+                        a: [emptyString, id],
+                    };
+                    try {
+                        return evalExpr(expr, this.props.previousNodes.concat(emptyStringDefs));
+                    } catch {
+                        return `<?${id}?>`;
+                    }
+                });
+
+            contents = (
+                <MdField
+                    key="preview"
+                    class="expr-preview"
+                    rules={RULES}
+                    value={renderedText} />
+            );
         }
 
         return (
-            <div class="form-editor-text-item">
-                {typeSwitch}
-                {contents}
-            </div>
+            <TemplatingContext.Provider value={this.templatingContext}>
+                <div class="form-editor-text-item">
+                    {contents}
+                    <TemplatingPopup
+                        title={locale.templating.insertTitle}
+                        varName={name => name}
+                        knownItems={knownItems}
+                        item={item}
+                        editing={editing} />
+                </div>
+            </TemplatingContext.Provider>
         );
     }
 }

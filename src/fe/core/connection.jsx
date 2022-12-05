@@ -62,6 +62,7 @@ export const connect = (...viewArgs) => (map = (id => id)) => Comp => {
         }
 
         #onUpdate = data => {
+            if (this.view.isDropped) return;
             this.setState({ data, loaded: true, error: null });
         };
         #onError = error => this.setState({ error });

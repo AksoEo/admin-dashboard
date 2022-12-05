@@ -235,7 +235,7 @@ const TYPES = {
                 <WithCountries>
                     {countries => {
                         const options = [];
-                        if (!item.required || !value) options.push({ value: null, label: '—' });
+                        if (!item.required || !value) options.push({ value: '', label: '—' });
 
                         for (const c in countries) {
                             const country = countries[c];
@@ -246,7 +246,7 @@ const TYPES = {
                         return (
                             <Select
                                 outline
-                                value={value}
+                                value={value || ''}
                                 onChange={onChange}
                                 items={options} />
                         );
@@ -945,9 +945,9 @@ const SETTINGS = {
             <Setting label={locale.inputFields.chAutofill}>
                 <Select
                     outline
-                    value={value}
+                    value={value || ''}
                     onChange={v => onChange(v || null)}
-                    items={[{ value: null, label: '—' }].concat(options.map(option => ({
+                    items={[{ value: '', label: '—' }].concat(options.map(option => ({
                         value: option,
                         label: locale.inputFields.chAutofillFields[option],
                     })))} />
@@ -1196,9 +1196,15 @@ class OptionsEditor extends PureComponent {
         this.props.onChange(value);
     };
     removeOption = opt => {
-        const value = this.props.value.slice();
-        value.splice(value.indexOf(opt), 1);
-        this.props.onChange(value);
+        if (this.props.value.length === 1) {
+            this.props.onChange([
+                { value: '', name: '', disabled: false },
+            ]);
+        } else {
+            const value = this.props.value.slice();
+            value.splice(value.indexOf(opt), 1);
+            this.props.onChange(value);
+        }
     };
     changeOption = (opt, newOpt) => {
         const value = this.props.value.slice();
@@ -1228,13 +1234,16 @@ class OptionsEditor extends PureComponent {
                     onChange={newOpt => this.changeOption(opt, newOpt)} />
             );
         }
-        items.push(
-            <div class="options-add-item" key="add-item">
-                <Button icon small onClick={() => this.addOption()}>
-                    <AddIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
-            </div>
-        );
+
+        if (items.length < 256) {
+            items.push(
+                <div class="options-add-item" key="add-item">
+                    <Button icon small onClick={() => this.addOption()}>
+                        <AddIcon style={{ verticalAlign: 'middle' }} />
+                    </Button>
+                </div>
+            );
+        }
 
         return (
             <RearrangingList
@@ -1257,6 +1266,8 @@ function OptionsEditorItem ({ onRemove, value, onChange }) {
                 outline
                 label={locale.inputFields.optionsName}
                 value={value.name}
+                minlength={1}
+                maxLength={50}
                 onChange={e => onChange({ ...value, name: e.target.value })} />
             <TextField
                 outline
@@ -1264,6 +1275,8 @@ function OptionsEditorItem ({ onRemove, value, onChange }) {
                 required
                 error={!value.value && dataLocale.requiredField}
                 value={value.value}
+                minLength={1}
+                maxLength={255}
                 onChange={e => onChange({ ...value, value: e.target.value })} />
             <Select
                 value={value.disabled.toString()}

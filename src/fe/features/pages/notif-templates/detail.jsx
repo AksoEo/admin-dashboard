@@ -15,7 +15,7 @@ import { coreContext } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
 import { FIELDS } from './fields';
 import { getFormVarsForIntent } from './intents';
-import TemplatingPopup, { TemplatingContext } from './templating-popup';
+import TemplatingPopup, { TemplatingContext } from '../../../components/cm-templating-popup';
 import './detail.less';
 
 let cachedAKSOScriptEditor = null;
@@ -212,6 +212,14 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
         };
     }
 
+    const formVars = getFormVarsForIntent(item.intent);
+
+    const knownItems = new Set();
+    if (item.script) for (const k in item.script) {
+        if (typeof k === 'string' && !k.startsWith('_')) knownItems.add(`${k}`);
+    }
+    for (const fv of formVars) knownItems.add(`@${fv.name}`);
+
     return (
         <div class="notif-template-detail">
             <DynamicHeightDiv useFirstHeight>
@@ -262,7 +270,7 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
                     <DefsPreview
                         previousNodes={[{
                             defs: {},
-                            formVars: getFormVarsForIntent(item.intent),
+                            formVars,
                         }]}
                         script={item.script || {}} />
                 </Suspense>
@@ -304,6 +312,9 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
                     </div>
                 </div>
                 <TemplatingPopup
+                    title={locale.templating.insertTitle}
+                    varName={name => locale.templateVars[name] || name}
+                    knownItems={knownItems}
                     item={item}
                     editing={editing} />
             </TemplatingContext.Provider>

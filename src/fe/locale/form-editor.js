@@ -73,9 +73,8 @@ export const formEditor = {
         datetime: 'Dato kaj horo',
         boolean_table: 'Tabelo de buleoj',
     },
-    textItemTypes: {
-        text: 'Simpla teksto',
-        script: 'Teksto de skripto',
+    templating: {
+        insertTitle: 'Enmeti ŝablonaĵon',
     },
 
     inputPreview: 'Test-valoro',

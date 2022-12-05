@@ -1,10 +1,8 @@
 import { h } from 'preact';
 import { createContext, createPortal, PureComponent } from 'preact/compat';
 import { AppBar, Button, MenuIcon, Spring, globalAnimator } from 'yamdl';
-import SvgIcon from '../../../components/svg-icon';
-import { notifTemplates as locale } from '../../../locale';
-import { getFormVarsForIntent } from './intents';
-import './templating-popup.less';
+import SvgIcon from './svg-icon';
+import './cm-templating-popup.less';
 
 const createTemplatingContext = () => {
     const onFocus = new Set();
@@ -53,7 +51,7 @@ function AddTemplatingIcon (props) {
 
 /**
  * Renders a FAB in the bottom right corner that appears if the user has focused a text input that
- * supports notif templating, and lets them insert templating constructs.
+ * supports templating, and lets them insert templating constructs.
  */
 export default class TemplatingPopup extends PureComponent {
     state = {
@@ -103,12 +101,15 @@ export default class TemplatingPopup extends PureComponent {
                 item={this.props.item}
                 open={this.state.open}
                 onClose={() => this.setState({ open: false })}
-                onInsert={this.onInsert} />,
+                onInsert={this.onInsert}
+                title={this.props.title}
+                varName={this.props.varName}
+                knownItems={this.props.knownItems} />,
             document.body,
         );
 
         return (
-            <div class={'notif-templating-popup' + (fabVisible ? '' : ' is-hidden')}>
+            <div class={'cm-templating-popup' + (fabVisible ? '' : ' is-hidden')}>
                 <Button
                     class="popup-fab"
                     icon
@@ -148,12 +149,12 @@ class ItemsSheet extends PureComponent {
         globalAnimator.deregister(this);
     }
 
-    render ({ item, onClose, onInsert }) {
+    render ({ item, onClose, onInsert, title, varName, knownItems }) {
         if (this.#open.value < 0.01) return null;
         const transform = `translateY(${((1 - this.#open.value) * 100).toFixed(3)}%)`;
 
         return (
-            <div class="notif-templates-templating-portal">
+            <div class="cm-templating-popup-portal">
                 <div class="items-sheet" style={{ transform }} onMouseDown={e => {
                     e.preventDefault(); // prevent stealing focus
                 }}>
@@ -162,23 +163,19 @@ class ItemsSheet extends PureComponent {
                         menu={<Button icon small onClick={onClose}>
                             <MenuIcon type="close" />
                         </Button>}
-                        title={locale.templating.insertTitle} />
+                        title={title} />
                     <Items
                         item={item}
-                        onInsert={onInsert} />
+                        onInsert={onInsert}
+                        varName={varName}
+                        knownItems={knownItems} />
                 </div>
             </div>
         );
     }
 }
 
-function Items ({ item, onInsert }) {
-    const knownItems = new Set();
-    for (const fv of getFormVarsForIntent(item.intent)) knownItems.add(`@${fv.name}`);
-    if (item.script) for (const k in item.script) {
-        if (typeof k === 'string' && !k.startsWith('_')) knownItems.add(`${k}`);
-    }
-
+function Items ({ item, onInsert, varName, knownItems }) {
     const items = [];
     for (const v of knownItems) {
         items.push(
@@ -186,7 +183,7 @@ function Items ({ item, onInsert }) {
                 onInsert(`{{${v}}}`);
             }}>
                 {v.startsWith('@') ? (
-                    <span class="item-preview is-form-var">{locale.templateVars[v.substr(1)]}</span>
+                    <span class="item-preview is-form-var">{varName(v.substr(1))}</span>
                 ) : (
                     <code class="item-preview is-script-var">{v}</code>
                 )}

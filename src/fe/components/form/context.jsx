@@ -11,5 +11,7 @@ export default createContext({
     register: () => {},
     /** Deregisters a previously registered component (pass component as first arg). */
     deregister: () => {},
+    /** Validates form fields and shows result to user */
+    reportValidity: () => {},
 });
 

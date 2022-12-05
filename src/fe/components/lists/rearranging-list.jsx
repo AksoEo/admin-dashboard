@@ -20,6 +20,8 @@ import './rearranging-list.less';
 export default class RearrangingList extends PureComponent {
     itemData = new Map();
     observer = new ResizeObserver(entries => {
+        let didUpdate = false;
+
         const keysByNode = new Map();
         for (const [k, v] of this.itemData) {
             if (v.node) keysByNode.set(v.node, k);
@@ -35,10 +37,16 @@ export default class RearrangingList extends PureComponent {
                 } else {
                     height = entry.contentRect.height;
                 }
-                this.itemData.get(keysByNode.get(entry.target)).height = Math.round(height);
+                const itemData = this.itemData.get(keysByNode.get(entry.target));
+                const newHeight = Math.round(height);
+                if (itemData.height !== itemData.height) {
+                    itemData.height = Math.round(height);
+                    didUpdate = true;
+                }
             }
         }
-        this.beginAnimating();
+
+        if (didUpdate) this.beginAnimating();
     });
 
     updateItemHeights () {

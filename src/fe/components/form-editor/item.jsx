@@ -8,6 +8,7 @@ import InputItem from './input-item';
 import TextItem from './text-item';
 import ScriptItem from './script-item';
 import { RefNameView } from './script-views';
+import { FormContext } from '../form';
 import { formEditor as locale } from '../../locale';
 import './item.less';
 
@@ -23,6 +24,46 @@ import './item.less';
  * - previousNodes: previous nodes' asc definitions (see getAscDefs in model)
  */
 export default class FormEditorItem extends PureComponent {
+    state = {
+        edit: null,
+    };
+
+    static contextType = FormContext;
+
+    componentDidMount () {
+        if (this.props.editing) {
+            this.setState({
+                edit: this.props.item,
+            });
+        }
+    }
+
+    componentDidUpdate (prevProps) {
+        if (prevProps.editing !== this.props.editing) {
+            if (this.props.editing) {
+                this.setState({
+                    edit: this.props.item,
+                });
+            } else {
+                const edit = this.state.edit;
+                this.setState({
+                    edit: null,
+                });
+                this.props.onChange(edit);
+            }
+        }
+    }
+
+    onEditChange = (edit) => {
+        this.setState({ edit });
+    };
+
+    onFinishEditing = () => {
+        if (this.context.reportValidity()) {
+            this.props.onEditingChange(false);
+        }
+    };
+
     render ({
         item, editable, onChange, editing, onEditingChange, editingData, value, onValueChange,
         onRemove, isEditingContext, disableValidation,
@@ -32,8 +73,8 @@ export default class FormEditorItem extends PureComponent {
         const props = {
             editable,
             editing,
-            item,
-            onChange,
+            item: this.state.edit || item,
+            onChange: this.state.edit ? this.onEditChange : onChange,
             previousNodes: this.props.previousNodes,
             isEditingContext,
             disableValidation,
@@ -62,7 +103,7 @@ export default class FormEditorItem extends PureComponent {
                     name={item.name}
                     editing={editing}
                     onStartEditing={() => onEditingChange(true)}
-                    onClose={() => onEditingChange(false)}
+                    onClose={this.onFinishEditing}
                     onRemove={onRemove} />
                 {contents}
             </div>

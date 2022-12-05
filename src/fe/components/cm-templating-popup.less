@@ -1,20 +1,18 @@
-@import '../../../prelude';
+@import '../prelude';
 
-.notif-template-detail {
-    .notif-templating-popup {
-        position: fixed;
-        bottom: 16px;
-        right: 16px;
-        transition: transform 0.3s @easing;
-        z-index: 140;
+.cm-templating-popup {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    transition: transform 0.3s @easing;
+    z-index: 140;
 
-        &.is-hidden {
-            transform: scale(0);
-        }
+    &.is-hidden {
+        transform: scale(0);
     }
 }
 
-.notif-templates-templating-portal {
+.cm-templating-popup-portal {
     position: fixed;
     display: flex;
     justify-content: center;
@@ -47,6 +45,7 @@
             position: sticky;
             top: 0;
             z-index: 5;
+            .md-gray-button();
         }
 
         .templating-items {
@@ -63,8 +62,19 @@
                 .md-gray-button();
 
                 .item-preview {
-                    font-family: @monospace;
-                    font-size: small;
+                    font-family: Roboto, sans-serif;
+                    font-size: smaller;
+                    font-weight: 500;
+                    border-radius: 4px;
+                    background: var(--editor-template-background);
+                    border: 1px solid var(--editor-template-delimiter);
+                    padding: 0 2px;
+
+                    &.is-script-var {
+                        background: white;
+                        border-color: #f48;
+                        color: black;
+                    }
                 }
             }
         }

@@ -17,7 +17,7 @@
     "@material-ui/icons": "4.11",
     "@tejo/akso-client": "^0.4.12",
     "@tejo/akso-script": "^0.2.2",
-    "@tejo/akso-script-editor": "github:AksoEo/akso-script-editor#0314457",
+    "@tejo/akso-script-editor": "github:AksoEo/akso-script-editor#0ba03dc",
     "@uiw/codemirror-theme-xcode": "^4.12.4",
     "@uiw/react-codemirror": "^4.12.4",
     "@wessberg/pointer-events": "^1.0.9",

@@ -13,6 +13,7 @@ import OrgIcon from '../../../components/org-icon';
 import RearrangingList from '../../../components/lists/rearranging-list';
 import CodeMirror from '../../../components/codemirror-themed';
 import { templateMarkings } from '../../../components/cm-templating';
+import { TemplatingContext } from '../../../components/cm-templating-popup';
 import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { indentUnit } from '@codemirror/language';
@@ -20,7 +21,6 @@ import { html } from '@codemirror/lang-html';
 import { connect } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
 import { getFormVarsForIntent } from './intents';
-import { TemplatingContext } from './templating-popup';
 import './fields.less';
 
 export const FIELDS = {

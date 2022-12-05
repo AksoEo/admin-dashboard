@@ -45,6 +45,12 @@ export default class Form extends PureComponent {
         return valid;
     }
 
+    reportValidity = () => {
+        if (!this.validate()) return false;
+        if (!this.node.current.reportValidity()) return false;
+        return true;
+    };
+
     componentDidMount () {
         // register the form inside a parent form context if applicable
         if (this.context) this.context.register(this);
@@ -84,6 +90,7 @@ export default class Form extends PureComponent {
             <FormContext.Provider value={{
                 register: this.onRegister,
                 deregister: this.onDeregister,
+                reportValidity: this.reportValidity,
             }}>
                 <form
                     ref={this.node}
