@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { createRef, h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Button, Menu } from 'yamdl';
 import AKSOScriptEditor from '@tejo/akso-script-editor';
@@ -150,6 +150,12 @@ export default class FormEditor extends PureComponent {
         formData: {},
     };
 
+    items = createRef();
+
+    stopEditing () {
+        this.items.current.stopEditing();
+    }
+
     render ({
         skipSettings,
         skipNonInputs,
@@ -172,6 +178,7 @@ export default class FormEditor extends PureComponent {
             <div class="form-editor">
                 <ScriptContextProvider>
                     <FormEditorItems
+                        ref={this.items}
                         org={org}
                         skipSettings={skipSettings}
                         skipNonInputs={skipNonInputs}
@@ -204,6 +211,10 @@ class FormEditorItems extends PureComponent {
         /** Item key that is currently being edited */
         editingItem: null,
     };
+
+    stopEditing () {
+        this.setState({ editingItem: null });
+    }
 
     addItem (item, skipEditing) {
         const itemIndex = this.props.items.length;

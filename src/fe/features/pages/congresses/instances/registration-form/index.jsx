@@ -122,22 +122,26 @@ const InnerEditor = connect(({ congress, instance }) => [
     };
 
     #form = createRef();
+    #formEditor = createRef();
     #commitTask = null;
     beginCommit = () => {
         this.#form.current.requestSubmit();
     };
 
     #performCommit = () => {
-        this.#commitTask = this.props.core.createTask('congresses/setRegistrationForm', {
-            congress: this.props.congress,
-            instance: this.props.instance,
-        }, {
-            data: this.state.edit,
+        this.#formEditor.current.stopEditing();
+        requestAnimationFrame(() => {
+            this.#commitTask = this.props.core.createTask('congresses/setRegistrationForm', {
+                congress: this.props.congress,
+                instance: this.props.instance,
+            }, {
+                data: this.state.edit,
+            });
+            this.#commitTask.on('success', () => {
+                this.setState({ edit: null });
+            });
+            this.#commitTask.on('drop', () => this.#commitTask = null);
         });
-        this.#commitTask.on('success', () => {
-            this.setState({ edit: null });
-        });
-        this.#commitTask.on('drop', () => this.#commitTask = null);
     };
 
     componentDidUpdate () {
@@ -204,7 +208,10 @@ const InnerEditor = connect(({ congress, instance }) => [
                     title={locale.editingTitle}
                     menu={(
                         <Button icon small onClick={() => {
-                            this.setState({ edit: null });
+                            this.#formEditor.current.stopEditing();
+                            requestAnimationFrame(() => {
+                                this.setState({ edit: null });
+                            });
                         }} aria-label={locale.cancel}>
                             <MenuIcon type="close" />
                         </Button>
@@ -220,6 +227,7 @@ const InnerEditor = connect(({ congress, instance }) => [
                     ref={this.#form}
                     onSubmit={this.#performCommit}>
                     <FormEditor
+                        ref={this.#formEditor}
                         isEditingContext
                         org={this.props.org}
                         editing={!!edit}

@@ -87,10 +87,27 @@ export default class TextItem extends PureComponent {
                 formVars: [],
             };
 
-            const renderedText = (item.text || '')
-                .replace(/\{\{(\S+)\}\}/g, (m, a) => {
-                    const id = a;
+            const ifRegex = /\{\{#if\s+(.+?)}}(.+?)(?:\{\{#else}}(.+?))?\{\{\/if}}/gs;
+            const identifierRegex = /\{\{([^#/].*?)}}/gs;
 
+            const renderedText = (item.text || '')
+                .replace(ifRegex, (m, cond, body, body2) => {
+                    try {
+                        const condValue = evalExpr({
+                            t: 'c',
+                            f: 'id',
+                            a: [cond],
+                        }, this.props.previousNodes);
+                        if (condValue) {
+                            return body;
+                        } else {
+                            return body2;
+                        }
+                    } catch {
+                        return `<?${cond} ? ${body} : ${body2}?>`;
+                    }
+                })
+                .replace(identifierRegex, (m, id) => {
                     const expr = {
                         t: 'c',
                         f: '++',
