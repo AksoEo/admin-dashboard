@@ -488,18 +488,11 @@ export default {
         );
     },
 
-    deleteOrg ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={orgLocale.delete.title}
-                actionLabel={orgLocale.delete.button}
-                run={() => task.runOnce()}>
-                {orgLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    deleteOrg: deleteDialog({
+        locale: orgLocale.delete,
+        objectView: ({ id }) => ['payments/org', { id }],
+        objectName: ({ name }) => name,
+    }),
     deleteAddon ({ open, task }) {
         return (
             <TaskDialog
@@ -512,18 +505,11 @@ export default {
             </TaskDialog>
         );
     },
-    deleteMethod ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={methodLocale.delete.title}
-                actionLabel={methodLocale.delete.button}
-                run={() => task.runOnce()}>
-                {methodLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    deleteMethod: deleteDialog({
+        locale: methodLocale.delete,
+        objectView: ({ org, id }) => ['payments/method', { org, id }],
+        objectName: ({ name }) => name,
+    }),
     deleteMethodThumbnail: deleteDialog({ locale: methodLocale.deleteThumbnail }),
 
     cancelIntent ({ open, task }) {

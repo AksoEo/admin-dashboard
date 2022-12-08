@@ -13,6 +13,7 @@ import './task-dialog.less';
  * - open/onClose
  * - sheet: if true, will use DialogSheet
  * - title
+ * - actionDisabled: if true, the action button will be disabled
  * - actionLabel: label string for the action button
  * - run: run closure; must return a promise. success will not be handled
  * - running: if true, will consider the task to be running
@@ -44,6 +45,7 @@ export default class TaskDialog extends Component {
         title,
         open,
         onClose,
+        actionDisabled,
         actionLabel,
         running,
         sheet,
@@ -69,7 +71,7 @@ export default class TaskDialog extends Component {
                         <Button
                             raised
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || actionDisabled}
                             validate={() => {}}>
                             <CircularProgress
                                 class="progress-overlay"

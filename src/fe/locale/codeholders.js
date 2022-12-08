@@ -326,6 +326,7 @@ export const codeholders = {
     failedFileUpload: 'Ne sukcesis alŝuti la dosieron',
     fileAddedBy: 'aldonita de ',
     delete: 'Forigi',
+    deleteTitle: 'Forigi membron',
     deleteDescription: 'Ĉu vi certas, ke vi volas forigi tiun ĉi membron? Ne eblas malfari tion ĉi.',
     fieldHistory: {
         title: field => `Historio de ${field}`,

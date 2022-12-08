@@ -1,8 +1,13 @@
 import { h } from 'preact';
+import { useContext, useEffect, useState } from 'preact/compat';
+import { CircularProgress, TextField } from 'yamdl';
 import TaskDialog from './task-dialog';
 import ChangedFields from './changed-fields';
+import DisplayError from '../utils/error';
 import { Field } from '../form';
+import { coreContext } from '../../core/connection';
 import { routerContext } from '../../router';
+import { data as dataLocale } from '../../locale';
 import './task-templates.less';
 
 export function createDialog ({ locale, fieldNames, fields: fieldDefs, className, onCompletion }) {
@@ -74,16 +79,65 @@ export function updateDialog ({ locale, fields }) {
         );
     };
 }
-export function deleteDialog ({ locale }) {
+export function deleteDialog ({ locale, objectView, objectName }) {
     return ({ open, task }) => {
+        const [name, setName] = useState('');
+
+        const [loading, setLoading] = useState(false);
+        const [loadError, setLoadError] = useState(null);
+        const [objName, setObjName] = useState(null);
+        const core = useContext(coreContext);
+
+        useEffect(() => {
+            if (!objectView) return;
+            setLoading(true);
+            setObjName(null);
+            setLoadError(null);
+
+            core.viewData(...objectView(task.options, task.parameters)).then(data => {
+                setObjName(objectName(data));
+            }).catch(err => {
+                setLoadError(err);
+            }).finally(() => {
+                setLoading(false);
+            });
+        }, []);
+
         return (
             <TaskDialog
+                class="delete-task"
                 open={open}
                 onClose={() => task.drop()}
                 title={locale.title}
                 actionLabel={locale.button}
+                actionDisabled={!objName || (objectView
+                    && name.toLowerCase().normalize() !== objName.toLowerCase().normalize())}
                 run={() => task.runOnce()}>
                 {locale.description}
+                {objectView ? (
+                    loading ? (
+                        <div class="delete-type-confirmation is-loading">
+                            <CircularProgress />
+                        </div>
+                    ) : loadError ? (
+                        <div class="delete-type-confirmation is-error">
+                            <DisplayError error={loadError} />
+                        </div>
+                    ) : (
+                        <div class="delete-type-confirmation">
+                            <div class="inner-desc">
+                                {dataLocale.deleteTask.confirmName.msgPre}
+                                <b>{objName}</b>
+                                {dataLocale.deleteTask.confirmName.msgPost}
+                            </div>
+                            <TextField
+                                class="inner-field"
+                                outline
+                                value={name}
+                                onChange={e => setName(e.target.value)} />
+                        </div>
+                    )
+                ) : null}
             </TaskDialog>
         );
     };

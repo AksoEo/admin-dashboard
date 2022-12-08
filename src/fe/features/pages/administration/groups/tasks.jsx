@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { TextField } from 'yamdl';
 import SavePerms from '../perms-editor/save';
 import { adminGroups as locale } from '../../../../locale';
+import { deleteDialog } from '../../../../components/tasks/task-templates';
 import { Field } from '../../../../components/form';
 import TaskDialog from '../../../../components/tasks/task-dialog';
 import ChangedFields from '../../../../components/tasks/changed-fields';
@@ -58,25 +59,12 @@ export default {
             </TaskDialog>
         );
     },
-    delete ({ open, task }) {
-        return (
-            <routerContext.Consumer>
-                {routerContext => (
-                    <TaskDialog
-                        class="admin-groups-task-delete"
-                        open={open}
-                        onClose={() => task.drop()}
-                        title={locale.delete}
-                        actionLabel={locale.deleteButton}
-                        run={() => task.runOnce().then(() => {
-                            routerContext.navigate('/administrado/grupoj');
-                        })}>
-                        {locale.deleteAreYouSure}
-                    </TaskDialog>
-                )}
-            </routerContext.Consumer>
-        );
-    },
+    delete: deleteDialog({
+        locale: locale.delete,
+        objectView: ({ id }) => ['adminGroups/group', { id }],
+        objectName: ({ name }) => name,
+    }),
+
 
     setPermissions ({ open, core, task }) {
         return (

@@ -70,7 +70,7 @@ export default connectPerms(class AdminGroupDetailPage extends DetailPage {
         if (perms.hasPerm('admin_groups.delete')) {
             actions.push({
                 overflow: true,
-                label: locale.delete,
+                label: locale.delete.menuItem,
                 action: () => this.context.createTask('adminGroups/delete', { id: this.id }),
             });
         }
@@ -103,7 +103,8 @@ export default connectPerms(class AdminGroupDetailPage extends DetailPage {
                     onEditChange={edit => this.setState({ edit })}
                     editing={editing}
                     onEndEdit={this.onEndEdit}
-                    onCommit={this.onCommit} />
+                    onCommit={this.onCommit}
+                    onDelete={this.onDelete} />
                 {showList && (
                     <Tabs
                         class="tab-switcher"

@@ -26,7 +26,11 @@ export default {
         onCompletion: (task, routerContext, id) => routerContext.navigate(`/revuoj/${id}`),
     }),
     updateMagazine: updateDialog({ locale: magazinesLocale.update, fields: magazinesLocale.fields }),
-    deleteMagazine: deleteDialog({ locale: magazinesLocale.delete }),
+    deleteMagazine: deleteDialog({
+        locale: magazinesLocale.delete,
+        objectView: ({ id }) => ['magazines/magazine', { id }],
+        objectName: ({ name }) => name,
+    }),
     createEdition: createDialog({
         locale: editionsLocale,
         fieldNames: ['idHuman', 'date'],
@@ -35,7 +39,11 @@ export default {
         onCompletion: (task, routerContext, id) => routerContext.navigate(`/revuoj/${task.options.magazine}/numero/${id}`),
     }),
     updateEdition: updateDialog({ locale: editionsLocale.update, fields: editionsLocale.fields }),
-    deleteEdition: deleteDialog({ locale: editionsLocale.delete }),
+    deleteEdition: deleteDialog({
+        locale: editionsLocale.delete,
+        objectView: ({ magazine, id }) => ['magazines/edition', { magazine, id }],
+        objectName: ({ idHuman }) => idHuman,
+    }),
     deleteEditionThumbnail: deleteDialog({ locale: editionsLocale.deleteThumbnail }),
 
     createTocEntry: createDialog({

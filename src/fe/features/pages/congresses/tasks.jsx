@@ -104,18 +104,11 @@ export default {
             </TaskDialog>
         );
     },
-    delete ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.delete.title}
-                actionLabel={locale.delete.button}
-                run={() => task.runOnce()}>
-                {locale.delete.description}
-            </TaskDialog>
-        );
-    },
+    delete: deleteDialog({
+        locale: locale.delete,
+        objectView: ({ id }) => ['congresses/congress', { id }],
+        objectName: ({ name }) => name,
+    }),
 
     createInstance ({ open, task }) {
         const { congress } = task.options;
@@ -167,18 +160,11 @@ export default {
             </TaskDialog>
         );
     },
-    deleteInstance ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={instanceLocale.delete.title}
-                actionLabel={instanceLocale.delete.button}
-                run={() => task.runOnce()}>
-                {instanceLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    deleteInstance: deleteDialog({
+        locale: instanceLocale.delete,
+        objectView: ({ congress, id }) => ['congresses/instance', { congress, id }],
+        objectName: ({ name }) => name,
+    }),
 
     createLocation ({ open, task }) {
         const { congress, instance } = task.options;
@@ -383,18 +369,11 @@ export default {
             </TaskDialog>
         );
     },
-    deleteRegistrationForm ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={regFormLocale.delete.title}
-                actionLabel={regFormLocale.delete.button}
-                run={() => task.runOnce()}>
-                {regFormLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    deleteRegistrationForm: deleteDialog({
+        locale: regFormLocale.delete,
+        objectView: ({ congress, instance }) => ['congresses/instance', { congress, id: instance }],
+        objectName: ({ name }) => name,
+    }),
 
     createParticipant ({ core, open, task }) {
         const { congress, instance } = task.options;

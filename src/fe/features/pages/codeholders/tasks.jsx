@@ -164,18 +164,31 @@ export default {
             </TaskDialog>
         );
     },
-    delete ({ open, task }) {
-        return (
-            <TaskDialog
-                class="codeholders-task-delete"
-                run={() => task.runOnce()}
-                actionLabel={locale.delete}
-                open={open}
-                onClose={() => task.drop()}>
-                {locale.deleteDescription}
-            </TaskDialog>
-        );
-    },
+    delete: deleteDialog({
+        locale: {
+            title: locale.deleteTitle,
+            description: locale.deleteDescription,
+            button: locale.delete,
+        },
+        objectView: ({ id }) => ['codeholders/codeholder', { id, fields: ['name', 'code'] }],
+        objectName: ({
+            name,
+            code,
+        }) => {
+            let chName = '';
+            if ('first' in name) {
+                chName = [
+                    name.honorific,
+                    (name.first || name.firstLegal),
+                    (name.last || name.lastLegal),
+                ].filter(x => x).join(' ');
+            } else {
+                chName = name.full;
+            }
+            return chName + ' ' + (code.new || code.old);
+        },
+    }),
+
     addMembership: connect('memberships/categories')(categories => ({
         categories,
     }))(function ({ open, task, categories }) {

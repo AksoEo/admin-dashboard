@@ -35,7 +35,11 @@ export default {
         );
     },
     update: updateDialog({ locale: locale.update, fields: locale.fields }),
-    delete: deleteDialog({ locale: locale.delete }),
+    delete: deleteDialog({
+        locale: locale.delete,
+        objectView: (_, { id }) => ['clients/client', { id }],
+        objectName: ({ name }) => name,
+    }),
 
     setPermissions ({ open, core, task }) {
         return (
