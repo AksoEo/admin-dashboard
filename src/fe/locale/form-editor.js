@@ -94,6 +94,8 @@ export const formEditor = {
         default: 'Defaŭlto',
         required: 'Deviga',
         disabled: 'Malŝaltita',
+        hideIfDisabled: '[[Hide if disabled]]',
+        hiddenIfDisabled: '[[Hidden if disabled]]',
         editable: 'Redaktebla',
         editableDesc: 'Ĉu la kampo estas redaktebla post aliĝo',
 

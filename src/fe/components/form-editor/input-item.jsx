@@ -615,6 +615,7 @@ const DEFAULT_SETTINGS = [
     'default',
     'required',
     'disabled',
+    'hideIfDisabled',
     'editable',
 ];
 
@@ -757,6 +758,15 @@ const SETTINGS = {
                 <ScriptableBool
                     ctx={scriptCtx}
                     value={value}
+                    onChange={onChange} />
+            </Setting>
+        );
+    },
+    hideIfDisabled ({ value, onChange }) {
+        return (
+            <Setting label={locale.inputFields.hideIfDisabled}>
+                <Checkbox
+                    checked={value}
                     onChange={onChange} />
             </Setting>
         );
@@ -1325,6 +1335,7 @@ function InputSettingsState ({ item, resolved, scriptCtx, onReset, showResolved 
                 showResolved={showResolved}
                 scriptCtx={scriptCtx} />
             <ScriptValueState
+                hideIfDisabled={item.hideIfDisabled}
                 label={locale.inputFields.disabled}
                 value={item.disabled}
                 resolved={resolved.disabled}
@@ -1335,10 +1346,11 @@ function InputSettingsState ({ item, resolved, scriptCtx, onReset, showResolved 
     );
 }
 
-function ScriptValueState ({ label, value, isDefault, hideIfNotComputed, scriptCtx, resolved, showResolved }) {
+function ScriptValueState ({ label, value, isDefault, hideIfDisabled, hideIfNotComputed, scriptCtx, resolved, showResolved }) {
     let contents = null;
     let isComputed = false;
     let defaultReset = null;
+    let disabledHidden = null;
 
     if (isDefault) {
         defaultReset = (
@@ -1346,6 +1358,9 @@ function ScriptValueState ({ label, value, isDefault, hideIfNotComputed, scriptC
                 <ResetIcon />
             </Button>
         );
+    }
+    if (hideIfDisabled) {
+        disabledHidden = <div>{locale.inputFields.hiddenIfDisabled}</div>;
     }
 
     if (value && typeof value === 'object') {
@@ -1393,6 +1408,7 @@ function ScriptValueState ({ label, value, isDefault, hideIfNotComputed, scriptC
             <div class="value-label">{label}</div>
             <div class="value-contents">
                 {contents}
+                {disabledHidden}
             </div>
             {defaultReset}
         </div>
