@@ -9,7 +9,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const express = require('express');
 const webpack = require('webpack');
-const pkg = require('./package.json');
+const pkgInfo = require('./package.json');
 
 const browserTargets = {
     // >1% on 2022-06-12
@@ -34,7 +34,7 @@ module.exports = function (env, argv) {
     if (!prod) console.warn('\x1b[33mbuilding for development\x1b[m');
 
     const entry = {};
-    entry.entry = './src/fe/index.js';
+    entry.entry = './src/fe/index.jsx';
     if (prod) {
         entry.unsupported = './src/unsupported.js';
     }
@@ -48,7 +48,7 @@ module.exports = function (env, argv) {
             globalObject: 'this',
         },
         resolve: {
-            extensions: ['.js', '.ts', '.json', '.less'],
+            extensions: ['.js', '.jsx', '.ts', '.json', '.less'],
             alias: {
                 // this is because cross-fetch insists on using a polyfill even though we don’t need
                 // it according to caniuse
@@ -94,6 +94,7 @@ module.exports = function (env, argv) {
             ],
         },
         plugins: [
+            new AksoPlugin(),
             new webpack.ProvidePlugin({
                 process: 'process/browser',
                 Buffer: ['buffer', 'Buffer'],
@@ -109,7 +110,6 @@ module.exports = function (env, argv) {
                 chunks: ['unsupported', 'entry'],
             }),
             analyze && new BundleAnalyzerPlugin(),
-            new AksoMagicStringReplacer(),
             // stop moment from loading all the locales
             new webpack.IgnorePlugin({
                 resourceRegExp: /^\.\/locale$/,
@@ -118,21 +118,15 @@ module.exports = function (env, argv) {
             new EsLintPlugin({
                 exclude: ['node_modules', 'src/unsupported.js'],
             }),
-            // a lot of modules want these nodejs globals
         ].filter(x => x),
         module: {
             rules: [
                 {
-                    test: /\.val\.js$/,
-                    exclude: /node_modules/,
-                    use: 'val-loader',
-                },
-                {
-                    test: /()\.m?js$/,
+                    test: /()\.m?jsx?$/,
                     // exclude val-loader stuff
                     // exclude unsupported.js
                     // exclude all node_modules
-                    exclude: /\.val\.js$|unsupported\.js|node_modules/,
+                    exclude: /unsupported\.js|node_modules/,
                     use: [
                         {
                             loader: 'babel-loader',
@@ -232,42 +226,29 @@ module.exports = function (env, argv) {
     };
 };
 
-// replaces magic strings in source files
-class AksoMagicStringReplacer {
+class AksoPlugin {
     apply (compiler) {
-        compiler.hooks.emit.tapPromise('AksoMagicStringReplacer', async compilation => {
-            for (const name in compilation.assets) {
-                const asset = compilation.assets[name];
-                const source = asset.source();
-                asset.source = function () {
-                    const re = /@!AKSO-MAGIC:(chunk|assets|dev)(?:\:(.+?))?(['"`])/;
-                    const stringEscape = s => s.replace(/["'`\n\r\t]/g, m => `\\${m}`);
+        const config = {
+            buildTime: new Date().toISOString(),
+            base: aksoBase,
+            version: pkgInfo.version,
+        };
+        const fileContents = Object.entries(config)
+            .map(([k, v]) => `export const ${k} = ${JSON.stringify(v)};`)
+            .join('\n');
 
-                    return source.replace(
-                        new RegExp(re, 'g'),
-                        m => {
-                            const a = m.match(re);
-                            const cmd = a[1];
-                            if (cmd === 'chunk') {
-                                for (const name in compilation.assets) {
-                                    if (name.startsWith(a[2])) {
-                                        return stringEscape(name) + a[3];
-                                    }
-                                }
-                            } else if (cmd === 'assets') {
-                                const assets = [];
-                                for (const n in compilation.assets) {
-                                    if (n === name) continue;
-                                    assets.push(n);
-                                }
-                                return stringEscape(JSON.stringify(assets)) + a[3];
-                            } else if (cmd === 'dev') {
-                                return (compiler.options.mode === 'development').toString() + a[3];
-                            }
-                        },
-                    );
-                };
-            }
+        compiler.hooks.compilation.tap('AksoPlugin', (compilation, { normalModuleFactory }) => {
+            normalModuleFactory.hooks.resolveForScheme.for('akso').tap('AksoPlugin', res => {
+                if (res.resource === 'akso:config') {
+                    res.resource = `data:text/javascript;base64,${btoa(fileContents)}`;
+                    return true;
+                }
+            });
+            normalModuleFactory.hooks.resolveForScheme.for('worker-url').tap('AksoPlugin', res => {
+                const resource = res.resource.substring('worker-url:'.length);
+                res.resource = `worker-loader!${resource}`;
+                return true;
+            });
         });
     }
 }

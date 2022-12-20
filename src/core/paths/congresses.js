@@ -640,7 +640,7 @@ export const tasks = {
     },
     deleteParticipant: async ({ congress, instance, id }) => {
         const client = await asyncClient;
-        await client.delete(`/congresses/${congress}/instances/${instance}/${id}`);
+        await client.delete(`/congresses/${congress}/instances/${instance}/participants/${id}`);
         store.remove([CONGRESS_PARTICIPANTS, id]);
         store.signal([CONGRESSES, congress, INSTANCES, instance, SIG_CONGRESS_PARTICIPANTS]);
     },

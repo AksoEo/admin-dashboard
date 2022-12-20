@@ -73,9 +73,8 @@ export const formEditor = {
         datetime: 'Dato kaj horo',
         boolean_table: 'Tabelo de buleoj',
     },
-    textItemTypes: {
-        text: 'Simpla teksto',
-        script: 'Teksto de skripto',
+    templating: {
+        insertTitle: 'Enmeti ŝablonaĵon',
     },
 
     inputPreview: 'Test-valoro',
@@ -95,6 +94,8 @@ export const formEditor = {
         default: 'Defaŭlto',
         required: 'Deviga',
         disabled: 'Malŝaltita',
+        hideIfDisabled: '[[Hide if disabled]]',
+        hiddenIfDisabled: '[[Hidden if disabled]]',
         editable: 'Redaktebla',
         editableDesc: 'Ĉu la kampo estas redaktebla post aliĝo',
 

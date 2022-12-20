@@ -22,7 +22,6 @@ module.exports = {
             { pragma: 'h' },
         ],
     ],
-    plugins: [
-        '@babel/plugin-proposal-export-default-from',
-    ],
+    plugins: [],
 };
+

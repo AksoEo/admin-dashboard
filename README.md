@@ -8,7 +8,7 @@ npm run build
 ```
 Build output will be located at `/dist`.
 
-To build for development, run `npx webpack`, and to analyze the webpack bundle, use `npm run analyze`.
+To analyze the webpack bundle, use `npm run analyze`.
 Passing an environment variable named `AKSO_BASE` overrides the API url (default: https://api.akso.org/v1).
 
 ### Server Setup

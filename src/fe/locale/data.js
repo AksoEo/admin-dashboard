@@ -263,6 +263,12 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
         title: 'Alŝuti bildon',
         button: 'Alŝuti',
     },
+    deleteTask: {
+        confirmName: {
+            msgPre: 'Por certigi, ke vi ne akcidente forigas la malĝustan aferon, bonvolu tajpi “',
+            msgPost: '” por konfirmi la forigon.',
+        },
+    },
 };
 
 export const search = {

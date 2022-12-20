@@ -8,9 +8,12 @@ export const adminGroups = {
     edit: 'Redakti',
     editGroup: 'Redakti grupon',
     editUpdate: 'Konservi',
-    delete: 'Forigi grupon',
-    deleteButton: 'Forigi',
-    deleteAreYouSure: 'Ĉu vi certas, ke vi volas forigi tiun ĉi administran grupon? Ne eblas malfari tiun ĉi agon.',
+    delete: {
+        menuItem: 'Forigi',
+        button: 'Forigi',
+        title: 'Forigi grupon',
+        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi administran grupon? Ne eblas malfari tiun ĉi agon.',
+    },
     search: {
         placeholders: {
             name: 'Serĉi nomojn de grupoj',
