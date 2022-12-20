@@ -120,13 +120,13 @@ export function getGlobalDefs (additionalVars) {
         formVars: [
             {
                 name: '@created_time',
-                type: 'timestamp',
-                value: new Date(),
+                type: 'n',
+                value: Math.round(new Date() / 1000),
             },
             {
                 name: '@edited_time',
-                type: 'timestamp',
-                value: new Date(),
+                type: 'n',
+                value: Math.round(new Date() / 1000),
             },
             ...(additionalVars || []),
         ],

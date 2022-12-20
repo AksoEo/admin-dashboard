@@ -5,7 +5,7 @@ export const formEditor = {
             allowUse: 'Malfermita',
             allowUseDesc: 'Ĉu la aliĝilo estas malfermita kaj eblas aliĝi',
             allowGuests: 'Gastoj permesataj',
-            allowGuestsDesc: 'Ĉu nemembroj povas aliĝi',
+            allowGuestsDesc: 'Ĉu ne-ensalutintoj povas aliĝi',
             editable: 'Redaktebla',
             editableDesc: 'Ĉu aliĝintoj povas poste redakti sian aliĝon',
             cancellable: 'Nuligebla',
