@@ -101,4 +101,18 @@
             width: 100%;
         }
     }
+
+    &[data-slot="table"] {
+        .custom-var-item {
+            background: none;
+            padding: 0;
+            justify-content: space-between;
+            margin: 0;
+
+            &.is-enabled .item-name {
+                font-weight: inherit;
+                font-size: smaller;
+            }
+        }
+    }
 }

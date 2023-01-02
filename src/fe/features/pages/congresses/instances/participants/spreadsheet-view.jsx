@@ -42,7 +42,7 @@ export default class SpreadsheetView extends Page {
         const { congress, instance } = this;
         this.context.createTask('congresses/registrationForm', { congress, instance }).runOnceAndDrop().then(res => {
             const viewFields = Object.keys(FIELDS);
-            const fields = Object.keys(FIELDS).filter(id => id !== 'data');
+            const fields = viewFields.filter(id => id !== 'data');
             for (const item of res.form) {
                 if (item.el === 'input') {
                     fields.push('data.' + item.name);
@@ -53,7 +53,7 @@ export default class SpreadsheetView extends Page {
                 fields,
                 viewFields,
                 currency: res.price && res.price.currency,
-                registrationForm: res.form,
+                registrationForm: res,
             }, () => this.load());
         }).catch(err => {
             console.error(err); // eslint-disable-line no-console
@@ -105,7 +105,7 @@ export default class SpreadsheetView extends Page {
                 const dataField = field.substr(5);
 
                 let renderData;
-                for (const item of this.state.registrationForm) {
+                for (const item of this.state.registrationForm.form) {
                     if (item.el === 'input' && item.name === dataField) {
                         renderData = DATA_RENDERERS[item.type];
                         if (renderData) renderData = renderData(item);
@@ -149,7 +149,7 @@ export default class SpreadsheetView extends Page {
             const dataField = field.substr(5);
 
             let stringifyData;
-            for (const item of this.state.registrationForm) {
+            for (const item of this.state.registrationForm.form) {
                 if (item.el === 'input' && item.name === dataField) {
                     stringifyData = DATA_STRINGIFIERS[item.type];
                     if (stringifyData) stringifyData = stringifyData(item);

@@ -72,6 +72,7 @@ export const FIELDS = {
                 formData = (
                     <span class="identity-form-data">
                         {value.name ? <span class="fd-name">{'' + value.name}</span> : null}
+                        {' '}
                         {value.email ? <span class="fd-email">{'' + value.email}</span> : null}
                     </span>
                 );
@@ -80,6 +81,7 @@ export const FIELDS = {
             return (
                 <div class="congress-participant-identity">
                     {formData}
+                    {' '}
                     {codeholder}
                     {(!formData && !codeholder) ? '—' : ''}
                 </div>
@@ -172,13 +174,13 @@ export const FIELDS = {
             return (
                 <span class="congress-participant-paid">
                     <currencyAmount.renderer value={value.amount} currency={userData.currency} />
-                    {value.hasPaidMinimum && (
+                    {value.hasPaidMinimum ? (
                         <span class="has-paid-minimum" title={locale.fields.hasPaidMinimumDescription}>
                             {locale.fields.hasPaidMinimumShort}
                             {' '}
                             <CheckIcon className="check-icon" />
                         </span>
-                    )}
+                    ) : null}
                 </span>
             );
         },
@@ -274,7 +276,7 @@ export const FIELDS = {
         },
     },
     customFormVars: {
-        component ({ value, editing, onChange, userData }) {
+        component ({ value, editing, onChange, slot, userData }) {
             if (!value) return;
 
             const form = userData?.registrationForm;
@@ -386,10 +388,25 @@ export const FIELDS = {
             }
 
             return (
-                <div class="congress-participant-custom-form-vars">
+                <div
+                    data-slot={slot}
+                    class="congress-participant-custom-form-vars">
                     {items}
                 </div>
             );
         },
+        stringify: v => {
+            return Object.entries(v || {}).map(([k, v]) => {
+                let content = '-';
+                if (typeof v === 'boolean') {
+                    content = formLocale.customFormVars.bool[v];
+                } else {
+                    content = (v || '').toString();
+                }
+
+                return `${k}: ${content}`;
+            }).join('\n');
+        },
+        weight: 2,
     },
 };
