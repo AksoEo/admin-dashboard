@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { TextField } from 'yamdl';
+import { Checkbox, TextField } from 'yamdl';
 import TaskDialog from '../../../components/tasks/task-dialog';
 import Segmented from '../../../components/controls/segmented';
 import Select from '../../../components/controls/select';
@@ -377,7 +377,11 @@ export default {
             overMaxAmount = total > maxAmount;
         }
 
+        const [autoSubmit, setAutoSubmit] = useState(true);
+
         if (ready) {
+            const autoSubmitId = Math.random().toString(36);
+
             fields.push(
                 <div key="total" class="create-intent-total">
                     <div>
@@ -397,6 +401,21 @@ export default {
                     )}
                 </div>
             );
+
+            if (methodInfo?.type === 'manual') {
+                fields.push(
+                    <div key="autosubmit" class="create-intent-auto-submit">
+                        <Checkbox
+                            id={autoSubmitId}
+                            checked={autoSubmit}
+                            onChange={setAutoSubmit} />
+                        {' '}
+                        <label for={autoSubmitId}>
+                            {intentLocale.create.autoSubmit}
+                        </label>
+                    </div>
+                );
+            }
         }
 
         const actuallyReady = ready && !overMaxAmount;
@@ -415,7 +434,7 @@ export default {
                         run={() => task.runOnce().then(id => {
                             routerContext.navigate(`/aksopago/pagoj/${id}`);
                             // immediately submit
-                            if (methodInfo?.type === 'manual') {
+                            if (methodInfo?.type === 'manual' && autoSubmit) {
                                 core.createTask('payments/submitIntent', { id }).run();
                             }
                         })}>
