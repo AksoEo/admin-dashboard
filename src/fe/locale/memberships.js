@@ -92,6 +92,10 @@ export const membershipOptions = {
             info100: 'Ĉiuj valutoj indikas prezon en sia plej malgranda unuo (ekz. cendoj). Tiel 1,50 EUR skribiĝu kiel 150 kaj 900 JPY kiel 900.',
         },
         paperVersion: 'Papera versio',
+
+        errors: {
+            priceVarMissing: (i) => `[[The price variable is missing in the ${i}th offer]]`,
+        },
     },
     create: {
         menuItem: 'Krei',

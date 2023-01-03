@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { createRef, h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
@@ -13,6 +13,8 @@ import Segmented from '../../../../components/controls/segmented';
 import StaticOverviewList from '../../../../components/lists/overview-list-static';
 import RearrangingList from '../../../../components/lists/rearranging-list';
 import OrgIcon from '../../../../components/org-icon';
+import DisplayError from '../../../../components/utils/error';
+import { FormContext } from '../../../../components/form';
 import { ScriptContextProvider } from '../../../../components/form-editor';
 import {
     membershipOptions as locale,
@@ -189,7 +191,44 @@ class OfferGroup extends PureComponent {
     state = {
         open: false,
         adding: false,
+        error: null,
     };
+
+    static contextType = FormContext;
+    node = createRef();
+
+    componentDidMount() {
+        this.context.register(this);
+    }
+
+    componentWillUnmount() {
+        this.context.deregister(this);
+    }
+
+    getError () {
+        let i = 0;
+        for (const offer of this.props.value.offers) {
+            if (offer.price && !offer.price.var) {
+                return locale.offers.errors.priceVarMissing(i + 1);
+            }
+            i++;
+        }
+        return null;
+    }
+
+    validate (submitting) {
+        const error = this.getError();
+        if (error) {
+            this.setState({ error });
+            if (submitting && this.node.current.scrollIntoView) {
+                this.node.current.scrollIntoView();
+            }
+            return false;
+        } else {
+            this.setState({ error: null });
+            return true;
+        }
+    }
 
     render ({ year, value, editing, onChange, onRemove, paymentOrg }) {
         const items = [];
@@ -232,7 +271,12 @@ class OfferGroup extends PureComponent {
         };
 
         return (
-            <div class={'registration-offer-group' + (editing ? ' is-editing' : '')}>
+            <div class={'registration-offer-group' + (editing ? ' is-editing' : '')} ref={this.node}>
+                {this.state.error && (
+                    <div class="inner-error">
+                        {this.state.error}
+                    </div>
+                )}
                 <div class="offer-group-title">
                     {editing && (
                         <Button class="remove-button" icon small onClick={onRemove}>
@@ -241,6 +285,7 @@ class OfferGroup extends PureComponent {
                     )}
                     {editing ? (
                         <TextField
+                            required
                             class="inner-input"
                             label={locale.offers.group.title}
                             outline
