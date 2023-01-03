@@ -39,7 +39,7 @@ export default class RearrangingList extends PureComponent {
                 }
                 const itemData = this.itemData.get(keysByNode.get(entry.target));
                 const newHeight = Math.round(height);
-                if (itemData.height !== itemData.height) {
+                if (newHeight !== itemData.height) {
                     itemData.height = Math.round(height);
                     didUpdate = true;
                 }
