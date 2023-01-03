@@ -505,7 +505,7 @@ export default class InputItem extends PureComponent {
             );
 
             contents = (
-                <div class="input-rendered-container">
+                <div class="input-rendered-container" key="input-rendered">
                     <div class="input-rendered">
                         <div class="input-details">
                             <Label required={resolved.required}>{item.label}</Label>

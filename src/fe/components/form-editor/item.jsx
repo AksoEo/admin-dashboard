@@ -4,6 +4,8 @@ import { Button } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
 import RemoveIcon from '@material-ui/icons/Remove';
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import InputItem from './input-item';
 import TextItem from './text-item';
 import ScriptItem from './script-item';
@@ -67,6 +69,7 @@ export default class FormEditorItem extends PureComponent {
     render ({
         item, editable, onChange, editing, onEditingChange, editingData, value, onValueChange,
         onRemove, isEditingContext, disableValidation, hasValues,
+        onMoveItem,
     }) {
         if (!item) return null;
 
@@ -100,6 +103,7 @@ export default class FormEditorItem extends PureComponent {
             <div class="form-editor-item">
                 <ItemBar
                     el={item.el}
+                    onMoveItem={onMoveItem}
                     editable={editable}
                     name={item.name}
                     editing={editing}
@@ -113,42 +117,64 @@ export default class FormEditorItem extends PureComponent {
 }
 
 /** The top bar on a form editor item. */
-class ItemBar extends PureComponent {
-    render ({ editable, el, name, editing, onStartEditing, onClose, onRemove }) {
-        let button;
-        if (!editable) {
-            button = <span />;
-        } else if (editing) {
-            button = (
-                <Button small icon onClick={onClose}>
-                    <DoneIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
-            );
-        } else {
-            button = (
-                <Button small icon onClick={onStartEditing}>
-                    <EditIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
-            );
-        }
+function ItemBar ({
+    editable,
+    el,
+    name,
+    editing,
+    onStartEditing,
+    onClose,
+    onRemove,
+    onMoveItem,
+}) {
+    let button = null;
+    if (editing) {
+        button = (
+            <Button small icon onClick={onClose}>
+                <DoneIcon style={{ verticalAlign: 'middle' }} />
+            </Button>
+        );
+    } else if (editable) {
+        button = (
+            <Button small icon onClick={onStartEditing}>
+                <EditIcon style={{ verticalAlign: 'middle' }} />
+            </Button>
+        );
+    }
 
-        let nameNode;
-        if (el === 'input') {
-            nameNode = <RefNameView def name={'@' + name} />;
-        } else {
-            nameNode = <span class="item-bar-name">{locale.itemTypes[el]}</span>;
-        }
-
-        return (
-            <div class={'form-editor-item-bar' + (editing ? ' is-editing' : '')}>
-                {editable ? (
-                    <Button class="remove-button" small icon onClick={onRemove}>
-                        <RemoveIcon style={{ verticalAlign: 'middle' }} />
-                    </Button>
-                ) : <span />}
-                {nameNode}
-                {button}
+    let moveItem = null;
+    if (editable && onMoveItem) {
+        moveItem = (
+            <div class="item-bar-move-item">
+                <Button small icon onClick={() => onMoveItem(-1)}>
+                    <KeyboardArrowUpIcon style={{ verticalAlign: 'middle' }} />
+                </Button>
+                <Button small icon onClick={() => onMoveItem(1)}>
+                    <KeyboardArrowDownIcon style={{ verticalAlign: 'middle' }} />
+                </Button>
             </div>
         );
     }
+
+    let nameNode;
+    if (el === 'input') {
+        nameNode = <RefNameView def name={'@' + name} />;
+    } else {
+        nameNode = <span class="item-bar-name">{locale.itemTypes[el]}</span>;
+    }
+
+    return (
+        <div class={'form-editor-item-bar' + (editing ? ' is-editing' : '')}>
+            {editable ? (
+                <Button class="remove-button" small icon onClick={onRemove}>
+                    <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                </Button>
+            ) : <span />}
+            {nameNode}
+            <span class="item-bar-right">
+                {button}
+                {moveItem}
+            </span>
+        </div>
+    );
 }

@@ -119,9 +119,6 @@ export class ScriptContextProvider extends PureComponent {
     }
 }
 
-// TODO: add Reset button to reset to default values etc
-// TODO: add Validate Form button
-
 /**
  * The Form Editor is the component used to edit e.g. registration forms.
  * It allows editing both the form data (i.e. like a user would) and editing the form itself.
@@ -246,6 +243,7 @@ class FormEditorItems extends PureComponent {
     }
 
     onMoveItem = (fromPos, toPos) => {
+        if (toPos < 0 || toPos > this.props.items.length) return;
         const items = this.props.items.slice();
         items.splice(toPos, 0, items.splice(fromPos, 1)[0]);
         this.#itemKeys.splice(toPos, 0, this.#itemKeys.splice(fromPos, 1)[0]);
@@ -344,6 +342,7 @@ class FormEditorItems extends PureComponent {
                 listItems.push(
                     <FormEditorItem
                         key={key}
+                        onMoveItem={(dir) => this.onMoveItem(index, index + dir)}
                         editable={editing}
                         isEditingContext={isEditingContext}
                         disableValidation={disableValidation}
@@ -404,13 +403,7 @@ class FormEditorItems extends PureComponent {
                         values={values}
                         onValuesChange={this.props.onValuesChange} />
                 )}
-                <RearrangingList
-                    spacing={16}
-                    isItemDraggable={index => editing && index < items.length}
-                    canMove={toPos => toPos < items.length}
-                    onMove={this.onMoveItem}>
-                    {listItems}
-                </RearrangingList>
+                {listItems}
             </div>
         );
     }
