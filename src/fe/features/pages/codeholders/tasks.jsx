@@ -22,6 +22,7 @@ import {
     detail as detailLocale,
     codeholderChgReqs as chgReqLocale,
     delegations as delegationsLocale,
+    notifTemplates as notifLocale,
     errors as errLocale,
 } from '../../../locale';
 import { FIELDS as DELEGATION_FIELDS } from '../delegations/delegates/fields';
@@ -489,8 +490,8 @@ export default {
             <TaskDialog
                 open={open}
                 onClose={() => task.drop()}
-                title={locale.notifTemplates.send.title}
-                actionLabel={locale.notifTemplates.send.confirm}
+                title={notifLocale.send.send.title}
+                actionLabel={notifLocale.send.send.confirm}
                 run={() => task.runOnce()}>
                 <NotifTemplateMessage
                     core={core}
@@ -554,17 +555,17 @@ class NotifTemplateMessage extends PureComponent {
         if (loading) {
             contents = [
                 <CircularProgress key={0} small indeterminate />,
-                <span key={1}> {locale.notifTemplates.send.messagePostIndeterminate}</span>,
+                <span key={1}> {notifLocale.send.send.messagePostIndeterminate}</span>,
             ];
         } else if (total !== null) {
-            contents = locale.notifTemplates.send.messagePost(total);
+            contents = notifLocale.send.send.messagePost(total);
         } else {
-            contents = locale.notifTemplates.send.messagePostUnknown;
+            contents = notifLocale.send.send.messagePostUnknown;
         }
 
         return (
             <div>
-                {locale.notifTemplates.send.messagePre}
+                {notifLocale.send.send.messagePre}
                 {' '}
                 {contents}
             </div>

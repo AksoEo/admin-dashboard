@@ -63,7 +63,7 @@ export const tasks = {
         const client = await asyncClient;
         await client.post(`/newsletters/${newsletter}/!send_notif_template`, {
             notifTemplateId: template,
-            deleteTemplateOnComplete: deleteOnComplete,
+            deleteTemplateOnComplete: !!deleteOnComplete,
             ...(additionalParams || {}),
         }, {});
     },

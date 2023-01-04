@@ -1523,7 +1523,7 @@ export const tasks = {
 
         await client.post('/codeholders/!send_notif_template', {
             notifTemplateId: template,
-            deleteTemplateOnComplete: deleteOnComplete,
+            deleteTemplateOnComplete: !!deleteOnComplete,
         }, options);
     },
 
