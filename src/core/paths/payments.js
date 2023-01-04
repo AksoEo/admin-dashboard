@@ -125,10 +125,14 @@ const iClientFields = {
             year: intent.intermediaryIdentifier?.year,
             number: intent.intermediaryIdentifier?.number,
         }) : ('intermediaryCountryCode' in intent) ? null : undefined,
-        toAPI: ({ country, year, number }) => ({
-            intermediaryCountryCode: country || null,
-            intermediaryIdentifier: (year || typeof number === 'number') ? ({ year, number }) : null,
-        }),
+        toAPI: (intermediary) => {
+            if (!intermediary) return {};
+            const { country, year, number } = intermediary;
+            return {
+                intermediaryCountryCode: country || null,
+                intermediaryIdentifier: (year || typeof number === 'number') ? ({ year, number }) : null,
+            };
+        },
     },
 };
 const iClientFilters = {
