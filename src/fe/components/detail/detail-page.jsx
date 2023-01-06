@@ -20,7 +20,19 @@ export default class DetailPage extends Page {
 
     onEndEdit = () => {
         this.props.editing?.pop(true);
-        this.setState({ edit: null });
+        this.setState({ edit: null }, () => {
+            requestAnimationFrame(() => {
+                // I mean it!
+                // alright, well, this is a terrible hack.
+                // some detail views fire onChange events when the user commits
+                // and this can cause edit state to be updated with new data.
+                // we don't want this because we stopped editing
+                // FIXME: instead of doing this, make detailShell handle edit state?
+                // with an onChange function in the content function.
+                // note: this issue appeared in notif templates when editing an mdfield
+                this.setState({ edit: null });
+            });
+        });
     };
 
     #commitTask = null;
@@ -45,6 +57,8 @@ export default class DetailPage extends Page {
     onDelete = () => {
         this.props.pop();
     };
+
+    componentDidMount () {}
 
     componentWillUnmount () {
         this.#commitTask?.drop();

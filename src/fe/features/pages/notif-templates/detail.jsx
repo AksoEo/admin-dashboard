@@ -5,11 +5,9 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
 import SendIcon from '@material-ui/icons/Send';
 import { CopyIcon } from '../../../components/icons';
-import Page from '../../../components/page';
+import DetailPage from '../../../components/detail/detail-page';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import DetailShell from '../../../components/detail/detail-shell';
-import Meta from '../../meta';
-import { connectPerms } from '../../../perms';
 import { LinkButton } from '../../../router';
 import { coreContext } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
@@ -29,52 +27,35 @@ const DefsPreview = lazy(async () => ({
     default: (await import('../../../components/form-editor/script-views')).DefsPreview,
 }));
 
-export default connectPerms(class NotifTemplate extends Page {
+export default class NotifTemplate extends DetailPage {
     state = {
         edit: null,
         org: null,
         intent: null,
     };
 
-    static contextType = coreContext;
+    locale = locale;
 
-    onEndEdit = () => {
-        this.props.editing && this.props.editing.pop(true);
-        this.setState({ edit: null });
-    };
-
-    #commitTask = null;
-    onCommit = changedFields => {
-        if (!this.props.editing || this.#commitTask) return Promise.resolve();
-        if (!changedFields.length) {
-            // nothing changed, so we can just pop the editing state
-            this.props.editing.pop(true);
-            return Promise.resolve();
-        }
-
-        return new Promise(resolve => {
-            this.#commitTask = this.context.createTask('notifTemplates/update', {
-                id: this.id,
-                _changedFields: changedFields,
-            }, this.state.edit);
-            this.#commitTask.on('success', this.onEndEdit);
-            this.#commitTask.on('drop', () => {
-                this.#commitTask = null;
-                resolve();
-            });
-        });
-    };
+    createCommitTask (changedFields, edit) {
+        return this.context.createTask('notifTemplates/update', {
+            id: this.id,
+            _changedFields: changedFields,
+        }, edit);
+    }
 
     onData = data => {
-        if (data) this.setState({ org: data.org, intent: data.intent });
+        if (data) {
+            this.setState({ org: data.org, intent: data.intent });
+        }
     };
 
     componentDidMount () {
+        super.componentDidMount();
         window.addEventListener('resize', this.onResize);
     }
 
     componentWillUnmount () {
-        if (this.#commitTask) this.#commitTask.drop();
+        super.componentWillUnmount();
         this.detachScriptEditor();
         window.removeEventListener('resize', this.onResize);
     }
@@ -121,10 +102,9 @@ export default connectPerms(class NotifTemplate extends Page {
         this.scriptEditor.height = window.innerHeight;
     };
 
-    render ({ perms, editing }, { edit, org }) {
+    renderActions ({ perms }, { org }) {
+        const { id } = this;
         const actions = [];
-
-        const id = this.id;
 
         if (perms.hasPerm(`notif_templates.create.${org}`)) {
             actions.push({
@@ -150,12 +130,14 @@ export default connectPerms(class NotifTemplate extends Page {
             });
         }
 
+        return actions;
+    }
+
+    renderContents ({ editing }, { edit }) {
+        const { id } = this;
+
         return (
             <div class="notif-template-page">
-                <Meta
-                    title={locale.detailTitle}
-                    actions={actions} />
-
                 <DetailShell
                     view="notifTemplates/template"
                     id={id}
@@ -170,7 +152,7 @@ export default connectPerms(class NotifTemplate extends Page {
                     {data => (
                         <DetailContents
                             id={id}
-                            item={this.state.edit || data}
+                            item={edit || data}
                             editing={editing}
                             onItemChange={edit => this.setState({ edit })}
                             openScriptEditor={this.openScriptEditor} />
@@ -179,7 +161,7 @@ export default connectPerms(class NotifTemplate extends Page {
             </div>
         );
     }
-});
+}
 
 function DetailField ({ field, item, editing, onItemChange }) {
     const Cmp = FIELDS[field].component;
