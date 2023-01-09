@@ -223,7 +223,7 @@ export const notifTemplateIntentExamples = {
         price: 999,
         currency: 'USD',
         sequenceId: 123,
-        createdTime: new Date(2022, 2, 24, 13, 50, 24),
+        createdTime: +new Date(2022, 2, 24, 13, 50, 24) / 1000,
         canEdit: true,
         dataId: '0123456789abcdef',
         dataKeys: [],

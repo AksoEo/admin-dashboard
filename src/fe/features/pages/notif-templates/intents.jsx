@@ -5,6 +5,7 @@ const BOOL = 'b';
 const NUMBER = 'n';
 const STRING = 's';
 const MATRIX = 'm';
+const TIMESTAMP = 'timestamp';
 
 export function getFormVarsForIntent (intent) {
     if (intent === 'codeholder') return spec2Vars(CODEHOLDER_SPEC);
@@ -17,7 +18,7 @@ export function getFormVarsForIntent (intent) {
 function spec2Vars (spec) {
     const vars = [];
     const visit = (node, name = '') => {
-        if (typeof node === 'object') {
+        if (typeof node === 'object' && !Array.isArray(node) && !(node instanceof Date)) {
             for (const k in node) {
                 visit(node[k], name + (name ? '.' : '') + k);
             }
@@ -28,6 +29,7 @@ function spec2Vars (spec) {
             else if (typeof value === 'number') type = NUMBER;
             else if (typeof value === 'string') type = STRING;
             else if (Array.isArray(value)) type = MATRIX;
+            else if (value instanceof Date) type = TIMESTAMP;
             vars.push({ name, type, value });
         }
     };
