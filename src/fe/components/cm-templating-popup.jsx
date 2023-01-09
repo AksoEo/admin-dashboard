@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { createContext, createPortal, PureComponent } from 'preact/compat';
 import { AppBar, Button, MenuIcon, Spring, globalAnimator } from 'yamdl';
 import SvgIcon from './svg-icon';
+import { data as locale } from '../locale';
 import './cm-templating-popup.less';
 
 const createTemplatingContext = () => {
@@ -177,6 +178,29 @@ class ItemsSheet extends PureComponent {
 
 function Items ({ item, onInsert, varName, knownItems }) {
     const items = [];
+
+    items.push(
+        <Button class="templating-item" onClick={() => {
+            onInsert(`{{#if }} {{#else}} {{/if}}`);
+        }}>
+            <span class="item-preview is-condition">
+                {locale.cmTemplating.condition.if}
+                {' '}
+                <span class="inner-var">…</span>
+                {' '}
+                {locale.cmTemplating.condition.then}
+            </span>
+            {' '}
+            <span class="item-preview is-condition">
+                {locale.cmTemplating.condition.else}
+            </span>
+            {' '}
+            <span class="item-preview is-condition">
+                {locale.cmTemplating.condition.end}
+            </span>
+        </Button>
+    );
+
     for (const v of knownItems) {
         items.push(
             <Button class="templating-item" onClick={() => {

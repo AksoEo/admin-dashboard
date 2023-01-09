@@ -12,6 +12,30 @@
         border-color: #f48;
         color: black;
     }
+
+    &.is-condition {
+        display: inline-block;
+        border-color: #999;
+        color: inherit;
+        background: none;
+
+        .inner-node {
+            margin: -1px 4px;
+            border-radius: 4px;
+            font: inherit;
+            color: inherit;
+
+            &.is-form-var {
+                background: var(--editor-template-background);
+                border: 1px solid var(--editor-template-delimiter);
+            }
+            &.is-script-var {
+                background: white;
+                border-color: #f48;
+                color: black;
+            }
+        }
+    }
 }
 
 .akso-cm-template-error-mark {

@@ -227,6 +227,14 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
             unknownVar: v => `Nekonata variablo “${v}”`,
         },
     },
+    cmTemplating: {
+        condition: {
+            if: '[[if]]',
+            then: '[[then]]',
+            else: '[[else]]',
+            end: '[[end if]]',
+        },
+    },
     mapList: {
         empty: 'Neniu loko',
         searchPlaceholder: 'Serĉi…',
