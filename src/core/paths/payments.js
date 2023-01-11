@@ -161,7 +161,7 @@ const iClientFilters = {
         toAPI: value => ({ $purposes: { triggers: value } }),
     },
     purposeDataId: {
-        toAPI: value => ({ $purposes: { dataId: value } }),
+        toAPI: value => ({ $purposes: { dataId: '==base64==' + Buffer.from(value, 'hex').toString('base64') } }),
     },
 };
 
