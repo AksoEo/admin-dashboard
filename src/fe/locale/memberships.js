@@ -94,7 +94,7 @@ export const membershipOptions = {
         paperVersion: 'Papera versio',
 
         errors: {
-            priceVarMissing: (i) => `[[The price variable is missing in the ${i}th offer]]`,
+            priceVarMissing: (i) => `La prezvariablo mankas en la ${i}-a oferto`,
         },
     },
     create: {

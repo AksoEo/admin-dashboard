@@ -428,7 +428,7 @@ export const paymentIntents = {
         noCurrencySelected: 'Neniu valuto estis elektita',
         paymentMethod: 'Pagmetodo',
         purposes: 'Pagceloj',
-        autoSubmit: '[[Mark payment as submitted]]',
+        autoSubmit: 'Aŭtomate marki pagon kiel ensendita',
         total: 'Sumo',
         totalNote: 'La sumo estas supozo, la ver valoro estos la ekvivalento de minimume 1 USD/maksimume 500.000 USD',
         totalOverMaxAmount: 'La pagenda sumo estas pli granda ol la maksimuma sumo de tiu ĉi pagmaniero. Bonvolu elekti alian pagmanieron.',

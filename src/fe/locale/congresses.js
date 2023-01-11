@@ -309,7 +309,7 @@ export const congressParticipants = {
         codeholderIdViewCodeholder: 'Vidi membron',
         hasPaidMinimumShort: 'min',
         hasPaidMinimumDescription: 'Aliĝinto antaŭpagis',
-        viewPayments: 'Vidi pagoj',
+        viewPayments: 'Vidi pagojn',
         actions: {
             createPaymentIntent: 'Aldoni pagon',
             createPaymentIntentData: {

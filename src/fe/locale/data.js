@@ -229,10 +229,10 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
     },
     cmTemplating: {
         condition: {
-            if: '[[if]]',
-            then: '[[then]]',
-            else: '[[else]]',
-            end: '[[end if]]',
+            if: 'se',
+            then: 'tiam',
+            else: 'alie',
+            end: 'se-fino',
         },
     },
     mapList: {
