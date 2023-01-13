@@ -168,7 +168,7 @@ export const paymentMethods = {
 };
 export const paymentIntents = {
     openInStripePrefix: 'Malfermi ĉe',
-    stripeIntentLink: id => `https://dashboard.stripe.com/test/payments/${id}`,
+    stripeIntentLink: id => `https://dashboard.stripe.com/payments/${id}`,
 
     title: 'Pagoj',
     detailTitle: 'Pago',

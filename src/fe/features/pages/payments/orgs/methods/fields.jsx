@@ -14,8 +14,7 @@ import './fields.less';
 
 export function PaymentMethodType ({ value }) {
     if (value === 'stripe') return <span class="payment-method-type is-stripe"><StripeIcon />™</span>;
-    else if (value === 'manual') return <span class="payment-method-type">{locale.fields.types[value]}</span>;
-    return null;
+    return <span class="payment-method-type">{locale.fields.types[value]}</span>;
 }
 
 const STRIPE_METHOD_ICONS = {
