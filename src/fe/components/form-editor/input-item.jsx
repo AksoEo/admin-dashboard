@@ -1049,12 +1049,12 @@ const SETTINGS = {
 
         const enableHeaderTop = enabled => {
             if (enabled) {
-                onItemChange({ ...item, headerTop: [...new Array(item.cols)].map(() => '') });
+                onItemChange({ ...item, headerTop: [...new Array(item.cols)].map(() => null) });
             } else onItemChange({ ...item, headerTop: null });
         };
         const enableHeaderLeft = enabled => {
             if (enabled) {
-                onItemChange({ ...item, headerLeft: [...new Array(item.rows)].map(() => '') });
+                onItemChange({ ...item, headerLeft: [...new Array(item.rows)].map(() => null) });
             } else onItemChange({ ...item, headerLeft: null });
         };
 
@@ -1067,10 +1067,11 @@ const SETTINGS = {
                 headerTopItems.push(
                     <div key={index} class="boolean-table-header-item">
                         <TextField
-                            value={item.headerTop[i]}
+                            value={item.headerTop[i] || ''}
+                            maxLength={20}
                             onChange={e => {
                                 const headerTop = item.headerTop.slice();
-                                headerTop[index] = e.target.value;
+                                headerTop[index] = e.target.value || null;
                                 onItemChange({ ...item, headerTop });
                             }} />
                     </div>
@@ -1083,10 +1084,11 @@ const SETTINGS = {
                 headerLeftItems.push(
                     <div key={index} class="boolean-table-header-item">
                         <TextField
-                            value={item.headerLeft[i]}
+                            value={item.headerLeft[i] || ''}
+                            maxLength={20}
                             onChange={e => {
                                 const headerLeft = item.headerLeft.slice();
-                                headerLeft[index] = e.target.value;
+                                headerLeft[index] = e.target.value || null;
                                 onItemChange({ ...item, headerLeft });
                             }} />
                     </div>
@@ -1140,6 +1142,7 @@ const SETTINGS = {
                         type="number"
                         outline
                         value={item.rows | 0}
+                        max={20}
                         onChange={e => setRows(+e.target.value | 0)} />
                 </Setting>
                 <Setting label={locale.inputFields.cols}>
@@ -1147,6 +1150,7 @@ const SETTINGS = {
                         type="number"
                         outline
                         value={item.cols | 0}
+                        max={20}
                         onChange={e => setCols(+e.target.value | 0)} />
                 </Setting>
                 <Setting label={locale.inputFields.minSelect}>
