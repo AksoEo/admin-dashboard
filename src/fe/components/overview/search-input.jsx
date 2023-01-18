@@ -47,7 +47,7 @@ export default class SearchInputFocusable extends Component {
  * # Props
  * - value/onChange: request params -> search
  *   looks like `{ field, query }`
- * - searchFields: string[] or null: available search fields
+ * - searchFields: (string | { id: string, label: string })[] or null: available search fields
  * - expanded: bool
  * - localizedFields: object
  * - localizedPlaceholders: object, or string if no searchFields are given
@@ -77,8 +77,8 @@ function SearchInput ({
                     onClick={e => !expanded && e.stopPropagation()}
                     onChange={field => onChange({ ...value, field })}
                     items={searchFields.map(field => ({
-                        value: field,
-                        label: localizedFields[field],
+                        value: field.id || field,
+                        label: field.label || localizedFields[field],
                     }))} />
             )}
             <div class="search-query-container">

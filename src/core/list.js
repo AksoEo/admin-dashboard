@@ -121,6 +121,7 @@ export const makeParametersToRequestData = ({
     clientFields,
     clientFilters,
     idFieldName,
+    doesExtraFieldExist,
 }) => params => {
     const options = {};
     const transientFields = [];
@@ -158,10 +159,10 @@ export const makeParametersToRequestData = ({
     const fields = (params.fields || []).concat(transientFields.map(id => ({ id, sorting: 'none' })));
 
     for (const field of fields) {
-        if (!(field.id in clientFields)) {
+        if (!(field.id in clientFields) && (doesExtraFieldExist ? !doesExtraFieldExist(field.id) : true)) {
             throw { code: 'unknown-field', message: `unknown field ${field.id}`, extra: { field: field.id } };
         }
-        for (const required of (clientFields[field.id].requires || [])) {
+        for (const required of (clientFields[field.id]?.requires || [])) {
             fields.push({ id: required, sorting: 'none' });
         }
     }
@@ -169,18 +170,18 @@ export const makeParametersToRequestData = ({
     options.order = fields
         .filter(({ sorting }) => sorting !== 'none')
         // some fields have multiple sub-fields that must be sorted individually
-        .flatMap(({ id, sorting }) => typeof clientFields[id] === 'string'
-            ? [[clientFields[id], sorting]]
-            : (clientFields[id].sort || clientFields[id].apiFields).map(id => [id, sorting]));
+        .flatMap(({ id, sorting }) => typeof clientFields[id] === 'object'
+            ? (clientFields[id].sort || clientFields[id].apiFields).map(id => [id, sorting])
+            : [[clientFields[id], sorting]]);
 
     // order by relevance if no order is selected
     if (options.search && !options.order.length) {
         options.order = [['_relevance', 'desc']];
     }
 
-    options.fields = fields.flatMap(({ id }) => typeof clientFields[id] === 'string'
-        ? clientFields[id]
-        : clientFields[id].apiFields);
+    options.fields = fields.flatMap(({ id }) => typeof clientFields[id] === 'object'
+        ? clientFields[id].apiFields
+        : clientFields[id] || id);
 
     options.fields.push(idFieldName || 'id'); // also select the ID field
 

@@ -11,6 +11,13 @@ import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import './index.less';
 
+function formSearchableFields (regFormItems) {
+    return regFormItems.filter(item => item.el === 'input' && item.type === 'text').map(item => ({
+        id: `data.${item.name}`,
+        label: item.label,
+    }));
+}
+
 export default class ParticipantsView extends PureComponent {
     state = {
         parameters: {
@@ -77,7 +84,6 @@ export default class ParticipantsView extends PureComponent {
         // TODO: hide this page if the user does not have permission?
         return (
             <div class="participants-view">
-                {/* FIXME: this is suboptimal because it can't distinguish between no registration form and not loaded */}
                 {hasRegistrationForm && registrationForm ? (
                     <div class="participants-view-contents">
                         <div class="participants-table-view-link">
@@ -89,6 +95,7 @@ export default class ParticipantsView extends PureComponent {
                             value={parameters}
                             searchFields={[
                                 'notes',
+                                ...formSearchableFields(registrationForm),
                             ]}
                             filters={FILTERS}
                             onChange={parameters => this.setState({ parameters })}

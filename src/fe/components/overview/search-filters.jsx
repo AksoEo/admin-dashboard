@@ -22,7 +22,7 @@ import './search-filters.less';
  * - value/onChange: core parameters (see e.g. docs for codeholders/list for details)
  *   additional fields:
  *   _savedFilter: null or object { id, name, description } if loaded
- * - searchFields: string[] or null
+ * - searchFields: (string | { id: string, label: string })[] or null
  * - filters: object mapping all available filter ids to their editor spec. An editor spec
  *   contains:
  *   - `default() -> Filter` where `typedef Filter { enabled: bool, value: any, ...other }`

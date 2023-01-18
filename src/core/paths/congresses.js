@@ -186,6 +186,7 @@ const pParametersToRequestData = makeParametersToRequestData({
     clientFields: pClientFields,
     clientFilters: pClientFilters,
     idFieldName: 'dataId',
+    doesExtraFieldExist: f => f.startsWith('data.'),
 });
 const pClientFromAPI = makeClientFromAPI(pClientFields);
 const pClientToAPI = makeClientToAPI(pClientFields);
