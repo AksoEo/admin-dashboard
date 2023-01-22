@@ -1,0 +1,9 @@
+body {
+    font-family: sans-serif;
+}
+
+@media print {
+    .print-action-container {
+        display: none;
+    }
+}

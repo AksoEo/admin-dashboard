@@ -14,6 +14,181 @@ import {
 import { OVERVIEW_FIELDS } from './fields';
 import './timeline.less';
 
+function layoutRegions (items, hourHeight, startBound) {
+    // lay out items in columns, such that overlapping items are simply put beside existing
+    // ones.
+    // these columns are split into regions, such that items that don't have any overlap
+    // can make use of the full width of the container.
+
+    // timestamps at which some event starts or ends
+    const splits = [];
+    const eventsStartingAtSplit = new Map();
+    const eventsEndingAtSplit = new Map();
+    const itemsById = new Map();
+
+    const addSplit = time => {
+        if (!splits.includes(time)) {
+            splits.push(time);
+            if (!eventsStartingAtSplit.has(time)) eventsStartingAtSplit.set(time, []);
+            if (!eventsEndingAtSplit.has(time)) eventsEndingAtSplit.set(time, []);
+        }
+    };
+
+    addSplit(startBound);
+
+    for (const info of items) {
+        addSplit(info.start);
+        addSplit(info.end);
+        eventsStartingAtSplit.get(info.start).push(info.id);
+        eventsEndingAtSplit.get(info.end).push(info.id);
+        itemsById.set(info.id, info);
+    }
+    splits.sort((a, b) => a - b); // sort ascending
+
+    let y = 0;
+    const splitsY = new Map(); // mapping from split to Y offset
+    let lastT = null;
+    for (const t of splits) {
+        const deltaHours = (lastT !== null) ? (t - lastT) / 3600 : 0;
+        lastT = t;
+        const splitHasItem = (lastT !== null) ? !!eventsEndingAtSplit.get(t).length : false;
+        if (splitHasItem) {
+            y += hourHeight * deltaHours;
+        } else {
+            y += hourHeight * deltaHours;
+        }
+        splitsY.set(t, y);
+    }
+
+    const regions = [[]];
+    const occupiedColumns = [];
+    for (const t of splits) {
+        const ending = eventsEndingAtSplit.get(t);
+
+        for (const id of ending) {
+            // free the column occupied by this event
+            const col = occupiedColumns.indexOf(id);
+            if (col < 0) continue;
+            occupiedColumns[col] = null;
+        }
+
+        // if all columns are free, then this is the end of a region
+        const isEndOfRegion = occupiedColumns.reduce((a, b) => a === null && b === null, true);
+        if (isEndOfRegion && regions[regions.length - 1].length) {
+            regions.push([]);
+            occupiedColumns.splice(0); // clear
+        }
+
+        const region = regions[regions.length - 1];
+        const starting = eventsStartingAtSplit.get(t);
+
+        for (const id of starting) {
+            // find a free column and occupy it
+            const freeCol = occupiedColumns.indexOf(null);
+            const info = itemsById.get(id);
+
+            const start = splitsY.get(info.start);
+            const end = splitsY.get(info.end);
+
+            const item = {
+                id,
+                start,
+                end,
+            };
+
+            const occupy = info.start < info.end;
+
+            if (freeCol >= 0) {
+                if (occupy) occupiedColumns[freeCol] = id;
+                region[freeCol].push(item);
+            } else {
+                // no free column; add one
+                if (occupy) occupiedColumns.push(id);
+                else occupiedColumns.push(null);
+                region.push([item]);
+            }
+        }
+    }
+
+    const outRegions = [];
+    for (let i = 0; i < regions.length; i++) {
+        const region = regions[i];
+        if (!region.length) continue;
+        let start = Infinity;
+        let end = -Infinity;
+        for (const col of region) {
+            for (const item of col) {
+                start = Math.min(start, item.start);
+                end = Math.max(end, item.end);
+            }
+        }
+
+        outRegions.push({
+            items: region,
+            start,
+            end,
+        });
+    }
+
+    return outRegions;
+}
+
+export function layoutByColumns (items, getItemInfo) {
+    const missingItems = [];
+    const hourHeight = 40;
+
+    const columns = new Map();
+    let minBound = Infinity;
+    let maxBound = -Infinity;
+
+    // collect columns and bounds
+    {
+        for (const id of items) {
+            const info = getItemInfo(id);
+            if (!info) {
+                missingItems.push(id);
+                continue;
+            }
+
+            if (!columns.has(info.column)) columns.set(info.column, []);
+            columns.get(info.column).push({ id, start: info.start, end: info.end });
+
+            if (info.start < minBound) minBound = info.start;
+            if (info.end > maxBound) maxBound = info.end;
+        }
+
+        for (const k in columns.keys()) {
+            columns.get(k).sort((a, b) => a.start - b.start);
+        }
+    }
+
+    // layout subcolumns
+    const output = [];
+    for (const [columnKey, columnItems] of columns) {
+        const regions = layoutRegions(columnItems, hourHeight, minBound);
+
+        let maxRegionWidth = 1;
+        for (const region of regions) {
+            maxRegionWidth = Math.max(maxRegionWidth, region.items.length);
+        }
+
+        output.push({
+            key: columnKey,
+            regions,
+            maxRegionWidth,
+        });
+    }
+
+    return {
+        columns: output,
+        height: hourHeight * (maxBound - minBound) / 3600,
+        timeStart: minBound,
+        timeEnd: maxBound,
+        hourHeight,
+        missingItems,
+    };
+}
+
 /**
  * Renders a timeline of program items.
  *
@@ -218,187 +393,32 @@ class TimelineDayView extends PureComponent {
 
     layoutTimeline () {
         const { items } = this.state;
-
-        // const refDate = moment.tz(this.props.date, this.props.tz);
-
-        // lay out items in columns, such that overlapping items are simply put beside existing
-        // ones.
-        // these columns are split into regions, such that items that don't have any overlap
-        // can make use of the full width of the screen.
-
-        // timestamps at which some event starts or ends
-        const splits = [];
-        const eventsStartingAtSplit = new Map();
-        const eventsEndingAtSplit = new Map();
-
-        const addSplit = time => {
-            if (!splits.includes(time)) {
-                splits.push(time);
-                if (!eventsStartingAtSplit.has(time)) eventsStartingAtSplit.set(time, []);
-                if (!eventsEndingAtSplit.has(time)) eventsEndingAtSplit.set(time, []);
-            }
-        };
-        const missingItems = [];
-        for (const id of items) {
-            const bounds = this.getItemInfo(id);
-            if (!bounds) {
-                missingItems.push(id);
-                continue;
-            }
-            addSplit(bounds.start);
-            addSplit(bounds.end);
-            eventsStartingAtSplit.get(bounds.start).push(id);
-            eventsEndingAtSplit.get(bounds.end).push(id);
-        }
-        splits.sort((a, b) => a - b); // sort ascending
-
-        const itemHeight = 96;
-        const minHourHeight = 20;
-
-        let y = 0;
-        const splitsY = new Map(); // mapping from split to Y offset
-        let lastT = null;
-        for (const t of splits) {
-            const deltaHours = (lastT !== null) ? (t - lastT) / 3600 : 0;
-            lastT = t;
-            const splitHasItem = (lastT !== null) ? !!eventsEndingAtSplit.get(t).length : false;
-            if (splitHasItem) {
-                y += Math.max(minHourHeight * deltaHours, itemHeight);
-            } else {
-                y += minHourHeight * deltaHours;
-            }
-            splitsY.set(t, y);
-        }
-
-        const regions = [[]];
-        const occupiedColumns = [];
-        for (const t of splits) {
-            const ending = eventsEndingAtSplit.get(t);
-
-            for (const id of ending) {
-                // free the column occupied by this event
-                const col = occupiedColumns.indexOf(id);
-                if (col < 0) continue;
-                occupiedColumns[col] = null;
-            }
-
-            // if all columns are free, then this is the end of a region
-            const isEndOfRegion = occupiedColumns.reduce((a, b) => a === null && b === null, true);
-            if (isEndOfRegion && regions[regions.length - 1].length) {
-                regions.push([]);
-                occupiedColumns.splice(0); // clear
-            }
-
-            const region = regions[regions.length - 1];
-            const starting = eventsStartingAtSplit.get(t);
-
-            for (const id of starting) {
-                // find a free column and occupy it
-                const freeCol = occupiedColumns.indexOf(null);
-                const bounds = this.getItemInfo(id);
-
-                const start = splitsY.get(bounds.start);
-                const end = splitsY.get(bounds.end);
-
-                const item = {
-                    id,
-                    start,
-                    end,
-                };
-
-                const occupy = bounds.start < bounds.end;
-
-                if (freeCol >= 0) {
-                    if (occupy) occupiedColumns[freeCol] = id;
-                    region[freeCol].push(item);
-                } else {
-                    // no free column; add one
-                    if (occupy) occupiedColumns.push(id);
-                    else occupiedColumns.push(null);
-                    region.push([item]);
-                }
-            }
-        }
-
-        const outRegions = [];
-        for (let i = 0; i < regions.length; i++) {
-            const region = regions[i];
-            if (!region.length) continue;
-            let start = Infinity;
-            let end = -Infinity;
-            for (const col of region) {
-                for (const item of col) {
-                    start = Math.min(start, item.start);
-                    end = Math.max(end, item.end);
-                }
-            }
-
-            outRegions.push({
-                items: region,
-                start,
-                end,
-            });
-        }
-
-        return { regions: outRegions, missingItems };
+        return layoutByColumns(items, id => {
+            const info = this.getItemInfo(id);
+            if (!info) return null;
+            return {
+                column: null,
+                start: info.start,
+                end: info.end,
+            };
+        });
     }
 
-    layoutByRoom () {
+    layoutByLocation () {
         const { items } = this.state;
-        const missingItems = [];
-
-        const locations = {};
-        let minBound = Infinity;
-        let maxBound = -Infinity;
-
-        for (const id of items) {
+        return layoutByColumns(items, id => {
             const info = this.getItemInfo(id);
-            if (!info) {
-                missingItems.push(id);
-                continue;
-            }
-
-            if (!locations[info.location]) locations[info.location] = [];
-            locations[info.location].push({ id, start: info.start, end: info.end });
-
-            if (info.start < minBound) minBound = info.start;
-            if (info.end > maxBound) maxBound = info.end;
-        }
-
-        for (const k in locations) {
-            locations[k].sort((a, b) => a.start - b.start);
-        }
-
-        const hourHeight = 40;
-
-        const region = {
-            items: [],
-            start: 0,
-            end: hourHeight * (maxBound - minBound) / 3600,
-            timeStart: minBound,
-            timeEnd: maxBound,
-            locs: Object.keys(locations),
-        };
-
-        for (const k in locations) {
-            const events = locations[k];
-            const col = [];
-            for (const event of events) {
-                col.push({
-                    id: event.id,
-                    start: hourHeight * (event.start - minBound) / 3600,
-                    end: hourHeight * (event.end - minBound) / 3600,
-                });
-            }
-            region.items.push(col);
-        }
-
-        const regions = [region];
-        return { regions, missingItems, isByRoom: true, hourHeight };
+            if (!info) return null;
+            return {
+                column: info.location,
+                start: info.start,
+                end: info.end,
+            };
+        });
     }
 
     layout () {
-        if (this.props.byRoom) return this.layoutByRoom();
+        if (this.props.byRoom) return this.layoutByLocation();
         return this.layoutTimeline();
     }
 
@@ -411,95 +431,86 @@ class TimelineDayView extends PureComponent {
 
         const contents = [];
 
-        const { regions, missingItems, isByRoom, hourHeight } = this.layout();
-        const ROOMS_MIN_COL_WIDTH = 40;
-        const ROOMS_WEIGHT = 4;
+        const { columns, timeStart, timeEnd, hourHeight, missingItems } = this.layout();
+        const MIN_COL_WIDTH = 120;
 
-        if (isByRoom) {
-            const { locs } = regions[0];
-            contents.push(
-                <div class="day-view-header" style={{
-                    minWidth: (locs.length * ROOMS_WEIGHT + 1) * ROOMS_MIN_COL_WIDTH,
-                }}>
-                    {locs.map((loc, i) => {
-                        return (
-                            <LocationHeader
-                                key={i}
-                                col={1 + i * 4}
-                                cols={locs.length * ROOMS_WEIGHT + 1}
-                                weight={4}
-                                congress={congress}
-                                instance={instance}
-                                id={loc} />
-                        );
-                    })}
-                </div>
-            );
-        }
+        contents.push(
+            <HoursOfTheDay
+                key="_hoursOfTheDay"
+                hasHeader={this.props.byRoom}
+                tz={tz}
+                start={timeStart}
+                end={timeEnd}
+                hourHeight={hourHeight} />
+        );
 
-        for (const region of regions) {
-            const regionNodes = [];
+        for (const column of columns) {
+            const columnNodes = [];
 
-            let cols = region.items.length;
-            let colIndex = 0;
-            let colWeight = 1;
-
-            if (isByRoom) {
-                colWeight = ROOMS_WEIGHT;
-                colIndex++;
-                cols = cols * colWeight + 1;
-
-                regionNodes.push(
-                    <HoursOfTheDay
-                        tz={tz}
-                        cols={cols}
-                        start={region.timeStart}
-                        end={region.timeEnd}
-                        hourHeight={hourHeight} />
+            if (this.props.byRoom) {
+                columnNodes.push(
+                    <LocationHeader
+                        key="_header"
+                        congress={congress}
+                        instance={instance}
+                        id={column.key} />
                 );
             }
 
-            for (const col of region.items) {
-                let prevStart = null;
-                let prevEnd = null;
-                let overlap = 0;
+            for (const region of column.regions) {
+                const regionNodes = [];
 
-                for (const item of col) {
-                    const isOverlapping = item.start < prevEnd;
-                    if (isOverlapping) overlap++;
-                    else overlap = 0;
-                    const start = Math.max(item.start, prevStart + 10);
-                    prevStart = start;
-                    prevEnd = item.end;
+                let colIndex = 0;
 
-                    regionNodes.push(
-                        <DayViewItem
-                            short={this.props.byRoom}
-                            col={colIndex}
-                            cols={cols}
-                            weight={colWeight}
-                            start={start}
-                            end={item.end}
-                            overlap={overlap}
-                            congress={congress}
-                            instance={instance}
-                            key={item.id}
-                            id={item.id}
-                            tz={tz}
-                            onLoadInfo={info => this.onLoadItemInfo(item.id, info)}
-                            onGetItemLink={(id) => {
-                                return `/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`;
-                            }} />
-                    );
+                for (const col of region.items) {
+                    let prevStart = null;
+                    let prevEnd = null;
+                    let overlap = 0;
+
+                    for (const item of col) {
+                        const isOverlapping = item.start < prevEnd;
+                        if (isOverlapping) overlap++;
+                        else overlap = 0;
+                        const start = Math.max(item.start, prevStart + 10);
+                        prevStart = start;
+                        prevEnd = item.end;
+
+                        const itemHeight = (item.end - item.start) * hourHeight;
+
+                        regionNodes.push(
+                            <DayViewItem
+                                short={itemHeight < 96}
+                                col={colIndex}
+                                cols={region.items.length}
+                                start={start}
+                                end={item.end}
+                                overlap={overlap}
+                                congress={congress}
+                                instance={instance}
+                                key={item.id}
+                                id={item.id}
+                                tz={tz}
+                                onLoadInfo={info => this.onLoadItemInfo(item.id, info)}
+                                onGetItemLink={(id) => {
+                                    return `/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`;
+                                }} />
+                        );
+                    }
+                    colIndex += 1;
                 }
-                colIndex += colWeight;
+
+                const minWidth = MIN_COL_WIDTH * region.items.length;
+                const height = region.end - region.start;
+                columnNodes.push(
+                    <div class="day-view-region" style={{ minWidth, height }}>
+                        {regionNodes}
+                    </div>
+                );
             }
 
-            const minWidth = isByRoom ? cols * ROOMS_MIN_COL_WIDTH : null;
-            const height = region.end - region.start;
             contents.push(
-                <div class="day-view-region" style={{ minWidth, height }}>
-                    {regionNodes}
+                <div class="day-view-column" key={column.key}>
+                    {columnNodes}
                 </div>
             );
         }
@@ -530,7 +541,7 @@ class TimelineDayView extends PureComponent {
                         <DisplayError error={error} />
                     </div>
                 ) : items ? (
-                    <div class={'day-view-contents' + (this.props.byRoom ? ' is-scrollable' : '')}>
+                    <div class="day-view-contents">
                         {this.renderContents()}
                     </div>
                 ) : null}
@@ -557,7 +568,7 @@ const DayViewItem = connect(({ congress, instance, id }) =>
     }
 
     render ({
-        col, cols, weight, overlap,
+        col, cols, overlap,
         congress,
         instance,
         id, tz,
@@ -576,15 +587,13 @@ const DayViewItem = connect(({ congress, instance, id }) =>
             }
         }
 
-        const dataCol = Math.floor(col / weight);
-
         return (
             <div class="timeline-item" style={{
-                width: `calc(${100 / cols * weight}% - ${overlap * 20}px)`,
+                width: `calc(${100 / cols}% - ${overlap * 20}px)`,
                 left: `calc(${(col / cols) * 100}% + ${overlap * 20}px)`,
                 top: start,
                 height,
-            }} data-col={dataCol}>
+            }} data-col={col}>
                 <OverviewListItem
                     compact view="congresses/program"
                     skipAnimation
@@ -605,10 +614,12 @@ const SELECTED_FIELDS = ['title', 'timeLoc', 'description'].map(x => ({ id: x, s
 const SELECTED_FIELDS_SHORT = ['title'].map(x => ({ id: x, sorting: 'none' }));
 const SELECTED_FIELDS_LESS_SHORT = ['title', 'time'].map(x => ({ id: x, sorting: 'none' }));
 
-function HoursOfTheDay ({ cols, start, end, hourHeight, tz }) {
+function HoursOfTheDay ({ start, end, hourHeight, tz, hasHeader }) {
     const hours = [];
     let current = Math.floor(start / 3600) * 3600;
     let y = (current - start) / 3600 * hourHeight;
+
+    if (hasHeader) y += 32;
 
     while (current <= end) {
         hours.push(
@@ -616,9 +627,7 @@ function HoursOfTheDay ({ cols, start, end, hourHeight, tz }) {
                 top: y,
                 height: hourHeight,
             }}>
-                <div class="inner-label" style={{
-                    width: `${100 / cols}%`,
-                }}>
+                <div class="inner-label">
                     {moment(current * 1000).tz(tz || 'UTC').format('HH:mm')}
                 </div>
             </div>
@@ -634,13 +643,10 @@ function HoursOfTheDay ({ cols, start, end, hourHeight, tz }) {
     );
 }
 
-function LocationHeader ({ congress, instance, id, col, cols, weight }) {
-    if (id === 'null') {
+function LocationHeader ({ congress, instance, id }) {
+    if (!id) {
         return (
-            <div class="location-header is-nowhere" style={{
-                left: `${(col / cols) * 100}%`,
-                width: `${100 / cols * weight}%`,
-            }}>
+            <div class="location-header is-nowhere">
                 {locationsLocale.locatedWithinNowhere}
             </div>
         );
@@ -649,27 +655,21 @@ function LocationHeader ({ congress, instance, id, col, cols, weight }) {
             <RealLocationHeader
                 congress={congress}
                 instance={instance}
-                id={id}
-                col={col}
-                cols={cols}
-                weight={weight} />
+                id={id} />
         );
     }
 }
 
 const RealLocationHeader = connect(({ congress, instance, id }) => [
     'congresses/location', { congress, instance, id },
-])(data => ({ data }))(function LocationHeader ({ col, cols, weight, data }) {
+])(data => ({ data }))(function LocationHeader ({ data }) {
     let contents = <TinyProgress />;
     if (data) {
         contents = data.name;
     }
 
     return (
-        <div class="location-header" style={{
-            left: `${(col / cols) * 100}%`,
-            width: `${100 / cols * weight}%`,
-        }}>
+        <div class="location-header">
             {contents}
         </div>
     );

@@ -231,6 +231,17 @@ export const congressPrograms = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la programeron? Ne eblas malfari tiun ĉi agon.',
     },
+
+    print: {
+        menuItem: '[[Print]]',
+        dialog: {
+            title: '[[Print program]]',
+            load: '[[Load]]',
+            print: '[[Print]]',
+        },
+        failedToOpenPrintWindow: 'Ne sukcesis malfermi la presilan fenestron',
+        print: '[[Print]]',
+    },
 };
 
 export const congressParticipants = {

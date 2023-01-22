@@ -36,23 +36,44 @@
         }
 
         .day-view-contents {
-            &.is-scrollable {
-                overflow-x: scroll;
-                overflow-y: hidden;
+            display: flex;
+            --hour-header-width: 70px;
+            padding-left: var(--hour-header-width);
+            position: relative;
+            overflow-x: scroll;
+            overflow-y: hidden;
+
+            .hour-item {
+                position: absolute;
+                display: flex;
+                align-items: stretch;
+                left: 0;
+                width: 100%;
+                border-top: 1px solid @separator;
+                pointer-events: none;
+
+                .inner-label {
+                    width: var(--hour-header-width);
+                    padding: 4px;
+                    text-align: right;
+                    pointer-events: auto;
+                    box-sizing: border-box;
+                    border-right: 1px solid @separator;
+                }
             }
 
-            .day-view-header {
-                position: relative;
+            .location-header {
                 height: 32px;
+                font-weight: bold;
+                padding: 4px;
+                box-sizing: border-box;
                 border-bottom: 1px solid @separator;
+            }
 
-                .location-header {
-                    position: absolute;
-                    height: 100%;
-                    font-weight: bold;
-                    padding: 4px;
-                    box-sizing: border-box;
-                }
+            .day-view-column {
+                position: relative;
+                width: 100%;
+                border-left: 1px solid @separator;
             }
 
             .day-view-region {
@@ -68,6 +89,10 @@
                     background: @secondary-fade-50;
                     border-radius: 4px;
                     box-sizing: border-box;
+
+                    .paper-button {
+                        align-items: flex-start;
+                    }
 
                     .gen-col(@col, @color) {
                         &[data-col="@{col}"] {
@@ -86,27 +111,6 @@
                     .gen-col(6, 238 204 119);
                     .gen-col(7, 238 136 119);
                 }
-
-                .hour-item {
-                    position: absolute;
-                    display: flex;
-                    align-items: stretch;
-                    width: 100%;
-                    border-top: 1px solid @separator;
-                    pointer-events: none;
-
-                    .inner-label {
-                        padding: 4px;
-                        text-align: right;
-                        pointer-events: auto;
-                        box-sizing: border-box;
-                        border-right: 1px solid @separator;
-                    }
-                }
-            }
-
-            &.is-scrollable .timeline-item .overview-list-item {
-                align-items: flex-start;
             }
         }
     }
