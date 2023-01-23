@@ -6,6 +6,7 @@ import DialogSheet from '../../../../../components/tasks/dialog-sheet';
 import { congressPrograms as locale } from '../../../../../locale';
 import SearchFilters from '../../../../../components/overview/search-filters';
 import DisplayError from '../../../../../components/utils/error';
+import { date } from '../../../../../components/data';
 import { coreContext } from '../../../../../core/connection';
 import { FILTERS } from './filters';
 import { OVERVIEW_FIELDS } from './fields';
@@ -112,7 +113,7 @@ function LoadPrograms ({ congress, instance, tz, params, byLocation }) {
     }, [params]);
 
     const print = () => {
-        const printWindow = window.open('', 'congressProgramPrintout');
+        const printWindow = window.open('', undefined, 'popup');
         if (!printWindow) {
             this.context.createTask('info', {
                 message: locale.print.failedToOpenPrintWindow,
@@ -162,6 +163,8 @@ function LoadPrograms ({ congress, instance, tz, params, byLocation }) {
 }
 
 async function* loadAllPrograms (core, congress, instance, params) {
+    const instanceInfo = await core.viewData('congresses/instance', { congress, id: instance });
+
     const items = [];
     const locationIdsToLoad = [];
 
@@ -213,7 +216,7 @@ async function* loadAllPrograms (core, congress, instance, params) {
         yield [null, 0.5 + (i + batch.length) / locationIdsToLoad.length / 2];
     }
 
-    yield [{ items, locations }, 1];
+    yield [{ items, locations, instanceInfo }, 1];
 }
 
 function PrintAction ({ window }) {
@@ -235,26 +238,52 @@ function PrintPrograms ({ data, tz, byLocation }) {
         byId.set(item.id, item);
     }
 
-    const layout = layoutByColumns(data.items.map(x => x.id), id => {
-        const item = byId.get(id);
-        return {
-            start: item.timeFrom,
-            end: item.timeTo,
-            column: byLocation ? item.location : null,
-        };
-    });
+    const byDate = new Map();
+    for (const item of data.items) {
+        const itemDate = moment.tz(item.timeFrom * 1000, tz || 'UTC').startOf('day').format('YYYY-MM-DD');
+        if (!byDate.has(itemDate)) byDate.set(itemDate, []);
+        byDate.get(itemDate).push(item);
+    }
+
+    const pages = [];
+
+    for (const pageDate of [...byDate.keys()].sort()) {
+        const layout = layoutByColumns(byDate.get(pageDate).map(x => x.id), id => {
+            const item = byId.get(id);
+            return {
+                start: item.timeFrom,
+                end: item.timeTo,
+                column: byLocation ? item.location : null,
+            };
+        });
+
+        pages.push(
+            <div class="print-day">
+                <h2 class="inner-date-title">
+                    <date.renderer value={pageDate} />
+                </h2>
+                <div class="inner-layout">
+                    <TimelineDayViewLayout
+                        key={pageDate}
+                        DayViewItem={PrintDayViewItem(data, byId)}
+                        LocationHeader={PrintLocationHeader(data)}
+                        layout={layout}
+                        onLoadItemInfo={() => {}}
+                        byLocation={byLocation}
+                        congress={0}
+                        instance={0}
+                        tz={tz} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div class="congress-program-print-layout">
-            <TimelineDayViewLayout
-                DayViewItem={PrintDayViewItem(data, byId)}
-                LocationHeader={PrintLocationHeader(data)}
-                layout={layout}
-                onLoadItemInfo={() => {}}
-                byLocation={byLocation}
-                congress={0}
-                instance={0}
-                tz={tz} />
+            <h1 class="top-title">
+                {locale.print.printTitle(data.instanceInfo?.name)}
+            </h1>
+            {pages}
         </div>
     );
 }

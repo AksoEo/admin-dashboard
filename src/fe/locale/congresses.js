@@ -241,6 +241,7 @@ export const congressPrograms = {
         },
         failedToOpenPrintWindow: 'Ne sukcesis malfermi la presilan fenestron',
         print: '[[Print]]',
+        printTitle: instanceName => `Programo de ${instanceName}`,
     },
 };
 

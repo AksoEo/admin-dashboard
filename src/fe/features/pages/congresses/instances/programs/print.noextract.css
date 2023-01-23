@@ -6,6 +6,12 @@
 
 .congress-program-print-layout {
     font-family: sans-serif;
+}
+
+.congress-program-print-layout .print-day {
+    break-after: page;
+}
+.congress-program-print-layout .inner-layout {
     position: relative;
     display: flex;
     padding-left: 6em;
@@ -16,6 +22,7 @@
     width: 100%;
     border-top: 1pt solid lightgray;
     position: absolute;
+    break-inside: avoid;
 }
 .congress-program-print-layout .hour-item.has-header {
     margin-top: 2em;
