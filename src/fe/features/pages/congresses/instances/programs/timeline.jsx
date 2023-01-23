@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { Fragment, PureComponent } from 'preact/compat';
 import moment from 'moment';
-import { CircularProgress } from 'yamdl';
+import { Button, CircularProgress } from 'yamdl';
 import DynamicHeightDiv from '../../../../../components/layout/dynamic-height-div';
 import TinyProgress from '../../../../../components/controls/tiny-progress';
 import DisplayError from '../../../../../components/utils/error';
@@ -12,6 +12,7 @@ import {
     congressLocations as locationsLocale,
 } from '../../../../../locale';
 import { OVERVIEW_FIELDS } from './fields';
+import PrintProgram from './print';
 import './timeline.less';
 
 function layoutRegions (items, hourHeight, startBound) {
@@ -88,7 +89,10 @@ function layoutRegions (items, hourHeight, startBound) {
             const info = itemsById.get(id);
 
             const start = splitsY.get(info.start);
-            const end = splitsY.get(info.end);
+            let end = splitsY.get(info.end);
+
+            // enforce min item height
+            end = Math.max(end, start + 60);
 
             const item = {
                 id,
@@ -209,9 +213,22 @@ export default class ProgramTimeline extends PureComponent {
         });
     }
 
-    render ({ congress, instance, tz }, { date }) {
+    render ({ congress, instance, tz, byRoom }, { date }) {
         return (
             <div class="congress-program-timeline">
+                <Button
+                    onClick={() => this.setState({ printingProgram: true })}>
+                    {locale.print.menuItem}
+
+                    <PrintProgram
+                        congress={congress}
+                        instance={instance}
+                        byLocation={byRoom}
+                        date={date}
+                        tz={tz}
+                        open={this.state.printingProgram}
+                        onClose={() => this.setState({ printingProgram: false })} />
+                </Button>
                 <TimelineDatePicker
                     value={date}
                     onChange={date => this.setState({ date })}
@@ -281,6 +298,120 @@ class TimelineDatePicker extends PureComponent {
             </div>
         );
     }
+}
+
+export function TimelineDayViewLayout ({
+    byLocation,
+    congress,
+    instance,
+    tz,
+    DayViewItem,
+    LocationHeader,
+    layout,
+    onLoadItemInfo,
+    useMinWidth,
+}) {
+    const contents = [];
+
+    const { columns, timeStart, timeEnd, hourHeight, missingItems } = layout;
+    const MIN_COL_WIDTH = 120;
+
+    contents.push(
+        <HoursOfTheDay
+            key="_hoursOfTheDay"
+            hasHeader={byLocation}
+            tz={tz}
+            start={timeStart}
+            end={timeEnd}
+            hourHeight={hourHeight} />
+    );
+
+    for (const column of columns) {
+        const columnNodes = [];
+
+        if (byLocation) {
+            columnNodes.push(
+                <LocationHeader
+                    key="_header"
+                    congress={congress}
+                    instance={instance}
+                    id={column.key} />
+            );
+        }
+
+        for (const region of column.regions) {
+            const regionNodes = [];
+
+            let colIndex = 0;
+
+            for (const col of region.items) {
+                let prevStart = null;
+                let prevEnd = null;
+                let overlap = 0;
+
+                for (const item of col) {
+                    const isOverlapping = prevEnd && item.start < prevEnd;
+                    if (isOverlapping) overlap++;
+                    else overlap = 0;
+                    const start = prevStart ? Math.max(item.start, prevStart + 10) : item.start;
+                    prevStart = start;
+                    prevEnd = item.end;
+
+                    const itemHeight = (item.end - item.start) * hourHeight;
+
+                    regionNodes.push(
+                        <DayViewItem
+                            short={itemHeight < 96}
+                            col={colIndex}
+                            cols={region.items.length}
+                            start={start}
+                            end={item.end}
+                            overlap={overlap}
+                            congress={congress}
+                            instance={instance}
+                            key={item.id}
+                            id={item.id}
+                            tz={tz}
+                            isByLocation={byLocation}
+                            onLoadInfo={info => onLoadItemInfo(item.id, info)}
+                            onGetItemLink={(id) => {
+                                return `/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`;
+                            }} />
+                    );
+                }
+                colIndex += 1;
+            }
+
+            const minWidth = useMinWidth ? MIN_COL_WIDTH * region.items.length : null;
+            const height = region.end - region.start;
+            columnNodes.push(
+                <div class="day-view-region" style={{ minWidth, height }}>
+                    {regionNodes}
+                </div>
+            );
+        }
+
+        contents.push(
+            <div class="day-view-column" key={column.key} style={{
+                '--max-region-width': column.maxRegionWidth,
+            }}>
+                {columnNodes}
+            </div>
+        );
+    }
+
+    for (const id of missingItems) {
+        contents.push(
+            <DayViewItem
+                congress={congress}
+                instance={instance}
+                key={id}
+                id={id}
+                onLoadInfo={info => onLoadItemInfo(id, info)} />
+        );
+    }
+
+    return contents;
 }
 
 class TimelineDayView extends PureComponent {
@@ -428,105 +559,20 @@ class TimelineDayView extends PureComponent {
         }
 
         const { congress, instance, tz } = this.props;
+        const layout = this.layout();
 
-        const contents = [];
-
-        const { columns, timeStart, timeEnd, hourHeight, missingItems } = this.layout();
-        const MIN_COL_WIDTH = 120;
-
-        contents.push(
-            <HoursOfTheDay
-                key="_hoursOfTheDay"
-                hasHeader={this.props.byRoom}
+        return (
+            <TimelineDayViewLayout
+                useMinWidth
+                congress={congress}
+                instance={instance}
                 tz={tz}
-                start={timeStart}
-                end={timeEnd}
-                hourHeight={hourHeight} />
+                LocationHeader={LocationHeader}
+                DayViewItem={DayViewItem}
+                byLocation={this.props.byRoom}
+                layout={layout}
+                onLoadItemInfo={this.onLoadItemInfo.bind(this)} />
         );
-
-        for (const column of columns) {
-            const columnNodes = [];
-
-            if (this.props.byRoom) {
-                columnNodes.push(
-                    <LocationHeader
-                        key="_header"
-                        congress={congress}
-                        instance={instance}
-                        id={column.key} />
-                );
-            }
-
-            for (const region of column.regions) {
-                const regionNodes = [];
-
-                let colIndex = 0;
-
-                for (const col of region.items) {
-                    let prevStart = null;
-                    let prevEnd = null;
-                    let overlap = 0;
-
-                    for (const item of col) {
-                        const isOverlapping = item.start < prevEnd;
-                        if (isOverlapping) overlap++;
-                        else overlap = 0;
-                        const start = Math.max(item.start, prevStart + 10);
-                        prevStart = start;
-                        prevEnd = item.end;
-
-                        const itemHeight = (item.end - item.start) * hourHeight;
-
-                        regionNodes.push(
-                            <DayViewItem
-                                short={itemHeight < 96}
-                                col={colIndex}
-                                cols={region.items.length}
-                                start={start}
-                                end={item.end}
-                                overlap={overlap}
-                                congress={congress}
-                                instance={instance}
-                                key={item.id}
-                                id={item.id}
-                                tz={tz}
-                                onLoadInfo={info => this.onLoadItemInfo(item.id, info)}
-                                onGetItemLink={(id) => {
-                                    return `/kongresoj/${congress}/okazigoj/${instance}/programeroj/${id}`;
-                                }} />
-                        );
-                    }
-                    colIndex += 1;
-                }
-
-                const minWidth = MIN_COL_WIDTH * region.items.length;
-                const height = region.end - region.start;
-                columnNodes.push(
-                    <div class="day-view-region" style={{ minWidth, height }}>
-                        {regionNodes}
-                    </div>
-                );
-            }
-
-            contents.push(
-                <div class="day-view-column" key={column.key}>
-                    {columnNodes}
-                </div>
-            );
-        }
-
-        for (const id of missingItems) {
-            contents.push(
-                <DayViewItem
-                    congress={congress}
-                    instance={instance}
-                    key={id}
-                    id={id}
-                    onLoadInfo={info => this.onLoadItemInfo(id, info)} />
-            );
-        }
-
-        return contents;
     }
 
     render (_, { loading, error, items }) {
@@ -574,12 +620,13 @@ const DayViewItem = connect(({ congress, instance, id }) =>
         id, tz,
         start, end, data,
         onGetItemLink,
+        isByLocation,
     }) {
         if (!data || !cols) return null;
 
         const height = end - start;
 
-        let fields = SELECTED_FIELDS;
+        let fields = isByLocation ? BYLOC_SELECTED_FIELDS : SELECTED_FIELDS;
         if (this.props.short) {
             fields = SELECTED_FIELDS_SHORT;
             if (height > 40) {
@@ -593,7 +640,7 @@ const DayViewItem = connect(({ congress, instance, id }) =>
                 left: `calc(${(col / cols) * 100}% + ${overlap * 20}px)`,
                 top: start,
                 height,
-            }} data-col={col}>
+            }} data-color={data.location % 8}>
                 <OverviewListItem
                     compact view="congresses/program"
                     skipAnimation
@@ -614,16 +661,16 @@ const SELECTED_FIELDS = ['title', 'timeLoc', 'description'].map(x => ({ id: x, s
 const SELECTED_FIELDS_SHORT = ['title'].map(x => ({ id: x, sorting: 'none' }));
 const SELECTED_FIELDS_LESS_SHORT = ['title', 'time'].map(x => ({ id: x, sorting: 'none' }));
 
+const BYLOC_SELECTED_FIELDS = ['title', 'time', 'description'].map(x => ({ id: x, sorting: 'none' }));
+
 function HoursOfTheDay ({ start, end, hourHeight, tz, hasHeader }) {
     const hours = [];
     let current = Math.floor(start / 3600) * 3600;
     let y = (current - start) / 3600 * hourHeight;
 
-    if (hasHeader) y += 32;
-
     while (current <= end) {
         hours.push(
-            <div class="hour-item" style={{
+            <div class={'hour-item' + (hasHeader ? ' has-header' : '')} style={{
                 top: y,
                 height: hourHeight,
             }}>

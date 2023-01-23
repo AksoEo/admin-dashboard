@@ -98,6 +98,16 @@ const ICON_LUT = {
     HOSTEL: SingleBedIcon,
 };
 
+export function LocationIcon ({ icon, slot }) {
+    const Icon = ICON_LUT[icon];
+    if (!Icon) return <span class="congress-location-icon is-empty" data-slot={slot} />;
+    return (
+        <span class="congress-location-icon" data-slot={slot}>
+            <Icon style={{ verticalAlign: 'middle' }} />
+        </span>
+    );
+}
+
 export const FIELDS = {
     type: {
         component ({ value }) {
@@ -110,14 +120,7 @@ export const FIELDS = {
             if (editing) {
                 return <IconPicker value={value} onChange={onChange} />;
             }
-
-            const Icon = ICON_LUT[value];
-            if (!Icon) return <span class="congress-location-icon is-empty" data-slot={slot} />;
-            return (
-                <span class="congress-location-icon" data-slot={slot}>
-                    <Icon style={{ verticalAlign: 'middle' }} />
-                </span>
-            );
+            return <LocationIcon icon={value} slot={slot} />;
         },
     },
     name: {

@@ -1,6 +1,5 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button } from 'yamdl';
 import ListIcon from '@material-ui/icons/List';
 import TimelineIcon from '@material-ui/icons/DateRange';
 import RoomIcon from '@material-ui/icons/Room';
@@ -14,7 +13,6 @@ import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import './index.less';
 import Segmented from '../../../../../components/controls/segmented';
-import PrintProgram from './print';
 
 const TIMELINE_VIEW = 'timeline';
 const LIST_VIEW = 'list';
@@ -160,17 +158,6 @@ export default class ProgramsView extends PureComponent {
 
         return (
             <div class="congresses-instance-programs">
-                <Button
-                    onClick={() => this.setState({ printingProgram: true })}>
-                    {locale.print.menuItem}
-
-                    <PrintProgram
-                        congress={congress}
-                        instance={instance}
-                        tz={tz}
-                        open={this.state.printingProgram}
-                        onClose={() => this.setState({ printingProgram: false })} />
-                </Button>
                 <div class="switch-button-container">
                     <Segmented
                         class="smaller"

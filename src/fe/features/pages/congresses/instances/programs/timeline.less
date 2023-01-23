@@ -52,6 +52,10 @@
                 border-top: 1px solid @separator;
                 pointer-events: none;
 
+                &.has-header {
+                    margin-top: 32px;
+                }
+
                 .inner-label {
                     width: var(--hour-header-width);
                     padding: 4px;
@@ -78,7 +82,6 @@
 
             .day-view-region {
                 position: relative;
-                margin-bottom: 16px;
 
                 .timeline-item {
                     position: absolute;
@@ -95,14 +98,11 @@
                     }
 
                     .gen-col(@col, @color) {
-                        &[data-col="@{col}"] {
-                            --secondary: @color;
-                        }
-                        @col2: (@col + 8);
-                        &[data-col="@{col2}"] {
+                        &[data-color="@{col}"] {
                             --secondary: @color;
                         }
                     }
+                    .gen-col(0, 255 119 238);
                     .gen-col(1, 238 119 187);
                     .gen-col(2, 170 119 238);
                     .gen-col(3, 119 153 238);
