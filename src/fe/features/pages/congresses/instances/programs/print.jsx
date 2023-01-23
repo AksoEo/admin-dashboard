@@ -286,7 +286,7 @@ const PrintDayViewItem = (data, itemsById) => function PrintDayViewItem ({
                 item={item}
                 value={null}
                 userData={{ tz }} />
-            {isByLocation && (
+            {!isByLocation && (
                 <div class="inner-loc">
                     <LocationIcon icon={location?.icon} slot="icon" />
                     {' '}
