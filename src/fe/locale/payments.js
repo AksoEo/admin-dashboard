@@ -84,8 +84,8 @@ export const paymentMethods = {
         stripeMethods: 'Stripe-metodoj',
         name: 'Nomo',
         internalDescription: 'Internaj notoj',
-        descriptionPreview: '[[DescriptionPreview]]',
-        description: 'Publika priskribo',
+        descriptionPreview: 'Publika antaŭ-priskribo',
+        description: 'Publika post-priskribo',
         currencies: 'Valutoj',
         internal: 'Interna',
         paymentValidity: 'Valideco de neplenumitaj pagoj',
@@ -101,8 +101,8 @@ export const paymentMethods = {
             description: 'La fiksaj kaj elcentaj kotizoj estos kunaldonitaj',
         },
 
-        descriptionPreviewDescription: '[[Shown before a user selects a payment method. Include only general information on the payment method but specifically no information on HOW to make the payment.]]',
-        descriptionDescription: '[[Shown to the user when they select a payment method. include information about how to make the payment, such as an IBAN.]]',
+        descriptionPreviewDescription: 'Montrata antaŭ ol kliento elektas pagmanieron. Ĝi inkluzivu nur ĝeneralajn informojn pri la pagmaniero, sed precipe neniuj informoj pri kiel fari la pagon.',
+        descriptionDescription: 'Montrata al klientoj post kiam ili elektis pagmanieron. Ĝi inkluzivu informojn pri kiel sendi la pagon, ekz. IBAN aŭ PayPal-retpoŝtadreson.',
 
         types: {
             manual: 'Permana',
@@ -125,7 +125,7 @@ export const paymentMethods = {
         maxAmountEnable: 'Uzi maksimuman sumon',
         maxAmountErrMinAmount: 'La maksimuma sumo ne rajtas esti malpli ol 1 USD.',
 
-        internalMethodNotice: '[[Note: internal payment methods no longer send payment instruction emails. ever]]',
+        internalMethodNotice: 'Notu: Internaj pagmanieroj ne sendas retpoŝtmesaĝojn kun instrukcioj pri kiel plenumi pagon.',
     },
     prices: {
         addYear: 'Aldoni jaron',
@@ -315,7 +315,7 @@ export const paymentIntents = {
             title: 'Indiki pagon ricevita',
             description: 'Ĉu vi certas, ke la mono estis ricevita? Bv. aldoni la eksternan identigilon de la pago se eblas.',
             button: 'Indiki',
-            sendReceipt: '[[Send receipt to client]]',
+            sendReceipt: 'Sendi kvitancon',
         },
         submit: {
             title: 'Indiki monon sendita',

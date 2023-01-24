@@ -233,14 +233,14 @@ export const congressPrograms = {
     },
 
     print: {
-        menuItem: '[[Print]]',
+        menuItem: 'Presi',
         dialog: {
-            title: '[[Print program]]',
-            load: '[[Load]]',
-            print: '[[Print]]',
+            title: 'Presi programon',
+            load: 'Ŝarĝi',
+            print: 'Presi',
         },
         failedToOpenPrintWindow: 'Ne sukcesis malfermi la presilan fenestron',
-        print: '[[Print]]',
+        print: 'Presi',
         printTitle: instanceName => `Programo de ${instanceName}`,
     },
 };
