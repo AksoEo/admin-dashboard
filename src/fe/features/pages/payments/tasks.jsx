@@ -134,11 +134,11 @@ export default {
                         </label>
                     ) : null}
                     <Component
+                        slot="create"
                         value={item[f]}
                         editing={true}
                         onChange={value => task.update({ [f]: value })}
                         item={item}
-                        isCreation={true}
                         onItemChange={value => task.update(value)} />
                 </Field>
             );
@@ -629,6 +629,8 @@ export default {
         );
     },
     markIntentSucceeded ({ open, task }) {
+        const sendReceiptId = Math.random().toString(36);
+
         return (
             <TaskDialog
                 class="payments-task-intent-action"
@@ -638,6 +640,14 @@ export default {
                 actionLabel={intentLocale.actions.markSucceeded.button}
                 run={() => task.runOnce()}>
                 {intentLocale.actions.markSucceeded.description}
+                <div class="input-container">
+                    <Checkbox
+                        id={sendReceiptId}
+                        checked={!!task.parameters.sendReceipt}
+                        onChange={sendReceipt => task.update({ sendReceipt })} />
+                    {' '}
+                    <label for={sendReceiptId}>{intentLocale.actions.markSucceeded.sendReceipt}</label>
+                </div>
             </TaskDialog>
         );
     },

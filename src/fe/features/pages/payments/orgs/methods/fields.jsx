@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { Fragment, PureComponent } from 'preact/compat';
 import { Checkbox, TextField } from 'yamdl';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 import CheckIcon from '@material-ui/icons/Check';
@@ -37,8 +37,8 @@ export const FIELDS = {
     type: {
         sortable: true,
         slot: 'titleAlt',
-        component ({ value, editing, onChange, isCreation }) {
-            if (isCreation && editing) {
+        component ({ value, editing, onChange, slot }) {
+            if (slot === 'create' && editing) {
                 if (!value) onChange(Object.keys(locale.fields.types)[0]);
 
                 return (
@@ -57,11 +57,11 @@ export const FIELDS = {
         sortable: true,
         slot: 'title',
         shouldHide: (_, editing) => !editing,
-        component ({ value, editing, onChange, isCreation, slot }) {
+        component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <TextField
                     required
-                    label={isCreation ? locale.fields.name : null}
+                    label={slot === 'create' ? locale.fields.name : null}
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }
@@ -71,10 +71,10 @@ export const FIELDS = {
     },
     internalDescription: {
         skipLabel: true,
-        component ({ value, editing, onChange, isCreation }) {
+        component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return <TextField
-                    label={isCreation ? locale.fields.internalDescription : null}
+                    label={slot === 'create' ? locale.fields.internalDescription : null}
                     value={value}
                     onChange={e => onChange(e.target.value)} />;
             }
@@ -84,9 +84,24 @@ export const FIELDS = {
     },
     internal: {
         wantsCreationLabel: true,
-        component ({ value, editing, onChange }) {
+        component ({ value, editing, onChange, slot }) {
             if (editing) {
-                return <Checkbox checked={value} onChange={onChange} />;
+                const checkbox = <Checkbox checked={value} onChange={onChange} />;
+
+                if (slot === 'create') {
+                    return (
+                        <Fragment>
+                            {checkbox}
+                            {value ? (
+                                <div class="payment-method-internal-method-notice">
+                                    {locale.fields.internalMethodNotice}
+                                </div>
+                            ) : null}
+                        </Fragment>
+                    );
+                }
+
+                return checkbox;
             }
 
             return value ? <CheckIcon /> : null;
@@ -94,13 +109,13 @@ export const FIELDS = {
     },
     description: {
         wantsCreationLabel: true,
-        component ({ value, editing, onChange, isCreation, slot }) {
+        component ({ value, editing, onChange, slot }) {
             return <MdField
                 ignoreLiveUpdates
                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
                 value={value}
                 editing={editing}
-                inline={slot !== 'detail' && !isCreation}
+                inline={slot !== 'detail' && slot !== 'create'}
                 onChange={onChange} />;
         },
         shouldHide: item => item.internal,

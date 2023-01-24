@@ -522,9 +522,11 @@ export const tasks = {
         // event log should be updated
         tasks.getIntent({ id }, { fields: ['events'] }).catch(() => {});
     },
-    markIntentSucceeded: async ({ id }) => {
+    markIntentSucceeded: async ({ id }, { sendReceipt }) => {
         const client = await asyncClient;
-        await client.post(`/aksopay/payment_intents/${id}/!mark_succeeded`);
+        await client.post(`/aksopay/payment_intents/${id}/!mark_succeeded`, {
+            sendReceipt: !!sendReceipt,
+        });
         const existing = store.get([PAYMENT_INTENTS, id]);
         store.insert([PAYMENT_INTENTS, id], deepMerge(existing, { status: 'succeeded' }));
         // event log should be updated

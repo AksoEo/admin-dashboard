@@ -439,7 +439,7 @@ const ACTIONS = {
         enabled: (t, s) => typeIsManualLike(t) && (s === 'pending' || s === 'submitted' || s === 'disputed'),
         types: ['manual', 'intermediary'],
         icon: AssignmentTurnedInIcon,
-        task: id => ['payments/markIntentSucceeded', { id }],
+        task: id => ['payments/markIntentSucceeded', { id }, { sendReceipt: true }],
         hasPerm: (perms, org) => perms.hasPerm(`pay.payment_intents.mark_succeeded.${org}`),
     },
     markRefunded: {

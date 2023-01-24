@@ -120,6 +120,8 @@ export const paymentMethods = {
         maxAmount: 'Maksimuma sumo',
         maxAmountEnable: 'Uzi maksimuman sumon',
         maxAmountErrMinAmount: 'La maksimuma sumo ne rajtas esti malpli ol 1 USD.',
+
+        internalMethodNotice: '[[Note: internal payment methods no longer send payment instruction emails. ever]]',
     },
     prices: {
         addYear: 'Aldoni jaron',
@@ -309,6 +311,7 @@ export const paymentIntents = {
             title: 'Indiki pagon ricevita',
             description: 'Ĉu vi certas, ke la mono estis ricevita? Bv. aldoni la eksternan identigilon de la pago se eblas.',
             button: 'Indiki',
+            sendReceipt: '[[Send receipt to client]]',
         },
         submit: {
             title: 'Indiki monon sendita',
