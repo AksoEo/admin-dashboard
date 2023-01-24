@@ -107,16 +107,33 @@ export const FIELDS = {
             return value ? <CheckIcon /> : null;
         },
     },
+    descriptionPreview: {
+        wantsCreationLabel: true,
+        component ({ value, editing, onChange, slot }) {
+            return <MdField
+                placeholder={locale.fields.descriptionPreviewDescription}
+                ignoreLiveUpdates
+                rules={['emphasis', 'strikethrough', 'link']}
+                value={value || ''}
+                editing={editing}
+                inline={slot !== 'detail' && slot !== 'create'}
+                onChange={v => onChange(v || null)}
+                maxLength={2000} />;
+        },
+        shouldHide: item => item.internal,
+    },
     description: {
         wantsCreationLabel: true,
         component ({ value, editing, onChange, slot }) {
             return <MdField
+                placeholder={locale.fields.descriptionDescription}
                 ignoreLiveUpdates
                 rules={['emphasis', 'strikethrough', 'link', 'list', 'table']}
-                value={value}
+                value={value || ''}
                 editing={editing}
                 inline={slot !== 'detail' && slot !== 'create'}
-                onChange={onChange} />;
+                onChange={v => onChange(v || null)}
+                maxLength={5000} />;
         },
         shouldHide: item => item.internal,
     },

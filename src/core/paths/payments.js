@@ -341,7 +341,7 @@ export const tasks = {
         const client = await asyncClient;
         const res = await client.get(`/aksopay/payment_orgs/${org}/methods/${id}`, {
             fields: [
-                'id', 'type', 'stripeMethods', 'name', 'internalDescription',
+                'id', 'type', 'stripeMethods', 'name', 'internalDescription', 'descriptionPreview',
                 'description', 'currencies', 'paymentValidity', 'isRecommended',
                 'stripePublishableKey', 'feePercent', 'feeFixed.val', 'feeFixed.cur',
                 'internal', 'prices', 'maxAmount',

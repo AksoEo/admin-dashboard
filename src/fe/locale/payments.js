@@ -84,6 +84,7 @@ export const paymentMethods = {
         stripeMethods: 'Stripe-metodoj',
         name: 'Nomo',
         internalDescription: 'Internaj notoj',
+        descriptionPreview: '[[DescriptionPreview]]',
         description: 'Publika priskribo',
         currencies: 'Valutoj',
         internal: 'Interna',
@@ -99,6 +100,9 @@ export const paymentMethods = {
             percent: 'Elcenta kotizo',
             description: 'La fiksaj kaj elcentaj kotizoj estos kunaldonitaj',
         },
+
+        descriptionPreviewDescription: '[[Shown before a user selects a payment method. Include only general information on the payment method but specifically no information on HOW to make the payment.]]',
+        descriptionDescription: '[[Shown to the user when they select a payment method. include information about how to make the payment, such as an IBAN.]]',
 
         types: {
             manual: 'Permana',
