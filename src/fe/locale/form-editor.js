@@ -19,6 +19,7 @@ export const formEditor = {
             minUpfront: 'Minimuma antaŭpago',
             pricePreview: 'Nuna prezo laŭ skripto:',
             notANumber: 'ne estas nombro',
+            description: 'Ĉiuj valutoj indikas prezon en sia plej malgranda unuo (ekz. cendoj). Tiel 1,50 EUR skribiĝu kiel 150 kaj 900 JPY kiel 900.',
         },
         confirmationNotifTemplateId: {
             label: 'Ŝablono por aliĝkonfirmilo',

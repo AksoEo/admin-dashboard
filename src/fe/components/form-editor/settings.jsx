@@ -183,6 +183,9 @@ function Price ({ value, editing, onChange, previousNodes }) {
                     items={Object.keys(currencies).map(c => ({ value: c, label: currencies[c] }))}
                     value={value.currency}
                     onChange={currency => onChange({ ...value, currency })} />
+                <div class="settings-item-description">
+                    {locale.settings.price.description}
+                </div>
             </Field>
         );
 
