@@ -195,7 +195,7 @@ function TimespanEditor ({ value, onChange }) {
     );
 }
 
-export function IsoDuration ({ value }) {
+export function parseIsoDuration (value) {
     let years = 0;
     let months = 0;
     let days = 0;
@@ -205,6 +205,12 @@ export function IsoDuration ({ value }) {
         months = +match[2] | 0;
         days = +match[3] | 0;
     }
+
+    return { years, months, days };
+}
+
+export function IsoDuration ({ value }) {
+    const { years, months, days } = parseIsoDuration(value);
 
     const out = [];
     if (years) out.push(locale.timespanUnits.years(years));

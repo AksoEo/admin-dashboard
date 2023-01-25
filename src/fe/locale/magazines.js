@@ -279,4 +279,17 @@ export const magazineSnaps = {
         },
         filename: 'lando_kvantoj',
     },
+    memberInclusionInfo: {
+        editionDate: '[[Edition date]]',
+        includeLastYearCutoffDate: '[[IncludeLastYear cutoff date]]',
+        includesLastYear: '[[Snapshot includes previous year]]',
+        doesNotIncludeLastYear: '[[Snapshot does not include previous year]]',
+        editInfo: [
+            '[[If you need to change this, you can edit subscription preferences for the]] ',
+            '[[edition]]',
+            ' [[or the]] ',
+            '[[magazine]]',
+            '.',
+        ],
+    },
 };

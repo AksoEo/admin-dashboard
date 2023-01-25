@@ -1,15 +1,19 @@
 import { h } from 'preact';
 import { useContext, useEffect, useRef, useState } from 'preact/compat';
 import { Button, Checkbox, TextField } from 'yamdl';
+import moment from 'moment';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import TinyProgress from '../../../../../components/controls/tiny-progress';
 import DataList from '../../../../../components/lists/data-list';
 import ItemPickerDialog from '../../../../../components/pickers/item-picker-dialog';
-import { timestamp } from '../../../../../components/data';
+import { date, timestamp } from '../../../../../components/data';
 import { connect, coreContext } from '../../../../../core/connection';
 import { magazineSnaps as locale } from '../../../../../locale';
 import CH_FIELDS from '../../../codeholders/table-fields';
+import { parseIsoDuration } from '../../../../../components/data/timespan';
+import permsContext from '../../../../../perms';
+import { Link } from '../../../../../router';
 import './fields.less';
 
 export const FIELDS = {
@@ -175,4 +179,80 @@ function CodeholderItem ({ codeholder }) {
             })}
         </div>
     );
+}
+
+export function MemberInclusionInfo ({ magazine, edition, onLinkClick }) {
+    const core = useContext(coreContext);
+    const perms = useContext(permsContext);
+    const [ilyInterval, setIlyInterval] = useState(null);
+    const [editionData, setEditionData] = useState(null);
+    const [magazineData, setMagazineData] = useState(null);
+
+    useEffect(() => {
+        let canceled = false;
+        (async () => {
+            const editionData = await core.viewData('magazines/edition', { magazine, id: edition });
+            const magazineData = await core.viewData('magazines/magazine', { id: magazine });
+
+            const subscribers = editionData.subscribers || magazineData.subscribers;
+
+            return { editionData, magazineData, ilyInterval: subscribers?.access?.membersIncludeLastYear };
+        })().then(({ editionData, magazineData, ilyInterval }) => {
+            if (canceled) return;
+            setEditionData(editionData);
+            setMagazineData(magazineData);
+            setIlyInterval(ilyInterval);
+        });
+        return () => canceled = true;
+    }, [magazine, edition]);
+
+    if (ilyInterval && editionData?.date) {
+        const { years, months, days } = parseIsoDuration(ilyInterval);
+        const lastYear = moment(editionData.date).subtract(1, 'years').year();
+        const cutOffDate = moment(editionData.date).subtract(years, 'years').subtract(months, 'months').subtract(days, 'days');
+        const includesLastYear = cutOffDate.year() === lastYear;
+
+        const canEdit = perms?.hasPerm(`magazines.update.${magazineData?.org}`);
+
+        return (
+            <div class="magazine-snapshot-members-inclusion-info">
+                <div class="inner-field">
+                    <div class="inner-label">
+                        {locale.memberInclusionInfo.editionDate}
+                    </div>
+                    <div class="inner-value">
+                        <date.renderer value={editionData.date} />
+                    </div>
+                </div>
+                <div class="inner-field">
+                    <div class="inner-label">
+                        {locale.memberInclusionInfo.includeLastYearCutoffDate}
+                    </div>
+                    <div class="inner-value">
+                        <date.renderer value={cutOffDate} />
+                    </div>
+                </div>
+                <div class="inner-verdict">
+                    {includesLastYear
+                        ? locale.memberInclusionInfo.includesLastYear
+                        : locale.memberInclusionInfo.doesNotIncludeLastYear}
+                </div>
+                {canEdit && (
+                    <div class="inner-edit-info">
+                        {locale.memberInclusionInfo.editInfo[0]}
+                        <Link target={`/revuoj/${magazine}/numero/${edition}/redakti`} onClick={onLinkClick}>
+                            {locale.memberInclusionInfo.editInfo[1]}
+                        </Link>
+                        {locale.memberInclusionInfo.editInfo[2]}
+                        <Link target={`/revuoj/${magazine}/redakti`} onClick={onLinkClick}>
+                            {locale.memberInclusionInfo.editInfo[3]}
+                        </Link>
+                        {locale.memberInclusionInfo.editInfo[4]}
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return null;
 }

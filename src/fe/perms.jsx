@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { forwardRef, createContext } from 'preact/compat';
 
 /** This context will contain a Perms instance (see akso-client) when active. */
-const permsContext = createContext(null);
+export const permsContext = createContext(null);
 export default permsContext;
 
 /**

@@ -1,5 +1,7 @@
 import { h } from 'preact';
+import { useContext } from 'preact/compat';
 import TaskDialog from '../../../components/tasks/task-dialog';
+import { TextField } from 'yamdl';
 import {
     magazines as magazinesLocale,
     magazineEditions as editionsLocale,
@@ -13,9 +15,11 @@ import { createDialog, updateDialog, deleteDialog } from '../../../components/ta
 import { FIELDS as MAGAZINE_FIELDS } from './fields';
 import { FIELDS as EDITION_FIELDS } from './editions/fields';
 import { FIELDS as TOC_FIELDS } from './editions/toc/fields';
-import { FIELDS as SNAP_FIELDS } from './editions/snapshots/fields';
+import { FIELDS as SNAP_FIELDS, MemberInclusionInfo } from './editions/snapshots/fields';
 import { FIELDS as SUB_FIELDS } from './subscriptions/fields';
 import './tasks.less';
+import { routerContext } from '../../../router';
+import { Field } from '../../../components/form';
 
 export default {
     createMagazine: createDialog({
@@ -119,14 +123,38 @@ export default {
     },
     deleteTocRecitation: deleteDialog({ locale: tocLocale.recitations.delete }),
 
-    createSnapshot: createDialog({
+    createSnapshot2: createDialog({
         locale: snapLocale,
         fieldNames: ['name'],
         fields: SNAP_FIELDS,
-        className: 'magazines-task-create-snapshot',
-        onCompletion: (task, routerContext, id) => routerContext
-            .navigate(`/revuoj/${task.options.magazine}/numero/${task.options.edition}/momentaj-abonantoj/${id}`),
     }),
+    createSnapshot ({ open, core, task }) {
+        const router = useContext(routerContext);
+
+        return (
+            <TaskDialog
+                class="magazines-task-create-snaphot creation-task"
+                open={open}
+                onClose={() => task.drop()}
+                title={snapLocale.create.title}
+                actionLabel={snapLocale.create.button}
+                run={() => task.runOnce().then(id => {
+                    router.navigate(`/revuoj/${task.options.magazine}/numero/${task.options.edition}/momentaj-abonantoj/${id}`);
+                })}>
+                <Field>
+                    <TextField
+                        outline
+                        label={snapLocale.fields.name}
+                        value={task.parameters.name}
+                        onChange={e => task.update({ name: e.target.value })} />
+                </Field>
+                <MemberInclusionInfo
+                    magazine={task.options.magazine}
+                    edition={task.options.edition}
+                    onLinkClick={() => task.drop()} />
+            </TaskDialog>
+        );
+    },
     updateSnapshot: updateDialog({ locale: snapLocale.update, fields: snapLocale.fields }),
     deleteSnapshot: deleteDialog({ locale: snapLocale.delete }),
 
