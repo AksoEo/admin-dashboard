@@ -421,9 +421,11 @@ function batchLoadMethodName (org, method) {
     return new Promise((resolve, reject) => {
         let schedule = false;
         if (batchLoadMethodOrgs.has(org)) {
-            if (batchLoadMethodOrgs.get(org).size > 50) batchFlushMethodOrg(org);
-            batchLoadMethodOrgs.set(org, new Set());
-            schedule = true;
+            if (batchLoadMethodOrgs.get(org).size > 50) {
+                batchFlushMethodOrg(org);
+                batchLoadMethodOrgs.set(org, new Set());
+                schedule = true;
+            }
         } else {
             batchLoadMethodOrgs.set(org, new Set());
             schedule = true;
@@ -465,9 +467,11 @@ function batchLoadAddonName (org, addon) {
     return new Promise((resolve, reject) => {
         let schedule = false;
         if (batchLoadAddonOrgs.has(org)) {
-            if (batchLoadAddonOrgs.get(org).size > 50) batchFlushAddonOrg(org);
-            batchLoadAddonOrgs.set(org, new Set());
-            schedule = true;
+            if (batchLoadAddonOrgs.get(org).size > 50) {
+                batchFlushAddonOrg(org);
+                batchLoadAddonOrgs.set(org, new Set());
+                schedule = true;
+            }
         } else {
             batchLoadAddonOrgs.set(org, new Set());
             schedule = true;
