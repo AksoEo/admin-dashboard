@@ -50,6 +50,14 @@ export default connectPerms(class ParticipantsPage extends DetailPage {
                 label: locale.update.menuItem,
                 action: () => this.props.push('redakti', true),
             });
+
+            actions.push({
+                label: locale.resendConfirmation.menuItem,
+                action: () => this.context.createTask('congresses/resendParticipantConfirmation', {
+                    congress, instance, id,
+                }),
+                overflow: true,
+            });
         }
 
         if (perms.hasPerm(`congress_instances.participants.delete.${org}`)) {

@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { lazy, Suspense, useEffect, useRef } from 'preact/compat';
+import { lazy, Suspense, useContext, useEffect, useRef, useState } from 'preact/compat';
 import { CircularProgress, TextField } from 'yamdl';
 import TaskDialog from '../../../components/tasks/task-dialog';
 import { Field } from '../../../components/form';
@@ -7,7 +7,7 @@ import ChangedFields from '../../../components/tasks/changed-fields';
 import Segmented from '../../../components/controls/segmented';
 import { TejoIcon, UeaIcon } from '../../../components/org-icon';
 import MdField from '../../../components/controls/md-field';
-import { Required, timestamp } from '../../../components/data';
+import { Required, email, timestamp } from '../../../components/data';
 import {
     congresses as locale,
     congressInstances as instanceLocale,
@@ -17,6 +17,7 @@ import {
     congressParticipants as participantLocale,
     data as dataLocale,
 } from '../../../locale';
+import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import { FIELDS as INSTANCE_FIELDS } from './instances/fields';
@@ -458,4 +459,49 @@ export default {
             </TaskDialog>
         );
     },
+
+    resendParticipantConfirmation ({ open, core, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={participantLocale.resendConfirmation.title}
+                actionLabel={participantLocale.resendConfirmation.button}
+                run={() => task.runOnce().then(() => {
+                    core.createTask('info', {
+                        message: participantLocale.resendConfirmation.sent,
+                    });
+                })}>
+                {participantLocale.resendConfirmation.description}
+                {' '}
+                <ParticipantEmailAddress
+                    congress={task.options.congress}
+                    instance={task.options.instance}
+                    id={task.options.id} />
+            </TaskDialog>
+        );
+    },
 };
+
+function ParticipantEmailAddress ({ congress, instance, id }) {
+    const core = useContext(coreContext);
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+        let revoked = false;
+        core.viewData('congresses/participant', {
+            congress, instance, id,
+            fields: ['identity'],
+        }).then(res => {
+            setData(res);
+        });
+
+        return () => revoked = true;
+    }, [congress, instance, id]);
+
+    if (data) {
+        return <email.inlineRenderer value={data.identity?.email} />;
+    }
+
+    return null;
+}

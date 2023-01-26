@@ -648,6 +648,18 @@ export const tasks = {
     participantFiltersToAPI: async ({ filters }) => {
         return filtersToAPI(pClientFilters, filters);
     },
+    resendParticipantConfirmation: async ({ congress, instance, id }) => {
+        const client = await asyncClient;
+        try {
+            await client.post(`/congresses/${congress}/instances/${instance}/participants/${id}/!resend_confirmation_notif`);
+        } catch (err) {
+            if (err?.statusCode === 409) {
+                throw { code: 'no-confirmation-template', message: 'Missing confirmation template' };
+            } else {
+                throw err;
+            }
+        }
+    },
 };
 
 export const views = {

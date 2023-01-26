@@ -357,6 +357,13 @@ export const congressParticipants = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi ne volas anstataŭe nuligi la aliĝon, kaj ke vi volas nepre forigi la aliĝon? Ne eblas malfari tiun ĉi agon.',
     },
+    resendConfirmation: {
+        menuItem: '[[Resend confirmation email]]',
+        title: '[[Resend confirmation]]',
+        description: '[[This will send a confirmation email to the following email address:]]',
+        button: '[[Send]]',
+        sent: '[[Email sent]]',
+    },
     csvFilename: 'alighintoj',
 };
 
