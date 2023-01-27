@@ -163,13 +163,15 @@ export default class MarkdownTextField extends PureComponent {
                 popout = <Popout closing={popoutClosing} onClose={this.#closeEditorBarPopout} />;
             }
 
+            const editorBarVisible = !!(focused || editorBarPopout);
             editorBar = (
                 <EditorBarPortal
+                    visible={editorBarVisible}
                     owner={this.#node}
                     requestBackdrop={popoutBackdrop}
                     request={popout}>
                     <EditorBar
-                        visible={focused || editorBarPopout}
+                        visible={editorBarVisible}
                         rules={rules}
                         view={this.editor.current?.view}
                         onChange={onChange}
@@ -280,6 +282,7 @@ class EditorBarPortal extends PureComponent {
         posX: 0,
         posY: 0,
         width: 0,
+        visible: this.props.visible,
     };
 
     #updates = 0;
@@ -323,10 +326,37 @@ class EditorBarPortal extends PureComponent {
         window.removeEventListener('wheel', this.#onMutate);
         window.removeEventListener('keydown', this.#onMutate);
         window.removeEventListener('keyup', this.#onMutate);
+        clearTimeout(this.#setInvisibleTimeout);
     }
 
-    render ({ children, requestBackdrop, request }, { posX, posY, width }) {
+    shouldComponentUpdate (nextProps, nextState) {
+        if (super.shouldComponentUpdate(nextProps, nextState)) {
+            if (!this.props.visible && !nextProps.visible) return false;
+            return true;
+        }
+        return false;
+    }
+
+    #setInvisibleTimeout = null;
+    componentDidUpdate (prevProps) {
+        if (!prevProps.visible && this.props.visible) {
+            globalAnimator.register(this);
+            clearTimeout(this.#setInvisibleTimeout);
+            this.setState({ visible: true });
+        } else if (prevProps.visible && !this.props.visible) {
+            globalAnimator.deregister(this);
+
+            clearTimeout(this.#setInvisibleTimeout);
+            this.#setInvisibleTimeout = setTimeout(() => {
+                this.setState({ visible: false });
+            }, 500);
+        }
+    }
+
+    render ({ children, requestBackdrop, request }, { posX, posY, width, visible }) {
         const transform = `translate(${posX}px, ${posY}px)`;
+
+        if (!visible) return null;
 
         return createPortal(
             <div class="markdown-text-field-editor-bar-container">
@@ -568,6 +598,13 @@ const FORMAT_BUTTONS = {
 };
 
 function EditorBar ({ visible, rules, view, onChange, onPopout, onOpenHelp }) {
+    const [actuallyVisible, setActuallyVisible] = useState(false);
+
+    useEffect(() => {
+        // we set visible with a delay so the animation can play
+        setActuallyVisible(visible);
+    }, [visible]);
+
     const buttons = [];
 
     const applyAction = apply => {
@@ -616,7 +653,7 @@ function EditorBar ({ visible, rules, view, onChange, onPopout, onOpenHelp }) {
     }
 
     return (
-        <div class={'markdown-text-field-editor-bar' + (visible ? ' is-visible' : '')}>
+        <div class={'markdown-text-field-editor-bar' + (actuallyVisible ? ' is-visible' : '')}>
             <div class="editor-bar-contents">
                 {buttons}
                 <div class="editor-bar-spacer" />
