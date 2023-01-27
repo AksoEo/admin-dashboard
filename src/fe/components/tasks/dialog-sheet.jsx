@@ -14,6 +14,7 @@ const DEFAULT_FULLSCREEN_WIDTH = 420;
  * # Props
  * - open/onClose
  * - title
+ * - allowBackdropClose - set to true to re-enable this feature
  */
 export default class DialogSheet extends Dialog {
     _container = document.createElement('div');
@@ -33,7 +34,8 @@ export default class DialogSheet extends Dialog {
 
     onContainerClick = e => {
         if (e.target === this.containerNode && this.props.onClose) {
-            this.onCancel();
+            if (this.props.allowBackdropClose) this.props.onClose();
+            else this.onCancel();
         }
     };
 

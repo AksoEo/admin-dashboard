@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { createRef, PureComponent } from 'preact/compat';
+import { createRef, PureComponent, useState } from 'preact/compat';
 import { Button, Checkbox, Slider, TextField } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -8,6 +8,7 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import ResetIcon from '@material-ui/icons/RotateLeft';
 import RearrangingList from '../lists/rearranging-list';
 import DynamicHeightDiv from '../layout/dynamic-height-div';
+import DialogSheet from '../tasks/dialog-sheet';
 import CountryPicker from '../pickers/country-picker';
 import TimeZoneEditor from '../controls/time-zone';
 import MdField from '../controls/md-field';
@@ -471,6 +472,7 @@ export default class InputItem extends PureComponent {
 
     render ({
         editing,
+        onStopEditing,
         item,
         onChange,
         value,
@@ -481,15 +483,22 @@ export default class InputItem extends PureComponent {
         disableValidation,
         hasValues,
     }) {
+        let editingContents;
+        if (isEditingContext) {
+            editingContents = (
+                <BufferedInputSettings
+                    editing={editing}
+                    onStopEditing={onStopEditing}
+                    key="settings"
+                    oldName={this.oldName}
+                    item={item}
+                    onChange={onChange}
+                    scriptCtx={{ previousNodes }} />
+            );
+        }
+
         let contents;
-        if (editing) {
-            contents = <InputSettings
-                oldName={this.oldName}
-                item={item}
-                onChange={onChange}
-                scriptCtx={{ previousNodes }}
-                key="settings" />;
-        } else {
+        {
             const resolved = this.resolveValues();
             const Renderer = TYPES[item.type].render;
             const rendered = (
@@ -549,6 +558,7 @@ export default class InputItem extends PureComponent {
         return (
             <div class="form-editor-input-item" ref={this.node}>
                 {contents}
+                {editingContents}
             </div>
         );
     }
@@ -619,33 +629,56 @@ const DEFAULT_SETTINGS = [
     'editable',
 ];
 
-class InputSettings extends PureComponent {
-    render ({ item, onChange, scriptCtx, oldName }) {
-        const type = TYPES[item.type];
-        if (!type) return null;
+function BufferedInputSettings ({ item, onChange, scriptCtx, oldName, editing, onStopEditing }) {
+    const [edit, setEdit] = useState(null);
 
-        const controls = [];
-        for (const k of DEFAULT_SETTINGS.concat(Object.keys(type.settings))) {
-            controls.push(
-                <InputSetting
-                    key={k}
-                    oldName={oldName}
-                    scriptCtx={scriptCtx}
-                    setting={k}
-                    options={type.settings[k]}
-                    item={item}
-                    onItemChange={onChange}
-                    value={item[k]}
-                    onChange={v => onChange({ ...item, [k]: v })}/>
-            );
-        }
+    const commit = () => {
+        if (edit) onChange(edit);
+        onStopEditing();
+    };
 
-        return (
-            <div class="form-editor-input-settings">
-                {controls}
-            </div>
+    return (
+        <DialogSheet
+            allowBackdropClose
+            title={locale.editInputFieldTitle}
+            class="form-editor-input-settings-dialog"
+            backdrop
+            open={editing}
+            onClose={commit}>
+            <InputSettings
+                item={edit || item}
+                onChange={setEdit}
+                scriptCtx={scriptCtx}
+                oldName={oldName} />
+        </DialogSheet>
+    );
+}
+
+function InputSettings ({ item, onChange, scriptCtx, oldName }) {
+    const type = TYPES[item.type];
+    if (!type) return null;
+
+    const controls = [];
+    for (const k of DEFAULT_SETTINGS.concat(Object.keys(type.settings))) {
+        controls.push(
+            <InputSetting
+                key={k}
+                oldName={oldName}
+                scriptCtx={scriptCtx}
+                setting={k}
+                options={type.settings[k]}
+                item={item}
+                onItemChange={onChange}
+                value={item[k]}
+                onChange={v => onChange({ ...item, [k]: v })}/>
         );
     }
+
+    return (
+        <div class="form-editor-input-settings">
+            {controls}
+        </div>
+    );
 }
 
 const NAME_PATTERN = '^[\\w\\-:ĥŝĝĉĵŭĤŜĜĈĴŬ]+$';
@@ -681,7 +714,6 @@ function Setting ({ label, stack, desc, children }) {
     );
 }
 
-// TODO: DRY
 const SETTINGS = {
     name ({ value, item, onItemChange, oldName }) {
         let helperLabel = null;

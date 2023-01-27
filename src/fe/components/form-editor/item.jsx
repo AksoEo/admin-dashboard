@@ -88,6 +88,7 @@ export default class FormEditorItem extends PureComponent {
         if (item.el === 'input') {
             contents = <InputItem
                 {...props}
+                onStopEditing={() => onEditingChange(false)}
                 editingData={editingData}
                 value={value}
                 onValueChange={onValueChange}

@@ -85,6 +85,7 @@ export const formEditor = {
         clear: 'Forviŝi',
     },
 
+    editInputFieldTitle: 'Redakti',
     inputFields: {
         name: 'Kodnomo',
         nameDesc: 'La interna nomo de la kampo. Devas esti unika.',

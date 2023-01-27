@@ -1,6 +1,6 @@
 import Markdown from 'markdown-it';
 import { h } from 'preact';
-import { createPortal, createRef, forwardRef, PureComponent, useState } from 'preact/compat';
+import { createPortal, createRef, forwardRef, PureComponent, useEffect, useMemo, useState } from 'preact/compat';
 import { globalAnimator, Button, Dialog, TextField, RootContext } from 'yamdl';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
@@ -359,6 +359,24 @@ const InnerEditor = forwardRef(({
 }, ref) => {
     const [localValue, setLocalValue] = useState(value);
 
+    // memoize to avoid reconfiguring editor too often
+    const editorExtensions = useMemo(() => [
+        markdown(),
+        EditorState.tabSize.of(4),
+        indentUnit.of('\t'),
+        EditorView.lineWrapping,
+        placeholder && viewPlaceholder(placeholder),
+        ...(extensions || []),
+    ].filter(x => x), [extensions, placeholder]);
+
+    const editorOnChange = useMemo(() => value => {
+        if (maxLength && value.length > maxLength) value = value.substr(0, maxLength);
+        if (singleLine) value = value.replace(/\n/g, '');
+
+        setLocalValue(value);
+        onChange(value);
+    }, [onChange]);
+
     return (
         <CodeMirror
             ref={ref}
@@ -374,26 +392,13 @@ const InnerEditor = forwardRef(({
                 highlightActiveLine: false,
             }}
             readOnly={disabled}
-            extensions={[
-                markdown(),
-                EditorState.tabSize.of(4),
-                indentUnit.of('\t'),
-                EditorView.lineWrapping,
-                placeholder && viewPlaceholder(placeholder),
-                ...(extensions || []),
-            ].filter(x => x)}
+            extensions={editorExtensions}
             onFocus={() => {
                 setLocalValue(value);
                 onFocus();
             }}
             onBlur={onBlur}
-            onChange={value => {
-                if (maxLength && value.length > maxLength) value = value.substr(0, maxLength);
-                if (singleLine) value = value.replace(/\n/g, '');
-
-                setLocalValue(value);
-                onChange(value);
-            }} />
+            onChange={editorOnChange} />
     );
 });
 
