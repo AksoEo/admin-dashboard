@@ -70,8 +70,7 @@ export const FIELDS = {
                             onChange={v => onChange(v[0] ? +v[0] : null)}
                             task="memberships/listOptions"
                             view="memberships/options"
-                            sorting={{ year: 'asc' }}
-                            filter={{ year: { $gte: new Date().getFullYear() } }}
+                            sorting={{ year: 'desc' }}
                             emptyLabel={locale.fields.yearSelectEmpty}
                             locale={{ year: locale.fields.year }}
                             fields={YEAR_PICKER_FIELDS} />
