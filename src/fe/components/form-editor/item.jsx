@@ -61,9 +61,7 @@ export default class FormEditorItem extends PureComponent {
     };
 
     onFinishEditing = () => {
-        if (this.context.reportValidity()) {
-            this.props.onEditingChange(false);
-        }
+        this.props.onEditingChange(false);
     };
 
     render ({
