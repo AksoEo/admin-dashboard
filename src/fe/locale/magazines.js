@@ -65,6 +65,9 @@ export const magazines = {
         enableFilter: 'Ŝalti filtrilon',
         filterDesc: 'Filtrilo de tiuj kiuj povas aliri la revuon sendepende de membreco.',
 
+        excludeFilter: '[[ExcludeFilter]]',
+        excludeFilterDesc: '[[A codeholder filter matching codeholders to always exclude regardless of all other settings.]]',
+
         freelyAvailableAfter: 'Libere alirebla post',
         freelyAvailableAfterDesc: 'Revuaj eldonoj iĝos libera alireblaj de la publiko post tiom ĉi da tempo. Por neniam, enmetu 0.',
     },

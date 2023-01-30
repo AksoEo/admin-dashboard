@@ -115,6 +115,21 @@ function MagazinePerms ({ value, editing, onChange, hasCopyableItems }) {
                         category="codeholders" />
                 </div>
             ) : null}
+            {(editing || value.excludeFilter) ? (
+                <div class="perms-field">
+                    <div class="field-label">
+                        {locale.subscribers.excludeFilter}
+                    </div>
+                    <div class="field-desc">
+                        {locale.subscribers.excludeFilterDesc}
+                    </div>
+                    <MagazinePermsFilter
+                        value={value.excludeFilter}
+                        editing={editing}
+                        onChange={excludeFilter => onChange({ ...value, excludeFilter })}
+                        category="codeholders" />
+                </div>
+            ) : null}
             {hasCopyableItems && (editing || value.freelyAvailableAfter) ? (
                 <div class="perms-field">
                     <div class="field-label">
@@ -183,16 +198,18 @@ function MagazinePermsDuration ({ value, editing, onChange }) {
 
 function MagazinePermsFilter ({ value, editing, onChange, desc, category }) {
     const chkId = Math.random().toString(36);
+    const hasValue = value !== null && value !== undefined;
+
     return (
         <div class="filter-field">
             {editing ? (
                 <Fragment>
                     <Checkbox
                         id={chkId}
-                        checked={value !== null}
+                        checked={hasValue}
                         disabled={!editing}
                         onChange={enabled => {
-                            if (enabled === (value !== null)) return;
+                            if (enabled === hasValue) return;
                             onChange(enabled ? {} : null);
                         }} />
                     {' '}
@@ -201,7 +218,7 @@ function MagazinePermsFilter ({ value, editing, onChange, desc, category }) {
                     </label>
                 </Fragment>
             ) : null}
-            {value !== null ? (
+            {hasValue ? (
                 <MagazinePermsFilterControl
                     desc={desc}
                     category={category}
