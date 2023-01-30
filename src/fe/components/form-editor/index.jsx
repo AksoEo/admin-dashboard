@@ -403,7 +403,13 @@ class FormEditorItems extends PureComponent {
                         values={values}
                         onValuesChange={this.props.onValuesChange} />
                 )}
-                {listItems}
+                <RearrangingList
+                    spacing={16}
+                    isItemDraggable={() => false}
+                    canMove={() => false}
+                    onMove={() => {}}>
+                    {listItems}
+                </RearrangingList>
             </div>
         );
     }

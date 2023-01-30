@@ -174,7 +174,9 @@ function ItemBar ({
             {nameNode}
             <span class="item-bar-right">
                 {button}
-                {moveItem}
+                <span class="inner-move-controls">
+                    {moveItem}
+                </span>
             </span>
         </div>
     );

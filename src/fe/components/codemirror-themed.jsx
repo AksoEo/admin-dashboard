@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { forwardRef, useState, useEffect } from 'preact/compat';
+import { forwardRef, useState, useEffect, useMemo, useRef } from 'preact/compat';
 import { CodeMirror } from './codemirror';
 import { xcodeLight, xcodeDark } from '@uiw/codemirror-theme-xcode';
 
@@ -20,14 +20,22 @@ export default forwardRef(({ value, onChange, forceDark, ...extra }, ref) => {
 
     const theme = (!forceDark && useLightTheme) ? xcodeLight : xcodeDark;
 
+    const onChangeState = useRef({ onChange, value });
+    onChangeState.current = { onChange, value };
+
+    // memoize this so we dont reconfigure the editor every time
+    const editorOnChange = useMemo(() => newValue => {
+        const { onChange, value } = onChangeState.current;
+
+        if (newValue === value) return;
+        onChange(newValue);
+    }, []);
+
     return (
         <CodeMirror
             ref={ref}
             value={value}
-            onChange={newValue => {
-                if (newValue === value) return;
-                onChange(newValue);
-            }}
+            onChange={editorOnChange}
             theme={theme}
             {...extra} />
     );

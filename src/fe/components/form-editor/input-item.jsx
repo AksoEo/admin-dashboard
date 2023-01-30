@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { createRef, PureComponent, useState } from 'preact/compat';
+import { memo, createRef, PureComponent, useEffect, useMemo, useRef, useState } from 'preact/compat';
 import { Button, Checkbox, Slider, TextField } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -8,7 +8,6 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import ResetIcon from '@material-ui/icons/RotateLeft';
 import RearrangingList from '../lists/rearranging-list';
 import DynamicHeightDiv from '../layout/dynamic-height-div';
-import DialogSheet from '../tasks/dialog-sheet';
 import CountryPicker from '../pickers/country-picker';
 import TimeZoneEditor from '../controls/time-zone';
 import MdField from '../controls/md-field';
@@ -41,7 +40,7 @@ function Desc ({ value }) {
 // TODO: better rendering (show/respect more fields)
 const TYPES = {
     boolean: {
-        render ({ disabled, editing, value, onChange }) {
+        render: memo(({ disabled, editing, value, onChange }) => {
             return (
                 <div class="form-input-boolean">
                     <Checkbox
@@ -50,11 +49,11 @@ const TYPES = {
                         disabled={!editing || disabled} />
                 </div>
             );
-        },
+        }),
         settings: {},
     },
     number: {
-        render ({ disabled, editing, item, value, onChange, disableValidation }) {
+        render: memo(({ disabled, editing, item, value, onChange, disableValidation }) => {
             const input = (
                 <div class="number-input">
                     <TextField
@@ -97,7 +96,7 @@ const TYPES = {
                     </div>
                 );
             }
-        },
+        }),
         settings: {
             placeholder: true,
             step: true,
@@ -107,7 +106,7 @@ const TYPES = {
         },
     },
     text: {
-        render ({ disabled, editing, item, value, onChange, disableValidation }) {
+        render: memo(({ disabled, editing, item, value, onChange, disableValidation }) => {
             let error = null;
             const compiledPattern = new RegExp(item.pattern);
             if (!compiledPattern.test(value)) {
@@ -145,7 +144,7 @@ const TYPES = {
                     {extra}
                 </div>
             );
-        },
+        }),
         settings: {
             placeholder: true,
             pattern: true,
@@ -157,7 +156,7 @@ const TYPES = {
         },
     },
     money: {
-        render ({ disabled, item, editing, value, onChange, disableValidation }) {
+        render: memo(({ disabled, item, editing, value, onChange, disableValidation }) => {
             return (
                 <div class="form-input-money">
                     <currencyAmount.editor
@@ -171,7 +170,7 @@ const TYPES = {
                         currency={item.currency} />
                 </div>
             );
-        },
+        }),
         settings: {
             placeholder: true,
             step: 'money',
@@ -181,7 +180,7 @@ const TYPES = {
         },
     },
     enum: {
-        render ({ disabled, editing, item, value, onChange, disableValidation }) {
+        render: memo(({ disabled, editing, item, value, onChange, disableValidation }) => {
             let options = item.options.map(opt => ({
                 value: opt.value,
                 label: opt.name,
@@ -226,14 +225,14 @@ const TYPES = {
                     {editor}
                 </div>
             );
-        },
+        }),
         settings: {
             options: true,
             variant: ['select', 'radio'],
         },
     },
     country: {
-        render ({ disabled, editing, value, onChange, item, disableValidation }) {
+        render: memo(({ disabled, editing, value, onChange, item, disableValidation }) => {
             return (
                 <WithCountries>
                     {countries => {
@@ -257,14 +256,14 @@ const TYPES = {
                     }}
                 </WithCountries>
             );
-        },
+        }),
         settings: {
             exclude: true,
             chAutofill: ['country', 'feeCountry'],
         },
     },
     date: {
-        render ({ disabled, editing, value, onChange }) {
+        render: memo(({ disabled, editing, value, onChange }) => {
             return (
                 <div class="form-input-date">
                     <date.editor
@@ -274,7 +273,7 @@ const TYPES = {
                         onChange={editing && onChange} />
                 </div>
             );
-        },
+        }),
         settings: {
             min: 'date',
             max: 'date',
@@ -282,7 +281,7 @@ const TYPES = {
         },
     },
     time: {
-        render ({ disabled, editing, value, onChange }) {
+        render: memo(({ disabled, editing, value, onChange }) => {
             return (
                 <div class="form-input-time">
                     <time.editor
@@ -293,14 +292,14 @@ const TYPES = {
                         onChange={editing && onChange} />
                 </div>
             );
-        },
+        }),
         settings: {
             min: 'time',
             max: 'time',
         },
     },
     datetime: {
-        render ({ disabled, editing, value, onChange }) {
+        render: memo(({ disabled, editing, value, onChange }) => {
             return (
                 <div class="form-input-datetime">
                     <timestamp.editor
@@ -310,7 +309,7 @@ const TYPES = {
                         onChange={editing && onChange} />
                 </div>
             );
-        },
+        }),
         settings: {
             min: 'datetime',
             max: 'datetime',
@@ -318,7 +317,7 @@ const TYPES = {
         },
     },
     boolean_table: {
-        render ({ disabled, editing, item, value, onChange, disableValidation }) {
+        render: memo(({ disabled, editing, item, value, onChange, disableValidation }) => {
             const excludedCells = disableValidation ? []
                 : (item.excludeCells || []).map(([x, y]) => `${x},${y}`);
             const resizeValue = (value, rows, cols) => {
@@ -380,7 +379,7 @@ const TYPES = {
                     </table>
                 </div>
             );
-        },
+        }),
         settings: {
             booleanTable: true,
             cols: true,
@@ -483,10 +482,10 @@ export default class InputItem extends PureComponent {
         disableValidation,
         hasValues,
     }) {
-        let editingContents;
-        if (isEditingContext) {
-            editingContents = (
-                <BufferedInputSettings
+        let contents;
+        if (editing) {
+            contents = (
+                <InputSettings
                     editing={editing}
                     onStopEditing={onStopEditing}
                     key="settings"
@@ -495,10 +494,7 @@ export default class InputItem extends PureComponent {
                     onChange={onChange}
                     scriptCtx={{ previousNodes }} />
             );
-        }
-
-        let contents;
-        {
+        } else {
             const resolved = this.resolveValues();
             const Renderer = TYPES[item.type].render;
             const rendered = (
@@ -558,7 +554,6 @@ export default class InputItem extends PureComponent {
         return (
             <div class="form-editor-input-item" ref={this.node}>
                 {contents}
-                {editingContents}
             </div>
         );
     }
@@ -629,31 +624,6 @@ const DEFAULT_SETTINGS = [
     'editable',
 ];
 
-function BufferedInputSettings ({ item, onChange, scriptCtx, oldName, editing, onStopEditing }) {
-    const [edit, setEdit] = useState(null);
-
-    const commit = () => {
-        if (edit) onChange(edit);
-        onStopEditing();
-    };
-
-    return (
-        <DialogSheet
-            allowBackdropClose
-            title={locale.editInputFieldTitle}
-            class="form-editor-input-settings-dialog"
-            backdrop
-            open={editing}
-            onClose={commit}>
-            <InputSettings
-                item={edit || item}
-                onChange={setEdit}
-                scriptCtx={scriptCtx}
-                oldName={oldName} />
-        </DialogSheet>
-    );
-}
-
 function InputSettings ({ item, onChange, scriptCtx, oldName }) {
     const type = TYPES[item.type];
     if (!type) return null;
@@ -714,8 +684,14 @@ function Setting ({ label, stack, desc, children }) {
     );
 }
 
+const WANTS_ITEM = new WeakSet();
+const wantsItem = component => {
+    WANTS_ITEM.add(component);
+    return component;
+};
+
 const SETTINGS = {
-    name ({ value, item, onItemChange, oldName }) {
+    name: wantsItem(memo(({ value, item, onItemChange, oldName }) => {
         let helperLabel = null;
         if (oldName && oldName !== value) {
             helperLabel = `${locale.inputFields.oldName}: ${oldName}`;
@@ -740,8 +716,8 @@ const SETTINGS = {
                     }} />
             </Setting>
         );
-    },
-    label ({ value, onChange }) {
+    })),
+    label: memo(({ value, onChange }) => {
         return (
             <Setting label={locale.inputFields.label} desc={locale.inputFields.labelDesc}>
                 <TextField
@@ -751,8 +727,8 @@ const SETTINGS = {
                     onChange={e => onChange(e.target.value)} />
             </Setting>
         );
-    },
-    description ({ value, onChange }) {
+    }),
+    description: memo(({ value, onChange }) => {
         return (
             <Setting stack label={locale.inputFields.description}>
                 <MdField
@@ -763,8 +739,8 @@ const SETTINGS = {
                     rules={FIELD_DESCRIPTION_RULES} />
             </Setting>
         );
-    },
-    default ({ value, onChange, scriptCtx }) {
+    }),
+    default: memo(({ value, onChange, scriptCtx }) => {
         return (
             <Setting label={locale.inputFields.default}>
                 <ScriptableValue
@@ -773,8 +749,8 @@ const SETTINGS = {
                     onChange={onChange} />
             </Setting>
         );
-    },
-    required ({ value, onChange, scriptCtx }) {
+    }),
+    required: memo(({ value, onChange, scriptCtx }) => {
         return (
             <Setting label={locale.inputFields.required}>
                 <ScriptableBool
@@ -783,8 +759,8 @@ const SETTINGS = {
                     onChange={onChange} />
             </Setting>
         );
-    },
-    disabled ({ value, onChange, scriptCtx }) {
+    }),
+    disabled: memo(({ value, onChange, scriptCtx }) => {
         return (
             <Setting label={locale.inputFields.disabled}>
                 <ScriptableBool
@@ -793,8 +769,8 @@ const SETTINGS = {
                     onChange={onChange} />
             </Setting>
         );
-    },
-    hideIfDisabled ({ value, onChange }) {
+    }),
+    hideIfDisabled: memo(({ value, onChange }) => {
         return (
             <Setting label={locale.inputFields.hideIfDisabled}>
                 <Checkbox
@@ -802,8 +778,8 @@ const SETTINGS = {
                     onChange={onChange} />
             </Setting>
         );
-    },
-    editable ({ value, onChange }) {
+    }),
+    editable: memo(({ value, onChange }) => {
         return (
             <Setting label={locale.inputFields.editable} desc={locale.inputFields.editableDesc}>
                 <Checkbox
@@ -811,9 +787,9 @@ const SETTINGS = {
                     onChange={onChange} />
             </Setting>
         );
-    },
+    }),
 
-    placeholder ({ value, onChange }) {
+    placeholder: memo(({ value, onChange }) => {
         return (
             <Setting label={locale.inputFields.placeholder}>
                 <TextField
@@ -823,8 +799,8 @@ const SETTINGS = {
                     onChange={e => onChange(e.target.value || null)} />
             </Setting>
         );
-    },
-    step ({ value, onChange, options }) {
+    }),
+    step: memo(({ value, onChange, options }) => {
         return (
             <Setting label={locale.inputFields.step}>
                 <TextField
@@ -837,8 +813,8 @@ const SETTINGS = {
                     onChange={e => onChange(+e.target.value || null)} />
             </Setting>
         );
-    },
-    min ({ value, onChange, item, options }) {
+    }),
+    min: wantsItem(memo(({ value, onChange, item, options }) => {
         let editor;
         if (options === 'date') {
             editor = (
@@ -884,8 +860,8 @@ const SETTINGS = {
                 {editor}
             </Setting>
         );
-    },
-    max ({ value, onChange, item, options }) {
+    })),
+    max: wantsItem(memo(({ value, onChange, item, options }) => {
         let editor;
         if (options === 'date') {
             editor = (
@@ -930,8 +906,8 @@ const SETTINGS = {
                 {editor}
             </Setting>
         );
-    },
-    variant ({ value, onChange, options }) {
+    })),
+    variant: memo(({ value, onChange, options }) => {
         return (
             <Setting label={locale.inputFields.variant}>
                 <Select
@@ -944,8 +920,8 @@ const SETTINGS = {
                     }))} />
             </Setting>
         );
-    },
-    pattern ({ value, onChange }) {
+    }),
+    pattern: memo(({ value, onChange }) => {
         return (
             <Setting label={locale.inputFields.pattern}>
                 <TextField
@@ -954,8 +930,8 @@ const SETTINGS = {
                     onChange={e => onChange(e.target.value || null)} />
             </Setting>
         );
-    },
-    patternError ({ value, onChange }) {
+    }),
+    patternError: memo(({ value, onChange }) => {
         return (
             <Setting label={locale.inputFields.patternError}>
                 <TextField
@@ -964,8 +940,8 @@ const SETTINGS = {
                     onChange={e => onChange(e.target.value || null)} />
             </Setting>
         );
-    },
-    minLength ({ value, onChange, item }) {
+    }),
+    minLength: wantsItem(memo(({ value, onChange, item }) => {
         return (
             <Setting label={locale.inputFields.minLength}>
                 <TextField
@@ -978,8 +954,8 @@ const SETTINGS = {
                     onChange={e => onChange(+e.target.value || null)} />
             </Setting>
         );
-    },
-    maxLength ({ value, onChange, item }) {
+    })),
+    maxLength: wantsItem(memo(({ value, onChange, item }) => {
         return (
             <Setting label={locale.inputFields.maxLength}>
                 <TextField
@@ -991,8 +967,8 @@ const SETTINGS = {
                     onChange={e => onChange(+e.target.value || null)} />
             </Setting>
         );
-    },
-    chAutofill ({ value, onChange, options }) {
+    })),
+    chAutofill: memo(({ value, onChange, options }) => {
         return (
             <Setting label={locale.inputFields.chAutofill}>
                 <Select
@@ -1008,8 +984,8 @@ const SETTINGS = {
                 </div>
             </Setting>
         );
-    },
-    currency ({ value, onChange }) {
+    }),
+    currency: memo(({ value, onChange }) => {
         return (
             <Setting label={locale.inputFields.currency}>
                 <Select
@@ -1022,29 +998,29 @@ const SETTINGS = {
                     }))} />
             </Setting>
         );
-    },
-    options ({ value, onChange }) {
+    }),
+    options: memo(({ value, onChange }) => {
         return (
             <Setting stack label={locale.inputFields.options}>
                 <OptionsEditor value={value} onChange={onChange} />
             </Setting>
         );
-    },
-    exclude ({ value, onChange }) {
+    }),
+    exclude: memo(({ value, onChange }) => {
         return (
             <Setting stack label={locale.inputFields.exclude}>
                 <CountryPicker value={value} onChange={onChange} hideGroups />
             </Setting>
         );
-    },
-    tz ({ value, onChange }) {
+    }),
+    tz: memo(({ value, onChange }) => {
         return (
             <Setting label={locale.inputFields.tz}>
                 <TimeZoneEditor value={value} onChange={onChange} editing />
             </Setting>
         );
-    },
-    booleanTable ({ item, onItemChange }) {
+    }),
+    booleanTable: wantsItem(memo(({ item, onItemChange }) => {
         const resizeHeader = (header, size) => {
             if (!header || header.length === size) return header;
             if (header.length > size) return header.slice(0, size);
@@ -1226,13 +1202,35 @@ const SETTINGS = {
                 </Setting>
             </div>
         );
-    },
+    })),
 };
 
-function InputSetting ({ setting, ...extra }) {
+function InputSetting ({ setting, item, onItemChange, onChange, ...extra }) {
     const Renderer = SETTINGS[setting];
     if (!Renderer) return null;
-    return <Renderer {...extra} />;
+
+    // PERFORMANCE: passing item data defeats memo change detection!
+    // so we only pass item to settings that actually want it.
+    // this fixes terrible performance issues.
+    const settingWantsItem = WANTS_ITEM.has(Renderer);
+    const pItem = settingWantsItem ? item : null;
+    const pOnItemChange = settingWantsItem ? onItemChange : null;
+
+    const outerOnChange = useRef(onChange);
+    useEffect(() => {
+        outerOnChange.current = onChange;
+    }, [onChange]);
+
+    // memoize onchange so it doesnt trigger a render
+    const innerOnChange = useMemo(() => (...args) => {
+        outerOnChange.current(...args);
+    }, []);
+
+    return <Renderer
+        onChange={innerOnChange}
+        item={pItem}
+        onItemChange={pOnItemChange}
+        {...extra} />;
 }
 
 class OptionsEditor extends PureComponent {

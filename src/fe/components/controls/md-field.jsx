@@ -1,6 +1,6 @@
 import Markdown from 'markdown-it';
 import { h } from 'preact';
-import { createPortal, createRef, forwardRef, PureComponent, useEffect, useMemo, useState } from 'preact/compat';
+import { createPortal, createRef, forwardRef, PureComponent, useEffect, useMemo, useRef, useState } from 'preact/compat';
 import { globalAnimator, Button, Dialog, TextField, RootContext } from 'yamdl';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
@@ -375,6 +375,17 @@ class EditorBarPortal extends PureComponent {
     }
 }
 
+const CM_BASIC_SETUP = {
+    autocompletion: false,
+    lineNumbers: false,
+    foldGutter: false,
+    closeBrackets: false,
+    allowMultipleSelections: false,
+    highlightSelectionMatches: false,
+    // this breaks selection for some reason
+    highlightActiveLine: false,
+};
+
 const InnerEditor = forwardRef(({
     value,
     onChange,
@@ -399,28 +410,19 @@ const InnerEditor = forwardRef(({
         ...(extensions || []),
     ].filter(x => x), [extensions, placeholder]);
 
-    const editorOnChange = useMemo(() => value => {
+    const editorOnChange = value => {
         if (maxLength && value.length > maxLength) value = value.substr(0, maxLength);
         if (singleLine) value = value.replace(/\n/g, '');
 
         setLocalValue(value);
         onChange(value);
-    }, [onChange]);
+    };
 
     return (
         <CodeMirror
             ref={ref}
             value={ignoreLiveUpdates ? localValue : value}
-            basicSetup={{
-                autocompletion: false,
-                lineNumbers: false,
-                foldGutter: false,
-                closeBrackets: false,
-                allowMultipleSelections: false,
-                highlightSelectionMatches: false,
-                // this breaks selection for some reason
-                highlightActiveLine: false,
-            }}
+            basicSetup={CM_BASIC_SETUP}
             readOnly={disabled}
             extensions={editorExtensions}
             onFocus={() => {
