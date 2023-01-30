@@ -17,7 +17,7 @@ export function transformError (err) {
     else if (err.statusCode === 500) code = 'internal-server-error';
     else if (err.statusCode === 502) code = 'service-unavailable';
     else if (err.statusCode === 503) code = 'service-unavailable';
-    else if (err.message.includes('NetworkError')) code = 'network';
+    else if (err.message.includes('NetworkError') || err.message.includes('Load failed')) code = 'network';
 
     return {
         code: code || err.code || '?',
