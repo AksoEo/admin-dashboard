@@ -14,7 +14,7 @@ export default class Intermediaries extends OverviewPage {
             },
             fields: [
                 { id: 'countryCode', sorting: 'asc', fixed: true },
-                { id: 'codeholderId', sorting: 'none', fixed: true },
+                { id: 'codeholders', sorting: 'none', fixed: true },
             ],
             offset: 0,
             limit: 10,

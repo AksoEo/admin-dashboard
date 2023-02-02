@@ -5,7 +5,7 @@ import { FIELDS } from './fields';
 export default {
     create: createDialog({
         locale,
-        fieldNames: ['countryCode', 'codeholderId', 'paymentDescription'],
+        fieldNames: ['countryCode', 'codeholders'],
         fields: FIELDS,
         onCompletion: (task, routerContext, id) => routerContext.navigate(`/perantoj/perantoj/${id}`),
     }),

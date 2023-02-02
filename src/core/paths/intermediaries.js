@@ -7,13 +7,13 @@ export const SIG_INTERMEDIARIES = '!intermediaries';
 export const tasks = {
     list: crudList({
         apiPath: () => `/intermediaries`,
-        fields: ['countryCode', 'codeholderId', 'paymentDescription'],
+        fields: ['countryCode', 'codeholders'],
         map: (item) => (item.id = item.countryCode),
         storePath: (_, item) => [INTERMEDIARIES, item.id],
     }),
     intermediary: crudGet({
         apiPath: ({ id }) => `/intermediaries/${id}`,
-        fields: ['countryCode', 'codeholderId', 'paymentDescription'],
+        fields: ['countryCode', 'codeholders'],
         map: (item) => (item.id = item.countryCode),
         storePath: ({ id }) => [INTERMEDIARIES, id],
     }),
@@ -34,7 +34,7 @@ export const tasks = {
 
         return await crudCreate({
             apiPath: (_, params) => `/intermediaries/${encodeURIComponent(params.countryCode)}`,
-            fields: ['codeholderId', 'paymentDescription'],
+            fields: ['codeholders'],
             idField: 'countryCode',
             storePath: (_, id) => [INTERMEDIARIES, id],
             signalPath: () => [INTERMEDIARIES, SIG_INTERMEDIARIES],

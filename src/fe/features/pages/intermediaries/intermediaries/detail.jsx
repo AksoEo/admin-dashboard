@@ -46,6 +46,7 @@ export default class Intermediary extends DetailPage {
         return (
             <Fragment>
                 <DetailView
+                    compact
                     view="intermediaries/intermediary"
                     id={this.id}
                     fields={FIELDS}

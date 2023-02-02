@@ -6,6 +6,7 @@ export const intermediaries = {
     },
     fields: {
         countryCode: 'Lando',
+        codeholders: 'Membroj',
         codeholderId: 'Membro',
         paymentDescription: 'Paginstrukcioj',
     },

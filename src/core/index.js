@@ -6,12 +6,14 @@ import DataView from './view';
 import * as log from './log';
 import './client';
 
+const GC_INTERVAL = 120000;
+
 // schedule gc every 2 minutes
 setInterval(() => {
     gc([]);
     // also GC codeholders individually because there’ll most likely always be a view into that
     gc([CODEHOLDERS]);
-}, 120000);
+}, GC_INTERVAL);
 
 /** Handlers for messages from the FE. */
 const messageHandlers = {
