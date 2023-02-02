@@ -243,12 +243,26 @@ class OfferGroup extends PureComponent {
             const onItemChange = item => {
                 const newOffers = value.offers.slice();
                 newOffers[index] = item;
+
+                if (item.type === 'magazine') {
+                    // ensure unique
+                    for (let i = 0; i < newOffers.length; i++) {
+                        const offer = newOffers[i];
+                        if (offer.id === item.id && offer !== item) {
+                            newOffers[i] = {
+                                ...offer,
+                                paperVersion: !item.paperVersion,
+                            };
+                        }
+                    }
+                }
+
                 onChange({ ...value, offers: newOffers });
             };
 
             items.push(
                 <Offer
-                    key={'o' + offer.id}
+                    key={'o' + offer.id + (offer.paperVersion || '')}
                     value={offer}
                     editing={editing}
                     onChange={onItemChange}
@@ -265,7 +279,14 @@ class OfferGroup extends PureComponent {
         };
 
         const addOffer = offer => {
-            if (offer.type === 'magazine') offer.paperVersion = true;
+            if (offer.type === 'magazine') {
+                offer.paperVersion = true;
+                for (const other of value.offers) {
+                    if (other.id === offer.id) {
+                        offer.paperVersion = !offer.paperVersion;
+                    }
+                }
+            }
             onChange({ ...value, offers: value.offers.concat([offer]) });
             this.setState({ adding: false });
         };
@@ -399,6 +420,21 @@ class AddOffer extends PureComponent {
                     }} />
             );
         } else if (this.state.type === 'magazine') {
+            const magazineTypes = new Map();
+            for (const offer of offers) {
+                if (offer.type === 'magazine') {
+                    if (!magazineTypes.has(offer.id)) {
+                        magazineTypes.set(offer.id, { paper: false, access: false });
+                    }
+                    magazineTypes.get(offer.id)[offer.paperVersion ? 'paper' : 'access'] = true;
+                }
+            }
+            const magazinesWithBothTypes = [...magazineTypes.keys()]
+                .filter(id => {
+                    const entry = magazineTypes.get(id);
+                    return entry.paper && entry.access;
+                });
+
             picker = (
                 <StaticOverviewList
                     key="magazine"
@@ -406,7 +442,7 @@ class AddOffer extends PureComponent {
                     task="magazines/listMagazines"
                     view="magazines/magazine"
                     jsonFilter={{
-                        id: { $nin: offers.filter(x => x.type === 'magazine').map(x => x.id) },
+                        id: { $nin: magazinesWithBothTypes },
                     }}
                     fields={REDUCED_MAGAZINE_FIELDS}
                     sorting={{ name: 'asc' }}
@@ -520,7 +556,6 @@ class Offer extends PureComponent {
                     paperVersion = (
                         <div class="paper-version is-editing">
                             <Checkbox
-                                disabled
                                 id={chkId}
                                 checked={value.paperVersion}
                                 onChange={paperVersion => onChange({ ...value, paperVersion })} />
