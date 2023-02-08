@@ -39,7 +39,7 @@ export default connectPerms(class RegistrationFormPage extends Page {
         return +this.props.matches.instance[1];
     }
 
-    render ({ perms }, { org, editorLoaded }) {
+    render ({ perms, editing }, { org, editorLoaded }) {
         const actions = [];
 
         const canEdit = perms.hasPerm(`congress_instances.update.${org}`);
@@ -76,7 +76,10 @@ export default connectPerms(class RegistrationFormPage extends Page {
                     org={this.state.org}
                     onLoad={this.onEditorLoad}
                     congress={this.congress}
-                    instance={this.instance} />
+                    instance={this.instance}
+                    editing={!!editing}
+                    onBeginEdit={() => this.props.push('redakti', true)}
+                    onEndEdit={() => editing.pop()} />
                 <DetailShell
                     /* this is kind of a hack to get the org field */
                     view="congresses/congress"
@@ -100,8 +103,11 @@ const InnerEditor = connect(({ congress, instance }) => [
     };
 
     beginEditing = () => {
-        if (this.props.data) this.setState({ edit: this.props.data });
-        else this.createForm();
+        if (this.props.data) {
+            this.props.onBeginEdit();
+        } else {
+            this.createForm();
+        }
     };
 
     createForm = () => {
@@ -112,6 +118,8 @@ const InnerEditor = connect(({ congress, instance }) => [
                 cancellable: true,
                 form: [],
             },
+        }, () => {
+            this.props.onBeginEdit();
         });
     };
 
@@ -125,6 +133,7 @@ const InnerEditor = connect(({ congress, instance }) => [
     #formEditor = createRef();
     #commitTask = null;
     beginCommit = () => {
+        this.setState({ committing: true });
         this.#form.current.requestSubmit();
     };
 
@@ -138,7 +147,8 @@ const InnerEditor = connect(({ congress, instance }) => [
                 data: this.state.edit,
             });
             this.#commitTask.on('success', () => {
-                this.setState({ edit: null });
+                this.props.onEndEdit();
+                this.setState({ edit: null, committing: false });
             });
             this.#commitTask.on('drop', () => this.#commitTask = null);
         });
@@ -146,13 +156,19 @@ const InnerEditor = connect(({ congress, instance }) => [
 
     componentDidUpdate () {
         this.props.onLoad(this.props.loaded && !!this.props.data);
+
+        if (!this.props.editing && this.state.edit) {
+            this.setState({ edit: null }); // cleanup
+        }
     }
 
     componentWillUnmount () {
         if (this.#commitTask) this.#commitTask.drop();
     }
 
-    render ({ data, err, loaded, canEdit }, { edit }) {
+    render ({ data, err, loaded, canEdit, editing }) {
+        const edit = editing ? (this.state.edit || data) : null;
+
         if (!loaded) {
             if (err) {
                 return (
@@ -204,14 +220,12 @@ const InnerEditor = connect(({ congress, instance }) => [
             <div class="form-editor-container">
                 <AppBarProxy
                     class="detail-view-editing-app-bar"
-                    priority={edit ? 2 : -Infinity}
+                    priority={editing ? 2 : -Infinity}
                     title={locale.editingTitle}
                     menu={(
                         <Button icon small onClick={() => {
                             this.#formEditor.current.stopEditing();
-                            requestAnimationFrame(() => {
-                                this.setState({ edit: null });
-                            });
+                            this.props.onEndEdit();
                         }} aria-label={locale.cancel}>
                             <MenuIcon type="close" />
                         </Button>
@@ -222,7 +236,10 @@ const InnerEditor = connect(({ congress, instance }) => [
                             icon: <DoneIcon />,
                             action: () => this.beginCommit(),
                         },
-                    ]} />
+                    ]}
+                    data={{
+                        dirty: !this.state.committing && !!this.state.edit,
+                    }} />
                 <Form
                     ref={this.#form}
                     onSubmit={this.#performCommit}>
