@@ -13,7 +13,6 @@ import {
     voterCodeholdersMemberFilter,
     viewerCodeholders,
     viewerCodeholdersMemberFilter,
-    ballotsSecret,
     type,
     config,
 } from './config';
@@ -23,7 +22,6 @@ import './detail.less';
 const DETAIL_FIELDS = {
     ...FIELDS,
     type: { component: type },
-    ballotsSecret: { component: ballotsSecret },
     config: { component: config },
     voterCodeholders: { component: voterCodeholders },
     voterCodeholdersMemberFilter: { component: voterCodeholdersMemberFilter, shouldHide: (_, editing) => editing },

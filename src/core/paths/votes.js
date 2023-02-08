@@ -60,10 +60,10 @@ const clientFields = {
             timeEnd: value.end,
         }),
     },
-    ballotsSecret: 'ballotsSecret',
     config: {
         apiFields: [
             'type',
+            'ballotsSecret',
             'blankBallotsLimit',
             'blankBallotsLimitInclusive',
             'quorum',
@@ -84,6 +84,7 @@ const clientFields = {
         ],
         fromAPI: vote => {
             const value = {
+                ballotsSecret: vote.ballotsSecret,
                 quorum: vote.quorum,
                 quorumInclusive: vote.quorumInclusive,
                 publishVoters: vote.publishVoters,
@@ -120,6 +121,7 @@ const clientFields = {
         },
         toAPI: (value, item) => {
             const vote = {
+                ballotsSecret: !!value.ballotsSecret,
                 quorum: enforceRational(value.quorum),
                 quorumInclusive: !!value.quorumInclusive,
                 publishVoters: !!value.publishVoters,
