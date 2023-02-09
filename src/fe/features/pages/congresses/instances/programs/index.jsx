@@ -6,7 +6,6 @@ import RoomIcon from '@material-ui/icons/Room';
 import SearchFilters from '../../../../../components/overview/search-filters';
 import OverviewList from '../../../../../components/lists/overview-list';
 import DetailShell from '../../../../../components/detail/detail-shell';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../../components/overview/list-url-coding';
 import { congressPrograms as locale } from '../../../../../locale';
 import ProgramTimeline from './timeline';
 import { FIELDS } from './fields';
@@ -57,44 +56,10 @@ export default class ProgramsView extends PureComponent {
     };
 
     #searchInput;
-    #currentQuery = '';
-
-    decodeURLQuery () {
-        if (!this.props.query) {
-            this.setState({ listView: false });
-        } else {
-            this.setState({
-                listView: true,
-                parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
-            });
-        }
-        this.#currentQuery = this.props.query;
-    }
-
-    encodeURLQuery () {
-        const encoded = this.state.listView
-            ? encodeURLQuery(this.state.parameters, FILTERS)
-            : '';
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
 
     componentDidMount () {
-        this.decodeURLQuery();
         if (this.#searchInput) this.#searchInput.focus(500);
     }
-
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters
-            || prevState.listView !== this.state.listView) {
-            this.encodeURLQuery();
-        }
-    }
-
 
     render ({ congress, instance }, { parameters, dateFrom, dateTo, tz, view, expanded }) {
         const contents = [];

@@ -6,7 +6,6 @@ import BusinessIcon from '@material-ui/icons/Business';
 import SearchFilters from '../../../../../components/overview/search-filters';
 import OverviewList from '../../../../../components/lists/overview-list';
 import OverviewListItem from '../../../../../components/lists/overview-list-item';
-import { decodeURLQuery, applyDecoded, encodeURLQuery } from '../../../../../components/overview/list-url-coding';
 import { congressLocations as locale } from '../../../../../locale';
 import { routerContext } from '../../../../../router';
 import { FIELDS } from './fields';
@@ -54,28 +53,6 @@ export default class LocationsView extends PureComponent {
     static contextType = routerContext;
 
     #searchInput;
-    #currentQuery = '';
-
-    decodeURLQuery () {
-        if (!this.props.query) {
-            this.setState({ listView: false });
-        } else {
-            this.setState({
-                listView: true,
-                parameters: applyDecoded(decodeURLQuery(this.props.query, FILTERS), this.state.parameters),
-            });
-        }
-        this.#currentQuery = this.props.query;
-    }
-
-    encodeURLQuery () {
-        const encoded = this.state.listView
-            ? encodeURLQuery(this.state.parameters, FILTERS)
-            : '';
-        if (encoded === this.#currentQuery) return;
-        this.#currentQuery = encoded;
-        this.props.onQueryChange(encoded);
-    }
 
     constructListItem () {
         const { congress, instance } = this.props;
@@ -88,18 +65,10 @@ export default class LocationsView extends PureComponent {
     }
 
     componentDidMount () {
-        this.decodeURLQuery();
         if (this.#searchInput) this.#searchInput.focus(500);
     }
 
-    componentDidUpdate (prevProps, prevState) {
-        if (prevProps.query !== this.props.query && this.props.query !== this.#currentQuery) {
-            this.decodeURLQuery();
-        }
-        if (prevState.parameters !== this.state.parameters
-            || prevState.listView !== this.state.listView) {
-            this.encodeURLQuery();
-        }
+    componentDidUpdate (prevProps) {
         if (prevProps.congress !== this.props.congress || prevProps.instance !== this.props.instance) {
             this.constructListItem();
         }
