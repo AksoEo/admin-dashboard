@@ -11,33 +11,141 @@
         text-align: center;
     }
 
-    .result-pie-chart {
-        .pie-chart-layer {
-            path {
-                fill: none;
-                stroke: currentColor;
+    h1 {
+        font-size: 1.4em;
+        margin: 0.5em 0;
+    }
+    h2 {
+        font-size: 1.1em;
+        margin-bottom: 0.5em;
+    }
+    h3 {
+        font-size: 1.05em;
+    }
+    h3, h4 {
+        margin-bottom: 0.2em;
+    }
 
-                &.s-a {
-                    stroke: @secondary;
-                }
-                &.s-a1 {
-                    stroke: @text-fade-50;
-                }
-                &.s-b {
-                    stroke: @primary;
-                }
+    .option-codeholder-link {
+        color: inherit;
+    }
+
+    .result-summary {
+        &.is-ynb {
+            display: grid;
+            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+
+            @media (max-width: 800px) {
+                display: block;
             }
         }
 
-        text {
-            fill: currentColor;
-            dominant-baseline: middle;
-            alignment-baseline: middle;
+        .ynb-condition {
+            background: @text-fade-05;
+            margin: 4px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+
+            .condition-icon {
+                background: @text-fade-10;
+                padding: 4px;
+                margin: 8px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            &.is-result {
+                font-size: 1.2em;
+
+                .condition-label {
+                    font-weight: bold;
+                }
+            }
+
+            &[data-passed="true"] .condition-icon {
+                background: @positive;
+                color: @text-on-positive;
+            }
+        }
+    }
+
+    .option-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0;
+        list-style: none;
+
+        .inner-item {
+            display: inline-block;
+            background: @text-fade-05;
+            border: 1px solid @separator;
+            border-radius: 4px;
+            padding: 4px 8px;
         }
 
-        .label-line {
-            fill: none;
-            stroke: currentColor;
+        &.is-empty {
+            opacity: 0.5;
+        }
+    }
+
+    .result-ballots {
+        margin-bottom: 16px;
+    }
+
+    .result-bar-chart {
+        width: 100%;
+        margin-bottom: 16px;
+
+        .candidate-item {
+            .candidate-name {
+                text-align: right;
+            }
+
+            .candidate-value {
+                width: 70%;
+                position: relative;
+
+                .inner-value {
+                    position: relative;
+                    width: 100%;
+                    min-height: 1em;
+                    white-space: nowrap;
+
+                    .min-bar, .value-bar {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: calc(100% * var(--value));
+                        height: 100%;
+                        border-radius: 2px;
+                        overflow: hidden;
+                        box-sizing: border-box;
+                    }
+
+                    .min-bar {
+                        box-shadow: inset 0 0 0 1px @separator;
+                    }
+
+                    .inner-label {
+                        position: relative;
+                        z-index: 1;
+                        padding: 2px 4px;
+                    }
+                }
+            }
+
+            &.is-not-marked .value-bar {
+                background: @text-fade-20;
+            }
+            &.is-marked .value-bar {
+                background: @positive;
+            }
+            &.is-marked .value-bar .inner-label {
+                color: @text-on-positive;
+            }
         }
     }
 
@@ -45,7 +153,7 @@
         .bar-chart-item {
             position: relative;
             padding: 8px 16px;
-            margin-bottom: 8px;
+            margin-bottom: 1px;
 
             .item-bar {
                 position: absolute;
@@ -53,6 +161,7 @@
                 left: 0;
                 bottom: 0;
                 background: @text-fade-20;
+                border-radius: 4px;
             }
 
             .item-name, .item-value, .item-description {
@@ -60,6 +169,7 @@
                 z-index: 1;
             }
             .item-value {
+                margin-top: 4px;
                 font-size: small;
             }
             .item-description:not(:empty) {
@@ -68,7 +178,11 @@
             }
 
             &.was-chosen .item-bar {
-                background: @secondary;
+                background: @positive-fade-50;
+            }
+
+            &.was-eliminated .item-bar {
+                background: @danger-fade-20;
             }
 
             .item-chosen-check {
@@ -81,38 +195,51 @@
         }
     }
 
-    .result-rounds {
-        .round-picker {
-            display: flex;
-            margin-bottom: 8px;
+    .rp-rounds {
+        padding: 0;
 
-            .round-picker-label {
-                flex: 1;
-                text-align: center;
-            }
-        }
-    }
+        .rp-round {
+            margin: 16px 0;
+            background: @text-fade-05;
+            border-radius: 4px;
+            padding: 8px 16px;
 
-    .result-round {
-        .round-chosen {
-            .round-chosen-name {
-                font-weight: bold;
-            }
-        }
-
-        .round-options {
-            .round-option {
-                .round-option-name {
-                    margin-right: 8px;
+            .round-options {
+                .round-option {
+                    .round-option-name {
+                        margin-right: 8px;
+                    }
                 }
             }
         }
     }
 
-    .result-lock-graph-container {
-        text-align: center;
+    .stv-events {
+        padding: 0;
+        list-style: none;
 
-        .ranked-pairs {
+        .stv-event {
+            margin: 16px 0;
+            background: @text-fade-05;
+            border-radius: 4px;
+            padding: 8px 16px;
+
+            h3:first-child {
+                margin-top: 0;
+            }
+        }
+    }
+
+    .result-lock-graph-container {
+        display: flex;
+        text-align: center;
+        gap: 8px;
+
+        @media (max-width: 800px) {
+            display: block;
+        }
+
+        .ordered-pairs {
             text-align: left;
 
             table {
@@ -132,10 +259,10 @@
                 background: @text-fade-10;
             }
         }
-    }
 
-    .lock-graph-title {
-        text-align: left;
+        .inner-lock-graph-container {
+            flex: 1;
+        }
     }
 
     .result-lock-graph {
@@ -172,9 +299,13 @@
         .lock-graph-node-background {
             fill: @text-fade-20;
 
-            &.is-the-chosen-one {
+            &.is-winner {
                 fill: @secondary;
             }
+        }
+
+        .lock-graph-node-label.is-winner {
+            color: @text-on-primary;
         }
 
         text {

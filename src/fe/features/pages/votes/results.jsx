@@ -1,482 +1,436 @@
 import { h, Component } from 'preact';
 import dagre from 'dagre';
-import { useState } from 'preact/compat';
-import { Button, CircularProgress } from 'yamdl';
+import { CircularProgress } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import CloseIcon from '@material-ui/icons/Close';
+import { useDataView } from '../../../core';
 import Page from '../../../components/page';
 import Meta from '../../meta';
-import { connect, coreContext } from '../../../core/connection';
+import { coreContext } from '../../../core/connection';
 import { IdUEACode } from '../../../components/data/uea-code';
 import DisplayError from '../../../components/utils/error';
+import { Link } from '../../../router';
 import { votes as locale } from '../../../locale';
 import './results.less';
 
-export default connect(({ matches }) => ['votes/voteResults', {
-    id: matches.vote[1],
-}])((data, core, error) => ({ data, core, error }))(connect(({ matches }) => ['votes/vote', {
-    id: matches.vote[1],
-    fields: ['config'],
-}])((data, core, error) => ({ vote: data, voteError: error }))(class VoteResultsPage extends Page {
-    render ({ data, error, vote, voteError }) {
-        if (!data || !vote) {
-            if (error || voteError) {
-                return (
-                    <div class="vote-results has-error">
-                        <DisplayError error={error || voteError} />
-                    </div>
-                );
-            }
-
-            return (
-                <div class="vote-results is-loading">
-                    <CircularProgress indeterminate />
-                </div>
-            );
-        }
-
-        const stats = [];
-        if ('electionQuota' in data) {
-            stats.push(locale.results.electionQuota(data.electionQuota));
-        }
-        if ('majorityBallotsOkay' in data) {
-            stats.push(locale.results.majorityBallotsOkay(data.majorityBallotsOkay));
-            stats.push(locale.results.majorityVotersOkay(data.majorityVotersOkay));
-            stats.push(locale.results.majorityOkay(data.majorityOkay));
-        }
-
-        const turnout = (
-            <Pie layers={[
-                [
-                    {
-                        value: data.numBallots / data.numVoters,
-                        label: locale.results.voters(data.numBallots),
-                        class: 's-a',
-                    },
-                    {
-                        value: 1 - data.numBallots / data.numVoters,
-                        label: locale.results.nonVoters(data.numVoters - data.numBallots),
-                        class: 's-b',
-                    },
-                ],
-                [
-                    {
-                        value: (data.numBallots - data.numBlankBallots) / data.numVoters,
-                        phantom: true,
-                    },
-                    ('numBlankBallots' in data) && ({
-                        value: data.numBlankBallots / data.numVoters,
-                        label: locale.results.votersBlank(data.numBlankBallots),
-                        class: 's-a1',
-                    }),
-                ].filter(x => x),
-            ]} />
-        );
-
-        let voteOptions = vote.type === 'yn' || vote.type === 'ynb'
-            ? [
-                { type: 'simple', name: locale.results.optionYes, description: null },
-                { type: 'simple', name: locale.results.optionNo, description: null },
-                vote.type === 'ynb' && { type: 'simple', name: locale.results.optionBlank, description: null },
-            ].filter(x => x)
-            : vote.config.options || [];
-
-        if (data.optsOrdered) {
-            voteOptions = data.optsOrdered.map(({ opt }) => voteOptions[opt]);
-        }
-
-        const tally = (
-            <Bar
-                ymax={data.numBallots}
-                items={voteOptions.map((option, i) => ({
-                    name: <VoteOptionName option={option} />,
-                    value: data.tally ? data.tally[i] : null,
-                    chosen: (data.optsChosen || []).includes(i),
-                    description: [
-                        (data.optsExcludedByMentionThreshold || []).includes(i)
-                            ? locale.results.excludedByMentionThreshold
-                            : '',
-                        (data.optsEqual || []).includes(i)
-                            ? locale.results.isEqualOpt
-                            : '',
-                    ].filter(x => x).join(' · '),
-                }))}
-                showPercentage={!!data.tally} />
-        );
-
-        const rounds = data.rounds
-            ? <Rounds type={vote.type} ballots={data.numBallots} rounds={data.rounds} options={voteOptions} />
-            : null;
-
+export default class VoteResultsPage extends Page {
+    render () {
         return (
-            <div class="vote-results">
+            <div class="vote-results-page">
                 <Meta
                     title={locale.results.title} />
-                <ResultTitle data={data} />
-                {stats.map((stat, i) => (<div key={i} class="stat-line">{stat}</div>))}
-                {turnout ? <h3>{locale.results.turnout}</h3> : null}
-                {turnout}
-                {tally ? <h3>{locale.results.tally}</h3> : null}
-                {tally}
-                {rounds ? <h3>{locale.results.rounds}</h3> : null}
-                {rounds}
+                <VoteResults id={this.props.matches.vote[1]} />
             </div>
         );
     }
-}));
+}
 
-function ResultTitle ({ data }) {
+function VoteResults ({ id }) {
+    const [loading1, error1, vote] = useDataView('votes/vote', { id, fields: ['config'] });
+    const [loading2, error2, data] = useDataView('votes/voteResults', { id });
+
+    if (loading1 || loading2) {
+        return (
+            <div class="vote-results is-loading">
+                <CircularProgress indeterminate />
+            </div>
+        );
+    } else if (error1 || error2) {
+        return (
+            <div class="vote-results has-error">
+                <DisplayError error={error2 || error1} />
+            </div>
+        );
+    } else if (!data || !vote) {
+        return null;
+    }
+
+    let content = null;
+    if (data.type === 'yn' || data.type === 'ynb') {
+        content = <YnbContent data={data} />;
+    } else if (data.type === 'rp') {
+        content = <RpContent config={vote.config} data={data} />;
+    } else if (data.type === 'stv') {
+        content = <StvContent config={vote.config} data={data} />;
+    } else {
+        content = <TmContent config={vote.config} data={data} />;
+    }
+
     return (
-        <h1 class="result-title">
-            {('result' in data)
-                ? locale.results.resultTypes[data.result]
-                : locale.results.resultTypes.success}
+        <div class="vote-results">
+            <ResultStatus data={data} />
+            <ResultSummary data={data} config={vote.config} />
+            {data.ballots ? <ResultBallots type={data.type} ballots={data.ballots} /> : null}
+            {data.mentions ? <ResultMentions config={vote.config} ballots={data.ballots} mentions={data.mentions} /> : null}
+            {content}
+        </div>
+    );
+}
+
+function ResultStatus ({ data }) {
+    return (
+        <h1 class="result-status">
+            {locale.results.statuses[data.status]}
         </h1>
     );
 }
 
-function isInCenteredRange (x, center, size) {
-    return x >= center - size / 2 && x < center - size / 2;
-}
-
-function collideOccupiedRegions (y, regions, spacing) {
-    for (const region of regions) {
-        if (Math.abs(region - y) < spacing / 2) return true;
-    }
-    return false;
-}
-
-function layoutVerticalPieLabels (labels, radius, spacing) {
-    for (const label of labels) {
-        label._layoutPriority = Math.sin(label.vAngle);
-    }
-    const labelsByPriority = [...labels];
-    labelsByPriority.sort((a, b) => b._layoutPriority - a._layoutPriority);
-
-    const occupiedRegions = [];
-    for (const l of labelsByPriority) {
-        const projectedY = -1.2 * radius * Math.cos(l.vAngle);
-        const moveSign = l.vAngle < Math.PI / 2 ? -1 : 1;
-
-        let y = projectedY;
-        while (collideOccupiedRegions(y, occupiedRegions, spacing)) {
-            y += moveSign * 4;
-        }
-
-        l.y = y;
-        occupiedRegions.push(y);
-    }
-}
-
-function getPathForArcAngles (x, y, radius, sweepStart, sweepEnd, circle) {
-    const startX = x + Math.cos(sweepStart) * radius;
-    const startY = y + Math.sin(sweepStart) * radius;
-    const endX = x + Math.cos(sweepEnd) * radius;
-    const endY = y + Math.sin(sweepEnd) * radius;
-
-    const largeArcFlag = sweepEnd > sweepStart + Math.PI ? '1' : '0';
-
-    if (circle && Math.abs(endX - startX) + Math.abs(endY - startY) < 0.001) {
-        return [
-            `M ${x - radius} ${y}`,
-            `A ${radius} ${radius} 0 1 1 ${x + radius} ${y}`,
-            `A ${radius} ${radius} 0 1 1 ${x - radius} ${y}`,
-        ].join(' ');
-    } else {
-        return [
-            `M ${startX} ${startY}`,
-            `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`,
-        ].join(' ');
-    }
-}
-
-function makePieHLabelLine (label, centerX, centerY, radius) {
-    const angledPartDY = label.y - (-radius * Math.cos(label.vAngle));
-    const dir = -Math.sign(label.x);
-
-    const totalWidth = Math.abs(label.x) - Math.abs(radius * Math.sin(label.vAngle));
-    const cornerPointX = centerX + label.x + dir * 4 + (totalWidth - Math.abs(angledPartDY)) * dir;
-
-    let d = `M${centerX + label.x + dir * 4} ${centerY + label.y}`;
-    if (angledPartDY) {
-        d += `L${cornerPointX} ${centerY + label.y}`;
-    }
-    d += `L${centerX + radius * Math.cos(label.angle + Math.PI / 2)} ${centerY + radius * Math.sin(label.angle + Math.PI / 2)}`;
+function ResultBallots ({ type, ballots }) {
+    const canHaveBlanks = type !== 'yn';
 
     return (
-        <path d={d} class="label-line" strokeWidth={2} />
-    );
-}
-
-/**
- * Draws a pie chart
- *
- * # Props
- * - layers: Slice[][] where Slice is an object:
- *
- *   `Slice { phantom: bool, value: number, class: string, label: string }`
- */
-function Pie ({ layers }) {
-    const labels = [];
-
-    const scale = Math.PI * 2;
-    for (const layer of layers) {
-        let r = 0;
-        for (const item of layer) {
-            if (!item.value) continue;
-            const labelAngle = r + scale * item.value / 2;
-            if (!item.phantom) labels.push({ angle: labelAngle, label: item.label });
-            r += scale * item.value;
-        }
-    }
-
-    labels.sort((a, b) => a.angle - b.angle);
-
-    const labelsTop = [];
-    const labelsBot = [];
-    const labelsLeft = [];
-    const labelsRight = [];
-
-    const centerX = 300;
-    const centerY = 200;
-    const radius = 100;
-    const spacing = 30;
-    const weight = 40;
-
-    const enableTopBottom = false; // TODO: handle these and set this to true
-
-    for (const l of labels) {
-        const eligibleForTop = isInCenteredRange(l.angle, Math.PI, Math.PI / 2);
-        const eligibleForLeft = Math.cos(l.angle + Math.PI / 2) < 0;
-        const eligibleForBot = isInCenteredRange(l.angle, 0, Math.PI / 2)
-            || isInCenteredRange(l.angle, Math.PI * 2, Math.PI / 2);
-
-        if (eligibleForTop && !labelsTop.length && enableTopBottom) {
-            labelsTop.push(l);
-        } else if (eligibleForBot && !labelsBot.length && enableTopBottom) {
-            labelsBot.push(l);
-        } else if (eligibleForLeft) {
-            l.vAngle = Math.PI - l.angle;
-            l.x = -1.5 * radius;
-            labelsLeft.unshift(l);
-        } else {
-            l.vAngle = l.angle - Math.PI;
-            l.x = 1.5 * radius;
-            labelsRight.push(l);
-        }
-    }
-
-    layoutVerticalPieLabels(labelsLeft, radius, spacing);
-    layoutVerticalPieLabels(labelsRight, radius, spacing);
-
-    const svgLayers = [];
-    for (const layer of layers) {
-        const layerContents = [];
-        let r = 0;
-        for (const item of layer) {
-            if (!item.phantom) {
-                const startAngle = Math.PI / 2 + r;
-                const endAngle = Math.PI / 2 + r + Math.PI * 2 * item.value;
-                const circle = item.value >= 1;
-
-                const d = getPathForArcAngles(centerX, centerY, radius - weight / 2, startAngle, endAngle, circle);
-                layerContents.push(<path d={d} class={item.class} style={item.style} strokeWidth={weight} />);
-            }
-            r += Math.PI * 2 * item.value;
-        }
-
-        svgLayers.push(<g class="pie-chart-layer">{layerContents}</g>);
-    }
-
-    const textLabels = [];
-    const labelLines = [];
-
-    for (const l of labelsLeft) {
-        labelLines.push(makePieHLabelLine(l, centerX, centerY, radius));
-
-        textLabels.push(
-            <text x={centerX + l.x} y={centerY + l.y} textAnchor="end">
-                {l.label}
-            </text>
-        );
-    }
-    for (const l of labelsRight) {
-        labelLines.push(makePieHLabelLine(l, centerX, centerY, radius));
-
-        textLabels.push(
-            <text x={centerX + l.x} y={centerY + l.y} textAnchor="start">
-                {l.label}
-            </text>
-        );
-    }
-
-    return (
-        <svg class="result-pie-chart" viewBox={`0 0 ${centerX * 2} ${centerY * 2}`}>
-            {svgLayers}
-            {labelLines}
-            {textLabels}
-        </svg>
-    );
-}
-
-/**
- * Draws a bar chart.
- *
- * # Props
- * - ymax: max y
- * - items: Item[] where `Item { name: Node, value: number, chosen: bool, description: Node }`
- * - showPercentage: if true, will show percentage
- */
-function Bar ({ ymax, items, showPercentage }) {
-    const contents = [];
-
-    for (const item of items) {
-        const percentage = item.value !== null
-            ? (ymax !== 0 ? item.value / ymax : 0)
-            : 1;
-
-        contents.push(
-            <div class={'bar-chart-item ' + (item.chosen ? 'was-chosen' : '')}>
-                <div class="item-name">{item.name}</div>
-                <div class="item-value">
-                    {item.value}
-                    {showPercentage ? ` (${+percentage.toFixed(2) * 100}%)` : ''}
+        <div class="result-ballots">
+            <h2>
+                {locale.results.ballots.title}
+            </h2>
+            <div class="stat-line">
+                {locale.results.ballots.voters(ballots.count)}
+            </div>
+            {canHaveBlanks && (
+                <div class="stat-line">
+                    {locale.results.ballots.blanks(ballots.blank)}
                 </div>
-                <div class="item-description">{item.description}</div>
-                {item.chosen ? <div class="item-chosen-check"><CheckIcon /></div> : null}
-                <div class="item-bar" style={{ width: `${percentage * 100}%` }} />
+            )}
+            <div class="stat-line">
+                {locale.results.ballots.nonVoters(ballots.voters - ballots.count)}
+            </div>
+        </div>
+    );
+}
+
+function OptionName ({ option }) {
+    if (option.type === 'simple') {
+        return option.name;
+    } else if (option.type === 'codeholder') {
+        return (
+            <Link class="option-codeholder-link" target={`/membroj/${option.codeholderId}`} outOfTree>
+                <IdUEACode id={option.codeholderId} />
+            </Link>
+        );
+    }
+    return '???';
+}
+
+function ResultSummary ({ data, config }) {
+    if (data.status !== 'success') return null;
+
+    if (data.type === 'yn' || data.type === 'ynb') {
+        const { pass } = data.value;
+        const iPass = <CheckIcon style={{ verticalAlign: 'middle' }} />;
+        const iFail = <CloseIcon style={{ verticalAlign: 'middle' }} />;
+
+        return (
+            <div class="result-summary is-ynb">
+                <div class="ynb-condition is-result" data-passed={pass.result}>
+                    <div class="condition-icon">
+                        {pass.result ? iPass : iFail}
+                    </div>
+                    <div class="condition-label">
+                        {pass.result
+                            ? locale.results.ynbResults.resultPass
+                            : locale.results.ynbResults.resultFail}
+                    </div>
+                </div>
+                <div class="ynb-condition" data-passed={pass.voters}>
+                    <div class="condition-icon">
+                        {pass.voters ? iPass : iFail}
+                    </div>
+                    <div class="condition-label">
+                        {pass.voters
+                            ? locale.results.ynbResults.votersPass
+                            : locale.results.ynbResults.votersFail}
+                    </div>
+                </div>
+                <div class="ynb-condition" data-passed={pass.majority}>
+                    <div class="condition-icon">
+                        {pass.majority ? iPass : iFail}
+                    </div>
+                    <div class="condition-label">
+                        {pass.majority
+                            ? locale.results.ynbResults.majorityPass
+                            : locale.results.ynbResults.majorityFail}
+                    </div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div class="result-bar-chart">
-            {contents}
+        <div class="result-summary is-winners">
+            <h2>{locale.results.winners}</h2>
+            <OptionList options={config.options} ids={data.value.winners} />
         </div>
     );
 }
 
-/** Renders the name of a vote option. */
-function VoteOptionName ({ option }) {
-    if (option.type === 'codeholder') {
-        return <IdUEACode id={option.codeholderId} />;
+function OptionList ({ options, ids }) {
+    if (!ids.length) {
+        return (
+            <div class="option-list is-empty">
+                {locale.results.optionListEmpty}
+            </div>
+        );
     }
-    return option.name;
+
+    return (
+        <ul class="option-list">
+            {ids.map((node, i) => (
+                <li key={i} class="inner-item">
+                    <OptionName option={options[node]} />
+                </li>
+            ))}
+        </ul>
+    );
 }
 
-/**
- * Renders rounds.
- *
- * # Props
- * - type: vote type
- * - ballots: ballot count
- * - rounds: rounds data
- * - options: vote options
- */
-function Rounds ({ type, ballots, rounds, options }) {
-    const [round, setRound] = useState(0);
+function rationalToFloat (r) {
+    if (Array.isArray(r)) return r[0] / r[1];
+    return r;
+}
 
-    const prevRound = () => round > 0 && setRound(round - 1);
-    const nextRound = () => round < rounds.length - 1 && setRound(round + 1);
+function ResultMentions ({ config, ballots, mentions }) {
+    const candidates = mentions.includedByMentions.concat(mentions.excludedByMentions);
+    let maxMentions = 1; // we initialize this to 1 so we dont divide by zero
+    for (const cand of candidates) {
+        maxMentions = Math.max(mentions.mentions[cand] || 0, maxMentions);
+    }
+    const mentionThreshold = ('mentionThreshold' in config)
+        ? rationalToFloat(config.mentionThreshold) * ballots.count
+        : 0;
+    maxMentions = Math.max(mentionThreshold * 1.2, maxMentions);
 
-    let roundView = null;
+    const entries = [];
+    for (const candidate of candidates) {
+        const isIncluded = mentions.includedByMentions.includes(candidate);
+        const count = mentions.mentions[candidate] || 0;
+        const innerLabel = isIncluded
+            ? locale.results.mentions.candidateIncludedWithCount(count)
+            : locale.results.mentions.candidateExcludedWithCount(count);
 
-    if (type === 'rp') {
-        const rankedPairs = new Map();
-        for (const round of rounds) {
-            for (const pair of round.rankedPairs) {
-                const key = pair.pair.join('~');
-                if (!rankedPairs.has(key)) {
-                    rankedPairs.set(key, pair);
-                }
+        entries.push({
+            label: <OptionName option={config.options[candidate]} />,
+            innerLabel,
+            value: count,
+            marked: isIncluded,
+        });
+    }
+
+    return (
+        <div class="result-mentions">
+            <BarChart
+                entries={entries}
+                threshold={mentionThreshold}
+                max={maxMentions} />
+        </div>
+    );
+}
+
+function YnbContent ({ data }) {
+    if (data.status !== 'success') return null;
+
+    const { tally } = data.value;
+    const max = Math.max(tally.yes, tally.no, tally.blank);
+
+    return (
+        <BarChart2 ymax={max} items={[
+            {
+                name: locale.results.ynbOptions.yes,
+                value: tally.yes,
+            },
+            {
+                name: locale.results.ynbOptions.no,
+                value: tally.no,
+            },
+            data.type === 'ynb' ? {
+                name: locale.results.ynbOptions.blank,
+                value: tally.blank,
+            } : null,
+        ].filter(x => x)} showPercentage />
+    );
+}
+
+function RpContent ({ data, config }) {
+    if (data.status === 'tie-breaker-needed') {
+        return (
+            <div class="rp-value is-tied-pairs">
+                <p>
+                    {locale.results.rpTieBreakerNeeded.description}
+                </p>
+                <ul>
+                    {data.pairs.map(([a, b], i) => (
+                        <li key={i}>
+                            <OptionName option={config.options[a]} />
+                            {' ↔ '}
+                            <OptionName option={config.options[b]} />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+    } else if (data.status === 'success') {
+        return (
+            <div class="rp-value is-success">
+                <h2>{locale.results.rpRounds.title}</h2>
+                <ul class="rp-rounds">
+                    {data.value.rounds.map((round, i) => (
+                        <RpRound key={i} round={round} options={config.options} />
+                    ))}
+                </ul>
+            </div>
+        );
+    }
+
+    return null;
+}
+
+function StvContent ({ data, config }) {
+    if (data.status === 'tie-breaker-needed') {
+        return (
+            <div class="stv-value is-tied-nodes">
+                <p>
+                    {locale.results.stvTieBreakerNeeded.description}
+                </p>
+                <ul>
+                    {data.tiedNodes.map((node, i) => (
+                        <li key={i}>
+                            <OptionName option={config.options[node]} />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+    } else if (data.status === 'success') {
+        const events = [];
+        const eliminated = [];
+
+        for (const event of data.value.events) {
+            events.push(
+                <li key={events.length} class="stv-event-container">
+                    <StvEvent
+                        eliminated={eliminated.slice()}
+                        event={event}
+                        options={config.options} />
+                </li>
+            );
+
+            if (event.type === 'eliminate') {
+                eliminated.push(event.candidate);
             }
         }
-        roundView = (
-            <RPRound
-                round={rounds[round]}
-                options={options}
-                rankedPairs={[...rankedPairs.values()]} />
+
+        return (
+            <div class="stv-value is-success">
+                <ul class="stv-events">
+                    {events}
+                </ul>
+            </div>
         );
-    } else if (type === 'stv') {
-        roundView = <STVRound ballots={ballots} round={rounds[round]} options={options} />;
     }
 
-    return (
-        <div class="result-rounds">
-            <div class="round-picker">
-                <Button icon small onClick={prevRound}>
-                    <ChevronLeftIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
-                <span class="round-picker-label">
-                    {locale.results.roundsPagination(round + 1, rounds.length)}
-                </span>
-                <Button icon small onClick={nextRound}>
-                    <ChevronRightIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
+    return null;
+}
+
+function TmContent ({ data, config }) {
+    if (data.status === 'tie') {
+        return (
+            <div class="tm-value is-tie">
+                <h2>{locale.results.tmTie.title}</h2>
+                <OptionList options={config.options} ids={data.tiedNodes} />
+                <h3>{locale.results.tmTie.sortedNodes}</h3>
+                <BarChart
+                    max={data.sortedNodes.map(node => data.mentions.mentions[node] || 0).reduce((a, b) => Math.max(a, b), 0)}
+                    threshold={0}
+                    entries={data.sortedNodes.map(node => ({
+                        label: <OptionName option={config.options[node]} />,
+                        innerLabel: data.tiedNodes.includes(node)
+                            ? locale.results.tmTie.nodeIsTied
+                            : '\u00a0',
+                        value: data.mentions.mentions[node] || 0,
+                        marked: data.tiedNodes.includes(node),
+                    }))} />
             </div>
-            {roundView}
-        </div>
-    );
-}
-
-/** Renders a single stv round. */
-function STVRound ({ ballots, round, options }) {
-    const items = [];
-
-    for (const i of round.optsChosen) {
-        items.push({
-            name: <VoteOptionName option={options[i]} />,
-            value: round.votes[i],
-            chosen: true,
-        });
+        );
     }
 
-    for (const i of round.optsEliminated) {
-        items.push({
-            name: <VoteOptionName option={options[i]} />,
-            value: round.votes[i],
-            chosen: false,
-        });
-    }
-
-    return (
-        <div class="result-round">
-            <Bar ymax={ballots} items={items} />
-        </div>
-    );
+    return null;
 }
 
-/** Renders a single ranked-pairs round. */
-function RPRound ({ round, options, rankedPairs }) {
+function RpRound ({ round, options }) {
     return (
-        <div class="result-round">
+        <div class="rp-round">
             <LockGraph
-                graph={round.graph}
-                rankedPairs={rankedPairs}
+                lockGraphEdges={round.lockGraphEdges}
+                orderedPairs={round.orderedPairs}
                 options={options}
-                chosen={round.optChosen} />
-            <div class="round-chosen">
-                {locale.results.roundsChosen}
-                <span class="round-chosen-name">
-                    <VoteOptionName option={options[round.optChosen]} />
-                </span>
+                winner={round.winner} />
+        </div>
+    );
+}
+
+function StvEvent ({ event, options, eliminated }) {
+    if (event.type === 'elect-with-quota') {
+        return (
+            <div class="stv-event is-elect-with-quota">
+                <h3>{locale.results.stvEvents.electWithQuota(+event.quota.toFixed(3))}</h3>
+                <p>
+                    {locale.results.stvEvents.electWithQuotaDescription}
+                </p>
+                <p>
+                    {locale.results.stvEvents.electingValuesDescription}
+                </p>
+                <StvValues values={event.values} options={options} chosen={event.elected} quota={event.quota} eliminated={eliminated} />
+                <h4>{locale.results.stvEvents.elected}</h4>
+                <OptionList options={options} ids={event.elected} />
             </div>
-            <ul class="round-options">
-                {Object.entries(round.optStats).map(([i, { won, lost, mentions }]) => {
-                    const option = options[+i];
-                    return (
-                        <li class="round-option" key={i}>
-                            <span class="round-option-name">
-                                <VoteOptionName option={option} />
-                            </span>
-                            <span class="round-option-stats">
-                                {locale.results.roundsOptionStats(won, lost, mentions)}
-                            </span>
-                        </li>
-                    );
-                })}
-            </ul>
+        );
+    } else if (event.type === 'elect-rest') {
+        return (
+            <div class="stv-event is-elect-rest">
+                <h3>{locale.results.stvEvents.electRest}</h3>
+                <p>
+                    {locale.results.stvEvents.electRestDescription}
+                </p>
+                <OptionList options={options} ids={event.elected} />
+            </div>
+        );
+    } else if (event.type === 'eliminate') {
+        return (
+            <div class="stv-event is-eliminate">
+                <h3>{locale.results.stvEvents.eliminate}</h3>
+                <p>
+                    {locale.results.stvEvents.eliminateDescription}
+                </p>
+                <h4>{locale.results.stvEvents.eliminated}</h4>
+                <OptionList options={options} ids={[event.candidate]} />
+                <p>
+                    {locale.results.stvEvents.eliminatedValuesDescription}
+                </p>
+                <StvValues values={event.values} options={options} chosen={[event.candidate]} eliminated={eliminated} />
+            </div>
+        );
+    }
+
+    return null;
+}
+
+function StvValues ({ values, chosen, options, eliminated, quota }) {
+    let max = 0;
+    const entries = [];
+    for (const k in values) {
+        if (eliminated.includes(+k)) continue;
+
+        max = Math.max(values[k], max);
+        entries.push({
+            label: <OptionName option={options[k]} />,
+            innerLabel: +values[k].toFixed(3),
+            value: values[k],
+            marked: chosen?.includes(+k),
+        });
+    }
+
+    return (
+        <div class="stv-values">
+            <BarChart max={max} entries={entries} threshold={quota || 0} />
         </div>
     );
 }
@@ -501,47 +455,46 @@ class LockGraph extends Component {
         g.setGraph({});
         g.setDefaultEdgeLabel(() => ({}));
 
+        const nodeIds = new Set();
+        for (const { from: a, to: b } of this.props.lockGraphEdges) {
+            nodeIds.add(a);
+            nodeIds.add(b);
+        }
+
         const optionLabels = {};
-        for (const node in this.props.graph) {
-            const option = this.props.options[+node];
+        for (const node of nodeIds) {
+            const option = this.props.options[node];
             if (option.type === 'simple') {
                 optionLabels[node] = option.name;
             } else if (option.type === 'codeholder') {
-                optionLabels[node] = new Promise((resolve, reject) => {
-                    const view = core.createDataView('codeholders/codeholder', {
-                        id: option.codeholderId,
-                        fields: ['code'],
-                        lazyFetch: true,
-                    });
-                    view.on('update', data => {
-                        resolve(data.code.new);
-                        view.drop();
-                    });
-                    view.on('error', err => {
-                        reject(err);
-                        view.drop();
-                    });
+                optionLabels[node] = core.viewData('codeholders/codeholder', {
+                    id: option.codeholderId,
+                    fields: ['code'],
+                    lazyFetch: true,
+                }).then(data => {
+                    return data.code.new;
                 });
             }
         }
 
-        for (const node in this.props.graph) {
+        for (const node of nodeIds) {
             let label;
             if (typeof optionLabels[node] === 'string') label = optionLabels[node];
             else label = await optionLabels[node];
 
             g.setNode('' + node, {
-                id: +node,
+                id: node,
                 label,
                 width: Math.max(30, label.length * 12), // heuristic approximation of node width
                 height: 30,
             });
-            for (const target of this.props.graph[node]) {
-                g.setEdge('' + node, '' + target, {
-                    fromNode: +node,
-                    toNode: +target,
-                });
-            }
+        }
+
+        for (const { from: a, to: b } of this.props.lockGraphEdges) {
+            g.setEdge('' + a, '' + b, {
+                fromNode: a,
+                toNode: b,
+            });
         }
 
         dagre.layout(g);
@@ -570,7 +523,7 @@ class LockGraph extends Component {
         if (prevProps.graph !== this.props.graph) this.layout(++this.layoutLock);
     }
 
-    render ({ options, rankedPairs }, { nodes, edges, minX, minY, maxX, maxY, selectedEdge }) {
+    render ({ options, orderedPairs, lockGraphEdges, winner }, { nodes, edges, minX, minY, maxX, maxY, selectedEdge }) {
         if (!nodes.length) return null;
 
         const margin = 20;
@@ -614,11 +567,11 @@ class LockGraph extends Component {
         }
 
         for (const node of nodes) {
-            const isChosen = this.props.chosen === node.id;
+            const isWinner = winner === node.id;
 
             svgNodes.push(
                 <rect
-                    class={'lock-graph-node-background' + (isChosen ? ' is-the-chosen-one' : '')}
+                    class={'lock-graph-node-background' + (isWinner ? ' is-winner' : '')}
                     x={node.x - node.width / 2}
                     y={node.y - node.height / 2}
                     width={node.width}
@@ -628,7 +581,7 @@ class LockGraph extends Component {
                     x={node.x}
                     y={node.y}
                     textAnchor="middle"
-                    class="lock-graph-node-label">
+                    class={'lock-graph-node-label' + (isWinner ? ' is-winner' : '')}>
                     {node.label}
                 </text>
             );
@@ -636,51 +589,60 @@ class LockGraph extends Component {
 
         return (
             <div class="result-lock-graph-container">
-                <RankedPairs options={options} rankedPairs={rankedPairs} selectedEdge={selectedEdge} />
-                <h4 class="lock-graph-title">{locale.results.lockGraph}</h4>
-                <svg class="result-lock-graph" width={viewW} viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`}>
-                    {svgEdges}
-                    {svgNodes}
-                </svg>
+                <OrderedPairs
+                    options={options}
+                    orderedPairs={orderedPairs}
+                    lockGraphEdges={lockGraphEdges}
+                    selectedEdge={selectedEdge} />
+                <div class="inner-lock-graph-container">
+                    <svg class="result-lock-graph" width={viewW} viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`}>
+                        {svgEdges}
+                        {svgNodes}
+                    </svg>
+                </div>
             </div>
         );
     }
 }
 
-function RankedPairs ({ options, rankedPairs, selectedEdge }) {
-    if (!rankedPairs) return;
+function OrderedPairs ({ options, orderedPairs, lockGraphEdges, selectedEdge }) {
     const edge = (selectedEdge || '').split('-').map(x => +x);
 
     const tableRows = [];
-    for (const pair of rankedPairs) {
-        const selected = edge[0] === pair.pair[0] && edge[1] === pair.pair[1]
-            || edge[0] === pair.pair[1] && edge[1] === pair.pair[0];
+    for (const [a, b] of orderedPairs) {
+        let lockGraphEdge = null;
+        for (const item of lockGraphEdges) {
+            if (item.from === a && item.to === b || item.from === b && item.to === a) {
+                lockGraphEdge = item;
+                break;
+            }
+        }
+
+        const selected = edge[0] === a && edge[1] === b
+            || edge[0] === b && edge[1] === a;
 
         tableRows.push({
             cells: [
                 <span key="a">
-                    <VoteOptionName option={options[pair.pair[0]]} />
-                    {` (${pair.opt0}) `}
-                    {locale.results.rankedPairs.vs}
-                    {' '}
-                    <VoteOptionName option={options[pair.pair[1]]} />
-                    {` (${pair.opt1}) `}
+                    <OptionName option={options[a]} />
+                    {' ↔ '}
+                    <OptionName option={options[b]} />
                 </span>,
-                <VoteOptionName key="b" option={options[pair.winner]} />,
-                '' + Math.abs(pair.diff),
+                lockGraphEdge ? <OptionName key="b" option={options[lockGraphEdge.from]} /> : null,
+                lockGraphEdge ? `${Math.abs(lockGraphEdge.diff)}` : null,
             ],
             selected,
         });
     }
 
     return (
-        <div class="ranked-pairs">
-            <table class="ranked-pairs-table">
+        <div class="ordered-pairs">
+            <table class="ordered-pairs-table">
                 <thead>
                     <tr>
-                        <th>{locale.results.rankedPairs.pair}</th>
-                        <th>{locale.results.rankedPairs.winner}</th>
-                        <th>{locale.results.rankedPairs.diff}</th>
+                        <th>{locale.results.rpRounds.pair}</th>
+                        <th>{locale.results.rpRounds.winner}</th>
+                        <th>{locale.results.rpRounds.diff}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -694,3 +656,66 @@ function RankedPairs ({ options, rankedPairs, selectedEdge }) {
         </div>
     );
 }
+
+function BarChart ({ entries, threshold, max }) {
+    return (
+        <table class="result-bar-chart">
+            <tbody>
+                {entries.map(({ value, label, innerLabel, marked }, i) => {
+                    return (
+                        <tr
+                            class={'candidate-item' + (marked ? ' is-marked' : ' is-not-marked')}
+                            key={i}>
+                            <td class="candidate-name">
+                                {label}
+                            </td>
+                            <td class="candidate-value">
+                                <div class="inner-value">
+                                    <div class="inner-label">
+                                        {innerLabel}
+                                    </div>
+                                    <div class="min-bar" style={{ '--value': threshold / max }} />
+                                    <div class="value-bar" style={{ '--value': value / max }}>
+                                        <div class="inner-label">
+                                            {innerLabel}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    );
+                })}
+            </tbody>
+        </table>
+    );
+}
+
+function BarChart2 ({ ymax, items, showPercentage }) {
+    const contents = [];
+
+    for (const item of items) {
+        const percentage = item.value !== null
+            ? (ymax !== 0 ? item.value / ymax : 0)
+            : 1;
+
+        contents.push(
+            <div class={'bar-chart-item' + (item.chosen ? ' was-chosen' : '') + (item.eliminated ? ' was-eliminated' : '')}>
+                <div class="item-name">{item.name}</div>
+                <div class="item-value">
+                    {item.value}
+                    {showPercentage ? ` (${+percentage.toFixed(2) * 100}%)` : ''}
+                </div>
+                <div class="item-description">{item.description}</div>
+                {item.chosen ? <div class="item-chosen-check"><CheckIcon /></div> : null}
+                <div class="item-bar" style={{ width: `${percentage * 100}%` }} />
+            </div>
+        );
+    }
+
+    return (
+        <div class="result-bar-chart">
+            {contents}
+        </div>
+    );
+}
+

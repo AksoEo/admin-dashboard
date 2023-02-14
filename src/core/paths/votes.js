@@ -3,6 +3,7 @@ import { util } from '@tejo/akso-client';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
+import { simpleDataView } from '../templates';
 import * as store from '../store';
 import { deepMerge, deepEq } from '../../util';
 
@@ -80,6 +81,7 @@ const clientFields = {
             'tieBreakerCodeholder',
             'publishVoters',
             'publishVotersPercentage',
+            'publishResults',
             'options',
         ],
         fromAPI: vote => {
@@ -89,6 +91,7 @@ const clientFields = {
                 quorumInclusive: vote.quorumInclusive,
                 publishVoters: vote.publishVoters,
                 publishVotersPercentage: vote.publishVotersPercentage,
+                publishResults: vote.publishResults,
             };
 
             if (vote.type === 'yn' || vote.type === 'ynb') {
@@ -126,6 +129,7 @@ const clientFields = {
                 quorumInclusive: !!value.quorumInclusive,
                 publishVoters: !!value.publishVoters,
                 publishVotersPercentage: !!value.publishVotersPercentage,
+                publishResults: !!value.publishResults,
             };
 
             if (item.type === 'yn' || item.type === 'ynb') {
@@ -209,6 +213,7 @@ const clientToAPI = makeClientToAPI(clientFields);
 export const VOTES = 'votes';
 export const VOTE_TEMPLATES = 'voteTemplates';
 export const VOTE_RESULTS = 'voteResults';
+export const VOTE_STATS = 'voteStats';
 export const SIG_VOTES = '!votes';
 
 export const tasks = {
@@ -306,6 +311,13 @@ export const tasks = {
         await client.delete(`/votes/${id}`);
         store.remove([VOTES, +id]);
         store.signal([VOTES, SIG_VOTES]);
+    },
+
+    /** votes/stats: staistics for a vote */
+    stats: async ({ id }) => {
+        const client = await asyncClient;
+        const res = await client.get(`/votes/${id}/stats`);
+        store.insert([VOTE_STATS, +id], res.body);
     },
 
     /** votes/listTemplates: lists vote templates */
@@ -501,6 +513,10 @@ export const views = {
             store.unsubscribe([VOTE_RESULTS, this.id], this.#onUpdate);
         }
     },
+    stats: simpleDataView({
+        storePath: ({ id }) => [VOTE_STATS, id],
+        get: ({ id }) => tasks.stats({ id }),
+    }),
 
     /** votes/voteTemplate: data view of a single vote template */
     voteTemplate: class VoteTemplate extends AbstractDataView {

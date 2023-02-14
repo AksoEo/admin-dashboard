@@ -289,6 +289,7 @@ export function tieBreakerCodeholder ({ value, onChange, editing }) {
 
 export const publishVoters = inactiveBool;
 export const publishVotersPercentage = bool;
+export const publishResults = bool;
 
 export const options = class OptionsEditor extends Component {
     /**
@@ -461,6 +462,7 @@ const CONFIG_FIELDS = {
     tieBreakerCodeholder: [tieBreakerCodeholder, ['rp', 'stv']],
     publishVoters: [publishVoters],
     publishVotersPercentage: [publishVotersPercentage],
+    publishResults: [publishResults],
     options: [options, ['rp', 'stv', 'tm'], true],
 };
 

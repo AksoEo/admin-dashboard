@@ -1,10 +1,12 @@
 import { h } from 'preact';
+import { CircularProgress } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailView from '../../../components/detail/detail';
 import Page from '../../../components/page';
 import OrgIcon from '../../../components/org-icon';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
+import { useDataView } from '../../../core';
 import { connectPerms } from '../../../perms';
 import { LinkButton } from '../../../router';
 import { votes as locale } from '../../../locale';
@@ -18,6 +20,7 @@ import {
 } from './config';
 import FIELDS from './fields';
 import './detail.less';
+import DisplayError from '../../../components/utils/error';
 
 const DETAIL_FIELDS = {
     ...FIELDS,
@@ -102,8 +105,6 @@ export default connectPerms(class VoteDetailPage extends Page {
             });
         }
 
-        const headerComponent = makeHeader(this);
-
         return (
             <div class="vote-detail-page">
                 <Meta
@@ -116,7 +117,7 @@ export default connectPerms(class VoteDetailPage extends Page {
                     options={{
                         fields: Object.keys(DETAIL_FIELDS),
                     }}
-                    header={headerComponent}
+                    header={Header}
                     fields={DETAIL_FIELDS}
                     locale={locale}
                     edit={edit}
@@ -124,14 +125,16 @@ export default connectPerms(class VoteDetailPage extends Page {
                     editing={editing}
                     onEndEdit={this.onEndEdit}
                     onCommit={this.onCommit}
-                    onDelete={() => this.props.pop()} />
+                    onDelete={() => this.props.pop()}
+                    userData={{ owner: this }} />
             </div>
         );
     }
 });
 
-const makeHeader = (owner) => function Header ({ item, editing }) {
+function Header ({ item, editing, userData }) {
     if (editing) return null;
+    const { owner } = userData;
     owner.setOrg(item.org);
     if (item) owner.setEnded(item.state.hasEnded);
 
@@ -143,11 +146,46 @@ const makeHeader = (owner) => function Header ({ item, editing }) {
                 </span>
                 {item.name}
             </h1>
-            {item && item.state.hasResults ? (
-                <LinkButton target={`/vochdonoj/${item.id}/rezultoj`}>
-                    {locale.results.link}
-                </LinkButton>
-            ) : null}
+            <div class="vote-header-items">
+                <VoteStats id={item.id} />
+                {item && item.state.hasResults ? (
+                    <LinkButton raised target={`/vochdonoj/${item.id}/rezultoj`}>
+                        {locale.results.link}
+                    </LinkButton>
+                ) : null}
+            </div>
         </div>
     );
-};
+}
+
+function VoteStats ({ id }) {
+    const [loading, error, data] = useDataView('votes/stats', { id });
+
+    if (loading) {
+        return (
+            <CircularProgress small indeterminate />
+        );
+    }
+
+    if (error) {
+        return (
+            <DisplayError error={error} />
+        );
+    }
+
+    if (!data) return null;
+
+    return (
+        <div class="vote-stats">
+            {data.numBallots ? (
+                locale.stats.ballots(
+                    data.numBallots,
+                    data.numVoters,
+                    (data.numBallots / data.numVoters * 100).toFixed(1),
+                )
+            ) : (
+                locale.stats.eligible(data.numVoters)
+            )}
+        </div>
+    );
+}
