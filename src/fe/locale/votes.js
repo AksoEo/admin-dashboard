@@ -181,19 +181,13 @@ export const votes = {
 
         tmTie: {
             title: '[[Tied candidates]]',
-            sortedNodes: '[[Sorted nodes]]',
+            sortedNodes: '[[Partial vote result]]',
             nodeIsTied: '[[Tied]]',
         },
 
-        turnout: 'Voĉdonintoj',
-        excludedByMentionThreshold: 'Opcioj nekonsiderataj pro limigo pri minimumaj mencioj',
-        isEqualOpt: 'Neelektitaj opcioj ricevintaj je same multe da voĉoj kiel elektita opcio',
-        electionQuota: n => `Elektiĝkvoto: ${n}`,
-        majorityBallotsOkay: k => k ? 'Plimulto de la balotiloj estis atingita.' : 'Plimulto de la balotiloj NE estis atingita.',
-        majorityVotersOkay: k => k ? 'Plimulto de la rajtantaj voĉdonantoj estis atingita.' : 'Plimulto de la rajtantaj voĉdonantoj NE estis atingita.',
-        majorityOkay: k => k ? 'Ambaŭ plimultoj estis atingitaj.' : 'Ambaŭ plimultoj NE estis atingitaj.',
-        rounds: 'Raŭndoj',
-        roundsPagination: (n, m) => `Raŭndo ${n} el ${m}`,
+        exportAsImage: '[[Export image]]',
+        exportAsImageFileName: 'rezultoj',
+        exportAsImageError: 'Eraro',
     },
     create: {
         menuItem: 'Krei',

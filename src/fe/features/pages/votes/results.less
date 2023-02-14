@@ -1,7 +1,21 @@
 @import '../../../prelude';
 
 .vote-results {
-    padding: 24px;
+    .results-bar {
+        padding: 8px 24px;
+        text-align: right;
+    }
+
+    .inner-results {
+        background: @card-background;
+        padding: 24px;
+
+        &.is-exporting {
+            // when fonts dont load, the text is invisible in dom-to-image.
+            // just use some default fonts
+            font-family: "Helvetica Neue", Helvetica, sans-serif;
+        }
+    }
 
     &.has-error {
         text-align: center;

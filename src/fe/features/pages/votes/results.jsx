@@ -1,10 +1,13 @@
 import { h, Component } from 'preact';
+import { useContext, useRef, useState } from 'preact/compat';
 import dagre from 'dagre';
 import { CircularProgress } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
+import domToImage from 'dom-to-image-more';
 import { useDataView } from '../../../core';
 import Page from '../../../components/page';
+import TaskButton from '../../../components/controls/task-button';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import { IdUEACode } from '../../../components/data/uea-code';
@@ -26,8 +29,10 @@ export default class VoteResultsPage extends Page {
 }
 
 function VoteResults ({ id }) {
+    const core = useContext(coreContext);
     const [loading1, error1, vote] = useDataView('votes/vote', { id, fields: ['config'] });
     const [loading2, error2, data] = useDataView('votes/voteResults', { id });
+    const containerNode = useRef(null);
 
     if (loading1 || loading2) {
         return (
@@ -56,13 +61,56 @@ function VoteResults ({ id }) {
         content = <TmContent config={vote.config} data={data} />;
     }
 
+    const [exporting, setExporting] = useState(false);
+
+    const exportAsImage = async () => {
+        const width = containerNode.current.offsetWidth;
+        const height = containerNode.current.offsetHeight;
+
+        await new Promise(resolve => {
+            setExporting(true);
+            setTimeout(() => {
+                resolve();
+            }, 100);
+        });
+
+        await domToImage.toPng(containerNode.current, {
+            width: width * 2,
+            height: height * 2,
+            style: {
+                transform: 'scale(2)',
+                transformOrigin: '0 0',
+            },
+        }).then(src => {
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = locale.results.exportAsImageFileName + '.png';
+            a.click();
+        }).catch(err => {
+            core.createTask('info', {
+                title: locale.results.exportAsImageError,
+                message: err.toString(),
+            });
+        });
+
+        setExporting(false);
+    };
+
     return (
         <div class="vote-results">
-            <ResultStatus data={data} />
-            <ResultSummary data={data} config={vote.config} />
-            {data.ballots ? <ResultBallots type={data.type} ballots={data.ballots} /> : null}
-            {data.mentions ? <ResultMentions config={vote.config} ballots={data.ballots} mentions={data.mentions} /> : null}
-            {content}
+            <div class="results-bar">
+                <TaskButton run={exportAsImage}>
+                    {locale.results.exportAsImage}
+                </TaskButton>
+            </div>
+
+            <div class={'inner-results' + (exporting ? ' is-exporting' : '')} ref={containerNode}>
+                <ResultStatus data={data} />
+                <ResultSummary data={data} config={vote.config} />
+                {data.ballots ? <ResultBallots type={data.type} ballots={data.ballots} /> : null}
+                {data.mentions ? <ResultMentions config={vote.config} ballots={data.ballots} mentions={data.mentions} tmInfo={data.type === 'tm' ? data.value : null} /> : null}
+                {content}
+            </div>
         </div>
     );
 }
@@ -188,7 +236,7 @@ function rationalToFloat (r) {
     return r;
 }
 
-function ResultMentions ({ config, ballots, mentions }) {
+function ResultMentions ({ config, ballots, mentions, tmInfo }) {
     const candidates = mentions.includedByMentions.concat(mentions.excludedByMentions);
     let maxMentions = 1; // we initialize this to 1 so we dont divide by zero
     for (const cand of candidates) {
@@ -212,7 +260,16 @@ function ResultMentions ({ config, ballots, mentions }) {
             innerLabel,
             value: count,
             marked: isIncluded,
+            candidate,
         });
+    }
+
+    if (tmInfo) {
+        // change display for TM: sort & mark winners only
+        entries.sort((a, b) => b.value - a.value);
+        for (const entry of entries) {
+            entry.marked = tmInfo.winners.includes(entry.candidate);
+        }
     }
 
     return (
