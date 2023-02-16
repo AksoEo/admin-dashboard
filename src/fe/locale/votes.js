@@ -209,6 +209,9 @@ export const votes = {
     },
     numberRequired: 'Bv. enmeti nombron',
     optionsRequired: 'Bv. enmeti voĉdonopciojn',
+    sendCastBallotNotif: '[[Send vote notification]]',
+    sendCastBallotNotifDescription: '[[Send a notification to all eligible voters who havent voted yet.]]',
+    sendCastBallotNotifMessage: n => `[[Send a notification to ${n} eligible voter${n === 1 ? '' : 's'} who ha${n === 1 ? 's' : 've'}n’t voted yet.]]`,
     update: {
         menuItem: 'Redakti',
         title: 'Redakti voĉdonon',

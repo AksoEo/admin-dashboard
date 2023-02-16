@@ -12,6 +12,7 @@ export function getFormVarsForIntent (intent) {
     else if (intent === 'newsletter') return spec2Vars(CODEHOLDER_SPEC);
     else if (intent === 'newsletter_magazine') return spec2Vars(NEWSLETTER_MAGAZINE_SPEC);
     else if (intent === 'congress_registration') return spec2Vars(CONGRESS_REGISTRATION_SPEC);
+    else if (intent === 'vote_cast_ballot') return spec2Vars(VOTE_CAST_BALLOT_SPEC);
     return [];
 }
 
@@ -49,4 +50,8 @@ const NEWSLETTER_MAGAZINE_SPEC = {
 
 const CONGRESS_REGISTRATION_SPEC = {
     registrationEntry: examples.registrationEntry,
+};
+
+const VOTE_CAST_BALLOT_SPEC = {
+    vote: examples.vote,
 };

@@ -1,14 +1,17 @@
 import { h } from 'preact';
-import { CircularProgress } from 'yamdl';
+import { useState } from 'preact/compat';
+import { Button, CircularProgress } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailView from '../../../components/detail/detail';
 import Page from '../../../components/page';
 import OrgIcon from '../../../components/org-icon';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
+import DisplayError from '../../../components/utils/error';
 import { useDataView } from '../../../core';
 import { connectPerms } from '../../../perms';
 import { LinkButton } from '../../../router';
+import SendNotifTemplate from '../notif-templates/send';
 import { votes as locale } from '../../../locale';
 import {
     voterCodeholders,
@@ -20,7 +23,6 @@ import {
 } from './config';
 import FIELDS from './fields';
 import './detail.less';
-import DisplayError from '../../../components/utils/error';
 
 const DETAIL_FIELDS = {
     ...FIELDS,
@@ -138,6 +140,8 @@ function Header ({ item, editing, userData }) {
     owner.setOrg(item.org);
     if (item) owner.setEnded(item.state.hasEnded);
 
+    const [sendNotifOpen, setSendNotifOpen] = useState(false);
+
     return (
         <div class="vote-header">
             <h1>
@@ -148,12 +152,28 @@ function Header ({ item, editing, userData }) {
             </h1>
             <div class="vote-header-items">
                 <VoteStats id={item.id} />
-                {item && item.state.hasResults ? (
+                {item?.state?.hasResults ? (
                     <LinkButton raised target={`/vochdonoj/${item.id}/rezultoj`}>
                         {locale.results.link}
                     </LinkButton>
                 ) : null}
             </div>
+            {item?.state?.hasEnded ? null : (
+                <div class="vote-cast-ballot">
+                    <Button raised onClick={() => setSendNotifOpen(true)}>
+                        {locale.sendCastBallotNotif}
+                    </Button>
+                    <div class="inner-desc">
+                        {locale.sendCastBallotNotifDescription}
+                    </div>
+                    <SendNotifTemplate
+                        options={{ id: item?.id }}
+                        jsonFilter={{ intent: 'vote_cast_ballot' }}
+                        task="votes/sendCastBallotNotif"
+                        open={sendNotifOpen}
+                        onClose={() => setSendNotifOpen(false)} />
+                </div>
+            )}
         </div>
     );
 }

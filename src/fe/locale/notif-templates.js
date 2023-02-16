@@ -55,6 +55,7 @@ export const notifTemplates = {
         newsletter: 'bulteno',
         newsletter_magazine: 'revua bulteno',
         congress_registration: 'kongresa aliĝo',
+        vote_cast_ballot: '[[vote cast ballot]]',
     },
     sendIntent: 'Sendi mesaĝon',
     preview: {
@@ -229,5 +230,18 @@ export const notifTemplateIntentExamples = {
         dataKeys: [],
         dataMeta: [],
         dataVals: [],
+    },
+    vote: {
+        id: 7,
+        org: 'uea',
+        name: '[[Example vote]]',
+        description: '[[Vote description]]',
+        timeStart: +new Date(2022, 2, 24, 13, 50, 24) / 1000,
+        timeEnd: +new Date(2022, 3, 5, 7, 50, 24) / 1000,
+        hasStarted: true,
+        ballotsSecret: true,
+        type: 'stv',
+        publishVoters: true,
+        publishResults: true,
     },
 };

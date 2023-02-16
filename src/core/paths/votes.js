@@ -320,6 +320,14 @@ export const tasks = {
         store.insert([VOTE_STATS, +id], res.body);
     },
 
+    sendCastBallotNotif: async ({ id }, { template, deleteOnComplete }) => {
+        const client = await asyncClient;
+        await client.post(`/votes/${id}/!send_cast_ballot_notif`, {
+            notifTemplateId: template,
+            deleteTemplateOnComplete: !!deleteOnComplete,
+        });
+    },
+
     /** votes/listTemplates: lists vote templates */
     listTemplates: async (_, { search, offset, limit }) => {
         const client = await asyncClient;

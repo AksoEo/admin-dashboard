@@ -1,7 +1,9 @@
 import { h } from 'preact';
+import { CircularProgress } from 'yamdl';
 import TaskDialog from '../../../components/tasks/task-dialog';
 import ChangedFields from '../../../components/tasks/changed-fields';
-import { votes as locale } from '../../../locale';
+import { useDataView } from '../../../core';
+import { votes as locale, notifTemplates as notifLocale } from '../../../locale';
 import makeCreateTask from './tasks-create';
 import './tasks.less';
 
@@ -60,4 +62,29 @@ export default {
             </TaskDialog>
         );
     },
+
+    sendCastBallotNotif ({ open, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={notifLocale.send.send.title}
+                actionLabel={notifLocale.send.send.confirm}
+                run={() => task.runOnce()}>
+                <NotifTemplateMessage vote={task.options.id} />
+            </TaskDialog>
+        );
+    },
 };
+
+function NotifTemplateMessage ({ vote }) {
+    const [loading, error, stats] = useDataView('votes/stats', { id: vote });
+
+    if (loading) {
+        return <CircularProgress small indeterminate />;
+    } else if (stats) {
+        return locale.sendCastBallotNotifMessage(stats.numVoters - stats.numBallots);
+    }
+
+    return null;
+}
