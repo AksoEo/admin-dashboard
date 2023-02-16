@@ -208,6 +208,12 @@ const TYPES = {
                             <input
                                 type="radio"
                                 disabled={!editing || disabled || opt.disabled}
+                                checked={value === opt.value}
+                                onChange={e => {
+                                    if (e.target.checked) {
+                                        onChange(opt.value);
+                                    }
+                                }}
                                 id={inputId}
                                 name={item.name}
                                 value={opt.value} />
