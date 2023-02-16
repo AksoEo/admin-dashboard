@@ -110,8 +110,8 @@ export function deleteDialog ({ locale, objectView, objectName }) {
                 onClose={() => task.drop()}
                 title={locale.title}
                 actionLabel={locale.button}
-                actionDisabled={!objName || (objectView
-                    && name.toLowerCase().normalize() !== objName.toLowerCase().normalize())}
+                actionDisabled={objectView
+                    && (!objName || name.toLowerCase().normalize() !== objName.toLowerCase().normalize())}
                 run={() => task.runOnce()}>
                 {locale.description}
                 {objectView ? (
