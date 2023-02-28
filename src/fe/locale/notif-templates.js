@@ -55,7 +55,7 @@ export const notifTemplates = {
         newsletter: 'bulteno',
         newsletter_magazine: 'revua bulteno',
         congress_registration: 'kongresa aliĝo',
-        vote_cast_ballot: '[[vote cast ballot]]',
+        vote_cast_ballot: 'baloteblo',
     },
     sendIntent: 'Sendi mesaĝon',
     preview: {
@@ -234,8 +234,8 @@ export const notifTemplateIntentExamples = {
     vote: {
         id: 7,
         org: 'uea',
-        name: '[[Example vote]]',
-        description: '[[Vote description]]',
+        name: 'Ekzempla voĉdono',
+        description: 'Tio ĉi estas priskribo.',
         timeStart: +new Date(2022, 2, 24, 13, 50, 24) / 1000,
         timeEnd: +new Date(2022, 3, 5, 7, 50, 24) / 1000,
         hasStarted: true,

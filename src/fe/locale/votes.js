@@ -116,7 +116,7 @@ export const votes = {
             'success': 'Sukcesis',
             'tie-breaker-needed': 'Necesas egalecrompanto',
             'tie': 'Finiĝis en egaleco',
-            'majority-empty': '[[The majority of ballots is effectively empty]]',
+            'majority-empty': 'La plejmulto de balotoj restis malplenaj',
             'no-quorum': 'Ne atingis kvorumon',
             'too-many-blanks': 'Tro da blankaj balotiloj',
         },
@@ -137,12 +137,12 @@ export const votes = {
         optionListEmpty: '(neniuj)',
 
         ynbResults: {
-            resultPass: '[[Vote passed]]',
-            resultFail: '[[Vote did not pass]]',
-            majorityPass: '[[Majority passed]]',
-            majorityFail: '[[Majority did not pass]]',
-            votersPass: '[[Voters passed]]',
-            votersFail: '[[Voters did not pass]]',
+            resultPass: 'La voĉdono sukcesis',
+            resultFail: 'La voĉdono ne sukcesis',
+            majorityPass: 'Estis sufiĉa plimulto de voĉdonintoj.',
+            majorityFail: 'NE estis sufiĉa plimulto de voĉdonintoj.',
+            votersPass: 'Estis sufiĉa plimulto de voĉdonrajtintoj.',
+            votersFail: 'NE estis sufiĉa plimutlo de voĉdonrajtintoj.',
         },
         ynbOptions: {
             yes: 'Jes',
@@ -151,7 +151,7 @@ export const votes = {
         },
 
         rpTieBreakerNeeded: {
-            description: '[[A tie breaker is needed because the ranking of the following pairs is ambiguous.]]',
+            description: 'Necesas egalecrompanto pro la sekvaj paroj:',
         },
         rpRounds: {
             title: 'Raŭndoj',
@@ -161,31 +161,31 @@ export const votes = {
         },
 
         stvTieBreakerNeeded: {
-            description: '[[A tie breaker is needed because the following candidates could not be ranked against each other.]]',
+            description: 'Necesas egalecromapnto pro egaleco inter la sekvaj opcioj:',
         },
         stvEvents: {
-            electWithQuota: quota => `[[Elected candidates with quota ${quota}]]`,
-            electWithQuotaDescription: '[[Candidates whose votes were above the quota were elected, and their votes were transferred.]]',
-            electingValuesDescription: '[[The surplus votes of the marked candidates will be transferred to the next choices:]]',
+            electWithQuota: quota => `Elektis voĉdoneblojn kun la kvoto ${quota}`,
+            electWithQuotaDescription: 'Voĉdonebloj kies favoraj balotoj superis la kvoton estis elektitaj kaj la kromvoĉoj estis movitaj.',
+            electingValuesDescription: 'La kromvoĉoj de la markitaj voĉdonebloj estos movitaj al la sekvaj preferoj:',
 
-            electRest: '[[Elected all remaining candidates]]',
-            electRestDescription: '[[There were now as only as many remaining candidates as remaining seats, so they were all elected.]]',
+            electRest: 'Elektis ĉiujn restantajn voĉdoneblojn',
+            electRestDescription: 'Restis same multe da restantaj voĉdonebloj kiel restantaj lokoj, tial ĉiuj restantaj voĉdonebloj estis elektitaj.',
 
-            eliminate: '[[Eliminated a candidate]]',
-            eliminateDescription: '[[No candidates were elected, so one must be eliminated.]]',
-            eliminatedValuesDescription: '[[The entire ballot value of the candidate has been transferred to the next choices:]]',
+            eliminate: 'Malelektis voĉdoneblon',
+            eliminateDescription: 'Neniu voĉdoneblo estis elektita, tial la maplej populara voĉdoneblo devas esti malelektita.',
+            eliminatedValuesDescription: 'La plena valoro de la favoraj voĉdoj de la voĉdoneblo estis movita al la sekvaj preferoj:',
 
-            elected: '[[Elected]]',
-            eliminated: '[[Eliminated]]',
+            elected: 'Elektis',
+            eliminated: 'Malelektis',
         },
 
         tmTie: {
-            title: '[[Tied candidates]]',
-            sortedNodes: '[[Partial vote result]]',
-            nodeIsTied: '[[Tied]]',
+            title: 'Egalaj voĉdonebloj',
+            sortedNodes: 'Parta voĉdonrezulto',
+            nodeIsTied: 'Egala',
         },
 
-        exportAsImage: '[[Export image]]',
+        exportAsImage: 'Elporti kiel bildon',
         exportAsImageFileName: 'rezultoj',
         exportAsImageError: 'Eraro',
     },
@@ -209,9 +209,9 @@ export const votes = {
     },
     numberRequired: 'Bv. enmeti nombron',
     optionsRequired: 'Bv. enmeti voĉdonopciojn',
-    sendCastBallotNotif: '[[Send vote notification]]',
-    sendCastBallotNotifDescription: '[[Send a notification to all eligible voters who havent voted yet.]]',
-    sendCastBallotNotifMessage: n => `[[Send a notification to ${n} eligible voter${n === 1 ? '' : 's'} who ha${n === 1 ? 's' : 've'}n’t voted yet.]]`,
+    sendCastBallotNotif: 'Sendi sciigon pri voĉdonado',
+    sendCastBallotNotifDescription: 'Sendas sciigon al ĉiuj voĉdonrajtintoj, kiuj ne jam voĉdonis.',
+    sendCastBallotNotifMessage: n => `Sendos sciigon al ${n} voĉdonrajtinto${n === 1 ? '' : 'j'}, kiu${n === 1 ? '' : 'j'} ne jam voĉdonis.`,
     update: {
         menuItem: 'Redakti',
         title: 'Redakti voĉdonon',
