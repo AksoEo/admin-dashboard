@@ -18,6 +18,7 @@ import DisplayError from '../../../../components/utils/error';
 import { FIELDS as ENTRY_FIELDS } from '../../memberships/entries/fields';
 import { IntentActions } from '../../payments/intents/detail';
 import { connect } from '../../../../core/connection';
+import { useDataView } from '../../../../core';
 import { connectPerms } from '../../../../perms';
 import { LinkButton } from '../../../../router';
 import { base } from 'akso:config';
@@ -412,7 +413,7 @@ class ReportEntries extends PureComponent {
 
         const entries = (item.purposes || []).filter(purpose => purpose.type === 'trigger'
             && purpose.triggers === 'registration_entry');
-        const isComplete = Object.keys(entryData).length == entries.length;
+        const isComplete = (Object.keys(entryData).length == entries.length) || ('null' in entryData);
 
         this.props.onNetTotalChange({
             difference: this.totalAmount - this.netTotalAmount,
@@ -475,7 +476,7 @@ class ReportEntries extends PureComponent {
                 }
             }
         }
-        if (Object.keys(this.entryData).length < entries.length) {
+        if (Object.keys(this.entryData).length < entries.length && !('null' in this.entryData)) {
             items.push({
                 title: <TinyProgress />,
                 count: ' ',
@@ -530,6 +531,19 @@ const ReportEntryData = connect(({ id }) => [
     const [collapsed, setCollapsed] = useState(true);
 
     if (error) {
+        if (error.code === 'not-found') {
+            useEffect(() => {
+                onData({
+                    offers: [],
+                });
+            }, []);
+
+            return (
+                <div class="report-entry-data is-error">
+                    {locale.entries.entryNotFound}
+                </div>
+            );
+        }
         return <div class="report-entry-data is-error"><DisplayError error={error} /></div>;
     }
 
@@ -653,25 +667,31 @@ export function EntrySelectedOffer ({ offer }) {
     );
 }
 
-export const CategoryName = connect(({ id }) => [
-    'memberships/category', { id },
-])()(function CategoryName ({ name, nameAbbrev, abbrev }) {
-    if (!name) return <TinyProgress />;
-    return abbrev ? nameAbbrev : name;
-});
+export function CategoryName ({ id, abbrev }) {
+    const [loading, error, data] = useDataView('memberships/category', { id });
 
-export const MagazineName = connect(({ id }) => [
-    'magazines/magazine', { id },
-])()(function MagazineName ({ name }) {
-    if (!name) return <TinyProgress />;
-    return name;
-});
+    if (error) return '—';
+    if (loading) return <TinyProgress />;
+    if (!data) return null;
+
+    return abbrev ? data.nameAbbrev : data.name;
+}
+
+export function MagazineName ({ id }) {
+    const [loading, error, data] = useDataView('magazines/magazine', { id });
+
+    if (error) return '—';
+    if (loading) return <TinyProgress />;
+    return data?.name;
+}
 
 
-export const EntrySelectedMembership = connect(({ id }) => ['memberships/category', { id }])(data => ({
-    data,
-}))(function EntrySelectedMembership ({ data }) {
-    if (!data) return <TinyProgress />;
+export function EntrySelectedMembership ({ id }) {
+    const [loading, error, data] = useDataView('memberships/category', { id });
+
+    if (error) return '—';
+    if (loading) return <TinyProgress />;
+    if (!data) return null;
     return (
         <MembershipChip
             abbrev={data.nameAbbrev}
@@ -679,12 +699,14 @@ export const EntrySelectedMembership = connect(({ id }) => ['memberships/categor
             givesMembership={data.givesMembership}
             lifetime={data.lifetime} />
     );
-});
+}
 
-export const EntrySelectedMagazine = connect(({ id }) => ['magazines/magazine', { id }])(data => ({
-    data,
-}))(function EntrySelectedMagazine ({ data, paperVersion }) {
-    if (!data) return <TinyProgress />;
+export function EntrySelectedMagazine ({ id, paperVersion }) {
+    const [loading, error, data] = useDataView('magazines/magazine', { id });
+
+    if (error) return '—';
+    if (loading) return <TinyProgress />;
+    if (!data) return null;
     return (
         <span class="intermediary-report-entry-selected-magazine">
             {locale.entries.magazinePrefix}
@@ -695,7 +717,7 @@ export const EntrySelectedMagazine = connect(({ id }) => ['magazines/magazine', 
             </span>
         </span>
     );
-});
+}
 
 export function Totals ({
     items, total, netTotal, currency, showCounts, showCommission, showPerItem, showNet, isFinal,

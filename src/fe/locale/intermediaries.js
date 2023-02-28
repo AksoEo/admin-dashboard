@@ -76,6 +76,8 @@ export const intermediaryReports = {
             'codeholderData.email': 'Membrodatumoj ▸ Retpoŝtadreso',
             'codeholderData.birthdate': 'Membrodatumoj ▸ Naskiĝdato',
         },
+
+        entryNotFound: '[[Missing data: entry not found. It was probably deleted.]]',
     },
     addons: {
         title: 'Donacoj',

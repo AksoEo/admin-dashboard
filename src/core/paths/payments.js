@@ -42,6 +42,7 @@ function getThumbnailKey () {
 }
 
 function iReadId (idBuffer) {
+    if (!idBuffer) return idBuffer;
     return base32.stringify(idBuffer);
 }
 
@@ -89,7 +90,7 @@ const iClientFields = {
                 const purpose = apiPurpose;
                 if (purpose.type === 'trigger') {
                     if ('dataId' in purpose) purpose.dataId = Buffer.from(purpose.dataId).toString('hex');
-                    if ('registrationEntryId' in purpose) purpose.dataId = base32.stringify(purpose.registrationEntryId);
+                    if ('registrationEntryId' in purpose) purpose.dataId = iReadId(purpose.registrationEntryId);
                 }
                 purposes.push(purpose);
             }
