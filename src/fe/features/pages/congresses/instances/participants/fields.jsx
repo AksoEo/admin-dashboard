@@ -200,11 +200,8 @@ export const FIELDS = {
                     <TextField
                         type="number"
                         outline
-                        value={value}
-                        onChange={e => {
-                            if (e.target.value) onChange(+e.target.value);
-                            else onChange(null);
-                        }} />
+                        value={value || ''}
+                        onChange={e => onChange(+e.target.value || null)} />
                 );
             }
             return value;

@@ -277,6 +277,15 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
                         userData={userData} />
                 </div>
                 <div class="detail-field">
+                    <span class="field-label">{locale.fields.sequenceId}</span>
+                    <DetailField
+                        field="sequenceId"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+                <div class="detail-field">
                     <span class="field-label">{locale.fields.notes}</span>
                     <DetailField
                         field="notes"
