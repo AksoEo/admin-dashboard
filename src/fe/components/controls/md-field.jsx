@@ -55,7 +55,9 @@ export default class MarkdownTextField extends PureComponent {
     editor = createRef();
 
     updateCache () {
-        const md = new Markdown('zero');
+        const md = new Markdown('zero', {
+            breaks: !this.props.singleLine,
+        });
         if (!this.props.singleLine) md.enable('newline');
         if (this.props.rules) md.enable(this.props.rules);
         this.#cachedHtml = md.render(this.props.value || '');
