@@ -250,7 +250,7 @@ export const congressParticipants = {
     detailTitle: 'Aliĝinto',
     search: {
         placeholders: {
-            notes: 'Serĉi notoj',
+            notes: 'Serĉi notojn',
         },
         filters: {
             approval: 'Permana aprobo',
