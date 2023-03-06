@@ -33,7 +33,7 @@ export default class DelegateApplicationsPage extends OverviewPage {
     locale = locale;
     filters = FILTERS;
     searchFields = ['internalNotes'];
-    category = 'delegationsappl';
+    category = 'delegations/applications';
     filtersToAPI = 'delegations/applicationFiltersToAPI';
 
     renderActions ({ perms }) {

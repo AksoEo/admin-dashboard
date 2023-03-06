@@ -82,7 +82,7 @@ export default class ParticipantsView extends PureComponent {
                             onExpandedChange={expanded => this.setState({ expanded })}
                             inputRef={view => this.#searchInput = view}
                             userData={{ congress, instance, currency, registrationForm }}
-                            category="congress_part"
+                            category="congresses/x/instances/x/participants"
                             filtersToAPI="congresses/participantFiltersToAPI" />
                         <OverviewList
                             expanded={expanded}

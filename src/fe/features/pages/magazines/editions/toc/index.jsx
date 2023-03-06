@@ -75,7 +75,7 @@ export default class TocView extends PureComponent {
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     inputRef={view => this.#searchInput = view}
-                    category="mag_toc" />
+                    category="magazines/x/editions/x/toc" />
                 <OverviewList
                     expanded={expanded}
                     useDeepCmp options={{ magazine, edition }}

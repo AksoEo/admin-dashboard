@@ -76,7 +76,7 @@ export default class EditionsView extends PureComponent {
                     expanded={expanded}
                     onExpandedChange={expanded => this.setState({ expanded })}
                     inputRef={view => this.#searchInput = view}
-                    category="mag_editions" />
+                    category="magazines/x/editions" />
                 <OverviewList
                     expanded={expanded}
                     useDeepCmp options={{ magazine }}

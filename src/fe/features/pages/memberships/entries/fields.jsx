@@ -578,7 +578,7 @@ function AddOfferDialogInner ({ data, intermediary, intermediaryCurrency, year, 
 
     const contents = (codeholder, memberships) => (
         <div class="add-offer">
-            {offerGroups.map((group, i) => (
+            {(offerGroups || []).map((group, i) => (
                 <AddOfferGroup
                     key={i}
                     group={group}

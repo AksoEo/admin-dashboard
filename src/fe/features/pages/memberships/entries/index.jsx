@@ -36,7 +36,7 @@ export default class RegistrationEntries extends OverviewPage {
     filters = FILTERS;
     searchFields = SEARCHABLE_FIELDS;
     filtersToAPI = 'memberships/entryFiltersToAPI';
-    category = 'registr_entries';
+    category = 'registration/entries';
 
     renderActions ({ perms }) {
         const actions = [];
