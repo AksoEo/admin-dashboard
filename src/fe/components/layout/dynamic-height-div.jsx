@@ -78,7 +78,11 @@ export default class DynamicHeightDiv extends PureComponent {
         clearTimeout(this.#ffScheduledUpdate);
     }
 
-    render (props) {
+    render ({ useCooldown, useFirstHeight, lazy, ...props }) {
+        void useCooldown;
+        void useFirstHeight;
+        void lazy;
+
         const style = {};
         if (this.#height.wantsUpdate() || !this.props.lazy) style.height = this.#height.value;
 

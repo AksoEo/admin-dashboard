@@ -63,6 +63,7 @@ export const CODEHOLDERS = 'codeholders';
 export const CODEHOLDER_PERMS = 'codeholderPerms';
 export const CODEHOLDER_FILES = 'codeholderFiles';
 export const CODEHOLDER_CHGREQS = 'codeholderChgReqs';
+export const CODEHOLDER_CONGRESS_PARTICIPATIONS = 'codeholderCongressParticipations';
 
 // signals
 export const SIG_CODEHOLDERS = '!codeholders';
@@ -1606,6 +1607,7 @@ export const tasks = {
         storePath: ({ id }, item) => [CODEHOLDER_DELEGATIONS, id, item.org],
         map: (item, { id }) => {
             item.codeholderId = id;
+            item.id = item.codeholderId + '~' + item.org;
         },
     }),
     setDelegations: async ({ id, org }, delegations) => {
@@ -1636,6 +1638,32 @@ export const tasks = {
         await client.delete(`/codeholders/${id}/delegations/${org}`);
         store.remove([CODEHOLDER_DELEGATIONS, id, org]);
         store.signal([CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS]);
+    },
+
+    congressParticipations: crudList({
+        apiPath: ({ id }) => `/codeholders/${id}/congress_participations`,
+        fields: [
+            'congressId',
+            'congressInstanceId',
+            'dataId',
+        ],
+        storePath: ({ id }, { dataId }) => [CODEHOLDER_CONGRESS_PARTICIPATIONS, id, dataId],
+        map: (item, { id }) => {
+            item.codeholderId = id;
+            item.dataId = Buffer.from(item.dataId).toString('hex');
+            item.id = item.dataId;
+        },
+    }),
+    congressParticipation: async ({ id, dataId }) => {
+        // proxy task
+        await tasks.congressParticipations({ id }, {
+            jsonFilter: {
+                filter: {
+                    dataId: '==base64==' + Buffer.from(dataId, 'hex').toString('base64'),
+                },
+            },
+        });
+        return dataId;
     },
 };
 
@@ -1830,6 +1858,11 @@ export const views = {
     delegation: simpleDataView({
         storePath: ({ id, org }) => org ? [CODEHOLDER_DELEGATIONS, id, org] : [CODEHOLDER_DELEGATIONS, ...id.split('~')],
         get: tasks.delegations,
+    }),
+
+    congressParticipation: simpleDataView({
+        storePath: ({ id, codeholder }) => [CODEHOLDER_CONGRESS_PARTICIPATIONS, codeholder, id],
+        get: tasks.congressParticipation,
     }),
 
     /** codeholders/sigCodeholders: observes codeholders for client-side changes */

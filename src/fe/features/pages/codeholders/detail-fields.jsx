@@ -37,6 +37,7 @@ import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
 import ChangeRequestsButton from '../change-requests/button';
 import DelegationsButton from '../delegations/delegates/button';
 import SubscriptionsButton from '../magazines/subscriptions/button';
+import ParticipationsButton from '../congresses/participations/button';
 import './detail-fields.less';
 
 const connectPerms = (Component) => {
@@ -504,24 +505,29 @@ export const Header = connectPerms(connect('login')(login => ({ login }))(functi
                                 canEdit={perms.hasPerm('codeholder_roles.update')} />
                         )}
                     </div>
-                    <div class="info-buttons">
-                        {!editing && perms.hasCodeholderField('files', 'r') && (
-                            <FilesButton id={item.id} />
-                        )}
-                        {!editing && perms.hasPerm('codeholders.change_requests.read') && (
-                            <ChangeRequestsButton id={userData?.isSelf ? 'self' : item.id} />
-                        )}
-                        {/* FIXME better perm check across orgs */}
-                        {!editing && perms.hasPerm('codeholders.delegations.read.uea') && (
-                            <DelegationsButton id={userData?.isSelf ? 'self' : item.id} />
-                        )}
-                        {!editing
-                            && perms.hasCodeholderField('roles', 'r')
-                            && (perms.hasPerm('magazines.subscriptions.read.uea')
-                            || perms.hasPerm('magazines.subscriptions.read.tejo')) && (
-                            <SubscriptionsButton id={userData?.isSelf ? 'self' : item.id} />
-                        )}
-                    </div>
+                    {!editing && (
+                        <div class="info-buttons">
+                            {perms.hasCodeholderField('files', 'r') && (
+                                <FilesButton id={item.id} />
+                            )}
+                            {perms.hasPerm('codeholders.change_requests.read') && (
+                                <ChangeRequestsButton id={userData?.isSelf ? 'self' : item.id} />
+                            )}
+                            {/* FIXME better perm check across orgs */}
+                            {perms.hasPerm('codeholders.delegations.read.uea') && (
+                                <DelegationsButton id={userData?.isSelf ? 'self' : item.id} />
+                            )}
+                            {perms.hasCodeholderField('roles', 'r')
+                                && (perms.hasPerm('magazines.subscriptions.read.uea')
+                                || perms.hasPerm('magazines.subscriptions.read.tejo')) && (
+                                <SubscriptionsButton id={userData?.isSelf ? 'self' : item.id} />
+                            )}
+                            {(perms.hasPerm('congress_instances.participants.read.uea')
+                                || perms.hasPerm('congress_instances.participants.read.tejo')) && (
+                                <ParticipationsButton id={userData?.isSelf ? 'self' : item.id} />
+                            )}
+                        </div>
+                    )}
                 </div>
                 <div class="decorative-flourish" />
             </div>

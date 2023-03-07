@@ -541,6 +541,12 @@ export default [
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('magazines.subscriptions.read.uea') || perms.hasPerm('magazines.subscriptions.read.tejo'),
                             },
+                            {
+                                path: 'kongresoj',
+                                component: elazy(() => import(/* webpackChunkName: "congress-participations" */ './congresses/participations')),
+                                type: 'stack',
+                                hasPerm: perms => perms.hasPerm('congress_instances.participants.read.uea') || perms.hasPerm('congress_instances.participants.read.tejo'),
+                            },
                         ],
                     },
                     {

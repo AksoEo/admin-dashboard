@@ -393,3 +393,12 @@ export const congressRegistrationForm = {
     },
 };
 
+export const congressParticipations = {
+    title: '[[Congress Participations]]',
+    fields: {
+        congressId: 'Kongreso',
+        congressInstanceId: 'Kongresa okazigo',
+        dataId: 'Aliĝidentigilo',
+    },
+    buttonLabel: n => n === 0 ? `Kongresoj` : n === 1 ? `1 Kongreso` : `${n} Kongresoj`,
+};
