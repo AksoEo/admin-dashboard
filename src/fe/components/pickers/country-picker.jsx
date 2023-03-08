@@ -1,6 +1,8 @@
 import { h } from 'preact';
+import { useMemo, useRef } from 'preact/compat';
 import LanguageIcon from '@material-ui/icons/Language';
-import { WithCountries, CountryFlag } from '../data/country';
+import { CountryFlag } from '../data/country';
+import { useDataView } from '../../core';
 import LargeMultiSelect from './large-multi-select';
 import { data as locale } from '../../locale';
 import './country-picker.less';
@@ -13,48 +15,58 @@ import './country-picker.less';
  * - hideGroups: if false, will hide country groups
  * - shouldHideItem: (id) => bool will hide individual items
  * - hidden: if true, will disable tab focusing
+ * - disabled: bool
  */
-export default function CountryPicker (props) {
-    return (
-        <WithCountries>
-            {(countries, countryGroups) => (
-                <CountryPickerInnerComponent
-                    {...props}
-                    countries={countries}
-                    countryGroups={countryGroups} />
-            )}
-        </WithCountries>
-    );
-}
+export default function CountryPicker ({ value, onChange, hideGroups, shouldHideItem, hidden, disabled }) {
+    const [countriesLoading, , countries_] = useDataView('countries/countries');
+    const [groupsLoading, , countryGroups_] = useDataView('countries/countryGroups');
 
-function CountryPickerInnerComponent ({ countries, countryGroups, value, onChange, hideGroups, shouldHideItem, hidden }) {
-    const items = (hideGroups ? [] : Object.keys(countryGroups)).concat(Object.keys(countries))
-        .filter(id => !shouldHideItem || !shouldHideItem(id));
-    const itemName = id => {
+    if (countriesLoading || groupsLoading) {
+        hidden = true;
+    }
+
+    const countries = countries_ || {};
+    const countryGroups = countryGroups_ || {};
+
+    const items = useMemo(() => {
+        return (hideGroups ? [] : Object.keys(countryGroups)).concat(Object.keys(countries))
+            .filter(id => !shouldHideItem || !shouldHideItem(id));
+    }, [hideGroups, shouldHideItem, countries, countryGroups]);
+
+    const itemName = useMemo(() => id => {
         if (id in countries) return countries[id].name_eo;
         return countryGroups[id]?.name;
-    };
-    const renderPreviewItem = ({ id }) => {
-        if (id in this.props.countries) {
+    }, [countries, countryGroups]);
+
+    const renderPreviewItem = useMemo(() => ({ id }) => {
+        if (id in countries) {
             return <CountryFlag country={id} />;
-        } else if (this.props.countryGroups[id]) {
-            return <span>{this.props.countryGroups[id].name}</span>;
+        } else if (countryGroups[id]) {
+            return <span>{countryGroups[id].name}</span>;
         }
-    };
-    const renderItemContents = ({ id }) => (
+    }, [countries, countryGroups]);
+
+    const renderItemContents = useMemo(() => ({ id }) => (
         <div class="country-picker-inner-country-item">
             <div class="country-icon">
-                {id in this.props.countries
+                {id in countries
                     ? <CountryFlag country={id} />
                     : <LanguageIcon />}
             </div>
             <div class="country-name">{itemName(id)}</div>
         </div>
-    );
+    ), [countries, itemName]);
+
+    // prevent re-rendering due to onChange closure being different
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
+    const onChangeMemoizedProxy = useMemo(() => (value) => {
+        onChangeRef.current(value);
+    }, []);
 
     return <LargeMultiSelect
         value={value}
-        onChange={onChange}
+        onChange={onChangeMemoizedProxy}
         items={items}
         renderPreviewItem={renderPreviewItem}
         itemName={itemName}
@@ -62,5 +74,5 @@ function CountryPickerInnerComponent ({ countries, countryGroups, value, onChang
         title={hideGroups
             ? locale.countryPicker.dialogTitleNoGroups
             : locale.countryPicker.dialogTitle}
-        disabled={hidden} />;
+        disabled={hidden || disabled} />;
 }

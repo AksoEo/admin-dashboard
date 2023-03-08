@@ -70,7 +70,7 @@ function fromXPerms (xperms) {
                 const hasWrite = flag === 'w' || hadWrite;
                 fields[field] = (hasRead ? 'r' : '') + (hasWrite ? 'w' : '');
             } else if (p !== '@.*') {
-                throw new Error('internal inconsistency: field wildcard present but did not delete field perms');
+                throw new Error('internal inconsistency: field wildcard present but did not delete field perm ' + p);
             }
         } else {
             perms.push(p);
@@ -98,8 +98,8 @@ function wildcardCandidates (id) {
 function isActive (xperms, id) {
     if (xperms.has(id)) return true;
     if (id.startsWith('@.')) {
-        // this is a field; there are no wildcards here
-        return false;
+        // this is a field; there is only one possible wildcard here
+        return xperms.has('@.*');
     } else if (id !== '*') {
         // this is a normal permission; might be implied by a wildcard
         const closestWildcardId = id.endsWith('.*')

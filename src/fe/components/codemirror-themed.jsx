@@ -29,7 +29,7 @@ export default forwardRef(({ value, onChange, forceDark, ...extra }, ref) => {
 
         if (newValue === value) return;
         onChange(newValue);
-    }, []);
+    }, [extra.readOnly || false]);
 
     return (
         <CodeMirror
