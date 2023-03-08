@@ -122,6 +122,15 @@ export const data = {
             title: 'Simplaj permesoj',
             empty: 'Neniu permeso',
         },
+        copyPaste: {
+            copy: '[[Copy permissions]]',
+            paste: '[[Paste permissions]]',
+            pasteDescription: '[[Please paste the copied data in the below text field.]]',
+            confirmPaste: '[[Paste]]',
+
+            copyError: '[[Failed to write to clipboard. Your browser may have disabled it or something.]]',
+            pasteParseError: '[[The pasted data is in an invalid format. Try copying the permissions again.]]',
+        },
     },
     mdEditor: {
         previewOn: 'Antaŭvidi formatigon',

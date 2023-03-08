@@ -50,7 +50,7 @@
 
     .perms-category {
         margin-bottom: 8px;
-        padding: 8px;
+        padding: 0 8px;
         background: @card1-background;
         border-radius: 8px;
         .elevation(4);
@@ -64,13 +64,17 @@
             width: 100%;
             background: none;
             text-align: left;
-            padding: 0;
+            padding: 8px 0;
             margin: 0;
             border: none;
             font: inherit;
             color: inherit;
             font-size: 1.1em;
             font-weight: bold;
+            position: sticky;
+            z-index: 1;
+            background: @card1-background;
+            top: 0;
 
             &:focus {
                 outline: none;
@@ -82,7 +86,7 @@
         }
 
         &.is-expanded .category-title {
-            margin-bottom: 16px;
+            margin-bottom: 8px;
         }
 
         &.is-expanded > .perms-req-notice {

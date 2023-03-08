@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'preact/compat';
-import { Checkbox, Dialog } from 'yamdl';
+import { Button, Checkbox, Dialog } from 'yamdl';
 import {
     spec,
     memberFields as fieldsSpec,
@@ -28,6 +28,8 @@ import {
 } from './solver';
 import './style.less';
 import { useDataView } from '../../../../core';
+import { coreContext } from '../../../../core/connection';
+import TextArea from '../../../../components/controls/text-area';
 
 const permsEditorState = createContext({
     showRaw: false,
@@ -153,6 +155,9 @@ export default class PermsEditor extends Component {
                 <p>
                     {locale.permsEditor.note}
                 </p>
+                {editable && (
+                    <CopyPaste value={value} onChange={this.props.onChange} />
+                )}
                 <div class="perms-stats">
                     <div class="stats-line is-linkish" onClick={() => this.setState({ showData: true })}>
                         {locale.permsEditor.stats.permCount(permissions.length)}
@@ -188,6 +193,76 @@ export default class PermsEditor extends Component {
             </div>
         );
     }
+}
+
+function CopyPaste ({ value, onChange }) {
+    const core = useContext(coreContext);
+    const [pasting, setPasting] = useState(false);
+    const [pasted, setPasted] = useState('');
+
+    const copyPerms = () => {
+        navigator.clipboard.writeText(btoa(JSON.stringify(value))).catch(err => {
+            console.error(err); // eslint-disable-line no-console
+            core.createTask('info', {
+                message: locale.permsEditor.copyPaste.copyError,
+            });
+        });
+    };
+
+    const tryPaste = () => {
+        try {
+            const perms = JSON.parse(atob(pasted.trim()));
+
+            // basic validation
+            for (const item of perms.permissions) {
+                if (typeof item !== 'string') throw new Error('invalid permission');
+            }
+            if (typeof perms.mrEnabled !== 'boolean') throw new Error('invalid MR enabled');
+            if (perms.mrFilter && typeof perms.mrFilter !== 'string') throw new Error('invalid MR filter');
+            if (perms.mrFields) {
+                for (const k of perms.mrFields) {
+                    if (typeof perms.mrFields[k] !== 'string') throw new Error('invalid MR field');
+                }
+            }
+
+            setPasted('');
+            setPasting(false);
+            onChange(perms);
+        } catch (err) {
+            console.error('error parsing perms', err); // eslint-disable-line no-console
+            core.createTask('info', {
+                message: locale.permsEditor.copyPaste.pasteParseError,
+            });
+        }
+    };
+
+    return (
+        <div class="perms-editor-copy-paste">
+            <Button onClick={copyPerms}>
+                {locale.permsEditor.copyPaste.copy}
+            </Button>
+            <Button onClick={() => setPasting(true)}>
+                {locale.permsEditor.copyPaste.paste}
+            </Button>
+            <Dialog
+                class="perms-editor-paste-permissions-dialog"
+                title={locale.permsEditor.copyPaste.paste}
+                backdrop
+                open={pasting}
+                onClose={() => setPasting(false)}
+                actions={[
+                    {
+                        label: locale.permsEditor.copyPaste.confirmPaste,
+                        action: tryPaste,
+                    },
+                ]}>
+                <p>
+                    {locale.permsEditor.copyPaste.pasteDescription}
+                </p>
+                <TextArea autofocus value={pasted} onChange={setPasted} />
+            </Dialog>
+        </div>
+    );
 }
 
 /** Renders a human-readable name for a given permission. */
