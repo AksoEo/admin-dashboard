@@ -1,6 +1,6 @@
-import { h } from 'preact';
+import { createRef, h } from 'preact';
 import { PureComponent, createContext } from 'preact/compat';
-import { Spring, globalAnimator } from 'yamdl';
+import { RtSpring, ElementAnimationController } from 'yamdl';
 import EventProxy from '../utils/event-proxy';
 
 export const layoutContext = createContext();
@@ -24,21 +24,25 @@ export const layoutContext = createContext();
 export default class DynamicHeightDiv extends PureComponent {
     static contextType = layoutContext;
 
-    #height = new Spring(1, 0.5);
-    #node = null;
+    #height = new RtSpring({ period: 0.5 });
+    #node = createRef();
+    #animCtrl = new ElementAnimationController(({ height }) => {
+        return { height: height + 'px' };
+    }, this.#node);
 
     updateHeight = () => {
-        if (!this.#node) return;
-        this.#height.target = [...this.#node.children]
+        if (!this.#node.current) return;
+        const height = [...this.#node.current.children]
             .map(child => child.offsetHeight)
             .reduce((a, b) => a + b, 0);
+        this.#height.setTarget(height);
 
         if (!this._usedFirstHeight && this.props.useFirstHeight) {
             this._usedFirstHeight = true;
-            this.#height.value = this.#height.target;
+            this.#height.setValue(this.#height.target);
         }
 
-        if (this.#height.wantsUpdate()) globalAnimator.register(this);
+        this.#animCtrl.setInputs({ height: this.#height });
     };
 
     #scheduledUpdate;
@@ -46,34 +50,28 @@ export default class DynamicHeightDiv extends PureComponent {
     scheduleUpdate = () => {
         clearTimeout(this.#scheduledUpdate);
         clearTimeout(this.#ffScheduledUpdate);
-        this.#scheduledUpdate = setTimeout(this.updateHeight, 1);
+
+        const now = Date.now();
+        const nextUpdateTime = this.props.useCooldown
+            ? Math.max(now + 1, this.props.lastChangeTime + this.props.cooldown)
+            : now + 1;
+
+        this.#scheduledUpdate = setTimeout(this.updateHeight, nextUpdateTime - now);
         // also a schedule update further in the future
         // because sometimes layout may be just a tad off
-        this.#ffScheduledUpdate = setTimeout(this.updateHeight, 1000);
+        this.#ffScheduledUpdate = setTimeout(this.updateHeight, nextUpdateTime - now + 1000);
     };
-    // because sometimes layout may be just a tad off
-
-    update (dt) {
-        if (!this.props.useCooldown
-            || this.props.lastChangeTime < Date.now() - this.props.cooldown) {
-            this.#height.update(dt);
-            if (this.context) this.context();
-        }
-        if (!this.#height.wantsUpdate()) globalAnimator.deregister(this);
-        this.forceUpdate();
-    }
 
     componentDidMount () {
-        globalAnimator.register(this);
         this.updateHeight();
     }
 
     componentDidUpdate (prevProps) {
-        if (prevProps.children !== this.props.children) this.updateHeight();
+        if (prevProps.children !== this.props.children) this.scheduleUpdate();
     }
 
     componentWillUnmount () {
-        globalAnimator.deregister(this);
+        this.#animCtrl.drop();
         clearTimeout(this.#scheduledUpdate);
         clearTimeout(this.#ffScheduledUpdate);
     }
@@ -81,13 +79,14 @@ export default class DynamicHeightDiv extends PureComponent {
     render ({ useCooldown, useFirstHeight, lazy, ...props }) {
         void useCooldown;
         void useFirstHeight;
-        void lazy;
 
-        const style = {};
-        if (this.#height.wantsUpdate() || !this.props.lazy) style.height = this.#height.value;
+        const style = props.style || {};
+        if (!lazy) {
+            style.height = this.#height.getValue();
+        }
 
         return (
-            <div {...props} ref={node => this.#node = node} style={style}>
+            <div {...props} ref={this.#node} style={style}>
                 <EventProxy dom target={window} onresize={this.updateHeight} />
                 <layoutContext.Provider value={this.scheduleUpdate}>
                     {props.children}

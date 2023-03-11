@@ -49,7 +49,6 @@ export default class EditionsView extends PureComponent {
 
     componentDidMount () {
         this.decodeURLQuery();
-        if (this.#searchInput) this.#searchInput.focus(500);
     }
 
     componentDidUpdate (prevProps, prevState) {

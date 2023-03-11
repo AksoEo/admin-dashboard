@@ -124,7 +124,7 @@ export const FIELDS = {
             };
 
             return (
-                <div class={'delegation-cities' + (slot !== 'detail' ? ' is-short' : '')}>
+                <div class={'delegation-cities' + ((slot !== 'detail' && !editing) ? ' is-short' : '')}>
                     {value.map(id => (
                         <div class={'delegation-city' + (editing ? ' is-editing' : '')} key={id}>
                             {editing ? (
