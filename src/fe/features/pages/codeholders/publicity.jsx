@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
+import { memo, useState } from 'preact/compat';
 import { Button, Menu } from 'yamdl';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
@@ -25,7 +25,7 @@ function getIcon (type) {
  * - disabled: bool
  * - types: list of allowed types. Undefined for all
  */
-export default function Publicity ({ value, editing, onChange, style, disabled, types: userTypes }) {
+export default memo(function Publicity ({ value, editing, onChange, style, disabled, types: userTypes }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [menuPosition, setMenuPosition] = useState(null);
     const [menuAnchor, setMenuAnchor] = useState(null);
@@ -83,4 +83,4 @@ export default function Publicity ({ value, editing, onChange, style, disabled, 
             </span>
         );
     }
-}
+});

@@ -1,5 +1,5 @@
 import { h, Component, createRef } from 'preact';
-import { useState, Fragment, PureComponent } from 'preact/compat';
+import { useState, Fragment, PureComponent, memo } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import BusinessIcon from '@material-ui/icons/Business';
@@ -156,7 +156,7 @@ const validators = {
     },
 };
 
-const NameEditor = connectPerms(function NameEditor ({
+const NameEditor = memo(connectPerms(function NameEditor ({
     perms,
     value,
     item,
@@ -344,9 +344,9 @@ const NameEditor = connectPerms(function NameEditor ({
             key: 'org',
         });
     }
-});
+}));
 
-const CodeEditor = connectPerms(function CodeEditor ({
+const CodeEditor = memo(connectPerms(function CodeEditor ({
     perms, value, item, originalItem, editing, onChange,
 }) {
     if (!value) return null;
@@ -365,9 +365,9 @@ const CodeEditor = connectPerms(function CodeEditor ({
         id={item.id}
         suggestionParameters={item}
         keepSuggestions={keepSuggestions} />;
-});
+}));
 
-class FileCounter extends Component {
+class FileCounter extends PureComponent {
     state = { count: NaN };
 
     static contextType = coreContext;
@@ -404,7 +404,7 @@ class FileCounter extends Component {
     }
 }
 
-function FilesButton ({ id }) {
+const FilesButton = memo(function FilesButton ({ id }) {
     return (
         <div class="info-button-container">
             <LinkButton class="info-button member-files-button" target={`/membroj/${id}/dosieroj`} raised>
@@ -417,9 +417,9 @@ function FilesButton ({ id }) {
             </LinkButton>
         </div>
     );
-}
+});
 
-export const Header = connectPerms(connect('login')(login => ({ login }))(function Header ({
+export const Header = memo(connectPerms(connect('login')(login => ({ login }))(function Header ({
     item,
     originalItem,
     editing,
@@ -533,7 +533,7 @@ export const Header = connectPerms(connect('login')(login => ({ login }))(functi
             </div>
         </div>
     );
-}));
+})));
 
 function IsSelfBanner () {
     return (
@@ -546,7 +546,7 @@ function IsSelfBanner () {
     );
 }
 
-export class CodeholderAddressRenderer extends Component {
+export class CodeholderAddressRenderer extends PureComponent {
     state = {
         address: null,
         postalOpen: false,
@@ -642,7 +642,7 @@ export class CodeholderAddressRenderer extends Component {
     }
 }
 
-class FeeCountryEditor extends Component {
+class FeeCountryEditor extends PureComponent {
     state = {
         addrCountryChanged: false,
     };

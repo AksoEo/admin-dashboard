@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { Button, Dialog, Menu, Slider, CircularProgress, Spring, globalAnimator } from 'yamdl';
 import AddAPhotoIcon from '@material-ui/icons/AddAPhoto';
 import { coreContext } from '../../../core/connection';
@@ -19,7 +20,7 @@ const lerp = (a, b, x) => (b - a) * x + a;
  * - `profilePictureHash`: whether the identicon should be used or not
  * - `canEdit`: bool
  */
-export default class ProfilePictureEditor extends Component {
+export default class ProfilePictureEditor extends PureComponent {
     state = {
         uploading: false,
         croppingFile: null,
@@ -97,7 +98,7 @@ const SLIDER_REGION_HEIGHT = 48;
 const ACCEPT_REJECT_REGION_HEIGHT = 48;
 const MAX_PX_SCALE = 1 / Math.hypot(128, 128);
 
-class FileCropDialog extends Component {
+class FileCropDialog extends PureComponent {
     imageX = 0;
     imageY = 0;
     normalizedScale = 1;

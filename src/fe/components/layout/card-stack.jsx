@@ -1,11 +1,12 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import './card-stack.less';
 
 const CONTEXT_KEY = 'akso-card-stack-provider';
 export const FULL_SCREEN_LAYOUT_MAX_WIDTH = 1100;
 
 /** Interface between CardStackRenderers and CardStackItems that provides the card stack context. */
-export class CardStackProvider extends Component {
+export class CardStackProvider extends PureComponent {
     getChildContext () {
         return {
             [CONTEXT_KEY]: this.context[CONTEXT_KEY] || this,
@@ -63,7 +64,7 @@ export class CardStackProvider extends Component {
 // even though they’re nested, and because every stack item will run register(..) and update the
 // renderer, this will cause all stack items to be re-rendered and may cause an infinite loop
 /** A card stack renderer. */
-export class CardStackRenderer extends Component {
+export class CardStackRenderer extends PureComponent {
     state = {
         stack: [],
         stackSize: 0,
@@ -186,7 +187,7 @@ export class CardStackRenderer extends Component {
  * - `appBar`: special slot for an app bar proxy to handle closing correctly
  * - `onScroll`: content scroll event
  */
-export class CardStackItem extends Component {
+export class CardStackItem extends PureComponent {
     id = Math.random().toString();
 
     componentDidMount () {

@@ -1,5 +1,12 @@
 import { h, Component } from 'preact';
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'preact/compat';
+import {
+    createContext,
+    memo,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'preact/compat';
 import { Button, Checkbox, Dialog } from 'yamdl';
 import {
     spec,
@@ -10,7 +17,6 @@ import {
     memberFieldsWrite,
 } from '../../../../permissions';
 import { data as locale } from '../../../../locale';
-import { WithCountries } from '../../../../components/data/country';
 import CountryPicker from '../../../../components/pickers/country-picker';
 import JSONEditor from '../../../../components/controls/json-editor';
 import DisclosureArrow from '../../../../components/disclosure-arrow';
@@ -436,7 +442,7 @@ function PermissionItemCountry ({ item, disabled }) {
     );
 }
 
-function PermsItem ({ item, disabled }) {
+const PermsItem = memo(function PermsItem ({ item, disabled }) {
     if (item.type === 'category') {
         const [expanded, setExpanded] = useState(true);
 
@@ -513,7 +519,7 @@ function PermsItem ({ item, disabled }) {
         );
     }
     return 'unknown perms spec type ' + item.type;
-}
+});
 
 function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
     const items = [];
