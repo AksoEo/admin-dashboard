@@ -44,7 +44,7 @@ export default class Task extends EventEmitter {
     }
 
     get running () {
-        return this.state == TaskState.RUNNING;
+        return this.state === TaskState.RUNNING;
     }
 
     run () {

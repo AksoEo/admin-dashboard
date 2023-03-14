@@ -11,18 +11,23 @@ import { h, Component } from 'preact';
  * - path: task path
  * - core: core ref
  * - view: task view
- * - isDead: whether or not this task is dead
+ * - isDead: whether this task is dead
  */
 export default class TaskView extends Component {
     constructor (props) {
         super(props);
 
         this.task = props.core.getTask(props.id);
+        this.task.on('result', this.#onTaskResult);
     }
 
     state = {
         mayBeOpen: false,
         error: null,
+    };
+
+    #onTaskResult = () => {
+        this.forceUpdate();
     };
 
     #onClose = () => {
@@ -32,6 +37,10 @@ export default class TaskView extends Component {
 
     componentDidMount () {
         setImmediate(() => this.setState({ mayBeOpen: true }));
+    }
+
+    componentWillUnmount () {
+        this.task.removeListener('result', this.#onTaskResult);
     }
 
     componentDidCatch (error, errorInfo) {
@@ -49,7 +58,7 @@ export default class TaskView extends Component {
 
         if (this.task.type !== path) {
             console.error('task type mismatch', this.task, path); // eslint-disable-line no-console
-            throw new Error('wtf?');
+            throw new Error('task view: task type does not match path prop');
         }
         return (
             <View

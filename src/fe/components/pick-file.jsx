@@ -13,6 +13,7 @@ let cb = null;
 filePickerInput.onchange = () => {
     if (filePickerInput.files.length && cb) {
         cb(filePickerInput.files);
+        filePickerInput.value = ''; // reset
     }
 };
 
