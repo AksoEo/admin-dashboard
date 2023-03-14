@@ -394,7 +394,7 @@ export const congressRegistrationForm = {
 };
 
 export const congressParticipations = {
-    title: '[[Congress Participations]]',
+    title: 'Kongresaj aliĝoj',
     fields: {
         congressId: 'Kongreso',
         congressInstanceId: 'Kongresa okazigo',

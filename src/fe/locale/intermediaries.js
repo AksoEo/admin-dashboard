@@ -77,7 +77,7 @@ export const intermediaryReports = {
             'codeholderData.birthdate': 'Membrodatumoj ▸ Naskiĝdato',
         },
 
-        entryNotFound: '[[Missing data: entry not found. It was probably deleted.]]',
+        entryNotFound: 'Tiu aliĝo ne estis trovita, ĝi verŝajne estis forigita.',
     },
     addons: {
         title: 'Donacoj',
