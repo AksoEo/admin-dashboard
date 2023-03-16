@@ -19,8 +19,8 @@ const DEFAULT_FULLSCREEN_WIDTH = 420;
 export default class DialogSheet extends Dialog {
     _container = document.createElement('div');
 
-    updatePeriod () {
-        this.presence.setPeriod((this.state.fullScreen || this.props.open) ? 0.5 : 0.3);
+    updatePeriod (presence) {
+        presence.setPeriod((this.state.fullScreen || this.props.open) ? 0.5 : 0.3);
     }
 
     updateFullScreen () {
@@ -29,11 +29,11 @@ export default class DialogSheet extends Dialog {
             : ('fullScreen' in this.props)
                 ? this.props.fullScreen
                 : window.innerWidth <= DEFAULT_FULLSCREEN_WIDTH;
-        this.setState({ fullScreen }, () => this.updatePeriod());
+        this.setState({ fullScreen });
     }
 
-    onContainerClick = e => {
-        if (e.target === this.containerNode && this.props.onClose) {
+    onContainerClick = () => {
+        if (this.props.onClose) {
             if (this.props.allowBackdropClose) this.props.onClose();
             else this.onCancel();
         }
@@ -47,14 +47,9 @@ export default class DialogSheet extends Dialog {
         }, 500);
     };
 
-    componentDidUpdate (prevProps) {
-        if (prevProps.fullScreen !== this.props.fullScreen) this.updateFullScreen();
-        if (prevProps.open !== this.props.open) {
-            this.presence.target = +!!this.props.open;
-            this.updatePeriod();
-            globalAnimator.register(this);
-        }
-        if (this.presence.value > 1 / 100) {
+    componentDidUpdate (prevProps, prevState, snapshot) {
+        super.componentDidUpdate(prevProps, prevState, snapshot);
+        if (this.state.mounted) {
             if (!this.container.parentNode && !this.props.container) {
                 document.body.appendChild(this.container);
             }
@@ -63,15 +58,15 @@ export default class DialogSheet extends Dialog {
         }
     }
 
-    renderStyle (props) {
+    renderStyle (style, presence) {
         if (this.state.fullScreen) {
-            props.style.transform += ` translateY(${lerp(100, 0, this.presence.value)}%)`;
-            props.style.opacity *= clamp(lerp(0, 50, this.presence.value), 0, 1);
+            style.transform += ` translateY(${lerp(100, 0, presence)}%)`;
+            style.opacity *= clamp(lerp(0, 50, presence), 0, 1);
         } else if (this.props.open) {
-            props.style.transform += ` translateY(${lerp(window.innerHeight / 2, 0, this.presence.value)}px)`;
-            props.style.opacity *= this.presence.value ** 0.2;
+            style.transform += ` translateY(${lerp(window.innerHeight / 2, 0, presence)}px)`;
+            style.opacity *= 1 - Math.exp(-8 * presence);
         } else {
-            props.style.opacity *= this.presence.value;
+            style.opacity *= presence;
         }
     }
 

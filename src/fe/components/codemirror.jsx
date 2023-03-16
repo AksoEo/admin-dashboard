@@ -8,6 +8,7 @@ import { indentWithTab } from '@codemirror/commands';
 import { EditorView, keymap, placeholder } from '@codemirror/view';
 import { basicSetup } from '@uiw/codemirror-extensions-basic-setup';
 
+/** Do not import this directly; use codemirror-themed */
 export function useCodeMirror (props) {
     const {
         value,
