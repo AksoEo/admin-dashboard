@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { globalAnimator, Dialog, Button, MenuIcon } from 'yamdl';
+import { Dialog, Button, MenuIcon } from 'yamdl';
 import './dialog-sheet.less';
 
 const clamp = (x, a, b) => Math.max(a, Math.min(x, b));
@@ -17,8 +17,6 @@ const DEFAULT_FULLSCREEN_WIDTH = 420;
  * - allowBackdropClose - set to true to re-enable this feature
  */
 export default class DialogSheet extends Dialog {
-    _container = document.createElement('div');
-
     updatePeriod (presence) {
         presence.setPeriod((this.state.fullScreen || this.props.open) ? 0.5 : 0.3);
     }
@@ -47,17 +45,6 @@ export default class DialogSheet extends Dialog {
         }, 500);
     };
 
-    componentDidUpdate (prevProps, prevState, snapshot) {
-        super.componentDidUpdate(prevProps, prevState, snapshot);
-        if (this.state.mounted) {
-            if (!this.container.parentNode && !this.props.container) {
-                document.body.appendChild(this.container);
-            }
-        } else if (this.container.parentNode) {
-            this.container.parentNode.removeChild(this.container);
-        }
-    }
-
     renderStyle (style, presence) {
         if (this.state.fullScreen) {
             style.transform += ` translateY(${lerp(100, 0, presence)}%)`;
@@ -81,9 +68,5 @@ export default class DialogSheet extends Dialog {
                 <MenuIcon type="close" />
             </Button>
         ) : null;
-    }
-
-    get container () {
-        return this.props.container || this._container;
     }
 }
