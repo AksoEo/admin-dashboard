@@ -54,6 +54,7 @@ export const notifTemplates = {
         codeholder: 'membro',
         newsletter: 'bulteno',
         newsletter_magazine: 'revua bulteno',
+        congress: 'kongreso',
         congress_registration: 'kongresa aliĝo',
         vote_cast_ballot: 'baloteblo',
     },

@@ -16,6 +16,7 @@ import {
     congressRegistrationForm as regFormLocale,
     congressParticipants as participantLocale,
     data as dataLocale,
+    notifTemplates as notifLocale,
 } from '../../../locale';
 import { coreContext } from '../../../core/connection';
 import { connectPerms } from '../../../perms';
@@ -481,6 +482,20 @@ export default {
             </TaskDialog>
         );
     },
+    sendParticipantsNotifTemplate ({ open, core, task }) {
+        return (
+            <TaskDialog
+                open={open}
+                onClose={() => task.drop()}
+                title={notifLocale.send.send.title}
+                actionLabel={notifLocale.send.send.confirm}
+                run={() => task.runOnce()}>
+                <NotifTemplateMessage
+                    core={core}
+                    options={task.options} />
+            </TaskDialog>
+        );
+    },
 };
 
 function ParticipantEmailAddress ({ congress, instance, id }) {
@@ -504,4 +519,29 @@ function ParticipantEmailAddress ({ congress, instance, id }) {
     }
 
     return null;
+}
+
+function NotifTemplateMessage ({ core, options }) {
+    const [participants, setParticipants] = useState(null);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        core.createTask('congresses/listParticipants', options, {
+            fields: [],
+            offset: 0,
+            limit: 1,
+        }).runOnceAndDrop().then(res => {
+            setParticipants(res.total);
+        }).catch(err => {
+            setError(err);
+        });
+    }, [options.congress, options.instance]);
+
+    if (participants === null && error === null) {
+        return <CircularProgress small indeterminate />;
+    } else if (error) {
+        return <DisplayError error={error} />;
+    } else {
+        return participantLocale.sendNotifTemplateMessage(participants);
+    }
 }

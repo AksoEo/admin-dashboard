@@ -9,6 +9,7 @@ import { congressParticipants as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import './index.less';
+import SendNotifTemplate from '../../../notif-templates/send';
 
 function formSearchableFields (regFormItems) {
     return regFormItems.filter(item => item.el === 'input' && item.type === 'text').map(item => ({
@@ -54,7 +55,11 @@ export default class ParticipantsView extends PureComponent {
         if (this.#searchInput) this.#searchInput.focus(500);
     }
 
-    render ({ congress, instance, push }, { parameters, expanded, currency, registrationForm, hasRegistrationForm }) {
+    render ({
+        org, congress, instance, push, sendingNotif, onStopSendingNotif,
+    }, {
+        parameters, expanded, currency, registrationForm, hasRegistrationForm,
+    }) {
         // TODO: hide this page if the user does not have permission?
         return (
             <div class="participants-view">
@@ -119,6 +124,19 @@ export default class ParticipantsView extends PureComponent {
                             hasRegistrationForm: false,
                         })} />
                 )}
+                <SendNotifTemplate
+                    task="congresses/sendParticipantsNotifTemplate"
+                    jsonFilter={{
+                        org,
+                        intent: { $in: ['congress'] },
+                    }}
+                    options={{
+                        congress,
+                        instance,
+                        ...parameters,
+                    }}
+                    open={sendingNotif}
+                    onClose={onStopSendingNotif} />
             </div>
         );
     }

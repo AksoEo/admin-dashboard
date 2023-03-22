@@ -364,6 +364,8 @@ export const congressParticipants = {
         button: 'Sendi',
         sent: 'Resendis aliĝkonfirmilon.',
     },
+    sendNotifTemplate: 'Sendi amasmesaĝon',
+    sendNotifTemplateMessage: n => `Sendos sciigon al ${n} aliĝinto${n === 1 ? '' : 'j'}.`,
     csvFilename: 'alighintoj',
 };
 

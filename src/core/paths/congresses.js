@@ -660,6 +660,23 @@ export const tasks = {
             }
         }
     },
+    sendParticipantsNotifTemplate: async ({ congress, instance, search, filters, jsonFilter }, { template, deleteOnComplete }) => {
+        const client = await asyncClient;
+        const { options } = pParametersToRequestData({
+            search,
+            filters,
+            jsonFilter,
+            fields: [],
+        });
+        delete options.fields;
+        delete options.offset;
+        delete options.limit;
+
+        await client.post(`/congresses/${congress}/instances/${instance}/participants/!send_notif_template`, {
+            notifTemplateId: template,
+            deleteTemplateOnComplete: !!deleteOnComplete,
+        }, options);
+    },
 };
 
 export const views = {

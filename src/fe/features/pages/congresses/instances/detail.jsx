@@ -24,6 +24,7 @@ import Programs from './programs';
 import Participants from './participants';
 import MapPicker from '../map-picker';
 import './detail.less';
+import SendNotifTemplate from '../../notif-templates/send';
 
 export default connectPerms(class CongressInstancePage extends Page {
     state = {
@@ -144,6 +145,11 @@ export default connectPerms(class CongressInstancePage extends Page {
                     icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
                     label: participantLocale.create.menuItem,
                     action: () => this.context.createTask('congresses/createParticipant', { congress, instance: id }),
+                }, {
+                    key: 'participants-notif',
+                    overflow: true,
+                    label: participantLocale.sendNotifTemplate,
+                    action: () => this.setState({ sendingNotif: true }),
                 });
             }
             actions.push({
@@ -223,7 +229,9 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 instance={id}
                                 query={query}
                                 onQueryChange={onQueryChange}
-                                push={this.props.push} />}
+                                push={this.props.push}
+                                sendingNotif={this.state.sendingNotif}
+                                onStopSendingNotif={() => this.setState({ sendingNotif: false })} />}
                         </div>
                     )}
                 </DetailShell>
