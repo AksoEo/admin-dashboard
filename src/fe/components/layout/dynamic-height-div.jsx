@@ -28,7 +28,9 @@ export default class DynamicHeightDiv extends PureComponent {
     #node = createRef();
     #animCtrl = new ElementAnimationController(({ height }) => {
         return { height: height + 'px' };
-    }, this.#node);
+    }, this.#node, {
+        useAnimationFillForwards: !this.props.lazy,
+    });
 
     updateHeight = () => {
         if (!this.#node.current) return;
@@ -63,11 +65,14 @@ export default class DynamicHeightDiv extends PureComponent {
     };
 
     componentDidMount () {
+        this.#animCtrl.didMount();
         this.updateHeight();
     }
 
     componentDidUpdate (prevProps) {
         if (prevProps.children !== this.props.children) this.scheduleUpdate();
+        this.#animCtrl.useAnimationFillForwards = !this.props.lazy;
+        if (prevProps.lazy !== this.props.lazy) this.#animCtrl.resolve();
     }
 
     componentWillUnmount () {

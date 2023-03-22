@@ -112,6 +112,10 @@ export default class RearrangingList extends PureComponent {
         if (prevProps.children !== this.props.children) this.beginAnimating();
     }
 
+    componentWillUnmount () {
+        globalAnimator.deregister(this);
+    }
+
     state = {
         draggingKey: null,
     };

@@ -518,6 +518,7 @@ export default class Navigation extends PureComponent {
 
     updateStackScrollAt (stackIndex) {
         let state = this.getNavState();
+        if (!state.stack[stackIndex]) return;
         const scrollView = state.stack[stackIndex].scrollView.current;
         if (scrollView) {
             const isScrolled = scrollView.scrollTop > 0;
