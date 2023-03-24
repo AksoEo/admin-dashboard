@@ -24,6 +24,11 @@ export const layoutContext = createContext();
 export default class DynamicHeightDiv extends PureComponent {
     static contextType = layoutContext;
 
+    resizeObserver = new ResizeObserver(() => {
+        this.updateHeight();
+    });
+    // TODO
+
     #height = new RtSpring({ period: 0.5 });
     #node = createRef();
     #animCtrl = new ElementAnimationController(({ height }) => {

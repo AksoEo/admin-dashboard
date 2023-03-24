@@ -391,7 +391,6 @@ export default class OverviewList extends PureComponent {
                 </Button>
                 <DynamicHeightDiv
                     class="list-contents"
-                    lazy
                     useCooldown
                     cooldown={PAGE_CHANGE_COOLDOWN}
                     lastChangeTime={this.#lastPageChangeTime}>

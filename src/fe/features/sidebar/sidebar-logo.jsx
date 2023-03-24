@@ -3,20 +3,6 @@ import { PureComponent } from 'preact/compat';
 import Logo from '../../components/logo';
 import { routerContext } from '../../router';
 
-// lazy-loaded particles
-let particlesPromise, triggerParticles;
-function loadParticles () {
-    if (!particlesPromise) {
-        particlesPromise = import('../logo-particles');
-        particlesPromise.then(e => {
-            triggerParticles = e.default;
-        }).catch(() => {
-            // fail silently and allow for retries
-            particlesPromise = false;
-        });
-    }
-}
-
 /**
  * # Props
  * - onClick
@@ -41,22 +27,7 @@ export default class SidebarLogo extends PureComponent {
                 onFocus={this.onFocus}
                 onBlur={this.onBlur}
                 ref={node => this.node = node}>
-                <Logo
-                    ref={view => this.logo = view}
-                    onUpdate={logo => {
-                        // trigger particles when the user pointlessly clicks the logo quickly
-                        // enough for it to bounce 96 px far
-                        if (logo.states[0].bounce.value > 96) {
-                            if (triggerParticles) {
-                                triggerParticles(this.node, this.context);
-                                for (const state of logo.states) {
-                                    state.bounce.value = 0;
-                                    state.bounce.velocity = 0;
-                                }
-                                logo.rotation.finish();
-                            } else loadParticles();
-                        }
-                    }} />
+                <Logo ref={view => this.logo = view} />
                 <img
                     class="logo-label"
                     src="/assets/logo-label.svg"

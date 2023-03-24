@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { createRef, h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import { Spring, globalAnimator } from 'yamdl';
 import SidebarContents from './contents';
@@ -24,8 +24,8 @@ const PEEK_TIMEOUT = 0.2;
  * - locked: if true, will lock the sidebar to user interactions
  */
 export default class Sidebar extends PureComponent {
-    node = null;
-    backdropNode = null;
+    node = createRef();
+    backdropNode = createRef();
 
     /** The spring used to animate the sidebar’s X position. */
     position = new Spring(1, 0.5);
@@ -59,13 +59,13 @@ export default class Sidebar extends PureComponent {
     onSpringUpdate = (position) => {
         position = Math.max(0, position);
         if (position <= 1) {
-            this.node.style.transform = `translateX(-${(1 - position) * 100}%)`;
+            this.node.current.style.transform = `translateX(-${(1 - position) * 100}%)`;
         } else {
             const mapped = 1 + Math.pow(position - 1, 0.3) / 20;
-            this.node.style.transform = `scaleX(${mapped})`;
+            this.node.current.style.transform = `scaleX(${mapped})`;
         }
-        this.node.style.visibility = position == 0 ? 'hidden' : '';
-        this.backdropNode.style.opacity = this.props.permanent ? 0 : Math.min(1, position);
+        this.node.current.style.visibility = position === 0 ? 'hidden' : '';
+        this.backdropNode.current.style.opacity = this.props.permanent ? 0 : Math.min(1, position);
     };
 
     componentDidMount () {
@@ -74,7 +74,7 @@ export default class Sidebar extends PureComponent {
             this.position.value = 1;
         }
         if (!this.props.permanent) this.sidebarDragHandler.bind();
-        this.sidebarDragHandler.setSidebarNode(this.node);
+        this.sidebarDragHandler.setSidebarNode(this.node.current);
         globalAnimator.register(this);
     }
 
@@ -117,14 +117,14 @@ export default class Sidebar extends PureComponent {
             <div class={className}>
                 <div
                     class="app-sidebar-backdrop"
-                    ref={node => this.backdropNode = node}
+                    ref={this.backdropNode}
                     onClick={() => {
                         this.position.locked = false;
                         this.props.onClose();
                     }} />
                 <div
                     class="app-sidebar"
-                    ref={node => this.node = node}
+                    ref={this.node}
                     onKeyDown={e => {
                         if (e.key === 'Escape') {
                             this.position.locked = false;

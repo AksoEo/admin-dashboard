@@ -162,7 +162,30 @@ const iClientFilters = {
         toAPI: value => ({ $purposes: { triggers: value } }),
     },
     purposeDataId: {
-        toAPI: value => ({ $purposes: { dataId: '==base64==' + Buffer.from(value, 'hex').toString('base64') } }),
+        toAPI: value => {
+            const conditions = [];
+            {
+                const buf = Buffer.from(value, 'hex');
+                if (buf.length) {
+                    conditions.push({
+                        $purposes: {
+                            dataId: '==base64==' + buf.toString('base64'),
+                        },
+                    });
+                }
+            }
+
+            try {
+                conditions.push({
+                    $purposes: {
+                        dataId: '==base64==' + Buffer.from(base32.parse(value)).toString('base64'),
+                    },
+                });
+            } catch {}
+
+            if (!conditions.length) throw new Error('invalid data id');
+            return { $or: conditions };
+        },
     },
 };
 
