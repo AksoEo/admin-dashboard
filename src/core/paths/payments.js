@@ -181,7 +181,7 @@ const iClientFilters = {
                         dataId: '==base64==' + Buffer.from(base32.parse(value)).toString('base64'),
                     },
                 });
-            } catch {}
+            } catch { /* whatever */ }
 
             if (!conditions.length) throw new Error('invalid data id');
             return { $or: conditions };
