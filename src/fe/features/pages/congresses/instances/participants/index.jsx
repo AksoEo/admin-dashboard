@@ -25,7 +25,9 @@ export default class ParticipantsView extends PureComponent {
                 field: 'notes',
                 query: '',
             },
-            filters: {},
+            filters: {
+                canceled: { enabled: true, value: 'false' },
+            },
             jsonFilter: {
                 _disabled: true,
                 filter: {},
