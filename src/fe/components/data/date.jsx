@@ -1,5 +1,5 @@
-import { h, Component } from 'preact';
-import { Fragment, createPortal } from 'preact/compat';
+import { h } from 'preact';
+import { Fragment, createPortal, PureComponent } from 'preact/compat';
 import moment from 'moment';
 import { globalAnimator, TextField, DatePicker, RootContext } from 'yamdl';
 import { data as locale } from '../../locale';
@@ -11,7 +11,7 @@ function DateFormatter ({ value }) {
 }
 
 const MIN_DATE = new Date(1900, 0, 1);
-// CHANGE THIS ONCE MYSQL ALLOWS DATES PAST 2038
+// TODO CHANGE THIS ONCE MYSQL ALLOWS DATES PAST 2038
 const MAX_DATE = new Date(2147482647 * 1000);
 
 const APPROX_DATE_EDITOR_HEIGHT = 300; // for deciding whether to show above or below
@@ -32,12 +32,24 @@ const parseFormatsToTry = [
     'D[-a de] MMMM YYYY',
     'D[-a de] MMM YYYY',
     'D[-a de] M YYYY',
+    'D[-a] MMMM YYYY',
+    'D[-a] MMM YYYY',
+    'D[-a] M YYYY',
+    'D[.]MMMM[.]YYYY',
+    'D[.]MMM[.]YYYY',
+    'D[.]M[.]YYYY',
     'D MMMM YYYY',
     'D MMM YYYY',
     'D M YYYY',
     'D[-a de] MMMM',
     'D[-a de] MMM',
     'D[-a de] M',
+    'D[-a] MMMM',
+    'D[-a] MMM',
+    'D[-a] M',
+    'D[.]MMMM',
+    'D[.]MMM',
+    'D[.]M',
     'D MMMM',
     'D MMM',
     'D M',
@@ -56,7 +68,7 @@ function tryParseDate (input) {
 }
 
 /** Edits a date. Value must be formatted as YYYY-MM-DD. */
-class DateEditor extends Component {
+class DateEditor extends PureComponent {
     static contextType = RootContext;
 
     state = {
@@ -66,8 +78,8 @@ class DateEditor extends Component {
         anchorBottom: false,
         // true if input is focused
         focused: false,
-        // if true, the pointer is in the popout and popout should remain open
-        pointerInPopout: false,
+        // if true, the pointer interacted with the popout and the popout should remain open
+        pointerInteracted: false,
         // input string that might be invalid
         inputText: null,
     };
@@ -81,19 +93,13 @@ class DateEditor extends Component {
         globalAnimator.register(this);
     };
     #onBlur = (e) => {
-        if (this.props.onBlur) this.props.onBlur(e);
-        if (e.defaultPrevented) return;
+        if (e && this.props.onBlur) this.props.onBlur(e);
+        if (e?.defaultPrevented) return;
         this.setState({
             focused: false,
             inputText: stringifyDate(this.props.value),
         });
         globalAnimator.deregister(this);
-    };
-    #onMouseLeave = () => {
-        if (this.textField && this.textField.inputNode) {
-            this.textField.inputNode.focus();
-        }
-        this.setState({ pointerInPopout: false });
     };
 
     bindDate (date) {
@@ -112,6 +118,7 @@ class DateEditor extends Component {
         const date = this.bindDate(tryParseDate(e.target.value));
 
         if (date !== undefined) {
+            this.ignoreNextTextUpdate = true; // stop parsed date from overwriting user text
             this.props.onChange(date ? moment(date).format('YYYY-MM-DD') : date);
         }
     };
@@ -150,7 +157,11 @@ class DateEditor extends Component {
 
     componentDidUpdate (prevProps) {
         if (prevProps.value !== this.props.value && (!this.state.focused || !prevProps.value)) {
-            this.setState({ inputText: stringifyDate(this.getDateValue()) });
+            if (this.ignoreNextTextUpdate) {
+                this.ignoreNextTextUpdate = false;
+            } else {
+                this.setState({ inputText: stringifyDate(this.getDateValue()) });
+            }
         }
         if (this.props.disabled && this.state.focused) {
             this.setState({ focused: false });
@@ -166,7 +177,7 @@ class DateEditor extends Component {
         popoutY,
         anchorBottom,
         focused,
-        pointerInPopout,
+        pointerInteracted,
         inputText,
     }) {
         const dateValue = this.getDateValue();
@@ -179,7 +190,7 @@ class DateEditor extends Component {
         const fakeUTCToday = new Date(today.getTime() + today.getTimezoneOffset() * 60000);
 
         let popout;
-        if (focused || pointerInPopout) {
+        if (focused || pointerInteracted) {
             popout = createPortal(
                 <div
                     class="data-date-picker-portal"
@@ -188,8 +199,16 @@ class DateEditor extends Component {
                             ? `translateY(-100%) translate(${popoutX}px, ${popoutY}px)`
                             : `translate(${popoutX}px, ${popoutY}px)`,
                     }}
-                    onMouseEnter={() => this.setState({ pointerInPopout: true })}
-                    onMouseLeave={this.#onMouseLeave}>
+                    onPointerDown={() => this.setState({ pointerInteracted: true })}>
+                    {pointerInteracted ? (
+                        <div
+                            onClick={() => {
+                                this.setState({ pointerInteracted: false });
+                                this.textField?.blur();
+                                this.#onBlur();
+                            }}
+                            class="data-date-picker-pointer-backdrop" />
+                    ) : null}
                     <DatePicker
                         months={locale.months}
                         weekdays={locale.weekdays}
@@ -198,6 +217,7 @@ class DateEditor extends Component {
                         max={max || MAX_DATE}
                         today={fakeUTCToday}
                         value={fakeUTCValue}
+                        useMaxHeight={anchorBottom}
                         onChange={date => {
                             const newDate = this.bindDate(new Date(date.getTime() - date.getTimezoneOffset() * 60000));
                             onChange(moment(newDate).format('YYYY-MM-DD'));

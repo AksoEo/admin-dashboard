@@ -2,101 +2,28 @@ import { h } from 'preact';
 import { useState } from 'preact/compat';
 import Page from '../../../components/page';
 import MdField from '../../../components/controls/md-field';
-import FormEditor from '../../../components/form-editor';
+import { date } from '../../../components/data';
 
 export default class Components extends Page {
     render () {
         return (
             <div>
-                <FormEditorTest />
+                <DatePickerTest />
                 <MdFieldTest />
             </div>
         );
     }
 }
 
-function FormEditorTest () {
-    const [value, setValue] = useState({
-        allowUse: true,
-        allowGuests: false,
-        editable: true,
-        cancellable: true,
-        manualApproval: false,
-        price: {
-            currency: 'AUD',
-            var: 'aaaaa',
-            minUpfront: null,
-        },
-        form: [
-            {
-                el: 'input',
-                name: 'test',
-                label: 'Test',
-                description: 'test',
-                type: 'boolean_table',
-                default: false,
-                editable: true,
-                disabled: false,
-                required: false,
-                cols: 6,
-                rows: 6,
-                minSelect: 2,
-                maxSelect: 2,
-                headerTop: ['a', 'b', 'c', 'd', 'e', 'f'],
-                headerLeft: ['1', '2', '3', '4', '5', '6'],
-                excludeCells: [[0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 5]],
-            },
-            {
-                el: 'script',
-                script: {
-                    aaaaa: { t: 's', v: 'cats' },
-                },
-            },
-            {
-                el: 'input',
-                name: 'disable_hewwo',
-                label: 'Disable hewwo',
-                description: '',
-                type: 'boolean',
-                default: false,
-                editable: true,
-                disabled: false,
-                required: false,
-            },
-            {
-                el: 'input',
-                name: 'hewwo',
-                label: 'Hewwo®',
-                description: 'horse',
-                type: 'text',
-                default: { t: 'c', f: 'id', a: ['aaaaa'] },
-                editable: true,
-                disabled: { t: 'c', f: 'id', a: ['@disable_hewwo'] },
-                required: false,
-            },
-            {
-                el: 'text',
-                // text: 'text text *text* **text**',
-                text: { t: 'c', f: '++', a: ['aaaaa', '@hewwo'] },
-            },
-            {
-                el: 'script',
-                script: {
-                    meow: { t: 'n', v: 2 },
-                    meow2: { t: 'n', v: 3 },
-                    horse: { t: 'c', f: '+', a: ['meow', 'meow2'] },
-                    ext_ref: { t: 'c', f: 'aaaaa' },
-                },
-            },
-        ],
-    });
+function DatePickerTest () {
+    const [value, setValue] = useState(null);
 
     return (
         <div>
-            <h2>Form Editor</h2>
-            <FormEditor
-                value={value}
-                onChange={setValue} />
+            <h2>Date Picker</h2>
+            <date.editor value={value} onChange={setValue} />
+            <div style={{ height: 200 }} />
+            <date.editor outline value={value} onChange={setValue} />
         </div>
     );
 }
