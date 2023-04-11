@@ -105,7 +105,7 @@ function AddYear ({ open, onClose, onAdd }) {
     );
 }
 
-function PriceYear ({ year, value, editing, onChange, isIntermediary }) {
+function PriceYear ({ year, value, editing, onChange, onRemove, isIntermediary }) {
     const [addingCategories, setAddingCategories] = useState(false);
     const [addingMagazines, setAddingMagazines] = useState(false);
 
@@ -121,9 +121,12 @@ function PriceYear ({ year, value, editing, onChange, isIntermediary }) {
 
     return (
         <div class="price-year">
-            <div class="year-label">
-                {year}
-            </div>
+            <header class="year-header">
+                <Button icon small onClick={onRemove}>
+                    <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                </Button>
+                <span class="year-label">{year}</span>
+            </header>
             <div class="year-section-label">{locale.prices.membershipCategories.title}</div>
             <div class="membership-categories">
                 {value.registrationEntries.membershipCategories.map((category, i) => (

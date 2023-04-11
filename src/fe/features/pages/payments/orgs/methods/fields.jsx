@@ -75,8 +75,8 @@ export const FIELDS = {
             if (editing) {
                 return <TextField
                     label={slot === 'create' ? locale.fields.internalDescription : null}
-                    value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    value={value || ''}
+                    onChange={e => onChange(e.target.value || null)} />;
             }
             return value;
         },
