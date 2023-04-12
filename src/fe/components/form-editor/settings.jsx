@@ -462,6 +462,7 @@ function AscVarPicker ({ previousNodes, editing, value, onChange, optional }) {
     const varValue = knownVariables.has(value) ? value : null;
     return (
         <Select
+            style={{ width: '100%' }}
             rendered
             disabled={!editing}
             emptyLabel={locale.settings.variables.noVariableSelected}

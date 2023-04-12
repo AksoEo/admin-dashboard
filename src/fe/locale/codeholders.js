@@ -289,6 +289,7 @@ export const codeholders = {
         year: 'Jaro',
         notAYear: 'Bonvolu enmeti validan jaron',
         add: 'Aldoni',
+        cannotEditNote: '[[Note that membership items cannot be edited. You will need to delete and re-create it if needed.]]',
     },
     roles: 'Roloj',
     noRoles: 'Neniu rolo',

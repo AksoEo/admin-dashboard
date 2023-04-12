@@ -33,6 +33,7 @@ export default class Select extends Component {
         if (focused) props.class += ' is-focused';
         if (outline) props.class += ' p-outline';
         if (disabled) props.class += ' is-disabled';
+        if (multi || rendered) props.class += ' is-multi';
 
         const selectIcon = (
             <svg class="p-select-icon" width="24" height="24">
@@ -141,7 +142,9 @@ class MultiSelect extends Component {
                 tabIndex={disabled ? -1 : 0}
                 onClick={this.#open}
                 ref={node => this.node = node}>
-                {label}
+                <span class="inner-select-label">
+                    {label}
+                </span>
 
                 <Menu
                     open={open}

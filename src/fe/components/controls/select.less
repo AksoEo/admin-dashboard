@@ -7,6 +7,10 @@
     border-radius: 4px;
     white-space: nowrap;
 
+    &.is-multi {
+        width: 200px;
+    }
+
     @media (prefers-color-scheme: dark) {
         // fix background in firefox
         option {
@@ -38,7 +42,18 @@
     }
 
     & > .multi-select {
+        display: inline-flex;
         cursor: default;
+        -webkit-user-select: none;
+        user-select: none;
+
+        .inner-select-label {
+            flex: 1;
+            flex-basis: 0;
+            width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     }
 
     &:not(.p-outline).is-disabled {

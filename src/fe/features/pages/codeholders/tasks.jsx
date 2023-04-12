@@ -273,6 +273,9 @@ export default {
                         {locale.membership.useCanuto}
                     </label>
                 </div>
+                <p class="edit-note">
+                    {locale.membership.cannotEditNote}
+                </p>
             </TaskDialog>
         );
     }),
