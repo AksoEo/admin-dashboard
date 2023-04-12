@@ -4,6 +4,8 @@ import { Button, CircularProgress, Checkbox, TextField } from 'yamdl';
 import TuneIcon from '@material-ui/icons/Tune';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
 import { formEditor as locale, currencies, data as dataLocale } from '../../locale';
 import { currencyAmount } from '../data';
 import { RefNameView } from './script-views';
@@ -101,6 +103,8 @@ export default class FormEditorSettings extends PureComponent {
                         onChange={v => onChange({ ...value, confirmationNotifTemplateId: v })} />
                 </Fragment>
             );
+        } else {
+            settings = <SettingsSummary value={value} />;
         }
 
         return (
@@ -116,6 +120,76 @@ export default class FormEditorSettings extends PureComponent {
             </div>
         );
     }
+}
+
+function SettingsSummary ({ value }) {
+    return (
+        <div class="settings-summary">
+            <div class="summary-flags">
+                {FLAGS.map(flag => (
+                    <span class="summary-flag" key={flag}>
+                        {value[flag]
+                            ? <CheckIcon className="i-icon" style={{ verticalAlign: 'middle' }} />
+                            : <CloseIcon className="i-icon" style={{ verticalAlign: 'middle' }} />}
+                        {' '}
+                        {locale.settings.flags[flag]}
+                    </span>
+                ))}
+                <span class="summary-flag">
+                    {value.sequenceIds
+                        ? <CheckIcon className="i-icon" style={{ verticalAlign: 'middle' }} />
+                        : <CloseIcon className="i-icon" style={{ verticalAlign: 'middle' }} />}
+                    {' '}
+                    {locale.settings.sequenceIds.enabled}
+                </span>
+            </div>
+            {value.price ? (
+                <div class="summary-price">
+                    <div>
+                        <CheckIcon className="i-icon" style={{ verticalAlign: 'middle' }}/>
+                        {' '}
+                        {locale.settings.price.enabled}
+                    </div>
+                    <div class="price-inner">
+                        <div class="i-price-var">
+                            <RefNameView class="form-editor-settings-var-ref" name={value.price.var} />
+                            {' '}
+                            <span class="price-currency">
+                                {currencies[value.price.currency]}
+                            </span>
+                        </div>
+                        {value.price.minUpfront ? (
+                            <div class="i-price-min">
+                                {locale.settings.price.minUpfront}
+                                {': '}
+                                <currencyAmount.renderer
+                                    value={value.price.minUpfront}
+                                    currency={value.price.currency} />
+                            </div>
+                        ) : null}
+                    </div>
+                </div>
+            ) : null}
+            <table class="summary-vars">
+                <tbody>
+                    {VARIABLES.map(({ key, required }) => (
+                        (value[key] || required) ? (
+                            <tr class="summary-var" key={key}>
+                                <td>
+                                    {locale.settings.variables[key]}
+                                </td>
+                                <td>
+                                    {value[key] ? (
+                                        <RefNameView class="form-editor-settings-var-ref" name={value[key]} />
+                                    ) : '—'}
+                                </td>
+                            </tr>
+                        ) : null
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 }
 
 function Flags ({ value, editing, onChange }) {

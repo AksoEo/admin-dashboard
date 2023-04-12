@@ -78,6 +78,53 @@
     .settings-confirmation-notif {
         padding: 8px 16px;
     }
+
+    .settings-summary {
+        padding: 8px 16px;
+
+        .i-icon {
+            font-size: inherit;
+        }
+
+        .summary-flag {
+            display: inline-block;
+            background: @text-fade-10;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .summary-flags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        .summary-price {
+            border-top: 1px solid @separator;
+            padding: 2px 4px;
+            margin: 2px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+
+            .i-price-var {
+                margin: 4px 0;
+            }
+            .i-price-min {
+                font-size: smaller;
+            }
+        }
+        .summary-vars {
+            display: block;
+            border-top: 1px solid @separator;
+            padding: 2px 4px;
+            margin: 2px 0;
+
+            td {
+                padding-right: 8px;
+            }
+        }
+    }
 }
 
 .form-editor-settings-var-ref {
