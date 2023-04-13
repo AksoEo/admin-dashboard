@@ -264,3 +264,24 @@ export function validateFormInput (item, previousNodes, value) {
 
     return null;
 }
+
+/**
+ * Validates the form input value for basic requirements.
+ * Returns null if valid, or an error if not.
+ */
+export function validateFormInputBaseRequirements (item, previousNodes, value) {
+    if (value === null) return null;
+
+    if (item.type === 'text') {
+        if (item.variant === 'textarea') {
+            if (!value || value.length > 8192) return locale.errors.textLenRange(1, 8192);
+        } else {
+            if (value.includes('\n')) return locale.errors.textPatternGeneric;
+            if (!value || value.length > 2048) return locale.errors.textLenRange(1, 2048);
+        }
+    } else if (item.type === 'country') {
+        if (item.exclude.includes(value)) return locale.errors.enumNotInSet;
+    }
+
+    return null;
+}

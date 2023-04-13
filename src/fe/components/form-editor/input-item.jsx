@@ -17,7 +17,7 @@ import { FormContext, ValidatedTextField } from '../form';
 import { WithCountries } from '../data/country';
 import { date, time, timestamp, currencyAmount } from '../data';
 import { ScriptableValue, ScriptableBool } from './script-expr';
-import { evalExpr, validateFormInput } from './model';
+import { evalExpr, validateFormInput, validateFormInputBaseRequirements } from './model';
 import { data as dataLocale, formEditor as locale, currencies } from '../../locale';
 import './input-item.less';
 
@@ -441,11 +441,18 @@ export default class InputItem extends PureComponent {
     }
 
     validate (submitting) {
-        if (!this.props.editingData || this.props.disableValidation) {
+        if (!this.props.editingData) {
             this.setState({ error: null });
             return true;
         }
-        const error = validateFormInput(this.props.item, this.props.previousNodes, this.props.value);
+        let error = validateFormInputBaseRequirements(this.props.item, this.props.previousNodes, this.props.value);
+        if (!error && this.props.disableValidation) {
+            this.setState({ error: null });
+            return true;
+        }
+        if (!error) {
+            error = validateFormInput(this.props.item, this.props.previousNodes, this.props.value);
+        }
         if (!error) {
             this.setState({ error: null });
         } else if (submitting || this.state.didInteract) {
