@@ -22,7 +22,7 @@ export default {
     },
     time: {
         needsSwitch: true,
-        default: () => ({ enabled: false, value: [MIN_TIME, new Date()] }),
+        default: () => ({ enabled: false, value: [new Date(), new Date()] }),
         serialize: ({ value }) => `${value[0].toISOString()}$${value[1].toISOString()}`,
         deserialize: value => ({ enabled: true, value: value.split('$').map(date => new Date(date)) }),
         editor ({ value, onChange, onEnabledChange, hidden }) {
@@ -30,12 +30,18 @@ export default {
                 <div class="time-filter">
                     <div>
                         <timestamp.editor label={locale.search.filters.timeRangeStart} disabled={hidden} value={+value[0] / 1000} onChange={v => {
-                            onChange([new Date(v * 1000), value[1]]);
+                            if (!v) return;
+                            if (Math.abs(+value[0] - +value[1]) <= 60000) {
+                                onChange([new Date(v * 1000), new Date(v * 1000 + 60000)]);
+                            } else {
+                                onChange([new Date(v * 1000), value[1]]);
+                            }
                             onEnabledChange(true);
                         }} />
                     </div>
                     <div>
                         <timestamp.editor label={locale.search.filters.timeRangeEnd} disabled={hidden} value={+value[1] / 1000} onChange={v => {
+                            if (!v) return;
                             onChange([value[0], new Date(v * 1000)]);
                             onEnabledChange(true);
                         }} />

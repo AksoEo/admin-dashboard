@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import Select from '../../../components/controls/select';
 import Segmented from '../../../components/controls/segmented';
-import { timestamp } from '../../../components/data';
+import { date } from '../../../components/data';
 import { votes as locale } from '../../../locale';
 
 export default {
@@ -79,23 +79,39 @@ export default {
     },
     timeStart: {
         needsSwitch: true,
-        default: () => ({ enabled: false, value: [+new Date() / 1000, +new Date() / 1000] }),
-        serialize: ({ value }) => `${new Date(value[0] * 1000).toISOString()}$${new Date(value[1] * 1000).toISOString()}`,
-        deserialize: value => value.split('$').map(t => Math.round(+new Date(t) / 1000)),
-        editor ({ value, onChange }) {
+        default: () => {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            return ({ enabled: false, value: [today, today] });
+        },
+        serialize: ({ value }) => value.join('$'),
+        deserialize: value => ({ enabled: true, value: value.split('$') }),
+        editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="time-range-editor">
                     <div>
-                        <timestamp.editor
+                        <date.editor
                             label={locale.filters.timeRangeStart}
                             value={value[0]}
-                            onChange={v => onChange([v, value[1]])} />
+                            onChange={v => {
+                                if (!v) return;
+                                if (value[0] === value[1]) {
+                                    onChange([v, v]);
+                                } else {
+                                    onChange([v, value[1]]);
+                                }
+                                onEnabledChange(true);
+                            }} />
                     </div>
                     <div>
-                        <timestamp.editor
+                        <date.editor
                             label={locale.filters.timeRangeEnd}
                             value={value[1]}
-                            onChange={v => onChange([value[0], v])} />
+                            onChange={v => {
+                                if (!v) return;
+                                onChange([value[0], v]);
+                                onEnabledChange(true);
+                            }} />
                     </div>
                 </div>
             );

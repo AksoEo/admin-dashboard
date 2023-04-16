@@ -177,16 +177,21 @@ const clientFields = {
     },
 };
 
+function dateToTimestamp (date, atEndOfDay) {
+    date = new Date(date + (atEndOfDay ? 'T23:59:59Z' : 'T00:00:00Z'));
+    return +date / 1000;
+}
+
 const clientFilters = {
     org: {
         toAPI: value => ({ org: value }),
         hasPerm: client => client.hasPerm('votes.read.tejo') && client.hasPerm('votes.read.uea'),
     },
     timeStart: {
-        toAPI: value => ({ timeStart: { $range: value } }),
+        toAPI: value => ({ timeStart: { $range: value.map(dateToTimestamp) } }),
     },
     timeEnd: {
-        toAPI: value => ({ timeEnd: { $range: value } }),
+        toAPI: value => ({ timeEnd: { $range: value.map(dateToTimestamp) } }),
     },
     state: {
         toAPI: value => {
