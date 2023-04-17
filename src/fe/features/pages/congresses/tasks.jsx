@@ -527,6 +527,9 @@ function NotifTemplateMessage ({ core, options }) {
 
     useEffect(() => {
         core.createTask('congresses/listParticipants', options, {
+            search: options.search,
+            filters: options.filters,
+            jsonFilter: options.jsonFilter,
             fields: [],
             offset: 0,
             limit: 1,
@@ -535,7 +538,7 @@ function NotifTemplateMessage ({ core, options }) {
         }).catch(err => {
             setError(err);
         });
-    }, [options.congress, options.instance]);
+    }, [options.congress, options.instance, options.search, options.filters, options.jsonFilter]);
 
     if (participants === null && error === null) {
         return <CircularProgress small indeterminate />;
