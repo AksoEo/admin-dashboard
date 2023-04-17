@@ -1,16 +1,62 @@
 import { h } from 'preact';
+import { PureComponent, useContext, useState } from 'preact/compat';
 import SaveIcon from '@material-ui/icons/SaveAlt';
-import Meta from '../../../../meta';
-import Page from '../../../../../components/page';
 import CSVExport from '../../../../../components/tasks/csv-export';
 import Spreadsheet from '../../../../../components/lists/spreadsheet';
+import DialogSheet from '../../../../../components/tasks/dialog-sheet';
 import { currencyAmount, date, timestamp } from '../../../../../components/data';
 import { coreContext } from '../../../../../core/connection';
+import { routerContext } from '../../../../../router';
 import { congressParticipants as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
 import './spreadsheet-view.less';
+import InfoIcon from '@material-ui/icons/Info';
 
-export default class SpreadsheetView extends Page {
+export default function SpreadsheetDialog ({ open, onClose, congress, instance, listParameters }) {
+    const [exportOpen, setExportOpen] = useState(false);
+    const router = useContext(routerContext);
+
+    const actions = [
+        {
+            icon: <SaveIcon style={{ verticalAlign: 'middle' }} />,
+            label: locale.spreadsheet.exportCsv,
+            action: () => setExportOpen(true),
+        },
+    ];
+
+    const hasActiveSearch = listParameters.search.query
+        || Object.values(listParameters.filters).find(item => item.enabled)
+        || !listParameters.jsonFilter._disabled;
+
+    return (
+        <DialogSheet
+            backdrop
+            fadeOnly
+            class="congress-participants-spreadsheet-dialog"
+            title={locale.spreadsheet.title}
+            open={open}
+            onClose={onClose}
+            actions={actions}>
+            {hasActiveSearch ? (
+                <div class="search-query-notice">
+                    <div class="inner-icon-container">
+                        <InfoIcon style={{ fontSize: 'inherit' }} />
+                    </div>
+                    <div>
+                        {locale.spreadsheet.searchQueryNotice}
+                    </div>
+                </div>
+            ) : null}
+            <SpreadsheetView
+                onNavigate={router.navigate}
+                congress={congress}
+                instance={instance}
+                listParameters={listParameters} />
+        </DialogSheet>
+    );
+}
+
+export class SpreadsheetView extends PureComponent {
     static contextType = coreContext;
 
     state = {
@@ -26,6 +72,13 @@ export default class SpreadsheetView extends Page {
         exportOpen: false,
     };
 
+    get congress () {
+        return +this.props.congress;
+    }
+    get instance () {
+        return +this.props.instance;
+    }
+
     getListOptions () {
         return {
             congress: this.congress,
@@ -34,6 +87,7 @@ export default class SpreadsheetView extends Page {
     }
     getListParameters () {
         return {
+            ...(this.props.listParameters || {}),
             fields: this.state.fields.map(id => ({ id, sorting: 'none' })),
         };
     }
@@ -80,13 +134,6 @@ export default class SpreadsheetView extends Page {
 
     componentDidMount () {
         this.loadFields();
-    }
-
-    get congress () {
-        return +this.props.matches.congress[1];
-    }
-    get instance () {
-        return +this.props.matches.instance[1];
     }
 
     columnNameForField = field => {
@@ -167,22 +214,11 @@ export default class SpreadsheetView extends Page {
         }
     };
 
-    render (_, { fields, rows, total }) {
+    render ({ exportOpen, onCloseExport }, { fields, rows, total }) {
         const { congress, instance } = this;
 
-        const actions = [];
-        actions.push({
-            icon: <SaveIcon style={{ verticalAlign: 'middle' }} />,
-            action: () => {
-                this.setState({ exportOpen: true });
-            },
-        });
-
         return (
-            <div class="congress-participants-spreadsheet-page">
-                <Meta
-                    title={locale.spreadsheet.title}
-                    actions={actions} />
+            <div class="congress-participants-spreadsheet">
                 <Spreadsheet
                     columnCount={fields.length}
                     rowCount={total}

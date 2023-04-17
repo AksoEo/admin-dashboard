@@ -10,6 +10,7 @@ import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import './index.less';
 import SendNotifTemplate from '../../../notif-templates/send';
+import SpreadsheetDialog from './spreadsheet-view';
 
 function formSearchableFields (regFormItems) {
     return regFormItems.filter(item => item.el === 'input' && item.type === 'text').map(item => ({
@@ -59,6 +60,7 @@ export default class ParticipantsView extends PureComponent {
 
     render ({
         org, congress, instance, push, sendingNotif, onStopSendingNotif,
+        spreadsheetOpen,
     }, {
         parameters, expanded, currency, registrationForm, hasRegistrationForm,
     }) {
@@ -139,6 +141,13 @@ export default class ParticipantsView extends PureComponent {
                     }}
                     open={sendingNotif}
                     onClose={onStopSendingNotif} />
+
+                <SpreadsheetDialog
+                    open={!!spreadsheetOpen}
+                    onClose={() => spreadsheetOpen?.pop()}
+                    congress={congress}
+                    instance={instance}
+                    listParameters={parameters} />
             </div>
         );
     }

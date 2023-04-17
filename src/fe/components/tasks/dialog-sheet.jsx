@@ -50,7 +50,9 @@ export default class DialogSheet extends Dialog {
             style.transform += ` translateY(${lerp(100, 0, presence)}%)`;
             style.opacity *= clamp(lerp(0, 50, presence), 0, 1);
         } else if (this.props.open) {
-            style.transform += ` translateY(${lerp(window.innerHeight / 2, 0, presence)}px)`;
+            if (!this.props.fadeOnly) {
+                style.transform += ` translateY(${lerp(window.innerHeight / 2, 0, presence)}px)`;
+            }
             style.opacity *= 1 - Math.exp(-8 * presence);
         } else {
             style.opacity *= presence;

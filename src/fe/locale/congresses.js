@@ -335,11 +335,13 @@ export const congressParticipants = {
     },
     spreadsheet: {
         title: 'Aliĝintoj',
+        exportCsv: 'Elŝuti CSV',
         bool: {
             true: 'jes',
             false: 'ne',
             null: '-',
         },
+        searchQueryNotice: 'Vi havas aktivan serĉon. [[etc etc participants are filtered]]',
     },
     create: {
         menuItem: 'Krei',

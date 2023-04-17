@@ -320,8 +320,8 @@ export default [
                                                     },
                                                     {
                                                         match: 'tabelo',
-                                                        type: 'stack',
-                                                        component: elazy(() => import(/* webpackChunkName: "congresses-spreadsheet" */ './congresses/instances/participants/spreadsheet-view')),
+                                                        type: 'state',
+                                                        state: 'spreadsheetOpen',
                                                     },
                                                 ],
                                             },

@@ -24,7 +24,6 @@ import Programs from './programs';
 import Participants from './participants';
 import MapPicker from '../map-picker';
 import './detail.less';
-import SendNotifTemplate from '../../notif-templates/send';
 
 export default connectPerms(class CongressInstancePage extends Page {
     state = {
@@ -230,6 +229,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                                 query={query}
                                 onQueryChange={onQueryChange}
                                 push={this.props.push}
+                                spreadsheetOpen={this.props.spreadsheetOpen}
                                 sendingNotif={this.state.sendingNotif}
                                 onStopSendingNotif={() => this.setState({ sendingNotif: false })} />}
                         </div>
