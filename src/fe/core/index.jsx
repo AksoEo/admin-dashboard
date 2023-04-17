@@ -29,6 +29,8 @@ export function useDataView (path, options) {
         && !deepEq(options, prevOptions.current);
     prevOptions.current = options;
 
+    const dataOptionsChangeId = useRef(0);
+
     if (optionsDidChange) {
         optionsChangeId.current++;
     }
@@ -38,6 +40,9 @@ export function useDataView (path, options) {
             if (dataView.current) dataView.current.drop();
             const view = dataView.current = core.createDataView(path, options);
             setLoading(true);
+            setError(null);
+            setData(null);
+            dataOptionsChangeId.current = optionsChangeId.current;
 
             view.on('update', data => {
                 setLoading(false);
@@ -53,7 +58,7 @@ export function useDataView (path, options) {
             dataView.current?.drop();
             dataView.current = null;
         };
-    }, [path, optionsChangeId]);
+    }, [path, optionsChangeId.current]);
 
-    return [loading, error, data];
+    return [loading, error, dataOptionsChangeId.current === optionsChangeId.current ? data : null];
 }

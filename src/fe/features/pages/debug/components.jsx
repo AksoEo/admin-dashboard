@@ -2,12 +2,13 @@ import { h } from 'preact';
 import { useState } from 'preact/compat';
 import Page from '../../../components/page';
 import MdField from '../../../components/controls/md-field';
-import { date } from '../../../components/data';
+import { currencyAmount, date } from '../../../components/data';
 
 export default class Components extends Page {
     render () {
         return (
             <div>
+                <CurrencyTest />
                 <DatePickerTest />
                 <MdFieldTest />
             </div>
@@ -24,6 +25,23 @@ function DatePickerTest () {
             <date.editor value={value} onChange={setValue} />
             <div style={{ height: 200 }} />
             <date.editor outline value={value} onChange={setValue} />
+        </div>
+    );
+}
+
+function CurrencyTest () {
+    const [value, setValue] = useState(null);
+
+    return (
+        <div>
+            <h2>CurrencyAmount Editor</h2>
+            <currencyAmount.editor outline value={value} onChange={setValue} currency="USD" />
+            <br />
+            <currencyAmount.editor outline value={value} onChange={setValue} currency="EUR" />
+            <br />
+            <currencyAmount.editor outline value={value} onChange={setValue} currency="GBP" />
+            <br />
+            <currencyAmount.editor outline value={value} onChange={setValue} currency="JPY" />
         </div>
     );
 }

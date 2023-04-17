@@ -286,6 +286,11 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
             msgPost: '” por konfirmi la forigon.',
         },
     },
+    currencyConversionPopover: {
+        title: '[[Convert from…]]',
+        loadingRates: 'Ŝarĝas...',
+        loadingRatesError: 'Eraro',
+    },
 };
 
 export const search = {
