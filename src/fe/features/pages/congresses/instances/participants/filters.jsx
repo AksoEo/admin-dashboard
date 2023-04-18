@@ -9,6 +9,7 @@ import Select from '../../../../../components/controls/select';
 import { congressParticipants as locale } from '../../../../../locale';
 import { currencyAmount, date, time, timestamp } from '../../../../../components/data';
 import './filters.less';
+import TextArea from '../../../../../components/controls/text-area';
 
 export const FILTERS = {
     approval: {
@@ -169,6 +170,25 @@ export const FILTERS = {
             );
         },
     },
+    dataId: {
+        default: () => ({ enabled: false, value: [] }),
+        serialize: ({ value }) => value.join(','),
+        deserialize: value => ({ enabled: true, value: value.split(',') }),
+        editor ({ value, onChange, onEnabledChange }) {
+            return (
+                <div class="congress-participants-data-id-filter">
+                    <TextArea
+                        placeholder={locale.search.filters.dataIdDescription}
+                        value={value.join('\n')}
+                        onChange={value => {
+                            value = value.trim().split('\n').filter(x => x);
+                            onEnabledChange(!!value.length);
+                            onChange(value);
+                        }} />
+                </div>
+            );
+        },
+    },
     data: {
         default: () => ({ enabled: false, value: [] }),
         serialize: ({ value }) => {
@@ -247,7 +267,7 @@ export const FILTERS = {
             );
 
             return (
-                <div class={'participants-data-filter' + (!value.length ? ' is-empty' : '')}>
+                <div class={'congress-participants-data-filter' + (!value.length ? ' is-empty' : '')}>
                     {contents}
                 </div>
             );

@@ -281,6 +281,10 @@ export const congressParticipants = {
                 false: 'ne',
                 none: 'ne gravas',
             },
+
+            dataId: 'Aliĝidentigilo',
+            dataIdDescription: 'Enmetu aliĝidentigilojn; po unu en unu vico.',
+
             data: 'Aliĝdatumoj',
 
             dataVerbs: {

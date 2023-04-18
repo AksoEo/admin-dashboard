@@ -165,6 +165,11 @@ const pClientFilters = {
     validity: {
         toAPI: validity => ({ isValid: validity === 'true' ? true : false }),
     },
+    dataId: {
+        toAPI: items => ({
+            $or: items.map(item => ({ dataId: '==base64==' + Buffer.from(item, 'hex').toString('base64') })),
+        }),
+    },
     data: {
         toAPI: predicates => {
             const out = [];
