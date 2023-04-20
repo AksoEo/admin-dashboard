@@ -345,7 +345,7 @@ export const congressParticipants = {
             false: 'ne',
             null: '-',
         },
-        searchQueryNotice: 'Vi havas aktivan serĉon. [[etc etc participants are filtered]]',
+        searchQueryNotice: 'Vi havas aktivan serĉon. La elŝutotaj aliĝintoj estos filtritaj laŭ tiu filtrilo.',
     },
     create: {
         menuItem: 'Krei',

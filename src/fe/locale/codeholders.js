@@ -169,7 +169,7 @@ export const codeholders = {
             admin: 'Administrado',
         },
 
-        emailTakenError: '[[Email is taken]]',
+        emailTakenError: 'Tiu retpoŝtadreso estas jam uzata',
     },
     fieldEditorInsufficientPerms: 'Vi ne havas redaktorajton',
     countryChangeNotice: {
@@ -289,7 +289,7 @@ export const codeholders = {
         year: 'Jaro',
         notAYear: 'Bonvolu enmeti validan jaron',
         add: 'Aldoni',
-        cannotEditNote: '[[Note that membership items cannot be edited. You will need to delete and re-create it if needed.]]',
+        cannotEditNote: 'Notu, ke ne eblas redakti membrecojn. Se necesas, forigu kaj rekreu la membrecon.',
     },
     roles: 'Roloj',
     noRoles: 'Neniu rolo',

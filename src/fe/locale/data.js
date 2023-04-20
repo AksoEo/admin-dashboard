@@ -123,13 +123,13 @@ export const data = {
             empty: 'Neniu permeso',
         },
         copyPaste: {
-            copy: '[[Copy permissions]]',
-            paste: '[[Paste permissions]]',
-            pasteDescription: '[[Please paste the copied data in the below text field.]]',
-            confirmPaste: '[[Paste]]',
+            copy: 'Kopii permesojn',
+            paste: 'Alglui permesojn',
+            pasteDescription: 'Bonvolu alglui la kopiitajn permesojn en la ĉi-suban kampon.',
+            confirmPaste: 'Alglui',
 
-            copyError: '[[Failed to write to clipboard. Your browser may have disabled it or something.]]',
-            pasteParseError: '[[The pasted data is in an invalid format. Try copying the permissions again.]]',
+            copyError: 'Okazis eraro dum kopiado de la permesoj. Bonvolu kontroli la sekurecagordojn de via retumilo.',
+            pasteParseError: 'La algluitaj datumoj ne havas la ĝustan formaton. Bv. reprovi kopii la permesojn.',
         },
     },
     mdEditor: {
@@ -287,7 +287,7 @@ Skribu tekston kiel kutime. Uzu du novajn liniojn por krei paragrafon.
         },
     },
     currencyConversionPopover: {
-        title: '[[Convert from…]]',
+        title: 'Konverti de ...',
         loadingRates: 'Ŝarĝas...',
         loadingRatesError: 'Eraro',
     },
