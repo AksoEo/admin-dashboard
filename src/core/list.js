@@ -174,9 +174,9 @@ export const makeParametersToRequestData = ({
             ? (clientFields[id].sort || clientFields[id].apiFields).map(id => [id, sorting])
             : [[clientFields[id], sorting]]);
 
-    // order by relevance if no order is selected
-    if (options.search && !options.order.length) {
-        options.order = [['_relevance', 'desc']];
+    // order by relevance first if search is active
+    if (options.search) {
+        options.order.unshift(['_relevance', 'desc']);
     }
 
     options.fields = fields.flatMap(({ id }) => typeof clientFields[id] === 'object'

@@ -342,7 +342,8 @@ export default class OverviewList extends PureComponent {
                     setFieldSorting={setFieldSorting}
                     selection={selection}
                     fields={fields}
-                    locale={localizedFields} />,
+                    locale={localizedFields}
+                    hasActiveSearch={!!parameters.search?.query} />,
             ];
 
             contents.push(...result.items.map((id, i) => <ListItem
@@ -436,7 +437,7 @@ export default class OverviewList extends PureComponent {
 // time interval after changing page during which the results list will not change height
 const PAGE_CHANGE_COOLDOWN = 400; // ms
 
-function ListHeader ({ fields, selectedFields, setFieldSorting, locale, selection }) {
+function ListHeader ({ fields, selectedFields, setFieldSorting, locale, selection, hasActiveSearch }) {
     const style = lineLayout(fields, selectedFields, selection);
 
     const cells = selectedFields.map(({ id, sorting, transient }) => {
@@ -453,7 +454,7 @@ function ListHeader ({ fields, selectedFields, setFieldSorting, locale, selectio
                 }}>
                 <div class="cell-label" title={locale[id]}>{locale[id]}</div>
                 {sortable ? (
-                    <div class={`cell-sorting sorting-${sorting}`}>
+                    <div class={`cell-sorting sorting-${sorting}` + (hasActiveSearch ? ' is-ineffective' : '')}>
                         {sorting === 'asc'
                             ? <ArrowUpIcon />
                             : sorting === 'desc'
