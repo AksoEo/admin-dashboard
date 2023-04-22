@@ -360,6 +360,10 @@ const CodeEditor = memo(connectPerms(function CodeEditor ({
     if (originalItem && originalItem.code) keepSuggestions.push(originalItem.code.new);
 
     return <ueaCode.editor
+        // due to migration using the old format for new codes, some codes may be technically
+        // invalid. we'll leave them be
+        skipValidationIfUnchanged
+
         value={value.new}
         onChange={v => onChange({ ...value, new: v })}
         id={item.id}

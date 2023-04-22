@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
+import { PureComponent } from 'preact/compat';
 import { CircularProgress } from 'yamdl';
 import { UEACode as AKSOUEACode, bannedCodes } from '@tejo/akso-client';
 import CheckIcon from '@material-ui/icons/Check';
@@ -64,7 +65,7 @@ function isBannedCode (value) {
  * Alternatively, pass `suggestionParameters` to automatically suggest some codes.
  * Also pass `keepSuggestions` to keep suggestions from being filtered above in suggestion params.
  */
-class UEACodeEditor extends Component {
+class UEACodeEditor extends PureComponent {
     state = {
         takenState: null,
         suggestions: [],
@@ -109,8 +110,10 @@ class UEACodeEditor extends Component {
         }).catch(console.error); // eslint-disable-line no-console
     }
 
+    originalValue = null;
     componentDidMount () {
         this.updateSuggestions();
+        this.originalValue = this.props.value;
     }
 
     componentDidUpdate (prevProps) {
@@ -121,7 +124,7 @@ class UEACodeEditor extends Component {
         this.doNotUpdate = true;
     }
 
-    render ({ value, onChange, ...extraProps }) {
+    render ({ value, onChange, skipValidationIfUnchanged, ...extraProps }) {
         let trailing;
         if (this.state.takenState === 'loading') {
             trailing = <CircularProgress class="taken-state is-loading" small indeterminate />;
@@ -153,6 +156,10 @@ class UEACodeEditor extends Component {
             label={locale.ueaCode.newCode + (this.props.required ? '*' : '')}
             onFocus={() => this.updateSuggestions()}
             validate={() => {
+                if (skipValidationIfUnchanged && value === this.originalValue) {
+                    return null;
+                }
+
                 try {
                     const code = new AKSOUEACode(value);
                     if (code.type !== 'new') throw 0;
