@@ -140,7 +140,9 @@ export const FIELDS = {
                     isHtml
                     item={item}
                     value={value}
-                    onChange={onChange} />;
+                    onChange={value => {
+                        onChange(value.slice(0, 100000));
+                    }} />;
             }
 
             if (!value) return <div class="mail-body-html is-empty">{locale.raw.noHtmlVersion}</div>;
@@ -158,7 +160,9 @@ export const FIELDS = {
                 return <TemplatedCodeMirror
                     item={item}
                     value={value}
-                    onChange={onChange} />;
+                    onChange={value => {
+                        onChange(value.slice(0, 10000));
+                    }} />;
             }
             if (!value) return <div class="mail-body-text is-empty">{locale.raw.noTextVersion}</div>;
             return (
@@ -393,6 +397,7 @@ class TextModule extends PureComponent {
                 <TemplatedMdField
                     key={index}
                     item={item}
+                    maxLength={5000}
                     rules={['blockquote', 'heading', 'emphasis', 'strikethrough', 'link', 'list', 'table', 'image']}
                     value={valueColumns[index]}
                     editing={editing}
