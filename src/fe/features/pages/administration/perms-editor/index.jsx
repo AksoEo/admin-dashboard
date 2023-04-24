@@ -226,7 +226,7 @@ function CopyPaste ({ value, onChange }) {
             if (typeof perms.mrEnabled !== 'boolean') throw new Error('invalid MR enabled');
             if (perms.mrFilter && typeof perms.mrFilter !== 'string') throw new Error('invalid MR filter');
             if (perms.mrFields) {
-                for (const k of perms.mrFields) {
+                for (const k in perms.mrFields) {
                     if (typeof perms.mrFields[k] !== 'string') throw new Error('invalid MR field');
                 }
             }
