@@ -318,16 +318,18 @@ class FormEditorItems extends PureComponent {
 
         const modelCustomVars = [];
         for (const k in customVars) {
+            const value = customVars[k].default;
             const type = ({
+                null: 'u',
                 boolean: 'b',
                 number: 'n',
-                text: 's',
-            })[customVars[k].type];
+                string: 's',
+            })[value === null ? 'null' : typeof value];
 
             modelCustomVars.push({
                 name: k.substring(1), // remove leading @
                 type,
-                value: customVars[k].default,
+                value,
             });
         }
 
