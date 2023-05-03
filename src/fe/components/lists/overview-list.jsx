@@ -308,7 +308,9 @@ export default class OverviewList extends PureComponent {
                     if (f.id === id) {
                         newFields[i] = { ...f, sorting };
                         found = true;
-                        break;
+                    } else if (f.sorting !== 'none') {
+                        // set sorting on all other fields to none
+                        newFields[i] = { ...f, sorting: 'none' };
                     }
                 }
                 if (!found && result.transientFields && result.transientFields.includes(id)) {

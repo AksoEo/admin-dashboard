@@ -43,6 +43,8 @@ export const adminGroups = {
     addClients: 'Aldoni API-klientojn',
     removeClients: n => `Elpreni ${n} API-kliento${n === 1 ? '' : 'j'}n el grupo`,
     addClientsCount: n => `${n} API-kliento${n === 1 ? '' : 'j'} elektitaj`,
+    removeCancel: 'Nuligi',
+    removeConfirm: 'Elpreni',
     addClientsDone: 'Aldoni elektitojn',
     removeClientsAreYouSure: n => `Ĉu vi certas, ke vi volas elpreni ${n} API-kliento${n === 1 ? '' : 'j'}n?`,
     filterToGroup: 'Montri nur membrojn de la grupo',

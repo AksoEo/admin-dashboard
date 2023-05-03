@@ -188,7 +188,7 @@ function parseTreeURL (url, state, perms) {
                     item.matches = { ...pathMatches };
 
                     const stateItem = state && state.stack[viewStack.length];
-                    if (stateItem && stateItem.viewPath == item.viewPath) {
+                    if (stateItem && stateItem.viewPath === item.viewPath) {
                         item.data = stateItem.data;
                         item.query = stateItem.query;
                     }
@@ -746,6 +746,7 @@ export default class Navigation extends PureComponent {
                 const itemIndex = i;
                 stackItems.push(
                     <CardStackItem
+                        wide={stackItem.route.requestWide}
                         open
                         onClose={() => this.popStackAt(itemIndex)}
                         appBar={itemAppBar}

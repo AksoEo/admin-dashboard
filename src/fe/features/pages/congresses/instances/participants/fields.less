@@ -54,17 +54,23 @@
 
 .congress-participant-form-data {
     .data-allow-invalid {
-        font-size: 0.7em;
-        opacity: 0.5;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         padding: 8px 16px;
-        transition: opacity 0.3s;
-
-        &.is-active {
-            opacity: 1;
-        }
+        margin-bottom: 8px;
+        background: @card1-background;
+        border-radius: 8px;
+        border: 1px solid @subtle-separator;
 
         label {
             margin-left: 8px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        &.is-active label {
+            opacity: 1;
         }
     }
 }

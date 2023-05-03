@@ -128,19 +128,17 @@ export class CardStackRenderer extends PureComponent {
                         if (window.innerWidth <= FULL_SCREEN_LAYOUT_MAX_WIDTH) {
                             // parallax offset at most 50% (when narrow), at least 10% (when wide)
                             const backDistance = Math.min(0.5, 1.1 - (window.innerWidth / FULL_SCREEN_LAYOUT_MAX_WIDTH));
-                            const dx = off >= 0
-                                ? -off * backDistance * 100
-                                : -off * 100;
+                            const dx = off >= 0 ? -off * backDistance : -off;
                             style = {
-                                transform: `translateX(${dx}%)`,
+                                '--card-dx': dx,
                             };
                         } else {
                             const dy = -12 * (4 - 4 * 2 ** (-off));
                             const s = 0.5 / Math.sqrt(off + 1) + 0.5;
 
                             style = {
-                                transform: `translateY(${dy}px) scale(${s})`,
-                                transformOrigin: '50% 0',
+                                '--card-dy': dy + 'px',
+                                '--card-s': s,
                             };
                         }
 
@@ -153,7 +151,10 @@ export class CardStackRenderer extends PureComponent {
                                 key={'b' + i}
                                 onClick={this.onBackdropClick} />,
                             <div
-                                class={'card-stack-item' + (ageMarker ? ' is-phantom' : '')}
+                                class={'card-stack-item'
+                                    + (ageMarker ? ' is-phantom' : '')
+                                    + (item.wide ? ' is-wide' : '')
+                                    + ((off === 0) ? ' is-top-card' : '')}
                                 style={style}
                                 key={'a' + i}>
                                 {!ageMarker ? item.appBar : null}
@@ -186,6 +187,7 @@ export class CardStackRenderer extends PureComponent {
  * - `scrollViewRef`: refs the card stack item’s scroll view
  * - `appBar`: special slot for an app bar proxy to handle closing correctly
  * - `onScroll`: content scroll event
+ * - `wide`: if true, will be wider on wide displays
  */
 export class CardStackItem extends PureComponent {
     id = Math.random().toString();

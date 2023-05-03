@@ -260,9 +260,26 @@ class WithItems extends PureComponent {
                         <AddIcon style={{ verticalAlign: 'middle' }} />
                     </Button>
                     <div class="selection-header">
-                        <Button disabled={!this.state.selection.length} onClick={this.deleteSelection}>
+                        <Button disabled={!this.state.selection.length} onClick={() => {
+                            this.setState({ deletingSelection: true });
+                        }}>
                             {locale.removeCodeholders(this.state.selection.length)}
                         </Button>
+                        <Dialog
+                            open={this.state.deletingSelection}
+                            onClose={() => this.setState({ deletingSelection: false })}
+                            actions={[
+                                {
+                                    label: locale.removeCancel,
+                                    action: () => this.setState({ deletingSelection: false }),
+                                },
+                                {
+                                    label: locale.removeConfirm,
+                                    action: this.deleteSelection,
+                                },
+                            ]}>
+                            {locale.removeCodeholdersAreYouSure(this.state.selection.length)}
+                        </Dialog>
                     </div>
                     <Dialog open={this.state.deletingItems !== null}>
                         <div>{locale.removingMembers}</div>

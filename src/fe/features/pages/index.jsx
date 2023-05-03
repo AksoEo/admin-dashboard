@@ -254,6 +254,7 @@ export default [
                                         component: elazy(() =>
                                             import(/* webpackChunkName: "congresses-instances" */ './congresses/instances/detail')),
                                         type: 'stack',
+                                        requestWide: true,
                                         paths: [
                                             {
                                                 path: 'redakti',

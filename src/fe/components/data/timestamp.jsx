@@ -3,7 +3,7 @@ import { createPortal, useContext, useState } from 'preact/compat';
 import moment from 'moment';
 import { RootContext } from 'yamdl';
 import {
-    timestampFormat, timestampTzFormat, timestampFormatToday, timestampTzFormatToday,
+    timestampFormat, timestampTzFormat, timestampFormatToday, timestampTzFormatToday, data as locale,
 } from '../../locale';
 import date from './date';
 import time from './time';
@@ -62,6 +62,7 @@ function TimestampRenderer ({ value, zone }) {
                         transform: `translate(${popoverOpen.x}px, ${popoverOpen.y}px)`,
                     }}>
                         <div class="inner-popover">
+                            <div class="inner-label">{locale.timestampLocalTimePopover}</div>
                             <TimestampFormatter value={value} zone="local" />
                         </div>
                     </div>,
