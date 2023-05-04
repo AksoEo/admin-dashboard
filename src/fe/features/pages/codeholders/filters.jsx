@@ -364,12 +364,13 @@ export default {
         },
         serialize ({ value }) {
             return value.map(({
-                invert, lifetime, givesMembership, useRange, range, categories,
+                invert, lifetime, givesMembership, canuto, useRange, range, categories,
             }) => {
                 let s = '';
                 if (invert) s += 'i';
                 if (lifetime !== null) s += lifetime ? 'l' : 'u';
                 if (givesMembership !== null) s += givesMembership ? 'm' : 'n';
+                if (canuto !== null) s += canuto ? 'c' : 's';
                 if (useRange) s += 'r' + range[0] + '-' + range[1];
                 if (categories.length) s += 'c' + categories.join(',');
                 return s;
@@ -397,6 +398,7 @@ export default {
                 }
                 if (c[0] === 'l' || c[0] === 'u') item.lifetime = c.shift() === 'l';
                 if (c[0] === 'm' || c[0] === 'n') item.givesMembership = c.shift() === 'm';
+                if (c[0] === 'c' || c[0] === 's') item.canuto = c.shift() === 'c';
                 if (c[0] === 'r') {
                     c.shift();
                     let d = '';
@@ -427,7 +429,7 @@ export default {
         }) {
             // FIXME: this mess
             const items = value.map(({
-                invert, lifetime, givesMembership, useRange, range, categories,
+                invert, lifetime, givesMembership, canuto, useRange, range, categories,
             }, index) => (
                 <div
                     class="membership-item"
@@ -517,6 +519,37 @@ export default {
                                 {
                                     id: 'all',
                                     label: locale.search.membership.givesMembership.all,
+                                    class: 'bordered',
+                                },
+                            ]}
+                        </Segmented>
+                    </div>
+                    <div class="membership-item-line">
+                        <Segmented
+                            class="smaller"
+                            selected={canuto
+                                ? 'yes' : canuto === false ? 'no' : 'all'}
+                            onSelect={selected => {
+                                const newValue = [...value];
+                                newValue[index] = {
+                                    ...newValue[index],
+                                    canuto: selected === 'yes'
+                                        ? true : selected === 'no' ? false : null,
+                                };
+                                onChange(newValue);
+                            }} disabled={hidden}>
+                            {[
+                                {
+                                    id: 'yes',
+                                    label: locale.search.membership.canuto.yes,
+                                },
+                                {
+                                    id: 'no',
+                                    label: locale.search.membership.canuto.no,
+                                },
+                                {
+                                    id: 'all',
+                                    label: locale.search.membership.canuto.all,
                                     class: 'bordered',
                                 },
                             ]}

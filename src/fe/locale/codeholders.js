@@ -75,6 +75,11 @@ export const codeholders = {
                 no: 'nemembrecdona',
                 all: 'ne gravas',
             },
+            canuto: {
+                yes: 'canuto',
+                no: '[[!canuto]]',
+                all: 'ne gravas',
+            },
             conjunction: 'kaj',
             pickSome: 'Elekti kategoriojn',
         },

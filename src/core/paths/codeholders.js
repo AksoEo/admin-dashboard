@@ -325,8 +325,8 @@ export const clientToAPI = makeClientToAPI(clientFields);
 //! - hasPassword: true or false
 //! - addressInvalid: true or false
 //! - isDead: true or false
-//! - membership: array of objects { invert, lifetime, givesMembership, useRange, range, categories }
-//!   where invert, lifetime, givesMembership, useRange are bool, range is an inclusive year
+//! - membership: array of objects { invert, lifetime, givesMembership, canuto, useRange, range, categories }
+//!   where invert, lifetime, givesMembership, canuto, useRange are bool, range is an inclusive year
 //!   interval, and categories is an array of membership category ids
 //! - isActiveMember: array [lower bound year, upper bound year]
 //! - deathdate: array [lower bound year, upper bound year]
@@ -396,10 +396,11 @@ const clientFilters = {
     membership: {
         toAPI: value => {
             const items = value.map(({
-                invert, lifetime, givesMembership, useRange, range, categories,
+                invert, lifetime, givesMembership, canuto, useRange, range, categories,
             }) => {
                 const filter = {};
                 if (givesMembership !== null) filter.givesMembership = givesMembership;
+                if (canuto !== null) filter.canuto = canuto;
                 if (lifetime !== null) filter.lifetime = lifetime;
                 if (useRange) {
                     if (range[0] === range[1]) filter.year = range[0];

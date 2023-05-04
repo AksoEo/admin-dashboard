@@ -60,7 +60,7 @@ export default connectPerms(class ListDetailPage extends Page {
         if (perms.hasPerm('lists.delete')) {
             actions.push({
                 label: locale.delete.menuItem,
-                action: () => this.context.createTask('lists/delete', {}, { id }),
+                action: () => this.context.createTask('lists/delete', { id }),
                 overflow: true,
             });
         }
