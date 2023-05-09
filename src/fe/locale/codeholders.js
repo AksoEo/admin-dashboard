@@ -77,7 +77,7 @@ export const codeholders = {
             },
             canuto: {
                 yes: 'canuto',
-                no: '[[!canuto]]',
+                no: 'pagita',
                 all: 'ne gravas',
             },
             conjunction: 'kaj',

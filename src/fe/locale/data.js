@@ -11,7 +11,7 @@ export const generic = {
 export const data = {
     copy: 'Kopii',
     timeSeparator: ':',
-    timestampLocalTimePopover: '[[Your time zone]]',
+    timestampLocalTimePopover: 'Via horzono',
     requiredField: 'Tiu ĉi kampo estas deviga',
     byteSizes: [
         ['bajto', 'bajtoj'],
