@@ -323,6 +323,7 @@ export const FIELDS = {
                         editor = (
                             <NumberField
                                 class="inner-editor"
+                                decimal
                                 outline
                                 value={value[k]}
                                 onChange={newValue => {
