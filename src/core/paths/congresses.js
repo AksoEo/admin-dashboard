@@ -138,7 +138,7 @@ const pClientFields = {
     },
     customFormVars: 'customFormVars',
 };
-const DERIVED_PARTICIPANT_FIELDS = ['isValid', 'editedTime'];
+const DERIVED_PARTICIPANT_FIELDS = ['isValid', 'editedTime', 'price', 'paid'];
 const pClientFilters = {
     approval: {
         toAPI: approval => ({ approved: approval === 'true' ? true : false }),
