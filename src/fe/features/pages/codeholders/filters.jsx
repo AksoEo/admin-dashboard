@@ -427,9 +427,11 @@ export default {
             onEnabledChange,
             hidden,
         }) {
-            // FIXME: this mess
+            const includePrevLifetimeIds = value.map(() => Math.random().toString());
+
             const items = value.map(({
                 invert, lifetime, givesMembership, canuto, useRange, range, categories,
+                includePrevLifetime,
             }, index) => (
                 <div
                     class="membership-item"
@@ -568,6 +570,24 @@ export default {
                                 onChange(newValue);
                             }} />
                     </div>
+                    <div class="membership-item-line">
+                        <Checkbox
+                            id={includePrevLifetimeIds[index]}
+                            disabled={hidden || (lifetime === false)}
+                            checked={includePrevLifetime && (lifetime !== false)}
+                            onChange={checked => {
+                                const newValue = [...value];
+                                newValue[index] = {
+                                    ...newValue[index],
+                                    includePrevLifetime: checked,
+                                };
+                                onChange(newValue);
+                            }} />
+                        {' '}
+                        <label for={includePrevLifetimeIds[index]}>
+                            {locale.search.membership.includePrevLifetime}
+                        </label>
+                    </div>
                     <div class="membership-item-line membership-range-line">
                         <Checkbox
                             class="membership-range-checkbox"
@@ -615,6 +635,7 @@ export default {
                             invert: false,
                             lifetime: null,
                             givesMembership: null,
+                            includePrevLifetime: true,
                             useRange: true,
                             range: [thisYear, thisYear],
                             categories: [],

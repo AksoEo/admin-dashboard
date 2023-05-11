@@ -396,15 +396,30 @@ const clientFilters = {
     membership: {
         toAPI: value => {
             const items = value.map(({
-                invert, lifetime, givesMembership, canuto, useRange, range, categories,
+                invert, lifetime, givesMembership, canuto, useRange, range, includePrevLifetime, categories,
             }) => {
                 const filter = {};
                 if (givesMembership !== null) filter.givesMembership = givesMembership;
                 if (canuto !== null) filter.canuto = canuto;
                 if (lifetime !== null) filter.lifetime = lifetime;
                 if (useRange) {
-                    if (range[0] === range[1]) filter.year = range[0];
-                    else filter.year = { $range: range };
+                    let year;
+                    if (range[0] === range[1]) year = range[0];
+                    else year = { $range: range };
+
+                    if (includePrevLifetime) {
+                        filter.$or = [
+                            {
+                                lifetime: true,
+                                year: { $lte: range[0] },
+                            },
+                            {
+                                year,
+                            },
+                        ];
+                    } else {
+                        filter.year = year;
+                    }
                 }
                 if (categories.length) filter.categoryId = { $in: categories };
                 return invert ? { $not: { $membership: filter } } : { $membership: filter };

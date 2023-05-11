@@ -80,6 +80,7 @@ export const codeholders = {
                 no: 'pagita',
                 all: 'ne gravas',
             },
+            includePrevLifetime: '[[Include lifetime from prev. years]]',
             conjunction: 'kaj',
             pickSome: 'Elekti kategoriojn',
         },
