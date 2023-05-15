@@ -490,6 +490,11 @@ const PermsItem = memo(function PermsItem ({ item, disabled }) {
                     checked={mrEnabled}
                     onClick={() => mutations.setMREnabled(!mrEnabled)} />
                 <label for={checkboxId}>{item.name}</label>
+                {!mrEnabled ? (
+                    <div class="perm-mr-note">
+                        {locale.permsEditor.mrDisabledDesc}
+                    </div>
+                ) : null}
             </div>
         );
     } else if (item === '!memberFieldsEditor') {

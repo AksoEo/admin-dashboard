@@ -84,7 +84,7 @@ export const spec = [
                 type: 'group',
                 requires: ['codeholders.read'],
                 children: [
-                    { type: '!memberRestrictionsSwitch', name: 'Membrorestriktoj' },
+                    { type: '!memberRestrictionsSwitch', name: '[[Set]] Membrorestriktoj' },
                     '!memberFieldsEditor',
                     '!memberFilterEditor',
                 ],

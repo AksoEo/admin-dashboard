@@ -101,6 +101,7 @@ export const data = {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',
         requires: 'Bezonas',
         mr: 'Membrorestriktoj (JSON-filtrilo)',
+        mrDisabledDesc: '[[Note that the default member restrictions are that no fields can be read. If you want to override this and havent already elsewhere, check this box.]]',
         update: {
             title: 'Ĝisdatigi permesojn',
             button: 'Ĝisdatigi',
