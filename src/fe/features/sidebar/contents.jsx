@@ -242,14 +242,14 @@ const SidebarUser = connect('codeholders/codeholder', {
     let compiledName = '';
     if (props.type === 'human') {
         compiledName = [
-            props.name.honorific,
-            props.name.first || props.name.firstLegal,
-            props.name.last || props.name.lastLegal,
+            props.name?.honorific,
+            props.name?.first || props.name?.firstLegal,
+            props.name?.last || props.name?.lastLegal,
         ].map(x => x).join(' ');
     } else if (props.type === 'org') {
         compiledName = props.name.full.length > 30
-            ? props.name.abbrev || props.name.full
-            : props.name.full;
+            ? props.name?.abbrev || props.name?.full
+            : props.name?.full;
     }
 
     const onLogout = () => props.core.createTask('login/logOut').run();

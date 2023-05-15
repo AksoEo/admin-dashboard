@@ -1,15 +1,17 @@
 import { h } from 'preact';
 import { Fragment } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
+import DetailShell from '../../../../../components/detail/detail-shell';
 import DetailPage from '../../../../../components/detail/detail-page';
 import DetailView from '../../../../../components/detail/detail';
 import { AudioIcon } from '../../../../../components/icons';
 import { magazineToc as locale } from '../../../../../locale';
+import { connectPerms } from '../../../../../perms';
 import { Files } from '../files';
 import { FIELDS } from './fields';
 import './detail.less';
 
-export default class MagazineTocEntry extends DetailPage {
+export default connectPerms(class MagazineTocEntry extends DetailPage {
     locale = locale;
     className = 'magazine-toc-entry-page';
 
@@ -62,8 +64,11 @@ export default class MagazineTocEntry extends DetailPage {
         return actions;
     }
 
-    renderContents ({ editing }, { edit }) {
+    renderContents ({ perms, editing }, { org, edit }) {
         const { magazine, edition, id } = this;
+
+        const canUpload = perms.hasPerm(`magazines.recitations.update.${org}`);
+        const canDelete = perms.hasPerm(`magazines.recitations.delete.${org}`);
 
         return (
             <Fragment>
@@ -101,10 +106,18 @@ export default class MagazineTocEntry extends DetailPage {
                         onDelete={(core, format) => {
                             core.createTask('magazines/deleteTocRecitation', { magazine, edition, id }, { format });
                         }}
+                        canUpload={canUpload}
+                        canDelete={canDelete}
                         downloadURL={f => `/magazines/${magazine}/editions/${edition}/toc/${id}/recitation/${f}`} />
                 )}
+
+                <DetailShell
+                    view="magazines/magazine"
+                    id={this.magazine}
+                    fields={{}} locale={{}}
+                    onData={data => data && this.setState({ org: data.org })} />
             </Fragment>
         );
     }
-}
+});
 

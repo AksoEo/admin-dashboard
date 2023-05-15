@@ -9,7 +9,7 @@ import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import DisplayError from '../../../components/utils/error';
 import { useDataView } from '../../../core';
-import { connectPerms } from '../../../perms';
+import { connectPerms, usePerms } from '../../../perms';
 import { LinkButton } from '../../../router';
 import SendNotifTemplate from '../notif-templates/send';
 import { votes as locale } from '../../../locale';
@@ -140,7 +140,11 @@ function Header ({ item, editing, userData }) {
     owner.setOrg(item.org);
     if (item) owner.setEnded(item.state.hasEnded);
 
+    const perms = usePerms();
     const [sendNotifOpen, setSendNotifOpen] = useState(false);
+
+    const canSendNotif = perms.hasPerm('codeholders.read') && perms.hasPerm('codeholders.send_notif')
+        && (perms.hasPerm('notif_templates.read.tejo') || perms.hasPerm('notif_templates.read.uea'));
 
     return (
         <div class="vote-header">
@@ -158,7 +162,7 @@ function Header ({ item, editing, userData }) {
                     </LinkButton>
                 ) : null}
             </div>
-            {item?.state?.hasEnded ? null : (
+            {(!item?.state?.hasEnded && canSendNotif) ? (
                 <div class="vote-cast-ballot">
                     <Button raised onClick={() => setSendNotifOpen(true)}>
                         {locale.sendCastBallotNotif}
@@ -173,7 +177,7 @@ function Header ({ item, editing, userData }) {
                         open={sendNotifOpen}
                         onClose={() => setSendNotifOpen(false)} />
                 </div>
-            )}
+            ) : null}
         </div>
     );
 }

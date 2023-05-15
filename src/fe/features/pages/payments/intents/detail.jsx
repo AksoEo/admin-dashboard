@@ -24,7 +24,7 @@ import { currencyAmount, email, timestamp } from '../../../../components/data';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { FIELDS as METHOD_FIELDS } from '../orgs/methods/fields';
 import Meta from '../../../meta';
-import { connectPerms } from '../../../../perms';
+import { connectPerms, usePerms } from '../../../../perms';
 import { connect, coreContext } from '../../../../core/connection';
 import { IntermediaryEditor } from './fields';
 import {
@@ -33,6 +33,7 @@ import {
 } from '../../../../locale';
 import { Link, LinkButton } from '../../../../router';
 import './detail.less';
+import { useDataView } from '../../../../core';
 
 export default connectPerms(class IntentPage extends Page {
     state = {
@@ -534,6 +535,8 @@ export const IntentActions = connectPerms(function IntentActions ({ item, perms,
 });
 
 function Customer ({ item, editing, onItemChange }) {
+    const perms = usePerms();
+
     let profilePictureHash;
     let profilePictureId;
     let isCodeholder = false;
@@ -575,10 +578,11 @@ function Customer ({ item, editing, onItemChange }) {
         if (item.customer.id !== null) {
             isCodeholder = true;
             profilePictureId = item.customer.id;
-            codeholderLink = `/membroj/${item.customer.id}`;
-            // TODO: use actual hash
-            profilePictureHash = `fake_hash_for_${item.customer.id}`;
             ueaCode = <IdUEACode id={item.customer.id} />;
+
+            if (perms.hasPerm('codeholders.read')) {
+                codeholderLink = `/membroj/${item.customer.id}`;
+            }
         } else {
             profilePictureId = item.customer.email;
         }
@@ -587,12 +591,22 @@ function Customer ({ item, editing, onItemChange }) {
         customerEmail = item.customer.email;
     }
 
+    if (isCodeholder && perms.hasPerm('codeholders.read') && perms.hasCodeholderField('profilePictureHash', 'r')) {
+        // don't really care for loading state/errors here
+        const [,, data] = useDataView('codeholders/codeholder', {
+            id: item.customer.id,
+            fields: ['profilePictureHash'],
+            lazyFetch: true,
+        });
+        profilePictureHash = data?.profilePictureHash;
+    }
+
     return (
         <div class="intent-split-card">
             {!editing && (
                 <div class="card-id">
                     <div class="customer-picture">
-                        <CustomerProfilePicture
+                        <ProfilePicture
                             id={profilePictureId}
                             profilePictureHash={profilePictureHash} />
                     </div>
@@ -615,15 +629,15 @@ function Customer ({ item, editing, onItemChange }) {
                 )}
             </div>
             <div class="card-after">
-                {editing ? (
-                    codeholderLink
-                ) : isCodeholder ? (
-                    <LinkButton
-                        class="customer-codeholder-link"
-                        target={codeholderLink}
-                        outOfTree>
-                        {locale.detailViewCodeholder}
-                    </LinkButton>
+                {editing ? null : isCodeholder ? (
+                    codeholderLink ? (
+                        <LinkButton
+                            class="customer-codeholder-link"
+                            target={codeholderLink}
+                            outOfTree>
+                            {locale.detailViewCodeholder}
+                        </LinkButton>
+                    ) : null
                 ) : (
                     <div class="customer-no-codeholder">
                         {locale.detailNoCodeholder}
@@ -643,54 +657,6 @@ function Intermediary ({ item, editing, onItemChange }) {
                 onChange={intermediary => onItemChange({ ...item, intermediary })} />
         </div>
     );
-}
-
-/**
- * Renders a customer's profile picture.
- * If profilePictureHash is given, will try fetch their actual picture.
- */
-class CustomerProfilePicture extends PureComponent {
-    static contextType = coreContext;
-
-    state = {
-        hasProfilePicture: false,
-    };
-
-    loadLock = 0;
-    load () {
-        if (!this.props.profilePictureHash) {
-            this.setState({ hasProfilePicture: false });
-            return;
-        }
-
-        const lock = ++this.loadLock;
-        const dv = this.context.createDataView('codeholders/codeholder', {
-            id: this.props.id,
-            fields: ['profilePictureHash'],
-        });
-        dv.on('update', data => {
-            if (this.loadLock > lock) dv.drop();
-            if (!data || lock !== this.loadLock) return;
-            dv.drop();
-            this.loadLock++;
-            this.setState({ hasProfilePicture: !!data.profilePictureHash });
-        });
-        dv.on('error', () => dv.drop());
-    }
-
-    componentDidMount () {
-        this.load();
-    }
-    componentDidUpdate (prevProps) {
-        if (prevProps.id !== this.props.id
-            || prevProps.profilePictureHash !== this.props.profilePictureHash) this.load();
-    }
-
-    render ({ id, profilePictureHash }, { hasProfilePicture }) {
-        return <ProfilePicture
-            id={id}
-            profilePictureHash={hasProfilePicture ? profilePictureHash : null}/>;
-    }
 }
 
 function Method ({ method, item, editing, onItemChange }) {

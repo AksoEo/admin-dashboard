@@ -20,6 +20,8 @@ export const Files = connect(({ view }) => view)((data, core) => ({
     onDelete,
     downloadURL,
     formats,
+    canUpload,
+    canDelete,
 }) {
     if (!data) return (
         <div class="magazine-edition-files is-loading">
@@ -54,7 +56,9 @@ export const Files = connect(({ view }) => view)((data, core) => ({
                     size={fileSlots[f]?.size}
                     downloadURL={fullDownloadURL(f)}
                     onUpload={uploadFile(f)}
-                    onDelete={deleteFile(f)} />
+                    onDelete={deleteFile(f)}
+                    canUpload={canUpload}
+                    canDelete={canDelete} />
             ))}
         </div>
     );
@@ -68,6 +72,8 @@ function EditionFileSlot ({
     onUpload,
     downloadURL,
     onDelete,
+    canUpload,
+    canDelete,
 }) {
     const exists = !!size;
 
@@ -96,21 +102,27 @@ function EditionFileSlot ({
                 <div class="fi-spacer" />
                 {exists ? (
                     <div class="file-actions">
-                        <Button class="file-replace" icon small onClick={onUpload}>
-                            <FileUploadIcon style={{ verticalAlign: 'middle' }} />
-                        </Button>
+                        {canUpload ? (
+                            <Button class="file-replace" icon small onClick={onUpload}>
+                                <FileUploadIcon style={{ verticalAlign: 'middle' }} />
+                            </Button>
+                        ) : null}
                         {' '}
-                        <Button class="file-delete" icon small onClick={onDelete}>
-                            <DeleteForeverIcon style={{ verticalAlign: 'middle' }} />
-                        </Button>
+                        {canDelete ? (
+                            <Button class="file-delete" icon small onClick={onDelete}>
+                                <DeleteForeverIcon style={{ verticalAlign: 'middle' }} />
+                            </Button>
+                        ) : null}
                     </div>
                 ) : (
                     <div class="file-actions">
-                        <Button class="upload-fab" fab onClick={onUpload}>
-                            <FileUploadIcon style={{ verticalAlign: 'middle' }} />
-                            {' '}
-                            {locale.files.upload}
-                        </Button>
+                        {canUpload ? (
+                            <Button class="upload-fab" fab onClick={onUpload}>
+                                <FileUploadIcon style={{ verticalAlign: 'middle' }} />
+                                {' '}
+                                {locale.files.upload}
+                            </Button>
+                        ) : null}
                     </div>
                 )}
             </div>

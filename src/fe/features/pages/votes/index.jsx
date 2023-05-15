@@ -82,7 +82,10 @@ export default connect('votes/filters')(data => ({
     render ({ perms, availableFilters }, { parameters, fieldPickerOpen, expanded }) {
         const actions = [];
 
-        if (perms.hasPerm('votes.create.tejo') || perms.hasPerm('votes.create.uea')) {
+        if (perms.hasPerm('codeholders.read')
+            && (perms.hasPerm('votes.create.tejo') || perms.hasPerm('votes.create.uea'))) {
+            // votes contain codeholders! technically you can create votes without codeholders.read,
+            // but we'll require it
             actions.push({
                 label: locale.create.menuItem,
                 icon: <AddIcon style={{ verticalAlign: 'middle' }} />,

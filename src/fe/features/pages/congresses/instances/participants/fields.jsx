@@ -11,6 +11,7 @@ import { IdUEACode } from '../../../../../components/data/uea-code';
 import { LinkButton } from '../../../../../router';
 import { currencyAmount, timestamp } from '../../../../../components/data';
 import { congressParticipants as locale, formEditor as formLocale } from '../../../../../locale';
+import { usePerms } from '../../../../../perms';
 import './fields.less';
 
 const FormEditor = lazy(() => import('../../../../../components/form-editor'));
@@ -41,6 +42,8 @@ export const FIELDS = {
         isEmpty: () => false,
         slot: 'title',
         component ({ value, editing, onChange, slot }) {
+            const perms = usePerms();
+
             if (!value && !editing) return;
             value = value || {};
             let codeholder = null;
@@ -58,7 +61,7 @@ export const FIELDS = {
                 codeholder = (
                     <span class="identity-codeholder">
                         <IdUEACode id={value.codeholder} />
-                        {slot === 'detail' && (
+                        {slot === 'detail' && perms.hasPerm('codeholders.read') && (
                             <LinkButton target={`/membroj/${value.codeholder}`}>
                                 {locale.fields.codeholderIdViewCodeholder}
                             </LinkButton>

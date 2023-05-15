@@ -67,6 +67,20 @@
             background: none;
         }
     }
+    &.uea-code-no-perm-replacement {
+        font-family: monospace;
+        font-size: 0.75em;
+        border: 1px solid @separator;
+        padding: 2px;
+        border-radius: 4px;
+
+        &::before {
+            content: '<';
+        }
+        &::after {
+            content: '>';
+        }
+    }
 
     &.uea-code-load-error {
         color: @error;

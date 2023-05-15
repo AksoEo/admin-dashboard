@@ -15,6 +15,7 @@ import { FIELDS } from './fields';
 import { getFormVarsForIntent } from './intents';
 import TemplatingPopup, { TemplatingContext } from '../../../components/cm-templating-popup';
 import './detail.less';
+import { usePerms } from '../../../perms';
 
 let cachedAKSOScriptEditor = null;
 const AKSOScriptEditor = () => {
@@ -174,6 +175,7 @@ function DetailField ({ field, item, editing, onItemChange }) {
 }
 
 function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) {
+    const perms = usePerms();
     const [templatingContext] = useState(TemplatingContext.create());
 
     const org = <DetailField field="org" item={item} />;
@@ -187,7 +189,7 @@ function DetailContents ({ id, item, editing, onItemChange, openScriptEditor }) 
     let intentLink;
     let onSendIntent;
 
-    if (item.intent === 'codeholder') {
+    if (item.intent === 'codeholder' && perms.hasPerm('codeholders.read')) {
         intentLink = `/membroj`;
         onSendIntent = (core) => {
             core.createTask('notifTemplates/_sendCodeholderInfo');

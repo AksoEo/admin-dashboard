@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { forwardRef, createContext } from 'preact/compat';
+import { forwardRef, createContext, useContext } from 'preact/compat';
 
 /** This context will contain a Perms instance (see akso-client) when active. */
 export const permsContext = createContext(null);
@@ -20,4 +20,8 @@ export function connectPerms (view, name = 'perms') {
             </permsContext.Consumer>
         );
     });
+}
+
+export function usePerms () {
+    return useContext(permsContext);
 }

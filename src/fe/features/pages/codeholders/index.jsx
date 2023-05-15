@@ -246,12 +246,17 @@ export default connectToEverything(class CodeholdersPage extends Page {
                 overflow: true,
             });
             if (!addrLabelGen) {
-                menu.push({
-                    icon: <ContactMailIcon style={{ verticalAlign: 'middle' }} />,
-                    label: locale.addrLabelGen.menuItem,
-                    action: () => this.props.onNavigate(`/membroj/etikedoj?${this.props.query}`),
-                    overflow: true,
-                });
+                const canGenAddrs = perms.hasCodeholderFields('r', 'address', 'honorific',
+                    'firstNameLegal', 'lastNameLegal', 'fullName', 'fullNameLocal', 'careOf');
+
+                if (canGenAddrs) {
+                    menu.push({
+                        icon: <ContactMailIcon style={{ verticalAlign: 'middle' }} />,
+                        label: locale.addrLabelGen.menuItem,
+                        action: () => this.props.onNavigate(`/membroj/etikedoj?${this.props.query}`),
+                        overflow: true,
+                    });
+                }
             }
             if (!sendNotifTemplates) {
                 menu.push({

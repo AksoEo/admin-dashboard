@@ -5,11 +5,13 @@ import { UEACode as AKSOUEACode, bannedCodes } from '@tejo/akso-client';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import ErrorIcon from '@material-ui/icons/Error';
-import { connect, coreContext } from '../../core/connection';
+import { coreContext } from '../../core/connection';
 import { data as locale } from '../../locale';
 import SuggestionField from '../controls/suggestion-field';
 import TinyProgress from '../controls/tiny-progress';
 import './style.less';
+import { useDataView } from '../../core';
+import { usePerms } from '../../perms';
 
 /** Renders a single UEA code. Props: `value`, `old`. */
 export function UEACode ({ value, old, ...extra }) {
@@ -39,18 +41,31 @@ function BothUEACodes ({ value, value2 }) {
  * # Props
  * - id: codeholder id
  */
-export const IdUEACode = connect(
-    ({ id }) => ['codeholders/codeholder', { id, fields: ['code'], lazyFetch: true }],
-    ['id'],
-)((data, _, err) => ({ data, err }))(({ data, err, errorLabel }) => (
-    err
-        ? (errorLabel || (
+export function IdUEACode ({ id, errorLabel }) {
+    const perms = usePerms();
+    if (!perms.hasCodeholderFields('r', 'oldCode', 'newCode')) {
+        return <span class="data uea-code-no-perm-replacement">{id}</span>;
+    }
+    const [loading, error, data] = useDataView('codeholders/codeholder', {
+        id,
+        fields: ['code'],
+        lazyFetch: true,
+    });
+
+    if (error) {
+        if (errorLabel) return errorLabel;
+
+        return (
             <span class="data uea-code-load-error" title={locale.ueaCode.idFailed}>
                 <ErrorIcon style={{ verticalAlign: 'middle' }} />
             </span>
-        ))
-        : (data && data.code) ? <UEACode value={data.code.new} /> : <TinyProgress />
-));
+        );
+    }
+
+    if (loading) return <TinyProgress />;
+    if (data?.code) return <UEACode value={data.code.new} />;
+    return null;
+}
 
 function isBannedCode (value) {
     for (const bannedCode of bannedCodes) {

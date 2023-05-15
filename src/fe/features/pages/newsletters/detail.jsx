@@ -8,6 +8,7 @@ import { newsletters as locale, newsletterUnsubs as unsubsLocale } from '../../.
 import { FIELDS } from './fields';
 import SendNotifTemplate from '../notif-templates/send';
 import './detail.less';
+import { usePerms } from '../../../perms';
 
 export default class Newsletter extends DetailPage {
     state = {
@@ -76,7 +77,12 @@ export default class Newsletter extends DetailPage {
 }
 
 function Footer ({ item }) {
+    const perms = usePerms();
     const [sending, setSending] = useState(false);
+
+    if (!perms.hasPerm('codeholders.read')) return null;
+    if (!perms.hasPerm('codeholders.send_notif')) return null;
+    if (!perms.hasPerm('notif_templates.read.tejo') || !perms.hasPerm('notif_templates.read.uea')) return null;
 
     return (
         <div class="newsletter-send">

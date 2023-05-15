@@ -242,7 +242,7 @@ class WithItems extends PureComponent {
             this.setState({ deletingItems: null });
             throw e;
         }
-        this.setState({ selection: [], deletingItems: null });
+        this.setState({ selection: [], deletingItems: null, deletingSelection: false });
     };
 
     selection = {

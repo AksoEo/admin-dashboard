@@ -8,13 +8,14 @@ import DetailShell from '../../../../components/detail/detail-shell';
 import DetailFields from '../../../../components/detail/detail-fields';
 import { DocumentIcon } from '../../../../components/icons';
 import { connect } from '../../../../core/connection';
+import { connectPerms } from '../../../../perms';
 import { magazineEditions as locale, magazineToc as tocLocale, magazineSnaps as snapLocale } from '../../../../locale';
 import { Files } from './files';
 import { FIELDS } from './fields';
 import TocView from './toc';
 import './detail.less';
 
-export default class MagazineEdition extends DetailPage {
+export default connectPerms(class MagazineEdition extends DetailPage {
     state = {
         org: null,
         magazineSubscribers: null,
@@ -79,8 +80,11 @@ export default class MagazineEdition extends DetailPage {
         return actions;
     }
 
-    renderContents ({ editing }, { edit }) {
+    renderContents ({ perms, editing }, { org, edit }) {
         const { magazine, id } = this;
+
+        const canUpload = perms.hasPerm(`magazines.files.update.${org}`);
+        const canDelete = perms.hasPerm(`magazines.files.delete.${org}`);
 
         return (
             <Fragment>
@@ -122,6 +126,8 @@ export default class MagazineEdition extends DetailPage {
                         onDelete={(core, format) => {
                             core.createTask('magazines/deleteEditionFile', { magazine, id }, { format });
                         }}
+                        canUpload={canUpload}
+                        canDelete={canDelete}
                         downloadURL={f => `magazines/${magazine}/editions/${id}/files/${f}`} />
                 )}
 
@@ -146,7 +152,7 @@ export default class MagazineEdition extends DetailPage {
             </Fragment>
         );
     }
-}
+});
 
 function DetailContents ({ magazine, id, data, item, editing, onItemChange, magazineSubscribers }) {
     return (

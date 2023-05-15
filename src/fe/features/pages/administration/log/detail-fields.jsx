@@ -5,6 +5,7 @@ import ObjectViewer from '../../../../components/object-viewer';
 import { CopyIcon } from '../../../../components/icons';
 import { LinkButton } from '../../../../router';
 import { httpLog as locale } from '../../../../locale';
+import { usePerms } from '../../../../perms';
 
 const DETAIL_FIELDS = Object.fromEntries(Object.entries(FIELDS)
     .map(([id, { component, isEmpty = (x => !x) }]) => ([id, {
@@ -14,6 +15,7 @@ const DETAIL_FIELDS = Object.fromEntries(Object.entries(FIELDS)
 
 const IdentityComponent = DETAIL_FIELDS.identity.component;
 DETAIL_FIELDS.identity.component = function Identity ({ value }) {
+    const perms = usePerms();
     if (!value || value.type === 'none') return;
 
     const linkTarget = value.type === 'codeholder'
@@ -27,9 +29,11 @@ DETAIL_FIELDS.identity.component = function Identity ({ value }) {
         <div class="request-identity">
             <IdentityComponent value={value} />
             {' '}
-            <LinkButton target={linkTarget} outOfTree>
-                {linkLabel}
-            </LinkButton>
+            {perms.hasPerm('codeholders.read') && (
+                <LinkButton target={linkTarget} outOfTree>
+                    {linkLabel}
+                </LinkButton>
+            )}
         </div>
     );
 };
