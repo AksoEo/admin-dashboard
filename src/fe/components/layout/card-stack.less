@@ -128,7 +128,16 @@
             }
 
             &.is-phantom {
-                animation: none;
+                animation-name: card-stack-item-out-fs;
+
+                @keyframes card-stack-item-out-fs {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(100%);
+                    }
+                }
             }
         }
         @media (min-width: 1200px) {

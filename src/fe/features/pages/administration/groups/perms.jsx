@@ -67,6 +67,7 @@ export default connect(({ matches }) => {
         if (group && group.permissions && group.id) {
             permsEditor = (
                 <PermsEditor
+                    isGroup
                     editable={perms.hasPerm('admin_groups.update')}
                     value={this.state.permissions || group.permissions}
                     onChange={this.#onChange} />

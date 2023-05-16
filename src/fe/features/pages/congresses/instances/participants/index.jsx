@@ -130,6 +130,7 @@ export default class ParticipantsView extends PureComponent {
                 )}
                 <SendNotifTemplate
                     task="congresses/sendParticipantsNotifTemplate"
+                    context="congressParticipants"
                     jsonFilter={{
                         org,
                         intent: { $in: ['congress'] },

@@ -172,6 +172,7 @@ function Header ({ item, editing, userData }) {
                     </div>
                     <SendNotifTemplate
                         options={{ id: item?.id }}
+                        context="voteCastBallot"
                         jsonFilter={{ intent: 'vote_cast_ballot' }}
                         task="votes/sendCastBallotNotif"
                         open={sendNotifOpen}

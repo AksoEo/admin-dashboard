@@ -1,4 +1,4 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
 import {
     createContext,
     memo,
@@ -6,6 +6,7 @@ import {
     useEffect,
     useMemo,
     useState,
+    PureComponent,
 } from 'preact/compat';
 import { Button, Checkbox, Dialog } from 'yamdl';
 import {
@@ -71,12 +72,14 @@ const permsEditorMutations = createContext({
  * # Props
  * - value/onChange: PermsData
  * - editable: if false, will not show as editable
+ * - isGroup: bool
  */
-export default class PermsEditor extends Component {
+export default class PermsEditor extends PureComponent {
     state = {
         // if true, will show raw perm ids
         showRaw: false,
         showData: false,
+        isGroup: this.props.isGroup,
     };
 
     #node = null;
@@ -477,6 +480,7 @@ const PermsItem = memo(function PermsItem ({ item, disabled }) {
     } else if (item.type === 'perm.country') {
         return <PermissionItemCountry item={item} />;
     } else if (item.type === '!memberRestrictionsSwitch') {
+        const { isGroup } = useContext(permsEditorState);
         const { mrEnabled } = useContext(permsEditorPermissions);
         const mutations = useContext(permsEditorMutations);
 
@@ -495,6 +499,11 @@ const PermsItem = memo(function PermsItem ({ item, disabled }) {
                         {locale.permsEditor.mrDisabledDesc}
                     </div>
                 ) : null}
+                <div class="perm-mr-note">
+                    {isGroup
+                        ? locale.permsEditor.mrGroupDesc
+                        : locale.permsEditor.mrDesc}
+                </div>
             </div>
         );
     } else if (item === '!memberFieldsEditor') {

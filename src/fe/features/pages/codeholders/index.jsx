@@ -368,6 +368,7 @@ export default connectToEverything(class CodeholdersPage extends Page {
                     onClose={() => addrLabelGen.pop()} />
                 <SendNotifTemplate
                     task="codeholders/sendNotifTemplate"
+                    context="codeholder"
                     jsonFilter={{ intent: 'codeholder' }}
                     open={sendNotifTemplates}
                     lvIsCursed={this.state.currentResultIsCursed}

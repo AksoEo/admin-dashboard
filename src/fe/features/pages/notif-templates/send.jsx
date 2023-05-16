@@ -10,31 +10,29 @@ import './send.less';
 const MagazineEditionPicker = lazy(() => import('../magazines/edition-picker'));
 const NotifTemplatePicker = lazy(() => import('./picker'));
 
-export default class SendNotifTemplate extends PureComponent {
-    render ({ options, open, onClose, lvIsCursed, isNewsletter, jsonFilter, task }) {
-        return (
-            <CardStackItem
-                open={open}
+export default function SendNotifTemplate ({ options, open, onClose, lvIsCursed, context, jsonFilter, task }) {
+    return (
+        <CardStackItem
+            open={open}
+            onClose={onClose}
+            depth={0}
+            appBar={
+                <AppBarProxy
+                    menu={<Button icon small onClick={onClose}>
+                        <MenuIcon type="close" />
+                    </Button>}
+                    title={locale.send.title}
+                    priority={9} />
+            }>
+            <Contents
+                task={task}
+                context={context}
+                options={options}
+                jsonFilter={jsonFilter}
                 onClose={onClose}
-                depth={0}
-                appBar={
-                    <AppBarProxy
-                        menu={<Button icon small onClick={onClose}>
-                            <MenuIcon type="close" />
-                        </Button>}
-                        title={locale.send.title}
-                        priority={9} />
-                }>
-                <Contents
-                    task={task}
-                    options={options}
-                    jsonFilter={jsonFilter}
-                    onClose={onClose}
-                    lvIsCursed={lvIsCursed}
-                    isNewsletter={isNewsletter} />
-            </CardStackItem>
-        );
-    }
+                lvIsCursed={lvIsCursed} />
+        </CardStackItem>
+    );
 }
 
 const Contents = connectPerms(class Contents extends PureComponent {
@@ -62,7 +60,7 @@ const Contents = connectPerms(class Contents extends PureComponent {
         });
     };
 
-    render ({ perms, lvIsCursed, isNewsletter, jsonFilter }, { template, templateData }) {
+    render ({ perms, lvIsCursed, context, jsonFilter }, { template, templateData }) {
         const contents = [];
         const intent = templateData?.intent;
 
@@ -142,11 +140,7 @@ const Contents = connectPerms(class Contents extends PureComponent {
                     {locale.send.cursedNotice}
                 </div> : null}
                 <p class="templates-description">
-                    {isNewsletter ? (
-                        locale.send.descriptionNewsletter
-                    ) : (
-                        locale.send.descriptionCodeholder
-                    )}
+                    {locale.send.descriptions[context]}
                 </p>
                 <Suspense fallback={(
                     <div class="notif-template-picker-loading">
@@ -158,7 +152,7 @@ const Contents = connectPerms(class Contents extends PureComponent {
                         value={template}
                         onChange={template => this.setState({ template })}
                         onLoadData={templateData => {
-                            const deleteOnComplete = isNewsletter && templateData?.intent === 'newsletter';
+                            const deleteOnComplete = (context === 'newsletter') && templateData?.intent === 'newsletter';
 
                             this.setState({
                                 templateData,

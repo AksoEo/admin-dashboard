@@ -94,7 +94,7 @@ function Footer ({ item }) {
             </Button>
             <SendNotifTemplate
                 task="newsletters/send"
-                isNewsletter
+                context="newsletter"
                 jsonFilter={{
                     org: item.org,
                     intent: {
