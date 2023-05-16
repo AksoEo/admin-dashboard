@@ -186,8 +186,14 @@ export const paymentIntents = {
         org: 'AKSO-Organizo',
         currencies: 'Valutoj',
         status: 'Stato',
+        purposeType: '[[Has PurposeType]]',
         purposeTrigger: 'Enhavas AKSO-agon',
+        purposeTriggerStatus: '[[Has PurposeTriggerStatus]]',
         purposeDataId: 'Aktivigas aliĝidentigilon',
+
+        purposeInvalid: '[[Has Invalid Purpose]]',
+        purposeInvalidNo: 'ne',
+        purposeInvalidYes: 'jes',
 
         orgs: {
             tejo: 'TEJO',
@@ -215,7 +221,7 @@ export const paymentIntents = {
             disputed: 'disputita',
             refunded: 'repagita',
         },
-        purposeTriggerNone: 'ne gravas',
+        optionNone: 'ne gravas',
     },
     fields: {
         customer: 'Kliento',

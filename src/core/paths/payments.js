@@ -158,8 +158,17 @@ const iClientFilters = {
     status: {
         toAPI: value => ({ status: { $in: value } }),
     },
+    purposeType: {
+        toAPI: value => ({ $purposes: { type: value } }),
+    },
+    purposeInvalid: {
+        toAPI: value => ({ $purposes: { invalid: value } }),
+    },
     purposeTrigger: {
         toAPI: value => ({ $purposes: { triggers: value } }),
+    },
+    purposeTriggerStatus: {
+        toAPI: value => ({ $purposes: { triggerStatus: value } }),
     },
     purposeDataId: {
         toAPI: value => {
