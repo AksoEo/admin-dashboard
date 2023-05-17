@@ -170,14 +170,106 @@ export const FILTERS = {
             );
         },
     },
+    checkInTime: {
+        default: () => ({ enabled: false, value: null }),
+        serialize: ({ value }) => {
+            if (value === true) return 'j';
+            if (value === false) return 'n';
+            if (Array.isArray(value)) {
+                return 't' + value.map(t => t.toISOString()).join('$');
+            }
+            return '';
+        },
+        deserialize: s => {
+            if (s === 'j') return { enabled: true, value: true };
+            if (s === 'n') return { enabled: true, value: false };
+            if (s.startsWith('t')) {
+                const parts = s.substring(1).split('$').map(t => new Date(t));
+                if (parts.length === 2) {
+                    return { enabled: true, value: parts };
+                }
+            }
+            return { enabled: false, value: null };
+        },
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            const rangeCheckboxId = Math.random().toString();
+
+            return (
+                <span class="congress-participants-check-in-time-filter">
+                    <Segmented
+                        class="smaller"
+                        disabled={hidden}
+                        selected={(Array.isArray(value) || value === true)
+                            ? 'yes'
+                            : value === false ? 'no' : ''}
+                        onSelect={opt => {
+                            if (opt === 'yes' && Array.isArray(value)) return;
+                            if (opt === 'yes') onChange(true);
+                            if (opt === 'no') onChange(false);
+                            if (opt === '') {
+                                onChange(null);
+                                onEnabledChange(false);
+                            } else {
+                                onEnabledChange(true);
+                            }
+                        }}>
+                        {[
+                            { id: '', label: locale.search.filters.checkInTimeOptions.none, class: 'bordered' },
+                            { id: 'no', label: locale.search.filters.checkInTimeOptions.no },
+                            { id: 'yes', label: locale.search.filters.checkInTimeOptions.yes },
+                        ]}
+                    </Segmented>
+                    {(Array.isArray(value) || value === true) ? (
+                        <div class="time-filter-range">
+                            <div>
+                                <Checkbox
+                                    id={rangeCheckboxId}
+                                    checked={Array.isArray(value)}
+                                    onChange={checked => {
+                                        if (checked && !Array.isArray(value)) {
+                                            onChange([new Date(Date.now() - 60000), new Date()]);
+                                        } else if (!checked) {
+                                            onChange(true);
+                                        }
+                                    }}/>
+                                {' '}
+                                <label for={rangeCheckboxId}>
+                                    {locale.search.filters.checkInTimeOptions.useRange}
+                                </label>
+                            </div>
+                            {Array.isArray(value) && (
+                                <div class="time-range">
+                                    <div class="range-item">
+                                        <timestamp.editor
+                                            outline
+                                            label={locale.search.filters.checkInTimeOptions.rangeStart}
+                                            value={value[0]}
+                                            onChange={v => onChange([v, value[1]])} />
+                                    </div>
+                                    <div class="range-item">
+                                        <timestamp.editor
+                                            outline
+                                            label={locale.search.filters.checkInTimeOptions.rangeEnd}
+                                            value={value[1]}
+                                            onChange={v => onChange([value[0], v])} />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : null}
+                </span>
+            );
+        },
+    },
     dataId: {
         default: () => ({ enabled: false, value: [] }),
         serialize: ({ value }) => value.join(','),
         deserialize: value => ({ enabled: true, value: value.split(',') }),
-        editor ({ value, onChange, onEnabledChange }) {
+        editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="congress-participants-data-id-filter">
                     <TextArea
+                        disabled={hidden}
                         placeholder={locale.search.filters.dataIdDescription}
                         value={value.join('\n')}
                         onChange={value => {
@@ -227,7 +319,7 @@ export const FILTERS = {
             }
             return { enabled: true, value: items };
         },
-        editor ({ value, onChange, onEnabledChange, userData }) {
+        editor ({ value, onChange, onEnabledChange, userData, hidden }) {
             if (!userData.registrationForm) return null;
             const contents = [];
 
@@ -236,6 +328,7 @@ export const FILTERS = {
                 contents.push(
                     <DataPredicate
                         key={i}
+                        disabled={hidden}
                         form={userData.registrationForm}
                         currency={userData.currency}
                         predicate={value[index]}
@@ -260,7 +353,7 @@ export const FILTERS = {
 
             contents.push(
                 <div class="add-predicate">
-                    <Button icon small onClick={addPredicate}>
+                    <Button icon small onClick={addPredicate} disabled={hidden}>
                         <AddIcon style={{ verticalAlign: 'middle' }} />
                     </Button>
                 </div>
@@ -275,9 +368,9 @@ export const FILTERS = {
     },
 };
 
-function DataPredicate ({ form, predicate, onChange, onRemove, currency }) {
+function DataPredicate ({ form, predicate, onChange, onRemove, currency, disabled }) {
     const remove = (
-        <Button icon small onClick={onRemove} class="remove-predicate-button">
+        <Button icon small onClick={onRemove} disabled={disabled} class="remove-predicate-button">
             <RemoveIcon style={{ verticalAlign: 'middle' }} />
         </Button>
     );
@@ -294,6 +387,7 @@ function DataPredicate ({ form, predicate, onChange, onRemove, currency }) {
 
     const subject = (
         <Select
+            disabled={disabled}
             value={predicate.var}
             onChange={v => {
                 let value = null;
@@ -318,6 +412,7 @@ function DataPredicate ({ form, predicate, onChange, onRemove, currency }) {
 
             verb = (
                 <Select
+                    disabled={disabled}
                     value={predicate.op}
                     onChange={op => onChange({ ...predicate, op })}
                     items={verbOptions} />
@@ -326,6 +421,7 @@ function DataPredicate ({ form, predicate, onChange, onRemove, currency }) {
             if (predicate.op) {
                 const ObjEditor = predicateObjectEditors[objectType];
                 object = <ObjEditor
+                    disabled={disabled}
                     item={selectedItem}
                     value={predicate.value}
                     onChange={value => onChange({ ...predicate, value })}
@@ -369,8 +465,9 @@ function getZeroValueForType (type) {
 }
 
 const predicateObjectEditors = {
-    bool: ({ value, onChange }) => <Checkbox checked={value} onChange={onChange} />,
-    number: ({ value, onChange }) => <TextField
+    bool: ({ value, onChange, disabled }) => <Checkbox checked={value} onChange={onChange} disabled={disabled} />,
+    number: ({ value, onChange, disabled }) => <TextField
+        disabled={disabled}
         outline
         type="number"
         value={+(+value).toFixed(3)}
@@ -378,16 +475,19 @@ const predicateObjectEditors = {
             const n = parseFloat(e.target.value);
             if (Number.isFinite(n)) onChange(n);
         }} />,
-    money: ({ value, onChange, currency }) => <currencyAmount.editor
+    money: ({ value, onChange, currency, disabled }) => <currencyAmount.editor
+        disabled={disabled}
         outline
         value={value}
         onChange={onChange}
         currency={currency} />,
-    enum: ({ value, onChange, item }) => <Select
+    enum: ({ value, onChange, item, disabled }) => <Select
+        disabled={disabled}
         value={value}
         onChange={onChange}
         items={item.options.map(opt => ({ value: opt.value, label: opt.name }))} />,
-    countries: ({ value, onChange }) => <CountryPicker
+    countries: ({ value, onChange, disabled }) => <CountryPicker
+        disabled={disabled}
         value={value.split(',')}
         onChange={v => onChange(v.join(','))} />,
     date: date.editor,

@@ -282,6 +282,16 @@ export const congressParticipants = {
                 none: 'ne gravas',
             },
 
+            checkInTime: '[[CheckInTime]]',
+            checkInTimeOptions: {
+                none: 'ne gravas',
+                no: '[[not checked in]]',
+                yes: '[[checked in]]',
+                useRange: '[[in time range…]]',
+                rangeStart: '[[Start]]',
+                rangeEnd: '[[End]]',
+            },
+
             dataId: 'Aliĝidentigilo',
             dataIdDescription: 'Enmetu aliĝidentigilojn; po unu en unu vico.',
 
@@ -312,6 +322,7 @@ export const congressParticipants = {
         cancelledTime: 'Nuligita',
         createdTime: 'Kreita je',
         editedTime: 'Laste redaktita je',
+        checkInTime: '[[CheckInTime]]',
         data: 'Datumoj',
         customFormVars: 'Propraj variabloj',
 
@@ -333,6 +344,12 @@ export const congressParticipants = {
             },
             approveManually: 'Permane aprobi',
             cancel: 'Nuligi',
+            setCheckedIn: '[[Set checked in]]',
+            unsetCheckedIn: '[[Unset checked in]]',
+
+            checkInConfirmWithoutFullPayment: '[[This participant hasnt paid their full price yet. Are you sure you want to check them in?]]',
+            checkInConfirmCancel: 'Nuligi',
+            checkInConfirmConfirm: '[[Check in]]',
         },
 
         customFormVarsEmpty: 'Neniu superskribo',

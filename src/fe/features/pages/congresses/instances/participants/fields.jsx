@@ -245,6 +245,23 @@ export const FIELDS = {
         },
         stringify: v => timestamp.stringify(v),
     },
+    checkInTime: {
+        sortable: true,
+        weight: 1.5,
+        component ({ value, editing, onChange }) {
+            if (editing) {
+                return (
+                    <timestamp.editor
+                        outline
+                        value={value}
+                        onChange={onChange} />
+                );
+            }
+            if (!value) return '—';
+            return <timestamp.renderer value={value} />;
+        },
+        stringify: v => timestamp.stringify(v),
+    },
     data: {
         component ({ value, editing, onChange, userData }) {
             const disableValidation = value && value['@$disableValidation'];

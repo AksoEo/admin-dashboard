@@ -1,7 +1,8 @@
 import { h } from 'preact';
+import { useState } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
 import SearchIcon from '@material-ui/icons/Search';
-import { CircularProgress } from 'yamdl';
+import { CircularProgress, Dialog } from 'yamdl';
 import DetailPage from '../../../../../components/detail/detail-page';
 import DetailShell from '../../../../../components/detail/detail-shell';
 import TaskButton from '../../../../../components/controls/task-button';
@@ -268,6 +269,15 @@ export function Detail ({ core, item, creating, editing, onItemChange, userData 
                     </div>
                 )}
                 <div class="detail-field">
+                    <span class="field-label">{locale.fields.checkInTime}</span>
+                    <DetailField
+                        field="checkInTime"
+                        item={item}
+                        editing={editing}
+                        onItemChange={onItemChange}
+                        userData={userData} />
+                </div>
+                <div class="detail-field">
                     <span class="field-label">{locale.fields.cancelledTime}</span>
                     <DetailField
                         field="cancelledTime"
@@ -340,6 +350,45 @@ const ViewPaymentsButton = connectPerms(function ViewPaymentsButton ({ perms, it
 });
 
 const ParticipantActions = connectPerms(function ParticipantActions ({ perms, core, item, userData }) {
+    // this one needs state...so it's up here unfortunately
+    const [checkInConfirmOpen, setCheckInConfirmOpen] = useState(false);
+    const setCheckedInAction = () => {
+        const showWarning = item.paid?.amount < item.price;
+        if (!checkInConfirmOpen && showWarning) {
+            setCheckInConfirmOpen(true);
+            return;
+        } else {
+            setCheckInConfirmOpen(false);
+        }
+
+        core.createTask('congresses/updateParticipant', {
+            congress: userData.congress,
+            instance: userData.instance,
+            id: item.dataId,
+            _changedFields: ['checkInTime'],
+        }, {
+            checkInTime: Math.round(Date.now() / 1000),
+        });
+    };
+    const checkInConfirmDialog = (
+        <Dialog
+            backdrop
+            open={checkInConfirmOpen}
+            onClose={() => setCheckInConfirmOpen(false)}
+            actions={[
+                {
+                    label: locale.fields.actions.checkInConfirmCancel,
+                    action: () => setCheckInConfirmOpen(false),
+                },
+                {
+                    label: locale.fields.actions.checkInConfirmConfirm,
+                    action: setCheckedInAction,
+                },
+            ]}>
+            {locale.fields.actions.checkInConfirmWithoutFullPayment}
+        </Dialog>
+    );
+
     const actions = [
         {
             id: 'createPaymentIntent',
@@ -387,6 +436,33 @@ const ParticipantActions = connectPerms(function ParticipantActions ({ perms, co
             },
         },
         {
+            id: 'setCheckedIn',
+            hasPerm: () => {
+                return !item.checkInTime && !item.cancelledTime
+                    && perms.hasPerm(`congress_instances.participants.update.${userData.org}`);
+            },
+            action: async () => {
+                setCheckedInAction();
+            },
+        },
+        {
+            id: 'unsetCheckedIn',
+            hasPerm: () => {
+                return item.checkInTime && !item.cancelledTime
+                    && perms.hasPerm(`congress_instances.participants.update.${userData.org}`);
+            },
+            action: async () => {
+                core.createTask('congresses/updateParticipant', {
+                    congress: userData.congress,
+                    instance: userData.instance,
+                    id: item.dataId,
+                    _changedFields: ['checkInTime'],
+                }, {
+                    checkInTime: null,
+                });
+            },
+        },
+        {
             id: 'cancel',
             hasPerm: () => {
                 return !item.cancelledTime
@@ -413,6 +489,7 @@ const ParticipantActions = connectPerms(function ParticipantActions ({ perms, co
 
     return (
         <div class="participant-actions">
+            {checkInConfirmDialog}
             {actions}
         </div>
     );

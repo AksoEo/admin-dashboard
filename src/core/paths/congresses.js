@@ -127,6 +127,7 @@ const pClientFields = {
         fromAPI: part => part.editedTime,
         toAPI: () => ({}),
     },
+    checkInTime: 'checkInTime',
     data: {
         apiFields: ['data'],
         fromAPI: part => part.data,
@@ -164,6 +165,17 @@ const pClientFilters = {
     },
     validity: {
         toAPI: validity => ({ isValid: validity === 'true' ? true : false }),
+    },
+    checkInTime: {
+        toAPI: value => {
+            if (value === true) return { checkInTime: { $neq: null } };
+            if (value === false) return { checkInTime: null };
+            if (Array.isArray(value)) {
+                const [start, end] = value;
+                return { checkInTime: { $range: [+start / 1000, +end / 1000] } };
+            }
+            return {};
+        },
     },
     dataId: {
         toAPI: items => ({
