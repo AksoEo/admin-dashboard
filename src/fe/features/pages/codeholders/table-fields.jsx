@@ -84,13 +84,15 @@ export default {
         component ({ value, slot }) {
             if (!value) return null;
             const { old: oldCode, new: newCode } = value;
-            if (slot === 'title') return <ueaCode.inlineRenderer value={newCode} />;
+            if (slot === 'title' || oldCode === newCode) {
+                return <ueaCode.inlineRenderer value={newCode} />;
+            }
             return <ueaCode.inlineRenderer value={newCode} value2={oldCode} />;
         },
         stringify (value) {
             if (!value) return null;
             const { old: oldCode, new: newCode } = value;
-            if (oldCode) {
+            if (oldCode && oldCode !== newCode) {
                 const oldCodeCheckLetter = new AKSOUEACode(oldCode).getCheckLetter();
                 return `${newCode} (${oldCode}-${oldCodeCheckLetter})`;
             } else return newCode;
