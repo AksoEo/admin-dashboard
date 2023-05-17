@@ -1,6 +1,6 @@
 import { h, render, Component } from 'preact';
 import { Fragment } from 'preact/compat';
-import { CircularProgress } from 'yamdl';
+import { CircularProgress, LinearProgress } from 'yamdl';
 import EventEmitter from 'events';
 import { base } from 'akso:config';
 import { LoginAuthStates } from '../protocol';
@@ -34,6 +34,9 @@ class Session extends Component {
         wasLoggedOut: false,
         /** if true, this is a special page (e.g. password reset) and must show the login screen */
         specialPage: false,
+
+        /** (derived from this.#loadingTaskViews) number of task views being loaded */
+        loadingTaskViews: 0,
     };
 
     loadLogin () {
@@ -114,6 +117,7 @@ class Session extends Component {
 
     #taskViews = new Map();
     #tasks = new Set();
+    #loadingTaskViews = 0;
     #onTasksUpdate = data => {
         for (const id in data) {
             if (!this.#tasks.has(id)) {
@@ -130,7 +134,12 @@ class Session extends Component {
     };
     #onAddTask = async (id, path) => {
         this.#tasks.add(id);
+        this.#loadingTaskViews++;
+        this.setState({ loadingTaskViews: this.#loadingTaskViews });
         const taskView = await loadTaskView(path);
+        this.#loadingTaskViews--;
+        this.setState({ loadingTaskViews: this.#loadingTaskViews });
+
         if (taskView !== null) {
             this.#taskViews.set(id, {
                 path,
@@ -207,6 +216,7 @@ class Session extends Component {
                         {app}
                         {login}
                         {renderTasksHere ? tasks : null}
+                        <SmallLoadingIndicator loading={this.state.loadingTaskViews} />
                     </Fragment>
                 </routerContext.Provider>
             </coreContext.Provider>
@@ -247,6 +257,17 @@ class LoadingIndicator extends Component {
         return (
             <div id="app-loading-indicator" class={!this.props.loading ? 'animate-out' : ''}>
                 <CircularProgress indeterminate />
+            </div>
+        );
+    }
+}
+
+class SmallLoadingIndicator extends LoadingIndicator {
+    render () {
+        if (!this.state.visible) return null;
+        return (
+            <div id="app-small-loading-indicator" class={!this.props.loading ? 'animate-out' : ''}>
+                <LinearProgress class="inner-progress-indicator" indeterminate />
             </div>
         );
     }

@@ -69,6 +69,49 @@ noscript {
     }
 }
 
+#app-small-loading-indicator {
+    position: fixed;
+    left: 0;
+    top: 0;
+    padding-top: env(safe-area-inset-top);
+    background: @card-background;
+    width: 100%;
+    line-height: 0;
+    z-index: 1000;
+    .elevation(8);
+
+    animation: app-small-loading-in 0.3s 0.5s backwards;
+
+    @keyframes app-small-loading-in {
+        0% {
+            transform: translateY(-100%);
+            animation-timing-function: @easing;
+            opacity: 0;
+        }
+        100% {
+            transform: translateX(0px);
+        }
+    }
+
+    .inner-progress-indicator {
+        width: 100%;
+    }
+
+    &.animate-out {
+        animation: app-small-loading-out 0.3s;
+        transform: translateY(-100%);
+        opacity: 0;
+
+        @keyframes app-small-loading-out {
+            0% {
+                transform: translateY(0);
+                animation-timing-function: cubic-bezier(0.5, 0.2, 0.5, 0.8);
+                opacity: 1;
+            }
+        }
+    }
+}
+
 #get-auth-sure-is-taking-a-while {
     position: fixed;
     left: 50%;
