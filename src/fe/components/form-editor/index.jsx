@@ -41,6 +41,10 @@ export class ScriptContextProvider extends PureComponent {
         }
 
         editor.load(defs);
+        editor.onCancel = () => {
+            resolve(defs);
+            this.detachScriptEditor();
+        };
         editor.onSave = () => {
             resolve(editor.save());
             this.detachScriptEditor();

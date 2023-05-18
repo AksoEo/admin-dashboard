@@ -71,6 +71,10 @@ export default class NotifTemplate extends DetailPage {
         const editor = new Editor();
         editor.setFormVars(getFormVarsForIntent(this.state.intent));
         editor.load(defs);
+        editor.onCancel = () => {
+            resolve(defs);
+            this.detachScriptEditor();
+        };
         editor.onSave = () => {
             resolve(editor.save());
             this.detachScriptEditor();
