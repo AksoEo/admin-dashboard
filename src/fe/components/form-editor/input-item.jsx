@@ -410,11 +410,16 @@ export default class InputItem extends PureComponent {
 
     oldName = null;
 
+    inputProxy = {
+        validate: (...args) => this.validateTestInput(...args),
+    };
+
     componentDidMount () {
         this.oldName = this.props.item.name || null;
 
         if (this.props.isEditingContext) {
-            if (this.props.registerTestInput) this.props.registerTestInput(this);
+            if (this.props.registerTestInput) this.props.registerTestInput(this.inputProxy);
+            this.context.register(this);
         } else if (this.context) {
             this.context.deregister(this);
         }
@@ -432,15 +437,47 @@ export default class InputItem extends PureComponent {
         }
     }
 
-    componentWillUnmount () {
-        if (this.props.isEditingContext) {
-            if (this.props.deregisterTestInput) this.props.deregisterTestInput(this);
-        } else if (this.context) {
-            this.context.deregister(this);
+    componentDidUpdate (prevProps) {
+        if (this.props.editing && prevProps.editing !== this.props.editing) {
+            this.setState({ error: null });
         }
     }
 
-    validate (submitting) {
+    componentWillUnmount () {
+        if (this.props.isEditingContext) {
+            if (this.props.deregisterTestInput) this.props.deregisterTestInput(this.inputProxy);
+            this.context.deregister(this);
+        } else if (this.context) {
+            this.context.deregister();
+        }
+    }
+
+    validate () {
+        this.setState({ error: null });
+        if (!this.props.isEditingContext) {
+            return true;
+        }
+        const type = this.props.item.type;
+        const settings = TYPES[type]?.settings;
+        if (!settings) return true;
+        for (const k of DEFAULT_SETTINGS.concat(settings)) {
+            const setting = SETTINGS[k];
+            if (setting?.validate) {
+                const error = setting.validate({
+                    value: this.props.item[k],
+                    item: this.props.item,
+                });
+                if (error) {
+                    this.setState({ error });
+                    // error :(
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    validateTestInput (submitting) {
         if (!this.props.editingData) {
             this.setState({ error: null });
             return true;
@@ -704,522 +741,578 @@ const wantsItem = component => {
 };
 
 const SETTINGS = {
-    name: wantsItem(memo(({ value, item, onItemChange, oldName }) => {
-        let helperLabel = null;
-        if (oldName && oldName !== value) {
-            helperLabel = `${locale.inputFields.oldName}: ${oldName}`;
+    name: {
+        component: wantsItem(memo(({ value, item, onItemChange, oldName }) => {
+            let helperLabel = null;
+            if (oldName && oldName !== value) {
+                helperLabel = `${locale.inputFields.oldName}: ${oldName}`;
+            }
+
+            return (
+                <Setting label={locale.inputFields.name} desc={locale.inputFields.nameDesc}>
+                    <ValidatedTextField
+                        class="wider-text-field"
+                        required
+                        outline
+                        value={value}
+                        pattern={NAME_PATTERN}
+                        helperLabel={helperLabel}
+                        validate={value => {
+                            if (!NAME_REGEX.test(value)) return locale.inputFields.namePatternError;
+                        }}
+                        maxLength={20}
+                        onChange={e => {
+                            const newItem = { ...item, name: e.target.value };
+                            if (oldName) newItem.oldName = oldName;
+                            onItemChange(newItem);
+                        }} />
+                </Setting>
+            );
+        })),
+        validate: ({ value }) => {
+            if (!value.match(NAME_PATTERN)) return locale.inputFields.namePatternError;
+            return null;
         }
+    },
+    label: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting label={locale.inputFields.label} desc={locale.inputFields.labelDesc}>
+                    <TextField
+                        class="wider-text-field"
+                        required
+                        outline
+                        value={value}
+                        onChange={e => onChange(e.target.value)} />
+                </Setting>
+            );
+        }),
+        validate: ({ value }) => {
+            if (!value) return locale.inputFields.required;
+            return null;
+        },
+    },
+    description: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting stack label={locale.inputFields.description}>
+                    <MdField
+                        class="input-description-field"
+                        value={value || ''}
+                        onChange={v => onChange(v || null)}
+                        editing
+                        rules={FIELD_DESCRIPTION_RULES} />
+                </Setting>
+            );
+        }),
+    },
+    default: {
+        component: memo(({ value, onChange, scriptCtx }) => {
+            return (
+                <Setting label={locale.inputFields.default}>
+                    <ScriptableValue
+                        ctx={scriptCtx}
+                        value={value}
+                        onChange={onChange} />
+                </Setting>
+            );
+        }),
+    },
+    required: {
+        component: memo(({ value, onChange, scriptCtx }) => {
+            return (
+                <Setting label={locale.inputFields.required}>
+                    <ScriptableBool
+                        ctx={scriptCtx}
+                        value={value}
+                        onChange={onChange} />
+                </Setting>
+            );
+        }),
+    },
+    disabled: {
+        component: memo(({ value, onChange, scriptCtx }) => {
+            return (
+                <Setting label={locale.inputFields.disabled}>
+                    <ScriptableBool
+                        ctx={scriptCtx}
+                        value={value}
+                        onChange={onChange} />
+                </Setting>
+            );
+        }),
+    },
+    hideIfDisabled: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting label={locale.inputFields.hideIfDisabled}>
+                    <Checkbox
+                        checked={value}
+                        onChange={onChange} />
+                </Setting>
+            );
+        }),
+    },
+    editable: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting label={locale.inputFields.editable} desc={locale.inputFields.editableDesc}>
+                    <Checkbox
+                        checked={value}
+                        onChange={onChange} />
+                </Setting>
+            );
+        }),
+    },
 
-        return (
-            <Setting label={locale.inputFields.name} desc={locale.inputFields.nameDesc}>
-                <ValidatedTextField
-                    class="wider-text-field"
-                    outline
-                    value={value}
-                    pattern={NAME_PATTERN}
-                    helperLabel={helperLabel}
-                    validate={value => {
-                        if (!NAME_REGEX.test(value)) return locale.inputFields.namePatternError;
-                    }}
-                    maxLength={20}
-                    onChange={e => {
-                        const newItem = { ...item, name: e.target.value };
-                        if (oldName) newItem.oldName = oldName;
-                        onItemChange(newItem);
-                    }} />
-            </Setting>
-        );
-    })),
-    label: memo(({ value, onChange }) => {
-        return (
-            <Setting label={locale.inputFields.label} desc={locale.inputFields.labelDesc}>
-                <TextField
-                    class="wider-text-field"
-                    outline
-                    value={value}
-                    onChange={e => onChange(e.target.value)} />
-            </Setting>
-        );
-    }),
-    description: memo(({ value, onChange }) => {
-        return (
-            <Setting stack label={locale.inputFields.description}>
-                <MdField
-                    class="input-description-field"
-                    value={value || ''}
-                    onChange={v => onChange(v || null)}
-                    editing
-                    rules={FIELD_DESCRIPTION_RULES} />
-            </Setting>
-        );
-    }),
-    default: memo(({ value, onChange, scriptCtx }) => {
-        return (
-            <Setting label={locale.inputFields.default}>
-                <ScriptableValue
-                    ctx={scriptCtx}
-                    value={value}
-                    onChange={onChange} />
-            </Setting>
-        );
-    }),
-    required: memo(({ value, onChange, scriptCtx }) => {
-        return (
-            <Setting label={locale.inputFields.required}>
-                <ScriptableBool
-                    ctx={scriptCtx}
-                    value={value}
-                    onChange={onChange} />
-            </Setting>
-        );
-    }),
-    disabled: memo(({ value, onChange, scriptCtx }) => {
-        return (
-            <Setting label={locale.inputFields.disabled}>
-                <ScriptableBool
-                    ctx={scriptCtx}
-                    value={value}
-                    onChange={onChange} />
-            </Setting>
-        );
-    }),
-    hideIfDisabled: memo(({ value, onChange }) => {
-        return (
-            <Setting label={locale.inputFields.hideIfDisabled}>
-                <Checkbox
-                    checked={value}
-                    onChange={onChange} />
-            </Setting>
-        );
-    }),
-    editable: memo(({ value, onChange }) => {
-        return (
-            <Setting label={locale.inputFields.editable} desc={locale.inputFields.editableDesc}>
-                <Checkbox
-                    checked={value}
-                    onChange={onChange} />
-            </Setting>
-        );
-    }),
+    placeholder: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting label={locale.inputFields.placeholder}>
+                    <TextField
+                        outline
+                        value={value || ''}
+                        maxLength={50}
+                        onChange={e => onChange(e.target.value || null)} />
+                </Setting>
+            );
+        }),
+    },
+    step: {
+        component: memo(({ value, onChange, options }) => {
+            return (
+                <Setting label={locale.inputFields.step}>
+                    <TextField
+                        outline
+                        placeholder={locale.inputFields.stepEmpty}
+                        type="number"
+                        value={value || ''}
+                        step={options === 'money' ? '1' : '0.000000000000001'}
+                        min={options === 'money' ? '1' : '0'}
+                        onChange={e => onChange(+e.target.value || null)} />
+                </Setting>
+            );
+        }),
+    },
+    min: {
+        component: wantsItem(memo(({ value, onChange, item, options }) => {
+            let editor;
+            if (options === 'date') {
+                editor = (
+                    <date.editor
+                        outline
+                        placeholder={locale.inputFields.minEmpty}
+                        value={value || null}
+                        onChange={v => onChange(v || null)}/>
+                );
+            } else if (options === 'time') {
+                editor = (
+                    <time.editor
+                        outline nullable
+                        placeholder={locale.inputFields.minEmpty}
+                        value={value}
+                        onChange={onChange} />
+                );
+            } else if (options === 'datetime') {
+                editor = (
+                    <timestamp.editor
+                        outline
+                        placeholder={locale.inputFields.minEmpty}
+                        value={value || null}
+                        onChange={onChange} />
+                );
+            } else {
+                editor = (
+                    <TextField
+                        outline
+                        placeholder={locale.inputFields.minEmpty}
+                        required={item.variant === 'slider'}
+                        error={(item.variant === 'slider' && !Number.isFinite(value)) && dataLocale.requiredField}
+                        type="number"
+                        value={Number.isFinite(value) ? value : ''}
+                        step={item.step}
+                        max={item.max}
+                        onChange={e => Number.isFinite(parseFloat(e.target.value)) ? onChange(parseFloat(e.target.value)) : onChange(null)} />
+                );
+            }
 
-    placeholder: memo(({ value, onChange }) => {
-        return (
-            <Setting label={locale.inputFields.placeholder}>
-                <TextField
-                    outline
-                    value={value || ''}
-                    maxLength={50}
-                    onChange={e => onChange(e.target.value || null)} />
-            </Setting>
-        );
-    }),
-    step: memo(({ value, onChange, options }) => {
-        return (
-            <Setting label={locale.inputFields.step}>
-                <TextField
-                    outline
-                    placeholder={locale.inputFields.stepEmpty}
-                    type="number"
-                    value={value || ''}
-                    step={options === 'money' ? '1' : '0.000000000000001'}
-                    min={options === 'money' ? '1' : '0'}
-                    onChange={e => onChange(+e.target.value || null)} />
-            </Setting>
-        );
-    }),
-    min: wantsItem(memo(({ value, onChange, item, options }) => {
-        let editor;
-        if (options === 'date') {
-            editor = (
-                <date.editor
-                    outline
-                    placeholder={locale.inputFields.minEmpty}
-                    value={value || null}
-                    onChange={v => onChange(v || null)}/>
+            return (
+                <Setting label={locale.inputFields.min}>
+                    {editor}
+                </Setting>
             );
-        } else if (options === 'time') {
-            editor = (
-                <time.editor
-                    outline nullable
-                    placeholder={locale.inputFields.minEmpty}
-                    value={value}
-                    onChange={onChange} />
+        })),
+    },
+    max: {
+        component: wantsItem(memo(({ value, onChange, item, options }) => {
+            let editor;
+            if (options === 'date') {
+                editor = (
+                    <date.editor
+                        outline
+                        placeholder={locale.inputFields.maxEmpty}
+                        value={value || null}
+                        onChange={v => onChange(v || null)}/>
+                );
+            } else if (options === 'time') {
+                editor = (
+                    <time.editor
+                        outline nullable
+                        placeholder={locale.inputFields.minEmpty}
+                        value={value}
+                        onChange={onChange} />
+                );
+            } else if (options === 'datetime') {
+                editor = (
+                    <timestamp.editor
+                        outline
+                        placeholder={locale.inputFields.maxEmpty}
+                        value={value || null}
+                        onChange={onChange} />
+                );
+            } else {
+                editor = (
+                    <TextField
+                        outline
+                        placeholder={locale.inputFields.maxEmpty}
+                        required={item.variant === 'slider'}
+                        error={(item.variant === 'slider' && !Number.isFinite(value)) && dataLocale.requiredField}
+                        type="number"
+                        value={Number.isFinite(value) ? value : ''}
+                        step={item.step}
+                        min={item.min}
+                        onChange={e => Number.isFinite(parseFloat(e.target.value)) ? onChange(parseFloat(e.target.value)) : onChange(null)} />
+                );
+            }
+            return (
+                <Setting label={locale.inputFields.max}>
+                    {editor}
+                </Setting>
             );
-        } else if (options === 'datetime') {
-            editor = (
-                <timestamp.editor
-                    outline
-                    placeholder={locale.inputFields.minEmpty}
-                    value={value || null}
-                    onChange={onChange} />
+        })),
+    },
+    variant: {
+        component: memo(({ value, onChange, options }) => {
+            return (
+                <Setting label={locale.inputFields.variant}>
+                    <Select
+                        outline
+                        value={value}
+                        onChange={onChange}
+                        items={options.map(option => ({
+                            value: option,
+                            label: locale.inputFields.variants[option],
+                        }))} />
+                </Setting>
             );
-        } else {
-            editor = (
-                <TextField
-                    outline
-                    placeholder={locale.inputFields.minEmpty}
-                    required={item.variant === 'slider'}
-                    error={(item.variant === 'slider' && !Number.isFinite(value)) && dataLocale.requiredField}
-                    type="number"
-                    value={Number.isFinite(value) ? value : ''}
-                    step={item.step}
-                    max={item.max}
-                    onChange={e => Number.isFinite(parseFloat(e.target.value)) ? onChange(parseFloat(e.target.value)) : onChange(null)} />
+        }),
+    },
+    pattern: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting label={locale.inputFields.pattern}>
+                    <TextField
+                        outline
+                        value={value || ''}
+                        onChange={e => onChange(e.target.value || null)} />
+                </Setting>
             );
-        }
+        }),
+    },
+    patternError: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting label={locale.inputFields.patternError}>
+                    <TextField
+                        outline
+                        value={value || ''}
+                        onChange={e => onChange(e.target.value || null)} />
+                </Setting>
+            );
+        }),
+    },
+    minLength: {
+        component: wantsItem(memo(({ value, onChange, item }) => {
+            return (
+                <Setting label={locale.inputFields.minLength}>
+                    <TextField
+                        outline
+                        placeholder={locale.inputFields.minLengthEmpty}
+                        type="number"
+                        value={value || ''}
+                        min={0}
+                        max={item.maxLength}
+                        onChange={e => onChange(+e.target.value || null)} />
+                </Setting>
+            );
+        })),
+    },
+    maxLength: {
+        component: wantsItem(memo(({ value, onChange, item }) => {
+            return (
+                <Setting label={locale.inputFields.maxLength}>
+                    <TextField
+                        outline
+                        placeholder={locale.inputFields.maxLengthEmpty}
+                        type="number"
+                        value={value || ''}
+                        min={item.minLength || 0}
+                        onChange={e => onChange(+e.target.value || null)} />
+                </Setting>
+            );
+        })),
+    },
+    chAutofill: {
+        component: memo(({ value, onChange, options }) => {
+            return (
+                <Setting label={locale.inputFields.chAutofill}>
+                    <Select
+                        outline
+                        value={value || ''}
+                        onChange={v => onChange(v || null)}
+                        items={[{ value: '', label: '—' }].concat(options.map(option => ({
+                            value: option,
+                            label: locale.inputFields.chAutofillFields[option],
+                        })))} />
+                    <div class="ch-autofill-description">
+                        {locale.inputFields.chAutofillDesc}
+                    </div>
+                </Setting>
+            );
+        }),
+    },
+    currency: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting label={locale.inputFields.currency}>
+                    <Select
+                        outline
+                        value={value}
+                        onChange={v => onChange(v || null)}
+                        items={Object.keys(currencies).map(currency => ({
+                            value: currency,
+                            label: currencies[currency],
+                        }))} />
+                </Setting>
+            );
+        }),
+    },
+    options: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting stack label={locale.inputFields.options}>
+                    <OptionsEditor value={value} onChange={onChange} />
+                </Setting>
+            );
+        }),
+    },
+    exclude: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting stack label={locale.inputFields.exclude}>
+                    <CountryPicker value={value} onChange={onChange} hideGroups />
+                </Setting>
+            );
+        }),
+    },
+    tz: {
+        component: memo(({ value, onChange }) => {
+            return (
+                <Setting label={locale.inputFields.tz}>
+                    <TimeZoneEditor value={value} onChange={onChange} editing />
+                </Setting>
+            );
+        }),
+    },
+    booleanTable: {
+        component: wantsItem(memo(({ item, onItemChange }) => {
+            const resizeHeader = (header, size) => {
+                if (!header || header.length === size) return header;
+                if (header.length > size) return header.slice(0, size);
+                return header.concat([...new Array(size - header.length)].map(() => ''));
+            };
 
-        return (
-            <Setting label={locale.inputFields.min}>
-                {editor}
-            </Setting>
-        );
-    })),
-    max: wantsItem(memo(({ value, onChange, item, options }) => {
-        let editor;
-        if (options === 'date') {
-            editor = (
-                <date.editor
-                    outline
-                    placeholder={locale.inputFields.maxEmpty}
-                    value={value || null}
-                    onChange={v => onChange(v || null)}/>
-            );
-        } else if (options === 'time') {
-            editor = (
-                <time.editor
-                    outline nullable
-                    placeholder={locale.inputFields.minEmpty}
-                    value={value}
-                    onChange={onChange} />
-            );
-        } else if (options === 'datetime') {
-            editor = (
-                <timestamp.editor
-                    outline
-                    placeholder={locale.inputFields.maxEmpty}
-                    value={value || null}
-                    onChange={onChange} />
-            );
-        } else {
-            editor = (
-                <TextField
-                    outline
-                    placeholder={locale.inputFields.maxEmpty}
-                    required={item.variant === 'slider'}
-                    error={(item.variant === 'slider' && !Number.isFinite(value)) && dataLocale.requiredField}
-                    type="number"
-                    value={Number.isFinite(value) ? value : ''}
-                    step={item.step}
-                    min={item.min}
-                    onChange={e => Number.isFinite(parseFloat(e.target.value)) ? onChange(parseFloat(e.target.value)) : onChange(null)} />
-            );
-        }
-        return (
-            <Setting label={locale.inputFields.max}>
-                {editor}
-            </Setting>
-        );
-    })),
-    variant: memo(({ value, onChange, options }) => {
-        return (
-            <Setting label={locale.inputFields.variant}>
-                <Select
-                    outline
-                    value={value}
-                    onChange={onChange}
-                    items={options.map(option => ({
-                        value: option,
-                        label: locale.inputFields.variants[option],
-                    }))} />
-            </Setting>
-        );
-    }),
-    pattern: memo(({ value, onChange }) => {
-        return (
-            <Setting label={locale.inputFields.pattern}>
-                <TextField
-                    outline
-                    value={value || ''}
-                    onChange={e => onChange(e.target.value || null)} />
-            </Setting>
-        );
-    }),
-    patternError: memo(({ value, onChange }) => {
-        return (
-            <Setting label={locale.inputFields.patternError}>
-                <TextField
-                    outline
-                    value={value || ''}
-                    onChange={e => onChange(e.target.value || null)} />
-            </Setting>
-        );
-    }),
-    minLength: wantsItem(memo(({ value, onChange, item }) => {
-        return (
-            <Setting label={locale.inputFields.minLength}>
-                <TextField
-                    outline
-                    placeholder={locale.inputFields.minLengthEmpty}
-                    type="number"
-                    value={value || ''}
-                    min={0}
-                    max={item.maxLength}
-                    onChange={e => onChange(+e.target.value || null)} />
-            </Setting>
-        );
-    })),
-    maxLength: wantsItem(memo(({ value, onChange, item }) => {
-        return (
-            <Setting label={locale.inputFields.maxLength}>
-                <TextField
-                    outline
-                    placeholder={locale.inputFields.maxLengthEmpty}
-                    type="number"
-                    value={value || ''}
-                    min={item.minLength || 0}
-                    onChange={e => onChange(+e.target.value || null)} />
-            </Setting>
-        );
-    })),
-    chAutofill: memo(({ value, onChange, options }) => {
-        return (
-            <Setting label={locale.inputFields.chAutofill}>
-                <Select
-                    outline
-                    value={value || ''}
-                    onChange={v => onChange(v || null)}
-                    items={[{ value: '', label: '—' }].concat(options.map(option => ({
-                        value: option,
-                        label: locale.inputFields.chAutofillFields[option],
-                    })))} />
-                <div class="ch-autofill-description">
-                    {locale.inputFields.chAutofillDesc}
-                </div>
-            </Setting>
-        );
-    }),
-    currency: memo(({ value, onChange }) => {
-        return (
-            <Setting label={locale.inputFields.currency}>
-                <Select
-                    outline
-                    value={value}
-                    onChange={v => onChange(v || null)}
-                    items={Object.keys(currencies).map(currency => ({
-                        value: currency,
-                        label: currencies[currency],
-                    }))} />
-            </Setting>
-        );
-    }),
-    options: memo(({ value, onChange }) => {
-        return (
-            <Setting stack label={locale.inputFields.options}>
-                <OptionsEditor value={value} onChange={onChange} />
-            </Setting>
-        );
-    }),
-    exclude: memo(({ value, onChange }) => {
-        return (
-            <Setting stack label={locale.inputFields.exclude}>
-                <CountryPicker value={value} onChange={onChange} hideGroups />
-            </Setting>
-        );
-    }),
-    tz: memo(({ value, onChange }) => {
-        return (
-            <Setting label={locale.inputFields.tz}>
-                <TimeZoneEditor value={value} onChange={onChange} editing />
-            </Setting>
-        );
-    }),
-    booleanTable: wantsItem(memo(({ item, onItemChange }) => {
-        const resizeHeader = (header, size) => {
-            if (!header || header.length === size) return header;
-            if (header.length > size) return header.slice(0, size);
-            return header.concat([...new Array(size - header.length)].map(() => ''));
-        };
+            const resizeItem = (rows, cols) => {
+                const headerTop = resizeHeader(item.headerTop, cols);
+                const headerLeft = resizeHeader(item.headerLeft, rows);
+                let excludeCells = null;
+                if (item.excludeCells) {
+                    excludeCells = [];
+                    for (const cell of item.excludeCells) {
+                        if (cell[0] < cols && cell[1] < rows) excludeCells.push(cell);
+                    }
+                }
 
-        const resizeItem = (rows, cols) => {
-            const headerTop = resizeHeader(item.headerTop, cols);
-            const headerLeft = resizeHeader(item.headerLeft, rows);
-            let excludeCells = null;
-            if (item.excludeCells) {
-                excludeCells = [];
-                for (const cell of item.excludeCells) {
-                    if (cell[0] < cols && cell[1] < rows) excludeCells.push(cell);
+                return {
+                    ...item,
+                    rows,
+                    cols,
+                    minSelect: Math.max(0, Math.min(item.minSelect, rows * cols)),
+                    maxSelect: Math.max(0, Math.min(item.maxSelect, rows * cols)),
+                    headerTop,
+                    headerLeft,
+                    excludeCells,
+                };
+            };
+
+            const setRows = v => onItemChange(resizeItem(v, item.cols));
+            const setCols = v => onItemChange(resizeItem(item.rows, v));
+            const setMinSelect = v => onItemChange({ ...item, minSelect: v });
+            const setMaxSelect = v => onItemChange({ ...item, maxSelect: v });
+
+            const enableHeaderTop = enabled => {
+                if (enabled) {
+                    onItemChange({ ...item, headerTop: [...new Array(item.cols)].map(() => null) });
+                } else onItemChange({ ...item, headerTop: null });
+            };
+            const enableHeaderLeft = enabled => {
+                if (enabled) {
+                    onItemChange({ ...item, headerLeft: [...new Array(item.rows)].map(() => null) });
+                } else onItemChange({ ...item, headerLeft: null });
+            };
+
+            const headerTopItems = [];
+            const headerLeftItems = [];
+
+            if (item.headerTop) {
+                for (let i = 0; i < item.headerTop.length; i++) {
+                    const index = i;
+                    headerTopItems.push(
+                        <div key={index} class="boolean-table-header-item">
+                            <TextField
+                                value={item.headerTop[i] || ''}
+                                maxLength={20}
+                                onChange={e => {
+                                    const headerTop = item.headerTop.slice();
+                                    headerTop[index] = e.target.value || null;
+                                    onItemChange({ ...item, headerTop });
+                                }} />
+                        </div>
+                    );
+                }
+            }
+            if (item.headerLeft) {
+                for (let i = 0; i < item.headerLeft.length; i++) {
+                    const index = i;
+                    headerLeftItems.push(
+                        <div key={index} class="boolean-table-header-item">
+                            <TextField
+                                value={item.headerLeft[i] || ''}
+                                maxLength={20}
+                                onChange={e => {
+                                    const headerLeft = item.headerLeft.slice();
+                                    headerLeft[index] = e.target.value || null;
+                                    onItemChange({ ...item, headerLeft });
+                                }} />
+                        </div>
+                    );
                 }
             }
 
-            return {
-                ...item,
-                rows,
-                cols,
-                minSelect: Math.max(0, Math.min(item.minSelect, rows * cols)),
-                maxSelect: Math.max(0, Math.min(item.maxSelect, rows * cols)),
-                headerTop,
-                headerLeft,
-                excludeCells,
-            };
-        };
-
-        const setRows = v => onItemChange(resizeItem(v, item.cols));
-        const setCols = v => onItemChange(resizeItem(item.rows, v));
-        const setMinSelect = v => onItemChange({ ...item, minSelect: v });
-        const setMaxSelect = v => onItemChange({ ...item, maxSelect: v });
-
-        const enableHeaderTop = enabled => {
-            if (enabled) {
-                onItemChange({ ...item, headerTop: [...new Array(item.cols)].map(() => null) });
-            } else onItemChange({ ...item, headerTop: null });
-        };
-        const enableHeaderLeft = enabled => {
-            if (enabled) {
-                onItemChange({ ...item, headerLeft: [...new Array(item.rows)].map(() => null) });
-            } else onItemChange({ ...item, headerLeft: null });
-        };
-
-        const headerTopItems = [];
-        const headerLeftItems = [];
-
-        if (item.headerTop) {
-            for (let i = 0; i < item.headerTop.length; i++) {
-                const index = i;
-                headerTopItems.push(
-                    <div key={index} class="boolean-table-header-item">
-                        <TextField
-                            value={item.headerTop[i] || ''}
-                            maxLength={20}
-                            onChange={e => {
-                                const headerTop = item.headerTop.slice();
-                                headerTop[index] = e.target.value || null;
-                                onItemChange({ ...item, headerTop });
-                            }} />
-                    </div>
-                );
+            const excludedCells = item.excludeCells
+                ? item.excludeCells.map(([x, y]) => `${x},${y}`)
+                : [];
+            const excludeCellsRows = [];
+            for (let y = 0; y < item.rows; y++) {
+                const row = [];
+                for (let x = 0; x < item.cols; x++) {
+                    const pos = [x, y];
+                    const isExcluded = excludedCells.includes(`${x},${y}`);
+                    const setExcluded = () => {
+                        if (isExcluded) {
+                            const i = excludedCells.indexOf(`${pos[0]},${pos[1]}`);
+                            const excludeCells = item.excludeCells.slice();
+                            excludeCells.splice(i, 1);
+                            onItemChange({ ...item, excludeCells });
+                        } else {
+                            const excludeCells = item.excludeCells ? item.excludeCells.slice() : [];
+                            excludeCells.push(pos);
+                            onItemChange({ ...item, excludeCells });
+                        }
+                    };
+                    row.push(
+                        <td key={x}>
+                            <Checkbox
+                                checked={isExcluded}
+                                onChange={setExcluded} />
+                        </td>
+                    );
+                }
+                excludeCellsRows.push(<tr key={y}>{row}</tr>);
             }
-        }
-        if (item.headerLeft) {
-            for (let i = 0; i < item.headerLeft.length; i++) {
-                const index = i;
-                headerLeftItems.push(
-                    <div key={index} class="boolean-table-header-item">
-                        <TextField
-                            value={item.headerLeft[i] || ''}
-                            maxLength={20}
-                            onChange={e => {
-                                const headerLeft = item.headerLeft.slice();
-                                headerLeft[index] = e.target.value || null;
-                                onItemChange({ ...item, headerLeft });
-                            }} />
-                    </div>
-                );
-            }
-        }
+            const excludeCells = (
+                <table>
+                    <tbody>
+                        {excludeCellsRows}
+                    </tbody>
+                </table>
+            );
 
-        const excludedCells = item.excludeCells
-            ? item.excludeCells.map(([x, y]) => `${x},${y}`)
-            : [];
-        const excludeCellsRows = [];
-        for (let y = 0; y < item.rows; y++) {
-            const row = [];
-            for (let x = 0; x < item.cols; x++) {
-                const pos = [x, y];
-                const isExcluded = excludedCells.includes(`${x},${y}`);
-                const setExcluded = () => {
-                    if (isExcluded) {
-                        const i = excludedCells.indexOf(`${pos[0]},${pos[1]}`);
-                        const excludeCells = item.excludeCells.slice();
-                        excludeCells.splice(i, 1);
-                        onItemChange({ ...item, excludeCells });
-                    } else {
-                        const excludeCells = item.excludeCells ? item.excludeCells.slice() : [];
-                        excludeCells.push(pos);
-                        onItemChange({ ...item, excludeCells });
-                    }
-                };
-                row.push(
-                    <td key={x}>
+            return (
+                <div>
+                    <Setting label={locale.inputFields.rows}>
+                        <TextField
+                            type="number"
+                            outline
+                            value={item.rows | 0}
+                            max={20}
+                            onChange={e => setRows(+e.target.value | 0)} />
+                    </Setting>
+                    <Setting label={locale.inputFields.cols}>
+                        <TextField
+                            type="number"
+                            outline
+                            value={item.cols | 0}
+                            max={20}
+                            onChange={e => setCols(+e.target.value | 0)} />
+                    </Setting>
+                    <Setting label={locale.inputFields.minSelect}>
+                        <TextField
+                            type="number"
+                            placeholder={locale.inputFields.minSelectEmpty}
+                            outline
+                            min={0}
+                            max={item.maxSelect || (item.rows * item.cols)}
+                            value={item.minSelect || ''}
+                            onChange={e => setMinSelect(+e.target.value || null)} />
+                    </Setting>
+                    <Setting label={locale.inputFields.maxSelect}>
+                        <TextField
+                            type="number"
+                            placeholder={locale.inputFields.maxSelectEmpty}
+                            outline
+                            min={item.minSelect | 0}
+                            max={item.rows * item.cols}
+                            value={item.maxSelect || ''}
+                            onChange={e => setMaxSelect(+e.target.value || null)} />
+                    </Setting>
+                    <Setting label={locale.inputFields.headerTop}>
                         <Checkbox
-                            checked={isExcluded}
-                            onChange={setExcluded} />
-                    </td>
-                );
-            }
-            excludeCellsRows.push(<tr key={y}>{row}</tr>);
-        }
-        const excludeCells = (
-            <table>
-                <tbody>
-                    {excludeCellsRows}
-                </tbody>
-            </table>
-        );
-
-        return (
-            <div>
-                <Setting label={locale.inputFields.rows}>
-                    <TextField
-                        type="number"
-                        outline
-                        value={item.rows | 0}
-                        max={20}
-                        onChange={e => setRows(+e.target.value | 0)} />
-                </Setting>
-                <Setting label={locale.inputFields.cols}>
-                    <TextField
-                        type="number"
-                        outline
-                        value={item.cols | 0}
-                        max={20}
-                        onChange={e => setCols(+e.target.value | 0)} />
-                </Setting>
-                <Setting label={locale.inputFields.minSelect}>
-                    <TextField
-                        type="number"
-                        placeholder={locale.inputFields.minSelectEmpty}
-                        outline
-                        min={0}
-                        max={item.maxSelect || (item.rows * item.cols)}
-                        value={item.minSelect || ''}
-                        onChange={e => setMinSelect(+e.target.value || null)} />
-                </Setting>
-                <Setting label={locale.inputFields.maxSelect}>
-                    <TextField
-                        type="number"
-                        placeholder={locale.inputFields.maxSelectEmpty}
-                        outline
-                        min={item.minSelect | 0}
-                        max={item.rows * item.cols}
-                        value={item.maxSelect || ''}
-                        onChange={e => setMaxSelect(+e.target.value || null)} />
-                </Setting>
-                <Setting label={locale.inputFields.headerTop}>
-                    <Checkbox
-                        checked={!!item.headerTop}
-                        onChange={enableHeaderTop} />
-                </Setting>
-                <DynamicHeightDiv useFirstHeight>
-                    {headerTopItems}
-                </DynamicHeightDiv>
-                <Setting label={locale.inputFields.headerLeft}>
-                    <Checkbox
-                        checked={!!item.headerLeft}
-                        onChange={enableHeaderLeft} />
-                </Setting>
-                <DynamicHeightDiv useFirstHeight>
-                    {headerLeftItems}
-                </DynamicHeightDiv>
-                <Setting stack label={locale.inputFields.excludeCells}>
-                    {excludeCells}
-                </Setting>
-            </div>
-        );
-    })),
+                            checked={!!item.headerTop}
+                            onChange={enableHeaderTop} />
+                    </Setting>
+                    <DynamicHeightDiv useFirstHeight>
+                        {headerTopItems}
+                    </DynamicHeightDiv>
+                    <Setting label={locale.inputFields.headerLeft}>
+                        <Checkbox
+                            checked={!!item.headerLeft}
+                            onChange={enableHeaderLeft} />
+                    </Setting>
+                    <DynamicHeightDiv useFirstHeight>
+                        {headerLeftItems}
+                    </DynamicHeightDiv>
+                    <Setting stack label={locale.inputFields.excludeCells}>
+                        {excludeCells}
+                    </Setting>
+                </div>
+            );
+        })),
+    },
 };
 
 function InputSetting ({ setting, item, onItemChange, onChange, ...extra }) {
-    const Renderer = SETTINGS[setting];
+    const Renderer = SETTINGS[setting]?.component;
     if (!Renderer) return null;
 
     // PERFORMANCE: passing item data defeats memo change detection!
