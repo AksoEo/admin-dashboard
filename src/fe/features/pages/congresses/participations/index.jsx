@@ -9,6 +9,8 @@ export default class Participations extends OverviewPage {
         parameters: {
             fields: [
                 { id: 'congressId', sorting: 'none', fixed: true },
+                { id: 'congressInstanceHumanId', sorting: 'none', fixed: true },
+                { id: 'congressInstanceLocation', sorting: 'none', fixed: true },
                 { id: 'congressInstanceId', sorting: 'desc', fixed: true },
                 { id: 'dataId', sorting: 'none', fixed: true },
             ],

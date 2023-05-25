@@ -3,14 +3,14 @@ The frontend uses Preact, and rarely, vanilla DOM APIs.
 It is located in the `src/fe/` directory.
 At the top level:
 
-- `index`: initializes the application
+- `index.jsx`: initializes the application
     - handles task views when not logged in
-- `features/login`: login screen
-- `features/pages`: application pages (see below)
-- `app`: the application when logged in
-    - handles task views not logged in
-- `core`: connection to the core web worker
-- `locale`: localized strings
+- `features/login/`: login screen
+- `features/pages/`: application pages (see below)
+- `app.jsx`: the application when logged in
+    - handles task views when logged in
+- `core/`: connection to the core web worker
+- `locale/`: localized strings
 
 ## Navigation
 App navigation is strictly hierarchical, defined in `features/pages/index.js`.
@@ -56,32 +56,32 @@ This overview page will usually be a top-level path (e.g. `/membroj`). A detail 
 
 Typically, the file structure is as follows:
 
-- `index.js` (overview page)
+- `index.jsx` (overview page)
     - use the `OverviewPage` (`components/detail/overview-page`) template
-- `detail.js` (detail page)
+- `detail.jsx` (detail page)
     - use the `DetailPage` (`components/detail/detail-page`) template
-- `fields.js` (field renderers)
+- `fields.jsx` (field renderers)
     - just a big object of fields
-- `filters.js` (filters in the overview page)
+- `filters.jsx` (filters in the overview page)
     - just a big object of filters
 
 ### Fields
 Fields are specified in a big object and identified by their name.
 Common properties of a field include:
 
-- `component`: the React component that renders or edits the field. Is often passed following props:
+- `component`: the React component that renders or edits the field. Is typically passed following props:
     - `value`: value of the field
     - `item`: the whole object that this is a field of
     - `editing`: if true, the item is being edited
     - `onChange`: callback to update the value when editing
     - `onItemChange`: callback to update the whole object when editing
 - `stringify`: like `component`, but used for CSV export. See code for function argument order
-- `validate`: same props as `component`. Should return an error if validation fails. Otherwise, it should return something falsy.
+- `validate`: same props as `component`. Should return an error if validation fails. If everything is fine, it should return something falsy.
 - `isEmpty`: if this function returns true, this field will be grayed out and sorted to the bottom in detail views
 - `shouldHide`: if this function returns true, this field will be hidden in detail views
 
 ### Searchable List Views
-AKSO contains a lot of searchable lists. In the interest of DRY, these have been abstracted to the One True List View:
+AKSO contains a lot of searchable lists. Commonly:
 
 - the SearchFilters component (also provided by OverviewPage)
     - at the top there is a search bar, where users *may* also pick a field to search
@@ -118,9 +118,6 @@ In `update(dt)`, call `spring.update(dt)` to update the spring, and `spring.want
 ### Useful Components
 #### Data Fields
 There should probably be more of these (refactor!). Located in `components/data`. These are renderers and editors for various kinds of data.
-
-#### DynamicHeightDiv
-This component will dynamically animate its height when its children change, with a few caveats (see docs for details).
 
 #### RearrangingList
 This component will animate a list of same-height elements, and allow the user to drag-and-drop to reorder them.

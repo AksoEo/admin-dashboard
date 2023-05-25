@@ -69,6 +69,7 @@ export default connectPerms(class CongressInstancePage extends Page {
     }
 
     previousTabState = null;
+    canWriteTabState = true;
     get tab () {
         let tab;
         if (this.props.editing) tab = null;
@@ -77,7 +78,7 @@ export default connectPerms(class CongressInstancePage extends Page {
         else if (this.props.participants) tab = 'participants';
         else {
             tab = null;
-            if (this.props.isTopPage) {
+            if (this.props.isTopPage && this.canWriteTabState) {
                 this.props.push('lokoj', true);
                 tab = 'locations';
             }
@@ -96,6 +97,7 @@ export default connectPerms(class CongressInstancePage extends Page {
         // FIXME: due to the way navigation state is updated (with setState), doing too much
         // at once will *overwrite* previous state, so we delay each step in the tab updating
         // process
+        this.canWriteTabState = false;
         requestAnimationFrame(() => {
             if (this.props.locations) this.props.locations.pop(true);
             if (this.props.programs) this.props.programs.pop(true);
@@ -108,6 +110,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                 } else if (tab === 'participants') {
                     this.props.push('alighintoj', true);
                 }
+                this.canWriteTabState = true;
             });
         });
     }

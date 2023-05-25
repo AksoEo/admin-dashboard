@@ -108,6 +108,7 @@ export const congressLocations = {
         nameRequired: 'Necesas nomo',
 
         location: 'Loko',
+        internalLocations: '[[Internal locations]]',
 
         types: {
             external: 'Ekstera loko',
@@ -422,6 +423,8 @@ export const congressParticipations = {
     title: 'Kongresaj aliĝoj',
     fields: {
         congressId: 'Kongreso',
+        congressInstanceHumanId: 'Homa ID',
+        congressInstanceLocation: 'Loko',
         congressInstanceId: 'Kongresa okazigo',
         dataId: 'Aliĝidentigilo',
     },

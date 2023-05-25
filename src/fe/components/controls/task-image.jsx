@@ -13,6 +13,7 @@ import TaskButton from './task-button';
 import DisplayError from '../utils/error';
 import { FileThumbnail, Mime, FileSize } from '../files';
 import './task-image.less';
+import { deepEq } from '../../../util';
 
 // TODO: add a crop dialog or something
 
@@ -118,6 +119,9 @@ export default class TaskImage extends PureComponent {
     componentDidUpdate (prevProps) {
         if (prevProps.hash !== this.props.hash) {
             this.load();
+        }
+        if (prevProps.updateView !== this.props.updateView && !deepEq(prevProps.updateView, this.props.updateView)) {
+            this.createUpdateView();
         }
     }
 

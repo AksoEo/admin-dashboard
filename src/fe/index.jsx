@@ -14,7 +14,6 @@ import TaskView from './task-view';
 import './style.less';
 
 import 'preact-debug-if-dev';
-import './chrome-focus';
 
 /** AKSO session manager. */
 class Session extends Component {
@@ -35,7 +34,7 @@ class Session extends Component {
         /** if true, this is a special page (e.g. password reset) and must show the login screen */
         specialPage: false,
 
-        /** (derived from this.#loadingTaskViews) number of task views being loaded */
+        /** (derived from this.#loadingTaskViews) number of task views being loaded at the moment */
         loadingTaskViews: 0,
     };
 
@@ -224,6 +223,7 @@ class Session extends Component {
     }
 }
 
+/** Loading indicator shown in the middle of the screen. Appears after a delay */
 class LoadingIndicator extends Component {
     state = {
         visible: false,
@@ -262,6 +262,7 @@ class LoadingIndicator extends Component {
     }
 }
 
+/** Small loading indicator shown on the top edge of the screen. */
 class SmallLoadingIndicator extends LoadingIndicator {
     render () {
         if (!this.state.visible) return null;
@@ -273,6 +274,7 @@ class SmallLoadingIndicator extends LoadingIndicator {
     }
 }
 
+/** Overlays information about connecting to API when it's taking a while */
 class GetAuthSureIsTakingAWhile extends Component {
     componentDidMount () {
         this.updateInterval = setInterval(this.update, 50);

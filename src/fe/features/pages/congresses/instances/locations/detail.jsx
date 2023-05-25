@@ -14,6 +14,9 @@ import MapPicker from '../../map-picker';
 import LocationPicker from '../location-picker';
 import TagManager from '../tag-manager';
 import './detail.less';
+import StaticOverviewList from '../../../../../components/lists/overview-list-static';
+import { useContext, useState } from 'preact/compat';
+import { routerContext } from '../../../../../router';
 
 export default connectPerms(class LocationPage extends Page {
     state = {
@@ -148,6 +151,7 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
     ];
 
     let locatedWithin = null;
+    let internalLocations = null;
     if (item.type === 'internal') {
         locatedWithin = (
             <div class="header-external-loc">
@@ -164,6 +168,11 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                 ) : ' ' + locale.locatedWithinNowhere}
             </div>
         );
+    } else if (item.type === 'external') {
+        internalLocations = <InternalLocations
+            congress={congress}
+            instance={instance}
+            location={id} />;
     }
 
     return (
@@ -175,7 +184,7 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                     updateView={['congresses/sigLocationThumbnail', { congress, instance, id }]}
                     options={{ congress, instance, id }}
                     sizes={[32, 64, 128, 256, 512, 1024, 2048]}
-                    id={id}
+                    hash={id} // trigger updates
                     editing={editing}
                     onUpdate={(thumbnail, core) => {
                         return core.createTask('congresses/updateLocationThumbnail', {
@@ -237,6 +246,7 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                         userData={{ congress, instance }} />
                 </div>
             </DynamicHeightDiv>
+            {internalLocations}
             {external ? (
                 <div class="inner-map-title">
                     {locale.fields.location}
@@ -267,6 +277,39 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
                     )}
                 </div>
             ) : null}
+        </div>
+    );
+}
+
+const INTERNAL_LOCATION_FIELDS = Object.fromEntries(['icon', 'name', 'description'].map(k => [k, FIELDS[k]]));
+
+/** Renders a list of internal locations for an external location */
+function InternalLocations ({ congress, instance, location }) {
+    const router = useContext(routerContext);
+    const [offset, setOffset] = useState(0);
+
+    return (
+        <div>
+            <div class="inner-internal-locs-title">{locale.fields.internalLocations}</div>
+            <div class="inner-internal-locs-list">
+                <StaticOverviewList
+                    task="congresses/listLocations"
+                    view="congresses/location"
+                    compact
+                    locale={locale.fields}
+                    options={{ congress, instance }}
+                    viewOptions={{ congress, instance }}
+                    fields={INTERNAL_LOCATION_FIELDS}
+                    jsonFilter={{
+                        externalLoc: location,
+                    }}
+                    limit={10}
+                    offset={offset}
+                    onSetOffset={setOffset}
+                    onItemClick={id => {
+                        router.navigate(`/kongresoj/${congress}/okazigoj/${instance}/lokoj/${id}`, false, true);
+                    }} />
+            </div>
         </div>
     );
 }
