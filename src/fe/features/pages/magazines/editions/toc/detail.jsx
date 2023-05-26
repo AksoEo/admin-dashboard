@@ -99,7 +99,8 @@ export default connectPerms(class MagazineTocEntry extends DetailPage {
                             flac: 'audio/flac',
                         }}
                         icon={<AudioIcon />}
-                        view={['magazines/tocRecitations', { magazine, edition, id }]}
+                        view="magazines/tocRecitations"
+                        options={{ magazine, edition, id }}
                         onUpload={(core, format, file) => {
                             core.createTask('magazines/updateTocRecitation', { magazine, edition, id }, { format, file });
                         }}
@@ -107,8 +108,7 @@ export default connectPerms(class MagazineTocEntry extends DetailPage {
                             core.createTask('magazines/deleteTocRecitation', { magazine, edition, id }, { format });
                         }}
                         canUpload={canUpload}
-                        canDelete={canDelete}
-                        downloadURL={f => `/magazines/${magazine}/editions/${edition}/toc/${id}/recitation/${f}`} />
+                        canDelete={canDelete} />
                 )}
 
                 <DetailShell

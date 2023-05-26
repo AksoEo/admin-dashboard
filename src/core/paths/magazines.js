@@ -1,7 +1,6 @@
 import { base32 } from 'rfc4648';
 import asyncClient from '../client';
 import * as store from '../store';
-import { deepMerge } from '../../util';
 import { createStoreObserver } from '../view';
 import { crudList, crudCreate, crudGet, crudUpdate, crudDelete, getRawFile, simpleDataView } from '../templates';
 import { clientFromAPI as codeholderFromAPI } from './codeholders';
@@ -12,7 +11,6 @@ export const M_DATA = 'mData';
 export const EDITIONS = 'editions';
 export const SIG_EDITIONS = '!editions';
 export const E_DATA = 'eData';
-export const SIG_THUMBNAIL = '!thumbnail';
 export const FILES = 'files';
 export const TOC = 'toc';
 export const SIG_TOC = '!toc';
@@ -50,11 +48,6 @@ export const SIG_SUBSCRIPTIONS = '!subscriptions';
 //!    |- SIG_SUBSCRIPTIONS
 //!    |- [subscription id]
 //!       |- (subscription id)
-
-// returns a random string to use as cache-buster with thumbnails
-function getThumbnailKey () {
-    return Math.random().toString(36).replace(/\./g, '');
-}
 
 function makeSubId (item) {
     return item.magazineId + '+' + item.rawId;
@@ -114,16 +107,13 @@ export const tasks = {
     }),
     edition: crudGet({
         apiPath: ({ magazine, id }) => `/magazines/${magazine}/editions/${id}`,
-        fields: ['id', 'idHuman', 'date', 'description', 'published', 'subscribers'],
-        map: item => {
-            item.thumbnailKey = getThumbnailKey();
-        },
+        fields: ['id', 'idHuman', 'date', 'description', 'published', 'subscribers', 'thumbnail'],
         storePath: ({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, E_DATA],
     }),
     updateEdition: crudUpdate({
         apiPath: ({ magazine, id }) => `/magazines/${magazine}/editions/${id}`,
         map: delta => {
-            delete delta.thumbnailKey;
+            delete delta.thumbnail;
         },
         storePath: ({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, E_DATA],
     }),
@@ -140,7 +130,7 @@ export const tasks = {
 
     editionFiles: crudGet({
         apiPath: ({ magazine, id }) => `/magazines/${magazine}/editions/${id}/files`,
-        fields: ['format', 'downloads', 'size'],
+        fields: ['format', 'downloads', 'size', 'url'],
         storePath: ({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, FILES],
     }),
     editionFile: getRawFile({
@@ -167,9 +157,6 @@ export const tasks = {
         tasks.editionFiles({ magazine, id }).catch(() => {});
     },
 
-    editionThumbnail: getRawFile({
-        apiPath: ({ magazine, id }, { size }) => `/magazines/${magazine}/editions/${id}/thumbnail/${size}`,
-    }),
     updateEditionThumbnail: async ({ magazine, id }, { thumbnail }) => {
         const client = await asyncClient;
         await client.put(`/magazines/${magazine}/editions/${id}/thumbnail`, null, {}, [{
@@ -177,18 +164,16 @@ export const tasks = {
             type: thumbnail.type,
             value: thumbnail,
         }]);
-        const path = [MAGAZINES, magazine, EDITIONS, id];
-        const existing = store.get(path);
-        store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
-        store.signal([MAGAZINES, magazine, EDITIONS, id, SIG_THUMBNAIL]);
+
+        // load in background
+        tasks.edition({ magazine, id });
     },
     deleteEditionThumbnail: async ({ magazine, id }) => {
         const client = await asyncClient;
         await client.delete(`/magazines/${magazine}/editions/${id}/thumbnail`);
-        const path = [MAGAZINES, magazine, EDITIONS, id];
-        const existing = store.get(path);
-        store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
-        store.signal([MAGAZINES, magazine, EDITIONS, id, SIG_THUMBNAIL]);
+
+        // load in background
+        tasks.edition({ magazine, id });
     },
 
     listTocEntries: crudList({
@@ -223,11 +208,8 @@ export const tasks = {
 
     tocRecitations: crudGet({
         apiPath: ({ magazine, edition, id }) => `/magazines/${magazine}/editions/${edition}/toc/${id}/recitation`,
-        fields: ['format', 'downloads', 'size'],
+        fields: ['format', 'downloads', 'size', 'url'],
         storePath: ({ magazine, edition, id }) => [MAGAZINES, magazine, EDITIONS, edition, TOC, id, RECITATIONS],
-    }),
-    tocRecitation: getRawFile({
-        apiPath: ({ magazine, edition, id }, { format }) => `/magazines/${magazine}/editions/${edition}/toc/${id}/recitation/${format}`,
     }),
     updateTocRecitation: async ({ magazine, edition, id }, { format, file }) => {
         const client = await asyncClient;
@@ -405,7 +387,6 @@ export const views = {
         get: tasks.edition,
     }),
     sigEditions: createStoreObserver(({ magazine }) => [MAGAZINES, magazine, EDITIONS, SIG_EDITIONS]),
-    sigThumbnail: createStoreObserver(({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, SIG_THUMBNAIL]),
     editionFiles: simpleDataView({
         storePath: ({ magazine, id }) => [MAGAZINES, magazine, EDITIONS, id, FILES],
         get: tasks.editionFiles,

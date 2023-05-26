@@ -3,7 +3,7 @@ import { Fragment } from 'preact/compat';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailPage from '../../../../components/detail/detail-page';
-import TaskImage from '../../../../components/controls/task-image';
+import UrlViewImage from '../../../../components/controls/url-view-image';
 import DetailShell from '../../../../components/detail/detail-shell';
 import DetailFields from '../../../../components/detail/detail-fields';
 import { DocumentIcon } from '../../../../components/icons';
@@ -119,7 +119,8 @@ export default connectPerms(class MagazineEdition extends DetailPage {
                             epub: 'application/epub+zip',
                         }}
                         icon={<DocumentIcon />}
-                        view={['magazines/editionFiles', { magazine, id }]}
+                        view="magazines/editionFiles"
+                        options={{ magazine, id }}
                         onUpload={(core, format, file) => {
                             core.createTask('magazines/updateEditionFile', { magazine, id }, { format, file });
                         }}
@@ -127,8 +128,7 @@ export default connectPerms(class MagazineEdition extends DetailPage {
                             core.createTask('magazines/deleteEditionFile', { magazine, id }, { format });
                         }}
                         canUpload={canUpload}
-                        canDelete={canDelete}
-                        downloadURL={f => `magazines/${magazine}/editions/${id}/files/${f}`} />
+                        canDelete={canDelete} />
                 )}
 
                 {!editing && (
@@ -158,14 +158,14 @@ function DetailContents ({ magazine, id, data, item, editing, onItemChange, maga
     return (
         <div class="edition-detail-contents">
             <div class="edition-header">
-                <TaskImage
+                <UrlViewImage
                     editing={editing}
                     class="edition-thumbnail"
                     contain lightbox
                     sizes={[32, 64, 128, 256, 512, 1024]}
-                    task="magazines/editionThumbnail"
+                    urlView="magazines/edition"
+                    urlViewField="thumbnail"
                     options={{ magazine, id }}
-                    updateView={['magazines/sigThumbnail', { magazine, id }]}
                     placeholder={<EditionPlaceholderThumbnail magazine={magazine} edition={item} />}
                     onUpdate={(thumbnail, core) => {
                         const task = core.createTask('magazines/updateEditionThumbnail', {

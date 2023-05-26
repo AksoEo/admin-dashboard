@@ -3,7 +3,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import PaymentIcon from '@material-ui/icons/Payment';
 import Page from '../../../../../components/page';
 import DetailView from '../../../../../components/detail/detail';
-import TaskImage from '../../../../../components/controls/task-image';
+import UrlViewImage from '../../../../../components/controls/url-view-image';
 import Meta from '../../../../meta';
 import { connectPerms } from '../../../../../perms';
 import { coreContext } from '../../../../../core/connection';
@@ -111,18 +111,18 @@ export default connectPerms(class MethodPage extends Page {
 function Header ({ item, editing, userData }) {
     return (
         <div class="payment-method-detail-header">
-            <TaskImage
+            <UrlViewImage
                 editing={editing}
                 class="method-thumbnail"
                 contain lightbox
                 sizes={[32, 64, 128, 256, 512]}
-                task="payments/methodThumbnail"
                 placeholder={
                     <div class="method-thumbnail-placeholder">
                         <PaymentIcon className="inner-icon" />
                     </div>
                 }
-                updateView={['payments/sigMethodThumbnail', { org: userData.org, id: userData.id }]}
+                urlView="payments/method"
+                urlViewField="thumbnail"
                 options={{ org: userData.org, id: userData.id }}
                 onUpdate={(thumbnail, core) => {
                     const task = core.createTask('payments/updateMethodThumbnail', {

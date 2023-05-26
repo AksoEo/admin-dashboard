@@ -29,7 +29,6 @@ export const SIG_LOCATIONS = '!locations';
 export const SIG_PROG_TAGS = '!program_tags';
 export const SIG_PROGRAMS = '!programs';
 export const SIG_CONGRESS_PARTICIPANTS = '!participants';
-export const SIG_THUMBNAIL = '!thumbnail';
 
 const locClientFilters = {
     type: {
@@ -339,7 +338,7 @@ export const tasks = {
     location: crudGet({
         apiPath: ({ congress, instance, id }) => `/congresses/${congress}/instances/${instance}/locations/${id}`,
         fields: ['id', 'name', 'description', 'll', 'icon', 'address', 'type', 'externalLoc',
-            'rating.rating', 'rating.max', 'rating.type', 'openHours'],
+            'rating.rating', 'rating.max', 'rating.type', 'openHours', 'thumbnail'],
         storePath: ({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, DATA],
     }),
     createLocation: crudCreate({
@@ -360,16 +359,6 @@ export const tasks = {
         ],
         signalPath: ({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOCATIONS],
     }),
-    locationThumbnail: async ({ congress, instance, id }, { size }) => {
-        const client = await asyncClient;
-        const res = await fetch(client.client.createURL(`/congresses/${congress}/instances/${instance}/locations/${id}/thumbnail/${size}`), {
-            credentials: 'include',
-            mode: 'cors',
-        });
-        if (res.status === 404) return null;
-        if (!res.ok) throw { statusCode: res.status };
-        return await res.blob();
-    },
     updateLocationThumbnail: async ({ congress, instance, id }, { thumbnail }) => {
         const client = await asyncClient;
         await client.put(`/congresses/${congress}/instances/${instance}/locations/${id}/thumbnail`, null, {}, [{
@@ -377,12 +366,16 @@ export const tasks = {
             type: thumbnail.type,
             value: thumbnail,
         }]);
-        store.signal([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, SIG_THUMBNAIL]);
+
+        // load in background
+        tasks.location({ congress, instance, id });
     },
     deleteLocationThumbnail: async ({ congress, instance, id }) => {
         const client = await asyncClient;
         await client.delete(`/congresses/${congress}/instances/${instance}/locations/${id}/thumbnail`);
-        store.signal([CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, SIG_THUMBNAIL]);
+
+        // load in background
+        tasks.location({ congress, instance, id });
     },
 
     // MARK - tags of a location
@@ -933,7 +926,6 @@ export const views = {
     sigLocationTags: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOC_TAGS]),
     sigLocations: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_LOCATIONS]),
     sigTagsOfLocation: createStoreObserver(({ congress, instance, location }) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, location, SIG_LOC_TAGS]),
-    sigLocationThumbnail: createStoreObserver(({ congress, instance, id }) => [CONGRESSES, congress, INSTANCES, instance, LOCATIONS, id, SIG_THUMBNAIL]),
     sigProgramTags: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROG_TAGS]),
     sigPrograms: createStoreObserver(({ congress, instance }) => [CONGRESSES, congress, INSTANCES, instance, SIG_PROGRAMS]),
     sigTagsOfProgram: createStoreObserver(({ congress, instance, program }) => [CONGRESSES, congress, INSTANCES, instance, PROGRAMS, program, SIG_PROG_TAGS]),

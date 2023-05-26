@@ -4,7 +4,7 @@ import Meta from '../../../../meta';
 import Page from '../../../../../components/page';
 import DetailShell from '../../../../../components/detail/detail-shell';
 import DynamicHeightDiv from '../../../../../components/layout/dynamic-height-div';
-import TaskImage from '../../../../../components/controls/task-image';
+import UrlViewImage from '../../../../../components/controls/url-view-image';
 import { coreContext } from '../../../../../core/connection';
 import { connectPerms } from '../../../../../perms';
 import { congressLocations as locale } from '../../../../../locale';
@@ -178,13 +178,12 @@ export function DetailInner ({ congress, instance, id, item, editing, onItemChan
     return (
         <div class="congress-location-detail-inner">
             <div class={'header-top' + (isCreation ? ' is-creation' : '')}>
-                {!isCreation && <TaskImage
+                {!isCreation && <UrlViewImage
                     lightbox class="header-cover-image"
-                    task="congresses/locationThumbnail"
-                    updateView={['congresses/sigLocationThumbnail', { congress, instance, id }]}
+                    urlView="congresses/location"
+                    urlViewField="thumbnail"
                     options={{ congress, instance, id }}
                     sizes={[32, 64, 128, 256, 512, 1024, 2048]}
-                    hash={id} // trigger updates
                     editing={editing}
                     onUpdate={(thumbnail, core) => {
                         return core.createTask('congresses/updateLocationThumbnail', {

@@ -41,6 +41,7 @@ import { CODEHOLDER_DELEGATIONS, SIG_DELEGATIONS, delegateFilters } from './dele
 //! - birthdate: identical to API
 //! - age: object { now, atStartOfYear }
 //! - deathdate: identical to API
+//! - profilePicture: identical to API
 //! - profilePictureHash: identical to API
 //! - isActiveMember: identical to API
 //! - profession: identical to API
@@ -241,6 +242,7 @@ const clientFields = {
         requires: ['isDead'], // to ignore atStartOfYear when they’re dead
     },
     deathdate: 'deathdate',
+    profilePicture: 'profilePicture',
     profilePictureHash: 'profilePictureHash',
     isActiveMember: 'isActiveMember',
     profession: 'profession',
@@ -859,6 +861,8 @@ export const tasks = {
         // if the user changes the profile picture while editing; the old hash will still be in
         // the codeholder data.
         // here we mitigate this
+        delete diff.profilePicture;
+        delete codeholderData.profilePicture;
         delete diff.profilePictureHash;
         delete codeholderData.profilePictureHash;
 

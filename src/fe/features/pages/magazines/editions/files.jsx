@@ -4,30 +4,38 @@ import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import FileUploadIcon from '@material-ui/icons/Publish';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import pickFile from '../../../../components/pick-file';
-import { connect } from '../../../../core/connection';
-import { base } from 'akso:config';
+import { coreContext } from '../../../../core/connection';
+import { useContext } from 'preact/compat';
 import { magazineEditions as locale } from '../../../../locale';
 import './files.less';
+import { useDataView } from '../../../../core';
+import DisplayError from '../../../../components/utils/error';
 
-export const Files = connect(({ view }) => view)((data, core) => ({
-    data,
-    core,
-}))(function Files ({
-    data,
-    core,
+export function Files ({
+    view,
+    options,
     icon,
     onUpload,
     onDelete,
-    downloadURL,
     formats,
     canUpload,
     canDelete,
 }) {
-    if (!data) return (
-        <div class="magazine-edition-files is-loading">
-            <LinearProgress class="inner-progress" indeterminate />
-        </div>
-    );
+    const core = useContext(coreContext);
+    const [loading, error, data] = useDataView(view, options);
+
+    if (loading) {
+        return (
+            <div class="magazine-edition-files is-loading">
+                <LinearProgress class="inner-progress" indeterminate />
+            </div>
+        );
+    }
+    if (error) {
+        return <DisplayError error={error} />;
+    }
+    if (!data) return null;
+
     const fileSlots = {};
     for (const item of data) {
         fileSlots[item.format] = item;
@@ -41,8 +49,6 @@ export const Files = connect(({ view }) => view)((data, core) => ({
         });
     };
 
-    const fullDownloadURL = f => new URL(downloadURL(f), base).toString();
-
     const deleteFile = format => () => onDelete(core, format);
 
     return (
@@ -54,7 +60,7 @@ export const Files = connect(({ view }) => view)((data, core) => ({
                     format={f}
                     downloads={fileSlots[f]?.downloads}
                     size={fileSlots[f]?.size}
-                    downloadURL={fullDownloadURL(f)}
+                    downloadURL={fileSlots[f]?.url}
                     onUpload={uploadFile(f)}
                     onDelete={deleteFile(f)}
                     canUpload={canUpload}
@@ -62,7 +68,7 @@ export const Files = connect(({ view }) => view)((data, core) => ({
             ))}
         </div>
     );
-});
+}
 
 function EditionFileSlot ({
     icon,

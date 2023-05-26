@@ -14,7 +14,6 @@ export const PO_ADDONS = 'poAddons';
 export const SIG_PO_ADDONS = '!poAddons';
 export const PO_METHODS = 'poMethods';
 export const SIG_PO_METHODS = '!poMethods';
-export const SIG_THUMBNAIL = '!thumbnail';
 export const PAYMENT_INTENTS = 'paymentIntents';
 export const SIG_PAYMENT_INTENTS = '!paymentIntents';
 export const EXCHANGE_RATES = 'exchRates';
@@ -36,10 +35,6 @@ export const EXCHANGE_RATES = 'exchRates';
 //!    |- ...
 //! ```
 
-// returns a random string to use as cache-buster with thumbnails
-function getThumbnailKey () {
-    return Math.random().toString(36).replace(/\./g, '');
-}
 
 function iReadId (idBuffer) {
     if (!idBuffer) return idBuffer;
@@ -351,7 +346,6 @@ export const tasks = {
         const res = await client.get(`/aksopay/payment_orgs/${org}/methods`, opts);
         for (const item of res.body) {
             const path = [PAYMENT_ORGS, org, PO_METHODS, item.id];
-            item.thumbnailKey = getThumbnailKey();
             const existing = store.get(path);
             store.insert(path, deepMerge(existing, item));
         }
@@ -377,7 +371,7 @@ export const tasks = {
                 'id', 'type', 'stripeMethods', 'name', 'internalDescription', 'descriptionPreview',
                 'description', 'currencies', 'paymentValidity', 'isRecommended',
                 'stripePublishableKey', 'feePercent', 'feeFixed.val', 'feeFixed.cur',
-                'internal', 'prices', 'maxAmount',
+                'internal', 'prices', 'maxAmount', 'thumbnail',
             ],
         });
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];
@@ -390,7 +384,7 @@ export const tasks = {
         const path = [PAYMENT_ORGS, org, PO_METHODS, id];
         const existing = store.get(path);
         const delta = fieldDiff(existing, params);
-        delete params.thumbnailKey;
+        delete delta.thumbnail;
         await client.patch(`/aksopay/payment_orgs/${org}/methods/${id}`, delta);
         store.insert(path, deepMerge(existing, params));
     },
@@ -400,16 +394,6 @@ export const tasks = {
         store.remove([PAYMENT_ORGS, org, PO_METHODS, id]);
         store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
     },
-    methodThumbnail: async ({ org, id }, { size }) => {
-        const client = await asyncClient;
-        const res = await fetch(client.client.createURL(`/aksopay/payment_orgs/${org}/methods/${id}/thumbnail/${size}`), {
-            credentials: 'include',
-            mode: 'cors',
-        });
-        if (res.status === 404) return null;
-        if (!res.ok) throw { statusCode: res.status };
-        return await res.blob();
-    },
     updateMethodThumbnail: async ({ org, id }, { thumbnail }) => {
         const client = await asyncClient;
         await client.put(`/aksopay/payment_orgs/${org}/methods/${id}/thumbnail`, null, {}, [{
@@ -417,18 +401,16 @@ export const tasks = {
             type: thumbnail.type,
             value: thumbnail,
         }]);
-        const path = [PAYMENT_ORGS, org, PO_METHODS, id];
-        const existing = store.get(path);
-        store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
-        store.signal([PAYMENT_ORGS, org, PO_METHODS, id, SIG_THUMBNAIL]);
+
+        // update in background
+        tasks.getMethod({ org, id });
     },
     deleteMethodThumbnail: async ({ org, id }) => {
         const client = await asyncClient;
         await client.delete(`/aksopay/payment_orgs/${org}/methods/${id}/thumbnail`);
-        const path = [PAYMENT_ORGS, org, PO_METHODS, id];
-        const existing = store.get(path);
-        store.insert(path, deepMerge(existing, { thumbnailKey: getThumbnailKey() }));
-        store.signal([PAYMENT_ORGS, org, PO_METHODS, id, SIG_THUMBNAIL]);
+
+        // update in background
+        tasks.getMethod({ org, id });
     },
 
     // MARK - INTENTS
@@ -743,6 +725,5 @@ export const views = {
     sigOrgs: createStoreObserver([PAYMENT_ORGS, SIG_PAYMENT_ORGS]),
     sigAddons: createStoreObserver(({ org }) => [PAYMENT_ORGS, org, SIG_PO_ADDONS]),
     sigMethods: createStoreObserver(({ org }) => [PAYMENT_ORGS, org, SIG_PO_METHODS]),
-    sigMethodThumbnail: createStoreObserver(({ org, id }) => [PAYMENT_ORGS, org, PO_METHODS, id, SIG_THUMBNAIL]),
     sigIntents: createStoreObserver([PAYMENT_INTENTS, SIG_PAYMENT_INTENTS]),
 };
