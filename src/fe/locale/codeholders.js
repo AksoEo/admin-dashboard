@@ -80,7 +80,7 @@ export const codeholders = {
                 no: 'pagita',
                 all: 'ne gravas',
             },
-            includePrevLifetime: '[[Include lifetime from prev. years]]',
+            includePrevLifetime: 'Inkludi dumvivajn membrecojn de antaŭaj jaroj',
             conjunction: 'kaj',
             pickSome: 'Elekti kategoriojn',
         },

@@ -101,9 +101,9 @@ export const data = {
         note: 'Bv. noti, ke uzantaj permesoj estas kombinitaj de pluraj fontoj; tial la ĉi-suba montrilo ne donas la plenan superrigardon.',
         requires: 'Bezonas',
         mr: 'Membrorestriktoj (JSON-filtrilo)',
-        mrDisabledDesc: '[[Note that the default member restrictions are that no fields can be read, and that all members are visible. If you want to override this and havent already elsewhere, check this box.]]',
-        mrGroupDesc: '[[Fields will be merged, and filters will be combined.]]',
-        mrDesc: '[[Fields will be merged, and the filter here the client/client will override any other filters.]]',
+        mrDisabledDesc: 'Notu ke la defaŭlta membrorestrikto estas, ke oni povas aliri ĉiujn kodposedantojn, sed ne legi ajnan kampon. Se vi volas superskribi tion kaj ne jam faris tion aliloke, elektu tiun ĉi skatolon.',
+        mrGroupDesc: 'Alireblaj kampoj kaj filtriloj estos kunmetitaj trans grupoj kaj rektaj restriktoj.',
+        mrDesc: 'Kampoalirebleco estos kunmetita trans grupoj kaj rektaj restriktoj. Atentu, ke se estas rekta filtrilrestrikto sur kodposedanto aŭ API-kliento, tiu filtrilo superskribas ajnan grupan filtrilon.',
         update: {
             title: 'Ĝisdatigi permesojn',
             button: 'Ĝisdatigi',

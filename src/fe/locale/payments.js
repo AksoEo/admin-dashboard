@@ -186,12 +186,12 @@ export const paymentIntents = {
         org: 'AKSO-Organizo',
         currencies: 'Valutoj',
         status: 'Stato',
-        purposeType: '[[Has PurposeType]]',
+        purposeType: 'Speco de pagcelo',
         purposeTrigger: 'Enhavas AKSO-agon',
-        purposeTriggerStatus: '[[Has PurposeTriggerStatus]]',
+        purposeTriggerStatus: 'Stato de AKSO-ago',
         purposeDataId: 'Aktivigas aliĝidentigilon',
 
-        purposeInvalid: '[[Has Invalid Purpose]]',
+        purposeInvalid: 'Enhavas nevalidan pagcelon',
         purposeInvalidNo: 'ne',
         purposeInvalidYes: 'jes',
 

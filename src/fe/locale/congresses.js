@@ -108,7 +108,7 @@ export const congressLocations = {
         nameRequired: 'Necesas nomo',
 
         location: 'Loko',
-        internalLocations: '[[Internal locations]]',
+        internalLocations: 'Internaj lokoj',
 
         types: {
             external: 'Ekstera loko',
@@ -283,14 +283,14 @@ export const congressParticipants = {
                 none: 'ne gravas',
             },
 
-            checkInTime: '[[CheckInTime]]',
+            checkInTime: 'Alvenhoro',
             checkInTimeOptions: {
                 none: 'ne gravas',
-                no: '[[not checked in]]',
-                yes: '[[checked in]]',
-                useRange: '[[in time range…]]',
-                rangeStart: '[[Start]]',
-                rangeEnd: '[[End]]',
+                no: 'ne alvenis',
+                yes: 'alvenis',
+                useRange: 'laŭ horo',
+                rangeStart: 'komenco',
+                rangeEnd: 'fino',
             },
 
             dataId: 'Aliĝidentigilo',
@@ -323,7 +323,7 @@ export const congressParticipants = {
         cancelledTime: 'Nuligita',
         createdTime: 'Kreita je',
         editedTime: 'Laste redaktita je',
-        checkInTime: '[[CheckInTime]]',
+        checkInTime: 'Alvenhoro',
         data: 'Datumoj',
         customFormVars: 'Propraj variabloj',
 
@@ -345,12 +345,12 @@ export const congressParticipants = {
             },
             approveManually: 'Permane aprobi',
             cancel: 'Nuligi',
-            setCheckedIn: '[[Set checked in]]',
-            unsetCheckedIn: '[[Unset checked in]]',
+            setCheckedIn: 'Marki kiel alveninta',
+            unsetCheckedIn: 'Marki kiel nealveninta',
 
-            checkInConfirmWithoutFullPayment: '[[This participant hasnt paid their full price yet. Are you sure you want to check them in?]]',
-            checkInConfirmCancel: 'Nuligi',
-            checkInConfirmConfirm: '[[Check in]]',
+            checkInConfirmWithoutFullPayment: 'Tiu ĉi aliĝinto ne pagis sian plenan kotizon. Ĉu vi certas, ke vi volas registri rin kiel alveninta? Se vi volas registri kontantan pagon, faru tion unue.',
+            checkInConfirmCancel: 'Reveni',
+            checkInConfirmConfirm: 'Konfirmi',
         },
 
         customFormVarsEmpty: 'Neniu superskribo',

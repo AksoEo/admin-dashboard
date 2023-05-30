@@ -210,8 +210,8 @@ export const votes = {
     numberRequired: 'Bv. enmeti nombron',
     optionsRequired: 'Bv. enmeti voĉdonopciojn',
     sendCastBallotNotif: 'Sendi sciigon pri voĉdonado',
-    sendCastBallotNotifDescription: 'Sendas sciigon al ĉiuj voĉdonrajtintoj, kiuj ne jam voĉdonis.',
-    sendCastBallotNotifMessage: n => `Sendos sciigon al ${n} voĉdonrajtinto${n === 1 ? '' : 'j'}, kiu${n === 1 ? '' : 'j'} ne jam voĉdonis.`,
+    sendCastBallotNotifDescription: 'Sendas sciigon al ĉiuj voĉdonrajtantoj, kiuj ne jam voĉdonis.',
+    sendCastBallotNotifMessage: n => `Sendos sciigon al ${n} voĉdonrajtanto${n === 1 ? '' : 'j'}, kiu${n === 1 ? '' : 'j'} ne jam voĉdonis.`,
     update: {
         menuItem: 'Redakti',
         title: 'Redakti voĉdonon',

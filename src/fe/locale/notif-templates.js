@@ -110,8 +110,8 @@ export const notifTemplates = {
         descriptions: {
             codeholder: 'Mesaĝoj estos senditaj al ĉiuj membroj laŭ via nuna filtrilo.',
             newsletter: 'Mesaĝoj estos senditaj al ĉiuj abonantoj de la bulteno.',
-            congressParticipants: '[[congressParticipants]]',
-            voteCastBallot: '[[voteCastBallot]]',
+            congressParticipants: 'Mesaĝoj estos senditaj al ĉiuj kongresaj aliĝintoj laŭ via nuna filtrilo.',
+            voteCastBallot: 'Mesaĝoj estos senditaj al ĉiuj voĉdonrajtantoj, kiuj ne ankoraŭ voĉdonis.',
         },
         empty: 'Estas neniu ŝablono kun la celo “membro”',
         emptyWithQuery: 'Estas neniu ŝablono kun la celo “membro” kiuj plenumas vian filtrilon',
