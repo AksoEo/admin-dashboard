@@ -48,6 +48,8 @@ export default function SpreadsheetDialog ({ open, onClose, congress, instance, 
                 </div>
             ) : null}
             <SpreadsheetView
+                exportOpen={exportOpen}
+                onCloseExport={() => setExportOpen(false)}
                 onNavigate={router.navigate}
                 congress={congress}
                 instance={instance}
@@ -68,8 +70,6 @@ export class SpreadsheetView extends PureComponent {
         // for field rendering
         currency: null,
         registrationForm: [],
-
-        exportOpen: false,
     };
 
     get congress () {
@@ -247,8 +247,8 @@ export class SpreadsheetView extends PureComponent {
                     columnName={i => this.columnNameForField(this.state.fields[i])} />
 
                 <CSVExport
-                    open={this.state.exportOpen}
-                    onClose={() => this.setState({ exportOpen: false })}
+                    open={exportOpen}
+                    onClose={onCloseExport}
                     task="congresses/listParticipants"
                     options={this.getListOptions()}
                     extraOptions={{

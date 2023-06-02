@@ -111,16 +111,17 @@ const InnerEditor = connect(({ congress, instance }) => [
     };
 
     createForm = () => {
-        this.setState({
-            edit: {
-                allowUse: true,
-                editable: true,
-                cancellable: true,
-                form: [],
-            },
-        }, () => {
-            this.props.onBeginEdit();
-        });
+        this.props.onBeginEdit(); // do this first so we only gain dirty state afterwards
+        setTimeout(() => {
+            this.setState({
+                edit: {
+                    allowUse: true,
+                    editable: true,
+                    cancellable: true,
+                    form: [],
+                },
+            });
+        }, 50);
     };
 
     showCopyFromDialog = () => {
