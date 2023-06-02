@@ -383,7 +383,7 @@ export function TimelineDayViewLayout ({
             }
 
             const minWidth = useMinWidth ? MIN_COL_WIDTH * region.items.length : null;
-            const height = region.end - region.start;
+            const height = region.end;
             columnNodes.push(
                 <div class="day-view-region" style={{ minWidth, height }}>
                     {regionNodes}
