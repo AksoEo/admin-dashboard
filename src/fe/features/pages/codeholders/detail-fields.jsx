@@ -351,9 +351,6 @@ const CodeEditor = memo(connectPerms(function CodeEditor ({
 }) {
     if (!value) return null;
     if (!editing) {
-        if (value.new === value.old) {
-            return <ueaCode.renderer value={value.new} />;
-        }
         return <ueaCode.renderer value={value.new} value2={value.old} />;
     }
     if (editing && !perms.hasCodeholderField('newCode', 'w')) return null;

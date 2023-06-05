@@ -25,7 +25,14 @@ export function UEACode ({ value, old, ...extra }) {
 }
 
 function BothUEACodes ({ value, value2 }) {
-    if (!value2) return <UEACode value={value} />;
+    let isSameCode = true;
+    try {
+        if (value2) {
+            isSameCode = `${value2}-${new AKSOUEACode(value2).getCheckLetter()}` === value
+        }
+    } catch { /* */ }
+
+    if (isSameCode) return <UEACode value={value} />;
     return (
         <span class="data both-uea-codes">
             <UEACode value={value} />

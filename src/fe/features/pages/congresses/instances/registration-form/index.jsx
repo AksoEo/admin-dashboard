@@ -112,16 +112,18 @@ const InnerEditor = connect(({ congress, instance }) => [
 
     createForm = () => {
         this.props.onBeginEdit(); // do this first so we only gain dirty state afterwards
-        setTimeout(() => {
-            this.setState({
-                edit: {
-                    allowUse: true,
-                    editable: true,
-                    cancellable: true,
-                    form: [],
-                },
-            });
-        }, 50);
+        return new Promise(resolve => {
+            setTimeout(() => {
+                this.setState({
+                    edit: {
+                        allowUse: true,
+                        editable: true,
+                        cancellable: true,
+                        form: [],
+                    },
+                }, () => resolve());
+            }, 50);
+        });
     };
 
     showCopyFromDialog = () => {
@@ -200,9 +202,11 @@ const InnerEditor = connect(({ congress, instance }) => [
                             open={this.state.copyFromPickerOpen}
                             onClose={() => this.setState({ copyFromPickerOpen: false })}
                             onLoad={(data) => {
-                                this.setState({
-                                    edit: data,
-                                    formData: {},
+                                this.createForm().then(() => {
+                                    this.setState({
+                                        edit: data,
+                                        formData: {},
+                                    });
                                 });
                             }}
                         />
