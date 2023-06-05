@@ -46,13 +46,18 @@ export function BoundEditor ({ min, max, minSoftBound, value, onChange, innerRef
         if (didChange) commit();
     };
     const onInputChange = e => {
-        setDidChange(true);
         if (isFocused) {
+            setDidChange(true);
             const softBound = softBindValue(e.target.value);
             setTmpValue(softBound);
             const bound = bindValue(softBound);
             if (softBound === bound && bound > minSoftBound) onChange(bound);
-        } else commit();
+        } else {
+            // probably clicked the up/down arrows
+            e.target.focus();
+            setTmpValue(softBindValue(e.target.value));
+            onChange(bindValue(softBindValue(e.target.value)));
+        }
     };
     const onKeyDown = e => {
         if (e.key === 'Enter') e.target.blur();
