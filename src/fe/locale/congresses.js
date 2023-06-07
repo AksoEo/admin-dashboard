@@ -167,7 +167,7 @@ export const congressLocations = {
         },
     },
     create: {
-        menuItem: 'Krei',
+        menuItem: 'Krei lokon',
         title: 'Krei lokon',
         button: 'Krei',
     },
@@ -216,7 +216,7 @@ export const congressPrograms = {
         empty: 'Okazas neniu programero en tiu ĉi tago',
     },
     create: {
-        menuItem: 'Krei',
+        menuItem: 'Krei programeron',
         duplicateMenuItem: 'Kopii',
         title: 'Krei programeron',
         button: 'Krei',
@@ -332,6 +332,7 @@ export const congressParticipants = {
             canceled: 'Nuligita',
             valid: 'Valida',
         },
+        invalidDataId: 'Nevalida aliĝidentigilo',
         dataAllowInvalid: 'Permesi nevalidajn datumojn',
 
         codeholderIdViewCodeholder: 'Vidi membron',
@@ -366,7 +367,7 @@ export const congressParticipants = {
         searchQueryNotice: 'Vi havas aktivan serĉon. La elŝutotaj aliĝintoj estos filtritaj laŭ tiu filtrilo.',
     },
     create: {
-        menuItem: 'Krei',
+        menuItem: 'Krei aliĝinton',
         title: 'Krei aliĝinton',
         button: 'Krei',
     },
@@ -391,6 +392,13 @@ export const congressParticipants = {
     sendNotifTemplate: 'Sendi amasmesaĝon',
     sendNotifTemplateMessage: n => `Sendos sciigon al ${n} aliĝinto${n === 1 ? '' : 'j'}.`,
     csvFilename: 'alighintoj',
+
+    openTableView: '[[Open table view]]',
+    findParticipantById: {
+        menuItem: '[[Find by ID]]',
+        title: '[[Find participant by ID]]',
+        find: '[[Open]]',
+    },
 };
 
 export const congressRegistrationForm = {

@@ -3,6 +3,7 @@ import { Button, TextField } from 'yamdl';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import BusinessIcon from '@material-ui/icons/Business';
+import TableIcon from '@material-ui/icons/TableChart';
 import Page from '../../../../components/page';
 import DetailShell from '../../../../components/detail/detail-shell';
 import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
@@ -24,6 +25,7 @@ import Programs from './programs';
 import Participants from './participants';
 import MapPicker from '../map-picker';
 import './detail.less';
+import { PersonSearchIcon } from '../../../../components/icons';
 
 export default connectPerms(class CongressInstancePage extends Page {
     state = {
@@ -152,6 +154,20 @@ export default connectPerms(class CongressInstancePage extends Page {
                     overflow: true,
                     label: participantLocale.sendNotifTemplate,
                     action: () => this.setState({ sendingNotif: true }),
+                }, {
+                    key: 'participants-table',
+                    icon: <TableIcon style={{ verticalAlign: 'middle' }} />,
+                    label: participantLocale.openTableView,
+                    action: () => {
+                        this.props.push('alighintoj/tabelo');
+                    },
+                }, {
+                    key: 'participants-go',
+                    icon: <PersonSearchIcon />,
+                    label: participantLocale.findParticipantById.menuItem,
+                    action: () => {
+                        this.context.createTask('congresses/_findParticipantById', { congress, instance: id });
+                    },
                 });
             }
             actions.push({

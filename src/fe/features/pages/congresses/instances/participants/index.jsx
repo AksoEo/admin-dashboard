@@ -1,7 +1,5 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button } from 'yamdl';
-import TableIcon from '@material-ui/icons/TableChart';
 import SearchFilters from '../../../../../components/overview/search-filters';
 import OverviewList from '../../../../../components/lists/overview-list';
 import DetailShell from '../../../../../components/detail/detail-shell';
@@ -69,11 +67,6 @@ export default class ParticipantsView extends PureComponent {
             <div class="participants-view">
                 {hasRegistrationForm && registrationForm ? (
                     <div class="participants-view-contents">
-                        <div class="participants-table-view-link">
-                            <Button icon small onClick={() => push('alighintoj/tabelo')}>
-                                <TableIcon />
-                            </Button>
-                        </div>
                         <SearchFilters
                             value={parameters}
                             searchFields={[
