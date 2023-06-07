@@ -85,6 +85,14 @@ export const formEditor = {
         clear: 'Forviŝi',
     },
 
+    removeItem: {
+        title: 'Forigi',
+        confirmation: '[[Remove this item?]]',
+        hint: '[[Hold shift to skip this prompt.]]',
+        cancel: 'Nuligi',
+        confirm: 'Forigi',
+    },
+
     editInputFieldTitle: 'Redakti',
     inputFields: {
         name: 'Kodnomo',

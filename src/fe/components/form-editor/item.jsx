@@ -1,6 +1,6 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
-import { Button } from 'yamdl';
+import { PureComponent, useState } from 'preact/compat';
+import { Button, Dialog } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import DoneIcon from '@material-ui/icons/Done';
 import RemoveIcon from '@material-ui/icons/Remove';
@@ -82,7 +82,7 @@ export default class FormEditorItem extends PureComponent {
             hasValues,
         };
 
-        let contents;
+        let contents, contentsPreview;
         if (item.el === 'input') {
             contents = <InputItem
                 {...props}
@@ -92,10 +92,20 @@ export default class FormEditorItem extends PureComponent {
                 onValueChange={onValueChange}
                 registerTestInput={this.props.registerTestInput}
                 deregisterTestInput={this.props.registerTestInput} />;
+
+            contentsPreview = <InputItem
+                {...props}
+                hasValues={false}
+                editing={false}
+                value={value}
+                registerTestInput={() => {}}
+                deregisterTestInput={() => {}} />;
         } else if (item.el === 'text') {
             contents = <TextItem {...props} />;
+            contentsPreview = <TextItem {...props} editing={false} />;
         } else if (item.el === 'script') {
             contents = <ScriptItem {...props} onEditingChange={onEditingChange} />;
+            contentsPreview = <ScriptItem {...props} editing={false} />;
         }
 
         return (
@@ -108,7 +118,8 @@ export default class FormEditorItem extends PureComponent {
                     editing={editing}
                     onStartEditing={() => onEditingChange(true)}
                     onClose={this.onFinishEditing}
-                    onRemove={onRemove} />
+                    onRemove={onRemove}
+                    removePreview={contentsPreview} />
                 {contents}
             </div>
         );
@@ -125,7 +136,10 @@ function ItemBar ({
     onClose,
     onRemove,
     onMoveItem,
+    removePreview,
 }) {
+    const [removing, setRemoving] = useState(false);
+
     let button = null;
     if (editing) {
         button = (
@@ -165,7 +179,13 @@ function ItemBar ({
     return (
         <div class={'form-editor-item-bar' + (editing ? ' is-editing' : '')}>
             {editable ? (
-                <Button class="remove-button" small icon onClick={onRemove}>
+                <Button class="remove-button" small icon onClick={e => {
+                    if (e.shiftKey) {
+                        onRemove();
+                    } else {
+                        setRemoving(true);
+                    }
+                }}>
                     <RemoveIcon style={{ verticalAlign: 'middle' }} />
                 </Button>
             ) : <span />}
@@ -176,6 +196,30 @@ function ItemBar ({
                     {moveItem}
                 </span>
             </span>
+
+            <Dialog
+                class="form-editor-item-remove-confirmation"
+                backdrop
+                open={removing}
+                onClose={() => setRemoving(false)}
+                title={locale.removeItem.confirmation}
+                actions={[
+                    { label: locale.removeItem.cancel, action: () => setRemoving(false) },
+                    {
+                        label: locale.removeItem.confirm,
+                        action: () => {
+                            setRemoving(false);
+                            onRemove();
+                        },
+                    },
+                ]}>
+                <div className="item-preview">
+                    {removePreview}
+                </div>
+                <div className="remove-skip-hint">
+                    {locale.removeItem.hint}
+                </div>
+            </Dialog>
         </div>
     );
 }
