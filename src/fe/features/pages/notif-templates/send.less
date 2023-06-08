@@ -1,41 +1,49 @@
 @import '../../../prelude';
 
+.send-notif-template-dialog {
+    width: 600px;
+    max-width: 100%;
+    height: 100%;
+
+    @media (min-height: 600px) {
+        min-height: 400px;
+        height: auto;
+    }
+}
+
 .codeholders-send-notif-template {
     .search-query-notice, .cursed-notice {
         border-radius: 4px;
-        margin: 24px;
+        margin: 24px 0;
         padding: 8px 16px;
         background: @text-fade-10;
     }
 
     .notif-template-picker-loading {
-        padding: 24px;
+        padding: 24px 0;
         text-align: center;
     }
 
     .templates-description {
-        margin-left: 24px;
-        margin-right: 24px;
+        margin-top: 0;
     }
 
     .notif-template-picker {
-        margin: 24px;
+        margin: 24px 0;
     }
 
     .magazine-params {
-        margin: 16px 24px;
+        margin: 16px 0;
     }
 
     .send-option {
-        margin: 0 24px;
-
         .option-switch {
             margin-right: 8px;
         }
     }
 
     .send-footer {
-        margin: 0 24px;
+        margin: 0;
         margin-top: 16px;
         text-align: right;
     }

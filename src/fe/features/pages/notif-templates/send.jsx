@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import { lazy, Suspense, PureComponent } from 'preact/compat';
-import { AppBarProxy, Button, Checkbox, CircularProgress, MenuIcon } from 'yamdl';
-import { CardStackItem } from '../../../components/layout/card-stack';
+import { Button, Checkbox, CircularProgress } from 'yamdl';
+import DialogSheet from '../../../components/tasks/dialog-sheet';
 import { connectPerms } from '../../../perms';
 import { coreContext } from '../../../core/connection';
 import { notifTemplates as locale } from '../../../locale';
@@ -12,18 +12,12 @@ const NotifTemplatePicker = lazy(() => import('./picker'));
 
 export default function SendNotifTemplate ({ options, open, onClose, lvIsCursed, context, jsonFilter, task }) {
     return (
-        <CardStackItem
+        <DialogSheet
+            backdrop
+            class="send-notif-template-dialog"
             open={open}
             onClose={onClose}
-            depth={0}
-            appBar={
-                <AppBarProxy
-                    menu={<Button icon small onClick={onClose}>
-                        <MenuIcon type="close" />
-                    </Button>}
-                    title={locale.send.title}
-                    priority={9} />
-            }>
+            title={locale.send.title}>
             <Contents
                 task={task}
                 context={context}
@@ -31,7 +25,7 @@ export default function SendNotifTemplate ({ options, open, onClose, lvIsCursed,
                 jsonFilter={jsonFilter}
                 onClose={onClose}
                 lvIsCursed={lvIsCursed} />
-        </CardStackItem>
+        </DialogSheet>
     );
 }
 

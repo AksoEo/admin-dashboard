@@ -1,14 +1,15 @@
 import { h } from 'preact';
-import { useState, Fragment, PureComponent } from 'preact/compat';
-import { AppBarProxy, Button, MenuIcon, Checkbox, Dialog, TextField } from 'yamdl';
+import { useState, Fragment, PureComponent, useContext } from 'preact/compat';
+import { Button, Checkbox, Dialog, TextField } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import Select from '../../../components/controls/select';
 import Segmented from '../../../components/controls/segmented';
 import DataList from '../../../components/lists/data-list';
-import { CardStackItem } from '../../../components/layout/card-stack';
+import DialogSheet from '../../../components/tasks/dialog-sheet';
 import { coreContext } from '../../../core/connection';
 import { codeholders as locale } from '../../../locale';
 import { connectPerms } from '../../../perms';
+import './addr-label-gen.less';
 
 export default function AddrLabelGenContainer ({
     open, lvIsCursed, options, onClose,
@@ -17,31 +18,20 @@ export default function AddrLabelGenContainer ({
 
     return (
         <Fragment>
-            <CardStackItem
+            <DialogSheet
+                class="codeholders-addr-label-gen-dialog"
+                backdrop
                 open={open}
                 onClose={onClose}
-                depth={0}
-                appBar={
-                    <AppBarProxy
-                        menu={<Button icon small onClick={onClose}>
-                            <MenuIcon type="close" />
-                        </Button>}
-                        title={locale.addrLabelGen.title}
-                        priority={9} />
-                }>
-                <coreContext.Consumer>
-                    {core => (
-                        <AddrLabelGen
-                            lvIsCursed={lvIsCursed}
-                            options={options}
-                            onSuccess={() => {
-                                onClose();
-                                setShowSuccess(true);
-                            }}
-                            core={core} />
-                    )}
-                </coreContext.Consumer>
-            </CardStackItem>
+                title={locale.addrLabelGen.title}>
+                <AddrLabelGen
+                    lvIsCursed={lvIsCursed}
+                    options={options}
+                    onSuccess={() => {
+                        onClose();
+                        setShowSuccess(true);
+                    }} />
+            </DialogSheet>
             <Dialog
                 backdrop
                 open={showSuccess}
@@ -58,7 +48,8 @@ export default function AddrLabelGenContainer ({
     );
 }
 
-function AddrLabelGen ({ lvIsCursed, onSuccess, options, core }) {
+function AddrLabelGen ({ lvIsCursed, onSuccess, options }) {
+    const core = useContext(coreContext);
     const [settings, setSettings] = useState({
         language: 'eo',
         latin: false,
