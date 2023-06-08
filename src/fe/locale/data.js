@@ -153,6 +153,10 @@ export const data = {
             ul: 'Neordigita listo',
             ol: 'Ordigita listo',
         },
+        formatButtonShortcuts: {
+            bold: '⌃B',
+            italic: '⌃I',
+        },
 
         urlLabel: 'Teksto',
         url: 'Ligilo', // when inserting links or images

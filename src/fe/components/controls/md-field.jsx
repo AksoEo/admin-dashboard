@@ -16,7 +16,7 @@ import HelpIcon from '@material-ui/icons/Help';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import CloseIcon from '@material-ui/icons/Close';
 import CodeMirror from '../codemirror-themed';
-import { EditorView, placeholder as viewPlaceholder } from '@codemirror/view';
+import { EditorView, keymap, placeholder as viewPlaceholder } from '@codemirror/view';
 import { indentUnit } from '@codemirror/language';
 import { EditorState, EditorSelection } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
@@ -388,6 +388,127 @@ const CM_BASIC_SETUP = {
     highlightActiveLine: false,
 };
 
+function convertShortcutToCm (shortcut) {
+    const takeModifier = (mod) => {
+        if (shortcut.includes(mod)) {
+            shortcut = shortcut.replace(new RegExp(`[${mod}]`, 'g'), '');
+            return true;
+        }
+        return false;
+    };
+
+    let out = '';
+    if (takeModifier('⌃')) out += 'Mod-';
+    if (takeModifier('⇧')) out += 'Shift-';
+    if (takeModifier('⌥')) out += 'Alt-';
+
+    return out + shortcut.toLowerCase();
+}
+
+const makeURLInputRequest = apply => function URLInputRequest ({ selection, onComplete }) {
+    const [label, setLabel] = useState(selection);
+    const [url, setUrl] = useState('');
+    const complete = () => onComplete(apply(label, url));
+
+    return (
+        <div class="url-input-request">
+            <TextField
+                class="label-field"
+                outline label={locale.mdEditor.urlLabel}
+                value={label}
+                onChange={e => setLabel(e.target.value)} />
+            <TextField
+                class="url-field"
+                outline label={locale.mdEditor.url}
+                placeholder={locale.mdEditor.urlPlaceholder}
+                value={url}
+                onChange={e => setUrl(e.target.value)} />
+            <div class="req-footer">
+                <Button outline class="insert-button" onClick={complete} disabled={!url}>
+                    {locale.mdEditor.insertUrl}
+                </Button>
+            </div>
+        </div>
+    );
+};
+
+
+const FORMAT_FNS = {
+    title: view => applyHeadings(view),
+    bold: view => applyWrappingFormat('**', '**', view),
+    italic: view => applyWrappingFormat('*', '*', view),
+    strike: view => applyWrappingFormat('~~', '~~', view),
+    code: view => applyWrappingFormat('`', '`', view),
+};
+
+const FORMAT_BUTTONS = {
+    title: {
+        icon: <TitleIcon />,
+        rule: 'heading',
+        apply: FORMAT_FNS.title,
+    },
+    bold: {
+        icon: <FormatBoldIcon />,
+        rule: 'emphasis',
+        apply: FORMAT_FNS.bold,
+    },
+    italic: {
+        icon: <FormatItalicIcon />,
+        rule: 'emphasis',
+        apply: FORMAT_FNS.italic,
+    },
+    strike: {
+        icon: <FormatStrikethroughIcon />,
+        rule: 'strikethrough',
+        apply: FORMAT_FNS.strike,
+    },
+    link: {
+        icon: <InsertLinkIcon />,
+        rule: 'link',
+        request: makeURLInputRequest((label, url) => view => {
+            view.dispatch(view.state.replaceSelection(`[${label}](${url})`));
+        }),
+    },
+    image: {
+        icon: <InsertPhotoIcon />,
+        rule: 'image',
+        request: makeURLInputRequest((label, url) => view => {
+            view.dispatch(view.state.replaceSelection(`![${label}](${url})`));
+        }),
+    },
+    code: {
+        icon: <CodeIcon />,
+        rule: 'backticks',
+        apply: FORMAT_FNS.code,
+    },
+    table: {
+        icon: <TableChartIcon />,
+        rule: 'table',
+        request: () => <HelpSection rule="table" />,
+    },
+    ul: {
+        icon: <FormatListBulletedIcon />,
+        rule: 'list',
+        request: () => <HelpSection rule="list" />,
+    },
+    // since we don't actually use these buttons, we can omit this for now
+    /* ol: {
+        icon: <FormatListNumberedIcon />,
+        rule: 'list',
+        request: () => <HelpSection rule="list" />,
+    }, */
+};
+
+
+const editorKeymap = Object.keys(locale.mdEditor.formatButtonShortcuts).map(s => {
+    const shortcut = convertShortcutToCm(locale.mdEditor.formatButtonShortcuts[s]);
+
+    return {
+        key: shortcut,
+        run: FORMAT_FNS[s],
+    };
+});
+
 const InnerEditor = forwardRef(({
     value,
     onChange,
@@ -409,6 +530,7 @@ const InnerEditor = forwardRef(({
         indentUnit.of('\t'),
         EditorView.lineWrapping,
         placeholder && viewPlaceholder(placeholder),
+        keymap.of(editorKeymap),
         ...(extensions || []),
     ].filter(x => x), [extensions, placeholder]);
 
@@ -516,91 +638,6 @@ function applyHeadings (view) {
     }));
 }
 
-const makeURLInputRequest = apply => function URLInputRequest ({ selection, onComplete }) {
-    const [label, setLabel] = useState(selection);
-    const [url, setUrl] = useState('');
-    const complete = () => onComplete(apply(label, url));
-
-    return (
-        <div class="url-input-request">
-            <TextField
-                class="label-field"
-                outline label={locale.mdEditor.urlLabel}
-                value={label}
-                onChange={e => setLabel(e.target.value)} />
-            <TextField
-                class="url-field"
-                outline label={locale.mdEditor.url}
-                placeholder={locale.mdEditor.urlPlaceholder}
-                value={url}
-                onChange={e => setUrl(e.target.value)} />
-            <div class="req-footer">
-                <Button outline class="insert-button" onClick={complete} disabled={!url}>
-                    {locale.mdEditor.insertUrl}
-                </Button>
-            </div>
-        </div>
-    );
-};
-
-const FORMAT_BUTTONS = {
-    title: {
-        icon: <TitleIcon />,
-        rule: 'heading',
-        apply: view => applyHeadings(view),
-    },
-    bold: {
-        icon: <FormatBoldIcon />,
-        rule: 'emphasis',
-        apply: view => applyWrappingFormat('**', '**', view),
-    },
-    italic: {
-        icon: <FormatItalicIcon />,
-        rule: 'emphasis',
-        apply: view => applyWrappingFormat('*', '*', view),
-    },
-    strike: {
-        icon: <FormatStrikethroughIcon />,
-        rule: 'strikethrough',
-        apply: view => applyWrappingFormat('~~', '~~', view),
-    },
-    link: {
-        icon: <InsertLinkIcon />,
-        rule: 'link',
-        request: makeURLInputRequest((label, url) => view => {
-            view.dispatch(view.state.replaceSelection(`[${label}](${url})`));
-        }),
-    },
-    image: {
-        icon: <InsertPhotoIcon />,
-        rule: 'image',
-        request: makeURLInputRequest((label, url) => view => {
-            view.dispatch(view.state.replaceSelection(`![${label}](${url})`));
-        }),
-    },
-    code: {
-        icon: <CodeIcon />,
-        rule: 'backticks',
-        apply: view => applyWrappingFormat('`', '`', view),
-    },
-    table: {
-        icon: <TableChartIcon />,
-        rule: 'table',
-        request: () => <HelpSection rule="table" />,
-    },
-    ul: {
-        icon: <FormatListBulletedIcon />,
-        rule: 'list',
-        request: () => <HelpSection rule="list" />,
-    },
-    // since we don't actually use these buttons, we can omit this for now
-    /* ol: {
-        icon: <FormatListNumberedIcon />,
-        rule: 'list',
-        request: () => <HelpSection rule="list" />,
-    }, */
-};
-
 function EditorBar ({ visible, rules, view, onChange, onPopout, onOpenHelp }) {
     const [actuallyVisible, setActuallyVisible] = useState(false);
 
@@ -620,10 +657,15 @@ function EditorBar ({ visible, rules, view, onChange, onPopout, onOpenHelp }) {
         const btn = FORMAT_BUTTONS[id];
         if (!rules.includes(btn.rule)) continue;
 
+        let shortcutLabel = locale.mdEditor.formatButtonShortcuts[id];
+        if (shortcutLabel && navigator.userAgent.includes('Mac OS')) {
+            shortcutLabel = shortcutLabel.replace(/⌃/g, '⌘');
+        }
+
         buttons.push(
             <Button
                 class="format-button"
-                title={locale.mdEditor.formatButtons[id]}
+                title={locale.mdEditor.formatButtons[id] + (shortcutLabel ? ` (${shortcutLabel})` : '')}
                 // prevent focus stealing
                 onTouchStart={e => e.preventDefault()}
                 onMouseDown={e => e.preventDefault()}
