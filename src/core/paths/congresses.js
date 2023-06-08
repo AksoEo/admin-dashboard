@@ -38,6 +38,9 @@ const locClientFilters = {
     externalLoc: {
         toAPI: locations => ({ externalLoc: { $in: locations } }),
     },
+    open: {
+        toAPI: open => ({ $open: open }),
+    },
 };
 const progClientFilters = {
     timeSlice: {

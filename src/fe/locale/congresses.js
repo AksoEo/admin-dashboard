@@ -90,6 +90,12 @@ export const congressLocations = {
         filters: {
             type: 'Tipo',
             externalLoc: 'Ekstera loko',
+            open: '[[Open]]',
+
+            openType: {
+                date: '[[at time…]]',
+                none: '[[no open hours]]',
+            },
         },
     },
     fields: {

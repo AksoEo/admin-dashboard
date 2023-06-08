@@ -1,7 +1,10 @@
 import { h } from 'preact';
 import Segmented from '../../../../../components/controls/segmented';
 import { congressLocations as locale } from '../../../../../locale';
+import { timestamp } from '../../../../../components/data';
 import LocationPicker from '../location-picker';
+import { useDataView } from '../../../../../core';
+import './filters.less';
 
 export const FILTERS = {
     type: {
@@ -95,4 +98,101 @@ export const FILTERS = {
             );
         },
     },
+    open: {
+        default: () => ({ enabled: false, value: null }),
+        serialize: ({ value }) => value ? value : '-',
+        deserialize: value => ({ enabled: true, value: value === '-' ? null : value }),
+        needsSwitch: true,
+        editor ({ value, onChange, enabled, onEnabledChange, hidden, userData }) {
+            const [,, instance] = useDataView('congresses/instance', {
+                congress: userData.congress,
+                id: userData.instance,
+            });
+
+            return (
+                <div class="congress-locations-open-filter" data-enabled={enabled.toString()}>
+                    <Segmented
+                        class="smaller"
+                        disabled={hidden}
+                        selected={value === null ? 'none' : 'date'}
+                        onSelect={type => {
+                            if (type === 'none') {
+                                onChange(null);
+                            } else if (type === 'date') {
+                                if (value) return;
+
+                                if (instance) {
+                                    // get date bounded to start/end date
+                                    const minDate = new Date(instance.dateFrom + 'T00:00:00Z');
+                                    const maxDate = new Date(instance.dateTo + 'T23:59:59Z');
+
+                                    const dateValue = Math.max(+minDate, Math.min(+new Date(), +maxDate));
+                                    onChange(dateToLocalString(new Date(dateValue)));
+                                } else {
+                                    onChange(dateToLocalString(new Date()));
+                                }
+                            }
+                            onEnabledChange(true);
+                        }}>
+                        {[
+                            {
+                                id: 'date',
+                                label: locale.search.filters.openType.date,
+                            },
+                            {
+                                id: 'none',
+                                label: locale.search.filters.openType.none,
+                                class: 'bordered',
+                            },
+                        ]}
+                    </Segmented>
+                    {value !== null ? (
+                        <div class="inner-date-input">
+                            <timestamp.editor
+                                outline
+                                value={+localStringToDate(value) / 1000}
+                                onChange={v => {
+                                    if (!v) return;
+                                    onChange(dateToLocalString(new Date(v * 1000)));
+                                    onEnabledChange(true);
+                                }} />
+                        </div>
+                    ) : null}
+                </div>
+            );
+        },
+    },
 };
+
+function pad (padding, s) {
+    const s2 = padding + s;
+    return s2.substring(s2.length - padding.length);
+}
+
+function dateToLocalString (date) {
+    // we will pretend to be in the UTC time zone
+
+    const y = pad('0000', date.getUTCFullYear());
+    const mo = pad('00', date.getUTCMonth());
+    const d = pad('00', date.getUTCDate());
+    const h = pad('00', date.getUTCHours());
+    const m = pad('00', date.getUTCMinutes());
+    const s = pad('00', date.getUTCSeconds());
+
+    return `${y}-${mo}-${d}T${h}:${m}:${s}`;
+}
+
+function localStringToDate (str) {
+    const parts = str.match(/^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)$/);
+    const y = parts[1];
+    const mo = parts[2];
+    const d = parts[3];
+    const h = parts[4];
+    const m = parts[5];
+    const s = parts[6];
+
+    const date = new Date();
+    date.setUTCFullYear(y, mo, d);
+    date.setUTCHours(h, m, s, 0);
+    return date;
+}
