@@ -500,6 +500,7 @@ export default {
     _findParticipantById ({ open, task }) {
         const [dataId, setDataId] = useState('');
         const router = useContext(routerContext);
+        const textField = useRef();
 
         const isDataIdValid = /^[0-9a-f]+$/i.test(dataId);
 
@@ -509,6 +510,10 @@ export default {
             router.navigate(`/kongresoj/${congress}/okazigoj/${instance}/alighintoj/${dataId}`);
             task.drop();
         };
+
+        useEffect(() => {
+            if (open) textField.current?.focus();
+        }, [open]);
 
         return (
             <TaskDialog
@@ -521,6 +526,7 @@ export default {
                 run={doOpen}>
                 <Field>
                     <TextField
+                        ref={textField}
                         outline
                         error={(!dataId || isDataIdValid) ? null : participantLocale.fields.invalidDataId}
                         label={participantLocale.fields.dataId}
