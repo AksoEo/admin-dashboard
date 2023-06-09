@@ -343,6 +343,7 @@ export const codeholders = {
         changedBy: 'Ŝanĝita de',
         initial: 'Origina datumo',
         dataRetentionNote: 'La historio estas konservata nur dum 60 tagoj.',
+        noChanges: '[[No changes]]',
     },
     addrLabelGen: {
         menuItem: 'Krei adresetikedojn',

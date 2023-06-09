@@ -69,6 +69,11 @@ export default class FieldHistory extends Page {
                     </div>
                 )}
                 <div class="history-items">
+                    {this.state.items.length === 1 ? (
+                        <div class="history-items-no-changes">
+                            {locale.fieldHistory.noChanges}
+                        </div>
+                    ) : null}
                     {this.state.items.map(item => <FieldHistoryItem
                         key={item.id}
                         item={item}
