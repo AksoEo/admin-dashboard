@@ -173,7 +173,7 @@ function dateToLocalString (date) {
     // we will pretend to be in the UTC time zone
 
     const y = pad('0000', date.getUTCFullYear());
-    const mo = pad('00', date.getUTCMonth());
+    const mo = pad('00', date.getUTCMonth() + 1);
     const d = pad('00', date.getUTCDate());
     const h = pad('00', date.getUTCHours());
     const m = pad('00', date.getUTCMinutes());
@@ -185,7 +185,7 @@ function dateToLocalString (date) {
 function localStringToDate (str) {
     const parts = str.match(/^(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)$/);
     const y = parts[1];
-    const mo = parts[2];
+    const mo = parts[2] - 1;
     const d = parts[3];
     const h = parts[4];
     const m = parts[5];
