@@ -490,7 +490,7 @@ export default [
                             {
                                 path: 'historio',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-history" */ './codeholders/history')),
+                                    import(/* webpackChunkName: "codeholder-history" */ './codeholders/field-history')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholders.hist.read'),
                             },
@@ -511,14 +511,14 @@ export default [
                             {
                                 path: 'dosieroj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-files" */ './codeholders/files-page')),
+                                    import(/* webpackChunkName: "codeholder-files" */ './codeholders/files/files-page')),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasCodeholderField('files', 'r'),
                                 paths: [
                                     {
                                         match: /^(\d+)$/,
                                         component: elazy(() =>
-                                            import(/* webpackChunkName: "codeholder-files" */ './codeholders/file-detail')),
+                                            import(/* webpackChunkName: "codeholder-files" */ './codeholders/files/file-detail')),
                                         type: 'stack',
                                     },
                                 ],

@@ -2,14 +2,14 @@ import { h } from 'preact';
 import { useState, Fragment, PureComponent, useContext } from 'preact/compat';
 import { Button, Checkbox, Dialog, TextField } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
-import Select from '../../../components/controls/select';
-import Segmented from '../../../components/controls/segmented';
-import DataList from '../../../components/lists/data-list';
-import DialogSheet from '../../../components/tasks/dialog-sheet';
-import { coreContext } from '../../../core/connection';
-import { codeholders as locale } from '../../../locale';
-import { connectPerms } from '../../../perms';
-import './addr-label-gen.less';
+import Select from '../../../../components/controls/select';
+import Segmented from '../../../../components/controls/segmented';
+import DataList from '../../../../components/lists/data-list';
+import DialogSheet from '../../../../components/tasks/dialog-sheet';
+import { coreContext } from '../../../../core/connection';
+import { codeholders as locale } from '../../../../locale';
+import { connectPerms } from '../../../../perms';
+import './index.less';
 
 export default function AddrLabelGenContainer ({
     open, lvIsCursed, options, onClose,

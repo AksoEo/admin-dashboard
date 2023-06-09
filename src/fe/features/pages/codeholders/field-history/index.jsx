@@ -1,16 +1,16 @@
 import { h } from 'preact';
 import { CircularProgress } from 'yamdl';
 import InfoIcon from '@material-ui/icons/Info';
-import Page from '../../../components/page';
-import { coreContext } from '../../../core/connection';
-import Meta from '../../meta';
-import { codeholders as locale } from '../../../locale';
-import DiffAuthor from '../../../components/diff-author';
-import { timestamp } from '../../../components/data';
-import { fields as detailFields } from './detail-fields';
-import './history.less';
+import Page from '../../../../components/page';
+import { coreContext } from '../../../../core/connection';
+import Meta from '../../../meta';
+import { codeholders as locale } from '../../../../locale';
+import DiffAuthor from '../../../../components/diff-author';
+import { timestamp } from '../../../../components/data';
+import { fields as detailFields } from '../detail-fields';
+import './index.less';
 
-export default class History extends Page {
+export default class FieldHistory extends Page {
     static contextType = coreContext;
 
     state = {

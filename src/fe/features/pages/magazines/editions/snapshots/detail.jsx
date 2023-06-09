@@ -7,7 +7,7 @@ import DetailShell from '../../../../../components/detail/detail-shell';
 import CSVExport from '../../../../../components/tasks/csv-export';
 import { FIELDS, Footer } from './fields';
 import ORIG_CODEHOLDER_FIELDS from '../../../codeholders/table-fields';
-import AddrLabelGen from '../../../codeholders/addr-label-gen';
+import AddrLabelGen from '../../../codeholders/addr-label-gen/addr-label-gen';
 import CSVCountryCount from './country-count';
 import {
     search as searchLocale,

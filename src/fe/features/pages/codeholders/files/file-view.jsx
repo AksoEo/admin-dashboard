@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import { Button, LinearProgress } from 'yamdl';
-import DisplayError from '../../../components/utils/error';
-import { data as dataLocale, codeholders as locale } from '../../../locale';
+import DisplayError from '../../../../components/utils/error';
+import { data as dataLocale, codeholders as locale } from '../../../../locale';
 import { base } from 'akso:config';
 
 /** Previews a file. */

@@ -1,15 +1,15 @@
 import { h } from 'preact';
 import { base } from 'akso:config';
 import DownloadIcon from '@material-ui/icons/SaveAlt';
-import Page from '../../../components/page';
-import DetailView from '../../../components/detail/detail';
-import { timestamp } from '../../../components/data';
-import { IdUEACode } from '../../../components/data/uea-code';
-import { FileThumbnail, Mime, FileSize } from '../../../components/files';
-import Meta from '../../meta';
-import { codeholders as locale } from '../../../locale';
-import { connectPerms } from '../../../perms';
-import { coreContext } from '../../../core/connection';
+import Page from '../../../../components/page';
+import DetailView from '../../../../components/detail/detail';
+import { timestamp } from '../../../../components/data';
+import { IdUEACode } from '../../../../components/data/uea-code';
+import { FileThumbnail, Mime, FileSize } from '../../../../components/files';
+import Meta from '../../../meta';
+import { codeholders as locale } from '../../../../locale';
+import { connectPerms } from '../../../../perms';
+import { coreContext } from '../../../../core/connection';
 import FileView from './file-view';
 import './file-detail.less';
 
