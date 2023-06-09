@@ -928,6 +928,10 @@ export const fields = {
         }),
         hasPerm: 'self',
         history: true,
+        renderLabel: ({ item }) => {
+            if (item.type === 'org') return locale.fields.isDeadOrg;
+            return locale.fields.isDead;
+        },
     },
     birthdate: {
         component: permsEditable('birthdate', ({ value, editing, onChange, item }) => {
@@ -991,6 +995,10 @@ export const fields = {
         }),
         hasPerm: 'self',
         history: true,
+        renderLabel: ({ item }) => {
+            if (item.type === 'org') return locale.fields.deathdateOrg;
+            return locale.fields.deathdate;
+        },
     },
     email: simpleField(permsEditable('email', makeDataEditable({
         renderer: email.renderer,

@@ -118,7 +118,9 @@ export default function DetailFields ({
 
         const itemId = (
             <div class={idClass} key={'i' + fieldId} data-id={fieldId}>
-                {locale.fields[fieldId]}
+                {field.renderLabel ? (
+                    field.renderLabel({ value: itemData[fieldId], item: itemData })
+                ) : locale.fields[fieldId]}
             </div>
         );
         const itemContents = (
