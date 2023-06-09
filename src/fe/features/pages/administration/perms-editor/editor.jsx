@@ -11,7 +11,7 @@ import {
 import { Button, Checkbox, Dialog } from 'yamdl';
 import {
     spec,
-    memberFields as fieldsSpec,
+    memberFieldsList as fieldsList,
     reverseMap,
     memberFieldsAll,
     memberFieldsRead,
@@ -538,8 +538,18 @@ const PermsItem = memo(function PermsItem ({ item, disabled }) {
 function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
     const items = [];
     if (fields !== null) {
-        for (const field in fieldsSpec) {
-            const item = fieldsSpec[field];
+        let i = 0;
+        for (const [field, item] of fieldsList) {
+            if (!field) {
+                // not a real field
+                items.push(
+                    <tr key={i++}>
+                        <th>{item.title}</th>
+                    </tr>
+                );
+                continue;
+            }
+
             let canRead = true;
             let canWrite = true;
             for (const f of item.fields) {
@@ -547,28 +557,39 @@ function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
                 if (!fields[f] || !fields[f].includes('w')) canWrite = false;
             }
 
+            const readCheckboxId = Math.random().toString(36);
+            const writeCheckboxId = Math.random().toString(36);
+
             items.push(
-                <tr class="member-field">
+                <tr class="member-field" key={field}>
                     <td class="field-name">{item.name}</td>
                     <td class="field-perms">
                         <Checkbox
+                            id={readCheckboxId}
                             class={'perm-checkbox' + (canRead && canWrite ? ' is-implied-active' : '')}
                             disabled={disabled}
                             checked={canRead}
                             onClick={() => toggleField(field, 'r')} />
-                        {memberFieldsRead}
+                        <label for={readCheckboxId}>
+                            {memberFieldsRead}
+                        </label>
                         {' \u00a0 \u00a0'}
                         <Checkbox
+                            id={writeCheckboxId}
                             class="perm-checkbox"
                             disabled={disabled}
                             checked={canWrite}
                             onClick={() => toggleField(field, 'w')} />
-                        {memberFieldsWrite}
+                        <label for={writeCheckboxId}>
+                            {memberFieldsWrite}
+                        </label>
                     </td>
                 </tr>
             );
         }
     }
+
+    const toggleAllId = Math.random().toString(36);
 
     return (
         <div class="member-fields-container">
@@ -577,10 +598,13 @@ function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
                     <tr>
                         <th>
                             <Checkbox
+                                id={toggleAllId}
                                 class="perm-checkbox"
                                 checked={fields === null}
                                 onClick={toggleAll} />
-                            {memberFieldsAll}
+                            <label for={toggleAllId}>
+                                {memberFieldsAll}
+                            </label>
                         </th>
                     </tr>
                 </thead>
