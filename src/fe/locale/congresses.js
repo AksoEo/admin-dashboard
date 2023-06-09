@@ -90,11 +90,11 @@ export const congressLocations = {
         filters: {
             type: 'Tipo',
             externalLoc: 'Ekstera loko',
-            open: '[[Open]]',
+            open: 'Malfermita',
 
             openType: {
-                date: '[[at time…]]',
-                none: '[[no open hours]]',
+                date: 'je horo ...',
+                none: 'sen malfermaj horoj',
             },
         },
     },
@@ -399,11 +399,11 @@ export const congressParticipants = {
     sendNotifTemplateMessage: n => `Sendos sciigon al ${n} aliĝinto${n === 1 ? '' : 'j'}.`,
     csvFilename: 'alighintoj',
 
-    openTableView: '[[Open table view]]',
+    openTableView: 'Malfermi tabelan montron',
     findParticipantById: {
-        menuItem: '[[Find by ID]]',
-        title: '[[Find participant by ID]]',
-        find: '[[Open]]',
+        menuItem: 'Trovi laŭ ID',
+        title: 'Trovi aliĝinton laŭ aliĝidentigilo',
+        find: 'Trovi',
     },
 };
 

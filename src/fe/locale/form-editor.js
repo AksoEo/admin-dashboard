@@ -87,8 +87,8 @@ export const formEditor = {
 
     removeItem: {
         title: 'Forigi',
-        confirmation: '[[Remove this item?]]',
-        hint: '[[Hold shift to skip this prompt.]]',
+        confirmation: 'Ĉu vi certas, ke vi volas forigi tiun ĉi eron?',
+        hint: 'Tenu la shift-butonon por forigi sen vidi tiun ĉi konfirmilon.',
         cancel: 'Nuligi',
         confirm: 'Forigi',
     },
