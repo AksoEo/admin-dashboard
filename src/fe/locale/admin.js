@@ -29,6 +29,7 @@ export const adminGroups = {
         clients: 'API-klientoj',
     },
     editPerms: 'Redakti permesojn',
+    viewPerms: 'Vidi permesojn',
     deleteSelection: 'Forigi elektitojn',
 
     addingMembers: 'Aldonas membrojn',
@@ -98,7 +99,8 @@ export const clients = {
     },
 
     perms: {
-        linkButton: 'Redakti permesojn',
+        editPerms: 'Redakti permesojn',
+        viewPerms: 'Vidi permesojn',
         title: 'Permesoj',
     },
     csvFilename: 'api-klientoj',

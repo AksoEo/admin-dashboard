@@ -17,7 +17,7 @@ import { PickerDialog as CodeholderPickerDialog } from '../../../../components/p
 import { coreContext } from '../../../../core/connection';
 import { LinkButton } from '../../../../router';
 import { adminGroups as locale, clients as clientsLocale, codeholders as codeholdersLocale } from '../../../../locale';
-import { connectPerms } from '../../../../perms';
+import { connectPerms, usePerms } from '../../../../perms';
 import './detail.less';
 
 export default connectPerms(class AdminGroupDetailPage extends DetailPage {
@@ -445,12 +445,15 @@ function ClientsList ({ perms, id, editing }) {
 
 function Header ({ item, userData, editing }) {
     if (editing) return null;
+    const perms = usePerms();
+    const canEdit = perms.hasPerm('admin_groups.update');
+
     return (
         <div class="group-header">
             <h1 class="group-title">{item.name}</h1>
             <div class="group-description">{item.description}</div>
             <LinkButton class="edit-perms-button" target={userData.permsTarget}>
-                {locale.editPerms}
+                {canEdit ? locale.editPerms : locale.viewPerms}
             </LinkButton>
         </div>
     );

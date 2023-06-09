@@ -79,13 +79,14 @@ function Header ({ item, editing, userData: { perms } }) {
     if (editing) return null;
 
     const canReadPerms = perms.hasPerm('clients.perms.read');
+    const canEditPerms = perms.hasPerm('clients.perms.update');
 
     return (
         <div class="client-header">
             <h1>{item.name}</h1>
             {canReadPerms ? (
                 <LinkButton target={`/administrado/klientoj/${item.id}/permesoj`}>
-                    {locale.perms.linkButton}
+                    {canEditPerms ? locale.perms.editPerms : locale.perms.viewPerms}
                 </LinkButton>
             ) : null}
         </div>
