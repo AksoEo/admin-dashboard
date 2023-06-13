@@ -12,6 +12,7 @@ import { connectPerms } from '../../perms';
 import { coreContext } from '../../core/connection';
 import { SavedFilterPicker } from './saved-filter-picker';
 import JSONFilterEditor from './json-filter-editor';
+import { deepEq } from '../../../util';
 import './search-filters.less';
 
 /**
@@ -36,6 +37,8 @@ import './search-filters.less';
  *     filters. Optional.
  *   - `needsSwitch: bool` if true, the filter will have an on/off switch that controls its
  *     `enabled` property
+ *   - `impliesValues: { [filter name: string]: value }` forces certain values on other filters when
+ *     enabled, or disables this filter if implications cannot be fulfilled.
  *
  *   Serialize and deserialize may be omitted for simple filter value types (i.e. primitives).
  * - expanded/onExpandedChange: bool
@@ -142,8 +145,10 @@ export default class SearchFilters extends PureComponent {
         const jsonFilterEnabled = value.jsonFilter && !value.jsonFilter._disabled;
 
         const filtersEnabled = value.filters && !value.filters._disabled;
+        const filterImplications = filtersEnabled
+            ? compileFilterImplications(filters, value.filters)
+            : { values: {}, disables: [] };
         for (const filterId in filters) {
-            // TODO: filter constaints
             if (!value.filters || !value.filters[filterId]) continue; // handled above
             const isEnabled = value.filters[filterId].enabled;
             const filterIsHidden = !filtersEnabled || (!isEnabled && !expanded);
@@ -157,6 +162,8 @@ export default class SearchFilters extends PureComponent {
                 node: <Filter
                     id={filterId}
                     spec={filters[filterId]}
+                    overrideValue={filterImplications.values[filterId]}
+                    overrideDisable={filterImplications.disables.includes(filterId)}
                     filter={value.filters[filterId]}
                     onFilterChange={filter => onChange({
                         ...value,
@@ -405,10 +412,21 @@ const FiltersBar = connectPerms(function FiltersBar ({
     );
 });
 
-function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData, expanded }) {
+function Filter ({
+    id, spec, filter, onFilterChange, hidden, locale, userData, expanded,
+    overrideValue, overrideDisable,
+}) {
     const [nextCommit] = useState({ filter: null });
 
     const FilterEditor = spec.editor;
+
+    let filter2 = filter;
+    if (overrideValue !== undefined) {
+        filter2 = { enabled: true, value: overrideValue };
+    }
+    if (overrideDisable) {
+        return null;
+    }
 
     let filterSwitch;
     if (spec.needsSwitch) {
@@ -436,9 +454,9 @@ function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData, e
                 <div class="filter-name" onClick={onNameClick}>{locale.filters[id]}</div>
             </div>
             <FilterEditor
-                filter={filter}
+                filter={filter2}
                 onFilterChange={onFilterChange}
-                value={filter.value}
+                value={filter2.value}
                 // SUPER HACKY: allow batched calls to onChange/onEnabledChange by delaying the
                 // commit
                 onChange={value => {
@@ -455,8 +473,8 @@ function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData, e
                         });
                     }
                 }}
-                enabled={filter.enabled}
-                hidden={hidden}
+                enabled={filter2.enabled && !overrideDisable}
+                hidden={hidden || overrideDisable}
                 onEnabledChange={enabled => {
                     const shouldCommit = !nextCommit.filter;
                     nextCommit.filter = { ...(nextCommit.filter || filter), enabled };
@@ -475,4 +493,58 @@ function Filter ({ id, spec, filter, onFilterChange, hidden, locale, userData, e
                 userData={userData} />
         </div>
     );
+}
+
+function compileFilterImplications (filters, values) {
+    const out = { values: {}, disables: [] };
+
+    for (const filterId in filters) {
+        const spec = filters[filterId];
+        if (!values || !values[filterId]) continue; // handled above
+        const isEnabled = values[filterId].enabled;
+
+        if (spec.impliesValues) {
+            let isDisabled = false;
+            for (const otherFilterId in spec.impliesValues) {
+                const impliedValues = spec.impliesValues[otherFilterId];
+                if (values[otherFilterId]?.enabled) {
+                    let matchesAny = false;
+                    for (const impliedValue of impliedValues) {
+                        if (deepEq(values[otherFilterId].value, impliedValue)) {
+                            matchesAny = true;
+                            break;
+                        }
+                    }
+
+                    if (!matchesAny) {
+                        isDisabled = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isDisabled) {
+                out.disables.push(filterId);
+            } else if (isEnabled) {
+                for (const otherFilterId in spec.impliesValues) {
+                    const impliedValues = spec.impliesValues[otherFilterId];
+                    if (!values[otherFilterId]?.enabled) {
+                        let matchesAny = false;
+                        for (const impliedValue of impliedValues) {
+                            if (deepEq(values[otherFilterId].value, impliedValue)) {
+                                matchesAny = true;
+                                break;
+                            }
+                        }
+
+                        if (!matchesAny) {
+                            out.values[otherFilterId] = impliedValues[0];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return out;
 }

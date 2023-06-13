@@ -97,6 +97,9 @@ export const FILTERS = {
                 </div>
             );
         },
+        impliesValues: {
+            type: ['internal', null],
+        },
     },
     open: {
         default: () => ({ enabled: false, value: null }),
