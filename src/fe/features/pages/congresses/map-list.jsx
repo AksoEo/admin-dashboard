@@ -8,6 +8,7 @@ import fuzzaldrin from 'fuzzaldrin';
 import DisplayError from '../../../components/utils/error';
 import { coreContext } from '../../../core/connection';
 import { data as locale } from '../../../locale';
+import { deepEq } from '../../../../util';
 import LMap from './map';
 import './map-list.less';
 
@@ -258,7 +259,20 @@ export default class MapList extends PureComponent {
                 markers.push(m);
             }
         }
-        if (this.props.markers) markers.push(...this.props.markers);
+        if (this.props.markers) {
+            outer:
+            for (const marker of this.props.markers) {
+                if (marker.skipIfDuplicate) {
+                    for (const m of markers) {
+                        if (deepEq(m.location, marker.location)) {
+                            continue outer;
+                        }
+                    }
+                } else {
+                    markers.push(marker);
+                }
+            }
+        }
 
         return (
             <div class={'map-list' + (this.state.mapOpen ? ' map-is-open' : '')}>

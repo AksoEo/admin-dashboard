@@ -126,6 +126,7 @@ export default class LocationsView extends PureComponent {
             markers.push({
                 location: congressLocation,
                 icon: <BusinessIcon />,
+                skipIfDuplicate: true,
             });
         }
 
