@@ -397,7 +397,7 @@ class TextModule extends PureComponent {
                 <TemplatedMdField
                     key={index}
                     item={item}
-                    maxLength={5000}
+                    maxLength={20000}
                     rules={['blockquote', 'heading', 'emphasis', 'strikethrough', 'link', 'list', 'table', 'image']}
                     value={valueColumns[index]}
                     editing={editing}
