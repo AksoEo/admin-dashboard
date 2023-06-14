@@ -91,10 +91,15 @@ export const congressLocations = {
             type: 'Tipo',
             externalLoc: 'Ekstera loko',
             open: 'Malfermita',
+            tags: '[[Tags]]',
 
             openType: {
                 date: 'je horo ...',
                 none: 'sen malfermaj horoj',
+            },
+            tagPicker: {
+                search: 'Serĉi…',
+                empty: '[[No tags]]',
             },
         },
     },

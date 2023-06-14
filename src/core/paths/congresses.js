@@ -41,6 +41,9 @@ const locClientFilters = {
     open: {
         toAPI: open => ({ $open: open }),
     },
+    tags: {
+        toAPI: tags => ({ tags: { $hasAny: tags } }),
+    },
 };
 const progClientFilters = {
     timeSlice: {
