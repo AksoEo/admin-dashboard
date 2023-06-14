@@ -14,11 +14,13 @@ import {
     intermediaryReports as reportsLocale,
     membershipEntries as registrationLocale,
     codeholderChgReqs as chgReqLocale,
+    adminStatus as statusLocale,
 } from '../../../locale';
 import { country, currencyAmount } from '../../../components/data';
 import { connect, coreContext } from '../../../core/connection';
 import { LinkButton } from '../../../router';
 import Notices from './notices';
+import { WorkerQueueStatus } from '../administration/status/queue';
 import { base as aksoBase, buildTime as aksoBuildTime, version as aksoVersion } from 'akso:config';
 import './index.less';
 
@@ -29,6 +31,12 @@ export default class HomePage extends Page {
                 <div class="inner-grid">
                     <HomeTasks />
                     <Notices />
+                    <div class="home-card">
+                        <div class="hc-title">
+                            {statusLocale.workerQueues.title}
+                        </div>
+                        <WorkerQueueStatus />
+                    </div>
                     <div class="home-card">
                         <div class="hc-title">
                             {locale.admin.title}

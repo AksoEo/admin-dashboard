@@ -29,9 +29,9 @@ const clients = () => import(/* webpackChunkName: 'core-clients' */ './clients')
 const codeholders = () => import(/* webpackChunkName: 'core-codeholders', webpackPrefetch: true */ './codeholders');
 const congresses = () => import(/* webpackChunkName: 'core-congresses' */ './congresses');
 const countries = () => import(/* webpackChunkName: 'core-countries', webpackPrefetch: true */ './countries');
-const countryLists = () => import(/* webpackChunkName: 'core-country-lists' */ './country-lists');
 const delegations = () => import(/* webpackChunkName: 'core-delegations' */ './delegations');
 const adminGroups = () => import(/* webpackChunkName: 'core-admin' */ './admin-groups');
+const adminStatus = () => import(/* webpackChunkName: 'core-admin' */ './admin-status');
 const geoDb = () => import(/* webpackChunkName: 'core-geo-db' */ './geo-db');
 const httpLog = () => import(/* webpackChunkName: 'core-admin' */ './http-log');
 const intermediaries = () => import(/* webpackChunkName: 'core-intermediaries' */ './intermediaries');
@@ -42,7 +42,6 @@ const memberships = () => import(/* webpackChunkName: 'core-memberships' */ './m
 const magazines = () => import(/* webpackChunkName: 'core-magazines' */ './magazines');
 const newsletters = () => import(/* webpackChunkName: 'core-newsletters' */ './newsletters');
 const notifTemplates = () => import(/* webpackChunkName: 'core-notif-templates' */ './notif-templates');
-const orgLists = () => import(/* webpackChunkName: 'core-org-lists' */ './org-lists');
 const payments = () => import(/* webpackChunkName: 'core-payments' */ './payments');
 const roles = () => import(/* webpackChunkName: 'core-codeholders' */ './roles');
 const queries = () => import(/* webpackChunkName: 'core-queries' */ './queries');
@@ -61,9 +60,9 @@ export const tasks = {
     codeholders: lazyPath(codeholders, mapTasks),
     congresses: lazyPath(congresses, mapTasks),
     countries: lazyPath(countries, mapTasks),
-    countryLists: lazyPath(countryLists, mapTasks),
     delegations: lazyPath(delegations, mapTasks),
     adminGroups: lazyPath(adminGroups, mapTasks),
+    adminStatus: lazyPath(adminStatus, mapTasks),
     geoDb: lazyPath(geoDb, mapTasks),
     httpLog: lazyPath(httpLog, mapTasks),
     intermediaries: lazyPath(intermediaries, mapTasks),
@@ -73,7 +72,6 @@ export const tasks = {
     magazines: lazyPath(magazines, mapTasks),
     notifTemplates: lazyPath(notifTemplates, mapTasks),
     newsletters: lazyPath(newsletters, mapTasks),
-    orgLists: lazyPath(orgLists, mapTasks),
     roles: lazyPath(roles, mapTasks),
     queries: lazyPath(queries, mapTasks),
     perms: lazyPath(perms, mapTasks),
@@ -89,9 +87,9 @@ export const views = {
     codeholders: lazyPath(codeholders, mapViews),
     congresses: lazyPath(congresses, mapViews),
     countries: lazyPath(countries, mapViews),
-    countryLists: lazyPath(countryLists, mapViews),
     delegations: lazyPath(delegations, mapViews),
     adminGroups: lazyPath(adminGroups, mapViews),
+    adminStatus: lazyPath(adminStatus, mapViews),
     geoDb: lazyPath(geoDb, mapViews),
     httpLog: lazyPath(httpLog, mapViews),
     intermediaries: lazyPath(intermediaries, mapViews),
@@ -101,7 +99,6 @@ export const views = {
     magazines: lazyPath(magazines, mapViews),
     notifTemplates: lazyPath(notifTemplates, mapViews),
     newsletters: lazyPath(newsletters, mapViews),
-    orgLists: lazyPath(orgLists, mapViews),
     roles: lazyPath(roles, mapViews),
     perms: lazyPath(perms, mapViews),
     payments: lazyPath(payments, mapViews),

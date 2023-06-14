@@ -28,6 +28,7 @@ import {
 // import AssignmentIcon from '@material-ui/icons/Assignment';
 // import FileIcon from '@material-ui/icons/InsertDriveFile';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
+import DataUsageIcon from '@material-ui/icons/DataUsage';
 
 /** Lazily load a page and also have some basic error handling. */
 const elazy = (inner, map) => lazy(() => inner().then(e => {
@@ -1104,6 +1105,16 @@ export default [
                         ],
                     },
                 ],
+            },
+            {
+                id: 'administration-status',
+                icon: DataUsageIcon,
+                component: elazy(() =>
+                    import(/* webpackChunkName: "admin-country-groups" */ './administration/status')),
+                type: 'bottom',
+                path: 'stato',
+                hasPerm: perms => perms.hasPerm('status.worker_queues'),
+                paths: [],
             },
         ],
     },

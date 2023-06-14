@@ -219,85 +219,18 @@ export const countryGroups = {
     },
     csvFilename: 'landaroj',
 };
-export const countryLists = {
-    title: 'Listoj de landaj asocioj',
-    detailTitle: 'Listo de landaj asocioj',
-    search: {
-        placeholders: 'Serĉi landan asocion ...',
-    },
-    fields: {
-        name: 'Nomo',
-        list: 'Listo',
 
-        nameNotEditable: 'Ne eblas redakti la nomojn de listoj de landoj asocioj. Anstataŭe iru al la menuo plej supre dekstre kaj kopii ĝin.',
-
-        listSearch: 'Serĉi landojn',
-        listEmpty: 'La listo estas malplena',
-        listAddCountry: {
-            title: 'Aldoni landon',
-            searchPlaceholder: 'Serĉi landojn ...',
-            empty: 'La listo estas malplena',
-            confirm: 'Aldoni',
+export const adminStatus = {
+    title: '[[System Status]]',
+    workerQueues: {
+        title: '[[Worker Queues]]',
+        labels: {
+            AKSO_SEND_EMAIL: '[[Send Email]]',
+            AKSO_SEND_TELEGRAM: '[[Send Telegram]]',
+            AKSO_ADDRESS_LABELS: '[[Address Labels]]',
         },
-    },
-    create: {
-        menuItem: 'Krei',
-        title: 'Krei liston de landaj asocioj',
-        button: 'Krei',
-
-        duplicateMenuItem: 'Krei kopion',
-        duplicateTitle: 'Krei kopion de listo',
-        duplicateButton: 'Kopii',
-    },
-    update: {
-        title: 'Redakti liston de landaj asocioj',
-        button: 'Aktualigi',
-    },
-    delete: {
-        title: 'Forigi liston de landaj asocioj',
-        button: 'Forigi',
-        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi liston? Ne eblas malfari tiun ĉi agon.',
+        pendingMessages: '[[Pending messages]]',
+        consumers: '[[Consumers]]',
+        noConsumers: '[[There are no consumers for this task. Tell your admin or something.]]',
     },
 };
-export const orgLists = {
-    title: 'Listoj de fakaj asocioj',
-    detailTitle: 'Listo de fakaj asocioj',
-    search: {
-        placeholders: 'Serĉi listojn de fakaj asocioj ...',
-    },
-    fields: {
-        name: 'Nomo',
-        list: 'Asocioj',
-
-        nameNotEditable: 'Ne eblas redakti la nomojn de listoj de asocioj. Anstataŭe iru al la menuo plej supre dekstre kaj kopii ĝin.',
-
-        listSearch: 'Serĉi fakajn asociojn',
-        listEmpty: 'La listo estas malplena',
-        listAddTag: {
-            title: 'Aldoni fakon',
-            label: 'Etikedo',
-            confirm: 'Aldoni',
-            labelEmpty: 'Nepras etikedo',
-            labelTaken: 'Tiu etikedo jam ekzistas',
-        },
-    },
-    create: {
-        menuItem: 'Krei',
-        title: 'Krei liston',
-        button: 'Krei',
-
-        duplicateMenuItem: 'Krei kopion',
-        duplicateTitle: 'Krei kopion de listo',
-        duplicateButton: 'Kopii',
-    },
-    update: {
-        title: 'Redakti liston',
-        button: 'Aktualigi',
-    },
-    delete: {
-        title: 'Forigi liston de fakaj asocioj',
-        button: 'Forigi',
-        description: 'Ĉu vi certas, ke vi volas forigi tiun ĉi liston? Ne eblas malfari tiun ĉi agon.',
-    },
-};
-
