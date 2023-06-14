@@ -63,6 +63,14 @@ export default {
                             <TextField
                                 required
                                 outline
+                                label={locale.fields.abbrev}
+                                value={task.parameters.abbrev || ''}
+                                onChange={e => task.update({ abbrev: e.target.value || null })} />
+                        </Field>
+                        <Field>
+                            <TextField
+                                required
+                                outline
                                 label={locale.fields.name}
                                 value={task.parameters.name || ''}
                                 onChange={e => task.update({ name: e.target.value })} />
