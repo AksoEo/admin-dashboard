@@ -227,6 +227,7 @@ export const paymentIntents = {
         customer: 'Kliento',
         customerName: 'Nomo',
         customerEmail: 'Retpoŝtadreso',
+        customerId: 'Ligita Membro',
         method: 'Pagmetodo',
         org: 'Organizo',
         currency: 'Valuto',

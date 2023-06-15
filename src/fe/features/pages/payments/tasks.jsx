@@ -6,6 +6,7 @@ import Segmented from '../../../components/controls/segmented';
 import Select from '../../../components/controls/select';
 import ChangedFields from '../../../components/tasks/changed-fields';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
+import CodeholderPicker from '../../../components/pickers/codeholder-picker';
 import { deleteDialog } from '../../../components/tasks/task-templates';
 import { currencyAmount } from '../../../components/data';
 import { Field } from '../../../components/form';
@@ -205,6 +206,26 @@ export default {
                     label={intentLocale.fields.customerEmail}
                     value={customer.email}
                     onChange={e => task.update({ customer: { ...customer, email: e.target.value } })} />
+            </Field>
+        );
+        fields.push(
+            <div key="customer" class="create-intent-subtitle">
+                {intentLocale.fields.customerId}
+            </div>
+        );
+        fields.push(
+            <Field key="customer.id">
+                <CodeholderPicker
+                    limit={1}
+                    value={customer.id ? [customer.id] : []}
+                    onChange={ids => {
+                        task.update({
+                            customer: {
+                                ...customer,
+                                id: ids[0] || null,
+                            },
+                        });
+                    }} />
             </Field>
         );
 
