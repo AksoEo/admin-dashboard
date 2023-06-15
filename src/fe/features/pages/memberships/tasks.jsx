@@ -154,6 +154,11 @@ export default {
         fieldNames: ENTRY_CREATE_FIELDS,
         fields: ENTRY_FIELDS,
         onCompletion: (task, routerContext, id) => routerContext.navigate(`/membreco/alighoj/${id}`),
+        canSubmit: (task) => {
+            console.log('cansubmit', task.parameters);
+            if (!task.parameters.offers?.selected?.length) return false;
+            return true;
+        },
     }),
     updateEntry ({ open, task }) {
         return (

@@ -386,15 +386,26 @@ function PurposeTriggerInfo ({ purpose, currency }) {
         );
     }
 
+    let linkTarget;
+    if (purpose.triggers === 'registration_entry') {
+        linkTarget = `/membreco/alighoj/${purpose.dataId}`;
+    }
+
     return (
         <div class="purpose-trigger-info">
             <div class="purpose-trigger-type">
                 <span class="purpose-triggers">
                     {locale.triggers[purpose.triggers]}
                 </span>
-                <span class="purpose-data-id">
-                    {purpose.dataId}
-                </span>
+                {linkTarget ? (
+                    <Link class="purpose-data-id" target={linkTarget} outOfTree>
+                        {purpose.dataId}
+                    </Link>
+                ) : (
+                    <span class="purpose-data-id">
+                        {purpose.dataId}
+                    </span>
+                )}
             </div>
             <div class="purpose-trigger-status">
                 <div class="inner-trigger-status" data-status={purpose.triggerStatus}>

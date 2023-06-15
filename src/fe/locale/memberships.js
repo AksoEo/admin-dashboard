@@ -170,6 +170,11 @@ export const membershipEntries = {
     titlePrefix: 'Aliĝo por la jaro',
     actions: {
         cancel: 'Nuligi',
+        createPaymentIntent: 'Aldoni pagon',
+        createPaymentIntentData: {
+            title: year => `Aliĝo por la jaro ${year}`,
+        },
+        viewPayments: 'Vidi pagojn',
     },
     offers: {
         selectYearFirst: 'Bonvolu unue elekti membron kaj jaron',

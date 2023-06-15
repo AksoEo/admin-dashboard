@@ -69,10 +69,11 @@ const makeEditable = (Renderer, Editor, History) => function EditableField ({
     editing,
     item,
     isHistory,
+    userData,
 }) {
     if (isHistory && History) return <History value={value} item={item} />;
     if (!editing) return <Renderer value={value} />;
-    return <Editor value={value} item={item} onChange={onChange} />;
+    return <Editor value={value} item={item} onChange={onChange} userData={userData} />;
 };
 
 const makeDataEditable = (data, history) => makeEditable(data.renderer, data.editor, history);
@@ -799,7 +800,7 @@ class ValidatedEmailEditor extends PureComponent {
         }
     }
 
-    render ({ value, onChange }) {
+    render ({ value, onChange, userData }) {
         let trailing, errorLabel;
         if (this.state.checking) trailing = <CircularProgress small indeterminate />;
         else if (this.state.error) trailing = null;
@@ -812,6 +813,7 @@ class ValidatedEmailEditor extends PureComponent {
 
         return <ValidatedTextField
             ref={this.textField}
+            required={!!userData?.forceRequireEmail}
             trailing={
                 <span class="trailing-validation-status">
                     {trailing}
@@ -934,13 +936,14 @@ export const fields = {
         },
     },
     birthdate: {
-        component: permsEditable('birthdate', ({ value, editing, onChange, item }) => {
+        component: permsEditable('birthdate', ({ value, editing, onChange, item, userData }) => {
             if (editing) {
                 let maxDate = new Date();
                 if (item.deathdate && new Date(item.deathdate) < maxDate) maxDate = new Date(item.deathdate);
 
                 return (
                     <date.editor
+                        required={!!userData?.forceRequireBirthdate}
                         value={value}
                         max={maxDate}
                         onChange={onChange} />

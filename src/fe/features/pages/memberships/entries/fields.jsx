@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState, PureComponent } from 'preact/compat';
+import { useContext, useState, PureComponent } from 'preact/compat';
 import { Button, CircularProgress, Dialog } from 'yamdl';
 import moment from 'moment';
 import { evaluate } from '@tejo/akso-script';
@@ -11,6 +11,7 @@ import DownIcon from '@material-ui/icons/KeyboardArrowDown';
 import AddIcon from '@material-ui/icons/Add';
 import LinkIcon from '@material-ui/icons/Link';
 import { currencyAmount, timestamp, ueaCode } from '../../../../components/data';
+import TaskButton from '../../../../components/controls/task-button';
 import TextArea from '../../../../components/controls/text-area';
 import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
 import Select from '../../../../components/controls/select';
@@ -21,9 +22,9 @@ import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import ItemPickerDialog from '../../../../components/pickers/item-picker-dialog';
 import DisplayError from '../../../../components/utils/error';
 import { membershipEntries as locale, codeholders as codeholdersLocale, currencies } from '../../../../locale';
-import { Link } from '../../../../router';
+import { Link, LinkButton } from '../../../../router';
 import { connect, coreContext } from '../../../../core/connection';
-import { connectPerms } from '../../../../perms';
+import { connectPerms, usePerms } from '../../../../perms';
 import { fields as CODEHOLDER_FIELDS } from '../../codeholders/detail-fields';
 import './fields.less';
 
@@ -301,10 +302,21 @@ export const FIELDS = {
                         value.name.first || value.name.firstLegal,
                         value.name.last || value.name.lastLegal,
                     ].filter(x => x).join(' ');
-                    contents = [
-                        <span key={0} class="new-codeholder">{locale.fields.codeholderDataTypes.object}</span>,
-                        <span key={1} class="formatted-name">{formattedName}</span>,
-                    ];
+
+                    if (item.newCodeholderId) {
+                        contents = (
+                            <span class="new-codeholder">
+                                {locale.fields.codeholderDataTypes.object}
+                                {' '}
+                                <CodeholderCard id={item.newCodeholderId} />
+                            </span>
+                        );
+                    } else {
+                        contents = [
+                            <span key={0} class="new-codeholder">{locale.fields.codeholderDataTypes.object}</span>,
+                            <span key={1} class="formatted-name">{formattedName}</span>,
+                        ];
+                    }
                 }
 
                 return (
@@ -354,6 +366,8 @@ export const FIELDS = {
                             locale={codeholdersLocale}
                             userData={{
                                 forceShowName: true,
+                                forceRequireEmail: true,
+                                forceRequireBirthdate: true,
                                 useLocalAddress: true,
                             }} />
                     </div>
@@ -414,54 +428,112 @@ export const FIELDS = {
     },
 };
 
-export class Header extends PureComponent {
-    static contextType = coreContext;
+export function Header ({ item }) {
+    const core = useContext(coreContext);
+    const perms = usePerms();
 
-    render ({ item }) {
-        let cancelButton;
-        if (item.status.status === 'pending' || item.status.status === 'submitted') {
-            cancelButton = (
-                <Button onClick={() => this.context.createTask('memberships/cancelEntry', {
-                    id: item.id,
-                })}>
-                    {locale.actions.cancel}
-                </Button>
-            );
-        }
-
-        let statusTime = null;
-        if (item.status.time) {
-            statusTime = (
-                <span>
-                    {locale.fields.timeSubmittedTime}
-                    {': '}
-                    <timestamp.renderer value={item.status.time} />
-                </span>
-            );
-        }
-
-        return (
-            <div class="registration-entry-header">
-                <div class="entry-top">
-                    <span class="inner-status" data-status={item.status.status}>
-                        {locale.fields.statusTypes[item.status.status]}
-                    </span>
-                    <span class="inner-id registration-entry-id">{item.id}</span>
-                </div>
-                <div class="entry-title">
-                    {locale.titlePrefix}
-                    {' '}
-                    <span class="title-year">{item.year}</span>
-                </div>
-                <div class="entry-status-time">
-                    {statusTime}
-                </div>
-                <div class="entry-actions">
-                    {cancelButton}
-                </div>
-            </div>
+    let cancelButton;
+    if (item.status.status === 'pending' || item.status.status === 'submitted') {
+        cancelButton = (
+            <Button onClick={() => core.createTask('memberships/cancelEntry', {
+                id: item.id,
+            })}>
+                {locale.actions.cancel}
+            </Button>
         );
     }
+
+    const canReadIntents = perms.hasPerm('pay.payment_intents.read.uea')
+        || perms.hasPerm('pay.payment_intents.read.tejo');
+    const canCreateIntent = perms.hasPerm('pay.payment_intents.create.uea')
+        || perms.hasPerm('pay.payment_intents.create.tejo');
+
+    let paymentButton;
+    if (item.status.status === 'submitted' && canCreateIntent) {
+        paymentButton = (
+            <TaskButton run={async () => {
+                let codeholderData;
+                if (typeof item.codeholderData === 'number') {
+                    const codeholder = await core.viewData('codeholders/codeholder', {
+                        id: item.codeholderData,
+                        fields: ['id', 'name', 'email'],
+                    });
+                } else {
+                    codeholderData = item.codeholderData;
+                }
+
+                let name = [
+                    codeholderData.name?.full,
+                    codeholderData.name?.honorific,
+                    codeholderData.name?.first || codeholderData.name?.firstLegal,
+                    codeholderData.name?.last || codeholderData.name?.lastLegal,
+                ].filter(x => x).join(' ');
+
+                core.createTask('payments/createIntent', {}, {
+                    customer: {
+                        name: name || null,
+                        email: codeholderData.email || null,
+                        id: codeholderData.id || null,
+                    },
+                    purposes: [
+                        {
+                            type: 'trigger',
+                            title: locale.actions.createPaymentIntentData.title(item.year),
+                            // description: congress.name,
+                            triggers: 'registration_entry',
+                            dataId: item.id,
+                            amount: item.offers.selected.map(item => item.amount).reduce((a, b) => a + b, 0),
+                        },
+                    ],
+                    currency: item.offers.currency,
+                });
+            }}>
+                {locale.actions.createPaymentIntent}
+            </TaskButton>
+        );
+    } else if (item.status.status === 'succeeded' && canReadIntents) {
+        const target = `/aksopago/pagoj?filter(purposeDataId:${item.id})`;
+
+        paymentButton = (
+            <LinkButton target={target}>
+                {locale.actions.viewPayments}
+            </LinkButton>
+        );
+    }
+
+    let statusTime = null;
+    if (item.status.time) {
+        statusTime = (
+            <span>
+                {locale.fields.timeSubmittedTime}
+                {': '}
+                <timestamp.renderer value={item.status.time} />
+            </span>
+        );
+    }
+
+    return (
+        <div class="registration-entry-header">
+            <div class="entry-top">
+                <span class="inner-status" data-status={item.status.status}>
+                    {locale.fields.statusTypes[item.status.status]}
+                </span>
+                <span class="inner-id registration-entry-id">{item.id}</span>
+            </div>
+            <div class="entry-title">
+                {locale.titlePrefix}
+                {' '}
+                <span class="title-year">{item.year}</span>
+            </div>
+            <div class="entry-status-time">
+                {statusTime}
+            </div>
+            <div class="entry-actions">
+                {cancelButton}
+                {paymentButton}
+            </div>
+        </div>
+    );
 }
 
 const CodeholderDataForOffers = connect(({ codeholder }) => ['codeholders/codeholder', {

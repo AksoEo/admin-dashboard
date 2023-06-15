@@ -10,7 +10,9 @@ import { routerContext } from '../../router';
 import { data as dataLocale } from '../../locale';
 import './task-templates.less';
 
-export function createDialog ({ locale, fieldNames, fields: fieldDefs, className, onCompletion }) {
+export function createDialog ({
+    locale, fieldNames, fields: fieldDefs, className, onCompletion, canSubmit,
+}) {
     return ({ open, task }) => {
         if (task.options._noGUI) return null;
 
@@ -48,6 +50,7 @@ export function createDialog ({ locale, fieldNames, fields: fieldDefs, className
                         onClose={() => task.drop()}
                         title={locale.create.title}
                         actionLabel={locale.create.button}
+                        actionDisabled={canSubmit && !canSubmit(task)}
                         run={() => task.runOnce().then(id => {
                             onCompletion(task, routerContext, id);
                         })}>

@@ -209,7 +209,7 @@ export default {
             </Field>
         );
         fields.push(
-            <div key="customer" class="create-intent-subtitle">
+            <div key="customer.id-title" class="create-intent-subtitle">
                 {intentLocale.fields.customerId}
             </div>
         );
@@ -374,7 +374,7 @@ export default {
                 </Field>
             );
         }
-        const ready = task.parameters.currency && task.parameters.purposes && task.parameters.purposes.length;
+        const ready = task.parameters.currency && method.id && task.parameters.purposes && task.parameters.purposes.length;
 
         let total = 0;
         let overMaxAmount = false;

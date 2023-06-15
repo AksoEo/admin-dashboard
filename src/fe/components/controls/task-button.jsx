@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
-import { Button, CircularProgress } from 'yamdl';
+import { Button, CircularProgress, Dialog } from 'yamdl';
+import DisplayError from '../utils/error';
 import './task-button.less';
 
 /**
@@ -15,6 +16,8 @@ import './task-button.less';
 export default class TaskButton extends PureComponent {
     state = {
         loading: false,
+        errorOpen: false,
+        error: null,
     };
 
     onClick = () => {
@@ -22,8 +25,8 @@ export default class TaskButton extends PureComponent {
         this.setState({ loading: true });
         this.props.run().catch(err => {
             console.error(err); // eslint-disable-line no-console
-            // TODO: do something with this error
-        }).then(() => {
+            this.setState({ errorOpen: true, error: err });
+        }).finally(() => {
             this.setState({ loading: false });
         });
     };
@@ -42,6 +45,12 @@ export default class TaskButton extends PureComponent {
                 <label class="task-button-label">
                     {children}
                 </label>
+
+                <Dialog
+                    open={this.state.errorOpen}
+                    onClose={() => this.setState({ errorOpen: false })}>
+                    <DisplayError error={this.state.error} />
+                </Dialog>
             </Button>
         );
     }
