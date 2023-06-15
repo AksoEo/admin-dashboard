@@ -165,7 +165,10 @@ export default class MulticolList extends PureComponent {
             }
 
             for (const item of this.props.children) {
-                if (!item.key) throw new Error('MulticolList: child has no key');
+                if (!item.key) {
+                    console.error('no key in', item);
+                    throw new Error('MulticolList: child has no key');
+                }
                 if (!this.itemData[item.key]) {
                     this.createItemData(item, columns[item.column].length);
                 } else {

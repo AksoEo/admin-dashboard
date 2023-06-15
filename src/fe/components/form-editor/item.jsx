@@ -115,6 +115,7 @@ export default class FormEditorItem extends PureComponent {
                     onMoveItem={onMoveItem}
                     editable={editable}
                     name={item.name}
+                    type={item.type}
                     editing={editing}
                     onStartEditing={() => onEditingChange(true)}
                     onClose={this.onFinishEditing}
@@ -130,6 +131,7 @@ export default class FormEditorItem extends PureComponent {
 function ItemBar ({
     editable,
     el,
+    type,
     name,
     editing,
     onStartEditing,
@@ -178,17 +180,20 @@ function ItemBar ({
 
     return (
         <div class={'form-editor-item-bar' + (editing ? ' is-editing' : '')}>
-            {editable ? (
-                <Button class="remove-button" small icon onClick={e => {
-                    if (e.shiftKey) {
-                        onRemove();
-                    } else {
-                        setRemoving(true);
-                    }
-                }}>
-                    <RemoveIcon style={{ verticalAlign: 'middle' }} />
-                </Button>
-            ) : <span />}
+            <span>
+                {editable ? (
+                    <Button class="remove-button" small icon onClick={e => {
+                        if (e.shiftKey) {
+                            onRemove();
+                        } else {
+                            setRemoving(true);
+                        }
+                    }}>
+                        <RemoveIcon style={{ verticalAlign: 'middle' }} />
+                    </Button>
+                ) : null}
+                {el === 'input' ? locale.inputTypes[type] : null}
+            </span>
             {nameNode}
             <span class="item-bar-right">
                 {button}

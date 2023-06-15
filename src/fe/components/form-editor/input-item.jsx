@@ -460,7 +460,7 @@ export default class InputItem extends PureComponent {
         const type = this.props.item.type;
         const settings = TYPES[type]?.settings;
         if (!settings) return true;
-        for (const k of DEFAULT_SETTINGS.concat(settings)) {
+        for (const k of DEFAULT_SETTINGS.concat(Object.keys(settings))) {
             const setting = SETTINGS[k];
             if (setting?.validate) {
                 const error = setting.validate({
@@ -1105,6 +1105,12 @@ const SETTINGS = {
                 </Setting>
             );
         }),
+        validate: ({ value }) => {
+            for (const opt of value) {
+                if (!opt.name) return dataLocale.requiredField;
+                if (!opt.value) return dataLocale.requiredField;
+            }
+        },
     },
     exclude: {
         component: memo(({ value, onChange }) => {
@@ -1425,6 +1431,7 @@ function OptionsEditorItem ({ onRemove, value, onChange }) {
             <TextField
                 outline
                 label={locale.inputFields.optionsName}
+                required
                 value={value.name}
                 minlength={1}
                 maxLength={50}

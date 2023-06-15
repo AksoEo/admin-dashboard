@@ -61,7 +61,7 @@ export function createInput (type) {
         maxSelect: null,
         headerTop: null,
         headerLeft: null,
-        excludeCells: null,
+        excludeCells: [],
     };
 
     return {

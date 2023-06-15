@@ -330,7 +330,6 @@ export const FILTERS = {
                         key={i}
                         disabled={hidden}
                         form={userData.registrationForm}
-                        currency={userData.currency}
                         predicate={value[index]}
                         onChange={item => {
                             const v = value.slice();
@@ -368,7 +367,7 @@ export const FILTERS = {
     },
 };
 
-function DataPredicate ({ form, predicate, onChange, onRemove, currency, disabled }) {
+function DataPredicate ({ form, predicate, onChange, onRemove, disabled }) {
     const remove = (
         <Button icon small onClick={onRemove} disabled={disabled} class="remove-predicate-button">
             <RemoveIcon style={{ verticalAlign: 'middle' }} />
@@ -424,8 +423,7 @@ function DataPredicate ({ form, predicate, onChange, onRemove, currency, disable
                     disabled={disabled}
                     item={selectedItem}
                     value={predicate.value}
-                    onChange={value => onChange({ ...predicate, value })}
-                    currency={currency} />;
+                    onChange={value => onChange({ ...predicate, value })} />;
             }
         }
     }
@@ -475,12 +473,12 @@ const predicateObjectEditors = {
             const n = parseFloat(e.target.value);
             if (Number.isFinite(n)) onChange(n);
         }} />,
-    money: ({ value, onChange, currency, disabled }) => <currencyAmount.editor
+    money: ({ value, onChange, item, disabled }) => <currencyAmount.editor
         disabled={disabled}
         outline
         value={value}
         onChange={onChange}
-        currency={currency} />,
+        currency={item.currency} />,
     enum: ({ value, onChange, item, disabled }) => <Select
         disabled={disabled}
         value={value}
@@ -488,7 +486,7 @@ const predicateObjectEditors = {
         items={item.options.map(opt => ({ value: opt.value, label: opt.name }))} />,
     countries: ({ value, onChange, disabled }) => <CountryPicker
         disabled={disabled}
-        value={value.split(',')}
+        value={value.split(',').filter(x => x)}
         onChange={v => onChange(v.join(','))} />,
     date: date.editor,
     time: time.editor,
