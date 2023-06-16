@@ -680,6 +680,7 @@ export default class Navigation extends PureComponent {
 
             let itemHeader = null;
             let itemAppBar = null;
+            const itemAccessoryView = stackItem.meta?.accessoryView;
             if (!globalMenu && !isBottom) {
                 itemHeader = (
                     <Fragment>

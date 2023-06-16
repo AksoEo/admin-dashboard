@@ -1,10 +1,11 @@
 import { h } from 'preact';
-import { useEffect, useState } from 'preact/compat';
+import { useEffect, useRef, useState } from 'preact/compat';
 import { AppBarProxy, Button, MenuIcon, CircularProgress } from 'yamdl';
 import PermsEditor from './editor';
 import DoneIcon from '@material-ui/icons/Done';
 import UndoIcon from '@material-ui/icons/Undo';
 import RedoIcon from '@material-ui/icons/Redo';
+import ListIcon from '@material-ui/icons/List';
 import Meta from '../../../meta';
 import DisplayError from '../../../../components/utils/error';
 import './page.less';
@@ -12,6 +13,7 @@ import './page.less';
 export default function PermsEditorPage ({ loading, error, perms, save, title, ...extra }) {
     const [history, setHistory] = useState([]);
     const [historyCursor, setHistoryCursor] = useState(0);
+    const [isIndexOpen, setIndexOpen] = useState(innerWidth > 1500);
 
     useEffect(() => {
         // reset when upstream changes
@@ -52,15 +54,27 @@ export default function PermsEditorPage ({ loading, error, perms, save, title, .
     } else if (perms) {
         permsEditor = (
             <PermsEditor
+                isIndexOpen={isIndexOpen}
+                setIndexOpen={setIndexOpen}
                 {...extra}
                 value={currentEdit}
                 onChange={pushChange} />
         );
     }
 
+    const isIndexOpenRef = useRef(isIndexOpen);
+    isIndexOpenRef.current = isIndexOpen;
+
     return (
         <div class="perms-editor-page">
-            <Meta title={title} />
+            <Meta
+                title={title}
+                actions={[
+                    {
+                        icon: <ListIcon />,
+                        action: () => setIndexOpen(!isIndexOpenRef.current),
+                    },
+                ]} />
             <AppBarProxy
                 class="perms-editor-app-bar"
                 priority={isEdited ? 9 : -Infinity}

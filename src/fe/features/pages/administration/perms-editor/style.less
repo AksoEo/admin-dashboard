@@ -219,6 +219,74 @@
     }
 }
 
+.perms-editor-index-sidebar {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 16px;
+    width: 240px;
+    max-height: calc(100vh - 64px - 16px);
+    overflow: auto;
+    background: @card-background;
+    border-radius: 8px;
+    .elevation(8);
+    z-index: 100;
+    animation: perms-editor-index-sidebar-in 0.3s @easing;
+
+    @keyframes perms-editor-index-sidebar-in {
+        0% {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+
+    .inner-header {
+        display: flex;
+        gap: 8px;
+        padding: 8px;
+        align-items: center;
+
+        .close-button {
+            .md-gray-button();
+        }
+
+        .inner-title {
+            font-weight: bold;
+        }
+    }
+
+    .inner-categories {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        & > li {
+            display: flex;
+            border-top: 1px solid @separator;
+
+            .inner-button {
+                flex: 1;
+                white-space: nowrap;
+                padding: 8px 16px;
+                background: none;
+                border: none;
+                font: inherit;
+                text-transform: none;
+                letter-spacing: 0;
+                color: inherit;
+                text-align: left;
+                transition: font-weight 0.1s;
+                border-radius: 0;
+                .md-gray-button();
+            }
+
+            &.is-selected .inner-button {
+                font-weight: bold;
+            }
+        }
+    }
+}
+
 .admin-perms-save-dialog {
     max-width: 100%;
     width: 350px;

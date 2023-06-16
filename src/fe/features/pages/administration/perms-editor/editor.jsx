@@ -1,10 +1,12 @@
 import { h } from 'preact';
 import {
     createContext,
+    createPortal,
     memo,
     useContext,
     useEffect,
     useMemo,
+    useRef,
     useState,
     PureComponent,
 } from 'preact/compat';
@@ -37,6 +39,7 @@ import './style.less';
 import { useDataView } from '../../../../core';
 import { coreContext } from '../../../../core/connection';
 import TextArea from '../../../../components/controls/text-area';
+import CloseIcon from '@material-ui/icons/Close';
 
 const permsEditorState = createContext({
     showRaw: false,
@@ -80,6 +83,8 @@ export default class PermsEditor extends PureComponent {
         showRaw: false,
         showData: false,
         isGroup: this.props.isGroup,
+
+        categoryCursor: null,
     };
 
     #node = null;
@@ -138,7 +143,51 @@ export default class PermsEditor extends PureComponent {
         },
     };
 
-    render ({value, editable }, { showData }) {
+    #scrollViewParent = null;
+    componentDidMount () {
+        // find scroll view container
+        let cursor = this.#node;
+        while (cursor) {
+            if (['scroll', 'auto'].includes(getComputedStyle(cursor).overflowY)) {
+                break;
+            }
+            cursor = cursor.parentNode;
+        }
+        this.#scrollViewParent = cursor;
+        this.#scrollViewParent.addEventListener('scroll', this.onScrollContainer, { passive: true });
+    }
+    componentWillUnmount () {
+        this.#scrollViewParent?.removeEventListener('scroll', this.onScrollContainer, { passive: true });
+    }
+
+    onScrollContainer = () => {
+        const scrollViewRect = this.#scrollViewParent.getBoundingClientRect();
+
+        let closestCategory = null;
+        let closestCategoryDist = Infinity;
+        for (const category of this.#node.querySelectorAll('.perms-category')) {
+            const rect = category.getBoundingClientRect();
+            const distance = Math.abs(rect.top - scrollViewRect.top);
+            if (distance < closestCategoryDist) {
+                closestCategory = category.dataset.name;
+                closestCategoryDist = distance;
+            }
+        }
+
+        if (closestCategory) {
+            this.setState({ categoryCursor: closestCategory });
+        }
+    };
+    scrollToCategory = (item) => {
+        for (const category of this.#node.querySelectorAll('.perms-category')) {
+            if (category.dataset.name === item.name) {
+                category.scrollIntoView({ behavior: 'smooth' });
+                break;
+            }
+        }
+    };
+
+    render ({ value, editable, isIndexOpen, setIndexOpen }, { showData }) {
         if (!value) return null;
 
         if (value.permissions !== this.permissions.__derivedFrom?.permissions
@@ -199,6 +248,13 @@ export default class PermsEditor extends PureComponent {
                     onClose={() => this.setState({ showData: false })}>
                     <RawPermissions permissions={permissions} />
                 </Dialog>
+
+                {isIndexOpen ? (
+                    <PermsIndex
+                        cursor={this.state.categoryCursor}
+                        onSelect={this.scrollToCategory}
+                        onClose={() => setIndexOpen(false)} />
+                ) : null}
             </div>
         );
     }
@@ -271,6 +327,50 @@ function CopyPaste ({ value, onChange }) {
                 <TextArea autofocus value={pasted} onChange={setPasted} />
             </Dialog>
         </div>
+    );
+}
+
+function PermsIndex ({ cursor, onSelect, onClose }) {
+    const containerNode = useMemo(() => document.createElement('div'), []);
+    useEffect(() => {
+        document.body.appendChild(containerNode);
+        return () => document.body.removeChild(containerNode);
+    }, [containerNode]);
+
+    const categories = spec.filter(x => x.type === 'category').map((item, i) => (
+        <PermsIndexItem key={i} item={item} selected={cursor === item.name} onSelect={() => onSelect(item)} />
+    ));
+
+    return createPortal(
+        <div class="perms-editor-index-sidebar">
+            <div class="inner-header">
+                <Button class="close-button" icon small onClick={onClose}>
+                    <CloseIcon />
+                </Button>
+                <div class="inner-title">
+                    {locale.permsEditor.indexSidebarTitle}
+                </div>
+            </div>
+            <ul class="inner-categories">
+                {categories}
+            </ul>
+        </div>,
+        containerNode,
+    );
+}
+
+function PermsIndexItem ({ item, selected, onSelect }) {
+    const node = useRef();
+    useEffect(() => {
+        if (selected) node.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, [selected]);
+
+    return (
+        <li ref={node} className={selected ? 'is-selected' : ''}>
+            <Button class="inner-button" onClick={onSelect}>
+                {item.name}
+            </Button>
+        </li>
     );
 }
 
@@ -450,7 +550,7 @@ const PermsItem = memo(function PermsItem ({ item, disabled }) {
         const [expanded, setExpanded] = useState(true);
 
         return (
-            <div class={'perms-category' + (expanded ? ' is-expanded' : '')}>
+            <div class={'perms-category' + (expanded ? ' is-expanded' : '')} data-name={item.name}>
                 <button class="category-title" onClick={() => setExpanded(!expanded)}>
                     <DisclosureArrow dir={expanded ? 'up' : 'down'} />
                     <span class="category-title-inner">{item.name}</span>
