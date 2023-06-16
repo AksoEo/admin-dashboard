@@ -1,33 +1,11 @@
 @import 'prelude';
 
-.gen-roboto-normal-declaration(@path, @weight) {
-    @font-face {
-        font-family: 'Roboto';
-        src: url('@{path}.woff2') format('woff2'), url('@{path}.woff') format('woff');
-        font-weight: @weight;
-        font-style: normal;
-    }
+@font-face {
+    font-family: 'Roboto';
+    src: url('/assets/roboto/RobotoFlex.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: oblique 0deg 10deg;
 }
-.gen-roboto-italic-declaration(@path, @weight) {
-    @font-face {
-        font-family: 'Roboto';
-        src: url('@{path}Italic.woff2') format('woff2'), url('@{path}Italic.woff') format('woff');
-        font-weight: @weight;
-        font-style: italic;
-    }
-}
-.gen-roboto-declaration(@path, @weight) {
-    .gen-roboto-normal-declaration(@path, @weight);
-    .gen-roboto-italic-declaration(@path, @weight);
-}
-
-.gen-roboto-declaration('/assets/roboto/Roboto-Black', 900);
-.gen-roboto-declaration('/assets/roboto/Roboto-Bold', 700);
-.gen-roboto-declaration('/assets/roboto/Roboto-Medium', 500);
-.gen-roboto-normal-declaration('/assets/roboto/Roboto-Regular', 400);
-.gen-roboto-italic-declaration('/assets/roboto/Roboto-', 400);
-.gen-roboto-declaration('/assets/roboto/Roboto-Light', 300);
-.gen-roboto-declaration('/assets/roboto/Roboto-Thin', 100);
 
 .paper-dialog-container .paper-dialog .p-app-bar-placeholder {
     padding-top: env(safe-area-inset-top);
