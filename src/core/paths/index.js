@@ -44,6 +44,7 @@ const newsletters = () => import(/* webpackChunkName: 'core-newsletters' */ './n
 const notifTemplates = () => import(/* webpackChunkName: 'core-notif-templates' */ './notif-templates');
 const payments = () => import(/* webpackChunkName: 'core-payments' */ './payments');
 const roles = () => import(/* webpackChunkName: 'core-codeholders' */ './roles');
+const statistics = () => import(/* webpackChunkName: 'core-statistics' */ './statistics');
 const queries = () => import(/* webpackChunkName: 'core-queries' */ './queries');
 const tasks_ = () => import(/* webpackChunkName: 'core-tasks' */ './tasks');
 const votes = () => import(/* webpackChunkName: 'core-votes' */ './votes');
@@ -73,6 +74,7 @@ export const tasks = {
     notifTemplates: lazyPath(notifTemplates, mapTasks),
     newsletters: lazyPath(newsletters, mapTasks),
     roles: lazyPath(roles, mapTasks),
+    statistics: lazyPath(statistics, mapTasks),
     queries: lazyPath(queries, mapTasks),
     perms: lazyPath(perms, mapTasks),
     payments: lazyPath(payments, mapTasks),
@@ -100,6 +102,7 @@ export const views = {
     notifTemplates: lazyPath(notifTemplates, mapViews),
     newsletters: lazyPath(newsletters, mapViews),
     roles: lazyPath(roles, mapViews),
+    statistics: lazyPath(statistics, mapViews),
     perms: lazyPath(perms, mapViews),
     payments: lazyPath(payments, mapViews),
     tasks: lazyPath(tasks_, mapViews),

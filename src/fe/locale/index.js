@@ -42,6 +42,7 @@ export * from './magazines';
 export * from './newsletters';
 export * from './notif-templates';
 export * from './roles';
+export * from './statistics';
 export * from './payments';
 export * from './admin';
 export * from './lists';

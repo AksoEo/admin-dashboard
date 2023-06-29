@@ -1,7 +1,7 @@
 import { lazy } from 'preact/compat';
 import HomeIcon from '@material-ui/icons/Home';
 import AssignmentIndIcon from '@material-ui/icons/AssignmentInd';
-// import AssessmentIcon from '@material-ui/icons/Assessment';
+import AssessmentIcon from '@material-ui/icons/Assessment';
 import BusinessIcon from '@material-ui/icons/Business';
 import PaymentIcon from '@material-ui/icons/Payment';
 import HowToVoteIcon from '@material-ui/icons/HowToVote';
@@ -712,12 +712,14 @@ export default [
                     },
                 ],
             },
-            /* {
+            {
                 id: 'statistics',
                 icon: AssessmentIcon,
                 path: 'statistiko',
-                hasPerm: () => true,
-            }, */
+                component: elazy(() =>
+                    import(/* webpackChunkName: "statistics" */ './statistics')),
+                hasPerm: perms => perms.hasPerm('statistics.read'),
+            },
         ],
     },
     {

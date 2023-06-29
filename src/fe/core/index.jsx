@@ -11,7 +11,7 @@ export { DataView, Task, Worker };
  * React Hook for using data from a data view.
  *
  * - path: data view path
- * - options: data view options (will be deep-compared for changes)
+ * - options: data view options (will be deep-compared for changes) (if null, will not load)
  *
  * Returns [loading, error, data]
  */
@@ -38,6 +38,7 @@ export function useDataView (path, options) {
     useEffect(() => {
         if (!dataView.current || optionsDidChange) {
             if (dataView.current) dataView.current.drop();
+            if (!options) return;
             const view = dataView.current = core.createDataView(path, options);
             setLoading(true);
             setError(null);

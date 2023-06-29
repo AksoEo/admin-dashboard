@@ -1,0 +1,66 @@
+@import '../../../prelude';
+
+.statistics-demographics {
+    .bucket-bars {
+        display: flex;
+
+        .bucket-bar {
+            flex: 1;
+
+            .bar-container {
+                height: 128px;
+                position: relative;
+
+                .bar-value {
+                    height: calc(var(--value) / var(--max) * 100%);
+                    background: @text-fade-40;
+                    position: absolute;
+                    left: 1px;
+                    right: 1px;
+                    bottom: 0;
+                }
+            }
+            .bar-label {
+                text-align: center;
+            }
+        }
+    }
+}
+
+.statistics-memberships-and-roles {
+    .statistics-memberships-and-roles-items {
+        .count-table {
+            background: @card-background;
+            border-radius: 4px;
+            width: 100%;
+
+            border-collapse: collapse;
+
+            thead {
+                position: sticky;
+                top: 0;
+                background: @card-background;
+            }
+
+            th {
+                text-align: left;
+            }
+            th, td {
+                padding: 2px 8px;
+                border: 1px solid @separator;
+            }
+            .is-count {
+                text-align: right;
+                font-feature-settings: 'tnum' 1;
+            }
+
+            .list-title {
+                padding-top: 12px;
+            }
+
+            .category-label {
+                font-weight: inherit;
+            }
+        }
+    }
+}

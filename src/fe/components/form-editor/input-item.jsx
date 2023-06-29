@@ -1149,12 +1149,14 @@ const SETTINGS = {
                     }
                 }
 
+                const nullIfZero = n => n === 0 ? null : n;
+
                 return {
                     ...item,
                     rows,
                     cols,
-                    minSelect: Math.max(0, Math.min(item.minSelect, rows * cols)),
-                    maxSelect: Math.max(0, Math.min(item.maxSelect, rows * cols)),
+                    minSelect: nullIfZero(Math.max(0, Math.min(item.minSelect, rows * cols))),
+                    maxSelect: nullIfZero(Math.max(0, Math.min(item.maxSelect, rows * cols))),
                     headerTop,
                     headerLeft,
                     excludeCells,
