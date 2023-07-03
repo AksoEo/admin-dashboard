@@ -1,6 +1,14 @@
 @import '../../../prelude';
 
 .statistics-demographics {
+    height: calc(128px + 24px);
+    box-sizing: border-box;
+
+    &.is-loading {
+        text-align: center;
+        padding: 16px;
+    }
+
     .bucket-bars {
         display: flex;
 
@@ -18,17 +26,55 @@
                     left: 1px;
                     right: 1px;
                     bottom: 0;
+                    transform-origin: 0 100%;
+                    animation: statistics-demographics-bar-in 0.3s backwards calc(var(--index) * 0.02s);
+
+                    @keyframes statistics-demographics-bar-in {
+                        0% {
+                            transform: scaleY(0);
+                        }
+                    }
                 }
             }
             .bar-label {
                 text-align: center;
+                line-height: 24px;
             }
         }
     }
 }
 
 .statistics-memberships-and-roles {
+    .hist-date-selector {
+        padding: 8px;
+    }
+
+    .hist-date-selector,
+    .display-selector {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .inner-view {
+        &.is-loading, &.is-empty {
+            text-align: center;
+        }
+
+        .view-controls {
+            padding: 8px;
+            text-align: center;
+        }
+        .view-demographics {
+            margin: 16px auto;
+            max-width: 800px;
+        }
+    }
+
     .statistics-memberships-and-roles-items {
+        overflow: auto;
+
         .count-table {
             background: @card-background;
             border-radius: 4px;
@@ -40,6 +86,27 @@
                 position: sticky;
                 top: 0;
                 background: @card-background;
+            }
+
+            .members-th-item {
+                padding-right: 0;
+
+                .inner-contents {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    height: 24px;
+                    gap: 4px;
+
+                    .inner-label {
+                        white-space: nowrap;
+                    }
+
+                    .inner-sorting {
+                        width: 24px;
+                        line-height: 0;
+                    }
+                }
             }
 
             th {
@@ -56,6 +123,7 @@
 
             .list-title {
                 padding-top: 12px;
+                padding-bottom: 4px;
             }
 
             .category-label {

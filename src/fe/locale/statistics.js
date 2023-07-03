@@ -8,6 +8,8 @@ export const statistics = {
         total: '[[All countries]]',
     },
     membershipsAndRoles: {
+        noDataAvailable: '[[No data avialable for this date]]',
+        allCategories: '[[all categories]]',
         byCountry: 'laŭ lando',
         byCategory: 'laŭ kategorio',
         showTejo: 'en TEJO-aĝo',
