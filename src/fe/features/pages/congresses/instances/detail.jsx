@@ -12,7 +12,7 @@ import Tabs from '../../../../components/controls/tabs';
 import { date } from '../../../../components/data';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
-import { connectPerms } from '../../../../perms';
+import { connectPerms, usePerms } from '../../../../perms';
 import {
     congressInstances as locale,
     congressLocations as locationLocale,
@@ -122,6 +122,42 @@ export default connectPerms(class CongressInstancePage extends Page {
 
         const actions = [];
 
+        if (tab === 'participants') {
+            if (perms.hasPerm(`congress_instances.participants.create.${org}`)) {
+                actions.push({
+                    key: 'participants',
+                    icon: <AddIcon style={{verticalAlign: 'middle'}}/>,
+                    label: participantLocale.create.menuItem,
+                    action: () => this.context.createTask('congresses/createParticipant', {
+                        congress,
+                        instance: id,
+                    }),
+                });
+            }
+            if (perms.hasPerm(`congress_instances.participants.read.${org}`) && perms.hasPerm(`notif_templates.read.${org}`)) {
+                actions.push({
+                    key: 'participants-notif',
+                    overflow: true,
+                    label: participantLocale.sendNotifTemplate,
+                    action: () => this.setState({ sendingNotif: true }),
+                });
+            }
+            actions.push({
+                key: 'participants-table',
+                icon: <TableIcon style={{ verticalAlign: 'middle' }} />,
+                label: participantLocale.openTableView,
+                action: () => {
+                    this.props.push('alighintoj/tabelo');
+                },
+            }, {
+                key: 'participants-go',
+                icon: <PersonSearchIcon />,
+                label: participantLocale.findParticipantById.menuItem,
+                action: () => {
+                    this.context.createTask('congresses/_findParticipantById', { congress, instance: id });
+                },
+            });
+        }
         if (perms.hasPerm(`congress_instances.update.${org}`)) {
             if (tab === 'locations') {
                 actions.push({
@@ -133,7 +169,7 @@ export default connectPerms(class CongressInstancePage extends Page {
             } else if (tab === 'programs') {
                 actions.push({
                     key: 'programs',
-                    icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
+                    icon: <AddIcon style={{verticalAlign: 'middle'}}/>,
                     label: programLocale.create.menuItem,
                     action: () => this.context.createTask('congresses/createProgram', {
                         congress,
@@ -142,32 +178,6 @@ export default connectPerms(class CongressInstancePage extends Page {
                     }, {
                         timeFrom: Math.floor(new Date(this.state.dateFrom) / 1000),
                     }),
-                });
-            } else if (tab === 'participants') {
-                actions.push({
-                    key: 'participants',
-                    icon: <AddIcon style={{ verticalAlign: 'middle' }} />,
-                    label: participantLocale.create.menuItem,
-                    action: () => this.context.createTask('congresses/createParticipant', { congress, instance: id }),
-                }, {
-                    key: 'participants-notif',
-                    overflow: true,
-                    label: participantLocale.sendNotifTemplate,
-                    action: () => this.setState({ sendingNotif: true }),
-                }, {
-                    key: 'participants-table',
-                    icon: <TableIcon style={{ verticalAlign: 'middle' }} />,
-                    label: participantLocale.openTableView,
-                    action: () => {
-                        this.props.push('alighintoj/tabelo');
-                    },
-                }, {
-                    key: 'participants-go',
-                    icon: <PersonSearchIcon />,
-                    label: participantLocale.findParticipantById.menuItem,
-                    action: () => {
-                        this.context.createTask('congresses/_findParticipantById', { congress, instance: id });
-                    },
                 });
             }
             actions.push({
@@ -278,7 +288,16 @@ function FieldWrapper ({ field, item, onItemChange }) {
 }
 
 function Header ({ item, editing, onItemChange, org, tab, onTabChange, push }) {
+    const perms = usePerms();
     const orgIcon = <OrgIcon org={org} />;
+
+    const tabs = {
+        locations: locale.tabs.locations,
+        programs: locale.tabs.programs,
+    };
+    if (perms.hasPerm(`congress_instances.participants.read.${org}`)) {
+        tabs.participants = locale.tabs.participants;
+    }
 
     return (
         <div class="instance-header">
@@ -356,7 +375,7 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange, push }) {
                     <Tabs
                         value={tab}
                         onChange={onTabChange}
-                        tabs={locale.tabs} />
+                        tabs={tabs} />
                 )}
             </DynamicHeightDiv>
         </div>
