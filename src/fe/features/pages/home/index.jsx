@@ -33,12 +33,6 @@ export default class HomePage extends Page {
                     <Notices />
                     <div class="home-card">
                         <div class="hc-title">
-                            {statusLocale.workerQueues.title}
-                        </div>
-                        <WorkerQueueStatus />
-                    </div>
-                    <div class="home-card">
-                        <div class="hc-title">
                             {locale.admin.title}
                         </div>
                         <div class="hc-content-box">

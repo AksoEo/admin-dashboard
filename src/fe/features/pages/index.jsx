@@ -712,14 +712,6 @@ export default [
                     },
                 ],
             },
-            {
-                id: 'statistics',
-                icon: AssessmentIcon,
-                path: 'statistiko',
-                component: elazy(() =>
-                    import(/* webpackChunkName: "statistics" */ './statistics')),
-                hasPerm: perms => perms.hasPerm('statistics.read'),
-            },
         ],
     },
     {
@@ -1107,16 +1099,6 @@ export default [
                         ],
                     },
                 ],
-            },
-            {
-                id: 'administration-status',
-                icon: DataUsageIcon,
-                component: elazy(() =>
-                    import(/* webpackChunkName: "admin-country-groups" */ './administration/status')),
-                type: 'bottom',
-                path: 'stato',
-                hasPerm: perms => perms.hasPerm('status.worker_queues'),
-                paths: [],
             },
         ],
     },
