@@ -84,7 +84,7 @@ export const spec = [
                 type: 'group',
                 requires: ['codeholders.read'],
                 children: [
-                    { type: '!memberRestrictionsSwitch', name: '[[Set]] Membrorestriktoj' },
+                    { type: '!memberRestrictionsSwitch', name: 'Agordi Membrorestriktojn' },
                     '!memberFieldsEditor',
                     '!memberFilterEditor',
                 ],
@@ -1182,7 +1182,7 @@ export const memberFieldsWrite = 'Redakti';
 
 /** List of member fields. Some member fields may correspond to multiple API fields. */
 export const memberFieldsList = [
-    [null, { title: '[[General]]' }],
+    [null, { title: 'Ĝenerale' }],
     ['code', { name: 'Kodo', fields: ['newCode', 'oldCode'] }],
     ['enabled', { name: 'Kontoŝalteco', fields: ['enabled'] }],
     ['codeholderType', { name: 'Membrospeco', fields: ['codeholderType'] }],
@@ -1224,7 +1224,7 @@ export const memberFieldsList = [
     ['searchAddress', { name: 'Plena, serĉebla adreso', fields: ['searchAddress'] }],
     ['addressPublicity', { name: 'Publikeco de adreso', fields: ['addressPublicity'] }],
 
-    [null, { title: '[[Contact]]' }],
+    [null, { title: 'Kontaktinformoj' }],
     ['email', { name: 'Retpoŝtadreso', fields: ['email'] }],
     ['officePhone', { name: 'Oficeja telefono', fields: ['officePhone', 'officePhoneFormatted'] }],
     ['landlinePhone', { name: 'Hejma telefono', fields: ['landlinePhone', 'landlinePhoneFormatted'] }],
@@ -1234,13 +1234,13 @@ export const memberFieldsList = [
     ['landlinePhonePublicity', { name: 'Publikeco de hejma telefono', fields: ['landlinePhonePublicity'] }],
     ['cellphonePublicity', { name: 'Publikeco de poŝtelefono', fields: ['cellphonePublicity'] }],
 
-    [null, { title: '[[Age]]' }],
+    [null, { title: 'Aĝo' }],
     ['birthdate', { name: 'Naskiĝdato', fields: ['birthdate'] }],
     ['isDead', { name: 'Morteco', fields: ['isDead'] }],
     ['deathdate', { name: 'Mortdato', fields: ['deathdate'] }],
     ['age', { name: 'Aĝo', fields: ['age', 'agePrimo'] }],
 
-    [null, { title: '[[Additional Information]]' }],
+    [null, { title: 'Aldonaj informoj' }],
     ['profilePicture', { name: 'Profilbildo', fields: ['profilePicture', 'profilePictureHash'] }],
     ['profilePicturePublicity', { name: 'Publikeco de profilbildo', fields: ['profilePicturePublicity'] }],
     ['website', { name: 'Retejo', fields: ['website'] }],

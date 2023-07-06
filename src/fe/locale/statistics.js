@@ -2,14 +2,14 @@ export const statistics = {
     title: 'Statistiko',
     count: 'Kvantoj',
     tabs: {
-        demo: '[[Demographics]]',
+        demo: 'Demografio',
     },
     countries: {
-        total: '[[All countries]]',
+        total: 'Ĉiuj landoj',
     },
     membershipsAndRoles: {
-        noDataAvailable: '[[No data avialable for this date]]',
-        allCategories: '[[all categories]]',
+        noDataAvailable: 'Ne disponeblas datumoj por tiu ĉi dato',
+        allCategories: 'ĉiuj kategorioj',
         byCountry: 'laŭ lando',
         byCategory: 'laŭ kategorio',
         showTejo: 'en TEJO-aĝo',

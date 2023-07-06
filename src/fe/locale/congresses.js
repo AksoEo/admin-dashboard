@@ -91,7 +91,7 @@ export const congressLocations = {
             type: 'Tipo',
             externalLoc: 'Ekstera loko',
             open: 'Malfermita',
-            tags: '[[Tags]]',
+            tags: 'Etikedoj',
 
             openType: {
                 date: 'je horo ...',
@@ -99,7 +99,7 @@ export const congressLocations = {
             },
             tagPicker: {
                 search: 'Serĉi…',
-                empty: '[[No tags]]',
+                empty: 'Neniu etikedo',
             },
         },
     },

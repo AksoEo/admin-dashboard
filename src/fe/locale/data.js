@@ -135,7 +135,7 @@ export const data = {
             copyError: 'Okazis eraro dum kopiado de la permesoj. Bonvolu kontroli la sekurecagordojn de via retumilo.',
             pasteParseError: 'La algluitaj datumoj ne havas la ĝustan formaton. Bv. reprovi kopii la permesojn.',
         },
-        indexSidebarTitle: '[[Index]]',
+        indexSidebarTitle: 'Indekso',
     },
     mdEditor: {
         previewOn: 'Antaŭvidi formatigon',

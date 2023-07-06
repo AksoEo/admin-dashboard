@@ -221,16 +221,16 @@ export const countryGroups = {
 };
 
 export const adminStatus = {
-    title: '[[System Status]]',
+    title: 'Sistema stato',
     workerQueues: {
-        title: '[[Worker Queues]]',
+        title: 'Atendolisto de procesiloj',
         labels: {
-            AKSO_SEND_EMAIL: '[[Send Email]]',
-            AKSO_SEND_TELEGRAM: '[[Send Telegram]]',
-            AKSO_ADDRESS_LABELS: '[[Address Labels]]',
+            AKSO_SEND_EMAIL: 'Sendado de retmesaĝoj',
+            AKSO_SEND_TELEGRAM: 'Sendado de Telegramo-sciigoj',
+            AKSO_ADDRESS_LABELS: 'Adresaj etikedoj',
         },
-        pendingMessages: '[[Pending messages]]',
-        consumers: '[[Consumers]]',
-        noConsumers: '[[There are no consumers for this task. Tell your admin or something.]]',
+        pendingMessages: 'Atendantaj taskoj',
+        consumers: 'Procesiloj',
+        noConsumers: 'Estas ĝuste nun nul procesiloj por tiu ĉi tasko. Bonvolu sciigi sisteman administranton.',
     },
 };
