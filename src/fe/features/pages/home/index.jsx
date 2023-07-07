@@ -23,32 +23,46 @@ import Notices from './notices';
 import { WorkerQueueStatus } from '../administration/status/queue';
 import { base as aksoBase, buildTime as aksoBuildTime, version as aksoVersion } from 'akso:config';
 import './index.less';
+import { usePerms } from '../../../perms';
 
 export default class HomePage extends Page {
     render () {
-        return (
-            <div class="home-page">
-                <div class="inner-grid">
-                    <HomeTasks />
-                    <Notices />
+        return <HomePageContents />;
+    }
+}
+
+function HomePageContents () {
+    const perms = usePerms();
+    return (
+        <div class="home-page">
+            <div class="inner-grid">
+                <HomeTasks />
+                <Notices />
+                {perms.hasPerm('status.worker_queues') && (
                     <div class="home-card">
                         <div class="hc-title">
-                            {locale.admin.title}
+                            {statusLocale.workerQueues.title}
                         </div>
-                        <div class="hc-content-box">
-                            <MdField
-                                value={locale.admin.description}
-                                rules={['emphasis', 'strikethrough', 'link', 'list', 'table', 'image']} />
-                        </div>
-                        <details class="hc-system-info">
-                            <summary>{locale.admin.systemInfo.title}</summary>
-                            <SystemInfo />
-                        </details>
+                        <WorkerQueueStatus />
                     </div>
+                )}
+                <div class="home-card">
+                    <div class="hc-title">
+                        {locale.admin.title}
+                    </div>
+                    <div class="hc-content-box">
+                        <MdField
+                            value={locale.admin.description}
+                            rules={['emphasis', 'strikethrough', 'link', 'list', 'table', 'image']} />
+                    </div>
+                    <details class="hc-system-info">
+                        <summary>{locale.admin.systemInfo.title}</summary>
+                        <SystemInfo />
+                    </details>
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
 }
 
 class SystemInfo extends PureComponent {
