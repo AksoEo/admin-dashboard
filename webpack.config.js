@@ -1,5 +1,6 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
+const childProcess = require('node:child_process');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -231,7 +232,7 @@ class AksoPlugin {
         const config = {
             buildTime: new Date().toISOString(),
             base: aksoBase,
-            version: pkgInfo.version,
+            version: getGitCommitHash(),
         };
         const fileContents = Object.entries(config)
             .map(([k, v]) => `export const ${k} = ${JSON.stringify(v)};`)
@@ -251,4 +252,11 @@ class AksoPlugin {
             });
         });
     }
+}
+
+function getGitCommitHash () {
+    return childProcess.execSync('git rev-parse --short HEAD', {
+        cwd: __dirname,
+        encoding: 'utf-8',
+    }).trim();
 }
