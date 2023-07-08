@@ -47,7 +47,7 @@ export function crudList ({
         }
 
         return {
-            items: res.body.map(x => x.id),
+            items: options._unmapped ? res.body : res.body.map(x => x.id),
             total: +res.res.headers.get('x-total-items'),
             transientFields,
             stats: { time: res.resTime, filtered: false },

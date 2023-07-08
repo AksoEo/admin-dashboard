@@ -1,9 +1,6 @@
 export const statistics = {
     title: 'Statistiko',
     count: 'Kvantoj',
-    tabs: {
-        demo: 'Demografio',
-    },
     countries: {
         total: 'Ĉiuj landoj',
     },
@@ -13,11 +10,15 @@ export const statistics = {
         byCountry: 'laŭ lando',
         byCategory: 'laŭ kategorio',
         showTejo: 'en TEJO-aĝo',
+        demoAge: 'Aĝo',
 
         sectionTitles: {
             membershipCategories: 'Nombroj en membro-kategorioj',
+            membershipGivingCategories: 'membrecdona',
+            membershipNonGivingCategories: 'nemembrecdona',
             roles: 'Roloj',
         },
+        total: 'Sumo',
 
         itemColumn: 'Kategorio',
         yearDiffColumn: 'Diferenco',
