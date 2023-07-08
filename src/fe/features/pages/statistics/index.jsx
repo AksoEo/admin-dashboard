@@ -514,6 +514,7 @@ function getDataByCategory ({
             query: {
                 country,
                 category: CATEGORY_TYPE_MEM + catId,
+                countField,
             },
             navigationTarget: { byFieldType: 'country', category: CATEGORY_TYPE_MEM + catId },
         });
@@ -534,7 +535,7 @@ function getDataByCategory ({
             ...membershipGivingTotal,
             name: locale.membershipsAndRoles.total,
             isTotal: true,
-            query: { country, category: CATEGORY_TOTAL_MEM_GIVING },
+            query: { country, category: CATEGORY_TOTAL_MEM_GIVING, countField },
         });
     }
     if (membershipNonGivingItems.length) {
@@ -543,7 +544,7 @@ function getDataByCategory ({
             ...membershipNonGivingTotal,
             name: locale.membershipsAndRoles.total,
             isTotal: true,
-            query: { country, category: CATEGORY_TOTAL_MEM_NON_GIVING },
+            query: { country, category: CATEGORY_TOTAL_MEM_NON_GIVING, countField },
         });
     }
 
@@ -581,6 +582,7 @@ function getDataByCategory ({
             query: {
                 country,
                 category: CATEGORY_TYPE_ROLE + roleId,
+                countField,
             },
             navigationTarget: { byFieldType: 'country', category: CATEGORY_TYPE_ROLE + roleId },
         });
@@ -696,6 +698,7 @@ function getDataByCountry ({
             query: {
                 country,
                 category,
+                countField,
             },
             navigationTarget: { byFieldType: 'category', country },
         });
@@ -909,12 +912,12 @@ function ItemDetails ({ query, currentDate }) {
 
             for (const cat of countryData.membershipCategories) {
                 if (doesItemMatchCategoryQuery(query.category, cat)) {
-                    count += cat.count;
+                    count += cat[query.countField];
                 }
             }
             for (const role of countryData.roles) {
                 if (doesItemMatchCategoryQuery(query.category, role)) {
-                    count += role.count;
+                    count += role[query.countField];
                 }
             }
 
