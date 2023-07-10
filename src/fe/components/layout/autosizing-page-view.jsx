@@ -94,6 +94,7 @@ export default class AutosizingPageView extends Component {
         let changed = false;
         for (const key in this.items) {
             const item = this.items[key];
+            if (!item.node) continue;
             const { offsetHeight } = item.node;
             if (offsetHeight !== item.height) {
                 changed = true;

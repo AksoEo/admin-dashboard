@@ -63,3 +63,19 @@ export const login = {
     invalidTotpFormat: 'Bonvolu enmeti vian sesciferan sekurkodon',
 };
 
+export const oneTimeToken = {
+    unknownContext: '[[unknown context]]',
+
+    deleteEmailAddress: {
+        title: '[[Delete Email Address]]',
+        description: '[[Press the button to remove your email address from our database. If you do not wish to do this, simply close the page.]]',
+        confirm: '[[Delete]]',
+        confirmed: '[[Your email address has been deleted.]]',
+    },
+    unsubscribeNewsletter: {
+        title: '[[Unsubscribe Newsletter]]',
+        description: '[[Press the button to unsubscribe from the newsletter. If you do not wish to do this, simply close the page.]]',
+        confirm: '[[Unsubscribe]]',
+        confirmed: '[[You have been unsubscribed successfully.]]',
+    },
+};

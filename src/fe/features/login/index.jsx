@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { lazy, Suspense } from 'preact/compat';
 import { LoginAuthStates } from '../../../protocol';
 import { connect } from '../../core/connection';
 import { login as locale, meta as localeMeta, app as appLocale } from '../../locale';
@@ -9,6 +10,10 @@ import TotpPage from './totp';
 import { Mode, getPageMode } from './is-special-page';
 import { version as aksoVersion, buildTime as aksoBuildTime } from 'akso:config';
 import './style.less';
+import { CircularProgress } from 'yamdl';
+
+const OneTimeToken = lazy(() =>
+    import('./one-time-token').then(r => r.default));
 
 const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
@@ -90,12 +95,12 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
 
     #focusCurrentPage = () => {
         const selectedPageIndex = this.#getSelectedPageIndex();
-        if (selectedPageIndex === 0) this.#detailsPage.focus();
-        else if (selectedPageIndex === 1) this.#totpPage.focus();
+        if (selectedPageIndex === 0) this.#detailsPage?.focus();
+        else if (selectedPageIndex === 1) this.#totpPage?.focus();
     };
 
     #onPageChange = () => this.#focusCurrentPage();
-    #onHeightChange = () => this.#autosizingPageView.pageHeightChanged();
+    #onHeightChange = () => this.#autosizingPageView?.pageHeightChanged();
 
     componentDidMount () {
         // set tab title
@@ -125,6 +130,16 @@ export default connect('login')((data, core) => ({ ...data, core }))(class Login
         let className = 'login';
         if (allowsNonAdmin) className += ' allows-non-admin';
         if (selectedPageIndex === 2) className += ' logged-in';
+
+        if (mode === Mode.ONE_TIME_TOKEN) {
+            return (
+                <div class="login">
+                    <Suspense fallback={<CircularProgress indeterminate />}>
+                        <OneTimeToken {...this.state.oneTimeToken} />
+                    </Suspense>
+                </div>
+            );
+        }
 
         return (
             <div class={className} onKeyDown={this.#onKeyDown}>

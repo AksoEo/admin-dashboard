@@ -1,0 +1,25 @@
+@import '../../prelude';
+
+.login-one-time-token {
+    background: @card-background;
+    border-radius: 4px;
+    max-width: 360px;
+    padding: 16px;
+    box-sizing: border-box;
+    .elevation(24);
+
+    @fullscreen-width: 420px;
+    @media (max-width: @fullscreen-width) {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .contents-loading {
+        padding: 16px;
+    }
+
+    h1 {
+        font-size: 1.2em;
+        margin: 0;
+    }
+}

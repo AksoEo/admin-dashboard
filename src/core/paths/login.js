@@ -167,7 +167,8 @@ export const tasks = {
         }
     },
 
-    // this is not really related to login but used on the login screen
+    // these are not really related to login but used on the login screen
+
     apiVersion: async () => {
         const client = await asyncClient;
         const res = await fetch(client.client.createURL('/'));
@@ -176,6 +177,26 @@ export const tasks = {
         const version = text.match(/version:\s*([^\n]+)/i);
         if (!version) throw { code: 'no-version', message: 'Could not find version string' };
         return version[1];
+    },
+
+    getOneTimeToken: async ({ ctx, token }) => {
+        const client = await asyncClient;
+        const res = await client.req({
+            method: 'GET',
+            path: `/tokens`,
+            query: { ctx, token },
+            _allowLoggedOut: true,
+        });
+        return res.body;
+    },
+    submitOneTimeToken: async ({ ctx, token }) => {
+        const client = await asyncClient;
+        await client.req({
+            method: 'PUT',
+            path: `/tokens`,
+            query: { ctx, token },
+            _allowLoggedOut: true,
+        });
     },
 };
 
