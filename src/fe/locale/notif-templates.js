@@ -226,7 +226,8 @@ export const notifTemplateIntentExamples = {
     },
     registrationEntry: {
         // TODO: proper test data
-        price: 999,
+        price: 10000,
+        amountPaid: 2000,
         currency: 'USD',
         sequenceId: 123,
         createdTime: +new Date(2022, 2, 24, 13, 50, 24) / 1000,
