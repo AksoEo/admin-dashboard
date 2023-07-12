@@ -111,6 +111,7 @@ export default connect(props => ([props.view, {
         cursed,
         selection,
         animateBackwards,
+        disabled,
         userData,
     }) {
         if (!data) return null;
@@ -229,6 +230,7 @@ export default connect(props => ([props.view, {
                 class={'overview-list-item' + (cursed ? ' is-cursed' : '') + (compact ? ' is-compact' : '')}
                 style={style}
                 ref={node => this.#node = node}
+                disabled={disabled}
                 onClick={e => {
                     // don’t keep focus on what is essentially button
                     e.currentTarget.blur();

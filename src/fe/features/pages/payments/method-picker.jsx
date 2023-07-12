@@ -23,6 +23,7 @@ const REDUCED_METHOD_FIELDS = Object.fromEntries(METHOD_FIELD_IDS
  * - org/onOrgChange
  * - onGetCurrencies
  * - jsonFilter
+ * - disabled
  */
 export default class PaymentMethodPicker extends PureComponent {
     state = {
@@ -51,13 +52,27 @@ export default class PaymentMethodPicker extends PureComponent {
         onOrgChange,
         onGetCurrencies,
         jsonFilter,
+        disabled,
     }, { pickerOpen, orgOffset, methodOffset }) {
         let contents, orgItem;
 
         if (org && value) {
             contents = (
                 <div class="picker-content-wrapper">
+                    <Button
+                        disabled={disabled}
+                        class="remove-button"
+                        onPointerDown={e => e.stopPropagation()}
+                        onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onOrgChange(null);
+                            onChange(null);
+                        }}>
+                        <MenuIcon type="close" />
+                    </Button>
                     <OverviewListItem
+                        disabled={disabled}
                         doFetch compact view="payments/method"
                         skipAnimation
                         id={value}
@@ -73,17 +88,6 @@ export default class PaymentMethodPicker extends PureComponent {
                             }
                             if (this.props.onItemData) this.props.onItemData(method);
                         }} />
-                    <Button
-                        class="remove-button"
-                        onPointerDown={e => e.stopPropagation()}
-                        onClick={e => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onOrgChange(null);
-                            onChange(null);
-                        }}>
-                        <MenuIcon type="close" />
-                    </Button>
                 </div>
             );
         } else {

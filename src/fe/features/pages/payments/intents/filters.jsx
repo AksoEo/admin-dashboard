@@ -3,6 +3,8 @@ import { TextField } from 'yamdl';
 import Select from '../../../../components/controls/select';
 import Segmented from '../../../../components/controls/segmented';
 import { paymentIntents as locale } from '../../../../locale';
+import PaymentMethodPicker from '../method-picker';
+import { useState } from 'preact/compat';
 
 export const FILTERS = {
     customerName: {
@@ -58,6 +60,26 @@ export const FILTERS = {
                         class: !type ? 'bordered' : '',
                     }))}
                 </Segmented>
+            );
+        },
+    },
+    paymentMethod: {
+        default: () => ({ enabled: false, value: null }),
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            const [org, setOrg] = useState(null);
+
+            return (
+                <PaymentMethodPicker
+                    disabled={hidden}
+                    value={value}
+                    onChange={v => {
+                        onChange((v || '').toString());
+                        onEnabledChange(!!v);
+                    }}
+                    org={org}
+                    onOrgChange={setOrg} />
             );
         },
     },
