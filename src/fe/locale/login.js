@@ -65,6 +65,7 @@ export const login = {
 
 export const oneTimeToken = {
     unknownContext: '[[unknown context]]',
+    close: 'Fermi',
 
     deleteEmailAddress: {
         title: '[[Delete Email Address]]',
@@ -75,6 +76,7 @@ export const oneTimeToken = {
     unsubscribeNewsletter: {
         title: '[[Unsubscribe Newsletter]]',
         description: '[[Press the button to unsubscribe from the newsletter. If you do not wish to do this, simply close the page.]]',
+        reasonDescription: 'Ni estus aparte dankemaj, se vi indikus kialon de via malabono.',
         confirm: '[[Unsubscribe]]',
         confirmed: '[[You have been unsubscribed successfully.]]',
     },

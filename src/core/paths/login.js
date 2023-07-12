@@ -189,12 +189,17 @@ export const tasks = {
         });
         return res.body;
     },
-    submitOneTimeToken: async ({ ctx, token }) => {
+    submitOneTimeToken: async ({ ctx, token, unsubscribeReason }) => {
+        const body = { ctx, token };
+        if (ctx === 'unsubscribe_newsletter') {
+            body.unsubscribeReason = unsubscribeReason;
+        }
+
         const client = await asyncClient;
         await client.req({
             method: 'PUT',
             path: `/tokens`,
-            query: { ctx, token },
+            body,
             _allowLoggedOut: true,
         });
     },

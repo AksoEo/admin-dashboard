@@ -59,6 +59,7 @@ class Session extends Component {
 
         if (isSpecialPage()) {
             this.setState({ specialPage: true });
+            this.loadLogin();
         }
 
         this.loadApp();
@@ -192,7 +193,7 @@ class Session extends Component {
             );
         }
 
-        if (loggedIn && App) {
+        if (!specialPage && loggedIn && App) {
             // also pass tasks because those need some contexts only available in the app
             app = (
                 <App

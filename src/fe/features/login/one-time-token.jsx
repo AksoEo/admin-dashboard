@@ -1,9 +1,9 @@
 import { h } from 'preact';
-import { useContext, useEffect, useRef, useState } from 'preact/compat';
-import { CircularProgress } from 'yamdl';
+import { useContext, useEffect, useMemo, useRef, useState } from 'preact/compat';
+import { Button, CircularProgress } from 'yamdl';
 import TaskButton from '../../components/controls/task-button';
 import { coreContext } from '../../core/connection';
-import { oneTimeToken as locale } from '../../locale';
+import { oneTimeToken as locale, newsletterUnsubs as newsUnsubLocale } from '../../locale';
 import DisplayError from '../../components/utils/error';
 import './one-time-token.less';
 
@@ -17,10 +17,11 @@ export default function OneTimeToken ({ context, token }) {
     const [loading, error, data] = useTokenData(context, token);
     const [done, setDone] = useState(false);
     const core = useContext(coreContext);
-    const confirm = () => {
+    const confirm = (options = {}) => {
         return core.createTask('login/submitOneTimeToken', {
             ctx: context,
             token,
+            ...options,
         }).runOnceAndDrop().then(() => {
             setDone(true);
         });
@@ -50,6 +51,11 @@ export default function OneTimeToken ({ context, token }) {
     return (
         <div class="login-one-time-token">
             {content}
+            {(!loading && (error || done)) ? (
+                <Button onClick={() => {
+                    document.location = '/';
+                }}>{locale.close}</Button>
+            ) : null}
         </div>
     );
 }
@@ -109,11 +115,39 @@ function UnsubscribeNewsletter ({ confirm, done }) {
         );
     }
 
+    const [unsubReason, setUnsubReason] = useState(0);
+
+    const unsubRadioName = useMemo(() => Math.random().toString(36), []);
+    const unsubReasons = [];
+    for (const i in newsUnsubLocale.reasons) {
+        const inputId = Math.random().toString(36);
+        unsubReasons.push(
+            <li key={i}>
+                <input
+                    type="radio"
+                    name={unsubRadioName}
+                    id={inputId}
+                    checked={unsubReason === +i}
+                    onChange={e => {
+                        if (e.target.checked) {
+                            setUnsubReason(+i);
+                        }
+                    }}
+                    value={i} />
+                <label for={inputId}>{newsUnsubLocale.reasons[i]}</label>
+            </li>
+        );
+    }
+
     return (
         <div class="ott-context">
             <h1>{locale.unsubscribeNewsletter.title}</h1>
             <p>{locale.unsubscribeNewsletter.description}</p>
-            <TaskButton run={confirm}>
+            <p>{locale.unsubscribeNewsletter.reasonDescription}</p>
+            <ul class="newsletter-unsub-reasons">
+                {unsubReasons}
+            </ul>
+            <TaskButton run={() => confirm({ unsubscribeReason: unsubReason })}>
                 {locale.unsubscribeNewsletter.confirm}
             </TaskButton>
         </div>
