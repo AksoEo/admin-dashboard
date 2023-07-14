@@ -13,8 +13,8 @@ import { Field } from '../form';
 import { evalExpr } from './model';
 import Select from '../controls/select';
 import DynamicHeightDiv from '../layout/dynamic-height-div';
-import './settings.less';
 import FormContext from '../form/context';
+import './settings.less';
 
 const FLAGS = [
     'allowUse',
@@ -73,7 +73,9 @@ export default class FormEditorSettings extends PureComponent {
         }
     }
 
-    render ({ org, value, editing, onChange, previousNodes }, { expanded }) {
+    render ({
+        org, value, editing, onChange, previousNodes, disableCurrencyChange,
+    }, { expanded }) {
         let settings = null;
         if (expanded) {
             settings = (
@@ -83,6 +85,7 @@ export default class FormEditorSettings extends PureComponent {
                         editing={editing}
                         onChange={onChange} />
                     <Price
+                        disableCurrencyChange={disableCurrencyChange}
                         previousNodes={previousNodes}
                         editing={editing}
                         value={value.price}
@@ -228,7 +231,7 @@ function Flag ({ flag, editing, value, onChange }) {
     );
 }
 
-function Price ({ value, editing, onChange, previousNodes }) {
+function Price ({ value, editing, onChange, previousNodes, disableCurrencyChange }) {
     const labelId = 'price' + Math.random().toString(36);
     const onChangeEnabled = enabled => {
         if (enabled) onChange({ currency: 'USD', var: null, minUpfront: null });
@@ -245,18 +248,26 @@ function Price ({ value, editing, onChange, previousNodes }) {
                 <label class="settings-item-title">
                     {locale.settings.price.variable}
                 </label>
-                <AscVarPicker
-                    previousNodes={previousNodes}
-                    editing={editing}
-                    value={value.var}
-                    onChange={v => onChange({ ...value, var: v })} />
-                <Select
-                    class="currency-select"
-                    disabled={!editing}
-                    outline
-                    items={Object.keys(currencies).map(c => ({ value: c, label: currencies[c] }))}
-                    value={value.currency}
-                    onChange={currency => onChange({ ...value, currency })} />
+                <div class="currency-select-container">
+                    <AscVarPicker
+                        autoWidth
+                        previousNodes={previousNodes}
+                        editing={editing}
+                        value={value.var}
+                        onChange={v => onChange({ ...value, var: v })} />
+                    <Select
+                        class="currency-select"
+                        disabled={!editing || disableCurrencyChange}
+                        outline
+                        items={Object.keys(currencies).map(c => ({ value: c, label: currencies[c] }))}
+                        value={value.currency}
+                        onChange={currency => onChange({ ...value, currency })} />
+                </div>
+                {editing && disableCurrencyChange ? (
+                    <div class="settings-item-description">
+                        {locale.settings.price.currencyChangeDisabled}
+                    </div>
+                ) : null}
                 <div class="settings-item-description">
                     {locale.settings.price.description}
                 </div>
@@ -444,7 +455,7 @@ function findKnownVariables (previousNodes) {
     return knownVariables;
 }
 
-function AscVarPicker ({ previousNodes, editing, value, onChange, optional }) {
+function AscVarPicker ({ previousNodes, editing, value, onChange, optional, autoWidth }) {
     const knownVariables = findKnownVariables(previousNodes);
     const ascVariables = [];
     if (optional) {
@@ -462,7 +473,7 @@ function AscVarPicker ({ previousNodes, editing, value, onChange, optional }) {
     const varValue = knownVariables.has(value) ? value : null;
     return (
         <Select
-            style={{ width: '100%' }}
+            style={autoWidth ? null : { width: '100%' }}
             rendered
             disabled={!editing}
             emptyLabel={locale.settings.variables.noVariableSelected}

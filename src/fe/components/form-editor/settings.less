@@ -63,8 +63,17 @@
         font-size: smaller;
     }
 
-    .currency-select {
-        margin-left: 8px;
+    .currency-select-container {
+        display: flex;
+        flex-wrap: wrap;
+
+        & > * {
+            flex: 1;
+        }
+
+        .currency-select {
+            margin-left: 8px;
+        }
     }
 
     .settings-section-title {

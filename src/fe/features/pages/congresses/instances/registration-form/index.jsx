@@ -99,7 +99,30 @@ const InnerEditor = connect(({ congress, instance }) => [
     state = {
         copyFromPickerOpen: false,
         edit: null,
+        participantsPaidMoney: true,
         formData: {},
+    };
+
+    loadWhetherParticipantsPaidMoney = () => {
+        this.props.core.createTask('congresses/listParticipants', {
+            congress: this.props.congress,
+            instance: this.props.instance,
+        }, {
+            fields: [],
+            offset: 0,
+            limit: 1,
+            jsonFilter: {
+                filter: {
+                    amountPaid: { $gt: 0 },
+                },
+            },
+        }).runOnceAndDrop().then(res => {
+            this.setState({ participantsPaidMoney: !!res.items.length });
+        }).catch(err => {
+            console.error('error checking whether anyone paid', err); // eslint-disable-line no-console
+            // default to false i guess
+            this.setState({ participantsPaidMoney: false });
+        });
     };
 
     beginEditing = () => {
@@ -156,6 +179,10 @@ const InnerEditor = connect(({ congress, instance }) => [
             this.#commitTask.on('drop', () => this.#commitTask = null);
         });
     };
+
+    componentDidMount () {
+        this.loadWhetherParticipantsPaidMoney();
+    }
 
     componentDidUpdate () {
         this.props.onLoad(this.props.loaded && !!this.props.data);
@@ -257,6 +284,7 @@ const InnerEditor = connect(({ congress, instance }) => [
                         onChange={edit => this.setState({ edit })}
                         additionalVars={ADDITIONAL_VARS}
                         editingFormData
+                        disableCurrencyChange={this.state.participantsPaidMoney}
                         formData={this.state.formData}
                         onFormDataChange={formData => this.setState({ formData })} />
                 </Form>

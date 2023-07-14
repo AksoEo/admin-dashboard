@@ -20,6 +20,7 @@ export const formEditor = {
             pricePreview: 'Nuna prezo laŭ skripto:',
             notANumber: 'ne estas nombro',
             description: 'Ĉiuj valutoj indikas prezon en sia plej malgranda unuo (ekz. cendoj). Tiel 1,50 EUR skribiĝu kiel 150 kaj 900 JPY kiel 900.',
+            currencyChangeDisabled: '[[The currency cannot be changed anymore because there are participants who have paid the registration fee in this currency.]]',
         },
         confirmationNotifTemplateId: {
             label: 'Ŝablono por aliĝkonfirmilo',

@@ -144,6 +144,7 @@ export class ScriptContextProvider extends PureComponent {
  * - skipSettings: TEMPORARY for not rendering settings
  * - skipNonInputs: will not render modules that aren't inputs
  * - disableValidation: bool
+ * - disableCurrencyChange: bool
  */
 export default class FormEditor extends PureComponent {
     state = {
@@ -167,6 +168,7 @@ export default class FormEditor extends PureComponent {
         editingFormData,
         isEditingContext,
         disableValidation,
+        disableCurrencyChange,
         org,
     }) {
         if (!value) return null;
@@ -198,7 +200,8 @@ export default class FormEditor extends PureComponent {
                         customVars={value.customFormVars}
                         onCustomVarsChange={v => onChange({ ...value, customFormVars: v })}
                         additionalVars={additionalVars}
-                        disableValidation={disableValidation} />
+                        disableValidation={disableValidation}
+                        disableCurrencyChange={disableCurrencyChange} />
                 </ScriptContextProvider>
             </div>
         );
@@ -314,7 +317,7 @@ class FormEditorItems extends PureComponent {
 
     render ({
         editing, settings, onSettingsChange, items, onItemsChange, values, additionalVars,
-        skipSettings, skipNonInputs, editingData, isEditingContext, disableValidation,
+        skipSettings, skipNonInputs, editingData, isEditingContext, disableValidation, disableCurrencyChange,
         customVars, onCustomVarsChange,
         org,
     }, { editingItem }) {
@@ -395,7 +398,8 @@ class FormEditorItems extends PureComponent {
                         editing={editing}
                         value={settings}
                         onChange={onSettingsChange}
-                        previousNodes={previousNodes} />
+                        previousNodes={previousNodes}
+                        disableCurrencyChange={disableCurrencyChange} />
                 )}
                 {isEditingContext && (
                     <CustomFormVars
