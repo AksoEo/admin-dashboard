@@ -11,6 +11,9 @@ export const statistics = {
         byCategory: 'laŭ kategorio',
         showTejo: 'en TEJO-aĝo',
         demoAge: 'Aĝo',
+        demoAgeLabels: {
+            rest: '[[Rest]]',
+        },
 
         sectionTitles: {
             membershipCategories: 'Nombroj en membro-kategorioj',

@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { Button, Checkbox, CircularProgress } from 'yamdl';
-import { useContext, useEffect, useMemo, useRef, useState } from 'preact/compat';
+import { useEffect, useRef, useState } from 'preact/compat';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
@@ -9,12 +9,12 @@ import Page from '../../../components/page';
 import Meta from '../../meta';
 import Select from '../../../components/controls/select';
 import { date } from '../../../components/data';
-import { coreContext } from '../../../core/connection';
 import { statistics as locale } from '../../../locale';
 import DisplayError from '../../../components/utils/error';
 import { useDataView } from '../../../core';
 import './index.less';
 import Segmented from '../../../components/controls/segmented';
+import { CategoryType, COUNTRY_TOTAL, encodeCategory, StatisticsData, useStatisticsHistory } from './data';
 
 export default class StatisticsPage extends Page {
     render () {
@@ -36,92 +36,15 @@ function Statistics () {
     );
 }
 
-function useStatisticsHistory ({ _unmapped, beforeDate, afterDate, offset, limit }) {
-    const core = useContext(coreContext);
-    const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState(null);
-    const [error, setError] = useState(null);
-
-    const currentLoadKey = useRef(0);
-    useEffect(() => {
-        let filter = {};
-        if (beforeDate) {
-            filter = { date: { $lte: beforeDate } };
-        } else if (afterDate) {
-            filter = { date: { $lte: afterDate } };
-        }
-
-        currentLoadKey.current++;
-        setLoading(true);
-        setError(null);
-        const loadKey = currentLoadKey.current;
-        core.createTask('statistics/listStatistics', { _unmapped }, {
-            fields: [{ id: 'date', sorting: 'desc' }],
-            jsonFilter: { filter },
-            offset,
-            limit,
-        }).runOnceAndDrop().then(result => {
-            if (loadKey !== currentLoadKey.current) return;
-            setResult(result);
-        }).catch(error => {
-            if (loadKey !== currentLoadKey.current) return;
-            setError(error);
-        }).finally(() => {
-            if (loadKey !== currentLoadKey.current) return;
-            setLoading(false);
-        });
-    }, [offset, beforeDate, afterDate]);
-
-    return [loading, error, result];
-}
-
-function getAllCategoriesAndRoles (data) {
-    const categories = new Map();
-    const roles = new Map();
-
-    for (const country in data) {
-        const countryData = data[country];
-        for (const category of countryData.membershipCategories) {
-            if (!categories.has(category.membershipCategoryId)) {
-                categories.set(category.membershipCategoryId, category.membershipCategory[0]);
-            }
-        }
-        for (const role of countryData.roles) {
-            if (!roles.has(role.roleId)) {
-                roles.set(role.roleId, role.role[0]);
-            }
-        }
-    }
-
-    return  { categories: [...categories.values()], roles: [...roles.values()] };
-}
-
-const CATEGORY_TYPE_MEM = 'm';
-const CATEGORY_TYPE_ROLE = 'r';
-const CATEGORY_TOTAL_MEM_GIVING = '!memGiving';
-const CATEGORY_TOTAL_MEM_NON_GIVING = '!memNonGiving';
-
-function getAllCategoriesAndRolesAsSelectItems (data) {
-    const { categories, roles } = getAllCategoriesAndRoles(data);
-    return categories
-        .map(cat => ({
-            value: CATEGORY_TYPE_MEM + cat.id,
-            label: (cat.nameAbbrev ? cat.nameAbbrev + ' ' : '') + cat.name,
-        }))
-        .concat(roles.map(role => ({
-            value: CATEGORY_TYPE_ROLE + role.id,
-            label: role.name,
-        })));
-}
-
 function MembershipsAndRoles () {
     const [,, countries] = useDataView('countries/countries', {});
+    const data = StatisticsData.use();
 
     const [currentDate, setCurrentDate] = useState(null);
 
     const [byFieldType, setByFieldType] = useState('category');
-    const [country, setCountry] = useState('total');
-    const [category, setCategory] = useState('total');
+    const [country, setCountry] = useState(COUNTRY_TOTAL);
+    const [category, setCategory] = useState(encodeCategory(CategoryType.All, null));
     const [showTejo, setShowTejo] = useState(false);
 
     const navigate = ({ byFieldType, country, category }) => {
@@ -133,33 +56,15 @@ function MembershipsAndRoles () {
         }
     };
 
+    const filter = {
+        country: byFieldType === 'country' ? null : country,
+        category: byFieldType === 'category' ? null : category,
+        tejo: showTejo,
+    };
+
+    const [loadingData, dataError] = data.useDataForDateDiff(currentDate);
+
     const [loadingHist, histError, histData] = useStatisticsHistory({ offset: 0, limit: 10 });
-    const [loadingData, dataError, currentData] = useDataView('statistics/statistics', currentDate && { date: currentDate });
-
-    const thisYear = currentDate && currentDate.split('-')[0];
-    const lastYearDate = thisYear && `${thisYear - 1}-12-31`;
-    const aYearAgoDate = thisYear && `${thisYear - 1}-${currentDate.split('-').slice(1).join('-')}`;
-
-    let thirtyDaysAgoDate = null;
-    if (thisYear) {
-        thirtyDaysAgoDate = new Date(thisYear + 'T00:00:00Z');
-        thirtyDaysAgoDate.setUTCDate(thirtyDaysAgoDate.getUTCDate() - 30);
-        thirtyDaysAgoDate = thirtyDaysAgoDate.toISOString().split('T')[0];
-    }
-
-    const [,, lastYearData] = useDataView(
-        'statistics/statistics',
-        lastYearDate && { date: lastYearDate },
-    );
-    const [,, aYearAgoData] = useDataView(
-        'statistics/statistics',
-        aYearAgoDate && { date: aYearAgoDate },
-    );
-    const [,, thirtyDaysAgoData] = useDataView(
-        'statistics/statistics',
-        thirtyDaysAgoDate && { date: thirtyDaysAgoDate },
-    );
-
     const [newestDate, setNewestDate] = useState(null);
 
     useEffect(() => {
@@ -175,35 +80,16 @@ function MembershipsAndRoles () {
         }
     }, [histData, currentDate]);
     useEffect(() => {
-        if (currentData && !category) {
-            setCategory(getAllCategoriesAndRolesAsSelectItems(currentData.data)[0]?.value);
+        if (!category) {
+            const first = [...data.categories[0]];
+            if (first) setCategory(first[0]);
         }
-    }, [currentData, category]);
+    }, [data.categories, category]);
 
     const showTejoCheckboxId = Math.random().toString(36);
-    const ageDemoFilter = useMemo(() => {
-        if (byFieldType === 'category') {
-            if (country === 'total') return {};
-            return {
-                feeCountry: country,
-            };
-        } else if (byFieldType === 'country') {
-            if (category === 'total') return {};
-            if (category.startsWith(CATEGORY_TYPE_MEM)) {
-                return {
-                    $membership: {
-                        categoryId: +category.substring(1),
-                    },
-                };
-            } else {
-                return {
-                    $roles: {
-                        roleId: +category.substring(1),
-                    },
-                };
-            }
-        }
-    }, [byFieldType, country, category]);
+
+    const { lastYearDate, aYearAgoDate } = data.getDateDiffDates(currentDate);
+    const ageBuckets = data.getAgeBuckets(filter, currentDate);
 
     let contents;
     if (histError) {
@@ -216,7 +102,7 @@ function MembershipsAndRoles () {
                 <CircularProgress indeterminate />
             </div>
         );
-    } else if (!histData || !currentData) {
+    } else if (!histData || !data.hasDataForDate(currentDate)) {
         contents = (
             <div class="inner-view is-empty">
                 {locale.membershipsAndRoles.noDataAvailable}
@@ -232,15 +118,15 @@ function MembershipsAndRoles () {
                             outline
                             value={country}
                             onChange={setCountry}
-                            items={Object.keys(currentData.data)
+                            items={[...data.countries]
                                 .sort((a, b) => {
-                                    if (a === 'total') a = '';
-                                    if (b === 'total') b = '';
+                                    if (a === COUNTRY_TOTAL) a = '';
+                                    if (b === COUNTRY_TOTAL) b = '';
                                     return a.localeCompare(b);
                                 })
                                 .map(id => ({
                                     value: id,
-                                    label: id === 'total' ? (
+                                    label: id === COUNTRY_TOTAL ? (
                                         locale.countries.total
                                     ) : (
                                         (countries && countries[id]?.name_eo) || id
@@ -251,23 +137,17 @@ function MembershipsAndRoles () {
                     <div class="view-demographics">
                         <div class="inner-card">
                             <div class="inner-title">{locale.membershipsAndRoles.demoAge}</div>
-                            <AgeDemographics filter={ageDemoFilter} />
+                            <AgeDemographics buckets={ageBuckets} isDimmed={filter.tejo} />
                         </div>
                     </div>
 
                     <MembersTable
                         navigate={navigate}
+                        data={data}
                         currentDate={currentDate}
                         lastYearDate={lastYearDate}
                         aYearAgoDate={aYearAgoDate}
-                        items={getDataByCategory({
-                            country,
-                            currentData,
-                            lastYearData,
-                            aYearAgoData,
-                            thirtyDaysAgoData,
-                            tejo: showTejo,
-                        })} />
+                        items={data.getDateDiffByCategory(currentDate, filter)} />
                 </div>
             ) : byFieldType === 'country' ? (
                 <div class="inner-view">
@@ -277,35 +157,23 @@ function MembershipsAndRoles () {
                             outline
                             value={category}
                             onChange={setCategory}
-                            items={[
-                                {
-                                    value: 'total',
-                                    label: locale.membershipsAndRoles.allCategories,
-                                },
-                            ].concat(getAllCategoriesAndRolesAsSelectItems(currentData.data))} />
+                            items={data.getCategoriesForSelect()} />
                     </div>
 
                     <div class="view-demographics">
                         <div class="inner-card">
                             <div class="inner-title">{locale.membershipsAndRoles.demoAge}</div>
-                            <AgeDemographics filter={ageDemoFilter} />
+                            <AgeDemographics buckets={ageBuckets} isDimmed={filter.tejo} />
                         </div>
                     </div>
 
                     <MembersTable
                         navigate={navigate}
+                        data={data}
                         currentDate={currentDate}
                         lastYearDate={lastYearDate}
                         aYearAgoDate={aYearAgoDate}
-                        items={getDataByCountry({
-                            category,
-                            countries,
-                            currentData,
-                            lastYearData,
-                            aYearAgoData,
-                            thirtyDaysAgoData,
-                            tejo: showTejo,
-                        })} />
+                        items={data.getDateDiffByCountry(currentDate, filter)} />
                 </div>
             ) : null
         );
@@ -370,343 +238,37 @@ function MembershipsAndRoles () {
     );
 }
 
-function AgeDemographics ({ filter }) {
-    const core = useContext(coreContext);
+function AgeDemographics ({ buckets, isDimmed }) {
+    const max = [...buckets.values()].reduce((a, b) => Math.max(a, b), 1);
 
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [buckets, setBuckets] = useState([]);
-    const [bucketsPrimo, setBucketsPrimo] = useState([]);
-
-    const idRef = useRef(0);
-    useEffect(() => {
-        idRef.current += 1;
-        const currentId = idRef.current;
-
-        setLoading(true);
-        (async () => {
-            const items = [];
-            let total = 1;
-            while (items.length < total) {
-                if (currentId !== idRef.current) return;
-                const result = await core.createTask('codeholders/list', {}, {
-                    fields: [{ id: 'age', sorting: 'none' }],
-                    jsonFilter: { filter: { $and: [{ enabled: true }, filter] } },
-                    offset: items.length,
-                    limit: 100,
-                }).runOnceAndDrop();
-
-                total = result.total;
-                for (const id of result.items) {
-                    items.push(await core.viewData('codeholders/codeholder', {
-                        id,
-                        fields: ['age'],
-                    }));
-                }
-            }
-
-            const buckets = [];
-            const bucketsPrimo = [];
-            for (let i = 0; i <= 10; i++) {
-                buckets.push({ label: (i * 10).toString(), count: 0 });
-                bucketsPrimo.push({ label: (i * 10).toString(), count: 0 });
-            }
-
-            for (const item of items) {
-                if (!item.age?.now || item.age?.now > 109) continue;
-                buckets[Math.floor(item.age.now / 10)].count++;
-                bucketsPrimo[Math.floor(item.age.atStartOfYear / 10)].count++;
-            }
-
-            if (currentId !== idRef.current) return;
-            setLoading(false);
-            setBuckets(buckets);
-            setBucketsPrimo(bucketsPrimo);
-        })().catch(err => {
-            setLoading(false);
-            setError(err);
-        });
-    }, [filter]);
-
-    const max = buckets.map(b => b.count).reduce((a, b) => Math.max(a, b), 1);
-
-    if (loading) {
-        return (
-            <div class="statistics-demographics is-loading">
-                <CircularProgress indeterminate />
-            </div>
-        );
-    }
-    if (error) {
-        return (
-            <div class="statistics-demographics is-error">
-                <DisplayError error={error} />
+    const columns = [];
+    const entries = [...buckets.entries()];
+    for (let i = 0; i < entries.length; i++) {
+        const [label, count] = entries[i];
+        const nextLabel = entries[i + 1] ? entries[i + 1][0] : null;
+        const weight = Number.isFinite(nextLabel - label) ? nextLabel - label : 10;
+        columns.push(
+            <div class="bucket-bar" key={i} style={{
+                '--index': i,
+                '--weight': weight,
+            }}>
+                <div class="bar-container">
+                    <div class="bar-value" style={{ '--value': count }}></div>
+                </div>
+                <div class="bar-label">
+                    {locale.membershipsAndRoles.demoAgeLabels[label] || label}
+                </div>
             </div>
         );
     }
 
     return (
-        <div class="statistics-demographics">
+        <div class={'statistics-demographics' + (isDimmed ? ' is-dimmed' : '')}>
             <div class="bucket-bars" style={{ '--max': max }}>
-                {buckets.map((bucket, i) => (
-                    <div class="bucket-bar" key={i} style={{ '--index': i }}>
-                        <div class="bar-container">
-                            <div class="bar-value" style={{ '--value': bucket.count }}></div>
-                        </div>
-                        <div class="bar-label">
-                            {bucket.label}
-                        </div>
-                    </div>
-                ))}
+                {columns}
             </div>
         </div>
     );
-}
-
-function getDataByCategory ({
-    country,
-    currentData,
-    lastYearData,
-    aYearAgoData,
-    thirtyDaysAgoData,
-    tejo,
-}) {
-    if (!currentData?.data || !currentData.data[country]) return [];
-    const countField = tejo ? 'countTEJO' : 'count';
-
-    const membershipGivingItems = [];
-    const membershipNonGivingItems = [];
-    const roleItems = [];
-
-    for (const categoryData of currentData.data[country].membershipCategories) {
-        const catId = categoryData.membershipCategoryId;
-        const lastYearCatData = (lastYearData?.data && lastYearData.data[country])
-            ? lastYearData.data[country].membershipCategories.find(item => item.membershipCategoryId === catId)
-            : null;
-        const aYearAgoCatData = (aYearAgoData?.data && aYearAgoData.data[country])
-            ? aYearAgoData.data[country].membershipCategories.find(item => item.membershipCategoryId === catId)
-            : null;
-        const thirtyDaysAgoCatData = (thirtyDaysAgoData?.data && thirtyDaysAgoData.data[country])
-            ? thirtyDaysAgoData.data[country].membershipCategories.find(item => item.membershipCategoryId === catId)
-            : null;
-
-        const nowCount = categoryData[countField];
-        const lastYearCount = lastYearCatData && lastYearCatData[countField];
-        const aYearAgoCount = aYearAgoCatData && aYearAgoCatData[countField];
-        const yearDifference = nowCount !== null && lastYearCount !== null
-            ? nowCount - lastYearCount
-            : null;
-        const thirtyDayDifference = thirtyDaysAgoCatData !== null
-            ? nowCount - thirtyDaysAgoCatData[countField]
-            : null;
-
-        const target = categoryData.membershipCategory[0].givesMembership
-            ? membershipGivingItems
-            : membershipNonGivingItems;
-        target.push({
-            nowCount,
-            lastYearCount,
-            aYearAgoCount,
-            yearDifference,
-            thirtyDayDifference,
-            nameAbbrev: categoryData.membershipCategory[0].nameAbbrev || null,
-            name: categoryData.membershipCategory[0].name,
-            query: {
-                country,
-                category: CATEGORY_TYPE_MEM + catId,
-                countField,
-            },
-            navigationTarget: { byFieldType: 'country', category: CATEGORY_TYPE_MEM + catId },
-        });
-    }
-
-    const reduceSum = (a, b) => {
-        const out = { ...a };
-        for (const k of Object.keys(b)) {
-            if (typeof b[k] === 'number') {
-                out[k] = (out[k] || 0) + b[k];
-            }
-        }
-        return out;
-    };
-    if (membershipGivingItems.length) {
-        const membershipGivingTotal = membershipGivingItems.reduce(reduceSum, {});
-        membershipGivingItems.push({
-            ...membershipGivingTotal,
-            name: locale.membershipsAndRoles.total,
-            isTotal: true,
-            query: { country, category: CATEGORY_TOTAL_MEM_GIVING, countField },
-        });
-    }
-    if (membershipNonGivingItems.length) {
-        const membershipNonGivingTotal = membershipNonGivingItems.reduce(reduceSum, {});
-        membershipNonGivingItems.push({
-            ...membershipNonGivingTotal,
-            name: locale.membershipsAndRoles.total,
-            isTotal: true,
-            query: { country, category: CATEGORY_TOTAL_MEM_NON_GIVING, countField },
-        });
-    }
-
-    for (const roleData of currentData.data[country].roles) {
-        const roleId = roleData.roleId;
-        const lastYearRoleData = (lastYearData?.data && aYearAgoData.data[country])
-            ? lastYearData.data[country].roles.find(item => item.roleId === roleId)
-            : null;
-        const aYearAgoRoleData = (aYearAgoData?.data && aYearAgoData.data[country])
-            ? aYearAgoData.data[country].roles.find(item => item.roleId === roleId)
-            : null;
-        const thirtyDaysAgoRoleData = (thirtyDaysAgoData?.data && thirtyDaysAgoData.data[country])
-            ? thirtyDaysAgoData.data[country].roles.find(item => item.roleId === roleId)
-            : null;
-
-        const nowCount = roleData[countField];
-        const lastYearCount = lastYearRoleData && lastYearRoleData[countField];
-        const aYearAgoCount = aYearAgoRoleData && aYearAgoRoleData[countField];
-        const yearDifference = nowCount !== null && lastYearCount !== null
-            ? nowCount - lastYearCount
-            : null;
-        const thirtyDayDifference = thirtyDaysAgoRoleData !== null
-            ? nowCount - thirtyDaysAgoRoleData[countField]
-            : null;
-
-        roleItems.push({
-            nowCount,
-            lastYearCount,
-            aYearAgoCount,
-            yearDifference,
-            yearRatio: nowCount / lastYearCount,
-            thirtyDayDifference,
-            nameAbbrev: null,
-            name: roleData.role[0].name,
-            query: {
-                country,
-                category: CATEGORY_TYPE_ROLE + roleId,
-                countField,
-            },
-            navigationTarget: { byFieldType: 'country', category: CATEGORY_TYPE_ROLE + roleId },
-        });
-    }
-
-    return [
-        (membershipGivingItems.length + membershipNonGivingItems.length) && {
-            type: 'section',
-            label: locale.membershipsAndRoles.sectionTitles.membershipCategories,
-        },
-        membershipGivingItems.length && {
-            type: 'section',
-            label: locale.membershipsAndRoles.sectionTitles.membershipGivingCategories,
-        },
-        { type: 'items', items: membershipGivingItems },
-        membershipNonGivingItems.length && {
-            type: 'section',
-            label: locale.membershipsAndRoles.sectionTitles.membershipNonGivingCategories,
-        },
-        { type: 'items', items: membershipNonGivingItems },
-        roleItems.length && {
-            type: 'section',
-            label: locale.membershipsAndRoles.sectionTitles.roles,
-        },
-        { type: 'items', items: roleItems },
-    ].filter(x => x);
-}
-
-function getDataByCountry ({
-    category,
-    currentData,
-    lastYearData,
-    aYearAgoData,
-    thirtyDaysAgoData,
-    tejo,
-    countries,
-}) {
-    if (!currentData?.data) return [];
-    const allCountries = Object.keys(currentData.data).filter(id => id.length === 2);
-
-    const countField = tejo ? 'countTEJO' : 'count';
-
-    const items = [];
-    const [categoryField, idField] = category.startsWith(CATEGORY_TYPE_MEM)
-        ? ['membershipCategories', 'membershipCategoryId']
-        : ['roles', 'roleId'];
-    const categoryId = +category.substring(1);
-    const all = category === 'total';
-
-    const categoryFields = all ? [
-        ['membershipCategories', 'membershipCategoryId'],
-        ['roles', 'roleId'],
-    ] : [[categoryField, idField]];
-
-    for (const country of allCountries) {
-        let nowCount = 0;
-        let lastYearCount = null;
-        let aYearAgoCount = null;
-        let thirtyDaysAgoCount = null;
-        for (const [categoryField, idField] of categoryFields) {
-            const getCount = a => a
-                .filter(i => all || i[idField] === categoryId)
-                .map(i => i[countField])
-                .reduce((a, b) => a + b, 0);
-
-            const nowCatCount = (currentData?.data && currentData?.data[country])
-                ? getCount(currentData.data[country][categoryField])
-                : null;
-            const lastYearCatCount = (lastYearData?.data && lastYearData?.data[country])
-                ? getCount(lastYearData.data[country][categoryField])
-                : null;
-            const aYearAgoCatCount = (aYearAgoData?.data && aYearAgoData?.data[country])
-                ? getCount(aYearAgoData.data[country][categoryField])
-                : null;
-            const thirtyDaysAgoCatCount = (thirtyDaysAgoData?.data && thirtyDaysAgoData?.data[country])
-                ? getCount(thirtyDaysAgoData.data[country][categoryField])
-                : null;
-
-            if (Number.isFinite(nowCatCount)) {
-                nowCount += nowCatCount;
-            }
-            if (Number.isFinite(lastYearCatCount)) {
-                lastYearCount ||= 0;
-                lastYearCount += lastYearCatCount;
-            }
-            if (Number.isFinite(aYearAgoCatCount)) {
-                aYearAgoCount ||= 0;
-                aYearAgoCount += aYearAgoCatCount;
-            }
-            if (Number.isFinite(thirtyDaysAgoCatCount)) {
-                thirtyDaysAgoCount ||= 0;
-                thirtyDaysAgoCount += thirtyDaysAgoCatCount;
-            }
-        }
-
-        if (!nowCount) continue;
-
-        const yearDifference = lastYearCount !== null
-            ? nowCount - lastYearCount
-            : null;
-        const thirtyDayDifference = thirtyDaysAgoCount !== null
-            ? nowCount - thirtyDaysAgoCount
-            : null;
-
-        items.push({
-            nowCount,
-            lastYearCount,
-            aYearAgoCount,
-            yearDifference,
-            yearRatio: nowCount / lastYearCount,
-            thirtyDayDifference,
-            name: countries[country].name_eo,
-            query: {
-                country,
-                category,
-                countField,
-            },
-            navigationTarget: { byFieldType: 'category', country },
-        });
-    }
-
-    return [
-        { type: 'items', items },
-    ];
 }
 
 function MembersTableHeader ({ onClick, sorting, children }) {
@@ -730,7 +292,12 @@ function MembersTableHeader ({ onClick, sorting, children }) {
     );
 }
 
-function MembersTable ({ currentDate, lastYearDate, aYearAgoDate, items, navigate }) {
+function MembersTable ({ data, currentDate, lastYearDate, aYearAgoDate, items, navigate }) {
+    const [,, countries] = useDataView('countries/countries', {});
+    const [sortByField, setSortByField] = useState(null);
+    const [sortAsc, setSortAsc] = useState(false);
+    const [expandedItem, setExpandedItem] = useState(null);
+
     if (!items) return null;
 
     const currentYear = currentDate.split('-')[0];
@@ -740,10 +307,6 @@ function MembersTable ({ currentDate, lastYearDate, aYearAgoDate, items, navigat
     const diffNum = n => typeof n === 'number'
         ? (n > 0 ? '+' : n < 0 ? '-' : '±') + n.toLocaleString('fr-FR')
         : '—';
-
-    const [sortByField, setSortByField] = useState(null);
-    const [sortAsc, setSortAsc] = useState(false);
-    const [expandedItem, setExpandedItem] = useState(null);
 
     const setSorting = field => () => {
         if (sortByField === field) {
@@ -774,19 +337,19 @@ function MembersTable ({ currentDate, lastYearDate, aYearAgoDate, items, navigat
             <table class="count-table">
                 <thead>
                     <tr>
-                        <MembersTableHeader {...sortingProps('nowCount')}>
+                        <MembersTableHeader {...sortingProps('current')}>
                             {currentYear}
                         </MembersTableHeader>
-                        <MembersTableHeader {...sortingProps('lastYearCount')}>
+                        <MembersTableHeader {...sortingProps('lastYear')}>
                             {lastYear}
                         </MembersTableHeader>
-                        <MembersTableHeader {...sortingProps('yearDifference')}>
+                        <MembersTableHeader {...sortingProps('yearDiff')}>
                             {locale.membershipsAndRoles.yearDiffColumn}
                         </MembersTableHeader>
-                        <MembersTableHeader {...sortingProps('thirtyDayDifference')}>
+                        <MembersTableHeader {...sortingProps('thirtyDayDiff')}>
                             {locale.membershipsAndRoles.thirtyDayGrowthColumn}
                         </MembersTableHeader>
-                        <MembersTableHeader {...sortingProps('aYearAgoCount')}>
+                        <MembersTableHeader {...sortingProps('aYearAgo')}>
                             <date.renderer value={aYearAgoDate} />
                         </MembersTableHeader>
                         <MembersTableHeader
@@ -810,10 +373,10 @@ function MembersTable ({ currentDate, lastYearDate, aYearAgoDate, items, navigat
                             );
                         } else if (item.type === 'items') {
                             return item.items.map(({
-                                nowCount, lastYearCount, aYearAgoCount,
-                                yearDifference, yearRatio,
-                                thirtyDayDifference,
-                                nameAbbrev, name, isTotal, query, navigationTarget,
+                                current, lastYear, aYearAgo,
+                                yearDiff, yearRatio,
+                                thirtyDayDiff,
+                                item, isTotal, filter, navigationTarget,
                             }, j) => {
                                 const itemKey = `${i} ${j}`;
                                 const isExpanded = expandedItem === itemKey;
@@ -828,18 +391,25 @@ function MembersTable ({ currentDate, lastYearDate, aYearAgoDate, items, navigat
                                         <tr key={itemKey + 'e'}>
                                             <td colSpan={6}>
                                                 <ItemDetails
-                                                    query={query}
+                                                    data={data}
+                                                    filter={filter}
                                                     currentDate={currentDate} />
                                             </td>
                                         </tr>
                                     );
                                 }
 
-                                const categoryLabel = (
+                                const categoryLabel = item.country ? (
                                     <span>
-                                        {nameAbbrev && <b>{nameAbbrev}</b>}
+                                        {item.country === COUNTRY_TOTAL
+                                            ? locale.countries.total
+                                            : countries[item.country]?.name_eo || item.country}
+                                    </span>
+                                ) : (
+                                    <span>
+                                        {item.nameAbbrev && <b>{item.nameAbbrev}</b>}
                                         {' '}
-                                        {name}
+                                        {item.name}
                                     </span>
                                 );
 
@@ -848,16 +418,16 @@ function MembersTable ({ currentDate, lastYearDate, aYearAgoDate, items, navigat
                                         key={itemKey}
                                         class={'count-row' + (isTotal ? ' is-total' : '')}
                                         onClick={onExpand}>
-                                        <td class="is-count">{num(nowCount)}</td>
-                                        <td class="is-count">{num(lastYearCount)}</td>
+                                        <td class="is-count">{num(current)}</td>
+                                        <td class="is-count">{num(lastYear)}</td>
                                         <td class="is-count">
-                                            {diffNum(yearDifference)}
-                                            {yearDifference
+                                            {diffNum(yearDiff)}
+                                            {yearDiff
                                                 ? ' (' + diffNum(Math.round((yearRatio - 1) * 100)) + '%)'
                                                 : ''}
                                         </td>
-                                        <td className="is-count">{num(thirtyDayDifference)}</td>
-                                        <td class="is-count">{num(aYearAgoCount)}</td>
+                                        <td className="is-count">{num(thirtyDayDiff)}</td>
+                                        <td class="is-count">{num(aYearAgo)}</td>
                                         <th class="category-label">
                                             {navigationTarget ? (
                                                 <a class="category-link" onClick={() => navigate(navigationTarget)}>
@@ -877,56 +447,14 @@ function MembersTable ({ currentDate, lastYearDate, aYearAgoDate, items, navigat
     );
 }
 
-function doesItemMatchCategoryQuery (query, item) {
-    if (query === 'total') return true;
-
-    const itemId = 'membershipCategoryId' in item
-        ? CATEGORY_TYPE_MEM + item.membershipCategoryId
-        : CATEGORY_TYPE_ROLE + item.roleId;
-    if (query === itemId) return true;
-
-    if (item.membershipCategory) {
-        const cat = item.membershipCategory[0];
-        if (query === CATEGORY_TOTAL_MEM_GIVING && cat.givesMembership) return true;
-        if (query === CATEGORY_TOTAL_MEM_NON_GIVING && !cat.givesMembership) return true;
-    }
-    return false;
-}
-
-function ItemDetails ({ query, currentDate }) {
-    const [loadingHist, histError, histData] = useStatisticsHistory({
-        _unmapped: true,
+function ItemDetails ({ data, filter, currentDate }) {
+    const [loadingHist, histError, counts] = data.useHistoryCounts({
+        ...filter,
         beforeDate: currentDate,
-        offset: 0,
-        limit: 100,
-    });
+    }, 100);
 
     if (loadingHist) return <div class="item-details"><CircularProgress indeterminate /></div>;
     if (histError) return <div class="item-details"><DisplayError error={histError} /></div>;
-
-    const counts = [];
-    for (const date of (histData?.items || [])) {
-        const countryData = date.data[query.country];
-        if (countryData) {
-            let count = 0;
-
-            for (const cat of countryData.membershipCategories) {
-                if (doesItemMatchCategoryQuery(query.category, cat)) {
-                    count += cat[query.countField];
-                }
-            }
-            for (const role of countryData.roles) {
-                if (doesItemMatchCategoryQuery(query.category, role)) {
-                    count += role[query.countField];
-                }
-            }
-
-            counts.push({ date: date.date, count });
-        } else {
-            counts.push({ date: date.date, count: 0 });
-        }
-    }
-    counts.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     return (
         <div class="item-details">

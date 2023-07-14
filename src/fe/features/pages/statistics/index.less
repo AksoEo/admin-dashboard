@@ -3,17 +3,22 @@
 .statistics-demographics {
     height: calc(128px + 24px);
     box-sizing: border-box;
+    transition: opacity 0.5s;
 
     &.is-loading {
         text-align: center;
         padding: 16px;
     }
 
+    &.is-dimmed {
+        opacity: 0.5;
+    }
+
     .bucket-bars {
         display: flex;
 
         .bucket-bar {
-            flex: 1;
+            flex: var(--weight, 1);
 
             .bar-container {
                 height: 128px;
@@ -28,6 +33,7 @@
                     bottom: 0;
                     transform-origin: 0 100%;
                     animation: statistics-demographics-bar-in 0.3s backwards calc(var(--index) * 0.02s);
+                    transition: height 0.2s;
 
                     @keyframes statistics-demographics-bar-in {
                         0% {
