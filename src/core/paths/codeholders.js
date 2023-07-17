@@ -519,6 +519,20 @@ const clientFilters = {
         },
         fields: [],
     },
+    newsletterSubscriptions: {
+        toAPI: filter => {
+            const subs = { id: { $in: filter.newsletters } };
+            if (filter.time) {
+                subs.time = {
+                    $range: [
+                        +new Date(filter.time[0] + 'T00:00:00Z') / 1000,
+                        +new Date(filter.time[1] + 'T23:59:59Z') / 1000,
+                    ],
+                };
+            }
+            return { $newsletterSubscriptions: subs };
+        },
+    },
 };
 
 /**

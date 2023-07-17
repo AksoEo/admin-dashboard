@@ -7,6 +7,7 @@ export const newsletters = {
             description: 'Serĉi priskribojn de bultenoj …',
         },
     },
+    emptyLabel: 'Neniu bulteno',
     fields: {
         org: 'Organizo',
         name: 'Nomo',

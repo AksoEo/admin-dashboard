@@ -37,6 +37,7 @@ export const codeholders = {
             deathdate: 'Mortjaro',
             codeList: 'Listo de UEA-kodoj',
             delegations: 'Delegeco',
+            newsletterSubscriptions: '[[Newsletter subscriptions]]',
         },
         countryFilter: {
             all: 'ne gravas',
@@ -103,6 +104,11 @@ export const codeholders = {
             has: 'havas',
             invert: 'ne havas',
             conjunction: 'kaj',
+        },
+        newsletterSubscriptions: {
+            filterTime: '[[Filter subscription time]]',
+            filterTimeStart: '[[Start]]',
+            filterTimeEnd: '[[End]]',
         },
     },
     globalFilterTitle: 'La rezultoj estas filtritaj',

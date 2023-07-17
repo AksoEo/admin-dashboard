@@ -17,6 +17,7 @@ import { date, ueaCode } from '../../../components/data';
 import { FILTERS as DELEGATE_FILTERS } from '../delegations/delegates/filters';
 import SearchFilters from '../../../components/overview/search-filters';
 import { encodeParens, decodeParens, encodeURLQuery, decodeURLQuery } from '../../../components/overview/list-url-coding';
+import NewsletterPicker from '../newsletters/picker';
 
 function makeDialogMultiSelect (view, pickSome, render, itemName, itemPreview) {
     return connect(view)(data => ({
@@ -958,6 +959,71 @@ export default {
                             <AddIcon />
                         </Button>
                     </div>
+                </div>
+            );
+        },
+    },
+    newsletterSubscriptions: {
+        default: () => ({ enabled: false, value: { newsletters: [], time: null } }),
+        serialize ({ value }) {
+            let out = value.newsletters.join(',');
+            if (value.time) {
+                out += '$' + value.time.join('$');
+            }
+            return out;
+        },
+        deserialize (value) {
+            const parts = value.split('$');
+            const newsletters = parts[0].split(',');
+            const timeStart = parts[1];
+            const timeEnd = parts[2];
+            const time = timeStart && timeEnd ? [timeStart, timeEnd] : null;
+            return { enabled: true, value: { newsletters, time } };
+        },
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            const checkboxId = Math.random().toString(36);
+            return (
+                <div class="codeholder-newsletter-subs-filter">
+                    <NewsletterPicker
+                        disabled={hidden}
+                        value={value.newsletters}
+                        onChange={newsletters => {
+                            onChange({ ...value, newsletters });
+                            onEnabledChange(!!newsletters.length);
+                        }} />
+                    {value.newsletters.length ? (
+                        <div class="time-filter-checkbox">
+                            <Checkbox
+                                id={checkboxId}
+                                checked={!!value.time}
+                                onChange={enabled => {
+                                    if (enabled === !!value.time) return;
+                                    if (!enabled) onChange({ ...value, time: null });
+                                    else {
+                                        const today = new Date().toISOString().split('T')[0];
+                                        onChange({ ...value, time: [today, today] });
+                                    }
+                                }} />
+                            {' '}
+                            <label for={checkboxId}>
+                                {locale.search.newsletterSubscriptions.filterTime}
+                            </label>
+                        </div>
+                    ) : null}
+                    {(value.newsletters.length && value.time) ? (
+                        <div class="time-filter-range">
+                            <date.editor
+                                outline
+                                label={locale.search.newsletterSubscriptions.filterTimeStart}
+                                value={value.time[0]}
+                                onChange={v => onChange({ ...value, time: [v, value.time[1]]})} />
+                            <date.editor
+                                outline
+                                label={locale.search.newsletterSubscriptions.filterTimeEnd}
+                                value={value.time[1]}
+                                onChange={v => onChange({ ...value, time: [value.time[0], v]})} />
+                        </div>
+                    ) : null}
                 </div>
             );
         },
