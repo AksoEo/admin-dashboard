@@ -56,6 +56,7 @@ export const votes = {
         noneType: 'ne gravas',
     },
     cannotEditActive: 'Ne eblas redakti aktivan voĉdonon',
+    cannotEditEnded: '[[Cannot edit vote that has ended]]',
     bool: {
         yes: 'Jes',
         no: 'Ne',

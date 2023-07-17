@@ -99,7 +99,7 @@ export default connectPerms(class VoteDetailPage extends Page {
             });
         }
 
-        if (perms.hasPerm(`votes.update.${org}`) && !hasEnded) {
+        if (perms.hasPerm(`votes.update.${org}`)) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
                 label: locale.update,

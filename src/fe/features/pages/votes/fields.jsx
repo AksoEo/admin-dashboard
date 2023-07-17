@@ -36,7 +36,7 @@ export default {
         stringify (value) {
             return value;
         },
-        shouldHide: (_, editing) => !editing,
+        shouldHide: (item, editing) => !editing || item.state?.hasEnded,
     },
     description: {
         sortable: true,
@@ -54,6 +54,7 @@ export default {
         stringify (value) {
             return value;
         },
+        shouldHide: (item, editing) => item.state?.hasEnded && editing,
     },
     type: {
         component ({ value }) {
@@ -62,6 +63,7 @@ export default {
         stringify (value) {
             return locale.types[value];
         },
+        shouldHide: (item, editing) => item.state?.hasEnded && editing,
     },
     state: (() => {
         const stringify = value => {
@@ -82,6 +84,7 @@ export default {
                 </div>
             ),
             stringify,
+            shouldHide: (item, editing) => item.state?.hasEnded && editing,
         };
     })(),
     timespan: {
@@ -109,5 +112,6 @@ export default {
         stringify (value) {
             return `${moment(value.start * 1000).format(timestampFormat)}–${moment(value.end * 1000).format(timestampFormat)}`;
         },
+        shouldHide: (item, editing) => item.state?.hasEnded && editing,
     },
 };

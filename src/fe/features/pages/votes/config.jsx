@@ -55,8 +55,17 @@ function JSONEditor ({ value, onChange, disabled, category }) {
     );
 }
 
+function CannotEditActive () {
+    return <span class="vote-config-cannot-edit-notice">{locale.cannotEditActive}</span>;
+}
+
+function CannotEditEnded () {
+    return <span class="vote-config-cannot-edit-notice">{locale.cannotEditEnded}</span>;
+}
+
 export function voterCodeholders ({ value, onChange, editing, item }) {
-    if (editing && item.state.isActive) return locale.cannotEditActive;
+    if (editing && item.state.isActive) return <CannotEditActive />;
+    if (editing && item.state.hasEnded) return <CannotEditEnded />;
     return (
         <Field validate={() => validateJSON(value)}>
             <JSONEditor
@@ -120,7 +129,8 @@ export function viewerCodeholdersMemberFilter ({ value, onChange, editing }) {
 
 const timeBound = (isStart) => function TimeBoundEditor ({ value, onChange, editing, item, copyFrom, ...extra }) {
     if (!editing) return <timestamp.renderer value={value} />;
-    if (isStart && item.state?.isActive) return locale.cannotEditActive;
+    if (isStart && item.state?.isActive) return <CannotEditActive />;
+    if (editing && item.state.hasEnded) return <CannotEditEnded />;
     return (
         <timestamp.editor
             {...extra}
@@ -161,7 +171,8 @@ function bool ({ value, onChange, editing }) {
 }
 
 function inactiveBool ({ value, onChange, editing, item }) {
-    if (editing && item.state.isActive) return locale.cannotEditActive;
+    if (editing && item.state.isActive) return <CannotEditActive />;
+    if (editing && item.state.hasEnded) return <CannotEditEnded />;
     const Bool = bool;
     return <Bool value={value} onChange={onChange} editing={editing} />;
 }
@@ -172,7 +183,8 @@ export function type ({ value, onChange, editing, item }) {
         return locale.types[value];
     }
 
-    if (item.state.isActive) return locale.cannotEditActive;
+    if (item.state.isActive) return <CannotEditActive />;
+    if (item.state.hasEnded) return <CannotEditEnded />;
 
     return (
         <Select
@@ -191,7 +203,10 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
     config,
     onConfigChange,
     editing,
+    item,
 }) {
+    if (editing && item.state.hasEnded) return <CannotEditEnded />;
+
     let relationLabel = null;
     let inclusiveCheckbox = null;
     const inclusive = config[field];
@@ -242,8 +257,9 @@ export const majorityBallots = requiredRationalInclusive('majorityBallotsInclusi
 export const majorityVoters = requiredRationalInclusive('majorityVotersInclusive', '>');
 export const majorityMustReachBoth = bool;
 
-export function numChosenOptions ({ value, onChange, editing }) {
+export function numChosenOptions ({ value, onChange, editing, item }) {
     if (!editing) return '' + value;
+    if (item.state.hasEnded) return <CannotEditEnded />;
 
     return (
         <TextField
@@ -259,7 +275,7 @@ export const mentionThreshold = requiredRationalInclusive('mentionThresholdInclu
 export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
     if (!editing) return value === null ? locale.config.noMaxOptions : '' + value;
 
-    if (item.state.isActive) return locale.cannotEditActive;
+    if (item.state.isActive) return <CannotEditActive />;
 
     return (
         <TextField
@@ -272,8 +288,9 @@ export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
     );
 }
 
-export function tieBreakerCodeholder ({ value, onChange, editing }) {
+export function tieBreakerCodeholder ({ value, onChange, editing, item }) {
     if (!editing) return <IdUEACode id={value} />;
+    if (item.state.hasEnded) return <CannotEditEnded />;
     return (
         <Field validate={() => {
             if (!value) return locale.config.tieBreakerRequired;
@@ -298,9 +315,10 @@ export const options = class OptionsEditor extends Component {
      */
     optionKeys = [];
 
-    render ({ value, onChange, editing }) {
+    render ({ value, onChange, editing, item }) {
         if (!value) return null;
         const items = [];
+        if (item.state.hasEnded) return <CannotEditEnded />;
 
         for (let i = 0; i < value.length; i++) {
             if (!this.optionKeys[i]) {

@@ -290,6 +290,10 @@ export const tasks = {
         const id = +res.res.headers.get('x-identifier');
         store.insert([VOTES, +id], data);
         store.signal([VOTES, SIG_VOTES]);
+
+        // give API some time to actually initialize it; otherwise we'll be reading 404s everywhere
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
         return id;
     },
 
