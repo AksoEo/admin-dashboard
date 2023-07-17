@@ -60,6 +60,9 @@ const progClientFilters = {
     location: {
         toAPI: locations => ({ location: { $in: locations } }),
     },
+    tags: {
+        toAPI: tags => ({ tags: { $hasAny: tags } }),
+    },
 };
 
 /** Reads a congress participant's dataId into a string. */

@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { congressPrograms as locale } from '../../../../../locale';
 import { timestamp } from '../../../../../components/data';
 import LocationPicker from '../location-picker';
+import { makeTagFilter } from '../tag-filtering';
 
 export const FILTERS = {
     timeSlice: {
@@ -92,4 +93,8 @@ export const FILTERS = {
             );
         },
     },
+    tags: makeTagFilter({
+        task: 'congresses/listProgramTags',
+        view: 'congresses/programTag',
+    }),
 };

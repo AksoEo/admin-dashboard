@@ -78,6 +78,12 @@ export const congressInstances = {
         button: 'Forigi',
         description: 'Ĉu vi certas, ke vi volas forigi la okazigon? Ne eblas malfari tiun ĉi agon.',
     },
+    general: {
+        tagPicker: {
+            search: 'Serĉi…',
+            empty: 'Neniu etikedo',
+        },
+    },
 };
 
 export const congressLocations = {
@@ -96,10 +102,6 @@ export const congressLocations = {
             openType: {
                 date: 'je horo ...',
                 none: 'sen malfermaj horoj',
-            },
-            tagPicker: {
-                search: 'Serĉi…',
-                empty: 'Neniu etikedo',
             },
         },
     },
@@ -213,6 +215,8 @@ export const congressPrograms = {
             timeSlice: 'Tempointervalo',
             timeSliceFrom: 'ekde',
             timeSliceTo: 'ĝis',
+
+            tags: 'Etikedoj',
         },
     },
     fields: {
