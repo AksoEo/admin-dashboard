@@ -389,6 +389,8 @@ function PurposeTriggerInfo ({ purpose, currency }) {
     let linkTarget;
     if (purpose.triggers === 'registration_entry') {
         linkTarget = `/membreco/alighoj/${purpose.dataId}`;
+    } else if (purpose.triggers === 'congress_registration') {
+        linkTarget = `/kongresoj/${purpose.congressId}/okazigoj/${purpose.congressInstanceId}/alighintoj/${purpose.dataId}`;
     }
 
     return (
