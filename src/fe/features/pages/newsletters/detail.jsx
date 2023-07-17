@@ -9,6 +9,7 @@ import { FIELDS } from './fields';
 import SendNotifTemplate from '../notif-templates/send';
 import './detail.less';
 import { usePerms } from '../../../perms';
+import { LinkButton } from '../../../router';
 
 export default class Newsletter extends DetailPage {
     state = {
@@ -84,6 +85,8 @@ function Footer ({ item }) {
     if (!perms.hasPerm('codeholders.send_notif')) return null;
     if (!perms.hasPerm('notif_templates.read.tejo') || !perms.hasPerm('notif_templates.read.uea')) return null;
 
+    const viewCodeholdersLink = `/membroj?filter(enabled:true,newsletterSubscriptions:${item.id})`;
+
     return (
         <div class="newsletter-send">
             <p>
@@ -92,6 +95,10 @@ function Footer ({ item }) {
             <Button raised onClick={() => setSending(true)}>
                 {locale.send.button}
             </Button>
+            {' '}
+            <LinkButton target={viewCodeholdersLink}>
+                {locale.viewSubscribedCodeholders}
+            </LinkButton>
             <SendNotifTemplate
                 task="newsletters/send"
                 context="newsletter"

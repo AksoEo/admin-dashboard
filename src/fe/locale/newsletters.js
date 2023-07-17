@@ -44,6 +44,7 @@ export const newsletters = {
             descriptionDelete: 'Ne eblas nuligi dissendadon de bulteno. Post la dissendado, la ŝablono estos forigita. Ĉu vi volas daŭrigi?',
         },
     },
+    viewSubscribedCodeholders: '[[View subscribers]]',
 };
 
 export const newsletterUnsubs = {
