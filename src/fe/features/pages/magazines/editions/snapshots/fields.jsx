@@ -90,8 +90,7 @@ export function Footer ({ editing, userData }) {
                     edition: userData.edition,
                     id: userData.id,
                     compare,
-                }, { offset, limit }).runOnceAndDrop()}
-                useShowMore />
+                }, { offset, limit }).runOnceAndDrop()} />
         </div>
     );
 }

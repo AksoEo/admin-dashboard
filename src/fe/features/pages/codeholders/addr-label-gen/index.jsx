@@ -294,7 +294,6 @@ const PresetPicker = connectPerms(function PresetPicker ({ open, onClose, core, 
                     offset,
                     limit,
                 }).runOnceAndDrop()}
-                itemHeight={56}
                 renderItem={item => (
                     <div class="preset-item">
                         {item.name}

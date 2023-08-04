@@ -24,7 +24,6 @@ export default class LoginsPage extends Page {
                             id,
                         }, { offset, limit }).runOnceAndDrop()}
                     emptyLabel={locale.logins.empty}
-                    itemHeight={84}
                     renderItem={item => <LoginItem item={item} />} />
             </div>
         );

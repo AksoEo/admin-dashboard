@@ -90,7 +90,6 @@ export default connectPerms(class FilesPage extends Page {
                             limit,
                         }).runOnceAndDrop()}
                     emptyLabel={locale.noFiles}
-                    itemHeight={96}
                     renderItem={this.renderFile}
                     onItemClick={this.onItemClick}
                     onRemove={item => this.context

@@ -287,8 +287,7 @@ function ListPreview ({ item }) {
                                 </div>
                             );
                         }}
-                        emptyLabel={locale.preview.empty}
-                        useShowMore />
+                        emptyLabel={locale.preview.empty} />
                 </div>
             )}
         </coreContext.Consumer>

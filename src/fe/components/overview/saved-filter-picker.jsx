@@ -32,7 +32,6 @@ export const SavedFilterPicker = connectPerms(function FilterPicker ({
                     offset,
                     limit,
                 }).runOnceAndDrop()}
-                itemHeight={56}
                 renderItem={item => (
                     <div class="search-filter-item">
                         <div>{item.name}</div>

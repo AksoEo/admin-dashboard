@@ -5,21 +5,17 @@
     overflow-y: auto;
 
     .data-list-empty {
-        position: absolute;
-        top: 24px;
-        left: 0;
+        padding: 24px;
         width: 100%;
+        box-sizing: border-box;
         text-align: center;
         opacity: 0.7;
     }
 
     .data-list-item {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
         padding-left: 24px;
         padding-right: 24px;
+        width: 100%;
         display: flex;
         align-items: center;
         box-sizing: border-box;
@@ -48,13 +44,14 @@
     }
 
     .data-list-loading-indicator {
-        padding: 8px;
+        padding: 12px;
         text-align: center;
     }
 
     .show-more-button {
         display: block;
         width: 100%;
+        margin-bottom: 32px;
     }
 
     &.is-flat {

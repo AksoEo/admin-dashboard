@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent, useState } from 'preact/compat';
+import { useContext, useEffect, useMemo, useRef, useState } from 'preact/compat';
 import { Button, Menu, CircularProgress } from 'yamdl';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import { data as locale } from '../../locale';
@@ -9,12 +9,10 @@ import TaskDialog from '../tasks/task-dialog';
 import DisplayError from '../utils/error';
 import './data-list.less';
 
-const VLIST_CHUNK_SIZE = 100;
-
-// TODO: this might need a refactor
+const VLIST_CHUNK_SIZE = 50;
 
 /**
- * Virtual list with auto-sorting and remove/load callbacks.
+ * A list that loads automatically as you scroll with basic item management.
  *
  * # Props
  * - onLoad: async (offset, limit) -> { items: [item], total: number } callback (required)
@@ -22,235 +20,172 @@ const VLIST_CHUNK_SIZE = 100;
  * - renderMenu: (item) -> menu items
  * - onRemove: async (item) -> void callback
  * - onItemClick: (item) -> void callback
- * - itemHeight: fixed item height in pixels
  * - emptyLabel: label to show when there are no items
  * - updateView: argument list to create a data view that emits updates (if available)
- * - useShowMore: if true, will use a “show more” button instead of scrollng magic
  */
-export default class DataList extends PureComponent {
-    state = {
-        items: [],
-        total: -1,
-        loading: false,
-        error: null,
+export default function DataList ({
+    onLoad,
+    renderItem,
+    renderMenu,
+    onRemove,
+    onItemClick,
+    emptyLabel,
+    updateView,
+}) {
+    const core = useContext(coreContext);
+    const node = useRef();
+    const [total, setTotal] = useState(-1);
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const [deleteItemOpen, setDeleteItemOpen] = useState(false);
+    const [deletingItem, setDeletingItem] = useState(null);
+
+    const hasMore = total < 0 || items.length < total;
+    const loadMore = () => {
+        if (loading) return;
+        setLoading(true);
+        setError(null);
+
+        onLoad(items.length, VLIST_CHUNK_SIZE).then(result => {
+            const newItems = items.slice();
+            for (const item of result.items) newItems.push(item);
+            setItems(newItems);
+
+            if (!Number.isFinite(result.total) && result.items.length < VLIST_CHUNK_SIZE) {
+                // if there's no total, assume we have all of them when we have received less than
+                // the requested number
+                result.total = items.length;
+            }
+
+            if (Number.isFinite(result.total)) {
+                setTotal(result.total);
+            }
+        }).catch(error => {
+            setError(error);
+        }).finally(() => {
+            setLoading(false);
+        });
     };
 
-    static contextType = coreContext;
-
-    async fetchChunk (chunk) {
-        if (this.state.total > -1 && chunk * VLIST_CHUNK_SIZE > this.state.total) return;
-        this.setState({ loading: true, error: null });
-        let result;
-        try {
-            result = await this.props.onLoad(chunk * VLIST_CHUNK_SIZE, VLIST_CHUNK_SIZE);
-        } catch (error) {
-            this.setState({ error, loading: false });
-            return;
-        }
-        if (!this.maySetState) return;
-
-        const items = this.state.items.slice();
-        for (let i = 0; i < result.items.length; i++) {
-            items[i + chunk * VLIST_CHUNK_SIZE] = result.items[i];
-        }
-        if (items.length > result.total) items.splice(result.total);
-
-        if (!Number.isFinite(result.total) && result.items.length < VLIST_CHUNK_SIZE) {
-            // if there's no total, assume we have all of them when we have received less than
-            // the requested number
-            result.total = items.length;
-        }
-
-        this.setState({
-            total: result.total,
-            items,
-            loading: false,
-        });
+    const renderedItems = [];
+    for (const item of items) {
+        const Component = onItemClick ? Button : 'div';
+        renderedItems.push(
+            <Component
+                key={item.id}
+                class="data-list-item"
+                onClick={() => onItemClick && onItemClick(item)}>
+                <div class="list-item-contents">
+                    {renderItem(item)}
+                </div>
+                {onRemove && (
+                    <div class="list-item-extra">
+                        <ListItemOverflow
+                            renderMenu={renderMenu}
+                            item={item}
+                            core={core}
+                            onDelete={() => {
+                                setDeleteItemOpen(true);
+                                setDeletingItem(item);
+                            }}/>
+                    </div>
+                )}
+            </Component>
+        );
     }
 
-    onScroll = () => {
-        if (!this.node || this.props.useShowMore) return;
-        const lower = Math.max(0, Math.floor(this.node.scrollTop / this.props.itemHeight));
-        const upper = Math.ceil((this.node.scrollTop + this.node.offsetHeight) / this.props.itemHeight);
-
-        const lowerChunk = Math.floor(lower / VLIST_CHUNK_SIZE);
-        const upperChunk = Math.ceil(upper / VLIST_CHUNK_SIZE);
-
-        for (let i = lowerChunk; i <= upperChunk; i++) {
-            if (!this.state.items[i * VLIST_CHUNK_SIZE]) {
-                this.fetchChunk(i).catch(this.onFailFetch);
-            }
-        }
-    };
-
-    showMore = () => {
-        let i = 0;
-        while (i <= Math.ceil(this.state.total / VLIST_CHUNK_SIZE)) {
-            if (!this.state.items[i * VLIST_CHUNK_SIZE]) {
-                this.fetchChunk(i).catch(this.onFailFetch);
-                break;
-            }
-            i++;
-        }
-    };
-
-    onFailFetch = err => {
-        // TODO: error handling
-        console.error(err); // eslint-disable-line no-console
-    };
-
-    initDeleteItem (index) {
-        const item = this.state.items[index];
-        if (!item) return;
-
-        this.setState({ deleteItem: item, deleteItemOpen: true });
+    if (!total && !hasMore && emptyLabel) {
+        renderedItems.push(<div class="data-list-empty" key={0}>{emptyLabel}</div>);
     }
 
-    deleteItem (item) {
-        return this.props.onRemove(item).then(() => {
-            const items = this.state.items.slice();
-            if (items.includes(item)) items.splice(items.indexOf(item), 1);
-            this.setState({ items, total: this.state.total - 1, deleteItemOpen: false });
-        });
-    }
-
-    #updateView;
-
-    bindUpdates () {
-        if (this.#updateView) this.unbindUpdates();
-        if (!this.props.updateView) return;
-        this.#updateView = this.context.createDataView(...this.props.updateView);
-        this.#updateView.on('update', () => {
-            // data updated
-            // re-fetch all chunks (and if we don’t have any right now; fetch at least one)
-            for (let i = 0; i < Math.max(1, this.state.items.length / VLIST_CHUNK_SIZE); i++) {
-                this.fetchChunk(i).catch(this.onFailFetch);
+    const showMoreButton = useRef();
+    const loadMoreRef = useRef(loadMore);
+    loadMoreRef.current = loadMore;
+    useEffect(() => {
+        const button = showMoreButton.current;
+        if (!button?.button) return;
+        const iob = new IntersectionObserver(entries => {
+            const entry = entries[0];
+            if (entry.isIntersecting && hasMore) {
+                loadMoreRef.current();
             }
         });
-    }
+        iob.observe(button.button);
+        return () => iob.disconnect();
+    }, [showMoreButton.current, hasMore]);
 
-    unbindUpdates () {
-        if (!this.#updateView) return;
-        this.#updateView.drop();
-        this.#updateView = null;
-    }
-
-    componentDidMount () {
-        this.maySetState = true;
-        this.fetchChunk(0).catch(this.onFailFetch);
-        this.bindUpdates();
-    }
-
-    componentDidUpdate (prevProps) {
-        if (!deepEq(prevProps.updateView, this.props.updateView)) {
-            this.bindUpdates();
+    const prevUpdateView = useRef(updateView);
+    const updateViewChangeDetection = useMemo(() => {
+        if (!deepEq(updateView, prevUpdateView.current)) {
+            prevUpdateView.current = updateView;
         }
-    }
+        return prevUpdateView.current;
+    }, [updateView]);
 
-    componentWillUnmount () {
-        this.maySetState = false;
-        this.unbindUpdates();
-    }
-
-    clear () {
-        this.setState({
-            items: [],
-            total: -1,
-            loading: false,
-            error: null,
+    useEffect(() => {
+        if (!updateView) return;
+        const view = core.createDataView(...updateView);
+        let isInitialUpdate = true;
+        view.on('update', () => {
+            if (isInitialUpdate) {
+                isInitialUpdate = false;
+                return;
+            }
+            // data updated. reload everything
+            setItems([]);
+            setTimeout(() => {
+                loadMoreRef.current();
+            }, 100);
         });
-        this.fetchChunk(0).catch(this.onFailFetch);
-    }
+        return () => view.drop();
+    }, [core, updateViewChangeDetection]);
 
-    render () {
-        const items = [];
+    return (
+        <div
+            class={'data-list ' + (this.props.class || '')}
+            ref={node}>
+            {renderedItems}
 
-        const useAbsolutePositioning = !this.props.useShowMore;
-
-        for (let i = 0; i < this.state.items.length; i++) {
-            const item = this.state.items[i];
-            if (item) {
-                const y = useAbsolutePositioning ? i * this.props.itemHeight : 0;
-                const Component = this.props.onItemClick ? Button : 'div';
-                items.push(
-                    <Component
-                        key={item.id}
-                        class="data-list-item"
-                        style={{ transform: `translateY(${y}px)` }}
-                        onClick={() => this.props.onItemClick && this.props.onItemClick(item)}>
-                        <div class="list-item-contents">
-                            {this.props.renderItem(item)}
-                        </div>
-                        {this.props.onRemove && (
-                            <div class="list-item-extra">
-                                <ListItemOverflow
-                                    renderMenu={this.props.renderMenu}
-                                    item={item}
-                                    core={this.context}
-                                    onDelete={() => this.initDeleteItem(i)}/>
-                            </div>
-                        )}
-                    </Component>
-                );
-            }
-        }
-
-        let total = this.state.total;
-        if (total === 0 && this.props.emptyLabel) {
-            total++;
-            items.push(<div class="data-list-empty" key={0}>{this.props.emptyLabel}</div>);
-        }
-
-        let error = null;
-        if (this.state.error) {
-            error = <DisplayError error={this.state.error} />;
-        }
-
-        let showMore = null;
-        if (this.props.useShowMore || error) {
-            const hasMore = this.state.items.length < this.state.total;
-            if (hasMore || error) {
-                showMore = (
-                    <Button class="show-more-button" onClick={this.showMore}>
-                        {error ? locale.retry : locale.showMore}
-                    </Button>
-                );
-            }
-        }
-
-        let loadingIndicator = null;
-        if (this.state.loading) {
-            loadingIndicator = (
+            {loading ? (
                 <div class="data-list-loading-indicator">
                     <CircularProgress indeterminate />
                 </div>
-            );
-        }
+            ) : null}
+            {error ? (
+                <div class="data-list-error">
+                    <DisplayError error={error} />
+                </div>
+            ) : null}
+            {(!loading && hasMore) ? (
+                <Button class="show-more-button" onClick={loadMore} ref={showMoreButton}>
+                    {error ? locale.retry : locale.showMore}
+                </Button>
+            ) : null}
 
-        return (
-            <div
-                class={'data-list ' + (useAbsolutePositioning ? '' : 'is-flat ') + (this.props.class || '')}
-                ref={node => this.node = node}
-                onScroll={this.onScroll}>
-                <div
-                    class="vlist-spacer"
-                    style={{ height: total * this.props.itemHeight }} />
-                {items}
-                {error}
-                {loadingIndicator}
-                {showMore}
-
-                <TaskDialog
-                    open={this.state.deleteItemOpen}
-                    onClose={() => this.setState({ deleteItemOpen: false })}
-                    title={locale.deleteTitle}
-                    actionLabel={locale.delete}
-                    run={() => this.deleteItem(this.state.deleteItem)}>
-                    {locale.deleteDescription}
-                </TaskDialog>
-            </div>
-        );
-    }
+            <TaskDialog
+                open={deleteItemOpen}
+                onClose={() => setDeleteItemOpen(false)}
+                title={locale.deleteTitle}
+                actionLabel={locale.delete}
+                run={() => {
+                    const item = deletingItem;
+                    if (loading) throw new Error(locale.deletePleaseWait);
+                    setLoading(true); // prevent loading more
+                    return this.props.onRemove(item).then(() => {
+                        const newItems = items.slice();
+                        if (newItems.includes(item)) newItems.splice(newItems.indexOf(item), 1);
+                        setItems(newItems);
+                        setTotal(total - 1);
+                        setLoading(false);
+                        setDeleteItemOpen(false);
+                    });
+                }}>
+                {locale.deleteDescription}
+            </TaskDialog>
+        </div>
+    );
 }
 
 function ListItemOverflow ({ renderMenu, item, core, onDelete }) {

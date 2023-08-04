@@ -164,7 +164,6 @@ function makePage (createTask, signal, listTask, deleteTask, fieldId, perm, rend
                                 id,
                             }, { offset, limit }).runOnceAndDrop()}
                         emptyLabel={empty}
-                        itemHeight={itemHeight}
                         onRemove={canEdit && (item =>
                             this.context.createTask(deleteTask, {
                                 id,

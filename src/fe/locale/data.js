@@ -49,6 +49,7 @@ export const data = {
     },
     deleteTitle: 'Forigi',
     deleteDescription: 'Ĉu vi certas, ke vi volas forigi tiun ĉi eron?',
+    deletePleaseWait: '[[Please wait]]',
     months: [
         'Januaro',
         'Februaro',
