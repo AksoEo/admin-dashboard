@@ -97,12 +97,25 @@ export function crudGet ({
     apiPath,
     fields,
     storePath,
+    storePathWithBody,
     map,
 }) {
     return async (options) => {
         const client = await asyncClient;
-        const res = await client.get(apiPath(options), { fields });
-        const path = storePath(options, res.body);
+        let res;
+        try {
+            res = await client.get(apiPath(options), { fields });
+        } catch (err) {
+            if (err.statusCode === 404) {
+                // not found - delete any applicable data
+                if (storePath) {
+                    const path = storePath(options);
+                    store.remove(path);
+                }
+            }
+            throw err;
+        }
+        const path = storePath ? storePath(options) : storePathWithBody(options, res.body);
         const existing = store.get(path);
         const data = res.body;
         if (map) map(data, options);

@@ -1638,7 +1638,7 @@ export const tasks = {
             'tos.paperAnnualBook',
             'tos.paperAnnualBookTime',
         ],
-        storePath: ({ id }, item) => [CODEHOLDER_DELEGATIONS, id, item.org],
+        storePathWithBody: ({ id }, item) => [CODEHOLDER_DELEGATIONS, id, item.org],
         map: (item, { id }) => {
             item.codeholderId = id;
             item.id = item.codeholderId + '~' + item.org;
