@@ -12,10 +12,12 @@ export { DataView, Task, Worker };
  *
  * - path: data view path
  * - options: data view options (will be deep-compared for changes) (if null, will not load)
+ * - extra options:
+ *   - onUpdate: update callback
  *
  * Returns [loading, error, data]
  */
-export function useDataView (path, options) {
+export function useDataView (path, options, { onUpdate } = {}) {
     const core = useContext(coreContext);
     const prevOptions = useRef(null);
     const dataView = useRef(null);
@@ -35,6 +37,9 @@ export function useDataView (path, options) {
         optionsChangeId.current++;
     }
 
+    const onUpdateRef = useRef(onUpdate);
+    onUpdateRef.current = onUpdate;
+
     useEffect(() => {
         if (!dataView.current || optionsDidChange) {
             if (dataView.current) dataView.current.drop();
@@ -48,6 +53,7 @@ export function useDataView (path, options) {
             view.on('update', data => {
                 setLoading(false);
                 setData(data);
+                if (onUpdateRef.current) onUpdateRef.current(data);
             });
             view.on('error', err => {
                 setLoading(false);

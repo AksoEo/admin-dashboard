@@ -477,14 +477,14 @@ export default [
                             {
                                 path: 'membrecoj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-memberships" */ './codeholders/membership-roles'), e => e.MembershipPage),
+                                    import(/* webpackChunkName: "codeholder-memberships" */ './codeholders/memberships-roles'), e => e.MembershipPage),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasCodeholderField('membership', 'r'),
                             },
                             {
                                 path: 'roloj',
                                 component: elazy(() =>
-                                    import(/* webpackChunkName: "codeholder-roles" */ './codeholders/membership-roles'), e => e.RolesPage),
+                                    import(/* webpackChunkName: "codeholder-roles" */ './codeholders/memberships-roles'), e => e.RolesPage),
                                 type: 'stack',
                                 hasPerm: perms => perms.hasPerm('codeholder_roles.read'),
                             },

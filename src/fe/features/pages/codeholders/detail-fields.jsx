@@ -33,7 +33,7 @@ import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import { FileIcon } from '../../../components/icons';
 import ProfilePictureEditor from './profile-picture';
 import Publicity from './publicity';
-import { MembershipInDetailView, RolesInDetailView } from './membership-roles';
+import { MembershipInDetailView, RolesInDetailView } from './memberships-roles';
 import ChangeRequestsButton from '../change-requests/button';
 import DelegationsButton from '../delegations/delegates/button';
 import SubscriptionsButton from '../magazines/subscriptions/button';
