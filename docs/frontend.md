@@ -115,6 +115,8 @@ Almost all JS-driven animation is performed by springs and the global animator (
 To use springs, simply call `globalAnimator.register(this)`, make sure to have an instance method `update(deltaTime)`, and call `globalAnimator.deregister(this)` when done (especially in `componentWillUnmount`).
 In `update(dt)`, call `spring.update(dt)` to update the spring, and `spring.wantsUpdate()` to check if the animation can be stopped.
 
+There's also a newer, more efficient `RtSpring`/`ElementAnimationController`, which uses the Web Animation API instead of a requestAnimationFrame loop.
+
 ### Useful Components
 #### Data Fields
 There should probably be more of these (refactor!). Located in `components/data`. These are renderers and editors for various kinds of data.

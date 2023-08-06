@@ -403,7 +403,7 @@ function MembersTable ({ data, currentDate, lastYearDate, aYearAgoDate, items, n
                                     <span>
                                         {item.country === COUNTRY_TOTAL
                                             ? locale.countries.total
-                                            : countries[item.country]?.name_eo || item.country}
+                                            : countries && countries[item.country]?.name_eo || item.country}
                                     </span>
                                 ) : (
                                     <span>
@@ -430,7 +430,10 @@ function MembersTable ({ data, currentDate, lastYearDate, aYearAgoDate, items, n
                                         <td class="is-count">{num(aYearAgo)}</td>
                                         <th class="category-label">
                                             {navigationTarget ? (
-                                                <a class="category-link" onClick={() => navigate(navigationTarget)}>
+                                                <a class="category-link" onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(navigationTarget);
+                                                }}>
                                                     {categoryLabel}
                                                 </a>
                                             ) : categoryLabel}

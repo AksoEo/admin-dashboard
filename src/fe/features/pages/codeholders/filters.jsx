@@ -973,7 +973,7 @@ export default {
         },
         deserialize (value) {
             const parts = value.split('$');
-            const newsletters = parts[0].split(',');
+            const newsletters = parts[0].split(',').map(id => +id).filter(x => Number.isFinite(x));
             const timeStart = parts[1];
             const timeEnd = parts[2];
             const time = timeStart && timeEnd ? [timeStart, timeEnd] : null;
