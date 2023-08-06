@@ -6,6 +6,7 @@ import { useDataView } from '../../core';
 import LargeMultiSelect from './large-multi-select';
 import { data as locale } from '../../locale';
 import './country-picker.less';
+import DisplayError from '../utils/error';
 
 /*8
  * Renders a country picker.
@@ -18,8 +19,8 @@ import './country-picker.less';
  * - disabled: bool
  */
 export default function CountryPicker ({ value, onChange, hideGroups, shouldHideItem, hidden, disabled }) {
-    const [countriesLoading, , countries_] = useDataView('countries/countries');
-    const [groupsLoading, , countryGroups_] = useDataView('countries/countryGroups');
+    const [countriesLoading, countriesError, countries_] = useDataView('countries/countries', {});
+    const [groupsLoading, groupsError, countryGroups_] = useDataView('countries/countryGroups', {});
 
     if (countriesLoading || groupsLoading) {
         hidden = true;
@@ -63,6 +64,10 @@ export default function CountryPicker ({ value, onChange, hideGroups, shouldHide
     const onChangeMemoizedProxy = useMemo(() => (value) => {
         onChangeRef.current(value);
     }, []);
+
+    if (countriesError || groupsError) {
+        return <DisplayError error={countriesError || groupsError} />;
+    }
 
     return <LargeMultiSelect
         value={value}

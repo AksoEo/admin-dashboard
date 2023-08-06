@@ -8,7 +8,7 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import moment from 'moment';
 import Segmented from '../../../components/controls/segmented';
-import { connect } from '../../../core/connection';
+import { useDataView } from '../../../core';
 import { codeholders as locale, delegations as delegationsLocale } from '../../../locale';
 import CountryPicker from '../../../components/pickers/country-picker';
 import LargeMultiSelect from '../../../components/pickers/large-multi-select';
@@ -20,9 +20,8 @@ import { encodeParens, decodeParens, encodeURLQuery, decodeURLQuery } from '../.
 import NewsletterPicker from '../newsletters/picker';
 
 function makeDialogMultiSelect (view, pickSome, render, itemName, itemPreview) {
-    return connect(view)(data => ({
-        available: data,
-    }))(function CoreMultiSelect ({ value, onChange, available, style, disabled }) {
+    return function CoreMultiSelect ({ value, onChange, style, disabled }) {
+        const [,, available] = useDataView(view, {});
         if (!available) return null;
 
         const sortedAvailable = Object.keys(available).sort((a, b) => {
@@ -41,7 +40,7 @@ function makeDialogMultiSelect (view, pickSome, render, itemName, itemPreview) {
             title={pickSome}
             disabled={disabled}
             style={style} />;
-    });
+    };
 }
 
 const MembershipCategoryPicker = makeDialogMultiSelect(

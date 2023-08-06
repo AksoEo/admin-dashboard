@@ -166,6 +166,7 @@ export default class MulticolList extends PureComponent {
 
             for (const item of this.props.children) {
                 if (!item.key) {
+                    // eslint-disable-next-line no-console
                     console.error('no key in', item);
                     throw new Error('MulticolList: child has no key');
                 }
@@ -212,6 +213,10 @@ export default class MulticolList extends PureComponent {
 
         const isItemFixed = item => item.x.value === Math.round(item.x.value);
         const columnScrollOffsets = this.columnRefs.map(column => column.scrollTop);
+        const isColumnLayout = this.columnRefs[0]?.parentNode
+            ? getComputedStyle(this.columnRefs[0]?.parentNode).flexDirection === 'column'
+            : false;
+        const columnWidth = this.columnRefs[0]?.offsetWidth;
         const maxColumnPixelHeight = this.columnRefs
             .map(column => column.offsetHeight)
             .reduce((a, b) => Math.max(a, b), 0);
@@ -224,7 +229,16 @@ export default class MulticolList extends PureComponent {
                 const leftScroll = columnScrollOffsets[leftCol] | 0;
                 const rightScroll = columnScrollOffsets[rightCol] | 0;
                 const scrollOffset = lerp(leftScroll, rightScroll, item.x.value - leftCol);
-                const y = item.y.value * this.props.itemHeight - scrollOffset;
+                let y = item.y.value * this.props.itemHeight - scrollOffset;
+
+                let x = `${item.x.value * 100}%`;
+
+                if (isColumnLayout) {
+                    const leftColumnY = this.columnRefs[leftCol]?.offsetTop;
+                    const rightColumnY = this.columnRefs[rightCol]?.offsetTop;
+                    x = 0;
+                    y += lerp(leftColumnY, rightColumnY, item.x.value - leftCol);
+                }
 
                 if (y > maxColumnPixelHeight) {
                     return null;
@@ -235,8 +249,8 @@ export default class MulticolList extends PureComponent {
                         class="list-item floating"
                         key={item.key}
                         style={{
-                            width: `${100 / columns.length}%`,
-                            transform: `translate(${item.x.value * 100}%, ${y}px)`,
+                            width: columnWidth,
+                            transform: `translate(${x}, ${y}px)`,
                         }}>
                         {renderItem(item)}
                     </div>

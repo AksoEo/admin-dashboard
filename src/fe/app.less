@@ -36,7 +36,7 @@
     @perma-sidebar-width: 250px;
 
     .app-header {
-        background: @primary;
+        --md-app-bar-bg: var(--primary);
         padding-left: env(safe-area-inset-left);
         padding-right: env(safe-area-inset-right);
         z-index: 201;
@@ -45,7 +45,8 @@
         --md-app-bar-extra-padding-top: env(safe-area-inset-top);
 
         &.paper-dialog-app-bar {
-            background: #333;
+            --md-app-bar-bg: 51 51 51;
+            --md-app-bar-ink: 255 255 255;
         }
 
         .header-progress {
