@@ -44,11 +44,13 @@ export default connectPerms(class FilesPage extends Page {
                         <span class="file-size">
                             <FileSize bytes={file.size} />
                         </span>
-                        {' · '}
-                        <span class="file-added-by">
-                            {locale.fileAddedBy}
-                            <IdUEACode id={file.addedBy} />
-                        </span>
+                        {file.addedBy && ' · '}
+                        {file.addedBy && (
+                            <span class="file-added-by">
+                                {locale.fileAddedBy}
+                                <IdUEACode id={file.addedBy} />
+                            </span>
+                        )}
                         {' · '}
                         <span class="file-time">
                             <timestamp.inlineRenderer value={file.time} />

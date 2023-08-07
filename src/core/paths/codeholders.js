@@ -943,7 +943,7 @@ export const tasks = {
             offset,
             limit,
             // all the fields
-            fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime', 'size'],
+            fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime', 'size', 'url'],
         });
 
         return { items: res.body, total: +res.res.headers.get('x-total-items') };
@@ -955,7 +955,7 @@ export const tasks = {
             limit: 1,
             filter: { id: +file },
             // all the fields
-            fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime', 'size'],
+            fields: ['id', 'time', 'addedBy', 'name', 'description', 'mime', 'size', 'url'],
         });
         if (!res.body[0]) throw { code: 'not-found', message: 'file not found' };
         const storeId = id === 'self' ? store.get(LOGIN_ID) : id;

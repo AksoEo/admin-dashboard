@@ -2,7 +2,6 @@ import { h, Component } from 'preact';
 import { Button, LinearProgress } from 'yamdl';
 import DisplayError from '../../../../components/utils/error';
 import { data as dataLocale, codeholders as locale } from '../../../../locale';
-import { base } from 'akso:config';
 
 /** Previews a file. */
 export default class FileView extends Component {
@@ -13,16 +12,12 @@ export default class FileView extends Component {
         error: null,
     };
 
-    getFileURL () {
-        const { id, file } = this.props;
-        return new URL(`codeholders/${id}/files/${file}`, base).toString();
-    }
-
     load () {
         const { mime } = this.props;
         const typeSpec = getTypespec(mime);
+        if (typeSpec.shouldLoadDirectly) return;
         if (!typeSpec) this.setState({ invalid: true });
-        const fileURL = this.getFileURL();
+        const fileURL = this.props.url;
 
         this.setState({
             progress: NaN,
@@ -69,16 +64,19 @@ export default class FileView extends Component {
         if (typeSpec && typeSpec.release && this.state.data) typeSpec.release(this.state.data);
     }
 
-    render ({ name, mime }, { progress, data, error, invalid }) {
-        if (invalid) return (
-            <div class="file-view is-invalid">
-                <Button href={this.getFileURL()} target="_blank" download={name}>
-                    {locale.files.downloadToView}
-                </Button>
-            </div>
-        );
+    render ({ name, url, mime }, { progress, data, error, invalid }) {
+        if (invalid) {
+            return (
+                <div class="file-view is-invalid">
+                    <Button href={url} target="_blank" download={name}>
+                        {locale.files.downloadToView}
+                    </Button>
+                </div>
+            );
+        }
 
         let contents = null;
+        const typeSpec = getTypespec(mime);
 
         if (error) {
             contents = (
@@ -89,9 +87,9 @@ export default class FileView extends Component {
                     </Button>
                 </div>
             );
-        } else if (data) {
+        } else if (data || typeSpec?.shouldLoadDirectly) {
             const Renderer = getTypespec(mime).component;
-            contents = <Renderer data={data} />;
+            contents = <Renderer data={data} url={url} />;
         }
 
         return (
@@ -100,7 +98,7 @@ export default class FileView extends Component {
                     <LinearProgress
                         indeterminate={!Number.isFinite(progress)}
                         progress={progress}
-                        class={(data || error) ? 'hide-none' : ''} />
+                        class={(typeSpec?.shouldLoadDirectly || data || error) ? 'hide-none' : ''} />
                 </div>
                 {contents ? (
                     <div class="file-contents" data-mime={mime}>
@@ -113,26 +111,23 @@ export default class FileView extends Component {
 }
 
 const imageType = {
-    prep: blob => URL.createObjectURL(blob),
-    release: url => URL.revokeObjectURL(url),
-    component ({ data }) {
-        return <img src={data} />;
+    shouldLoadDirectly: true,
+    component ({ url }) {
+        return <img src={url} />;
     },
 };
 
 const videoType = {
-    prep: blob => URL.createObjectURL(blob),
-    release: url => URL.revokeObjectURL(url),
-    component ({ data }) {
-        return <video src={data} controls />;
+    shouldLoadDirectly: true,
+    component ({ url }) {
+        return <video src={url} controls />;
     },
 };
 
 const audioType = {
-    prep: blob => URL.createObjectURL(blob),
-    release: url => URL.revokeObjectURL(url),
-    component ({ data }) {
-        return <audio src={data} controls />;
+    shouldLoadDirectly: true,
+    component ({ url }) {
+        return <audio src={url} controls />;
     },
 };
 

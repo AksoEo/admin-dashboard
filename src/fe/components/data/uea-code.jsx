@@ -63,7 +63,7 @@ export function IdUEACode ({ id, errorLabel }) {
         if (errorLabel) return errorLabel;
 
         return (
-            <span class="data uea-code-load-error" title={locale.ueaCode.idFailed}>
+            <span class="data uea-code-load-error" title={locale.ueaCode.idFailed} data-id={id}>
                 <ErrorIcon style={{ verticalAlign: 'middle' }} />
             </span>
         );

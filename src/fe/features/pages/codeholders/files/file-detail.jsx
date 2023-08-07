@@ -91,11 +91,13 @@ function Header ({ item, userData }) {
                 <span class="file-size">
                     <FileSize bytes={item.size} />
                 </span>
-                {' · '}
-                <span class="file-added-by">
-                    {locale.fileAddedBy}
-                    <IdUEACode id={item.addedBy} />
-                </span>
+                {item.addedBy && ' · '}
+                {item.addedBy && (
+                    <span class="file-added-by">
+                        {locale.fileAddedBy}
+                        <IdUEACode id={item.addedBy} />
+                    </span>
+                )}
                 {' · '}
                 <span class="file-time">
                     <timestamp.inlineRenderer value={item.time} />
@@ -105,7 +107,7 @@ function Header ({ item, userData }) {
                 {item.description}
             </p>
             <div class="file-view-container">
-                <FileView id={userData.codeholderId} file={item.id} mime={item.mime} />
+                <FileView url={item.url} name={item.name} mime={item.mime} />
             </div>
         </div>
     );
