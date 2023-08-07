@@ -40,7 +40,7 @@ export function makeTagFilter ({
                 view={view}
                 options={{ congress, instance }}
                 viewOptions={{ congress, instance }}
-                search={{ fields: 'name', placeholder: locale.general.tagPicker.search }}
+                search={{ field: 'name', placeholder: locale.general.tagPicker.search }}
                 emptyLabel={locale.general.tagPicker.empty}
                 fields={TAG_FIELDS}
                 locale={{}}

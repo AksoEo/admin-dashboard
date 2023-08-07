@@ -7,6 +7,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import SearchIcon from '@material-ui/icons/Search';
 import DetailShell from '../../../../components/detail/detail-shell';
 import StaticOverviewList from '../../../../components/lists/overview-list-static';
+import ItemPicker from '../../../../components/pickers/item-picker-dialog';
 import { LinkButton } from '../../../../router';
 import { congressLocations as locale } from '../../../../locale';
 import { FIELDS } from './locations/fields';
@@ -100,12 +101,24 @@ export default class LocationPicker extends PureComponent {
                     onClose={() => this.setState({ pickerOpen: false })}
                     fullScreen={width => width < 600}
                     title={locale.locationPicker.pick}>
-                    <Picker
-                        onChange={onChange}
+                    <ItemPicker
+                        open={pickerOpen}
                         onClose={() => this.setState({ pickerOpen: false })}
-                        externalOnly={externalOnly}
-                        congress={congress}
-                        instance={instance} />
+                        limit={1}
+                        value={value ? [value] : []}
+                        onChange={v => {
+                            if (v.length) onChange(v[0]);
+                            else onChange(null);
+                        }}
+                        task="congresses/listLocations"
+                        view="congresses/location"
+                        options={{ congress, instance, externalOnly }}
+                        viewOptions={{ congress, instance }}
+                        emptyLabel={locale.locationPicker.empty}
+                        fields={REDUCED_FIELDS}
+                        locale={locale.fields}
+                        search={{ field: 'name', placeholder: locale.locationPicker.search }}
+                    />
                 </Dialog>
             </div>
         );
@@ -113,40 +126,3 @@ export default class LocationPicker extends PureComponent {
 }
 
 const REDUCED_FIELDS = Object.fromEntries(['name', 'icon', 'description'].map(id => [id, FIELDS[id]]));
-
-function Picker ({ onChange, onClose, externalOnly, congress, instance }) {
-    const [search, setSearch] = useState('');
-    const [offset, setOffset] = useState(0);
-
-    return (
-        <div>
-            <div class="picker-search">
-                <div class="search-icon-container">
-                    <SearchIcon />
-                </div>
-                <input
-                    class="search-inner"
-                    placeholder={locale.locationPicker.search}
-                    value={search}
-                    onChange={e => setSearch(e.target.value)} />
-            </div>
-            <StaticOverviewList
-                compact
-                task="congresses/listLocations"
-                options={{ congress, instance, externalOnly }}
-                view="congresses/location"
-                viewOptions={{ congress, instance }}
-                search={{ field: 'name', query: search }}
-                fields={REDUCED_FIELDS}
-                sorting={{ name: 'asc' }}
-                offset={offset}
-                onSetOffset={setOffset}
-                onItemClick={id => {
-                    onChange(id);
-                    onClose();
-                }}
-                limit={10}
-                locale={locale.fields} />
-        </div>
-    );
-}

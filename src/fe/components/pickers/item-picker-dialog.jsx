@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
+import { useEffect, useRef, useState } from 'preact/compat';
 import { Dialog } from 'yamdl';
 import SearchIcon from '@material-ui/icons/Search';
 import StaticOverviewList from '../lists/overview-list-static';
@@ -124,6 +124,24 @@ function DialogInner ({
         },
     };
 
+    const searchDebounce = useRef(null);
+    const [listSearch, setListSearch] = useState('');
+    const searchData = useRef([search, setListSearch]);
+    searchData.current = [search, setListSearch];
+    useEffect(() => {
+        if (searchDebounce.current) return;
+        searchDebounce.current = setTimeout(() => {
+            searchDebounce.current = null;
+            const [search, setListSearch] = searchData.current;
+            setListSearch(search);
+        }, 300);
+    }, [search]);
+
+    useEffect(() => {
+        // clear when unmounting
+        return () => clearTimeout(searchDebounce.current);
+    }, []);
+
     return (
         <div>
             {searchDef ? (
@@ -147,7 +165,7 @@ function DialogInner ({
                 useDeepCmp
                 emptyLabel={emptyLabel}
                 {...extraListOptions}
-                search={searchDef ? { field: searchDef.field, query: search } : null}
+                search={searchDef ? { field: searchDef.field, query: listSearch } : null}
                 jsonFilter={filter}
                 fields={fields}
                 sorting={sorting}

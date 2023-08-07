@@ -134,6 +134,7 @@ export const congressLocations = {
     locatedWithinNowhere: 'nenie', // if externalLoc is null
     locationPicker: {
         pick: 'Elekti lokon',
+        empty: '[[No locations]]',
         search: 'Serĉi…',
     },
     congressAddress: 'Adreso de la kongreso',
