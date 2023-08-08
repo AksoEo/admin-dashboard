@@ -5,6 +5,7 @@ import LimitedTextField from '../../../../components/controls/limited-text-field
 import MdField from '../../../../components/controls/md-field';
 import { membershipCategories as locale } from '../../../../locale';
 import './fields.less';
+import NumberField from '../../../../components/controls/number-field';
 
 export const FIELDS = {
     nameAbbrev: {
@@ -80,24 +81,22 @@ export const FIELDS = {
         shouldHide: (_, editing) => !editing,
         component ({ value, editing, onChange }) {
             if (!editing) return '' + value;
-            return <TextField
+            return <NumberField
                 type="number"
-                pattern="\d+"
-                value={value || ''}
                 placeholder={locale.availability.placeholder}
-                onChange={e => onChange(+e.target.value || null)} />;
+                value={value}
+                onChange={onChange} />;
         },
     },
     availableTo: {
         shouldHide: (_, editing) => !editing,
         component ({ value, editing, onChange }) {
             if (!editing) return '' + value;
-            return <TextField
+            return <NumberField
                 type="number"
-                pattern="\d+"
                 placeholder={locale.availability.placeholder}
-                value={value || ''}
-                onChange={e => onChange(+e.target.value || null)} />;
+                value={value}
+                onChange={onChange} />;
         },
     },
     availability: {

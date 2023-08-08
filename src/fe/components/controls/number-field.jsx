@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/compat';
+import { useEffect, useState } from 'preact/compat';
 import { TextField } from 'yamdl';
 
 const DISALLOWED_CHARS_REGEX = /[^\d\s'.,+-]/g;
@@ -7,10 +7,14 @@ const DISALLOWED_CHARS_REGEX = /[^\d\s'.,+-]/g;
 export default function NumberField ({ value, onChange, onBlur, onFocus, decimal, ...extra }) {
     const [editingValue, setEditingValue] = useState(null);
 
+    useEffect(() => {
+        if (editingValue !== null && value !== null) setEditingValue(value.toString());
+    }, [value]);
+
     return (
         <TextField
-            {...extra}
             type="text"
+            {...extra}
             inputmode={decimal ? 'decimal' : 'numeric'}
             value={editingValue !== null ? editingValue : value}
             onKeyDown={e => {
@@ -20,11 +24,11 @@ export default function NumberField ({ value, onChange, onBlur, onFocus, decimal
             onChange={e => setEditingValue(e.target.value.replace(DISALLOWED_CHARS_REGEX, ''))}
             onFocus={(e) => {
                 if (onFocus) onFocus(e);
-                setEditingValue((value || '').toString());
+                setEditingValue(Number.isFinite(value) ? value.toString() : '');
             }}
             onBlur={(e) => {
                 if (onBlur) onBlur(e);
-                let value = editingValue;
+                let value = editingValue || '';
                 value = value.replace(/,/g, '.');
                 if (value.endsWith('.')) value += '0';
                 if (!value) {

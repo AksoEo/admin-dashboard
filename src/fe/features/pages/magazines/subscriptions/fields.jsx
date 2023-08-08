@@ -15,6 +15,7 @@ import { magazineSubs as locale, magazines as magazinesLocale } from '../../../.
 import { FIELDS as MAGAZINE_FIELDS } from '../fields';
 import './fields.less';
 import CheckIcon from '@material-ui/icons/Check';
+import NumberField from '../../../../components/controls/number-field';
 
 const REDUCED_MAGAZINE_FIELDS = Object.fromEntries(['org', 'name'].map(k => [k, MAGAZINE_FIELDS[k]]));
 
@@ -103,18 +104,17 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (editing) {
                 return (
-                    <TextField
+                    <NumberField
                         outline
                         type="number"
                         label={slot === 'create' ? locale.fields.year : null}
                         value={value}
                         onFocus={e => {
-                            if (!e.target.value) onChange(new Date().getFullYear());
+                            if (!e.target.value) {
+                                onChange(new Date().getFullYear());
+                            }
                         }}
-                        onChange={e => {
-                            const v = e.target.value;
-                            if (Number.isFinite(+v)) onChange(+v);
-                        }} />
+                        onChange={onChange} />
                 );
             }
             return '' + value;

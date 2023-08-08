@@ -1,10 +1,11 @@
 import { h } from 'preact';
-import { Checkbox, TextField } from 'yamdl';
+import { Checkbox } from 'yamdl';
 import CheckIcon from '@material-ui/icons/Check';
 import LimitedTextField from '../../../../../components/controls/limited-text-field';
 import MdField from '../../../../../components/controls/md-field';
 import { magazineToc as locale, data as dataLocale } from '../../../../../locale';
 import './fields.less';
+import NumberField from '../../../../../components/controls/number-field';
 
 export const FIELDS = {
     page: {
@@ -14,13 +15,13 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (editing && slot === 'create') {
                 return (
-                    <TextField
+                    <NumberField
                         outline
                         required
                         type="number"
                         label={locale.fields.page}
-                        value={Number.isFinite(value) ? `${value}` : ''}
-                        onChange={e => onChange(e.target.value | 0)} />
+                        value={value}
+                        onChange={onChange} />
                 );
             }
             return '' + value;

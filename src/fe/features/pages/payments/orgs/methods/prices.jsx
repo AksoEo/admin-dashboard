@@ -15,6 +15,7 @@ import {
     magazines as magazinesLocale,
 } from '../../../../../locale';
 import './prices.less';
+import NumberField from '../../../../../components/controls/number-field';
 
 /** Edits the “prices” field on payment methods. */
 export default function Prices ({ value, editing, onChange, isIntermediary }) {
@@ -92,15 +93,11 @@ function AddYear ({ open, onClose, onAdd }) {
                     },
                 },
             ]}>
-            <TextField
+            <NumberField
                 type="number"
                 outline
                 value={year}
-                onChange={e => {
-                    if (+e.target.value > 0) {
-                        setYear(e.target.value);
-                    }
-                }} />
+                onChange={setYear} />
         </Dialog>
     );
 }

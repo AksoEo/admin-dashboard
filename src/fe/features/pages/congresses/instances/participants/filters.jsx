@@ -10,6 +10,7 @@ import { congressParticipants as locale } from '../../../../../locale';
 import { currencyAmount, date, time, timestamp } from '../../../../../components/data';
 import './filters.less';
 import TextArea from '../../../../../components/controls/text-area';
+import NumberField from '../../../../../components/controls/number-field';
 
 export const FILTERS = {
     approval: {
@@ -464,15 +465,14 @@ function getZeroValueForType (type) {
 
 const predicateObjectEditors = {
     bool: ({ value, onChange, disabled }) => <Checkbox checked={value} onChange={onChange} disabled={disabled} />,
-    number: ({ value, onChange, disabled }) => <TextField
+    number: ({ value, onChange, disabled }) => <NumberField
         disabled={disabled}
-        outline
         type="number"
-        value={+(+value).toFixed(3)}
-        onChange={e => {
-            const n = parseFloat(e.target.value);
-            if (Number.isFinite(n)) onChange(n);
-        }} />,
+        step="0.001"
+        decimal
+        outline
+        value={value}
+        onChange={onChange} />,
     money: ({ value, onChange, item, disabled }) => <currencyAmount.editor
         disabled={disabled}
         outline

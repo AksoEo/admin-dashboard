@@ -24,6 +24,7 @@ import Subject from './subject';
 import CityPicker from './city-picker';
 import SubjectPicker from '../subjects/subject-picker';
 import './fields.less';
+import NumberField from '../../../../components/controls/number-field';
 
 export const FIELDS = {
     org: {
@@ -302,15 +303,14 @@ export const FIELDS = {
                             value.maxDays ? (
                                 `${value.maxDays} ${locale.hosting.maxDaysUnit(value.maxDays)}`
                             ) : locale.hosting.maxDaysNone,
-                            <TextField
+                            <NumberField
                                 type="number"
                                 trailing={locale.hosting.maxDaysUnit(0)}
                                 outline
                                 placeholder={locale.hosting.maxDaysNone}
-                                value={value.maxDays || ''}
-                                onChange={e => {
-                                    const val = e.target.value;
-                                    onChange({ ...value, maxDays: +val > 0 ? +val : null });
+                                value={value.maxDays}
+                                onChange={maxDays => {
+                                    onChange({ ...value, maxDays: maxDays > 0 ? maxDays : null });
                                 }} />
                         )}
                     </div>
@@ -320,15 +320,14 @@ export const FIELDS = {
                             value.maxPersons ? (
                                 `${value.maxPersons} ${locale.hosting.maxPersonsUnit(value.maxPersons)}`
                             ) : locale.hosting.maxPersonsNone,
-                            <TextField
+                            <NumberField
                                 type="number"
                                 trailing={locale.hosting.maxPersonsUnit(0)}
                                 outline
                                 placeholder={locale.hosting.maxPersonsNone}
-                                value={value.maxPersons || ''}
-                                onChange={e => {
-                                    const val = e.target.value;
-                                    onChange({ ...value, maxPersons: +val > 0 ? +val : null });
+                                value={value.maxPersons}
+                                onChange={maxPersons => {
+                                    onChange({ ...value, maxPersons: maxPersons > 0 ? maxPersons : null });
                                 }} />
                         )}
                     </div>

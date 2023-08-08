@@ -3,6 +3,7 @@ import { TextField } from 'yamdl';
 import Select from '../../../../components/controls/select';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import { membershipEntries as locale } from '../../../../locale';
+import NumberField from '../../../../components/controls/number-field';
 
 export const FILTERS = {
     year: {
@@ -14,23 +15,15 @@ export const FILTERS = {
         editor ({ value, onChange, onEnabledChange }) {
             return (
                 <div class="year-filter">
-                    <TextField
+                    <NumberField
                         type="number"
                         outline
-                        value={value || ''}
-                        onChange={e => {
-                            const v = +e.target.value;
-                            if (e.target.value && Number.isFinite(v)) {
-                                onChange(v);
+                        value={value}
+                        onChange={value => {
+                            if (Number.isFinite(value)) {
+                                onChange(value);
                                 onEnabledChange(true);
-                            } else if (!e.target.value) {
-                                onChange(null);
-                                onEnabledChange(false);
-                            }
-                        }}
-                        onBlur={e => {
-                            if (!e.target.value || !Number.isFinite(+e.target.value)) {
-                                e.target.value = '';
+                            } else {
                                 onChange(null);
                                 onEnabledChange(false);
                             }

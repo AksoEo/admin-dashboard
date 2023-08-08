@@ -18,6 +18,7 @@ import { votes as locale } from '../../../locale';
 import Rational from './rational';
 import './config.less';
 import { SavedFilterPickerButton } from '../../../components/overview/saved-filter-picker';
+import NumberField from '../../../components/controls/number-field';
 
 function validateJSON (value) {
     try {
@@ -262,11 +263,11 @@ export function numChosenOptions ({ value, onChange, editing, item }) {
     if (item.state.hasEnded) return <CannotEditEnded />;
 
     return (
-        <TextField
+        <NumberField
             required
             type="number"
             value={value}
-            onChange={e => onChange(e.target.value)} />
+            onChange={onChange} />
     );
 }
 
@@ -278,9 +279,8 @@ export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
     if (item.state.isActive) return <CannotEditActive />;
 
     return (
-        <TextField
+        <NumberField
             required
-            component={TextField}
             type="number"
             value={value || ''}
             placeholder={locale.config.noMaxOptions}
