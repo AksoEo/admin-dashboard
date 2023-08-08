@@ -1,6 +1,6 @@
 import Markdown from 'markdown-it';
 import { h } from 'preact';
-import { createPortal, createRef, forwardRef, PureComponent, useEffect, useMemo, useRef, useState } from 'preact/compat';
+import { createPortal, createRef, forwardRef, PureComponent, useEffect, useMemo, useState } from 'preact/compat';
 import { globalAnimator, Button, Dialog, TextField, RootContext } from 'yamdl';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FormatItalicIcon from '@material-ui/icons/FormatItalic';
@@ -546,6 +546,7 @@ const InnerEditor = forwardRef(({
         <CodeMirror
             ref={ref}
             value={ignoreLiveUpdates ? localValue : value}
+            indentWithTab={false}
             basicSetup={CM_BASIC_SETUP}
             readOnly={disabled}
             extensions={editorExtensions}
