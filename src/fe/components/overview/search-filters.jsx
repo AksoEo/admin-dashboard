@@ -33,8 +33,6 @@ import './search-filters.less';
  *   - `editor: Component { filter: Filter, onFilterChange }` editor component
  *     May return a fragment. First fragment item may be displayed inline.
  *     Additional convenience props: `value`, `onChange`, `enabled`, `onEnabledChange`
- *   - `applyConstraints(Filter, filters: Filter[]) -> Filter` applies constraints given the other
- *     filters. Optional.
  *   - `needsSwitch: bool` if true, the filter will have an on/off switch that controls its
  *     `enabled` property
  *   - `impliesValues: { [filter name: string]: value }` forces certain values on other filters when

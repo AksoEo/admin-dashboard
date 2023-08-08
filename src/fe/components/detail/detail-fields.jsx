@@ -173,9 +173,11 @@ export default function DetailFields ({
     return (
         <Fragment>
             {header}
-            <div class={'detail-fields' + (compact ? ' is-compact' : '') + (wideExtra ? ' wide-extra' : '')}>
-                {items}
-                {emptyItems}
+            <div class="detail-fields">
+                <div class={'inner-detail-fields' + (compact ? ' is-compact' : '') + (wideExtra ? ' wide-extra' : '')}>
+                    {items}
+                    {emptyItems}
+                </div>
             </div>
             {footer}
         </Fragment>

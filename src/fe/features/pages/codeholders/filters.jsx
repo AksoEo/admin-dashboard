@@ -159,17 +159,6 @@ export default {
                 return false;
             },
         ),
-        applyConstraints (filter, filters) {
-            let humanOnly = false;
-            if (filters.age && filters.age.enabled) humanOnly = true;
-            if (filters.deathdate && filters.deathdate.enabled) humanOnly = true;
-
-            if (humanOnly && !filter._constrained) {
-                return { value: 'human', _constrained: true, enabled: filter.enabled };
-            } else if (!humanOnly && filter._constrained) {
-                return { value: 'human', enabled: filter.enabled };
-            }
-        },
     },
     country: {
         default () {
@@ -326,6 +315,9 @@ export default {
                     ) : null}
                 </Fragment>
             );
+        },
+        impliesValues: {
+            type: ['human', null],
         },
     },
     hasOldCode: {
