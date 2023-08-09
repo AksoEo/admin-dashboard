@@ -2,7 +2,14 @@ import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as log from '../log';
 import * as store from '../store';
-import { crudList, crudGet, crudCreate, crudUpdate, crudDelete } from '../templates';
+import {
+    crudList,
+    crudGet,
+    crudCreate,
+    crudUpdate,
+    crudDelete,
+    simpleDataView,
+} from '../templates';
 
 /** Data store path. */
 export const ROLES = 'codeholder_roles';
@@ -93,28 +100,9 @@ export const views = {
             store.unsubscribe([ROLES], this.#onUpdate);
         }
     },
-    role: class Role extends AbstractDataView {
-        constructor ({ id, noFetch }) {
-            super();
-            this.id = id;
-
-            store.subscribe([ROLES, id], this.#onUpdate);
-            if (store.get([ROLES, id])) setImmediate(this.#onUpdate);
-
-            if (!noFetch) {
-                tasks.role({ id }).catch(err => this.emit('error', err));
-            }
-        }
-        #onUpdate = (type) => {
-            if (type === store.UpdateType.DELETE) {
-                this.emit('update', store.get([ROLES, this.id]), 'delete');
-            } else {
-                this.emit('update', store.get([ROLES, this.id]));
-            }
-        };
-        drop () {
-            store.unsubscribe([ROLES, this.id], this.#onUpdate);
-        }
-    },
+    role: simpleDataView({
+        storePath: ({ id }) => [ROLES, id],
+        get: tasks.role,
+    }),
     sigRoles: createStoreObserver([ROLES, SIG_ROLES]),
 };

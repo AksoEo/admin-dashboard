@@ -147,46 +147,14 @@ export const tasks = {
     },
 
     /** adminGroups/listClients: lists clients that are part of an admin group */
-    listClients: async ({ group }, { offset, limit, fields, search }) => {
-        const client = await asyncClient;
-
-        const opts = {
-            fields: ['apiKey', 'name', 'ownerName', 'ownerEmail'],
-            order: fieldsToOrder(fields),
-            offset,
-            limit,
-        };
-
-        if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
-            }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
-            }
-            opts.search = { str: transformedQuery, cols: [search.field] };
-        }
-
-        const res = await client.get(`/admin_groups/${group}/clients`, opts);
-
-        for (const item of res.body) {
+    listClients: crudList({
+        apiPath: ({ group }) => `/admin_groups/${group}/clients`,
+        fields: ['apiKey', 'name', 'ownerName', 'ownerEmail'],
+        map: (item) => {
             item.id = Buffer.from(item.apiKey).toString('hex');
-            const existing = store.get([CLIENTS, item.id]);
-            store.insert([CLIENTS, item.id], deepMerge(existing, item));
-        }
-
-        const list = res.body.map(item => item.id);
-
-        return {
-            items: list,
-            total: +res.res.headers.get('x-total-items'),
-            stats: {
-                time: res.resTime,
-                filtered: false,
-            },
-        };
-    },
+        },
+        storePath: (_, { id }) => [CLIENTS, id],
+    }),
 
     // dummies for task views
     addCodeholdersBatchTask: async () => {},

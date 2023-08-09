@@ -4,7 +4,14 @@ import * as store from '../store';
 import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
-import { simpleDataView } from '../templates';
+import {
+    crudCreate,
+    crudDelete,
+    crudGet,
+    crudList,
+    crudUpdate,
+    simpleDataView,
+} from '../templates';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI, fieldDiff } from '../list';
 
 export const PAYMENT_ORGS = 'paymentOrgs';
@@ -218,182 +225,98 @@ const INTENT_ALLOWED_PATCH_FIELDS = [
 ];
 
 export const tasks = {
-    listOrgs: async (_, { offset, limit, fields, jsonFilter, _skipMapHack }) => {
-        const client = await asyncClient;
-        const options = {
-            offset,
-            limit,
-            fields: ['id', 'org', 'name', 'description'],
-            order: fieldsToOrder(fields),
-        };
-        if (jsonFilter) options.filter = jsonFilter.filter;
-        const res = await client.get('/aksopay/payment_orgs', options);
-        for (const item of res.body) {
-            const existing = store.get([PAYMENT_ORGS, item.id, PO_DATA]);
-            store.insert([PAYMENT_ORGS, item.id, PO_DATA], deepMerge(existing, item));
-        }
-        return {
-            items: _skipMapHack ? res.body : res.body.map(x => x.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { time: res.resTime, filtered: false },
-        };
-    },
-    createOrg: async (_, { org, name, description }) => {
-        const client = await asyncClient;
-        description = description || null;
-        const res = await client.post('/aksopay/payment_orgs', {
-            org,
-            name,
-            description,
-        });
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([PAYMENT_ORGS, id, PO_DATA], { id, org, name, description });
-        store.signal([PAYMENT_ORGS, SIG_PAYMENT_ORGS]);
-        return id;
-    },
-    getOrg: async ({ id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/aksopay/payment_orgs/${id}`, {
-            fields: ['id', 'org', 'name', 'description'],
-        });
-        const path = [PAYMENT_ORGS, id, PO_DATA];
-        const existing = store.get(path);
-        store.insert(path, deepMerge(existing, res.body));
-        return res.body;
-    },
-    updateOrg: async ({ id }, params) => {
-        const client = await asyncClient;
-        delete params.id;
-        delete params.org;
-        await client.patch(`/aksopay/payment_orgs/${id}`, params);
-        const existing = store.get([PAYMENT_ORGS, +id, PO_DATA]);
-        store.insert([PAYMENT_ORGS, id, PO_DATA], deepMerge(existing, params));
-    },
-    deleteOrg: async ({ id }) => {
-        const client = await asyncClient;
-        await client.delete(`/aksopay/payment_orgs/${id}`);
-        store.remove([PAYMENT_ORGS, id, PO_DATA]);
-        store.remove([PAYMENT_ORGS, id, PO_ADDONS]);
-        store.remove([PAYMENT_ORGS, id, PO_METHODS]);
-        store.remove([PAYMENT_ORGS, id]);
-        store.signal([PAYMENT_ORGS, SIG_PAYMENT_ORGS]);
-    },
-    listAddons: async ({ org }, { offset, limit, fields, jsonFilter, _skipMapHack }) => {
-        const client = await asyncClient;
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'name', 'description'],
-            order: fieldsToOrder(fields),
-        };
-        if (jsonFilter) opts.filter = jsonFilter.filter;
-        const res = await client.get(`/aksopay/payment_orgs/${org}/addons`, opts);
-        for (const item of res.body) {
-            const path = [PAYMENT_ORGS, org, PO_ADDONS, item.id];
-            store.insert(path, item);
-        }
-        return {
-            items: _skipMapHack ? res.body : res.body.map(x => x.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { time: res.resTime, filtered: false },
-        };
-    },
-    createAddon: async ({ org }, { name, description }) => {
-        const client = await asyncClient;
-        const res = await client.post(`/aksopay/payment_orgs/${org}/addons`, {
-            name,
-            description: description || null,
-        });
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([PAYMENT_ORGS, org, PO_ADDONS, id], { id, name, description });
-        store.signal([PAYMENT_ORGS, org, SIG_PO_ADDONS]);
-        return id;
-    },
-    getAddon: async ({ org, id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/aksopay/payment_orgs/${org}/addons/${id}`, {
-            fields: ['id', 'name', 'description'],
-        });
-        const path = [PAYMENT_ORGS, org, PO_ADDONS, id];
-        const existing = store.get(path);
-        store.insert(path, deepMerge(existing, res.body));
-        return res.body;
-    },
-    updateAddon: async ({ org, id }, params) => {
-        const client = await asyncClient;
-        delete params.id;
-        await client.patch(`/aksopay/payment_orgs/${org}/addons/${id}`, params);
-        const path = [PAYMENT_ORGS, org, PO_ADDONS, id];
-        const existing = store.get(path);
-        store.insert(path, deepMerge(existing, params));
-    },
-    deleteAddon: async ({ org, id }) => {
-        const client = await asyncClient;
-        await client.delete(`/aksopay/payment_orgs/${org}/addons/${id}`);
-        store.remove([PAYMENT_ORGS, org, PO_ADDONS, id]);
-        store.signal([PAYMENT_ORGS, org, SIG_PO_ADDONS]);
-    },
-    listMethods: async ({ org }, { offset, limit, jsonFilter, fields, _skipMapHack }) => {
-        const client = await asyncClient;
-        const opts = {
-            offset,
-            limit,
-            fields: ['id', 'type', 'name', 'internalDescription', 'internal'],
-            order: fieldsToOrder(fields),
-        };
-        if (jsonFilter) opts.filter = jsonFilter.filter;
-
-        const res = await client.get(`/aksopay/payment_orgs/${org}/methods`, opts);
-        for (const item of res.body) {
-            const path = [PAYMENT_ORGS, org, PO_METHODS, item.id];
-            const existing = store.get(path);
-            store.insert(path, deepMerge(existing, item));
-        }
-        return {
-            items: _skipMapHack ? res.body : res.body.map(x => x.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: { time: res.resTime, filtered: false },
-        };
-    },
-    createMethod: async ({ org }, params) => {
-        const client = await asyncClient;
-        delete params.id;
-        const res = await client.post(`/aksopay/payment_orgs/${org}/methods`, params);
-        const id = +res.res.headers.get('x-identifier');
-        store.insert([PAYMENT_ORGS, org, PO_METHODS, id], { id, ...params });
-        store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
-        return id;
-    },
-    getMethod: async ({ org, id }) => {
-        const client = await asyncClient;
-        const res = await client.get(`/aksopay/payment_orgs/${org}/methods/${id}`, {
-            fields: [
-                'id', 'type', 'stripeMethods', 'name', 'internalDescription', 'descriptionPreview',
-                'description', 'currencies', 'paymentValidity', 'isRecommended',
-                'stripePublishableKey', 'feePercent', 'feeFixed.val', 'feeFixed.cur',
-                'internal', 'prices', 'maxAmount', 'thumbnail',
-            ],
-        });
-        const path = [PAYMENT_ORGS, org, PO_METHODS, id];
-        const existing = store.get(path);
-        store.insert(path, deepMerge(existing, res.body));
-        return res.body;
-    },
-    updateMethod: async ({ org, id }, params) => {
-        const client = await asyncClient;
-        const path = [PAYMENT_ORGS, org, PO_METHODS, id];
-        const existing = store.get(path);
-        const delta = fieldDiff(existing, params);
-        delete delta.thumbnail;
-        await client.patch(`/aksopay/payment_orgs/${org}/methods/${id}`, delta);
-        store.insert(path, deepMerge(existing, params));
-    },
-    deleteMethod: async ({ org, id }) => {
-        const client = await asyncClient;
-        await client.delete(`/aksopay/payment_orgs/${org}/methods/${id}`);
-        store.remove([PAYMENT_ORGS, org, PO_METHODS, id]);
-        store.signal([PAYMENT_ORGS, org, SIG_PO_METHODS]);
-    },
+    listOrgs: crudList({
+        apiPath: () => `/aksopay/payment_orgs`,
+        fields: ['id', 'org', 'name', 'description'],
+        storePath: (_, { id }) => [PAYMENT_ORGS, id, PO_DATA],
+    }),
+    createOrg: crudCreate({
+        apiPath: () => `/aksopay/payment_orgs`,
+        fields: ['org', 'name', 'description'],
+        omitNulls: true,
+        storePath: (_, id) => [PAYMENT_ORGS, id, PO_DATA],
+        signalPath: () => [PAYMENT_ORGS, SIG_PAYMENT_ORGS],
+    }),
+    getOrg: crudGet({
+        apiPath: ({ id }) => `/aksopay/payment_orgs/${id}`,
+        fields: ['id', 'org', 'name', 'description'],
+        storePath: ({ id }) => [PAYMENT_ORGS, id, PO_DATA],
+    }),
+    updateOrg: crudUpdate({
+        apiPath: ({ id }) => `/aksopay/payment_orgs/${id}`,
+        storePath: ({ id }) => [PAYMENT_ORGS, id, PO_DATA],
+    }),
+    deleteOrg: crudDelete({
+        apiPath: ({ id }) => `/aksopay/payment_orgs/${id}`,
+        storePaths: ({ id }) => [
+            [PAYMENT_ORGS, id, PO_DATA],
+            [PAYMENT_ORGS, id, PO_ADDONS],
+            [PAYMENT_ORGS, id, PO_METHODS],
+            [PAYMENT_ORGS, id],
+        ],
+        signalPath: () => [PAYMENT_ORGS, SIG_PAYMENT_ORGS],
+    }),
+    listAddons: crudList({
+        apiPath: ({ org }) => `/aksopay/payment_orgs/${org}/addons`,
+        fields: ['id', 'name', 'description'],
+        storePath: ({ org }, { id }) => [PAYMENT_ORGS, org, PO_ADDONS, id],
+    }),
+    createAddon: crudCreate({
+        apiPath: ({ org }) => `/aksopay/payment_orgs/${org}/addons`,
+        fields: ['name', 'description'],
+        useAutoNull: true,
+        storePath: ({ org }, id) => [PAYMENT_ORGS, org, PO_ADDONS, id],
+        signalPath: ({ org }) => [PAYMENT_ORGS, org, SIG_PO_ADDONS],
+    }),
+    getAddon: crudGet({
+        apiPath: ({ org, id }) => `/aksopay/payment_orgs/${org}/addons/${id}`,
+        fields: ['id', 'name', 'description'],
+        storePath: ({ org, id }) => [PAYMENT_ORGS, org, PO_ADDONS, id],
+    }),
+    updateAddon: crudUpdate({
+        apiPath: ({ org, id }) => `/aksopay/payment_orgs/${org}/addons/${id}`,
+        storePath: ({ org, id }) => [PAYMENT_ORGS, org, PO_ADDONS, id],
+    }),
+    deleteAddon: crudDelete({
+        apiPath: ({ org, id }) => `/aksopay/payment_orgs/${org}/addons/${id}`,
+        storePath: ({ org, id }) => [PAYMENT_ORGS, org, PO_ADDONS, id],
+        signalPath: ({ org }) => [PAYMENT_ORGS, org, SIG_PO_ADDONS],
+    }),
+    listMethods: crudList({
+        apiPath: ({ org }) => `/aksopay/payment_orgs/${org}/methods`,
+        fields: ['id', 'type', 'name', 'internalDescription', 'internal'],
+        storePath: ({ org }, { id }) => [PAYMENT_ORGS, org, PO_METHODS, id],
+    }),
+    createMethod: crudCreate({
+        apiPath: ({ org }) => `/aksopay/payment_orgs/${org}/methods`,
+        fields: [
+            'type', 'stripeMethods', 'name', 'internalDescription', 'descriptionPreview',
+            'description', 'currencies', 'paymentValidity', 'isRecommended', 'stripePublishableKey',
+            'stripeSecretKey', 'feePercent', 'feeFixed', 'internal', 'prices', 'maxAmount',
+            'thumbnail',
+        ],
+        storePath: ({ org }, id) => [PAYMENT_ORGS, org, PO_METHODS, id],
+        signalPath: ({ org }) => [PAYMENT_ORGS, org, SIG_PO_METHODS],
+    }),
+    getMethod: crudGet({
+        apiPath: ({ org, id }) => `/aksopay/payment_orgs/${org}/methods/${id}`,
+        fields: [
+            'id', 'type', 'stripeMethods', 'name', 'internalDescription', 'descriptionPreview',
+            'description', 'currencies', 'paymentValidity', 'isRecommended',
+            'stripePublishableKey', 'feePercent', 'feeFixed.val', 'feeFixed.cur',
+            'internal', 'prices', 'maxAmount', 'thumbnail',
+        ],
+        storePath: ({ org, id }) => [PAYMENT_ORGS, org, PO_METHODS, id],
+    }),
+    updateMethod: crudUpdate({
+        apiPath: ({ org, id }) => `/aksopay/payment_orgs/${org}/methods/${id}`,
+        storePath: ({ org, id }) => [PAYMENT_ORGS, org, PO_METHODS, id],
+    }),
+    deleteMethod: crudDelete({
+        apiPath: ({ org, id }) => `/aksopay/payment_orgs/${org}/methods/${id}`,
+        storePath: ({ org, id }) => [PAYMENT_ORGS, org, PO_METHODS, id],
+        signalPath: ({ org }) => [PAYMENT_ORGS, org, SIG_PO_METHODS],
+    }),
     updateMethodThumbnail: async ({ org, id }, { thumbnail }) => {
         const client = await asyncClient;
         await client.put(`/aksopay/payment_orgs/${org}/methods/${id}/thumbnail`, null, {}, [{
@@ -596,85 +519,20 @@ export const tasks = {
     },
 };
 export const views = {
-    org: class Org extends AbstractDataView {
-        constructor (options) {
-            super();
-            const { id } = options;
-            this.id = id;
+    org: simpleDataView({
+        storePath: ({ id }) => [PAYMENT_ORGS, id, PO_DATA],
+        get: tasks.getOrg,
+    }),
 
-            store.subscribe([PAYMENT_ORGS, id, PO_DATA], this.#onUpdate);
-            const current = store.get([PAYMENT_ORGS, id, PO_DATA]);
-            if (current) setImmediate(this.#onUpdate);
+    addon: simpleDataView({
+        storePath: ({ org, id }) => [PAYMENT_ORGS, org, PO_ADDONS, id],
+        get: tasks.getAddon,
+    }),
 
-            if (!options.noFetch) {
-                tasks.getOrg({ id }).catch(err => this.emit('error', err));
-            }
-        }
-        #onUpdate = (type) => {
-            if (type === store.UpdateType.DELETE) {
-                this.emit('update', store.get([PAYMENT_ORGS, this.id, PO_DATA]), 'delete');
-            } else {
-                this.emit('update', store.get([PAYMENT_ORGS, this.id, PO_DATA]));
-            }
-        };
-        drop () {
-            store.unsubscribe([PAYMENT_ORGS, this.id, PO_DATA], this.#onUpdate);
-        }
-    },
-
-    addon: class Addon extends AbstractDataView {
-        constructor (options) {
-            super();
-            const { org, id } = options;
-            this.org = org;
-            this.id = id;
-
-            store.subscribe([PAYMENT_ORGS, org, PO_ADDONS, id], this.#onUpdate);
-            const current = store.get([PAYMENT_ORGS, org, PO_ADDONS, id]);
-            if (current) setImmediate(this.#onUpdate);
-
-            if (!options.noFetch) {
-                tasks.getAddon({ org, id }).catch(err => this.emit('error', err));
-            }
-        }
-        #onUpdate = (type) => {
-            if (type === store.UpdateType.DELETE) {
-                this.emit('update', store.get([PAYMENT_ORGS, this.org, PO_ADDONS, this.id]), 'delete');
-            } else {
-                this.emit('update', store.get([PAYMENT_ORGS, this.org, PO_ADDONS, this.id]));
-            }
-        };
-        drop () {
-            store.unsubscribe([PAYMENT_ORGS, this.org, PO_ADDONS, this.id], this.#onUpdate);
-        }
-    },
-
-    method: class Method extends AbstractDataView {
-        constructor (options) {
-            super();
-            const { org, id } = options;
-            this.org = org;
-            this.id = id;
-
-            store.subscribe([PAYMENT_ORGS, org, PO_METHODS, id], this.#onUpdate);
-            const current = store.get([PAYMENT_ORGS, org, PO_METHODS, id]);
-            if (current) setImmediate(this.#onUpdate);
-
-            if (!options.noFetch) {
-                tasks.getMethod({ org, id }).catch(err => this.emit('error', err));
-            }
-        }
-        #onUpdate = (type) => {
-            if (type === store.UpdateType.DELETE) {
-                this.emit('update', store.get([PAYMENT_ORGS, this.org, PO_METHODS, this.id]), 'delete');
-            } else {
-                this.emit('update', store.get([PAYMENT_ORGS, this.org, PO_METHODS, this.id]));
-            }
-        };
-        drop () {
-            store.unsubscribe([PAYMENT_ORGS, this.org, PO_METHODS, this.id], this.#onUpdate);
-        }
-    },
+    method: simpleDataView({
+        storePath: ({ org, id }) => [PAYMENT_ORGS, org, PO_METHODS, id],
+        get: tasks.getMethod,
+    }),
 
     intent: class Intent extends AbstractDataView {
         constructor (options) {

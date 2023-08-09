@@ -374,7 +374,7 @@ function batchFlushOrgs () {
         limit: orgs.length,
         fields: [{ id: 'id', sorting: 'none' }, { id: 'name', sorting: 'none' }],
         jsonFilter: { filter: { id: { $in: orgs } } },
-        _skipMapHack: true,
+        _unmapped: true,
     }).runOnceAndDrop().then(res => {
         const namesById = {};
         for (const item of res.items) namesById[item.id] = item.name;
@@ -406,7 +406,7 @@ function batchFlushMethodOrg (org) {
         offset: 0,
         limit: methods.length,
         jsonFilter: { filter: { id: { $in: methods.map(x => x.method) } } },
-        _skipMapHack: true,
+        _unmapped: true,
     }).runOnceAndDrop().then(res => {
         const namesById = {};
         for (const item of res.items) namesById[item.id] = item.name;
@@ -452,7 +452,7 @@ function batchFlushAddonOrg (org) {
         offset: 0,
         limit: addons.length,
         jsonFilter: { filter: { id: { $in: addons.map(x => x.addon) } } },
-        _skipMapHack: true,
+        _unmapped: true,
     }).runOnceAndDrop().then(res => {
         const namesById = {};
         for (const item of res.items) namesById[item.id] = item.name;

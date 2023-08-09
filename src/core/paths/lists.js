@@ -1,7 +1,14 @@
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
-import { crudList, crudGet, crudCreate, crudUpdate, crudDelete } from '../templates';
+import {
+    crudList,
+    crudGet,
+    crudCreate,
+    crudUpdate,
+    crudDelete,
+    simpleDataView,
+} from '../templates';
 import JSON5 from 'json5';
 
 export const LISTS = 'lists';
@@ -88,32 +95,10 @@ export const tasks = {
 
 export const views = {
     /** lists/list: data view of a single list */
-    list: class ListView extends AbstractDataView {
-        constructor (options) {
-            super();
-            this.id = options.id;
-
-            store.subscribe([LISTS, this.id], this.#onUpdate);
-            const current = store.get([LISTS, this.id]);
-            if (current) setImmediate(this.#onUpdate);
-
-            if (!options.noFetch) {
-                tasks.item({ id: this.id }).catch(err => this.emit('error', err));
-            }
-        }
-
-        #onUpdate = (type) => {
-            if (type === store.UpdateType.DELETE) {
-                this.emit('update', store.get([LISTS, this.id]), 'delete');
-            } else {
-                this.emit('update', store.get([LISTS, this.id]));
-            }
-        };
-
-        drop () {
-            store.unsubscribe([LISTS, this.id], this.#onUpdate);
-        }
-    },
+    list: simpleDataView({
+        storePath: ({ id }) => [LISTS, id],
+        get: tasks.item,
+    }),
 
     /** lists/sigLists: emits a signal when the list of lists may have changed */
     sigLists: createStoreObserver([LISTS, SIG_LISTS]),

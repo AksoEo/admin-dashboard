@@ -1,10 +1,16 @@
-import { util } from '@tejo/akso-client';
 import JSON5 from 'json5';
 import { AbstractDataView, createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
-import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
+import {
+    crudCreate,
+    crudDelete,
+    crudGet,
+    crudList,
+    crudUpdate,
+    simpleDataView,
+} from '../templates';
 
 export const CLIENTS = 'clients';
 export const CLIENT_PERMS = 'clientPerms';
@@ -12,73 +18,38 @@ export const SIG_CLIENTS = '!clients';
 
 export const tasks = {
     /** clients/list: lists clients */
-    list: async (_, { search, offset, limit, fields, jsonFilter }) => {
-        const client = await asyncClient;
-
-        const opts = { offset, limit };
-        if (search && search.query) {
+    list: crudList({
+        apiPath: () => `/clients`,
+        fields: ['name', 'apiKey', 'ownerName', 'ownerEmail'],
+        specialSearchFields: (search, options, transientFields) => {
             if (search.field === 'apiKey') {
                 try {
                     const key = Buffer.from(search.query, 'hex');
                     if (key.length !== 16) throw new Error('invalid length');
-                    opts.filter = { apiKey: key };
+                    options.filter = { apiKey: key };
+                    transientFields.push('apiKey');
                 } catch {
                     throw { code: 'invalid-api-key', message: 'invalid API key' };
                 }
-            } else {
-                const transformedQuery = util.transformSearch(search.query);
-                if (transformedQuery.length < 3) {
-                    throw { code: 'search-query-too-short', message: 'search query too short' };
-                }
-                if (!util.isValidSearch(transformedQuery)) {
-                    throw { code: 'invalid-search-query', message: 'invalid search query' };
-                }
-                opts.search = { cols: [search.field], str: transformedQuery };
+                return true;
             }
-        }
-
-        if (jsonFilter && jsonFilter.filter) {
-            opts.filter = opts.filter ? { $and: [opts.filter, jsonFilter.filter] }
-                : jsonFilter.filter;
-        }
-
-        const res = await client.get('/clients', {
-            fields: ['name', 'apiKey', 'ownerName', 'ownerEmail'],
-            order: fieldsToOrder(fields),
-            ...opts,
-        });
-
-        for (const item of res.body) {
+            return false;
+        },
+        map: (item) => {
             item.id = item.apiKey.toString('hex');
-            const existing = store.get([CLIENTS, item.id]);
-            store.insert([CLIENTS, item.id], deepMerge(existing, item));
-        }
-
-        return {
-            items: res.body.map(item => item.id),
-            total: +res.res.headers.get('x-total-items'),
-            stats: {
-                filtered: false,
-                time: res.resTime,
-            },
-        };
-    },
+        },
+        storePath: (_, { id }) => [CLIENTS, id],
+    }),
 
     /** clients/client: returns a single client */
-    client: async ({ id }) => {
-        const client = await asyncClient;
-
-        const res = await client.get(`/clients/${id}`, {
-            fields: ['name', 'apiKey', 'ownerName', 'ownerEmail'],
-        });
-
-        const item = res.body;
-        item.id = item.apiKey.toString('hex');
-        const existing = store.get([CLIENTS, id]);
-        store.insert([CLIENTS, item.id], deepMerge(existing, item));
-
-        return item;
-    },
+    client: crudGet({
+        apiPath: ({ id }) => `/clients/${id}`,
+        fields: ['name', 'apiKey', 'ownerName', 'ownerEmail'],
+        map: (item) => {
+            item.id = item.apiKey.toString('hex');
+        },
+        storePath: ({ id }) => [CLIENTS, id],
+    }),
 
     /** clients/create: creates a client */
     create: async (_, { name, ownerName, ownerEmail }) => {
@@ -94,30 +65,24 @@ export const tasks = {
     _createdSecret: async () => {},
 
     /** clients/update: updates a client */
-    update: async ({ id }, { name, ownerName, ownerEmail }) => {
-        const client = await asyncClient;
-        await client.patch(`/clients/${id}`, { name, ownerName, ownerEmail });
-
-        const existing = store.get([CLIENTS, id]);
-        store.insert([CLIENTS, id], deepMerge(existing, { name, ownerName, ownerEmail }));
-
-        store.signal([CLIENTS, id]);
-    },
+    update: crudUpdate({
+        apiPath: ({ id }) => `/clients/${id}`,
+        storePath: ({ id }) => [CLIENTS, id],
+    }),
 
     /** clients/delete: deletes a client */
-    delete: async (_, { id }) => {
-        const client = await asyncClient;
-        await client.delete(`/clients/${id}`);
-        store.remove([CLIENTS, id]);
-        store.signal([CLIENTS, SIG_CLIENTS]);
-    },
+    delete: crudDelete({
+        apiPath: ({ id }) => `/clients/${id}`,
+        storePath: ({ id }) => [CLIENTS, id],
+        signalPath: () => [CLIENTS, SIG_CLIENTS],
+    }),
 
     /** clients/permissions: returns permissions of a client */
     permissions: async ({ id }) => {
         const client = await asyncClient;
         const res = await client.get(`/clients/${id}/permissions`);
 
-        let memberRestrictions;
+        let memberRestrictions = null;
         try {
             const res = await client.get(`/clients/${id}/member_restrictions`, {
                 fields: ['filter', 'fields'],
@@ -133,10 +98,10 @@ export const tasks = {
 
         const perms = res.body.map(({ permission }) => permission);
         const mrEnabled = !!memberRestrictions;
-        const mrFilter = mrEnabled
+        const mrFilter = memberRestrictions
             ? JSON5.stringify(memberRestrictions.filter, undefined, 4)
             : '{\n\t\n}';
-        const mrFields = mrEnabled
+        const mrFields = memberRestrictions
             ? memberRestrictions.fields
             : {};
 
@@ -196,32 +161,10 @@ export const views = {
      * - id: client id
      * - noFetch: if true, will not fetch any new data
      */
-    client: class ClientView extends AbstractDataView {
-        constructor (options) {
-            super();
-            this.id = options.id;
-
-            store.subscribe([CLIENTS, this.id], this.#onUpdate);
-            const current = store.get([CLIENTS, this.id]);
-            if (current) setImmediate(this.#onUpdate);
-
-            if (!options.noFetch) {
-                tasks.client({ id: this.id }).catch(err => this.emit('error', err));
-            }
-        }
-
-        #onUpdate = (type) => {
-            if (type === store.UpdateType.DELETE) {
-                this.emit('update', store.get([CLIENTS, this.id]), 'delete');
-            } else {
-                this.emit('update', store.get([CLIENTS, this.id]));
-            }
-        };
-
-        drop () {
-            store.unsubscribe([CLIENTS, this.id], this.#onUpdate);
-        }
-    },
+    client: simpleDataView({
+        storePath: ({ id }) => [CLIENTS, id],
+        get: tasks.client,
+    }),
     /**
      * clients/permissions: views a client’s permissions
      *
@@ -229,23 +172,10 @@ export const views = {
      * - id: client id
      * - noFetch: if true, will not fetch any new data
      */
-    permissions: class ClientPerms extends AbstractDataView {
-        constructor ({ id, noFetch }) {
-            super();
-            this.id = id;
-            store.subscribe([CLIENT_PERMS, this.id], this.#onUpdate);
-            const current = store.get([CLIENT_PERMS, this.id]);
-            if (current) setImmediate(this.#onUpdate);
-
-            if (!noFetch) {
-                tasks.permissions({ id }).catch(err => this.emit('error', err));
-            }
-        }
-        #onUpdate = () => this.emit('update', store.get([CLIENT_PERMS, this.id]));
-        drop () {
-            store.unsubscribe([CLIENT_PERMS, this.id]);
-        }
-    },
+    permissions: simpleDataView({
+        storePath: ({ id }) => [CLIENT_PERMS, id],
+        get: tasks.permissions,
+    }),
 
     sigClients: createStoreObserver([CLIENTS, SIG_CLIENTS]),
 };

@@ -12,6 +12,7 @@ export function crudList ({
     storePath,
     withApiOptions,
     map,
+    specialSearchFields,
 }) {
     return async (options, { search, offset, limit, fields, filters, jsonFilter }) => {
         const client = await asyncClient;
@@ -23,15 +24,22 @@ export function crudList ({
         };
         const transientFields = [];
         if (search && search.query) {
-            const transformedQuery = util.transformSearch(search.query);
-            if (transformedQuery.length < 3) {
-                throw { code: 'search-query-too-short', message: 'search query too short' };
+            let handled = false;
+            if (typeof specialSearchFields === 'function') {
+                handled = !!specialSearchFields(search, apiOptions, transientFields);
             }
-            if (!util.isValidSearch(transformedQuery)) {
-                throw { code: 'invalid-search-query', message: 'invalid search query' };
+
+            if (!handled) {
+                const transformedQuery = util.transformSearch(search.query);
+                if (transformedQuery.length < 3) {
+                    throw { code: 'search-query-too-short', message: 'search query too short' };
+                }
+                if (!util.isValidSearch(transformedQuery)) {
+                    throw { code: 'invalid-search-query', message: 'invalid search query' };
+                }
+                apiOptions.search = { cols: [search.field], str: transformedQuery };
+                if (defaultFields.includes(search.field)) transientFields.push(search.field);
             }
-            apiOptions.search = { cols: [search.field], str: transformedQuery };
-            if (defaultFields.includes(search.field)) transientFields.push(search.field);
         }
 
         const apiFilter = filterDefs ? filtersToAPI(filterDefs, filters) : null;

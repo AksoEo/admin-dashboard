@@ -3,6 +3,7 @@ import * as store from '../store';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
 import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI } from '../list';
+import { simpleDataView } from '../templates';
 
 const NOTIF_TEMPLATES = 'notifTemplates';
 const NOTIF_EMAIL_DOMAINS = 'notifEmailDomains';
@@ -190,24 +191,11 @@ export const views = {
         }
     },
 
-    emailDomains: class EmailDomains extends AbstractDataView {
-        constructor () {
-            super();
-            store.subscribe([NOTIF_EMAIL_DOMAINS], this.#onUpdate);
-            const current = store.get([NOTIF_EMAIL_DOMAINS]);
-            if (current) setImmediate(this.#onUpdate);
-
-            if (!current) {
-                tasks.emailDomains().catch(err => this.emit('error', err));
-            }
-        }
-        #onUpdate = () => {
-            this.emit('update', store.get([NOTIF_EMAIL_DOMAINS]));
-        };
-        drop () {
-            store.unsubscribe([NOTIF_EMAIL_DOMAINS]);
-        }
-    },
+    emailDomains: simpleDataView({
+        storePath: () => [NOTIF_EMAIL_DOMAINS],
+        get: tasks.emailDomains,
+        canBeLazy: true,
+    }),
 
     sigTemplates: createStoreObserver([NOTIF_TEMPLATES, SIG_NOTIF_TEMPLATES]),
 };
