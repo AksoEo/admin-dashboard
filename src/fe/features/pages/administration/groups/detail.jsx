@@ -466,7 +466,7 @@ const fields = {
                 <TextField
                     outline
                     value={value}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={onChange} />
             );
         },
         shouldHide: (_, editing) => !editing,
@@ -477,7 +477,7 @@ const fields = {
                 <TextField
                     outline
                     value={value}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={onChange} />
             );
         },
         shouldHide: (_, editing) => !editing,

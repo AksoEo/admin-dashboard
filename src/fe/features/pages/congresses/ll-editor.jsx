@@ -29,8 +29,8 @@ export default function LatLonEditor ({ value, editing, onChange, onDelete, requ
                     inputmode="numeric"
                     value={value ? ('' + lat) : ''}
                     trailing={deletion}
-                    onChange={e => e.target.value
-                        ? onChange([+e.target.value, lon])
+                    onChange={v => v
+                        ? onChange([+v, lon])
                         : onChange(null)} />
                 {' '}
                 <TextField
@@ -40,8 +40,8 @@ export default function LatLonEditor ({ value, editing, onChange, onDelete, requ
                     inputmode="numeric"
                     value={value ? ('' + lon) : ''}
                     trailing={deletion}
-                    onChange={e => e.target.value
-                        ? onChange([lat, +e.target.value])
+                    onChange={v => v
+                        ? onChange([lat, +v])
                         : onChange(null)} />
             </span>
         );

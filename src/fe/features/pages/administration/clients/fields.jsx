@@ -16,7 +16,7 @@ export const FIELDS = {
                         outline
                         label={slot === 'create' ? locale.fields.name : null}
                         value={value}
-                        onChange={e => onChange(e.target.value)} />
+                        onChange={onChange} />
                 );
             }
 
@@ -62,7 +62,7 @@ export const FIELDS = {
                     outline
                     label={slot === 'create' ? locale.fields.ownerName : null}
                     value={value}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={onChange} />
             );
         },
         stringify: v => v,
@@ -81,7 +81,7 @@ export const FIELDS = {
                     label={slot === 'create' ? locale.fields.ownerEmail : null}
                     type="email"
                     value={value}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={onChange} />
             );
         },
         stringify: v => v,

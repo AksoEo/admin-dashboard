@@ -356,8 +356,8 @@ export const FIELDS = {
                                 class="inner-editor"
                                 outline
                                 value={value[k]}
-                                onChange={e => {
-                                    onChange({ ...value, [k]: e.target.value || null });
+                                onChange={v => {
+                                    onChange({ ...value, [k]: v || null });
                                 }} />
                         );
                     }

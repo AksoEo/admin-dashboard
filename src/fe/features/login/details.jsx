@@ -182,8 +182,8 @@ export default class DetailsPage extends Component {
                         autocapitalize="none"
                         spellcheck="false"
                         value={this.props.login}
-                        onChange={e => {
-                            this.props.onLoginChange(e.target.value);
+                        onChange={v => {
+                            this.props.onLoginChange(v);
                             clearTimeout(this.#nopwCheckTimeout);
                             this.#nopwCheckTimeout = setTimeout(this.#checkHasPassword, 2000);
                         }}
@@ -225,7 +225,7 @@ export default class DetailsPage extends Component {
                                 else this.#passwordField2.focus();
                             }
                         }}
-                        onChange={e => this.setState({ password: e.target.value })}
+                        onChange={password => this.setState({ password })}
                         validate={() => null} />
                 </Field>
                 {needsPasswordValidation ? (
@@ -238,7 +238,7 @@ export default class DetailsPage extends Component {
                             value={this.state.confirmPassword}
                             type="password"
                             placeholder={locale.confirmPasswordPlaceholder}
-                            onChange={e => this.setState({ confirmPassword: e.target.value })}
+                            onChange={confirmPassword => this.setState({ confirmPassword })}
                             onKeyDown={e => {
                                 if (e.key === 'Enter') this.#form.submit();
                             }}

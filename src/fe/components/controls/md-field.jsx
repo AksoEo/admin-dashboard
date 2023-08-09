@@ -416,13 +416,13 @@ const makeURLInputRequest = apply => function URLInputRequest ({ selection, onCo
                 class="label-field"
                 outline label={locale.mdEditor.urlLabel}
                 value={label}
-                onChange={e => setLabel(e.target.value)} />
+                onChange={setLabel} />
             <TextField
                 class="url-field"
                 outline label={locale.mdEditor.url}
                 placeholder={locale.mdEditor.urlPlaceholder}
                 value={url}
-                onChange={e => setUrl(e.target.value)} />
+                onChange={setUrl} />
             <div class="req-footer">
                 <Button outline class="insert-button" onClick={complete} disabled={!url}>
                     {locale.mdEditor.insertUrl}

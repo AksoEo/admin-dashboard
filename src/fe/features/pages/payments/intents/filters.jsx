@@ -16,8 +16,7 @@ export const FILTERS = {
                 outline
                 disabled={hidden}
                 value={value}
-                onChange={e => {
-                    const v = e.target.value;
+                onChange={v => {
                     onEnabledChange(!!v);
                     onChange(v);
                 }} />;
@@ -33,8 +32,7 @@ export const FILTERS = {
                 type="email"
                 disabled={hidden}
                 value={value}
-                onChange={e => {
-                    const v = e.target.value;
+                onChange={v => {
                     onEnabledChange(!!v);
                     onChange(v);
                 }} />;
@@ -200,8 +198,7 @@ export const FILTERS = {
                 outline
                 disabled={hidden}
                 value={value || ''}
-                onChange={e => {
-                    const value = e.target.value;
+                onChange={value => {
                     onEnabledChange(!!value);
                     onChange(value);
                 }} />;

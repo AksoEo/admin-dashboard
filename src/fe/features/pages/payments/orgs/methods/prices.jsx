@@ -376,9 +376,9 @@ function Price ({ commission, onCommissionChange, price, onPriceChange, editing,
                             outline
                             type="number"
                             value={commission}
-                            onChange={e => {
-                                if (+e.target.value <= 100) {
-                                    onCommissionChange(+e.target.value);
+                            onChange={v => {
+                                if (+v <= 100) {
+                                    onCommissionChange(+v);
                                 }
                             }}
                             onBlur={e => {

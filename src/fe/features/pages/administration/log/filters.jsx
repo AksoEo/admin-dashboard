@@ -57,9 +57,9 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="api-key-filter">
-                    <TextField outline value={value} disabled={hidden} onChange={e => {
-                        onChange(e.target.value);
-                        onEnabledChange(!!e.target.value);
+                    <TextField outline value={value} disabled={hidden} onChange={value => {
+                        onChange(value);
+                        onEnabledChange(!!value);
                     }} />
                 </div>
             );
@@ -72,9 +72,9 @@ export default {
         editor ({ value, onChange, onEnabledChange, hidden }) {
             return (
                 <div class="ip-filter">
-                    <TextField outline disabled={hidden} value={value} onChange={e => {
-                        onChange(e.target.value);
-                        onEnabledChange(!!e.target.value);
+                    <TextField outline disabled={hidden} value={value} onChange={value => {
+                        onChange(value);
+                        onEnabledChange(!!value);
                     }} />
                 </div>
             );
@@ -92,9 +92,9 @@ export default {
                         disabled={hidden}
                         placeholder={locale.search.filters.originPlaceholder}
                         value={value}
-                        onChange={e => {
-                            onChange(e.target.value);
-                            onEnabledChange(!!e.target.value);
+                        onChange={value => {
+                            onChange(value);
+                            onEnabledChange(!!value);
                         }} />
                 </div>
             );
@@ -169,9 +169,9 @@ export default {
                         value={value.path}
                         disabled={hidden}
                         placeholder={locale.search.filters.pathPlaceholder}
-                        onChange={e => {
-                            onChange({ ...value, path: e.target.value });
-                            onEnabledChange(!!e.target.value);
+                        onChange={v => {
+                            onChange({ ...value, path: v});
+                            onEnabledChange(!!v);
                         }} />
                 </div>
             );
@@ -189,9 +189,9 @@ export default {
                         value={value}
                         disabled={hidden}
                         placeholder={locale.search.filters.resStatusPlaceholder}
-                        onChange={e => {
-                            onChange(e.target.value);
-                            onEnabledChange(!!e.target.value);
+                        onChange={value => {
+                            onChange(value);
+                            onEnabledChange(!!value);
                         }} />
                 </div>
             );

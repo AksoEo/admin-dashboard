@@ -93,7 +93,7 @@ export default {
                             pattern="\d+"
                             label={optionsLocale.create.year}
                             value={task.parameters.year}
-                            onChange={e => task.update({ year: e.target.value })} />
+                            onChange={year => task.update({ year })} />
                     </TaskDialog>
                 )}
             </routerContext.Consumer>
@@ -115,7 +115,7 @@ export default {
                             outline
                             label={optionsLocale.create.year}
                             value={task.parameters.year}
-                            onChange={e => task.update({ year: e.target.value })} />
+                            onChange={year => task.update({ year })} />
                     </TaskDialog>
                 )}
             </routerContext.Consumer>

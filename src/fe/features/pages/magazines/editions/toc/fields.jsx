@@ -57,7 +57,7 @@ export const FIELDS = {
                     outline
                     value={value}
                     maxLength={200}
-                    onChange={e => onChange(e.target.value || null)} />;
+                    onChange={v => onChange(v || null)} />;
             }
             return value;
         },
@@ -71,7 +71,7 @@ export const FIELDS = {
                     outline
                     value={value}
                     maxLength={100}
-                    onChange={e => onChange(e.target.value || null)} />;
+                    onChange={v => onChange(v || null)} />;
             }
             return value;
         },

@@ -39,7 +39,7 @@ export const FIELDS = {
                     label={slot === 'create' ? locale.fields.name : null}
                     required
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             if (slot === 'title') return <b>{value}</b>;
             return value;

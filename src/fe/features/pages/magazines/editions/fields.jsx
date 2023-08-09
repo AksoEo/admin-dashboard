@@ -25,7 +25,7 @@ export const FIELDS = {
                     required
                     value={value}
                     maxLength={50}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             if (slot === 'title') return <b class="edition-field-id-human">{value}</b>;
             return value;

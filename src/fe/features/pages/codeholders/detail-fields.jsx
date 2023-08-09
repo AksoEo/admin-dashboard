@@ -133,13 +133,13 @@ function lotsOfTextFields (lines, { value, onChange, ...restProps }) {
                             value={editor.fromValue
                                 ? editor.fromValue(getKeyedValue(value, editor.key))
                                 : getKeyedValue(value, editor.key)}
-                            onChange={e => onChange(
+                            onChange={v => onChange(
                                 replaceKeyedValue(
                                     value,
                                     editor.key,
                                     editor.intoValue
-                                        ? editor.intoValue(e.target.value)
-                                        : (e.target.value || null),
+                                        ? editor.intoValue(v)
+                                        : (v || null),
                                 )
                             )}
                             {...(editor.props || {})} />
@@ -827,7 +827,7 @@ class ValidatedEmailEditor extends PureComponent {
             }}
             class="codeholder-validated-email-editor"
             value={value}
-            onChange={e => onChange(e.target.value || null)}
+            onChange={v => onChange(v || null)}
             type="email" />;
     }
 }
@@ -972,7 +972,7 @@ export const fields = {
     },
     careOf: simpleField(permsEditable('careOf', function ({ value, editing, onChange }) {
         if (!editing) return value;
-        return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+        return <LimitedTextField value={value} onChange={v => onChange(v || null)} maxLength={50} />;
     }), {
         shouldHide: item => item.type !== 'org',
         hasPerm: 'self',
@@ -1150,7 +1150,7 @@ export const fields = {
     },
     profession: simpleField(permsEditable('profession', function ({ value, editing, onChange }) {
         if (!editing) return value;
-        return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={50} />;
+        return <LimitedTextField value={value} onChange={v => onChange(v || null)} maxLength={50} />;
     }), {
         shouldHide: item => item.type !== 'human',
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
@@ -1171,7 +1171,7 @@ export const fields = {
         }
         return <LimitedTextField
             value={value}
-            onChange={e => onChange(e.target.value || null)}
+            onChange={v => onChange(v || null)}
             maxLength={50}
             onBlur={() => {
                 // prepend protocol if it’s missing
@@ -1212,7 +1212,7 @@ export const fields = {
     mainDescriptor: {
         component: permsEditable('mainDescriptor', ({ value, editing, onChange }) => {
             if (!editing) return value;
-            return <LimitedTextField value={value} onChange={e => onChange(e.target.value || null)} maxLength={80} />;
+            return <LimitedTextField value={value} onChange={v => onChange(v || null)} maxLength={80} />;
         }),
         extra: ({ editing }) => <Publicity value="public" editing={editing} style="icon" />,
         shouldHide: item => item.type !== 'org',
@@ -1352,10 +1352,10 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
                 maxLength={1500}
                 type="number"
                 value={v.val}
-                onChange={e => {
-                    if (e.target.value === v.val.toString()) return;
-                    if (Number.isFinite(+e.target.value)) {
-                        onValueChange({ ...v, val: +e.target.value });
+                onChange={value => {
+                    if (value === v.val.toString()) return;
+                    if (Number.isFinite(+value)) {
+                        onValueChange({ ...v, val: +value });
                     }
                 }} />;
         } else {
@@ -1368,7 +1368,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
                 maxLength={1500}
                 type="email"
                 value={v.val}
-                onChange={e => onValueChange({ ...v, val: e.target.value })}
+                onChange={value => onValueChange({ ...v, val: value })}
                 placeholder={locale.factoids.placeholders.email} />;
         } else {
             editor = `${v.val}`;
@@ -1380,7 +1380,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
                 maxLength={1500}
                 type="url"
                 value={v.val}
-                onChange={e => onValueChange({ ...v, val: e.target.value })}
+                onChange={value => onValueChange({ ...v, val: value })}
                 placeholder={locale.factoids.placeholders.url} />;
         } else {
             editor = `${v.val}`;
@@ -1404,8 +1404,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
                         outline
                         error={keyDupEnabled ? locale.factoids.duplicateKey : null}
                         value={keyDupEnabled ? keyDup : k}
-                        onChange={e => {
-                            const k = e.target.value;
+                        onChange={k => {
                             if (onKeyChange(k)) {
                                 setKeyDup(null);
                             } else {

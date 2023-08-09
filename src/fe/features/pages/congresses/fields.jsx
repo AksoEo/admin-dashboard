@@ -19,7 +19,7 @@ export const FIELDS = {
             if (editing) {
                 return <TextField
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             return  value;
         },
@@ -31,7 +31,7 @@ export const FIELDS = {
             if (editing) {
                 return <TextField
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             return value;
         },

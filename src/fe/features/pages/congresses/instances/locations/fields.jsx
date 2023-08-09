@@ -134,10 +134,9 @@ export const FIELDS = {
                     required
                     outline
                     label={locale.fields.name}
-                    component={LimitedTextField}
                     maxLength={50}
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             return <span class="congress-location-name">{value}</span>;
         },
@@ -263,8 +262,8 @@ export const FIELDS = {
                             max={max}
                             step="0.1"
                             value={rating}
-                            onChange={e => e.target.value
-                                ? onChange({ type, rating: +e.target.value, max })
+                            onChange={v => v
+                                ? onChange({ type, rating: +v, max })
                                 : onChange(null)} />
                         <span class="editor-infix">{locale.fields.ratingInfixOf}</span>
                         <ValidatedTextField
@@ -288,9 +287,9 @@ export const FIELDS = {
                                     <Icon style={{ verticalAlign: 'middle' }} />
                                 </Button>
                             )}
-                            onChange={e => {
-                                if (!value) setVirtualMax(+e.target.value);
-                                else onChange({ type, rating, max: +e.target.value });
+                            onChange={v => {
+                                if (!value) setVirtualMax(+v);
+                                else onChange({ type, rating, max: +v });
                             }} />
                     </span>
                 );

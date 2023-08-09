@@ -67,13 +67,13 @@ export default {
                                 required
                                 label={orgLocale.fields.name}
                                 value={task.parameters.name || ''}
-                                onChange={e => task.update({ name: e.target.value })} />
+                                onChange={name => task.update({ name })} />
                         </Field>
                         <Field>
                             <TextField
                                 label={orgLocale.fields.description}
                                 value={task.parameters.description || ''}
-                                onChange={e => task.update({ description: e.target.value || null })} />
+                                onChange={v => task.update({ description: v || null })} />
                         </Field>
                     </TaskDialog>
                 )}
@@ -100,13 +100,13 @@ export default {
                                 required
                                 label={addonLocale.fields.name}
                                 value={task.parameters.name || ''}
-                                onChange={e => task.update({ name: e.target.value })} />
+                                onChange={name => task.update({ name })} />
                         </Field>
                         <Field>
                             <TextField
                                 label={addonLocale.fields.description}
                                 value={task.parameters.description || ''}
-                                onChange={e => task.update({ description: e.target.value || null })} />
+                                onChange={v => task.update({ description: v || null })} />
                         </Field>
                     </TaskDialog>
                 )}
@@ -194,7 +194,7 @@ export default {
                     required
                     label={intentLocale.fields.customerName}
                     value={customer.name}
-                    onChange={e => task.update({ customer: { ...customer, name: e.target.value } })} />
+                    onChange={name => task.update({ customer: { ...customer, name } })} />
             </Field>
         );
         fields.push(
@@ -205,7 +205,7 @@ export default {
                     outline
                     label={intentLocale.fields.customerEmail}
                     value={customer.email}
-                    onChange={e => task.update({ customer: { ...customer, email: e.target.value } })} />
+                    onChange={email => task.update({ customer: { ...customer, email } })} />
             </Field>
         );
         fields.push(
@@ -702,7 +702,7 @@ export default {
                         required
                         label={intentLocale.resendReceipt.email}
                         value={task.parameters.email || ''}
-                        onChange={e => task.update(e.target.value || null)} />
+                        onChange={v => task.update(v || null)} />
                 </Field>
             </TaskDialog>
         );

@@ -182,8 +182,8 @@ class TimeEditor extends PureComponent {
                 onBlur={this.onBlur}
                 value={editingValue}
                 onKeyDown={this.onKeyDown}
-                onChange={e => {
-                    this.setState({ editingValue: e.target.value });
+                onChange={value => {
+                    this.setState({ editingValue: value });
                 }}/>
         );
     }

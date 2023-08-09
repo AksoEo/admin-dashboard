@@ -153,7 +153,7 @@ const templatePage = () => ({
                         class="name-editor"
                         outline
                         value={value.name}
-                        onChange={e => onChange({ ...value, name: e.target.value })} />
+                        onChange={name => onChange({ ...value, name })} />
                 </Field>
                 <WizardSection title={locale.fields.description} />
                 <Field>
@@ -161,7 +161,7 @@ const templatePage = () => ({
                         class="name-editor"
                         outline
                         value={value.description}
-                        onChange={e => onChange({ ...value, description: e.target.value || null })} />
+                        onChange={v => onChange({ ...value, description: v || null })} />
                 </Field>
                 {hasTejo && hasUea ? (
                     <OrgPicker
@@ -194,7 +194,7 @@ const generalPage = (isTemplate) => ({
                     class="name-editor"
                     outline
                     value={value.name}
-                    onChange={e => onChange({ ...value, name: e.target.value })} />
+                    onChange={name => onChange({ ...value, name })} />
                 {hasTejo && hasUea && !isTemplate ? (
                     <OrgPicker
                         value={value.org}

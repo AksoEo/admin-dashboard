@@ -62,7 +62,7 @@ export default {
             const Component = field?.component || TextField;
             const extra = field?.extra || {};
             // HACK: to make suggestionfield work
-            const mapChangeEvent = Component === TextField ? (e => e.target.value) : (e => e);
+            const mapChangeEvent = Component === TextField ? (e => e) : (e => e);
             return (
                 <Field>
                     <Component
@@ -160,7 +160,7 @@ export default {
                         class="update-comment"
                         label={detailLocale.updateComment}
                         value={task.parameters.updateComment || ''}
-                        onChange={e => task.update({ updateComment: e.target.value })} />
+                        onChange={updateComment => task.update({ updateComment })} />
                 </Field>
             </TaskDialog>
         );
@@ -257,7 +257,7 @@ export default {
                         min={yearMin}
                         max={yearMax}
                         value={task.parameters.year}
-                        onChange={e => task.update({ year: e.target.value })}
+                        onChange={year => task.update({ year })}
                         validate={value => {
                             if (Number.isNaN(+value)) return locale.membership.notAYear;
                             if (yearMin !== null && +value < yearMin) return locale.membership.notAYear;
@@ -415,7 +415,7 @@ export default {
                             maxLength={50}
                             value={task.parameters.name}
                             disabled={task.running}
-                            onChange={e => task.update({ name: e.target.value })} />
+                            onChange={name => task.update({ name })} />
                     </Field>
                 )}
                 {canUploadFile && (
@@ -425,7 +425,7 @@ export default {
                             maxLength={300}
                             value={task.parameters.description}
                             disabled={task.running}
-                            onChange={e => task.update({ description: e.target.value })} />
+                            onChange={description => task.update({ description })} />
                     </Field>
                 )}
             </TaskDialog>
@@ -460,7 +460,7 @@ export default {
                     <TextField
                         required
                         value={task.parameters.name}
-                        onChange={e => task.update({ name: e.target.value })}
+                        onChange={name => task.update({ name })}
                         outline
                         label={locale.addrLabelGen.presets.name} />
                 </Field>
@@ -480,7 +480,7 @@ export default {
                     <TextField
                         required
                         value={task.parameters.name}
-                        onChange={e => task.update({ name: e.target.value })}
+                        onChange={name => task.update({ name })}
                         outline
                         label={locale.addrLabelGen.presets.name} />
                 </Field>
@@ -648,7 +648,7 @@ function makeRoleEditor (type) {
                         <LimitedTextField
                             outline
                             value={task.parameters.dataString}
-                            onChange={e => task.update({ dataString: e.target.value || null })}
+                            onChange={v => task.update({ dataString: v || null })}
                             maxLength={128} />
                     </div>
                 </div>

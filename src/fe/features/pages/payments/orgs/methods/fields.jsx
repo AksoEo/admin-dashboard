@@ -63,7 +63,7 @@ export const FIELDS = {
                     required
                     label={slot === 'create' ? locale.fields.name : null}
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             if (slot === 'title') return <b>{value}</b>;
             return value;
@@ -76,7 +76,7 @@ export const FIELDS = {
                 return <TextField
                     label={slot === 'create' ? locale.fields.internalDescription : null}
                     value={value || ''}
-                    onChange={e => onChange(e.target.value || null)} />;
+                    onChange={v => onChange(v || null)} />;
             }
             return value;
         },
@@ -339,7 +339,7 @@ export const FIELDS = {
                     <TextField
                         label={locale.fields.stripePublishableKey}
                         value={value}
-                        onChange={e => onChange(e.target.value)} />
+                        onChange={onChange} />
                 );
             }
             return value;
@@ -433,10 +433,10 @@ class PercentEditor extends PureComponent {
     #onFocus = () => {
         this.setState({ editing: true, editingValue: this.formatValue() });
     };
-    #onChange = e => {
+    #onChange = v => {
         if (!this.state.editing) return;
-        this.setState({ editingValue: e.target.value });
-        this.commitValue(e.target.value);
+        this.setState({ editingValue: v });
+        this.commitValue(v);
     };
     #onBlur = () => {
         this.commitValue(this.state.editingValue);
@@ -474,7 +474,7 @@ export const CREATION_FIELDS = {
                 <TextField
                     label={locale.fields.stripeSecretKey}
                     value={value}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={onChange} />
             );
         },
         shouldHide: item => item.type !== 'stripe',

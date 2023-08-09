@@ -359,7 +359,7 @@ function SequenceIds ({ value, editing, onChange }) {
                     disabled={!editing}
                     label={locale.settings.sequenceIds.startAt}
                     value={value.startAt | 0}
-                    onChange={e => onChange({ ...value, startAt: +e.target.value | 0 })} />
+                    onChange={v => onChange({ ...value, startAt: +v | 0 })} />
             </Field>
         );
         const validId = 'flag' + Math.random().toString(36);

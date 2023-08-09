@@ -46,7 +46,7 @@ export default {
                             autocapitalize="none"
                             spellcheck="false"
                             value={login}
-                            onChange={e => task.update({ login: e.target.value })}
+                            onChange={login => task.update({ login })}
                             validate={value => {
                                 if (!value.includes('@') && !UEACode.validate(value)) {
                                     return locale.invalidUEACode;

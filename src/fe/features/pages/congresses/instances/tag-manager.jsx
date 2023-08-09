@@ -345,7 +345,7 @@ const PopoutTag = connect(({ id, view, options }) =>
                         outline
                         maxLength="50"
                         value={editedName}
-                        onChange={e => setEditedName(e.target.value)} />
+                        onChange={setEditedName} />
                 ) : data ? data.name : <TinyProgress />}
             </div>
             <div class={'tag-check' + (loadingAttachment ? ' is-loading' : '')}>
@@ -426,7 +426,7 @@ function AddTag ({ onCreate }) {
                     outline
                     maxLength="50"
                     value={name}
-                    onChange={e => setName(e.target.value)} />
+                    onChange={setName} />
                 <Button icon small onClick={() => {
                     setLoading(true);
                     onCreate(name).then(() => {

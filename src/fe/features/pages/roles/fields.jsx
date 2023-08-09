@@ -15,7 +15,7 @@ export const FIELDS = {
                     outline={slot === 'create'}
                     label={slot === 'create' ? locale.fields.name : null}
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             if (slot === 'title') return <b>{value}</b>;
             return value;

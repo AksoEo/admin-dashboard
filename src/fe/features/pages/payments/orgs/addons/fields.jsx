@@ -11,7 +11,7 @@ export const FIELDS = {
                 return <TextField
                     required
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             if (slot === 'title') return <b>{value}</b>;
             return value;

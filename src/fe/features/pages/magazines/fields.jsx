@@ -41,7 +41,7 @@ export const FIELDS = {
                     label={slot === 'create' ? locale.fields.name : null}
                     required
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             if (slot === 'title') return <b>{value}</b>;
             return value;
@@ -74,7 +74,7 @@ export const FIELDS = {
                         value={value}
                         pattern="\d{8}"
                         maxLength={8}
-                        onChange={e => onChange(e.target.value || null)} />
+                        onChange={v => onChange(v || null)} />
                 );
             }
             if (!value) return null;

@@ -27,7 +27,7 @@ export default function PhoneNumberEditor ({ value, onChange, outline }) {
         class="data phone-number-editor"
         value={value}
         outline={outline}
-        onChange={e => onChange({ ...wholeValue, value: e.target.value.replace(/[^+\d]/g, '') || null })}
+        onChange={value => onChange({ ...wholeValue, value: value.replace(/[^+\d]/g, '') || null })}
         type="tel"
         placeholder="+"
         maxLength="50"

@@ -170,9 +170,9 @@ const boundedNumber = (min, max, step, unit) => ({ value, onChange }) => {
             min={min}
             max={max}
             value={isFocused ? editingText : +value.toFixed(1)}
-            onChange={e => {
-                setEditingText(e.target.value);
-                if (Number.isFinite(+e.target.value)) onChange(+e.target.value);
+            onChange={v => {
+                setEditingText(v);
+                if (Number.isFinite(+v)) onChange(+v);
             }}
             onFocus={() => {
                 setFocused(true);

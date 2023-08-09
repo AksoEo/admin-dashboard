@@ -30,7 +30,7 @@ export const FIELDS = {
                         outline
                         label={slot === 'create' ? locale.fields.name : null}
                         value={value}
-                        onChange={e => onChange(e.target.value || null)} />
+                        onChange={v => onChange(v || null)} />
                 );
             }
             return value;

@@ -310,7 +310,7 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange, push }) {
                             outline
                             label={locale.fields.name}
                             value={item.name}
-                            onChange={e => onItemChange({ ...item, name: e.target.value })} />
+                            onChange={name => onItemChange({ ...item, name })} />
                     ) : item.name}
                 </div>
                 <div class={'header-id' + (editing ? ' is-editing' : '')}>
@@ -320,7 +320,7 @@ function Header ({ item, editing, onItemChange, org, tab, onTabChange, push }) {
                             outline
                             label={locale.fields.humanId}
                             value={item.humanId}
-                            onChange={e => onItemChange({ ...item, humanId: e.target.value })} />
+                            onChange={humanId => onItemChange({ ...item, humanId })} />
                     ) : (
                         <div>
                             {locale.fields.humanId}

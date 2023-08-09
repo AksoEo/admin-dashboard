@@ -146,7 +146,7 @@ export default {
                         outline
                         label={snapLocale.fields.name}
                         value={task.parameters.name}
-                        onChange={e => task.update({ name: e.target.value })} />
+                        onChange={name => task.update({ name })} />
                 </Field>
                 <MemberInclusionInfo
                     magazine={task.options.magazine}

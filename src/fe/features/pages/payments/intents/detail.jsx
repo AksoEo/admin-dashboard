@@ -567,7 +567,7 @@ function Customer ({ item, editing, onItemChange }) {
                     label={locale.fields.customerName}
                     required
                     value={item.customer.name}
-                    onChange={e => onCustomerChange({ ...item.customer, name: e.target.value })} />
+                    onChange={name => onCustomerChange({ ...item.customer, name })} />
             </Field>
         );
         customerEmail = (
@@ -576,7 +576,7 @@ function Customer ({ item, editing, onItemChange }) {
                 type="email"
                 required
                 value={item.customer.email}
-                onChange={e => onCustomerChange({ ...item.customer, email: e.target.value })} />
+                onChange={email => onCustomerChange({ ...item.customer, email })} />
         );
         codeholderLink = (
             <CodeholderPicker
@@ -713,7 +713,7 @@ function Method ({ method, item, editing, onItemChange }) {
                 <TextField
                     class="fid-inner"
                     value={item.foreignId}
-                    onChange={e => onItemChange({ ...item, foreignId: e.target.value })} />
+                    onChange={foreignId => onItemChange({ ...item, foreignId })} />
             ) : (
                 <div class="fid-inner">
                     {item.foreignId}

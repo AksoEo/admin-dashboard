@@ -315,7 +315,7 @@ class AddPurposeDialog extends PureComponent {
                     label={locale.purposesPicker.manual.title}
                     outline
                     value={manualTitle}
-                    onChange={e => this.setState({ manualTitle: e.target.value })}/>
+                    onChange={manualTitle => this.setState({ manualTitle })}/>
             </Field>
         );
         const descField = () => (
@@ -397,8 +397,8 @@ class AddPurposeDialog extends PureComponent {
                             }}
                             class="trigger-data-id-field"
                             value={this.state.triggerDataId.toString('hex')}
-                            onChange={e => {
-                                this.setState({ triggerDataId: e.target.value });
+                            onChange={triggerDataId => {
+                                this.setState({ triggerDataId });
                             }}
                             trailing={(
                                 <TriggerPicker

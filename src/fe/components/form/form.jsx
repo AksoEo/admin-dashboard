@@ -18,7 +18,7 @@ import FormContext from './context';
  *                     if (this.state.value !== 'valid') return 'error label';
  *                 }}
  *                 value={this.state.value}
- *                 onChange={e => this.setState({ value: e.target.value })} />
+ *                 onChange={value => this.setState({ value })} />
  *         </Form>
  *     );
  * }

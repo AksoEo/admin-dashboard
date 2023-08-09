@@ -113,9 +113,9 @@ class DateEditor extends PureComponent {
         return date;
     }
 
-    onInputTextChange = e => {
-        this.setState({ inputText: e.target.value });
-        const date = this.bindDate(tryParseDate(e.target.value));
+    onInputTextChange = value => {
+        this.setState({ inputText: value });
+        const date = this.bindDate(tryParseDate(value));
 
         if (date !== undefined) {
             this.ignoreNextTextUpdate = true; // stop parsed date from overwriting user text

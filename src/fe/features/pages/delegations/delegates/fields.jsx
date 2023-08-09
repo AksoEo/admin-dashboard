@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/compat';
-import { Button, Checkbox, TextField } from 'yamdl';
+import { Button, Checkbox } from 'yamdl';
 import SearchIcon from '@material-ui/icons/Search';
 import RemoveIcon from '@material-ui/icons/Remove';
 import OrgIcon from '../../../../components/org-icon';
@@ -357,8 +357,7 @@ export const FIELDS = {
                                 placeholder="https://www.pasportaservo.org/ejo/..."
                                 outline
                                 value={value.psProfileURL || ''}
-                                onChange={e => {
-                                    const val = e.target.value;
+                                onChange={val => {
                                     onChange({ ...value, psProfileURL: val || null });
                                 }} />
                         )}

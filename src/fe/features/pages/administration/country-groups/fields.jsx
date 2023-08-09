@@ -19,7 +19,7 @@ export const FIELDS = {
                 return (
                     <TextField
                         value={value}
-                        onChange={e => onChange(e.target.value)} />
+                        onChange={onChange} />
                 );
             }
             return <span class="country-group-name">{value}</span>;

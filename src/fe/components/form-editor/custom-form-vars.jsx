@@ -188,9 +188,7 @@ function NameTextField ({ value, onChange }) {
             leading={VAR_PREFIX}
             maxLength={18}
             value={editingValue !== null ? editingValue : value}
-            onChange={e => {
-                setEditingValue(e.target.value);
-            }}
+            onChange={setEditingValue}
             onFocus={() => {
                 setEditingValue(value);
             }}
@@ -233,7 +231,7 @@ function DefaultValue ({ type, value, onChange }) {
             <TextField
                 outline
                 value={value}
-                onChange={e => onChange(e.target.value)} />
+                onChange={onChange} />
         );
     }
 
@@ -275,9 +273,7 @@ function AddVar ({ onAdd }) {
                 value={newName}
                 maxLength={18}
                 onKeyDown={nameFieldOnKeyDown}
-                onChange={e => {
-                    setNewName(e.target.value);
-                }} />
+                onChange={setNewName} />
             <Button icon small disabled={!newName} onClick={() => {
                 onAdd(newName);
                 setNewName('');

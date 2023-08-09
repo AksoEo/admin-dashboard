@@ -72,8 +72,8 @@ export default class ValidatedTextField extends PureComponent {
         }
     }
 
-    onChange = (e) => {
-        if (this.props.onChange) this.props.onChange(e);
+    onChange = (v, e) => {
+        if (this.props.onChange) this.props.onChange(v, e);
         if (!e.defaultPrevented && this.state.continuous) {
             this.validate();
         }

@@ -11,7 +11,7 @@ const nameField = {
                 <TextField
                     class="country-name-editor"
                     value={value}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={onChange} />
             );
         }
         return <span class="country-name">{value}</span>;

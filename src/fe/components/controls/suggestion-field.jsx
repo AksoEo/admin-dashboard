@@ -91,7 +91,7 @@ export default function SuggestionField ({
     return <SuggestionFieldRender textFieldProps={{
         ...extraProps,
         value,
-        onChange: e => onChange(e.target.value),
+        onChange,
         onFocus,
         onBlur,
         onKeyDown,

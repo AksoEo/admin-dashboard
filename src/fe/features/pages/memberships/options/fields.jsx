@@ -311,7 +311,7 @@ class OfferGroup extends PureComponent {
                             label={locale.offers.group.title}
                             outline
                             value={value.title}
-                            onChange={e => onChange({ ...value, title: e.target.value })} />
+                            onChange={title => onChange({ ...value, title })} />
                     ) : value.title}
                 </div>
                 {editing && (

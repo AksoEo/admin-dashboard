@@ -61,8 +61,8 @@ const TYPES = {
                         placeholder={item.placeholder}
                         disabled={!editing || disabled}
                         value={value}
-                        onChange={e => {
-                            if (e.target.value) onChange(+e.target.value);
+                        onChange={value => {
+                            if (value) onChange(+value);
                             else onChange(null);
                         }}
                         type="number"
@@ -139,7 +139,7 @@ const TYPES = {
                         pattern={disableValidation ? null : item.pattern}
                         minLength={disableValidation ? null : item.minLength}
                         maxLength={disableValidation ? null : item.maxLength}
-                        onChange={e => onChange(e.target.value || null)}
+                        onChange={v => onChange(v || null)}
                         error={error} />
                     {extra}
                 </div>
@@ -761,8 +761,8 @@ const SETTINGS = {
                             if (!NAME_REGEX.test(value)) return locale.inputFields.namePatternError;
                         }}
                         maxLength={20}
-                        onChange={e => {
-                            const newItem = { ...item, name: e.target.value };
+                        onChange={name => {
+                            const newItem = { ...item, name };
                             if (oldName) newItem.oldName = oldName;
                             onItemChange(newItem);
                         }} />
@@ -783,7 +783,7 @@ const SETTINGS = {
                         required
                         outline
                         value={value}
-                        onChange={e => onChange(e.target.value)} />
+                        onChange={onChange} />
                 </Setting>
             );
         }),
@@ -873,7 +873,7 @@ const SETTINGS = {
                         outline
                         value={value || ''}
                         maxLength={50}
-                        onChange={e => onChange(e.target.value || null)} />
+                        onChange={v => onChange(v || null)} />
                 </Setting>
             );
         }),
@@ -889,7 +889,7 @@ const SETTINGS = {
                         value={value || ''}
                         step={options === 'money' ? '1' : '0.000000000000001'}
                         min={options === 'money' ? '1' : '0'}
-                        onChange={e => onChange(+e.target.value || null)} />
+                        onChange={v => onChange(+v || null)} />
                 </Setting>
             );
         }),
@@ -932,7 +932,7 @@ const SETTINGS = {
                         value={Number.isFinite(value) ? value : ''}
                         step={item.step}
                         max={item.max}
-                        onChange={e => Number.isFinite(parseFloat(e.target.value)) ? onChange(parseFloat(e.target.value)) : onChange(null)} />
+                        onChange={v => Number.isFinite(parseFloat(v)) ? onChange(parseFloat(v)) : onChange(null)} />
                 );
             }
 
@@ -981,7 +981,7 @@ const SETTINGS = {
                         value={Number.isFinite(value) ? value : ''}
                         step={item.step}
                         min={item.min}
-                        onChange={e => Number.isFinite(parseFloat(e.target.value)) ? onChange(parseFloat(e.target.value)) : onChange(null)} />
+                        onChange={v => Number.isFinite(parseFloat(v)) ? onChange(parseFloat(v)) : onChange(null)} />
                 );
             }
             return (
@@ -1014,7 +1014,7 @@ const SETTINGS = {
                     <TextField
                         outline
                         value={value || ''}
-                        onChange={e => onChange(e.target.value || null)} />
+                        onChange={v => onChange(v || null)} />
                 </Setting>
             );
         }),
@@ -1026,7 +1026,7 @@ const SETTINGS = {
                     <TextField
                         outline
                         value={value || ''}
-                        onChange={e => onChange(e.target.value || null)} />
+                        onChange={v => onChange(v || null)} />
                 </Setting>
             );
         }),
@@ -1042,7 +1042,7 @@ const SETTINGS = {
                         value={value || ''}
                         min={0}
                         max={item.maxLength}
-                        onChange={e => onChange(+e.target.value || null)} />
+                        onChange={v => onChange(+v || null)} />
                 </Setting>
             );
         })),
@@ -1057,7 +1057,7 @@ const SETTINGS = {
                         type="number"
                         value={value || ''}
                         min={item.minLength || 0}
-                        onChange={e => onChange(+e.target.value || null)} />
+                        onChange={v => onChange(+v || null)} />
                 </Setting>
             );
         })),
@@ -1190,9 +1190,9 @@ const SETTINGS = {
                             <TextField
                                 value={item.headerTop[i] || ''}
                                 maxLength={20}
-                                onChange={e => {
+                                onChange={v => {
                                     const headerTop = item.headerTop.slice();
-                                    headerTop[index] = e.target.value || null;
+                                    headerTop[index] = v || null;
                                     onItemChange({ ...item, headerTop });
                                 }} />
                         </div>
@@ -1207,9 +1207,9 @@ const SETTINGS = {
                             <TextField
                                 value={item.headerLeft[i] || ''}
                                 maxLength={20}
-                                onChange={e => {
+                                onChange={v => {
                                     const headerLeft = item.headerLeft.slice();
-                                    headerLeft[index] = e.target.value || null;
+                                    headerLeft[index] = v || null;
                                     onItemChange({ ...item, headerLeft });
                                 }} />
                         </div>
@@ -1264,7 +1264,7 @@ const SETTINGS = {
                             outline
                             value={item.rows | 0}
                             max={20}
-                            onChange={e => setRows(+e.target.value | 0)} />
+                            onChange={v => setRows(+v | 0)} />
                     </Setting>
                     <Setting label={locale.inputFields.cols}>
                         <TextField
@@ -1272,7 +1272,7 @@ const SETTINGS = {
                             outline
                             value={item.cols | 0}
                             max={20}
-                            onChange={e => setCols(+e.target.value | 0)} />
+                            onChange={v => setCols(+v | 0)} />
                     </Setting>
                     <Setting label={locale.inputFields.minSelect}>
                         <TextField
@@ -1282,7 +1282,7 @@ const SETTINGS = {
                             min={0}
                             max={item.maxSelect || (item.rows * item.cols)}
                             value={item.minSelect || ''}
-                            onChange={e => setMinSelect(+e.target.value || null)} />
+                            onChange={v => setMinSelect(+v || null)} />
                     </Setting>
                     <Setting label={locale.inputFields.maxSelect}>
                         <TextField
@@ -1292,7 +1292,7 @@ const SETTINGS = {
                             min={item.minSelect | 0}
                             max={item.rows * item.cols}
                             value={item.maxSelect || ''}
-                            onChange={e => setMaxSelect(+e.target.value || null)} />
+                            onChange={v => setMaxSelect(+v || null)} />
                     </Setting>
                     <Setting label={locale.inputFields.headerTop}>
                         <Checkbox
@@ -1437,7 +1437,7 @@ function OptionsEditorItem ({ onRemove, value, onChange }) {
                 value={value.name}
                 minlength={1}
                 maxLength={50}
-                onChange={e => onChange({ ...value, name: e.target.value })} />
+                onChange={v => onChange({ ...value, name: v })} />
             <TextField
                 outline
                 label={locale.inputFields.optionsValue}
@@ -1446,7 +1446,7 @@ function OptionsEditorItem ({ onRemove, value, onChange }) {
                 value={value.value}
                 minLength={1}
                 maxLength={255}
-                onChange={e => onChange({ ...value, value: e.target.value })} />
+                onChange={v => onChange({ ...value, value: v })} />
             <Select
                 value={value.disabled.toString()}
                 onChange={disabled => onChange({

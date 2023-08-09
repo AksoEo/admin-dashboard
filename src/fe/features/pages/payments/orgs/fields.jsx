@@ -23,7 +23,7 @@ export const FIELDS = {
                 return <TextField
                     required
                     value={value}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             return value;
         },
@@ -35,7 +35,7 @@ export const FIELDS = {
     description: {
         skipLabel: true,
         component ({ value, editing, onChange }) {
-            if (editing) return <TextField value={value || ''} onChange={e => onChange(e.target.value || null)} />;
+            if (editing) return <TextField value={value || ''} onChange={v => onChange(v || null)} />;
             return value;
         },
         stringify (value) {

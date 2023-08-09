@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Button, Checkbox, TextField } from 'yamdl';
+import { Button, Checkbox } from 'yamdl';
 import moment from 'moment';
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';

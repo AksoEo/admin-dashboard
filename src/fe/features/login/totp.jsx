@@ -84,8 +84,8 @@ export default class TotpPage extends Component {
                             }
                             if (e.key === 'Enter') this.form.submit();
                         }}
-                        onChange={e => this.setState({
-                            code: e.target.value.replace(/\D/g, '').substr(0, 6),
+                        onChange={value => this.setState({
+                            code: value.replace(/\D/g, '').substr(0, 6),
                         })}
                         validate={() => {
                             if (!this.state.code || !this.state.code.match(/^\d{6}$/)) {

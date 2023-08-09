@@ -65,7 +65,7 @@ export default {
                                 outline
                                 label={locale.fields.abbrev}
                                 value={task.parameters.abbrev || ''}
-                                onChange={e => task.update({ abbrev: e.target.value || null })} />
+                                onChange={v => task.update({ abbrev: v || null })} />
                         </Field>
                         <Field>
                             <TextField
@@ -73,7 +73,7 @@ export default {
                                 outline
                                 label={locale.fields.name}
                                 value={task.parameters.name || ''}
-                                onChange={e => task.update({ name: e.target.value })} />
+                                onChange={name => task.update({ name })} />
                         </Field>
                         {hasTejo && hasUea && (
                             <Field validate={() => {
@@ -299,7 +299,7 @@ export default {
                                 class="name-field"
                                 outline label={programLocale.fields.owner}
                                 value={task.parameters.owner || ''}
-                                onChange={e => task.update({ owner: e.target.value || null })} />
+                                onChange={v => task.update({ owner: v || null })} />
                         </Field>
                         <Field>
                             <timestamp.editor
@@ -539,7 +539,7 @@ export default {
                         error={(!dataId || isDataIdValid) ? null : participantLocale.fields.invalidDataId}
                         label={participantLocale.fields.dataId}
                         value={dataId}
-                        onChange={e => setDataId(e.target.value)}
+                        onChange={setDataId}
                         onKeyDown={e => {
                             if (e.key === 'Enter') {
                                 doOpen();

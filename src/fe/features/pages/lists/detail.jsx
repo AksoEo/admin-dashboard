@@ -137,7 +137,7 @@ function Header ({ item, editing, onItemChange }) {
                         outline
                         label={locale.fields.name}
                         value={item.name}
-                        onChange={e => onItemChange({ ...item, name: e.target.value })} />
+                        onChange={name => onItemChange({ ...item, name })} />
                 </div>
                 <div class="detail-header-field">
                     <label class="header-field-label">{locale.fields.description}</label>

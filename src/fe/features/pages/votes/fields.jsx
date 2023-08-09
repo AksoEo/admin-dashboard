@@ -30,7 +30,7 @@ export default {
                     outline
                     maxLength={100}
                     value={value}
-                    onChange={e => onChange(e.target.value)} />
+                    onChange={onChange} />
             );
         },
         stringify (value) {

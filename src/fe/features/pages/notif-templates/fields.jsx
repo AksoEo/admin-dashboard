@@ -54,7 +54,7 @@ export const FIELDS = {
                     outline
                     maxLength={150}
                     value={value}
-                    onChange={e => onChange(e.target.value)}/>;
+                    onChange={onChange}/>;
             }
             return value;
         },
@@ -87,7 +87,7 @@ export const FIELDS = {
                     value={value}
                     maxLength={255}
                     editing={editing}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             return value;
         },
@@ -115,7 +115,7 @@ export const FIELDS = {
                     maxLength={50}
                     value={value}
                     editing={editing}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             return value;
         },
@@ -582,7 +582,7 @@ class TemplatedTextField extends PureComponent {
                 onFocus={this.onFocus}
                 onBlur={this.onBlur}
                 {...props}
-                onChange={e => this.props.onChange(e.target.value)} />
+                onChange={this.props} />
         );
     }
 }

@@ -1,5 +1,4 @@
 import { h } from 'preact';
-import { TextField } from 'yamdl';
 import Select from '../../../../components/controls/select';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import { membershipEntries as locale } from '../../../../locale';

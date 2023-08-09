@@ -24,7 +24,7 @@ function makeQuerySaveDialog (type) {
                         class="form-field text-field"
                         label={locale.savedFilterName}
                         value={task.parameters.name}
-                        onChange={e => task.update({ name: e.target.value })} />
+                        onChange={name => task.update({ name })} />
                 </Field>
                 <Field>
                     <TextField
@@ -32,7 +32,7 @@ function makeQuerySaveDialog (type) {
                         class="form-field text-field"
                         label={locale.savedFilterDesc}
                         value={task.parameters.description}
-                        onChange={e => task.update({ description: e.target.value })} />
+                        onChange={description => task.update({ description })} />
                 </Field>
             </TaskDialog>
         );

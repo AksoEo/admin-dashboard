@@ -21,7 +21,7 @@ export default function NumberField ({ value, onChange, onBlur, onFocus, decimal
                 if (e.ctrlKey || e.altKey || e.metaKey) return;
                 if (e.key.length === 1 && e.key.match(DISALLOWED_CHARS_REGEX)) e.preventDefault();
             }}
-            onChange={e => setEditingValue(e.target.value.replace(DISALLOWED_CHARS_REGEX, ''))}
+            onChange={v => setEditingValue(v.replace(DISALLOWED_CHARS_REGEX, ''))}
             onFocus={(e) => {
                 if (onFocus) onFocus(e);
                 setEditingValue(Number.isFinite(value) ? value.toString() : '');

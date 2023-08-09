@@ -13,7 +13,7 @@ const string100Editor = (label, props = {}) => ({
                 label={label}
                 value={value}
                 maxLength={100}
-                onChange={e => onChange(e.target.value || null)}
+                onChange={v => onChange(v || null)}
                 {...props} />;
         }
         return value;
@@ -33,7 +33,7 @@ export const FIELDS = {
                     label={locale.fields.humanId}
                     value={value}
                     maxLength={20}
-                    onChange={e => onChange(e.target.value)} />;
+                    onChange={onChange} />;
             }
             if (slot === 'title') return <b>{value}</b>;
             return value;

@@ -246,8 +246,8 @@ class AddressEditor extends Component {
                             label={isRequired
                                 ? <Required>{locale.addressFields[k]}</Required>
                                 : locale.addressFields[k]}
-                            onChange={onChangeField(k, e => {
-                                const v = e.target.value || null;
+                            onChange={onChangeField(k, v => {
+                                v = v || null;
                                 if (isUpper) return v ? v.toUpperCase() : v;
                                 else return v;
                             })} />

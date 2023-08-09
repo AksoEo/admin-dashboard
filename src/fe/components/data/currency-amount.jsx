@@ -43,10 +43,10 @@ class CurrencyEditor extends PureComponent {
     onFocus = () => this.setState({ editing: true, editingValue: this.format(this.props.value) });
     onBlur = () => this.setState({ editing: false, error: false });
 
-    onInputChange = (e) => {
-        this.setState({ editingValue: e.target.value });
+    onInputChange = (value) => {
+        this.setState({ editingValue: value });
 
-        const v = parseFloat(e.target.value.replace(/\s/g, '').replace(/,/g, '.'));
+        const v = parseFloat(value.replace(/\s/g, '').replace(/,/g, '.'));
         if (Number.isNaN(v) || !this.props.currency) {
             this.setState({ error: true });
         } else {
@@ -270,7 +270,7 @@ function CurrencyConversion ({ value, onChange, targetCurrency, onClose }) {
                 error={(ratesError || ratesError2)
                     ? locale.currencyConversionPopover.loadingRatesError
                     : isValueInvalid ? locale.invalidCurrencyAmount : null}
-                onChange={e => setInnerValue(e.target.value)}
+                onChange={setInnerValue}
                 onKeyDown={onKeyDown}
                 trailing={(
                     <Select

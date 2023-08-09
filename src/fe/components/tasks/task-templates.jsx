@@ -137,7 +137,7 @@ export function deleteDialog ({ locale, objectView, objectName }) {
                                 class="inner-field"
                                 outline
                                 value={name}
-                                onChange={e => setName(e.target.value)} />
+                                onChange={setName} />
                         </div>
                     )
                 ) : null}

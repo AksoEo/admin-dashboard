@@ -48,7 +48,7 @@ export const FIELDS = {
                 return <LimitedTextField
                     outline
                     value={value}
-                    onChange={e => onChange(e.target.value)}
+                    onChange={onChange}
                     maxLength={100} />;
             }
             return value;

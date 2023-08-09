@@ -49,14 +49,14 @@ export default {
                                 }}
                                 label={groupsLocale.fields.code}
                                 value={fixCodeValue(task.parameters.code)}
-                                onChange={e => task.update({ code: fixCodeValue(e.target.value) })} />
+                                onChange={v => task.update({ code: fixCodeValue(v) })} />
                         </Field>
                         <Field>
                             <TextField
                                 required
                                 label={groupsLocale.fields.name}
                                 value={task.parameters.name || ''}
-                                onChange={e => task.update({ name: e.target.value })} />
+                                onChange={name => task.update({ name })} />
                         </Field>
                     </TaskDialog>
                 )}

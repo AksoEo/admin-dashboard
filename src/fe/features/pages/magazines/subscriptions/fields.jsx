@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { useState } from 'preact/compat';
-import { Button, Checkbox, TextField } from 'yamdl';
+import { Button, Checkbox } from 'yamdl';
 import RemoveIcon from '@material-ui/icons/Remove';
 import AddIcon from '@material-ui/icons/Add';
 import { timestamp } from '../../../../components/data';

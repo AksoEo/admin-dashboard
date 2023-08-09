@@ -284,7 +284,7 @@ export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
             type="number"
             value={value || ''}
             placeholder={locale.config.noMaxOptions}
-            onChange={e => onChange(+e.target.value || null)} />
+            onChange={v => onChange(+v || null)} />
     );
 }
 
@@ -346,9 +346,9 @@ export const options = class OptionsEditor extends Component {
                         outline
                         label={locale.options.name}
                         value={item.name}
-                        onChange={e => {
+                        onChange={name => {
                             const newValue = [...value];
-                            newValue[index] = { ...item, name: e.target.value };
+                            newValue[index] = { ...item, name };
                             onChange(newValue);
                         }} />
                 );

@@ -991,7 +991,7 @@ function ExpenseItem ({ expense, onChange, onRemove, currency }) {
                     class="title-field"
                     label={locale.expenses.item.title}
                     value={expense.title}
-                    onChange={e => onChange({ ...expense, title: e.target.value })} />
+                    onChange={title => onChange({ ...expense, title })} />
             </div>
             <div class="amount-container">
                 <currencyAmount.editor

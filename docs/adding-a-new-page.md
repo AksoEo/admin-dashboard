@@ -434,7 +434,7 @@ export const fields = {
         // component used to render the field
         component ({ value, editing, onChange }) {
             if (editing) {
-                return <TextField value={value} onChange={e => onChange(e.target.value)} />;
+                return <TextField value={value} onChange={onChange} />;
             }
             return <span>{value}</span>;
         },

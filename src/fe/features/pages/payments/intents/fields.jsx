@@ -187,9 +187,9 @@ export function IntermediaryEditor ({ value, editing, onChange, slot }) {
                     label={locale.fields.intermediaryYear}
                     type="number"
                     value={value.year}
-                    onChange={e => {
-                        if (+e.target.value || !e.target.value) {
-                            onChange({ ...value, year: +e.target.value || null });
+                    onChange={v => {
+                        if (+v || !v) {
+                            onChange({ ...value, year: +v || null });
                         }
                     }} />
                 {slot === 'create' ? (
@@ -203,9 +203,9 @@ export function IntermediaryEditor ({ value, editing, onChange, slot }) {
                         outline
                         label={locale.fields.intermediaryNumber}
                         value={value.number}
-                        onChange={e => {
-                            if (+e.target.value || !e.target.value) {
-                                onChange({ ...value, number: e.target.value ? +e.target.value : null });
+                        onChange={v => {
+                            if (+v || !v) {
+                                onChange({ ...value, number: v ? +v : null });
                             }
                         }} />
                 )}
