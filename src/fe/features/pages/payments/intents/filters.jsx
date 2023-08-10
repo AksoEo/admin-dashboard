@@ -1,10 +1,37 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
+import { useState } from 'preact/compat';
 import Select from '../../../../components/controls/select';
 import Segmented from '../../../../components/controls/segmented';
-import { paymentIntents as locale } from '../../../../locale';
+import { timestamp } from '../../../../components/data';
+import { currencies, paymentIntents as locale } from '../../../../locale';
+import PaymentOrgPicker from '../org-picker';
 import PaymentMethodPicker from '../method-picker';
-import { useState } from 'preact/compat';
+
+const timeFilter = {
+    needsSwitch: true,
+    default: () => ({ enabled: false, value: [new Date(), new Date()] }),
+    serialize: ({ value }) => `${value[0].toISOString()}$${value[1].toISOString()}`,
+    deserialize: value => ({ enabled: true, value: value.split('$').map(date => new Date(date)) }),
+    editor ({ value, onChange, onEnabledChange, hidden }) {
+        return (
+            <div class="time-range-filter">
+                <div>
+                    <timestamp.editor outline label={locale.filters.timeRange.start} disabled={hidden} value={+value[0] / 1000} onChange={v => {
+                        onChange([new Date(v * 1000), value[1]]);
+                        onEnabledChange(true);
+                    }} />
+                </div>
+                <div>
+                    <timestamp.editor outline label={locale.filters.timeRange.end} disabled={hidden} value={+value[1] / 1000} onChange={v => {
+                        onChange([value[0], new Date(v * 1000)]);
+                        onEnabledChange(true);
+                    }} />
+                </div>
+            </div>
+        );
+    },
+};
 
 export const FILTERS = {
     customerName: {
@@ -61,6 +88,22 @@ export const FILTERS = {
             );
         },
     },
+    paymentOrg: {
+        default: () => ({ enabled: false, value: null }),
+        serialize: ({ value }) => value,
+        deserialize: value => ({ enabled: true, value }),
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            return (
+                <PaymentOrgPicker
+                    disabled={hidden}
+                    value={value}
+                    onChange={v => {
+                        onChange((v || '').toString());
+                        onEnabledChange(!!v);
+                    }} />
+            );
+        },
+    },
     paymentMethod: {
         default: () => ({ enabled: false, value: null }),
         serialize: ({ value }) => value,
@@ -78,6 +121,26 @@ export const FILTERS = {
                     }}
                     org={org}
                     onOrgChange={setOrg} />
+            );
+        },
+    },
+    currencies: {
+        default: () => ({ enabled: false, value: [] }),
+        serialize: ({ value }) => value.join(','),
+        deserialize: value => ({ enabled: true, value: value.split(',') }),
+        editor ({ value, onChange, onEnabledChange, hidden }) {
+            return (
+                <Select
+                    multi
+                    disabled={hidden}
+                    value={value || ''}
+                    emptyLabel={locale.filters.currenciesNone}
+                    onChange={value => {
+                        onChange(value);
+                        onEnabledChange(value.length);
+                    }}
+                    items={Object.keys(currencies)
+                        .map(c => ({ value: c, label: currencies[c] }))} />
             );
         },
     },
@@ -204,4 +267,8 @@ export const FILTERS = {
                 }} />;
         },
     },
+    timeCreated: timeFilter,
+    statusTime: timeFilter,
+    succeededTime: timeFilter,
+    refundedTime: timeFilter,
 };

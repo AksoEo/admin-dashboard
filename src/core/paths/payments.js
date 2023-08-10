@@ -198,6 +198,10 @@ const iClientFilters = {
             return { $or: conditions };
         },
     },
+    timeCreated: { toAPI: range => ({ timeCreated: { $range: [range[0] / 1000, range[1] / 1000] } }) },
+    statusTime: { toAPI: range => ({ statusTime: { $range: [range[0] / 1000, range[1] / 1000] } }) },
+    succeededTime: { toAPI: range => ({ succeededTime: { $range: [range[0] / 1000, range[1] / 1000] } }) },
+    refundedTime: { toAPI: range => ({ refundedTime: { $range: [range[0] / 1000, range[1] / 1000] } }) },
 };
 
 const iSearchFieldToTransientFields = {

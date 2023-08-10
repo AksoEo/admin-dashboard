@@ -190,10 +190,16 @@ export const paymentIntents = {
         purposeTrigger: 'Enhavas AKSO-agon',
         purposeTriggerStatus: 'Stato de AKSO-ago',
         purposeDataId: 'Aktivigas aliĝidentigilon',
+        timeCreated: '[[TimeCreated]]',
+        statusTime: '[[Time of last change]]',
+        succeededTime: '[[SucceededTime]]',
+        refundedTime: '[[RefundedTime]]',
 
         purposeInvalid: 'Enhavas nevalidan pagcelon',
         purposeInvalidNo: 'ne',
         purposeInvalidYes: 'jes',
+
+        currenciesNone: 'ne gravas',
 
         orgs: {
             tejo: 'TEJO',
@@ -222,6 +228,11 @@ export const paymentIntents = {
             refunded: 'repagita',
         },
         optionNone: 'ne gravas',
+
+        timeRange: {
+            start: 'Komenco',
+            end: 'Fino',
+        },
     },
     fields: {
         customer: 'Kliento',
