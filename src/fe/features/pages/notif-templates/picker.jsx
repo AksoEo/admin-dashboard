@@ -22,7 +22,7 @@ const REDUCED_FIELDS = {
     description: FIELDS.description,
 };
 
-/// Big notif template picker used in the "send notification" page.
+/** Big notif template picker used in the "send notification" page. */
 export default class NotifTemplatePicker extends PureComponent {
     render ({ value, disabled, onChange, onLoadData, jsonFilter }) {
         const onRemove = () => {
