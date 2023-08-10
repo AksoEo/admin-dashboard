@@ -115,11 +115,28 @@ export default class DetailShell extends PureComponent {
     render ({ inline, editing, children }) {
         let contents;
         if (this.state.error) {
-            contents = (
-                <div class="detail-view-error">
-                    <DisplayError error={this.state.error} />
-                </div>
-            );
+            if (this.state.error.code === 'not-found') {
+                contents = (
+                    <div class="detail-view-not-found">
+                        <h1>{locale.notFoundError.title}</h1>
+                        <p>{locale.notFoundError.description}</p>
+                        <p>{locale.notFoundError.description2}</p>
+                        {window.history.length ? (
+                            <div class="back-button-container">
+                                <Button onClick={() => window.history.back()}>
+                                    {locale.notFoundError.back}
+                                </Button>
+                            </div>
+                        ) : null}
+                    </div>
+                );
+            } else {
+                contents = (
+                    <div class="detail-view-error">
+                        <DisplayError error={this.state.error} />
+                    </div>
+                );
+            }
         } else if (this.state.data) {
             contents = (
                 <Fragment>

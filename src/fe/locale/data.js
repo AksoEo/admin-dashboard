@@ -384,6 +384,13 @@ export const detail = {
     diff: 'Redaktitaj kampoj',
     updateComment: 'Fonto aŭ kialo de ŝanĝoj farotaj',
     commit: 'Aktualigi',
+
+    notFoundError: {
+        title: '[[Not found]]',
+        description: '[[The thing you are looking for may have been deleted.]]',
+        description2: '[[If you manually typed the URL, make sure you typed it correctly.]]',
+        back: 'Reiri',
+    },
 };
 
 export const csvExport = {
