@@ -1194,18 +1194,24 @@ export const memberFieldsList = [
     ['notes', { name: 'Notoj', fields: ['notes'] }],
 
     [null, { title: 'Nomo' }],
-    ['name', { name: 'Nomo', fields: ['firstName', 'firstNameLegal', 'lastName', 'lastNameLegal', 'honorific', 'fullName', 'fullNameLocal', 'careOf', 'nameAbbrev'] }],
-    ['honorific', { name: 'Titolo', fields: ['honorific'] }],
-    ['firstName', { name: 'Persona nomo', fields: ['firstName'] }],
-    ['firstNameLegal', { name: 'Persona nomo jura', fields: ['firstNameLegal'] }],
-    ['lastName', { name: 'Familia nomo', fields: ['lastName'] }],
-    ['lastNameLegal', { name: 'Familia nomo jura', fields: ['lastNameLegal'] }],
-    ['fullName', { name: 'Plena nomo de organizo', fields: ['fullName'] }],
-    ['fullNameLocal', { name: 'Plena, loka nomo de organizo', fields: ['fullNameLocal'] }],
-    ['careOf', { name: 'p/a', fields: ['careOf'] }],
-    ['nameAbbrev', { name: 'Organiza mallongigo', fields: ['nameAbbrev'] }],
-    ['lastNamePublicity', { name: 'Publikeco de familia nomo', fields: ['lastNamePublicity'] }],
-    ['searchName', { name: 'Plena, serĉebla nomo', fields: ['searchName'] }],
+    [
+        'name',
+        {
+            name: 'Nomo',
+            fields: ['firstName', 'firstNameLegal', 'lastName', 'lastNameLegal', 'honorific', 'fullName', 'fullNameLocal', 'careOf', 'nameAbbrev'],
+        },
+    ],
+    ['honorific', { name: 'Titolo', fields: ['honorific'], impliesFields: ['codeholderType'] }],
+    ['firstName', { name: 'Persona nomo', fields: ['firstName'], impliesFields: ['codeholderType'] }],
+    ['firstNameLegal', { name: 'Persona nomo jura', fields: ['firstNameLegal'], impliesFields: ['codeholderType'] }],
+    ['lastName', { name: 'Familia nomo', fields: ['lastName'], impliesFields: ['codeholderType'] }],
+    ['lastNameLegal', { name: 'Familia nomo jura', fields: ['lastNameLegal'], impliesFields: ['codeholderType'] }],
+    ['fullName', { name: 'Plena nomo de organizo', fields: ['fullName'], impliesFields: ['codeholderType'] }],
+    ['fullNameLocal', { name: 'Plena, loka nomo de organizo', fields: ['fullNameLocal'], impliesFields: ['codeholderType'] }],
+    ['careOf', { name: 'p/a', fields: ['careOf'], impliesFields: ['codeholderType'] }],
+    ['nameAbbrev', { name: 'Organiza mallongigo', fields: ['nameAbbrev'], impliesFields: ['codeholderType'] }],
+    ['lastNamePublicity', { name: 'Publikeco de familia nomo', fields: ['lastNamePublicity'], impliesFields: ['codeholderType'] }],
+    ['searchName', { name: 'Plena, serĉebla nomo', fields: ['searchName'], impliesFields: ['codeholderType'] }],
 
     [null, { title: 'Membreco' }],
     ['membership', { name: 'Membreco', fields: ['membership'] }],
@@ -1320,5 +1326,17 @@ for (const perm in reverseMap) {
     for (const perm of requires) {
         if (!reverseRequirementGraph.has(perm)) reverseRequirementGraph.set(perm, new Set());
         reverseRequirementGraph.get(perm).add(node.id);
+    }
+}
+for (const [, field] of memberFieldsList) {
+    for (const f of (field.impliesFields || [])) {
+        if (!reverseFieldsImplicationGraph.has(f)) reverseFieldsImplicationGraph.set(f, new Map());
+        const fieldMap = reverseFieldsImplicationGraph.get(f);
+        if (!fieldMap.has('r')) fieldMap.set('r', new Set());
+        if (!fieldMap.has('w')) fieldMap.set('w', new Set());
+        for (const id of field.fields) {
+            fieldMap.get('r').add('@.' + id + '.r');
+            fieldMap.get('w').add('@.' + id + '.w');
+        }
     }
 }

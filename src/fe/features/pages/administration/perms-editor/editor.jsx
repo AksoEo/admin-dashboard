@@ -165,6 +165,7 @@ export default class PermsEditor extends PureComponent {
 
         let closestCategory = null;
         let closestCategoryDist = Infinity;
+        if (!this.#node) return;
         for (const category of this.#node.querySelectorAll('.perms-category')) {
             const rect = category.getBoundingClientRect();
             const distance = Math.abs(rect.top - scrollViewRect.top);
@@ -651,10 +652,16 @@ function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
             }
 
             let canRead = true;
+            let canReadAny = false;
             let canWrite = true;
+            let canWriteAny = false;
             for (const f of item.fields) {
-                if (!fields[f] || !fields[f].includes('r')) canRead = false;
-                if (!fields[f] || !fields[f].includes('w')) canWrite = false;
+                const r = fields[f] && fields[f].includes('r');
+                const w = fields[f] && fields[f].includes('w');
+                if (!r) canRead = false;
+                else canReadAny = true;
+                if (!w) canWrite = false;
+                else canWriteAny = true;
             }
 
             const readCheckboxId = Math.random().toString(36);
@@ -669,6 +676,7 @@ function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
                             class={'perm-checkbox' + (canRead && canWrite ? ' is-implied-active' : '')}
                             disabled={disabled}
                             checked={canRead}
+                            indeterminate={canReadAny && !canRead}
                             onClick={() => toggleField(field, 'r')} />
                         <label for={readCheckboxId}>
                             {memberFieldsRead}
@@ -679,6 +687,7 @@ function MemberFieldsEditor ({ disabled, fields, toggleField, toggleAll }) {
                             class="perm-checkbox"
                             disabled={disabled}
                             checked={canWrite}
+                            indeterminate={canWriteAny && !canWrite}
                             onClick={() => toggleField(field, 'w')} />
                         <label for={writeCheckboxId}>
                             {memberFieldsWrite}

@@ -10,7 +10,7 @@ import {
     reverseMap,
     reverseImplicationGraph,
     reverseFieldsImplicationGraph,
-    reverseRequirementGraph,
+    reverseRequirementGraph, memberFields,
 } from '../../../../permissions';
 
 /** Pops an item from the permission path. */
@@ -255,6 +255,12 @@ function add (xperms, id) {
             // also add r
             xperms = add(xperms, xpEncodeField(field, 'r'));
         }
+        const fieldInfo = memberFields[field];
+        if (fieldInfo && fieldInfo.impliesFields) {
+            for (const field of fieldInfo.impliesFields) {
+                xperms = add(xperms, xpEncodeField(field, flag));
+            }
+        }
     }
 
     return xperms;
@@ -334,6 +340,13 @@ export function addMemberField (permissions, memberFields, field, flags) {
     for (const f of fieldSpec.fields) {
         for (const flag of flags.split('')) {
             xperms = add(xperms, xpEncodeField(f, flag));
+        }
+    }
+    if (fieldSpec.impliesFields) {
+        for (const field of fieldSpec.impliesFields) {
+            for (const flag of flags.split('')) {
+                xperms = add(xperms, xpEncodeField(field, flag));
+            }
         }
     }
     return fromXPerms(xperms);
