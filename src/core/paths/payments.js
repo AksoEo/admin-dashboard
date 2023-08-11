@@ -1,7 +1,6 @@
 import { base32 } from 'rfc4648';
 import asyncClient from '../client';
 import * as store from '../store';
-import { fieldsToOrder } from '../list';
 import { deepMerge } from '../../util';
 import { AbstractDataView, createStoreObserver } from '../view';
 import {
@@ -12,7 +11,7 @@ import {
     crudUpdate,
     simpleDataView,
 } from '../templates';
-import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI, fieldDiff } from '../list';
+import { makeParametersToRequestData, makeClientFromAPI, makeClientToAPI, filtersToAPI } from '../list';
 
 export const PAYMENT_ORGS = 'paymentOrgs';
 export const SIG_PAYMENT_ORGS = '!paymentOrgs';

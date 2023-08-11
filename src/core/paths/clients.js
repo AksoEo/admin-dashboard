@@ -1,10 +1,9 @@
 import JSON5 from 'json5';
-import { AbstractDataView, createStoreObserver } from '../view';
+import { createStoreObserver } from '../view';
 import asyncClient from '../client';
 import * as store from '../store';
 import { deepMerge } from '../../util';
 import {
-    crudCreate,
     crudDelete,
     crudGet,
     crudList,

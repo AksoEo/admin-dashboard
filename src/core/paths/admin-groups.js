@@ -1,4 +1,3 @@
-import { util } from '@tejo/akso-client';
 import JSON5 from 'json5';
 import asyncClient from '../client';
 import { AbstractDataView, createStoreObserver } from '../view';

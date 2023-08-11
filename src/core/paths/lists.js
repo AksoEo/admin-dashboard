@@ -1,6 +1,5 @@
-import { AbstractDataView, createStoreObserver } from '../view';
+import { createStoreObserver } from '../view';
 import asyncClient from '../client';
-import * as store from '../store';
 import {
     crudList,
     crudGet,
