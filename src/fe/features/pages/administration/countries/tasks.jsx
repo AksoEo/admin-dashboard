@@ -1,26 +1,17 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
 import TaskDialog from '../../../../components/tasks/task-dialog';
-import ChangedFields from '../../../../components/tasks/changed-fields';
 import { ValidatedTextField, Field } from '../../../../components/form';
 import { routerContext } from '../../../../router';
 import { countries as locale, countryGroups as groupsLocale } from '../../../../locale';
+import { deleteDialog, updateDialog } from '../../../../components/tasks/task-templates';
+import './tasks.less';
 
 export default {
-    update ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.update.title}
-                actionLabel={locale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields || []}
-                    locale={locale.fields} />
-            </TaskDialog>
-        );
-    },
+    update: updateDialog({
+        locale: locale.update,
+        fields: locale.fields,
+    }),
     createGroup ({ open, task }) {
         const fixCodeValue = codeValue => {
             codeValue = codeValue || '';
@@ -33,6 +24,7 @@ export default {
             <routerContext.Consumer>
                 {routerContext => (
                     <TaskDialog
+                        class="country-group-create-dialog"
                         open={open}
                         onClose={() => task.drop()}
                         title={groupsLocale.create.title}
@@ -42,6 +34,7 @@ export default {
                         })}>
                         <Field>
                             <ValidatedTextField
+                                outline
                                 validate={value => {
                                     if (!value.match(/^x[a-z]{2}$/)) {
                                         return groupsLocale.create.invalidCode;
@@ -53,6 +46,7 @@ export default {
                         </Field>
                         <Field>
                             <TextField
+                                outline
                                 required
                                 label={groupsLocale.fields.name}
                                 value={task.parameters.name || ''}
@@ -63,36 +57,13 @@ export default {
             </routerContext.Consumer>
         );
     },
-    updateGroup ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={groupsLocale.update.title}
-                actionLabel={groupsLocale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields || []}
-                    locale={groupsLocale.fields} />
-            </TaskDialog>
-        );
-    },
-    deleteGroup ({ open, task }) {
-        return (
-            <routerContext.Consumer>
-                {routerContext => (
-                    <TaskDialog
-                        open={open}
-                        onClose={() => task.drop()}
-                        title={groupsLocale.delete.title}
-                        actionLabel={groupsLocale.delete.button}
-                        run={() => task.runOnce().then(() => {
-                            routerContext.navigate(`/administrado/landaroj`);
-                        })}>
-                        {groupsLocale.delete.description}
-                    </TaskDialog>
-                )}
-            </routerContext.Consumer>
-        );
-    },
+    updateGroup: updateDialog({
+        locale: groupsLocale.update,
+        fields: groupsLocale.fields,
+    }),
+    deleteGroup: deleteDialog({
+        locale: groupsLocale.delete,
+        objectView: (_, { id }) => ['countries/group', { id }],
+        objectName: group => group.name,
+    }),
 };
