@@ -26,6 +26,7 @@ import Participants from './participants';
 import MapPicker from '../map-picker';
 import './detail.less';
 import { PersonSearchIcon } from '../../../../components/icons';
+import { GetCongressOrgField } from '../utils';
 
 export default connectPerms(class CongressInstancePage extends Page {
     state = {
@@ -264,13 +265,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                         </div>
                     )}
                 </DetailShell>
-                <DetailShell
-                    /* this is kind of a hack to get the org field */
-                    view="congresses/congress"
-                    id={congress}
-                    fields={{}}
-                    locale={{}}
-                    onData={data => data && this.setState({ org: data.org })} />
+                <GetCongressOrgField id={congress} onOrg={org => this.setState({ org })} />
             </div>
         );
     }

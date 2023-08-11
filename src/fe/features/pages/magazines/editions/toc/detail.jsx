@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import { Fragment } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
-import DetailShell from '../../../../../components/detail/detail-shell';
 import DetailPage from '../../../../../components/detail/detail-page';
 import DetailView from '../../../../../components/detail/detail';
 import { AudioIcon } from '../../../../../components/icons';
@@ -9,6 +8,7 @@ import { magazineToc as locale } from '../../../../../locale';
 import { connectPerms } from '../../../../../perms';
 import { Files } from '../files';
 import { FIELDS } from './fields';
+import { GetMagazineData } from '../../utils';
 import './detail.less';
 
 export default connectPerms(class MagazineTocEntry extends DetailPage {
@@ -111,10 +111,8 @@ export default connectPerms(class MagazineTocEntry extends DetailPage {
                         canDelete={canDelete} />
                 )}
 
-                <DetailShell
-                    view="magazines/magazine"
+                <GetMagazineData
                     id={this.magazine}
-                    fields={{}} locale={{}}
                     onData={data => data && this.setState({ org: data.org })} />
             </Fragment>
         );

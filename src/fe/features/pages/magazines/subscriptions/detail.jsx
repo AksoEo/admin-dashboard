@@ -3,7 +3,7 @@ import { Fragment } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailPage from '../../../../components/detail/detail-page';
 import DetailView from '../../../../components/detail/detail';
-import DetailShell from '../../../../components/detail/detail-shell';
+import { GetMagazineData } from '../utils';
 import { FIELDS } from './fields';
 import { magazineSubs as locale } from '../../../../locale';
 
@@ -71,10 +71,8 @@ export default class Subscription extends DetailPage {
                     onCommit={this.onCommit}
                     onDelete={this.onDelete} />
 
-                <DetailShell
-                    view="magazines/magazine"
+                <GetMagazineData
                     id={this.magazine}
-                    fields={{}} locale={{}}
                     onData={data => data && this.setState({ org: data.org })} />
             </Fragment>
         );

@@ -14,6 +14,7 @@ import { connectPerms } from '../../../../../perms';
 import { congressRegistrationForm as locale } from '../../../../../locale';
 import InstancePicker from '../instance-picker';
 import './index.less';
+import { GetCongressOrgField } from '../../utils';
 
 const ADDITIONAL_VARS = [
     { name: '@upfront_time', type: 'u', value: null },
@@ -80,13 +81,7 @@ export default connectPerms(class RegistrationFormPage extends Page {
                     editing={!!editing}
                     onBeginEdit={() => this.props.push('redakti', true)}
                     onEndEdit={() => editing.pop()} />
-                <DetailShell
-                    /* this is kind of a hack to get the org field */
-                    view="congresses/congress"
-                    id={this.congress}
-                    fields={{}}
-                    locale={{}}
-                    onData={data => data && this.setState({ org: data.org })} />
+                <GetCongressOrgField id={this.congress} onOrg={org => this.setState({ org })} />
             </div>
         );
     }

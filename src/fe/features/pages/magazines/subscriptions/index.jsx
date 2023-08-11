@@ -6,7 +6,7 @@ import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import { magazineSubs as locale } from '../../../../locale';
 import AddIcon from '@material-ui/icons/Add';
-import DetailShell from '../../../../components/detail/detail-shell';
+import { GetMagazineData } from '../utils';
 
 export default class SubscriptionsPage extends OverviewPage {
     state = {
@@ -91,10 +91,8 @@ export default class SubscriptionsPage extends OverviewPage {
                     locale={locale.fields} />
 
                 {this.magazine ? (
-                    <DetailShell
-                        view="magazines/magazine"
+                    <GetMagazineData
                         id={this.magazine}
-                        fields={{}} locale={{}}
                         onData={data => data && this.setState({ org: data.org })} />
                 ) : null}
             </Fragment>

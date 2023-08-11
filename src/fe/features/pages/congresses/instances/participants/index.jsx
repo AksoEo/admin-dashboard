@@ -1,14 +1,15 @@
 import { h } from 'preact';
-import { PureComponent } from 'preact/compat';
+import { useEffect, PureComponent } from 'preact/compat';
+import { CircularProgress } from 'yamdl';
 import SearchFilters from '../../../../../components/overview/search-filters';
 import OverviewList from '../../../../../components/lists/overview-list';
-import DetailShell from '../../../../../components/detail/detail-shell';
 import { congressParticipants as locale } from '../../../../../locale';
 import { FIELDS } from './fields';
 import { FILTERS } from './filters';
 import './index.less';
 import SendNotifTemplate from '../../../notif-templates/send';
 import SpreadsheetDialog from './spreadsheet-view';
+import { useDataView } from '../../../../../core';
 
 function formSearchableFields (regFormItems) {
     return regFormItems.filter(item => item.el === 'input' && item.type === 'text').map(item => ({
@@ -57,7 +58,7 @@ export default class ParticipantsView extends PureComponent {
     }
 
     render ({
-        org, congress, instance, push, sendingNotif, onStopSendingNotif,
+        org, congress, instance, sendingNotif, onStopSendingNotif,
         spreadsheetOpen,
     }, {
         parameters, expanded, currency, registrationForm, hasRegistrationForm,
@@ -107,13 +108,9 @@ export default class ParticipantsView extends PureComponent {
                         {locale.noParticipation}
                     </div>
                 ) : (
-                    <DetailShell
-                        /* a hack to get the currency */
-                        view="congresses/registrationForm"
-                        options={{ congress, instance }}
-                        id="irrelevant" // detail shell won't work without one
-                        fields={{}}
-                        locale={{}}
+                    <GetCongressRegistrationForm
+                        congress={congress}
+                        instance={instance}
                         onData={data => data ? this.setState({
                             registrationForm: data.form,
                             currency: data.price ? data.price.currency : null,
@@ -145,4 +142,14 @@ export default class ParticipantsView extends PureComponent {
             </div>
         );
     }
+}
+
+function GetCongressRegistrationForm ({ congress, instance, onData }) {
+    const [loading,, data] = useDataView('congresses/registrationForm', { congress, instance });
+    useEffect(() => {
+        if (data) onData(data);
+    }, [data]);
+
+    if (loading) return <CircularProgress indeterminate />;
+    return null;
 }

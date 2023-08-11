@@ -14,6 +14,7 @@ import DisplayError from '../../../../../components/utils/error';
 import { FIELDS } from './fields';
 import WithRegistrationForm from '../registration-form/with-form';
 import './detail.less';
+import { GetCongressOrgField } from '../../utils';
 
 export default connectPerms(class ParticipantsPage extends DetailPage {
     state = {
@@ -119,13 +120,7 @@ export default connectPerms(class ParticipantsPage extends DetailPage {
                         </WithRegistrationForm>
                     )}
                 </DetailShell>
-                <DetailShell
-                    /* this is kind of a hack to get the org field */
-                    view="congresses/congress"
-                    id={congress}
-                    fields={{}}
-                    locale={{}}
-                    onData={data => data && this.setState({ org: data.org })} />
+                <GetCongressOrgField id={congress} onOrg={org => this.setState({ org })} />
             </div>
         );
     }

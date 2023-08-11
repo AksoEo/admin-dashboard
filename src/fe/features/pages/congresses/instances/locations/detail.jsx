@@ -17,6 +17,7 @@ import './detail.less';
 import StaticOverviewList from '../../../../../components/lists/overview-list-static';
 import { useContext, useState } from 'preact/compat';
 import { routerContext } from '../../../../../router';
+import { GetCongressOrgField } from '../../utils';
 
 export default connectPerms(class LocationPage extends Page {
     state = {
@@ -110,13 +111,7 @@ export default connectPerms(class LocationPage extends Page {
                             org={org} />
                     )}
                 </DetailShell>
-                <DetailShell
-                    /* this is kind of a hack to get the org field */
-                    view="congresses/congress"
-                    id={congress}
-                    fields={{}}
-                    locale={{}}
-                    onData={data => data && this.setState({ org: data.org })} />
+                <GetCongressOrgField id={congress} onOrg={org => this.setState({ org })} />
             </div>
         );
     }

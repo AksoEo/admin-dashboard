@@ -3,12 +3,12 @@ import { Fragment } from 'preact/compat';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailPage from '../../../../../components/detail/detail-page';
 import DetailView from '../../../../../components/detail/detail';
-import DetailShell from '../../../../../components/detail/detail-shell';
 import CSVExport from '../../../../../components/tasks/csv-export';
 import { FIELDS, Footer } from './fields';
 import ORIG_CODEHOLDER_FIELDS from '../../../codeholders/table-fields';
 import AddrLabelGen from '../../../codeholders/addr-label-gen';
 import CSVCountryCount from './country-count';
+import { GetMagazineData } from '../../utils';
 import {
     search as searchLocale,
     magazineSnaps as locale,
@@ -151,10 +151,8 @@ export default class Snapshot extends DetailPage {
                     onCommit={this.onCommit}
                     onDelete={this.onDelete} />
 
-                <DetailShell
-                    view="magazines/magazine"
+                <GetMagazineData
                     id={this.magazine}
-                    fields={{}} locale={{}}
                     onData={data => data && this.setState({ org: data.org })} />
 
                 <CSVExport

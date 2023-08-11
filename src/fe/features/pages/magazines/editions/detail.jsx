@@ -13,6 +13,7 @@ import { magazineEditions as locale, magazineToc as tocLocale, magazineSnaps as 
 import { Files } from './files';
 import { FIELDS } from './fields';
 import TocView from './toc';
+import { GetMagazineData } from '../utils';
 import './detail.less';
 
 export default connectPerms(class MagazineEdition extends DetailPage {
@@ -144,10 +145,8 @@ export default connectPerms(class MagazineEdition extends DetailPage {
                         onQueryChange={this.props.onQueryChange} />
                 )}
 
-                <DetailShell
-                    view="magazines/magazine"
+                <GetMagazineData
                     id={this.magazine}
-                    fields={{}} locale={{}}
                     onData={data => data && this.setState({ org: data.org, magazineSubscribers: data.subscribers })} />
             </Fragment>
         );
