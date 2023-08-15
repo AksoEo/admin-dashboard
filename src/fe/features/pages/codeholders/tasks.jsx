@@ -12,7 +12,7 @@ import CodeholderPicker from '../../../components/pickers/codeholder-picker';
 import DynamicHeightDiv from '../../../components/layout/dynamic-height-div';
 import LimitedTextField from '../../../components/controls/limited-text-field';
 import { Field, ValidatedTextField } from '../../../components/form';
-import { country, ueaCode, date } from '../../../components/data';
+import { country, ueaCode, date, org } from '../../../components/data';
 import { createDialog, updateDialog, deleteDialog } from '../../../components/tasks/task-templates';
 import { connect } from '../../../core/connection';
 import { routerContext } from '../../../router';
@@ -314,11 +314,10 @@ export default {
                     <label>
                         {locale.resetPassword.orgsSelect}
                     </label>
-                    <Segmented
-                        selected={task.parameters.org}
-                        onSelect={org => task.update({ org })}>
-                        {Object.entries(locale.resetPassword.orgs).map(([k, v]) => ({ id: k, label: v }))}
-                    </Segmented>
+                    <org.editor
+                        value={task.parameters.org}
+                        onChange={org => task.update({ org })}
+                        orgs={locale.resetPassword.orgs} />
                 </div>
             </TaskDialog>
         );
@@ -344,11 +343,10 @@ export default {
                     <label>
                         {locale.resetPassword.orgsSelect}
                     </label>
-                    <Segmented
-                        selected={task.parameters.org}
-                        onSelect={org => task.update({ org })}>
-                        {Object.entries(locale.resetPassword.orgs).map(([k, v]) => ({ id: k, label: v }))}
-                    </Segmented>
+                    <org.editor
+                        value={task.parameters.org}
+                        onChange={org => task.update({ org })}
+                        orgs={locale.resetPassword.orgs} />
                 </div>
             </TaskDialog>
         );

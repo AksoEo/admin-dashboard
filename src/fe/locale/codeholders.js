@@ -447,11 +447,7 @@ export const codeholders = {
         descriptionCreate: 'Tio ĉi sendas retpoŝtmesaĝon al la membro pri kreado de AKSO-konto.',
         descriptionReset: 'Tio ĉi sendas sciigon al la membro pri nuligo de ties pasvorto.',
         orgsSelect: 'Elekti AKSO-organizon por la sciigo',
-        orgs: {
-            uea: 'UEA',
-            tejo: 'TEJO',
-            akso: 'AKSO',
-        },
+        orgs: ['uea', 'tejo', 'akso'],
         send: 'Sciigi',
         success: 'Sciigo sendita',
     },
