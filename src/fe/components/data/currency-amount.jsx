@@ -46,13 +46,20 @@ class CurrencyEditor extends PureComponent {
     onInputChange = (e) => {
         this.setState({ editingValue: e.target.value });
 
-        const v = parseFloat(e.target.value.replace(/\s/g, '').replace(/,/g, '.'));
-        if (Number.isNaN(v) || !this.props.currency) {
+        let v = parseFloat(e.target.value.replace(/\s/g, '').replace(/,/g, '.'));
+        if (!e.target.value) v = null;
+
+        if ((v !== null && Number.isNaN(v)) || !this.props.currency) {
             this.setState({ error: true });
         } else {
             this.setState({ error: false });
-            const value = v * currencies[this.props.currency];
-            this.props.onChange(this.clamp(value));
+
+            if (v !== null) {
+                const value = v * currencies[this.props.currency];
+                this.props.onChange(this.clamp(value));
+            } else {
+                this.props.onChange(null);
+            }
         }
     };
 
@@ -98,6 +105,9 @@ class CurrencyEditor extends PureComponent {
     /** Formats the given value for the user according to the current currency (e.g. 102 -> "1,02") */
     format (value) {
         const { currency } = this.props;
+
+        if (!Number.isFinite(value)) return '';
+
         const fractValue = currency ? (value | 0) / currencies[currency] : (value | 0);
         const minimumFractionDigits = Math.log10(currencies[currency]) | 0;
         return fractValue.toLocaleString('fr-FR', {
@@ -126,6 +136,7 @@ class CurrencyEditor extends PureComponent {
 
         return (
             <TextField
+                placeholder={currencies[currency] > 1 ? '–,—' : '—'}
                 {...extra}
                 error={this.state.error ? locale.invalidCurrencyAmount : null}
                 value={editing ? this.state.editingValue : this.format(value)}
