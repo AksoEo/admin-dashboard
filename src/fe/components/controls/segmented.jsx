@@ -26,6 +26,7 @@ const lerp = (a, b, x) => (b - a) * x + a;
  * - children: a list of objects with the following properties:
  *   - `id`: a unique identifier that will be used for the `selected` prop
  *   - `label`: a label string or component
+ *   - `alt`: alternate text label
  *   - `disabled`: if true, will render it disabled
  * - selected/onSelect: the selected option’s id
  * - disabled: bool
@@ -197,6 +198,8 @@ export default class Segmented extends PureComponent {
                     class={className}
                     type="button"
                     role="radio"
+                    title={option.alt}
+                    aria-label={option.alt}
                     aria-checked={option.id === this.props.selected}
                     disabled={this.props.disabled || option.disabled}
                     onPointerDown={this.onPointerDown}

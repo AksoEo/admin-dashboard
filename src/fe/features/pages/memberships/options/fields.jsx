@@ -12,8 +12,7 @@ import Select from '../../../../components/controls/select';
 import Segmented from '../../../../components/controls/segmented';
 import StaticOverviewList from '../../../../components/lists/overview-list-static';
 import RearrangingList from '../../../../components/lists/rearranging-list';
-import OrgIcon from '../../../../components/org-icon';
-import DisplayError from '../../../../components/utils/error';
+import { org } from '../../../../components/data';
 import { FormContext } from '../../../../components/form';
 import { ScriptContextProvider } from '../../../../components/form-editor';
 import {
@@ -107,7 +106,7 @@ const PaymentOrgLabel = connect(({ id }) => (['payments/org', { id }]))(data => 
         if (!data) return <TinyProgress />;
         return (
             <span class="payment-org-label">
-                <OrgIcon org={data.org} style={{ verticalAlign: 'middle' }} />
+                <org.renderer value={data.org} />
                 {' '}
                 {data.name}
             </span>

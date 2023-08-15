@@ -3,14 +3,12 @@ import { useState, useEffect } from 'preact/compat';
 import { Button, Checkbox } from 'yamdl';
 import SearchIcon from '@material-ui/icons/Search';
 import RemoveIcon from '@material-ui/icons/Remove';
-import OrgIcon from '../../../../components/org-icon';
 import { CountryFlag } from '../../../../components/data/country';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import Required from '../../../../components/data/required';
-import { country, timestamp } from '../../../../components/data';
+import { country, org, timestamp } from '../../../../components/data';
 import CountryPicker from '../../../../components/pickers/country-picker';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
-import Segmented from '../../../../components/controls/segmented';
 import { ValidatedTextField } from '../../../../components/form';
 import Select from '../../../../components/controls/select';
 import TextArea from '../../../../components/controls/text-area';
@@ -34,13 +32,9 @@ export const FIELDS = {
         wantsCreationLabel: true,
         component ({ value, editing, onChange, slot }) {
             if (slot === 'create' && editing) {
-                return (
-                    <Segmented selected={value} onSelect={onChange}>
-                        {['uea'].map(id => ({ id, label: <OrgIcon org={id} /> }))}
-                    </Segmented>
-                );
+                return <org.editor value={value} onChange={onChange} orgs={['uea']} />;
             }
-            return <OrgIcon org={value} />;
+            return <org.renderer value={value} />;
         },
         validate: ({ value }) => {
             if (!value) return dataLocale.requiredField;

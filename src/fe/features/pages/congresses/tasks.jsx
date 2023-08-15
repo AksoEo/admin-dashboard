@@ -5,9 +5,8 @@ import TaskDialog from '../../../components/tasks/task-dialog';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/tasks/changed-fields';
 import Segmented from '../../../components/controls/segmented';
-import { TejoIcon, UeaIcon } from '../../../components/org-icon';
 import MdField from '../../../components/controls/md-field';
-import { Required, email, timestamp } from '../../../components/data';
+import { Required, email, org, timestamp } from '../../../components/data';
 import {
     congresses as locale,
     congressInstances as instanceLocale,
@@ -79,20 +78,10 @@ export default {
                             <Field validate={() => {
                                 if (!task.parameters.org) return dataLocale.requiredField;
                             }}>
-                                <Segmented
-                                    selected={task.parameters.org}
-                                    onSelect={org => task.update({ org })}>
-                                    {[
-                                        {
-                                            id: 'uea',
-                                            label: <UeaIcon />,
-                                        },
-                                        {
-                                            id: 'tejo',
-                                            label: <TejoIcon />,
-                                        },
-                                    ]}
-                                </Segmented>
+                                <org.editor
+                                    orgs={['uea', 'tejo']}
+                                    value={task.parameters.org}
+                                    onChange={org => task.update({ org })} />
                             </Field>
                         )}
                     </TaskDialog>

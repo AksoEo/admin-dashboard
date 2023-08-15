@@ -1,8 +1,7 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
 import MdField from '../../../components/controls/md-field';
-import Segmented from '../../../components/controls/segmented';
-import OrgIcon from '../../../components/org-icon';
+import { org } from '../../../components/data';
 import { magazines as locale, magazineSubs as subsLocale } from '../../../locale';
 import MagazineSubscribers from './magazine-subscribers';
 import { connectPerms } from '../../../perms';
@@ -16,17 +15,13 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (slot === 'create' && editing) {
                 return (
-                    <Segmented
-                        selected={value}
-                        onSelect={onChange}>
-                        {[
-                            { id: 'uea', label: <OrgIcon org="uea" /> },
-                            { id: 'tejo', label: <OrgIcon org="tejo" /> },
-                        ]}
-                    </Segmented>
+                    <org.editor
+                        orgs={['uea', 'tejo']}
+                        value={value}
+                        onChange={onChange} />
                 );
             }
-            return <OrgIcon org={value} />;
+            return <org.renderer value={value} />;
         },
         shouldHide: () => true,
     },
@@ -94,7 +89,7 @@ export const Header = connectPerms(function Header ({ item, editing, perms }) {
     return (
         <div class="magazine-header">
             <div class="inner-title">
-                <OrgIcon org={item.org} />
+                <org.renderer color value={item.org} />
                 <h1 class="inner-title-text">{item.name}</h1>
             </div>
             <FIELDS.description.component value={item.description} slot="detail" />

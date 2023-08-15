@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
-import OrgIcon from '../../../../components/org-icon';
+import { org } from '../../../../components/data';
 import Page from '../../../../components/page';
 import Meta from '../../../meta';
 import DetailView from '../../../../components/detail/detail';
@@ -20,7 +20,7 @@ function Header ({ item, editing }) {
         <div class="payment-org-header">
             <h1 class="payment-org-title">
                 <span class="payment-org-icon">
-                    <OrgIcon org={item.org} />
+                    <org.renderer value={item.org} />
                 </span>
                 {item.name}
             </h1>

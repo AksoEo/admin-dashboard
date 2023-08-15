@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import { Spring, globalAnimator } from 'yamdl';
+import './logo.less';
 
 const PATH = 'M33 5h8.053c6.24 0 8.503.65 10.785 1.87a12.721 12.721 0 0 1 5.292 5.292C58.35 14.444'
     + ' 59 16.707 59 22.947V31H33V5z';
@@ -58,30 +59,18 @@ export default class Logo extends Component {
         if (this.props.onUpdate) this.props.onUpdate(this);
     }
 
-    darkModeListener = () => this.forceUpdate();
-
-    componentDidMount () {
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addListener(this.darkModeListener);
-        }
-    }
 
     componentWillUnmount () {
         globalAnimator.deregister(this);
-
-        if (window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').removeListener(this.darkModeListener);
-        }
     }
 
     render () {
-        const dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
+        const monochrome = this.props.monochrome;
         const spread = this.spread.value;
 
         return (
             <svg
-                class="logo"
+                class={'akso-logo' + (monochrome ? ' is-monochrome' : '')}
                 aria-hidden="true"
                 role="presentation"
                 viewBox="0 0 64 64"
@@ -90,8 +79,8 @@ export default class Logo extends Component {
                 {this.states.map((state, i) => (
                     <path
                         class="corner"
+                        data-i={i}
                         key={i}
-                        fill={dark ? '#fff' : i % 2 === 0 ? '#31a64f' : '#363636'}
                         d={PATH}
                         style={{
                             transformOrigin: '32px 32px',

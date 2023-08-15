@@ -46,6 +46,37 @@
         word-wrap: break-word;
     }
 
+    &.org {
+        &.is-icon {
+            display: inline-block;
+            vertical-align: middle;
+            width: 1.5em;
+            height: 1.5em;
+
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+        }
+        &.is-color {
+            color: rgb(var(--color-accent));
+        }
+        &.is-editor {
+            --primary: var(--color-background);
+            --secondary: var(--color-background);
+
+            .selected-item {
+                color: rgb(var(--color-foreground));
+            }
+        }
+
+        .i-akso-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+        }
+    }
+
     &.phone-number {
         color: inherit;
     }

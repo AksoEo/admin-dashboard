@@ -9,7 +9,7 @@ import TextArea from '../../../components/controls/text-area';
 import SvgIcon from '../../../components/svg-icon';
 import MdField from '../../../components/controls/md-field';
 import Select from '../../../components/controls/select';
-import OrgIcon from '../../../components/org-icon';
+import { org } from '../../../components/data';
 import RearrangingList from '../../../components/lists/rearranging-list';
 import CodeMirror from '../../../components/codemirror-themed';
 import { templateMarkings } from '../../../components/cm-templating';
@@ -33,7 +33,7 @@ export const FIELDS = {
         weight: 0.25,
         slot: 'icon',
         component ({ value }) {
-            return <OrgIcon org={value} />;
+            return <org.renderer value={value} />;
         },
     },
     intent: {

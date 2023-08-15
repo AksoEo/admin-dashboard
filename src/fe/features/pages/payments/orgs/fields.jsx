@@ -1,13 +1,13 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import OrgIcon from '../../../../components/org-icon';
+import { org } from '../../../../components/data';
 
 export const FIELDS = {
     org: {
         sortable: true,
         slot: 'title',
         component ({ value }) {
-            return <OrgIcon org={value} />;
+            return <org.renderer value={value} />;
         },
         stringify (value) {
             return value;

@@ -2,8 +2,7 @@ import { h } from 'preact';
 import { PureComponent } from 'preact/compat';
 import moment from 'moment';
 import { TextField } from 'yamdl';
-import { country, currencyAmount, email, timestamp } from '../../../../components/data';
-import OrgIcon from '../../../../components/org-icon';
+import { country, currencyAmount, email, org, timestamp } from '../../../../components/data';
 import DiffAuthor from '../../../../components/diff-author';
 import TinyProgress from '../../../../components/controls/tiny-progress';
 import { paymentIntents as locale, timestampFormat } from '../../../../locale';
@@ -62,7 +61,7 @@ export const FIELDS = {
     org: {
         weight: 0.5,
         component ({ value }) {
-            return <OrgIcon org={value} />;
+            return <org.renderer value={value} />;
         },
         stringify (value) {
             return value;

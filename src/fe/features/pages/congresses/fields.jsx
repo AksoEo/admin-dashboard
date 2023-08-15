@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import OrgIcon from '../../../components/org-icon';
+import { org } from '../../../components/data';
 
 export const FIELDS = {
     org: {
@@ -8,7 +8,7 @@ export const FIELDS = {
         weight: 0.25,
         sortable: true,
         component ({ value }) {
-            return <OrgIcon org={value} />;
+            return <org.renderer value={value} />;
         },
     },
     abbrev: {

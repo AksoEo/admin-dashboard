@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { PureComponent, useState } from 'preact/compat';
+import { useState } from 'preact/compat';
 import { Button, Menu, TextField } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import CloseIcon from '@material-ui/icons/Close';
@@ -13,14 +13,13 @@ import AssignmentReturnIcon from '@material-ui/icons/AssignmentReturn';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Page from '../../../../components/page';
 import DetailView from '../../../../components/detail/detail';
-import OrgIcon from '../../../../components/org-icon';
 import { StripeIcon } from '../../../../components/icons';
 import ProfilePicture from '../../../../components/profile-picture';
 import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import MdField from '../../../../components/controls/md-field';
 import { Field } from '../../../../components/form';
-import { currencyAmount, email, timestamp } from '../../../../components/data';
+import { currencyAmount, email, org as dataOrg, timestamp } from '../../../../components/data';
 import { IdUEACode } from '../../../../components/data/uea-code';
 import { FIELDS as METHOD_FIELDS } from '../orgs/methods/fields';
 import Meta from '../../../meta';
@@ -203,7 +202,7 @@ function DetailViewInner ({ item, editing, onItemChange }) {
                     <span>{locale.detailTo}</span>
                     {' '}
                     <span class="intent-payment-org">
-                        <OrgIcon org={org} class="payment-org-icon" />
+                        <dataOrg.renderer value={org} class="payment-org-icon" />
                         {' '}
                         {!!paymentOrg && <PaymentOrgName id={paymentOrg} />}
                     </span>

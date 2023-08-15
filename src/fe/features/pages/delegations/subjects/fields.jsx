@@ -1,8 +1,7 @@
 import { h } from 'preact';
 import { TextField } from 'yamdl';
-import Segmented from '../../../../components/controls/segmented';
+import { org } from '../../../../components/data';
 import TextArea from '../../../../components/controls/text-area';
-import OrgIcon from '../../../../components/org-icon';
 import { delegationSubjects as locale, data as dataLocale } from '../../../../locale';
 
 export const FIELDS = {
@@ -13,15 +12,10 @@ export const FIELDS = {
         component ({ value, editing, onChange, slot }) {
             if (slot === 'create' && editing) {
                 return (
-                    <Segmented selected={value} onSelect={onChange}>
-                        {['uea'].map(org => ({
-                            id: org,
-                            label: <OrgIcon org={org} />,
-                        }))}
-                    </Segmented>
+                    <org.editor value={value} onChange={onChange} orgs={['uea']} />
                 );
             }
-            return <OrgIcon org={value} />;
+            return <org.renderer value={value} />;
         },
         validate: ({ value }) => {
             if (!value) return dataLocale.requiredField;

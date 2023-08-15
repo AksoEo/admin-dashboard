@@ -7,9 +7,8 @@ import TableIcon from '@material-ui/icons/TableChart';
 import Page from '../../../../components/page';
 import DetailShell from '../../../../components/detail/detail-shell';
 import DynamicHeightDiv from '../../../../components/layout/dynamic-height-div';
-import OrgIcon from '../../../../components/org-icon';
 import Tabs from '../../../../components/controls/tabs';
-import { date } from '../../../../components/data';
+import { date, org as dataOrg } from '../../../../components/data';
 import Meta from '../../../meta';
 import { coreContext } from '../../../../core/connection';
 import { connectPerms, usePerms } from '../../../../perms';
@@ -284,7 +283,7 @@ function FieldWrapper ({ field, item, onItemChange }) {
 
 function Header ({ item, editing, onItemChange, org, tab, onTabChange, push }) {
     const perms = usePerms();
-    const orgIcon = <OrgIcon org={org} />;
+    const orgIcon = <dataOrg.renderer value={org} />;
 
     const tabs = {
         locations: locale.tabs.locations,

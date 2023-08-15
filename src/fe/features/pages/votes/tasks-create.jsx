@@ -6,7 +6,7 @@ import ProgressIndicator from '../../../components/dialog-progress-indicator';
 import FadingPageView from '../../../components/layout/fading-page-view';
 import DisplayError from '../../../components/utils/error';
 import { Form, Field } from '../../../components/form';
-import { TejoIcon, UeaIcon, UeaColorIcon } from '../../../components/org-icon';
+import { org } from '../../../components/data';
 import { votes as locale } from '../../../locale';
 import {
     config as Config,
@@ -71,21 +71,7 @@ function OrgPicker ({ value, onChange }) {
     return (
         <div class="org-picker">
             <WizardSection title={locale.fields.org} />
-            <WizardSelector
-                value={value}
-                onChange={onChange}
-                items={[
-                    {
-                        value: 'tejo',
-                        icon: true,
-                        contents: <TejoIcon />,
-                    },
-                    {
-                        value: 'uea',
-                        icon: true,
-                        contents: value === 'uea' ? <UeaColorIcon /> : <UeaIcon />,
-                    },
-                ]} />
+            <org.editor value={value} onChange={onChange} orgs={['uea', 'tejo']} />
         </div>
     );
 }

@@ -4,6 +4,7 @@ import country from './country';
 import currencyAmount from './currency-amount';
 import date from './date';
 import email from './email';
+import org from './org';
 import phoneNumber from './phone-number';
 import ueaCode from './uea-code';
 import time from './time';
@@ -58,6 +59,7 @@ export {
     currencyAmount,
     date,
     email,
+    org,
     phoneNumber,
     ueaCode,
     time,

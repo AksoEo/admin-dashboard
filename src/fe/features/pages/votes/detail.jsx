@@ -4,7 +4,7 @@ import { Button, CircularProgress } from 'yamdl';
 import EditIcon from '@material-ui/icons/Edit';
 import DetailView from '../../../components/detail/detail';
 import Page from '../../../components/page';
-import OrgIcon from '../../../components/org-icon';
+import { org } from '../../../components/data';
 import Meta from '../../meta';
 import { coreContext } from '../../../core/connection';
 import DisplayError from '../../../components/utils/error';
@@ -150,7 +150,7 @@ function Header ({ item, editing, userData }) {
         <div class="vote-header">
             <h1>
                 <span class="vote-org-icon">
-                    <OrgIcon org={item.org} />
+                    <org.renderer value={item.org} />
                 </span>
                 {item.name}
             </h1>

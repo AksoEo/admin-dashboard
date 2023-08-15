@@ -2,7 +2,7 @@ import { h } from 'preact';
 import TaskDialog from '../../../components/tasks/task-dialog';
 import Segmented from '../../../components/controls/segmented';
 import Select from '../../../components/controls/select';
-import { TejoIcon, UeaIcon } from '../../../components/org-icon';
+import { org } from '../../../components/data';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/tasks/changed-fields';
 import { notifTemplates as locale, data as dataLocale } from '../../../locale';
@@ -10,8 +10,16 @@ import { connectPerms } from '../../../perms';
 import { routerContext } from '../../../router';
 import { FIELDS } from './fields';
 import './tasks.less';
+import { useDataView } from '../../../core';
 
 const CREATE_FIELDS = ['name', 'subject', 'from'];
+
+function OrgEditor ({ value, onChange }) {
+    const [,, emailDomains] = useDataView('notifTemplates/emailDomains', {});
+    const orgs = emailDomains ? Object.keys(emailDomains) : null;
+
+    return <org.editor value={value} onChange={onChange} orgs={orgs} />;
+}
 
 export default {
     create: connectPerms(({ open, task, perms }) => {
@@ -24,14 +32,9 @@ export default {
                 <Field class="org-field" key="org" validate={() => {
                     if (!task.parameters.org) return dataLocale.requiredField;
                 }}>
-                    <Segmented
-                        selected={task.parameters.org}
-                        onSelect={org => task.update({ org })}>
-                        {[
-                            { id: 'tejo', label: <TejoIcon /> },
-                            { id: 'uea', label: <UeaIcon /> },
-                        ]}
-                    </Segmented>
+                    <OrgEditor
+                        value={task.parameters.org}
+                        onChange={org => task.update({ org })} />
                 </Field>
             );
         } else if (!task.parameters.org) {

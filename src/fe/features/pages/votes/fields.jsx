@@ -2,7 +2,7 @@ import { h } from 'preact';
 import moment from 'moment';
 import MdField from '../../../components/controls/md-field';
 import LimitedTextField from '../../../components/controls/limited-text-field';
-import OrgIcon from '../../../components/org-icon';
+import { org } from '../../../components/data';
 import { votes as locale, timestampFormat } from '../../../locale';
 import { timeStart as TimeStart, timeEnd as TimeEnd } from './config';
 
@@ -12,7 +12,7 @@ export default {
         weight: 0.5,
         slot: 'title',
         component ({ value }) {
-            return <OrgIcon org={value} />;
+            return <org.renderer value={value} />;
         },
         stringify (value) {
             return value;
