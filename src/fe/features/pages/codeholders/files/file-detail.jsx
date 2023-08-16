@@ -18,6 +18,7 @@ export default connectPerms(class FileDetailPage extends Page {
 
     state = {
         fileName: '?',
+        fileUrl: '',
     };
 
     getCodeholderId = () => +this.props.matches.codeholder[1];
@@ -32,13 +33,12 @@ export default connectPerms(class FileDetailPage extends Page {
             icon: <DownloadIcon style={{ verticalAlign: 'middle' }} />,
             label: locale.downloadFile,
             action: () => {
-                const downloadURL = new URL(`codeholders/${codeholderId}/files/${id}`, base).toString();
                 const anchor = document.createElement('a');
                 anchor.rel = 'noopener noreferrer';
                 // open in a new tab because some browsers just insist on not downloading the file
                 anchor.target = '_blank';
                 anchor.download = this.state.fileName;
-                anchor.href = downloadURL;
+                anchor.href = this.state.fileUrl;
                 anchor.click();
             },
         });
@@ -67,6 +67,7 @@ export default connectPerms(class FileDetailPage extends Page {
                     footer={({ item }) => {
                         // minor hack to get the file name to download with
                         if (item && item.name !== fileName) this.setState({ fileName: item.name });
+                        if (item) this.setState({ fileUrl: item.url });
                     }}
                     locale={locale.files}
                     onDelete={() => this.props.pop()}

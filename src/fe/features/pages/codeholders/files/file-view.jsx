@@ -25,9 +25,7 @@ export default class FileView extends Component {
             error: null,
         });
 
-        fetch(fileURL, {
-            credentials: 'include',
-        }).then(async res => {
+        fetch(fileURL).then(async res => {
             const reader = res.body.getReader();
             const len = +res.headers.get('content-length');
 
