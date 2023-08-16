@@ -64,7 +64,6 @@ export default class PaymentMethodPicker extends PureComponent {
                         class="remove-button"
                         onPointerDown={e => e.stopPropagation()}
                         onClick={e => {
-                            e.preventDefault();
                             e.stopPropagation();
                             onOrgChange(null);
                             onChange(null);

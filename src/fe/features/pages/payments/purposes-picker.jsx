@@ -63,7 +63,6 @@ export default class PurposesPicker extends PureComponent {
                 <Button
                     class="purposes-picker-add"
                     onClick={e => {
-                        e.preventDefault();
                         e.stopPropagation();
                         this.#open();
                     }}>
@@ -132,7 +131,6 @@ function Purpose ({ org, value, onChange, onRemove, currency }) {
 
     const removeButton = (
         <Button class="remove-button" onClick={e => {
-            e.preventDefault();
             e.stopPropagation();
             onRemove();
         }}>

@@ -36,8 +36,7 @@ export default class Rational extends Component {
         const switchButton = (
             <button
                 class={'rational-type-switch' + (isFractional ? ' is-fraction' : '')}
-                onClick={e => {
-                    e.preventDefault();
+                onClick={() => {
                     if (isFractional) {
                         onChange(value[0] / value[1]);
                     } else {

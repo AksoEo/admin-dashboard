@@ -330,7 +330,6 @@ function IconPicker ({ value, onChange }) {
     return (
         <Button class="congress-location-icon-picker" onClick={e => {
             e.stopPropagation();
-            e.preventDefault();
             setOpen(true);
         }}>
             {value ? (
@@ -456,8 +455,7 @@ function OpenHoursDay ({ date: pDate, value, editing, onChange }) {
         latestTime = Math.max(latestTime, timeToSeconds(range.split('-')[1]));
     }
 
-    const addRange = (e) => {
-        e.preventDefault();
+    const addRange = () => {
         onChange(value.concat([secondsToTime(latestTime) + '-' + secondsToTime(endTime)]));
     };
     const onRangeChange = index => range => {
@@ -514,10 +512,7 @@ function OpenHoursRange ({ value, editing, onChange, onRemove }) {
     if (editing) {
         return (
             <div class="open-hours-range is-editing">
-                <Button class="remove-button" icon small onClick={e => {
-                    e.preventDefault();
-                    onRemove();
-                }}>
+                <Button class="remove-button" icon small onClick={onRemove}>
                     <RemoveIcon />
                 </Button>
                 <time.editor

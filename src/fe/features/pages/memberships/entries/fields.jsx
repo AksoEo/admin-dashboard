@@ -245,10 +245,7 @@ export const FIELDS = {
                             <div class="add-offer-container">
                                 <Button
                                     class="add-offer-button"
-                                    onClick={e => {
-                                        e.preventDefault();
-                                        setAddOfferOpen(true);
-                                    }}>
+                                    onClick={() => setAddOfferOpen(true)}>
                                     <AddIcon style={{ verticalAlign: 'middle' }} />
                                     {' '}
                                     {locale.offers.add.button}
@@ -820,10 +817,7 @@ function OfferItem ({ value, year, currency, editing, onChange, onRemove, onSele
             class={'registration-entry-offer-item' + (onSelect ? ' is-selectable' : '') + (disabled ? ' is-disabled' : '')}>
             {editing && (
                 <div class="item-remove">
-                    <Button class="item-remove-button" icon small onClick={e => {
-                        e.preventDefault();
-                        onRemove();
-                    }}>
+                    <Button class="item-remove-button" icon small onClick={onRemove}>
                         <RemoveIcon />
                     </Button>
                 </div>

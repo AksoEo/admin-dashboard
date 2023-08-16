@@ -76,8 +76,7 @@ export default class TriggerPicker extends PureComponent {
         pickerOpen: false,
     };
 
-    onOpenPicker = (e) => {
-        e.preventDefault();
+    onOpenPicker = () => {
         this.setState({ pickerOpen: true });
     };
 

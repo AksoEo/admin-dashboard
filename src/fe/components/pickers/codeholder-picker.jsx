@@ -85,7 +85,6 @@ export default class CodeholderPicker extends Component {
                                 small
                                 onClick={e => {
                                     e.stopPropagation();
-                                    e.preventDefault();
                                     const value = this.props.value.slice();
                                     value.splice(value.indexOf(id), 1);
                                     onChange(value);
@@ -111,7 +110,6 @@ export default class CodeholderPicker extends Component {
                             icon
                             onClick={e => {
                                 e.stopPropagation();
-                                e.preventDefault();
                                 this.open();
                             }}>
                             <AddIcon style={{ verticalAlign: 'middle' }} />

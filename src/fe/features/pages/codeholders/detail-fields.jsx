@@ -1294,8 +1294,7 @@ function FactoidsEditor ({ value, editing, onChange }) {
     ));
 
     if (editing && keys.length < 15) items.push(
-        <Button class="factoid-add" key="\nadd" icon small onClick={e => {
-            e.preventDefault();
+        <Button class="factoid-add" key="\nadd" icon small onClick={() => {
             let key = '';
             let i = keys.length + 1;
             while (keys.includes(key)) key = locale.factoids.newDupKeyName(i++);
@@ -1391,10 +1390,7 @@ function FactoidEditor ({ k, v, onKeyChange, onValueChange, onDelete, editing })
         <div class={'factoid-editor' + (editing ? ' is-editing' : '')}>
             <div class="factoid-header">
                 {editing ? (
-                    <Button class="factoid-delete" icon small onClick={e => {
-                        e.preventDefault();
-                        onDelete();
-                    }}>
+                    <Button class="factoid-delete" icon small onClick={onDelete}>
                         <RemoveIcon />
                     </Button>
                 ) : null}

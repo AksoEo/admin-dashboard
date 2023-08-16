@@ -40,7 +40,6 @@ export default memo(function Publicity ({ value, editing, onChange, style, disab
         if (editing) {
             const openMenu = e => {
                 if (isStatic) return;
-                e.preventDefault();
                 const button = e.currentTarget;
                 const buttonRect = button.getBoundingClientRect();
                 const x = buttonRect.left + buttonRect.width / 2;

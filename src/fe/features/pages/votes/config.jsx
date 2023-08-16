@@ -65,8 +65,8 @@ function CannotEditEnded () {
 }
 
 export function voterCodeholders ({ value, onChange, editing, item }) {
-    if (editing && item.state.isActive) return <CannotEditActive />;
-    if (editing && item.state.hasEnded) return <CannotEditEnded />;
+    if (editing && item.state?.isActive) return <CannotEditActive />;
+    if (editing && item.state?.hasEnded) return <CannotEditEnded />;
     return (
         <Field validate={() => validateJSON(value)}>
             <JSONEditor
@@ -131,7 +131,7 @@ export function viewerCodeholdersMemberFilter ({ value, onChange, editing }) {
 const timeBound = (isStart) => function TimeBoundEditor ({ value, onChange, editing, item, copyFrom, ...extra }) {
     if (!editing) return <timestamp.renderer value={value} />;
     if (isStart && item.state?.isActive) return <CannotEditActive />;
-    if (editing && item.state.hasEnded) return <CannotEditEnded />;
+    if (editing && item.state?.hasEnded) return <CannotEditEnded />;
     return (
         <timestamp.editor
             {...extra}
@@ -172,8 +172,8 @@ function bool ({ value, onChange, editing }) {
 }
 
 function inactiveBool ({ value, onChange, editing, item }) {
-    if (editing && item.state.isActive) return <CannotEditActive />;
-    if (editing && item.state.hasEnded) return <CannotEditEnded />;
+    if (editing && item.state?.isActive) return <CannotEditActive />;
+    if (editing && item.state?.hasEnded) return <CannotEditEnded />;
     const Bool = bool;
     return <Bool value={value} onChange={onChange} editing={editing} />;
 }
@@ -184,8 +184,8 @@ export function type ({ value, onChange, editing, item }) {
         return locale.types[value];
     }
 
-    if (item.state.isActive) return <CannotEditActive />;
-    if (item.state.hasEnded) return <CannotEditEnded />;
+    if (item.state?.isActive) return <CannotEditActive />;
+    if (item.state?.hasEnded) return <CannotEditEnded />;
 
     return (
         <Select
@@ -206,7 +206,7 @@ const requiredRationalInclusive = (field, relation) => function reqRational ({
     editing,
     item,
 }) {
-    if (editing && item.state.hasEnded) return <CannotEditEnded />;
+    if (editing && item.state?.hasEnded) return <CannotEditEnded />;
 
     let relationLabel = null;
     let inclusiveCheckbox = null;
@@ -260,7 +260,7 @@ export const majorityMustReachBoth = bool;
 
 export function numChosenOptions ({ value, onChange, editing, item }) {
     if (!editing) return '' + value;
-    if (item.state.hasEnded) return <CannotEditEnded />;
+    if (item.state?.hasEnded) return <CannotEditEnded />;
 
     return (
         <NumberField
@@ -276,7 +276,7 @@ export const mentionThreshold = requiredRationalInclusive('mentionThresholdInclu
 export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
     if (!editing) return value === null ? locale.config.noMaxOptions : '' + value;
 
-    if (item.state.isActive) return <CannotEditActive />;
+    if (item.state?.isActive) return <CannotEditActive />;
 
     return (
         <NumberField
@@ -290,7 +290,7 @@ export function maxOptionsPerBallot ({ value, onChange, editing, item }) {
 
 export function tieBreakerCodeholder ({ value, onChange, editing, item }) {
     if (!editing) return <IdUEACode id={value} />;
-    if (item.state.hasEnded) return <CannotEditEnded />;
+    if (item.state?.hasEnded) return <CannotEditEnded />;
     return (
         <Field validate={() => {
             if (!value) return locale.config.tieBreakerRequired;
@@ -318,7 +318,7 @@ export const options = class OptionsEditor extends Component {
     render ({ value, onChange, editing, item }) {
         if (!value) return null;
         const items = [];
-        if (item.state.hasEnded) return <CannotEditEnded />;
+        if (item.state?.hasEnded) return <CannotEditEnded />;
 
         for (let i = 0; i < value.length; i++) {
             if (!this.optionKeys[i]) {
@@ -358,8 +358,7 @@ export const options = class OptionsEditor extends Component {
                 items.push(
                     <div class="options-item" key={this.optionKeys[index]}>
                         <div class="option-header">
-                            <Button class="option-remove-button" icon small onClick={e => {
-                                e.preventDefault();
+                            <Button class="option-remove-button" icon small onClick={() => {
                                 const newValue = [...value];
                                 newValue.splice(index, 1);
                                 onChange(newValue);
@@ -417,8 +416,7 @@ export const options = class OptionsEditor extends Component {
         if (editing) {
             items.push(
                 <div class="options-add-item" key="add">
-                    <Button icon onClick={e => {
-                        e.preventDefault();
+                    <Button icon onClick={() => {
                         const newValue = [...value];
                         newValue.push({
                             type: 'simple',

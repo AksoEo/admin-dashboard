@@ -52,10 +52,7 @@ function WizardSelector ({ value, onChange, items, vertical }) {
                 {items.map((item, i) => (
                     <Button
                         key={i}
-                        onClick={e => {
-                            e.preventDefault();
-                            onChange(item.value);
-                        }}
+                        onClick={() => onChange(item.value)}
                         class={'wizard-selector-item'
                             + (item.value === value ? ' selected' : '')
                             + (item.icon ? ' icon-container' : '')}>
