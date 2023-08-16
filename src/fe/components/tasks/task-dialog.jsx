@@ -15,6 +15,7 @@ import './task-dialog.less';
  * - title
  * - actionDisabled: if true, the action button will be disabled
  * - actionLabel: label string for the action button
+ * - actionDanger: if true, marks the action as dangerous
  * - run: run closure; must return a promise. success will not be handled
  * - running: if true, will consider the task to be running
  */
@@ -47,6 +48,7 @@ export default class TaskDialog extends Component {
         onClose,
         actionDisabled,
         actionLabel,
+        actionDanger,
         running,
         sheet,
         ...extra
@@ -71,6 +73,7 @@ export default class TaskDialog extends Component {
                         <Button
                             raised
                             type="submit"
+                            danger={actionDanger}
                             disabled={loading || actionDisabled}
                             validate={() => {}}>
                             <CircularProgress

@@ -37,6 +37,7 @@ export default class DelegationApplication extends DetailPage {
                     id: this.application,
                 }),
                 overflow: true,
+                danger: true,
             });
         }
 

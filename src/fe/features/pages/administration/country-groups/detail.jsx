@@ -71,6 +71,7 @@ export default connectPerms(class CountryGroupPage extends Page {
                 label: detailLocale.delete,
                 action: () => this.context.createTask('countries/deleteGroup', {}, { id }),
                 overflow: true,
+                danger: true,
             });
         }
 

@@ -53,7 +53,7 @@ export const FIELDS = {
                                     <Button onClick={() => core.createTask('delegations/approveApplication', { id: item.id }, item)}>
                                         {locale.status.approve}
                                     </Button>
-                                    <Button onClick={() => core.createTask('delegations/denyApplication', { id: item.id })}>
+                                    <Button danger onClick={() => core.createTask('delegations/denyApplication', { id: item.id })}>
                                         {locale.status.deny}
                                     </Button>
                                 </div>

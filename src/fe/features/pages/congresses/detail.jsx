@@ -70,6 +70,7 @@ export default connectPerms(class CongressDetailPage extends Page {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('congresses/delete', { id }),
                 overflow: true,
+                danger: true,
             });
         }
 

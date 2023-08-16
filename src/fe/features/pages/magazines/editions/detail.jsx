@@ -75,6 +75,7 @@ export default connectPerms(class MagazineEdition extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('magazines/deleteEdition', { magazine, id }),
                 overflow: true,
+                danger: true,
             });
         }
 

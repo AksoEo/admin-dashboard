@@ -268,6 +268,7 @@ export default connectPerms(class IntermediaryReport extends DetailPage {
                         {
                             label: locale.update.confirm,
                             action: () => this.deleteAndRedraft(),
+                            danger: true,
                         },
                     ]}>
                     {locale.update.description}
@@ -413,7 +414,7 @@ class ReportEntries extends PureComponent {
 
         const entries = (item.purposes || []).filter(purpose => purpose.type === 'trigger'
             && purpose.triggers === 'registration_entry');
-        const isComplete = (Object.keys(entryData).length == entries.length) || ('null' in entryData);
+        const isComplete = (Object.keys(entryData).length === entries.length) || ('null' in entryData);
 
         this.props.onNetTotalChange({
             difference: this.totalAmount - this.netTotalAmount,

@@ -296,7 +296,7 @@ const PopoutTag = connect(({ id, view, options }) =>
                             ? locale.tagManager.deleting
                             : locale.tagManager.deleteYouSure}
                     </span>
-                    <Button class="delete-button" small disabled={updating} onClick={e => {
+                    <Button class="delete-button" danger small disabled={updating} onClick={e => {
                         e.stopPropagation(); // prevent this click from modifying attachment
                         setReallyDelete(true);
                         setDeleting(true);

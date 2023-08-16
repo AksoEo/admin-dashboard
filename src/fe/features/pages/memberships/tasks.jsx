@@ -3,7 +3,7 @@ import { TextField } from 'yamdl';
 import TaskDialog from '../../../components/tasks/task-dialog';
 import { Field } from '../../../components/form';
 import ChangedFields from '../../../components/tasks/changed-fields';
-import { createDialog } from '../../../components/tasks/task-templates';
+import { createDialog, deleteDialog, updateDialog } from '../../../components/tasks/task-templates';
 import {
     membershipCategories as categoriesLocale,
     membershipOptions as optionsLocale,
@@ -48,32 +48,13 @@ export default {
             </routerContext.Consumer>
         );
     },
-    updateCategory ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={categoriesLocale.update.title}
-                actionLabel={categoriesLocale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={categoriesLocale.fields} />
-            </TaskDialog>
-        );
-    },
-    deleteCategory ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={categoriesLocale.delete.title}
-                actionLabel={categoriesLocale.delete.button}
-                run={() => task.runOnce()}>
-                {categoriesLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    updateCategory: updateDialog({
+        locale: categoriesLocale.update,
+        fields: categoriesLocale.fields,
+    }),
+    deleteCategory: deleteDialog({
+        locale: categoriesLocale.delete,
+    }),
 
     createOptions ({ open, task }) {
         return (
@@ -121,32 +102,13 @@ export default {
             </routerContext.Consumer>
         );
     },
-    updateOptions ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={optionsLocale.update.title}
-                actionLabel={optionsLocale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={optionsLocale.fields} />
-            </TaskDialog>
-        );
-    },
-    deleteOptions ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={optionsLocale.delete.title}
-                actionLabel={optionsLocale.delete.button}
-                run={() => task.runOnce()}>
-                {optionsLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    updateOptions: updateDialog({
+        locale: optionsLocale.update,
+        fields: optionsLocale.fields,
+    }),
+    deleteOptions: deleteDialog({
+        locale: optionsLocale.delete,
+    }),
 
     createEntry: createDialog({
         className: 'memberships-tasks-create-entry',
@@ -155,37 +117,17 @@ export default {
         fields: ENTRY_FIELDS,
         onCompletion: (task, routerContext, id) => routerContext.navigate(`/membreco/alighoj/${id}`),
         canSubmit: (task) => {
-            console.log('cansubmit', task.parameters);
             if (!task.parameters.offers?.selected?.length) return false;
             return true;
         },
     }),
-    updateEntry ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={entriesLocale.update.title}
-                actionLabel={entriesLocale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={entriesLocale.fields} />
-            </TaskDialog>
-        );
-    },
-    deleteEntry ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={entriesLocale.delete.title}
-                actionLabel={entriesLocale.delete.button}
-                run={() => task.runOnce()}>
-                {entriesLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    updateEntry: updateDialog({
+        locale: entriesLocale.update,
+        fields: entriesLocale.fields,
+    }),
+    deleteEntry: deleteDialog({
+        locale: entriesLocale.delete,
+    }),
     cancelEntry ({ open, task }) {
         return (
             <TaskDialog
@@ -193,6 +135,7 @@ export default {
                 onClose={() => task.drop()}
                 title={entriesLocale.cancel.title}
                 actionLabel={entriesLocale.cancel.button}
+                actionDanger
                 run={() => task.runOnce()}>
                 {entriesLocale.cancel.description}
             </TaskDialog>

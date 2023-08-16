@@ -43,6 +43,7 @@ export default class Delegations extends DetailPage {
                     org: this.org,
                 }),
                 overflow: true,
+                danger: true,
             });
         }
 

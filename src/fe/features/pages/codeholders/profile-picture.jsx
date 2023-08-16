@@ -71,6 +71,7 @@ export default class ProfilePictureEditor extends PureComponent {
                         this.props.profilePictureHash ? {
                             label: locale.profilePicture.remove.menuItem,
                             action: () => this.removePicture(),
+                            danger: true,
                         } : null,
                     ].filter(x => x)}/>
                 <Dialog

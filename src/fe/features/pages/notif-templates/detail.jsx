@@ -132,6 +132,7 @@ export default class NotifTemplate extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('notifTemplates/delete', { id }),
                 overflow: true,
+                danger: true,
             });
         }
 

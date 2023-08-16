@@ -57,14 +57,6 @@ export default connectPerms(class ListDetailPage extends Page {
 
         const actions = [];
 
-        if (perms.hasPerm('lists.delete')) {
-            actions.push({
-                label: locale.delete.menuItem,
-                action: () => this.context.createTask('lists/delete', { id }),
-                overflow: true,
-            });
-        }
-
         if (perms.hasPerm('lists.update') && perms.hasPerm('codeholders.read')) {
             actions.push({
                 icon: <EditIcon style={{ verticalAlign: 'middle' }} />,
@@ -72,6 +64,15 @@ export default connectPerms(class ListDetailPage extends Page {
                 action: () => {
                     this.props.onNavigate(`/listoj/${id}/redakti`, true);
                 },
+            });
+        }
+
+        if (perms.hasPerm('lists.delete')) {
+            actions.push({
+                label: locale.delete.menuItem,
+                action: () => this.context.createTask('lists/delete', { id }),
+                overflow: true,
+                danger: true,
             });
         }
 

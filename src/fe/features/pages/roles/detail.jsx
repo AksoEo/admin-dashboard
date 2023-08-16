@@ -70,6 +70,7 @@ export default connectPerms(class Role extends Page {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('roles/delete', { id }),
                 overflow: true,
+                danger: true,
             });
         }
 

@@ -75,6 +75,7 @@ export default connectPerms(class AddonPage extends Page {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('payments/deleteAddon', { org, id }),
                 overflow: true,
+                danger: true,
             });
         }
 

@@ -35,6 +35,7 @@ export default class RegistrationEntry extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('memberships/deleteEntry', { id: this.id }),
                 overflow: true,
+                danger: true,
             });
         }
 

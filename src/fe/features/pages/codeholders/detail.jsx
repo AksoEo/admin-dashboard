@@ -129,6 +129,7 @@ export default connectPerms(connect('codeholders/fields')(res => ({
                     label: locale.delete,
                     action: () => this.context.createTask('codeholders/delete', { id }),
                     overflow: true,
+                    danger: true,
                 });
             }
         }

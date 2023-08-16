@@ -78,6 +78,7 @@ export default connectPerms(class MethodPage extends Page {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('payments/deleteMethod', { org, id }),
                 overflow: true,
+                danger: true,
             });
         }
 

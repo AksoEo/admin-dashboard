@@ -35,6 +35,7 @@ export default class Membership extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('memberships/deleteCategory', { id: this.id }),
                 overflow: true,
+                danger: true,
             });
         }
 

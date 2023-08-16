@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useContext, useState, PureComponent } from 'preact/compat';
+import { PureComponent, useContext, useState } from 'preact/compat';
 import { Button, CircularProgress, Dialog } from 'yamdl';
 import moment from 'moment';
 import { evaluate } from '@tejo/akso-script';
@@ -21,7 +21,11 @@ import TinyProgress from '../../../../components/controls/tiny-progress';
 import CodeholderPicker from '../../../../components/pickers/codeholder-picker';
 import ItemPickerDialog from '../../../../components/pickers/item-picker-dialog';
 import DisplayError from '../../../../components/utils/error';
-import { membershipEntries as locale, codeholders as codeholdersLocale, currencies } from '../../../../locale';
+import {
+    codeholders as codeholdersLocale,
+    currencies,
+    membershipEntries as locale,
+} from '../../../../locale';
 import { Link, LinkButton } from '../../../../router';
 import { connect, coreContext } from '../../../../core/connection';
 import { connectPerms, usePerms } from '../../../../perms';
@@ -451,7 +455,7 @@ export function Header ({ item }) {
             <TaskButton run={async () => {
                 let codeholderData;
                 if (typeof item.codeholderData === 'number') {
-                    const codeholder = await core.viewData('codeholders/codeholder', {
+                    codeholderData = await core.viewData('codeholders/codeholder', {
                         id: item.codeholderData,
                         fields: ['id', 'name', 'email'],
                     });
@@ -459,7 +463,7 @@ export function Header ({ item }) {
                     codeholderData = item.codeholderData;
                 }
 
-                let name = [
+                const name = [
                     codeholderData.name?.full,
                     codeholderData.name?.honorific,
                     codeholderData.name?.first || codeholderData.name?.firstLegal,

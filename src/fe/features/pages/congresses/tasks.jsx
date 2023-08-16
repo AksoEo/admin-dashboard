@@ -25,7 +25,7 @@ import { DetailInner as LocationEditor } from './instances/locations/detail';
 import LocationPicker from './instances/location-picker';
 import DisplayError from '../../../components/utils/error';
 import WithRegistrationForm from './instances/registration-form/with-form';
-import { deleteDialog } from '../../../components/tasks/task-templates';
+import { deleteDialog, updateDialog } from '../../../components/tasks/task-templates';
 import './tasks.less';
 
 const ParticipantEditor = lazy(async () => ({
@@ -89,20 +89,10 @@ export default {
             </routerContext.Consumer>
         );
     }),
-    update ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.update.title}
-                actionLabel={locale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={locale.fields} />
-            </TaskDialog>
-        );
-    },
+    update: updateDialog({
+        locale: locale.update,
+        fields: locale.fields,
+    }),
     delete: deleteDialog({
         locale: locale.delete,
         objectView: ({ id }) => ['congresses/congress', { id }],
@@ -145,20 +135,10 @@ export default {
             </routerContext.Consumer>
         );
     },
-    updateInstance ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={instanceLocale.update.title}
-                actionLabel={instanceLocale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={instanceLocale.fields} />
-            </TaskDialog>
-        );
-    },
+    updateInstance: updateDialog({
+        locale: instanceLocale.update,
+        fields: instanceLocale.fields,
+    }),
     deleteInstance: deleteDialog({
         locale: instanceLocale.delete,
         objectView: ({ congress, id }) => ['congresses/instance', { congress, id }],
@@ -217,32 +197,13 @@ export default {
             </routerContext.Consumer>
         );
     },
-    updateLocation ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locationLocale.update.title}
-                actionLabel={locationLocale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={locationLocale.fields} />
-            </TaskDialog>
-        );
-    },
-    deleteLocation ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locationLocale.delete.title}
-                actionLabel={locationLocale.delete.button}
-                run={() => task.runOnce()}>
-                {locationLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    updateLocation: updateDialog({
+        locale: locationLocale.update,
+        fields: locationLocale.fields,
+    }),
+    deleteLocation: deleteDialog({
+        locale: locationLocale.delete,
+    }),
     deleteLocationThumbnail: deleteDialog({ locale: locationLocale.deleteThumbnail }),
 
     createProgram ({ open, task }) {
@@ -327,32 +288,13 @@ export default {
             </routerContext.Consumer>
         );
     },
-    updateProgram ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={programLocale.update.title}
-                actionLabel={programLocale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={programLocale.fields} />
-            </TaskDialog>
-        );
-    },
-    deleteProgram ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={programLocale.delete.title}
-                actionLabel={programLocale.delete.button}
-                run={() => task.runOnce()}>
-                {programLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    updateProgram: updateDialog({
+        locale: programLocale.update,
+        fields: programLocale.fields,
+    }),
+    deleteProgram: deleteDialog({
+        locale: programLocale.delete,
+    }),
 
     setRegistrationForm ({ open, task }) {
         return (
@@ -431,32 +373,13 @@ export default {
             </TaskDialog>
         );
     },
-    updateParticipant ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={participantLocale.update.title}
-                actionLabel={participantLocale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={participantLocale.fields} />
-            </TaskDialog>
-        );
-    },
-    deleteParticipant ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={participantLocale.delete.title}
-                actionLabel={participantLocale.delete.button}
-                run={() => task.runOnce()}>
-                {participantLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    updateParticipant: updateDialog({
+        locale: participantLocale.update,
+        fields: participantLocale.fields,
+    }),
+    deleteParticipant: deleteDialog({
+        locale: participantLocale.delete,
+    }),
 
     resendParticipantConfirmation ({ open, core, task }) {
         return (

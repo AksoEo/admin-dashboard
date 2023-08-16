@@ -38,6 +38,7 @@ export default class ClientDetailPage extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('clients/delete', {}, { id }),
                 overflow: true,
+                danger: true,
             });
         }
 

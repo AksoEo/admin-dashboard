@@ -115,6 +115,7 @@ class DelegatesExport extends PureComponent {
                             id={ignoreTosId}
                             checked={this.state.ignoreTos}
                             onChange={ignoreTos => this.setState({ ignoreTos })} />
+                        {' '}
                         <label for={ignoreTosId}>
                             {locale.export.settings.ignoreTos}
                         </label>

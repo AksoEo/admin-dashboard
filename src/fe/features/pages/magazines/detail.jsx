@@ -52,6 +52,7 @@ export default class Magazine extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('magazines/deleteMagazine', { id: this.id }),
                 overflow: true,
+                danger: true,
             });
         }
 

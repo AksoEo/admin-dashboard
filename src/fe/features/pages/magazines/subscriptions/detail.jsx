@@ -49,6 +49,7 @@ export default class Subscription extends DetailPage {
                     rawId: this.id,
                 }),
                 overflow: true,
+                danger: true,
             });
         }
 

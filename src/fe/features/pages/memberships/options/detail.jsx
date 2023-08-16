@@ -41,6 +41,7 @@ export default class RegistrationOptions extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('memberships/deleteOptions', { id: this.id }),
                 overflow: true,
+                danger: true,
             });
         }
 

@@ -133,6 +133,7 @@ export default connectPerms(class Org extends Page {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('payments/deleteOrg', { id }),
                 overflow: true,
+                danger: true,
             });
         }
 

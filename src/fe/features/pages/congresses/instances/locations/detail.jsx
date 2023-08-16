@@ -81,6 +81,7 @@ export default connectPerms(class LocationPage extends Page {
                 action: () => this.context.createTask('congresses/deleteLocation', {
                     congress, instance, id,
                 }),
+                danger: true,
             });
         }
 

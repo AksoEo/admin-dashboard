@@ -36,6 +36,7 @@ export default class Intermediary extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('intermediaries/delete', { id: this.id }),
                 overflow: true,
+                danger: true,
             });
         }
 

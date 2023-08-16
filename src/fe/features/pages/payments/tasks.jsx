@@ -533,18 +533,9 @@ export default {
         objectView: ({ id }) => ['payments/org', { id }],
         objectName: ({ name }) => name,
     }),
-    deleteAddon ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={addonLocale.delete.title}
-                actionLabel={addonLocale.delete.button}
-                run={() => task.runOnce()}>
-                {addonLocale.delete.description}
-            </TaskDialog>
-        );
-    },
+    deleteAddon: deleteDialog({
+        locale: addonLocale.delete,
+    }),
     deleteMethod: deleteDialog({
         locale: methodLocale.delete,
         objectView: ({ org, id }) => ['payments/method', { org, id }],

@@ -196,6 +196,7 @@ export default connectPerms(class CongressInstancePage extends Page {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('congresses/deleteInstance', { congress, id }),
                 overflow: true,
+                danger: true,
             });
         }
 

@@ -50,6 +50,7 @@ export default class Newsletter extends DetailPage {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('newsletters/delete', { id: this.id }),
                 overflow: true,
+                danger: true,
             });
         }
 

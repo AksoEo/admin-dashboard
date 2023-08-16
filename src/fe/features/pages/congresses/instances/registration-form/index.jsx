@@ -63,6 +63,7 @@ export default connectPerms(class RegistrationFormPage extends Page {
                         instance: this.instance,
                     });
                 },
+                danger: true,
             });
         }
 

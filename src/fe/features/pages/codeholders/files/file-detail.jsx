@@ -51,6 +51,7 @@ export default connectPerms(class FileDetailPage extends Page {
                     file: this.getId(),
                 }),
                 overflow: true,
+                danger: true,
             });
         }
 

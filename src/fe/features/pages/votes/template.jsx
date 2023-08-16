@@ -88,6 +88,7 @@ export default connectPerms(class VoteTemplateDetailpage extends Page {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('votes/deleteTemplate', { id }),
                 overflow: true,
+                danger: true,
             });
         }
 

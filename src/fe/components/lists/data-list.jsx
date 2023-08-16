@@ -169,6 +169,7 @@ export default function DataList ({
                 onClose={() => setDeleteItemOpen(false)}
                 title={locale.deleteTitle}
                 actionLabel={locale.delete}
+                actionDanger
                 run={() => {
                     const item = deletingItem;
                     if (loading) throw new Error(locale.deletePleaseWait);
@@ -210,6 +211,7 @@ function ListItemOverflow ({ renderMenu, item, core, onDelete }) {
                 items={[...additionalMenu, {
                     label: locale.delete,
                     action: onDelete,
+                    danger: true,
                 }]} />
         </Button>
     );

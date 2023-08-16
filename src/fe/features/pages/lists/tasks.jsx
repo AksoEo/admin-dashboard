@@ -5,6 +5,7 @@ import { Field } from '../../../components/form';
 import { lists as locale } from '../../../locale';
 import { routerContext } from '../../../router';
 import './tasks.less';
+import { deleteDialog } from '../../../components/tasks/task-templates';
 
 export default {
     create ({ open, task }) {
@@ -54,16 +55,7 @@ export default {
             </TaskDialog>
         );
     },
-    delete ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.delete.title}
-                actionLabel={locale.delete.button}
-                run={() => task.runOnce()}>
-                {locale.delete.description}
-            </TaskDialog>
-        );
-    },
+    delete: deleteDialog({
+        locale: locale.delete,
+    }),
 };

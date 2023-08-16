@@ -67,6 +67,7 @@ export default connectPerms(class DelegationSubject extends Page {
                 label: locale.delete.menuItem,
                 action: () => this.context.createTask('delegations/deleteSubject', { id: this.id }),
                 overflow: true,
+                danger: true,
             });
         }
 

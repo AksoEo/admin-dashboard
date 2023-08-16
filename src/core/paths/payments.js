@@ -61,10 +61,17 @@ const iClientFields = {
             email: intent.customer.email,
             name: intent.customer.name,
         }) : undefined,
-        toAPI: ({ id, email, name }) => ({
-            customer: { email, name },
-            codeholderId: id,
-        }),
+        toAPI: customer => {
+            if (customer) {
+                const { id, email, name } = customer;
+                return {
+                    customer: { email, name },
+                    codeholderId: id,
+                };
+            } else {
+                return {};
+            }
+        },
     },
     method: {
         apiFields: ['paymentMethod'],

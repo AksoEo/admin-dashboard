@@ -58,6 +58,7 @@ export default connectPerms(class MagazineTocEntry extends DetailPage {
                     id,
                 }),
                 overflow: true,
+                danger: true,
             });
         }
 

@@ -53,6 +53,7 @@ export default {
                 onClose={() => task.drop()}
                 title={applicationsLocale.deny.title}
                 actionLabel={applicationsLocale.deny.button}
+                actionDanger
                 run={() => task.runOnce()}>
                 {applicationsLocale.deny.description}
             </TaskDialog>

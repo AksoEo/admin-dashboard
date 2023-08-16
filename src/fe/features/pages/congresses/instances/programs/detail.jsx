@@ -95,6 +95,7 @@ export default connectPerms(class ProgramPage extends Page {
                 action: () => this.context.createTask('congresses/deleteProgram', {
                     congress, instance, id,
                 }),
+                danger: true,
             });
         }
 

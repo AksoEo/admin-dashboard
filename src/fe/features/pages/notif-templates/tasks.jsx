@@ -11,6 +11,7 @@ import { routerContext } from '../../../router';
 import { FIELDS } from './fields';
 import './tasks.less';
 import { useDataView } from '../../../core';
+import { deleteDialog, updateDialog } from '../../../components/tasks/task-templates';
 
 const CREATE_FIELDS = ['name', 'subject', 'from'];
 
@@ -165,32 +166,13 @@ export default {
             </routerContext.Consumer>
         );
     },
-    update ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.update.title}
-                actionLabel={locale.update.button}
-                run={() => task.runOnce()}>
-                <ChangedFields
-                    changedFields={task.options._changedFields}
-                    locale={locale.fields} />
-            </TaskDialog>
-        );
-    },
-    delete ({ open, task }) {
-        return (
-            <TaskDialog
-                open={open}
-                onClose={() => task.drop()}
-                title={locale.delete.title}
-                actionLabel={locale.delete.button}
-                run={() => task.runOnce()}>
-                {locale.delete.description}
-            </TaskDialog>
-        );
-    },
+    update: updateDialog({
+        locale: locale.update,
+        fields: locale.fields,
+    }),
+    delete: deleteDialog({
+        locale: locale.delete,
+    }),
 
     _sendCodeholderInfo ({ open, task }) {
         return (

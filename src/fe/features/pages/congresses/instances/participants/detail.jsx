@@ -71,6 +71,7 @@ export default connectPerms(class ParticipantsPage extends DetailPage {
                     id,
                 }),
                 overflow: true,
+                danger: true,
             });
         }
 
