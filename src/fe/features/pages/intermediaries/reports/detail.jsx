@@ -123,6 +123,11 @@ export default connectPerms(class IntermediaryReport extends DetailPage {
                 throw err;
             }
 
+            for (const offer of entryData.offers.selected) {
+                offer.id = offer.membershipCategory.id;
+                delete offer.membershipCategory;
+            }
+
             dataEntries.push({
                 codeholderData: entryData.codeholderData,
                 offers: entryData.offers,

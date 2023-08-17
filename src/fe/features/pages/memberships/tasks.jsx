@@ -136,6 +136,7 @@ export default {
                 title={entriesLocale.cancel.title}
                 actionLabel={entriesLocale.cancel.button}
                 actionDanger
+                running={task.running}
                 run={() => task.runOnce()}>
                 {entriesLocale.cancel.description}
             </TaskDialog>

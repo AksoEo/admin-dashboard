@@ -551,6 +551,7 @@ export default {
                 onClose={() => task.drop()}
                 title={intentLocale.actions.cancel.title}
                 actionLabel={intentLocale.actions.cancel.button}
+                running={task.running}
                 run={() => task.runOnce()}>
                 {intentLocale.actions.cancel.description}
             </TaskDialog>

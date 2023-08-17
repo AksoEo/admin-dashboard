@@ -69,7 +69,7 @@ const iClientFields = {
                     codeholderId: id,
                 };
             } else {
-                return {};
+                return { customer: null };
             }
         },
     },
