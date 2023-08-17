@@ -147,9 +147,7 @@ export const FIELDS = {
                 </div>
             );
         },
-        validate: ({ value }) => {
-            if (!value || !value.length) return dataLocale.requiredField;
-        },
+        isEmpty: value => !value?.length,
     },
     countries: {
         wantsCreationLabel: true,
@@ -266,6 +264,7 @@ export const FIELDS = {
                 </div>
             );
         },
+        isEmpty: value => !value?.length,
     },
     hosting: {
         wantsCreationLabel: true,

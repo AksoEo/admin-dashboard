@@ -183,6 +183,7 @@ export const tasks = {
             'codeholderId',
             'tos',
         ],
+        omitNulls: true,
         storePath: (_, id) => [DELEGATION_APPLICATIONS, id],
         signalPath: () => [DELEGATION_APPLICATIONS, SIG_APPLICATIONS],
     }),
