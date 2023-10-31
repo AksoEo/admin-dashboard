@@ -169,7 +169,11 @@ export const paymentMethods = {
     methodPicker: {
         title: 'Elekti pagmetodon',
         orgsEmpty: 'Ekzistas neniu pagorganizo',
-        empty: 'Tiu ĉi pagorganizo ne enhavas ajnan permanan pagmetodon',
+        empty: {
+            any: 'Tiu ĉi pagorganizo ne enhavas ajnan pagmetodon',
+            manual: 'Tiu ĉi pagorganizo ne enhavas ajnan permanan pagmetodon',
+            intermediary: 'Tiu ĉi pagorganizo ne enhavas ajnan perantan pagmetodon',
+        },
     },
 };
 export const paymentIntents = {

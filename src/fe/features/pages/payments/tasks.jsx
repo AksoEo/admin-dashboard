@@ -291,8 +291,8 @@ export default {
                             .filter(purpose => purpose.type !== 'addon');
                         task.update({ paymentOrg, purposes });
                     }}
-                    jsonFilter={{ $not: { type: 'intermediary' } }}
                     value={method.id}
+                    type="manual"
                     onChange={id => {
                         if (id) task.update({ method: { id } });
                         else task.update({ method: null, currency: null });

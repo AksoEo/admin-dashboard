@@ -46,10 +46,6 @@ export function Footer ({ editing, userData }) {
     const { compare, setCompare } = userData;
     const dataList = useRef(null);
 
-    useEffect(() => {
-        dataList.current?.clear();
-    }, [compare]);
-
     const chkId = Math.random().toString(36);
 
     return (

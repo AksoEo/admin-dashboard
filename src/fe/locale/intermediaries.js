@@ -78,6 +78,16 @@ export const intermediaryReports = {
         },
 
         entryNotFound: 'Tiu aliĝo ne estis trovita, ĝi verŝajne estis forigita.',
+
+        yearUnavailable: {
+            title: '[[Registration unavailable]]',
+            description: {
+                notFound: '[[Registration data for this year does not exist.]]',
+                disabled: '[[Registration is not enabled for this year.]]',
+            },
+            mustRemoveEntries: '[[You must remove all entries before submitting.]]',
+            removeEntries: '[[Remove all]]',
+        },
     },
     addons: {
         title: 'Donacoj',

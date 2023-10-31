@@ -73,13 +73,29 @@ export default connectPerms(class IntermediaryReport extends DetailPage {
             throw year;
         }
 
-        const membershipYear = await this.context.createTask('memberships/options', {
-            id: year,
-        }).runOnceAndDrop();
-        if (!membershipYear.enabled) {
-            const err = new Error('year is not enabled');
-            err.localizedDescription = locale.update.steps.yearUnavailable;
-            throw err;
+        let needsMembershipYear = false;
+        for (const purpose of intent.purposes) {
+            if (purpose.type === 'trigger' && purpose.triggers === 'registration_entry') {
+                needsMembershipYear = true;
+            }
+        }
+
+        if (needsMembershipYear) {
+            const membershipYear = await this.context.createTask('memberships/options', {
+                id: year,
+            }).runOnceAndDrop().catch(err => {
+                if (err.code === 'not-found') {
+                    const err = new Error('year could not be found');
+                    err.localizedDescription = locale.update.steps.yearUnavailable;
+                    throw err;
+                }
+                throw err;
+            });
+            if (!membershipYear.enabled) {
+                const err = new Error('year is not enabled');
+                err.localizedDescription = locale.update.steps.yearUnavailable;
+                throw err;
+            }
         }
 
         const entries = [];

@@ -26,6 +26,7 @@ import { FIELDS as ADDON_FIELDS } from '../../payments/orgs/addons/fields';
 import { connect, coreContext } from '../../../../core/connection';
 import { connectPerms } from '../../../../perms';
 import './create.less';
+import { useDataView } from '../../../../core';
 
 const REDUCED_ENTRY_FIELDS = Object.fromEntries(['codeholderData', 'offers'].map(id => [id, ENTRY_FIELDS[id]]));
 const NEW_ENTRY = {
@@ -101,6 +102,10 @@ export default class CreateReport extends Page {
 
     static contextType = coreContext;
 
+    /**
+     * Automatically selects a payment method if there's only one choice.
+     * This is for users who do not have sufficient permissions to choose.
+     */
     autoPickMethod () {
         if (this.state.method) return;
         this.setState({ loading: true });
@@ -357,7 +362,7 @@ export default class CreateReport extends Page {
                                 this.setState({ method }, () => this.loadMethod());
                                 if (!method) this.setState({ country: null, year: null });
                             }}
-                            jsonFilter={{ type: 'intermediary' }} />
+                            type="intermediary" />
                     </div>
                     {this.state.method && (
                         <div class="setup-field">
@@ -383,7 +388,7 @@ export default class CreateReport extends Page {
                                 })))} />
                         </div>
                     )}
-                    {this.state.year && (
+                    {this.state.country && this.state.year && (
                         <div class="setup-confirm-container">
                             <Button onClick={() => this.confirmSetup()}>
                                 {locale.create.setup.confirm}
@@ -567,6 +572,23 @@ function CollapsingSection ({ title, children, count }) {
 function EntriesEditor ({ value, onChange, year, org, method, methodData, currency }) {
     const [editing, setEditing] = useState(null);
 
+    let disabled = true;
+    let loading;
+    let cannotUse = null;
+    {
+        const [regOptionsLoading, regOptionsError, regOptionsData] = useDataView('memberships/options', {
+            id: year,
+        });
+        loading = regOptionsLoading;
+        if (regOptionsError?.code === 'not-found') {
+            cannotUse = 'notFound';
+        } else if (!regOptionsData?.enabled) {
+            cannotUse = 'disabled';
+        } else if (regOptionsData?.enabled) {
+            disabled = false;
+        }
+    }
+
     const entryPrices = (methodData?.prices || {})[year]?.registrationEntries || {};
     const categoryPrices = {};
     const magazinePrices = {};
@@ -630,12 +652,41 @@ function EntriesEditor ({ value, onChange, year, org, method, methodData, curren
 
     return (
         <div class="report-section-container">
+            {loading ? (
+                <div class="report-section-floating-loading">
+                    <CircularProgress indeterminate />
+                </div>
+            ) : null}
             <CollapsingSection title={locale.entries.title} count={value.length}>
+                {cannotUse ? (
+                    <div class="report-warning-box">
+                        <div class="inner-title">{locale.entries.yearUnavailable.title}</div>
+                        <div class="inner-description">
+                            {locale.entries.yearUnavailable.description[cannotUse]}
+                        </div>
+                        {value.length ? (
+                            <div class="inner-action">
+                                <div class="inner-description">
+                                    {locale.entries.yearUnavailable.mustRemoveEntries}
+                                </div>
+                                <div class="inner-buttons">
+                                    <Button onClick={() => {
+                                        onChange([]);
+                                        setEditing(null);
+                                    }}>
+                                        {locale.entries.yearUnavailable.removeEntries}
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : null}
+                    </div>
+                ) : null}
                 {value.map((entry, i) => (
                     <EntryItem
                         key={i}
                         entry={entry}
                         editing={editing === i}
+                        disabled={disabled}
                         onEdit={() => setEditing(i)}
                         onRemove={() => {
                             const newEntries = value.slice();
@@ -645,7 +696,7 @@ function EntriesEditor ({ value, onChange, year, org, method, methodData, curren
                         }} />
                 ))}
                 <div>
-                    <Button onClick={() => {
+                    <Button disabled={disabled} onClick={() => {
                         setEditing(value.length);
                         onChange(value.concat([NEW_ENTRY]));
                     }}>
@@ -684,7 +735,7 @@ function EntriesEditor ({ value, onChange, year, org, method, methodData, curren
     );
 }
 
-function EntryItem ({ entry, onEdit, onRemove }) {
+function EntryItem ({ entry, onEdit, onRemove, disabled }) {
     if (!entry) {
         useEffect(() => onRemove());
         return '???';
@@ -693,11 +744,11 @@ function EntryItem ({ entry, onEdit, onRemove }) {
     return (
         <div class="report-entry">
             <div class="entry-header">
-                <Button icon small class="remove-button" onClick={onRemove}>
+                <Button icon small class="remove-button" disabled={disabled} onClick={onRemove}>
                     <RemoveIcon />
                 </Button>
                 <RegistrationEntryName entry={entry} />
-                <Button icon small class="edit-button" onClick={onEdit}>
+                <Button icon small class="edit-button" disabled={disabled} onClick={onEdit}>
                     <EditIcon />
                 </Button>
             </div>

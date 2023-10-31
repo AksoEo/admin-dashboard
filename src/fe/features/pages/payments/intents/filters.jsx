@@ -119,6 +119,7 @@ export const FILTERS = {
                         onChange((v || '').toString());
                         onEnabledChange(!!v);
                     }}
+                    type="any"
                     org={org}
                     onOrgChange={setOrg} />
             );

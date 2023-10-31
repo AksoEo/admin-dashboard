@@ -160,6 +160,7 @@
 
             & > summary {
                 padding: 4px 0;
+                cursor: default;
 
                 .inner-title {
                     font-weight: bold;
@@ -173,6 +174,31 @@
     }
     .report-final-totals {
         margin: 16px;
+    }
+
+    .report-section-floating-loading {
+        float: right;
+    }
+
+    .report-warning-box {
+        border: 1px solid @warning-text;
+        padding: 8px 15px;
+        border-radius: 8px;
+
+        .inner-title {
+            font-weight: bold;
+        }
+        .inner-description {
+            margin: 4px 0;
+        }
+
+        .inner-action {
+            margin-top: 8px;
+
+            .inner-buttons {
+                --md-button-color: var(--warning-text);
+            }
+        }
     }
 
     .report-submit-container {

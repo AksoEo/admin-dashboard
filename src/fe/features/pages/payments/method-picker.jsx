@@ -22,7 +22,7 @@ const REDUCED_METHOD_FIELDS = Object.fromEntries(METHOD_FIELD_IDS
  * - value/onChange
  * - org/onOrgChange
  * - onGetCurrencies
- * - jsonFilter
+ * - type: 'any' | 'manual' | 'intermediary'
  * - disabled
  */
 export default class PaymentMethodPicker extends PureComponent {
@@ -51,7 +51,7 @@ export default class PaymentMethodPicker extends PureComponent {
         org,
         onOrgChange,
         onGetCurrencies,
-        jsonFilter,
+        type,
         disabled,
     }, { pickerOpen, orgOffset, methodOffset }) {
         let contents, orgItem;
@@ -151,7 +151,9 @@ export default class PaymentMethodPicker extends PureComponent {
                             else this.setState({ orgOffset: offset });
                         }}
                         limit={10}
-                        jsonFilter={org ? jsonFilter : null}
+                        jsonFilter={org
+                            ? (type === 'any' ? {} : { type })
+                            : null}
                         locale={org ? methodLocale.fields : orgLocale.fields}
                         onItemClick={id => {
                             if (!org) {
@@ -165,7 +167,7 @@ export default class PaymentMethodPicker extends PureComponent {
                             }
                         }}
                         emptyLabel={org
-                            ? methodLocale.methodPicker.empty
+                            ? methodLocale.methodPicker.empty[type]
                             : methodLocale.methodPicker.orgsEmpty}
                         compact />
                 </Dialog>
