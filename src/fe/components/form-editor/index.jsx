@@ -90,17 +90,20 @@ export class ScriptContextProvider extends PureComponent {
     attachScriptEditor (editor) {
         if (this.scriptEditor) this.detachScriptEditor();
         this.scriptEditor = editor;
-        const editorNode = document.createElement('div');
+        const editorNode = document.createElement('dialog');
         editorNode.className = 'form-editor-script-node-root';
         editorNode.appendChild(editor.node);
         if (this.props.reallyOnTop) editorNode.classList.add('really-on-top');
         document.body.appendChild(editorNode);
+        if (editorNode.showModal) editorNode.showModal();
         this.onResize();
     }
 
     detachScriptEditor () {
         if (!this.scriptEditor) return;
-        document.body.removeChild(this.scriptEditor.node.parentNode);
+        const editorNode = this.scriptEditor.node.parentNode;
+        if (editorNode.close) editorNode.close();
+        document.body.removeChild(editorNode);
         this.scriptEditor.destroy();
         this.scriptEditor = null;
     }
@@ -116,6 +119,7 @@ export class ScriptContextProvider extends PureComponent {
     }
     componentWillUnmount () {
         window.removeEventListener('resize', this.onResize);
+        this.detachScriptEditor();
     }
 
     render ({ children }) {

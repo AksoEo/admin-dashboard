@@ -84,6 +84,17 @@
     height: 100%;
     z-index: 250;
 
+    // undo dialog styles
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    border: none;
+    margin: 0;
+
+    &::backdrop {
+        opacity: 0;
+    }
+
     &.really-on-top {
         z-index: 2000;
     }
