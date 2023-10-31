@@ -24,10 +24,10 @@ const STRIPE_METHOD_EXTRA = {
     card: () => {
         return (
             <span class="credit-card-types">
-                <img draggable={0} src="/assets/payments/accept_visa.png" />
-                <img draggable={0} src="/assets/payments/accept_mc.svg" />
-                <img draggable={0} src="/assets/payments/accept_ms.svg" />
-                <img draggable={0} src="/assets/payments/accept_axp.png" />
+                <img draggable="false" alt="Visa" src="/assets/payments/accept_visa.png" />
+                <img draggable="false" alt="MasterCard" src="/assets/payments/accept_mc.svg" />
+                <img draggable="false" alt="Maestro" src="/assets/payments/accept_ms.svg" />
+                <img draggable="false" alt="American Express" src="/assets/payments/accept_axp.png" />
             </span>
         );
     },
@@ -220,6 +220,11 @@ export const FIELDS = {
                     onChange={onChange}
                     isIntermediary={item.type === 'intermediary'} />
             );
+        },
+        validate: ({ value }) => {
+            if (!value || !Object.keys(value).length) {
+                return dataLocale.requiredField;
+            }
         },
     },
     paymentValidity: {

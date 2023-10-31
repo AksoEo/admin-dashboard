@@ -150,9 +150,9 @@ export default {
                 {routerContext => (
                     <TaskDialog
                         sheet
-                        class="payment-method-task-create"
+                        class={'payment-method-task-create' + (item.type === 'intermediary' ? ' is-intermediary' : '')}
                         open={open}
-                        fullScreen={width => width < 400}
+                        fullScreen={width => width < 700}
                         onClose={() => task.drop()}
                         title={methodLocale.create.title}
                         actionLabel={methodLocale.create.button}
