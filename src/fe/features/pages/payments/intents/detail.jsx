@@ -524,6 +524,14 @@ export const IntentActions = connectPerms(function IntentActions ({ item, perms,
                         { id: item.stripePaymentIntentId },
                     ];
                 }
+
+                if (intermediary) {
+                    // add param to options
+                    task[1] = Object.assign((task[1] || {}), {
+                        _isIntermediary: true,
+                    });
+                }
+
                 actions.push(
                     <Button
                         disabled={!enabled}

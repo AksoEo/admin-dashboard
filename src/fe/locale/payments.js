@@ -310,6 +310,11 @@ export const paymentIntents = {
             description: 'Ĉu vi certas, ke vi volas nuligi tiun ĉi pagon?',
             button: 'Nuligi',
         },
+        cancelIntermediary: {
+            title: 'Nuligi',
+            description: 'Ĉu vi certas, ke vi volas nuligi tiun ĉi spezfolion?',
+            button: 'Nuligi',
+        },
         markDisputed: {
             title: 'Krei disputon',
             description: 'Ĉu vi certas, ke vi volas krei disputon pri tiu ĉi pago? Bv. aldoni detalojn pri la disputo en la internaj notoj.',
@@ -339,7 +344,18 @@ export const paymentIntents = {
             button: 'Indiki',
             sendReceipt: 'Sendi kvitancon',
         },
+        markSucceededIntermediary: {
+            title: 'Akcepti spezfolion',
+            description: 'Ĉu vi certas, ke la mono estis ricevita?',
+            button: 'Indiki',
+            sendReceipt: 'Sendi kvitancon',
+        },
         submit: {
+            title: 'Indiki monon sendita',
+            description: 'Ĉu vi certas, ke la mono estis sendita (eĉ se ankoraŭ ne ricevita)?',
+            button: 'Indiki',
+        },
+        submitIntermediary: {
             title: 'Indiki monon sendita',
             description: 'Ĉu vi certas, ke la mono estis sendita (eĉ se ankoraŭ ne ricevita)?',
             button: 'Indiki',

@@ -643,38 +643,43 @@ export default {
     },
     markIntentSucceeded ({ open, task }) {
         const sendReceiptId = Math.random().toString(36);
+        let locale = intentLocale.actions.markSucceeded;
+        if (task.options._isIntermediary) locale = intentLocale.actions.markSucceededIntermediary;
 
         return (
             <TaskDialog
                 class="payments-task-intent-action"
                 open={open}
                 onClose={() => task.drop()}
-                title={intentLocale.actions.markSucceeded.title}
-                actionLabel={intentLocale.actions.markSucceeded.button}
+                title={locale.title}
+                actionLabel={locale.button}
                 run={() => task.runOnce()}>
-                {intentLocale.actions.markSucceeded.description}
+                {locale.description}
                 <div class="input-container">
                     <Checkbox
                         id={sendReceiptId}
                         checked={!!task.parameters.sendReceipt}
                         onChange={sendReceipt => task.update({ sendReceipt })} />
                     {' '}
-                    <label for={sendReceiptId}>{intentLocale.actions.markSucceeded.sendReceipt}</label>
+                    <label for={sendReceiptId}>{locale.sendReceipt}</label>
                 </div>
             </TaskDialog>
         );
     },
     submitIntent ({ open, task }) {
+        let locale = intentLocale.actions.submit;
+        if (task.options._isIntermediary) locale = intentLocale.actions.submitIntermediary;
+
         return (
             <TaskDialog
                 class="payments-task-intent-action"
                 open={open}
                 onClose={() => task.drop()}
-                title={intentLocale.actions.submit.title}
+                title={locale.title}
                 running={task.running}
-                actionLabel={intentLocale.actions.submit.button}
+                actionLabel={locale.button}
                 run={() => task.runOnce()}>
-                {intentLocale.actions.submit.description}
+                {locale.description}
             </TaskDialog>
         );
     },
