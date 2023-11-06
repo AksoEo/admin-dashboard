@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { createRef, PureComponent } from 'preact/compat';
+import { createRef, PureComponent, useEffect, useRef, useState } from 'preact/compat';
 import { Button, TextField } from 'yamdl';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import PhotoIcon from '@material-ui/icons/Photo';
@@ -19,6 +19,7 @@ import { EditorState } from '@codemirror/state';
 import { indentUnit } from '@codemirror/language';
 import { html } from '@codemirror/lang-html';
 import { connect } from '../../../core/connection';
+import { useDataView } from '../../../core';
 import { notifTemplates as locale } from '../../../locale';
 import { getFormVarsForIntent } from './intents';
 import './fields.less';
@@ -180,95 +181,113 @@ export const FIELDS = {
     },
 };
 
-const DomainEmailEditor = connect('notifTemplates/emailDomains')(domains => ({
-    domains,
-}))(class DomainEmailEditor extends PureComponent {
-    state = {
-        editing: false,
-        address: '',
-        domain: '',
-    };
+function DomainEmailEditor ({ value, onChange, org, placeholder, required }) {
+    const [domainsLoading, domainsError, domains] = useDataView('notifTemplates/emailDomains', {});
+    const [address, setAddress] = useState('');
+    const [domain, setDomain] = useState('');
+    const stagedValue = useRef(null);
+    const postNextState = useRef(false);
 
-    _value = null;
-
-    deriveState () {
-        const value = this.props.value;
+    const deriveState = () => {
         if (!value) return;
         const parts = value.split('@');
-        const address = parts[0];
-        const domain = parts[1];
-        this.setState({ address, domain });
-    }
+        setAddress(parts[0]);
+        setDomain(parts[1]);
+    };
 
-    postState () {
-        if (this.state.address) {
-            this._value = this.state.address + '@' + this.state.domain;
-            this.props.onChange(this._value);
+    const postState = () => {
+        if (address) {
+            stagedValue.current = address + '@' + domain;
+            onChange(stagedValue.current);
         } else {
-            this.props.onChange(null);
+            onChange(null);
         }
-    }
+    };
 
-    componentDidMount () {
-        this.deriveState();
-    }
+    useEffect(() => {
+        deriveState();
+    }, []);
 
-    componentDidUpdate (prevProps) {
-        if (prevProps.value !== this.props.value && this.props.value !== this._value) {
-            this.deriveState();
+    useEffect(() => {
+        if (stagedValue.current !== value) {
+            deriveState();
         }
-    }
+    }, [value]);
 
-    onAddressKeyDown = e => {
+    useEffect(() => {
+        if (postNextState.current) {
+            postNextState.current = false;
+            postState();
+        }
+    }, [postNextState.current]);
+
+    const onAddressKeyDown = e => {
         if (e.key === '@') e.preventDefault();
     };
-    onAddressChange = e => {
+    const onAddressChange = e => {
         if (!e.target.value) {
             // cleared, clear domain too
-            this.setState({ domain: '' });
-        } else if (!this.state.domain) {
+            setDomain('');
+        } else if (!domain) {
             // no domain selected, but typing an address
-            if (this.props.domains) this.setState({
-                domain: this.props.domains[this.props.org][0] || '',
-            });
-        }
-        this.setState({ address: e.target.value }, () => this.postState());
-    };
-    onDomainChange = domain => {
-        this.setState({ domain }, () => this.postState());
-    };
-
-    render ({ domains, org, placeholder, required }, { address, domain }) {
-        const domainOptions = [];
-        if (domains && domains[org]) {
-            for (const domain of domains[org]) {
-                domainOptions.push({ value: domain, label: domain });
-            }
-            if (!domains[org].includes(domain)) {
-                domainOptions.push({ value: domain, label: domain });
+            if (domains) {
+                setDomain((domains[org] ? domains[org][0] : '') || '');
             }
         }
+        setAddress(e.target.value);
+        postNextState.current = true;
+    };
+    const onDomainChange = domain => {
+        setDomain(domain);
+        postNextState.current = true;
+    };
 
-        return (
-            <div class="notif-template-domain-email-editor">
-                <input
-                    required={required}
-                    class="domain-email-editor-address"
-                    value={address}
-                    placeholder={placeholder}
-                    onKeyDown={this.onAddressKeyDown}
-                    onChange={this.onAddressChange} />
-                <span class="domain-email-editor-at-sign">@</span>
-                <Select
-                    required={required}
-                    class="domain-email-editor-domain"
-                    items={domainOptions}
-                    value={domain}
-                    onChange={this.onDomainChange} />
-            </div>
-        );
+    const domainOptions = [];
+    if (domainsLoading) {
+        domainOptions.push({ value: null, label: '...' });
     }
-});
+    if (domainsError) {
+        domainOptions.push({ value: null, label: locale.fields.emailDomainsError });
+    }
+
+    let shouldClearDomain = false;
+    if (domains && domains[org]) {
+        for (const domain of domains[org]) {
+            domainOptions.push({ value: domain, label: domain });
+        }
+        if (!domains[org].includes(domain)) {
+            shouldClearDomain = true;
+            domainOptions.push({ value: domain, label: domain });
+        }
+    }
+
+    useEffect(() => {
+        if (shouldClearDomain) {
+            setDomain('');
+            postNextState.current = true;
+        }
+    }, [shouldClearDomain]);
+
+    return (
+        <div class="notif-template-domain-email-editor">
+            <input
+                required={required}
+                class="domain-email-editor-address"
+                value={address}
+                placeholder={placeholder}
+                onKeyDown={onAddressKeyDown}
+                onChange={onAddressChange} />
+            <span class="domain-email-editor-at-sign">@</span>
+            <Select
+                required={required}
+                disabled={domainsLoading || domainsError}
+                class="domain-email-editor-domain"
+                items={domainOptions}
+                value={domain}
+                onChange={onDomainChange} />
+        </div>
+    );
+}
 
 const MAX_MODULE_COUNT = 16;
 class ModulesEditor extends PureComponent {

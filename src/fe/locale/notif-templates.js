@@ -24,6 +24,7 @@ export const notifTemplates = {
         modules: 'Moduloj',
 
         replyToPlaceholder: 'Uzas la sendoadreson',
+        emailDomainsError: '(Eraro)',
     },
     bases: {
         raw: 'Kruda',
